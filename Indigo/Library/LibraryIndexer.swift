@@ -53,13 +53,23 @@ actor LibraryIndexer {
         generation: Int,
         onProgress: @escaping @Sendable (ScanProgress) -> Void
     ) async throws -> ScanSummary {
+        try await scan(roots: [root], generation: generation, onProgress: onProgress)
+    }
+
+    func scan(
+        roots: [URL],
+        generation: Int,
+        onProgress: @escaping @Sendable (ScanProgress) -> Void
+    ) async throws -> ScanSummary {
         let fileManager = FileManager.default
-        var isDirectory: ObjCBool = false
-        guard fileManager.fileExists(atPath: root.path, isDirectory: &isDirectory), isDirectory.boolValue else {
-            throw LibraryError.folderMissing
+        for root in roots {
+            var isDirectory: ObjCBool = false
+            guard fileManager.fileExists(atPath: root.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+                throw LibraryError.folderMissing
+            }
         }
 
-        let files = try discoverFiles(under: root)
+        let files = try discoverFiles(under: roots)
         var progress = ScanProgress(filesTotal: files.count)
         onProgress(progress)
 
@@ -69,10 +79,11 @@ actor LibraryIndexer {
         }
 
         var summary = ScanSummary()
-        let rootPath = root.standardizedFileURL.path
-
-        for (offset, url) in files.enumerated() {
+        for (offset, file) in files.enumerated() {
             try Task.checkCancellation()
+            let url = file.url
+            let root = file.root
+            let rootPath = root.standardizedFileURL.path
 
             let attributes = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey])
             let modified = attributes?.contentModificationDate ?? .distantPast
@@ -142,24 +153,32 @@ actor LibraryIndexer {
 
     // MARK: - Discovery
 
-    private func discoverFiles(under root: URL) throws -> [URL] {
-        let fileManager = FileManager.default
-        guard let enumerator = fileManager.enumerator(
-            at: root,
-            includingPropertiesForKeys: [.isRegularFileKey],
-            options: [.skipsHiddenFiles, .skipsPackageDescendants]
-        ) else {
-            throw LibraryError.folderUnreadable
-        }
+    private struct DiscoveredFile {
+        let url: URL
+        let root: URL
+    }
 
-        var files: [URL] = []
-        for case let url as URL in enumerator {
-            if Task.isCancelled { break }
-            guard MetadataReader.isSupported(url) else { continue }
-            guard (try? url.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true else { continue }
-            files.append(url)
+    private func discoverFiles(under roots: [URL]) throws -> [DiscoveredFile] {
+        let fileManager = FileManager.default
+        var files: [String: DiscoveredFile] = [:]
+        for root in roots {
+            guard let enumerator = fileManager.enumerator(
+                at: root,
+                includingPropertiesForKeys: [.isRegularFileKey],
+                options: [.skipsHiddenFiles, .skipsPackageDescendants]
+            ) else {
+                throw LibraryError.folderUnreadable
+            }
+
+            for case let url as URL in enumerator {
+                if Task.isCancelled { break }
+                guard MetadataReader.isSupported(url) else { continue }
+                guard (try? url.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile == true else { continue }
+                files[url.standardizedFileURL.path, default: DiscoveredFile(url: url, root: root)] =
+                    DiscoveredFile(url: url, root: root)
+            }
         }
-        return files.sorted { $0.path < $1.path }
+        return files.values.sorted { $0.url.path < $1.url.path }
     }
 
     private func relativePath(of url: URL, rootPath: String) -> String {

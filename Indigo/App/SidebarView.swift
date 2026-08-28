@@ -15,7 +15,6 @@ private enum RadioSidebarGroup: CaseIterable, Hashable {
 
 struct SidebarView: View {
     @Environment(AppState.self) private var appState
-    @Environment(LibraryStore.self) private var library
     @Environment(NTSProvider.self) private var nts
     @Environment(KioskProvider.self) private var kiosk
     @Environment(NoodsProvider.self) private var noods
@@ -106,8 +105,6 @@ struct SidebarView: View {
             .scrollIndicators(.never)
 
             Spacer(minLength: 0)
-            Rule(color: Palette.outline)
-            LibraryStatusFooter()
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .background(Palette.paperChrome)
@@ -257,71 +254,6 @@ struct SidebarView: View {
             artists.insert(track.artistKey)
         }
         return (tracks.count, albums.count, artists.count)
-    }
-}
-
-// MARK: - Footer
-
-private struct LibraryStatusFooter: View {
-    @Environment(LibraryStore.self) private var library
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            switch library.scanState {
-            case .scanning(let progress):
-                Text("Indexing")
-                    .microLabel(1.4)
-                    .foregroundStyle(Palette.accent)
-                ProgressTrack(fraction: progress.fraction)
-                Text(progress.filesTotal > 0
-                     ? "\(progress.filesProcessed.formatted(.number)) / \(progress.filesTotal.formatted(.number))"
-                     : "Reading folder…")
-                    .font(Typeface.mono(9.5))
-                    .foregroundStyle(Palette.inkFaint)
-                    .lineLimit(1)
-
-            case .failed(let message):
-                Text("Library")
-                    .microLabel(1.4)
-                    .foregroundStyle(Palette.live)
-                Text(message)
-                    .font(Typeface.mono(9.5))
-                    .foregroundStyle(Palette.inkMuted)
-                    .lineLimit(3)
-                actionButton("Choose Folder") { library.chooseFolder() }
-
-            case .idle:
-                Text("Folder")
-                    .microLabel(1.4)
-                    .foregroundStyle(Palette.inkFaint)
-                Text(library.rootDisplayName)
-                    .font(Typeface.mono(10))
-                    .foregroundStyle(Palette.inkMuted)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                HStack(spacing: 6) {
-                    actionButton(library.hasLibrary ? "Change" : "Choose") { library.chooseFolder() }
-                    if library.hasLibrary {
-                        actionButton("Rescan") { library.scan() }
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func actionButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .microLabel(1.0, size: 9)
-                .foregroundStyle(Palette.ink)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
-        }
-        .buttonStyle(.plain)
     }
 }
 

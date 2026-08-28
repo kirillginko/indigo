@@ -234,7 +234,7 @@ struct NoLibraryView: View {
 
     var body: some View {
         EmptyStateView(headline: "No music yet", message: context) {
-            Button("Choose Music Folder") { library.chooseFolder() }
+            Button("Add Music Folders…") { library.chooseFolder() }
                 .buttonStyle(OutlineButtonStyle())
         }
     }

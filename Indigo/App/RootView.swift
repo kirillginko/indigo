@@ -47,7 +47,8 @@ struct RootView: View {
                 get: { library.isPresentingImporter },
                 set: { library.isPresentingImporter = $0 }
             ),
-            allowedContentTypes: [.folder]
+            allowedContentTypes: [.folder],
+            allowsMultipleSelection: true
         ) { result in
             library.handleImporterResult(result)
         }

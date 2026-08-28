@@ -14,6 +14,7 @@ import XCTest
 final class LibraryStoreBookmarkTests: XCTestCase {
     private var container: ModelContainer!
     private var folder: URL!
+    private var secondFolder: URL!
     private var defaults: UserDefaults!
     private var suiteName: String!
 
@@ -25,12 +26,16 @@ final class LibraryStoreBookmarkTests: XCTestCase {
         folder = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("lib-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        secondFolder = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("lib-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: secondFolder, withIntermediateDirectories: true)
         suiteName = "indigo.tests.\(UUID().uuidString)"
         defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
     }
 
     override func tearDownWithError() throws {
         try? FileManager.default.removeItem(at: folder)
+        try? FileManager.default.removeItem(at: secondFolder)
         defaults.removePersistentDomain(forName: suiteName)
         defaults = nil
     }
@@ -43,8 +48,9 @@ final class LibraryStoreBookmarkTests: XCTestCase {
         store.adopt(folder)
 
         XCTAssertEqual(store.rootURL?.standardizedFileURL, folder.standardizedFileURL)
-        XCTAssertNotNil(
-            defaults.data(forKey: "library.rootBookmark"),
+        XCTAssertEqual(
+            defaults.array(forKey: "library.rootBookmarks")?.count,
+            1,
             "Adopting a folder must persist a security-scoped bookmark. notice=\(store.notice ?? "nil")"
         )
         store.cancelScan()
@@ -71,5 +77,26 @@ final class LibraryStoreBookmarkTests: XCTestCase {
                        "notice=\(second.notice ?? "nil")")
         XCTAssertEqual(second.rootDisplayName, folder.lastPathComponent)
         second.cancelScan()
+    }
+
+    func testMultipleFoldersPersistRestoreAndRemove() async throws {
+        let first = LibraryStore(container: container, defaults: defaults)
+        first.adopt([folder, secondFolder])
+
+        XCTAssertEqual(first.rootURLs.count, 2)
+        XCTAssertEqual(defaults.array(forKey: "library.rootBookmarks")?.count, 2)
+        first.cancelScan()
+
+        let restored = LibraryStore(container: container, defaults: defaults)
+        restored.restore()
+        XCTAssertEqual(Set(restored.rootURLs.map(\.standardizedFileURL)),
+                       Set([folder.standardizedFileURL, secondFolder.standardizedFileURL]),
+                       "notice=\(restored.notice ?? "nil")")
+
+        restored.removeFolder(folder)
+        XCTAssertEqual(restored.rootURLs.map(\.standardizedFileURL),
+                       [secondFolder.standardizedFileURL])
+        XCTAssertEqual(defaults.array(forKey: "library.rootBookmarks")?.count, 1)
+        restored.cancelScan()
     }
 }

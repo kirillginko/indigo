@@ -1,12 +1,3 @@
-//
-//  LibraryStore.swift
-//  Indigo
-//
-//  Owns the chosen music folder (persisted as a security-scoped bookmark) and
-//  drives background scans. Views read the indexed result through @Query; this
-//  object only deals with access, progress, and errors.
-//
-
 import Foundation
 import SwiftData
 import SwiftUI
@@ -18,97 +9,94 @@ import AppKit
 @Observable
 final class LibraryStore {
     enum ScanState: Equatable {
-        case idle
-        case scanning(ScanProgress)
-        case failed(String)
-
+        case idle, scanning(ScanProgress), failed(String)
         var isScanning: Bool { if case .scanning = self { true } else { false } }
     }
 
     private enum Keys {
         static let bookmark = "library.rootBookmark"
         static let displayPath = "library.rootDisplayPath"
+        static let bookmarks = "library.rootBookmarks"
+        static let displayPaths = "library.rootDisplayPaths"
         static let generation = "library.scanGeneration"
     }
 
-    private(set) var rootURL: URL?
+    private(set) var rootURLs: [URL] = []
     private(set) var scanState: ScanState = .idle
     private(set) var lastSummary: ScanSummary?
-    /// Non-fatal message shown as a dismissible strip.
     var notice: String?
-    /// Drives `.fileImporter` on platforms without NSOpenPanel.
     var isPresentingImporter = false
 
     private let container: ModelContainer
     private let defaults: UserDefaults
-    private var securityScopedURL: URL?
+    private var securityScopedURLs: [URL] = []
     private var scanTask: Task<Void, Never>?
 
-    /// `defaults` is injectable so tests never touch the user's real settings.
     init(container: ModelContainer, defaults: UserDefaults = .standard) {
         self.container = container
         self.defaults = defaults
     }
 
-    deinit {
-        securityScopedURL?.stopAccessingSecurityScopedResource()
-    }
+    deinit { for url in securityScopedURLs { url.stopAccessingSecurityScopedResource() } }
 
-    var hasLibrary: Bool { rootURL != nil }
-
+    var rootURL: URL? { rootURLs.first }
+    var hasLibrary: Bool { !rootURLs.isEmpty }
     var rootDisplayName: String {
-        rootURL?.lastPathComponent ?? defaults.string(forKey: Keys.displayPath) ?? "No folder"
+        switch rootURLs.count {
+        case 0: "No folders"
+        case 1: rootURLs[0].lastPathComponent
+        default: "\(rootURLs.count) folders"
+        }
     }
 
-    // MARK: - Restoring
-
-    /// Reopens the previously chosen folder. Called once at launch.
     func restore() {
-        guard let data = defaults.data(forKey: Keys.bookmark) else {
-            // Tracks may still be indexed from a previous run, but without a
-            // bookmark none of them can be opened. Say so rather than letting
-            // every click fail.
-            if defaults.string(forKey: Keys.displayPath) != nil {
-                notice = "Indigo needs permission to read your music folder again. Choose it to start playing."
+        let saved = defaults.array(forKey: Keys.bookmarks) as? [Data]
+            ?? defaults.data(forKey: Keys.bookmark).map { [$0] }
+            ?? []
+        guard !saved.isEmpty else {
+            if defaults.string(forKey: Keys.displayPath) != nil
+                || defaults.stringArray(forKey: Keys.displayPaths) != nil {
+                notice = "Indigo needs permission to read your music folders again. Add them to continue."
             }
             return
         }
-        var isStale = false
-        do {
-            let url = try URL(
+
+        var restored: [URL] = []
+        var shouldRepersist = defaults.array(forKey: Keys.bookmarks) == nil
+        for data in saved {
+            var stale = false
+            guard let url = try? URL(
                 resolvingBookmarkData: data,
                 options: Self.resolutionOptions,
                 relativeTo: nil,
-                bookmarkDataIsStale: &isStale
-            )
-            // A bookmark-resolved URL carries no access of its own, so here a
-            // failed claim really does mean permission is gone.
-            guard claimScope(url, requiresScope: true) else {
-                notice = LibraryError.accessDenied.errorDescription
-                return
+                bookmarkDataIsStale: &stale
+            ), claimScope(url, requiresScope: true) else { continue }
+            if !restored.contains(where: { $0.standardizedFileURL == url.standardizedFileURL }) {
+                restored.append(url)
             }
-            rootURL = url
-            if isStale { persistBookmark(for: url) }
-            scan()
-        } catch {
-            notice = "Couldn't reopen the last music folder. Choose it again."
+            shouldRepersist = shouldRepersist || stale
         }
+        guard !restored.isEmpty else {
+            notice = "Couldn't reopen the music folders. Add them again to restore access."
+            return
+        }
+        rootURLs = restored.sorted { $0.path.localizedCaseInsensitiveCompare($1.path) == .orderedAscending }
+        if shouldRepersist { persistBookmarks() }
+        scan()
     }
-
-    // MARK: - Choosing
 
     func chooseFolder() {
         #if os(macOS)
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
-        panel.allowsMultipleSelection = false
+        panel.allowsMultipleSelection = true
         panel.canCreateDirectories = false
-        panel.prompt = "Use Folder"
-        panel.message = "Choose the folder Indigo should index."
+        panel.prompt = "Add Folders"
+        panel.message = "Choose one or more folders to add to Indigo."
         panel.directoryURL = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask).first
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        adopt(url)
+        guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
+        adopt(panel.urls)
         #else
         isPresentingImporter = true
         #endif
@@ -116,64 +104,58 @@ final class LibraryStore {
 
     func handleImporterResult(_ result: Result<[URL], Error>) {
         switch result {
-        case .success(let urls):
-            guard let url = urls.first else { return }
-            adopt(url)
-        case .failure:
-            notice = "Couldn't open that folder."
+        case .success(let urls): adopt(urls)
+        case .failure: notice = "Couldn't open those folders."
         }
     }
 
-    /// Entry point for every folder source: the open panel, the file importer,
-    /// and tests.
-    ///
-    /// A URL the user just picked already carries access, granted by the system
-    /// when it showed the panel. `startAccessingSecurityScopedResource()`
-    /// returns false for such a URL — that is normal, not a denial, so a fresh
-    /// pick must never be rejected on it.
-    func adopt(_ url: URL) {
-        _ = claimScope(url, requiresScope: false)
-        rootURL = url
-        defaults.set(url.path, forKey: Keys.displayPath)
-        persistBookmark(for: url)
+    func adopt(_ url: URL) { adopt([url]) }
+
+    func adopt(_ urls: [URL]) {
+        for url in urls {
+            _ = claimScope(url, requiresScope: false)
+            if !rootURLs.contains(where: { $0.standardizedFileURL == url.standardizedFileURL }) {
+                rootURLs.append(url)
+            }
+        }
+        rootURLs.sort { $0.path.localizedCaseInsensitiveCompare($1.path) == .orderedAscending }
+        persistBookmarks()
         scan()
     }
 
-    // MARK: - Scanning
+    func removeFolder(_ url: URL) {
+        rootURLs.removeAll { $0.standardizedFileURL == url.standardizedFileURL }
+        if let index = securityScopedURLs.firstIndex(where: {
+            $0.standardizedFileURL == url.standardizedFileURL
+        }) {
+            securityScopedURLs[index].stopAccessingSecurityScopedResource()
+            securityScopedURLs.remove(at: index)
+        }
+        persistBookmarks()
+        scan()
+    }
 
     func scan() {
-        guard let root = rootURL else { return }
-        guard FileManager.default.fileExists(atPath: root.path) else {
-            scanState = .failed(LibraryError.folderMissing.errorDescription ?? "Folder missing")
-            return
-        }
-
         scanTask?.cancel()
+        let roots = rootURLs
         let generation = nextGeneration()
         scanState = .scanning(ScanProgress())
-
         let indexer = LibraryIndexer(modelContainer: container)
-
-        // Progress crosses back over an AsyncStream rather than a captured
-        // closure, so the indexer never holds a reference to this object.
-        let (progressStream, progressFeed) = AsyncStream<ScanProgress>.makeStream()
+        let (stream, feed) = AsyncStream<ScanProgress>.makeStream()
         let progressTask = Task { @MainActor [weak self] in
-            for await progress in progressStream {
+            for await progress in stream {
                 guard let self, self.scanState.isScanning else { continue }
                 self.scanState = .scanning(progress)
             }
         }
 
         scanTask = Task { [weak self] in
-            defer {
-                progressFeed.finish()
-                progressTask.cancel()
-            }
+            defer { feed.finish(); progressTask.cancel() }
             do {
                 let summary = try await indexer.scan(
-                    root: root,
+                    roots: roots,
                     generation: generation,
-                    onProgress: { progressFeed.yield($0) }
+                    onProgress: { feed.yield($0) }
                 )
                 guard !Task.isCancelled else { return }
                 self?.finishScan(with: summary)
@@ -208,8 +190,6 @@ final class LibraryStore {
         return next
     }
 
-    // MARK: - Security-scoped access
-
     private static var creationOptions: URL.BookmarkCreationOptions {
         #if os(macOS)
         [.withSecurityScope]
@@ -226,34 +206,32 @@ final class LibraryStore {
         #endif
     }
 
-    /// Starts a security scope if the URL has one to give. Returns false only
-    /// when `requiresScope` is set and no scope could be started.
     private func claimScope(_ url: URL, requiresScope: Bool) -> Bool {
-        if securityScopedURL == url { return true }
-
+        if securityScopedURLs.contains(where: { $0.standardizedFileURL == url.standardizedFileURL }) {
+            return true
+        }
         let started = url.startAccessingSecurityScopedResource()
         if requiresScope && !started { return false }
-
-        securityScopedURL?.stopAccessingSecurityScopedResource()
-        securityScopedURL = started ? url : nil
+        if started { securityScopedURLs.append(url) }
         return true
     }
 
-    private func persistBookmark(for url: URL) {
-        do {
-            let data = try url.bookmarkData(
-                options: Self.creationOptions,
-                includingResourceValuesForKeys: nil,
-                relativeTo: nil
-            )
-            defaults.set(data, forKey: Keys.bookmark)
-        } catch {
-            // Surface the real reason — a silent failure here means the folder
-            // has to be picked again after every launch.
-            notice = """
-                Indigo can index this folder now, but won't be able to reopen it \
-                automatically: \(error.localizedDescription)
-                """
+    private func persistBookmarks() {
+        var bookmarks: [Data] = []
+        for url in rootURLs {
+            do {
+                bookmarks.append(try url.bookmarkData(
+                    options: Self.creationOptions,
+                    includingResourceValuesForKeys: nil,
+                    relativeTo: nil
+                ))
+            } catch {
+                notice = "Indigo can index \(url.lastPathComponent) now, but may need permission again later."
+            }
         }
+        defaults.set(bookmarks, forKey: Keys.bookmarks)
+        defaults.set(rootURLs.map(\.path), forKey: Keys.displayPaths)
+        defaults.removeObject(forKey: Keys.bookmark)
+        defaults.removeObject(forKey: Keys.displayPath)
     }
 }

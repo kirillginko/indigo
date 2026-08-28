@@ -102,6 +102,16 @@ struct IndigoApp: App {
         }
         .defaultSize(width: 320, height: 210)
         .windowResizability(.contentSize)
+
+        // The music folder lives here rather than at the foot of the sidebar:
+        // it is a setting and a progress report, not part of browsing.
+        MenuBarExtra {
+            LibraryMenuBarContent()
+                .environment(library)
+        } label: {
+            LibraryMenuBarLabel()
+                .environment(library)
+        }
         #endif
     }
 }
@@ -138,7 +148,7 @@ struct PlaybackCommands: Commands {
                 .keyboardShortcut(.leftArrow, modifiers: .command)
                 .disabled(!player.canSkipPrevious)
             Divider()
-            Button("Choose Music Folder…") { library.chooseFolder() }
+            Button("Add Music Folders…") { library.chooseFolder() }
                 .keyboardShortcut("o", modifiers: .command)
             Button("Rescan Library") { library.scan() }
                 .keyboardShortcut("r", modifiers: .command)
