@@ -63,7 +63,7 @@ struct KioskStationView: View {
                 }
 
                 HStack(alignment: .top, spacing: 28) {
-                    ArtworkView(remoteURL: kiosk.now?.artworkURL, side: 300)
+                    ArtworkView(remoteURL: kiosk.liveArtworkURL, side: 300)
                         .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
                         .overlay(alignment: .topLeading) {
                             LiveBadge()

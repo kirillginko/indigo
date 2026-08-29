@@ -19,6 +19,35 @@ struct ArtistDigView: View {
 
     var body: some View {
         let profile = dig.artistProfile(name: artistName, mbid: artistMBID)
+        let collaborators = profile.related.filter { artist in
+            artist.reasons.contains { $0.kind == .collaborator || $0.kind == .appearsOnRelease }
+        }
+        let projects = profile.related.filter { artist in
+            artist.reasons.contains { $0.kind == .aliasOrProject }
+        }
+        let labelArtists = profile.related.filter { artist in
+            !collaborators.contains(where: { $0.id == artist.id })
+                && !projects.contains(where: { $0.id == artist.id })
+                && artist.reasons.contains { $0.kind == .sharedLabel }
+        }
+        let soundArtists = profile.related.filter { artist in
+            !collaborators.contains(where: { $0.id == artist.id })
+                && !labelArtists.contains(where: { $0.id == artist.id })
+                && artist.reasons.contains { $0.kind == .sharedStyle }
+        }
+        let personalArtists = profile.related.filter { artist in
+            !collaborators.contains(where: { $0.id == artist.id })
+                && !labelArtists.contains(where: { $0.id == artist.id })
+                && !soundArtists.contains(where: { $0.id == artist.id })
+                && artist.reasons.contains { $0.kind == .sharedBroadcast || $0.kind == .sharedCollection }
+        }
+        let eraArtists = profile.related.filter { artist in
+            !collaborators.contains(where: { $0.id == artist.id })
+                && !projects.contains(where: { $0.id == artist.id })
+                && !labelArtists.contains(where: { $0.id == artist.id })
+                && !soundArtists.contains(where: { $0.id == artist.id })
+                && !personalArtists.contains(where: { $0.id == artist.id })
+        }
 
         VStack(spacing: 0) {
             PageHeader(
@@ -35,21 +64,73 @@ struct ArtistDigView: View {
                         BufferingGlyph()
                             .accessibilityLabel("Loading")
                     }
-                    if let error = dig.notice {
-                        VStack(alignment: .leading, spacing: 10) {
-                            NoticeStrip(text: error) { dig.notice = nil }
-                            Button("Try Again") {
-                                Task { await dig.retryArtist(name: artistName, mbid: artistMBID) }
+                    HStack(alignment: .top, spacing: 26) {
+                        ArtworkView(remoteURL: profile.imageURL, side: 220, glyphScale: 0.24)
+                            .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                        VStack(alignment: .leading, spacing: 20) {
+                            DigTallies(entries: [
+                                ("Your library", "\(profile.libraryTrackCount)"),
+                                ("Your crate", "\(profile.crateCount)"),
+                                ("Radio", "\(profile.radioAppearances.reduce(0) { $0 + $1.count })")
+                            ])
+                            VStack(alignment: .leading, spacing: 12) {
+                                if let realName = profile.realName, realName != profile.name {
+                                    DigSection(title: "Name") { DigLine(text: realName) }
+                                }
+                                if let biography = profile.biography, !biography.isEmpty {
+                                    DigSection(title: "Profile") {
+                                        Text(biography)
+                                            .font(Typeface.body(12.5))
+                                            .foregroundStyle(Palette.inkMuted)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .padding(.top, 5)
+                                    }
+                                }
                             }
-                            .buttonStyle(OutlineButtonStyle())
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    DigTallies(entries: [
-                        ("Your library", "\(profile.libraryTrackCount)"),
-                        ("Your crate", "\(profile.crateCount)"),
-                        ("Radio", "\(profile.radioAppearances.reduce(0) { $0 + $1.count })")
-                    ])
+                    if let discogsURL = profile.discogsURL {
+                        Link(destination: discogsURL) {
+                            HStack(spacing: 7) {
+                                Text("Data provided by Discogs")
+                                    .microLabel(1.2, size: 9)
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 8, weight: .bold))
+                            }
+                            .foregroundStyle(Palette.inkFaint)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if !profile.styles.isEmpty || !profile.genres.isEmpty || !profile.aliases.isEmpty {
+                        HStack(alignment: .top, spacing: 34) {
+                            if !profile.styles.isEmpty || !profile.genres.isEmpty {
+                                DigSection(title: "Genres / styles") {
+                                    Text((profile.styles + profile.genres).joined(separator: " · "))
+                                        .font(Typeface.mono(10))
+                                        .foregroundStyle(Palette.inkMuted)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .padding(.top, 5)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            if !profile.aliases.isEmpty {
+                                DigSection(title: "Aliases") {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        ForEach(profile.aliases, id: \.self) { alias in
+                                            DigLine(text: alias) {
+                                                appState.open(.digArtist(mbid: nil, name: alias))
+                                            }
+                                        }
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                    }
 
                     if profile.isBare {
                         VStack(alignment: .leading, spacing: 8) {
@@ -64,17 +145,25 @@ struct ArtistDigView: View {
                         .padding(.vertical, 8)
                     }
 
-                    HStack(alignment: .top, spacing: 34) {
-                        VStack(alignment: .leading, spacing: 26) {
-                            if !profile.releases.isEmpty {
-                                DigSection(title: "Releases", trailing: "\(profile.releases.count)") {
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        ForEach(profile.releases.prefix(12)) { release in
-                                            DigLine(text: release.title, detail: release.year)
-                                        }
+                    if !profile.releases.isEmpty {
+                        DigSection(title: "Browse releases", trailing: "\(profile.releases.count)") {
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 18, alignment: .top)],
+                                alignment: .leading,
+                                spacing: 22
+                            ) {
+                                ForEach(profile.releases.prefix(24)) { release in
+                                    DigReleaseTile(release: release) {
+                                        openRelease(release)
                                     }
                                 }
                             }
+                            .padding(.top, 14)
+                        }
+                    }
+
+                    HStack(alignment: .top, spacing: 34) {
+                        VStack(alignment: .leading, spacing: 26) {
                             if !profile.radioAppearances.isEmpty {
                                 DigSection(title: "Radio appearances") {
                                     VStack(alignment: .leading, spacing: 0) {
@@ -96,19 +185,11 @@ struct ArtistDigView: View {
                                     VStack(alignment: .leading, spacing: 0) {
                                         ForEach(profile.labels) { label in
                                             DigLine(text: label.name) {
-                                                guard let mbid = label.mbid else { return }
-                                                appState.open(.digLabel(mbid: mbid, name: label.name))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if !profile.related.isEmpty {
-                                DigSection(title: "Related", trailing: "\(profile.related.count)") {
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        ForEach(profile.related.prefix(12)) { peer in
-                                            ConnectionExplainer(artist: peer) {
-                                                appState.open(.digArtist(mbid: peer.mbid, name: peer.name))
+                                                if let mbid = label.mbid {
+                                                    appState.open(.digLabel(mbid: mbid, name: label.name))
+                                                } else {
+                                                    appState.open(.digDiscogsLabel(name: label.name))
+                                                }
                                             }
                                         }
                                     }
@@ -116,6 +197,20 @@ struct ArtistDigView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    if !profile.related.isEmpty {
+                        DigSection(title: "Continue digging", trailing: "\(profile.related.count) routes") {
+                            VStack(alignment: .leading, spacing: 22) {
+                                connectionLane("Collaborators", artists: collaborators)
+                                connectionLane("Aliases & projects", artists: projects)
+                                connectionLane("Label neighbours", artists: labelArtists)
+                                connectionLane("Same frequency", artists: soundArtists)
+                                connectionLane("Heard together", artists: personalArtists)
+                                connectionLane("Same era", artists: eraArtists)
+                            }
+                            .padding(.top, 14)
+                        }
                     }
                 }
                 .padding(.horizontal, Metrics.gutter)
@@ -133,5 +228,38 @@ struct ArtistDigView: View {
             .compactMap { $0 }
             .filter { !$0.isEmpty }
             .joined(separator: " · ")
+    }
+
+    private func openRelease(_ release: ArtistProfile.ReleaseLine) {
+        if let id = release.discogsID {
+            appState.open(.digRelease(id: id, title: release.title))
+            return
+        }
+        Task {
+            guard let id = await dig.resolveRelease(title: release.title, artist: artistName) else { return }
+            appState.open(.digRelease(id: id, title: release.title))
+        }
+    }
+
+    @ViewBuilder
+    private func connectionLane(_ title: String, artists: [RelatedArtist]) -> some View {
+        if !artists.isEmpty {
+            VStack(alignment: .leading, spacing: 9) {
+                Text(title)
+                    .microLabel(1.4, size: 9)
+                    .foregroundStyle(Palette.inkMuted)
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 220), spacing: 12)],
+                    alignment: .leading,
+                    spacing: 10
+                ) {
+                    ForEach(artists.prefix(12)) { peer in
+                        ConnectionExplainer(artist: peer) {
+                            appState.open(.digArtist(mbid: peer.mbid, name: peer.name))
+                        }
+                    }
+                }
+            }
+        }
     }
 }

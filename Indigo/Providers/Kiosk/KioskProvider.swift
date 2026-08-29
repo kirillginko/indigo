@@ -14,6 +14,12 @@ import Observation
 final class KioskProvider: RadioProvider {
     nonisolated static let providerID = "kiosk"
     let displayName = "Kiosk Radio"
+    /// Kiosk keeps broadcasting through gaps in its published calendar. Its
+    /// site-wide image keeps the live player visual during those gaps and
+    /// while residency artwork is still being resolved.
+    private static let stationArtworkURL = URL(
+        string: "https://www.kioskradio.com/images/og-image.png"
+    )!
 
     enum LoadState: Equatable {
         case idle
@@ -81,6 +87,10 @@ final class KioskProvider: RadioProvider {
         showArtwork[entry.showName.lowercased()]
     }
 
+    var liveArtworkURL: URL {
+        onAir.flatMap { artwork(for: $0) } ?? Self.stationArtworkURL
+    }
+
     var now: RadioShow? {
         onAir.map { $0.asRadioShow(artworkURL: artwork(for: $0)) }
     }
@@ -98,7 +108,7 @@ final class KioskProvider: RadioProvider {
             title: station.name,
             subtitle: onAir?.title ?? "Live",
             detail: station.strapline,
-            remoteArtworkURL: onAir.flatMap { artwork(for: $0) },
+            remoteArtworkURL: liveArtworkURL,
             playbackURL: station.streamURL
         )
     }

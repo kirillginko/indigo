@@ -329,8 +329,8 @@ struct LotTrackRow: View {
 
 /// Where else an artist can be heard. Rendered as chips because the Lot lists
 /// between none and six of them and a column of full URLs reads as noise.
-struct LotLinkChips: View {
-    let links: [LotLink]
+struct MediaLinkChips: View {
+    let links: [MediaLink]
 
     var body: some View {
         if !links.isEmpty {

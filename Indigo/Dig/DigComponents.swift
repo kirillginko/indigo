@@ -81,62 +81,113 @@ struct ConnectionExplainer: View {
     let artist: RelatedArtist
     let open: () -> Void
 
-    @State private var isExpanded = false
     @State private var isHovering = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 10) {
-                Button(action: open) {
+        Button(action: open) {
+            HStack(alignment: .center, spacing: 12) {
+                Rectangle()
+                    .fill(isHovering ? Palette.accent : Palette.outline)
+                    .frame(width: 3, height: 30)
+                VStack(alignment: .leading, spacing: 3) {
                     Text(artist.name)
                         .font(Typeface.body(12.5, weight: .medium))
                         .foregroundStyle(isHovering ? Palette.accent : Palette.ink)
                         .lineLimit(1)
-                        .contentShape(Rectangle())
+                    Text(connectionLine)
+                        .font(Typeface.mono(9.5))
+                        .foregroundStyle(Palette.inkFaint)
+                        .lineLimit(2)
                 }
-                .buttonStyle(.plain)
-                .onHover { isHovering = $0 }
-
                 Spacer(minLength: 8)
-
-                Button {
-                    withAnimation(.easeOut(duration: 0.12)) { isExpanded.toggle() }
-                } label: {
-                    Text(isExpanded ? "Hide" : "Why?")
-                        .microLabel(1.1, size: 9)
-                        .foregroundStyle(Palette.inkFaint)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
-                        .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Why this connection?")
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(isHovering ? Palette.accent : Palette.inkFaint)
             }
-            .padding(.vertical, 5)
-
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Why this connection?")
-                        .microLabel(1.4, size: 9)
-                        .foregroundStyle(Palette.inkFaint)
-                        .padding(.bottom, 2)
-                    ForEach(artist.reasons) { reason in
-                        HStack(spacing: 7) {
-                            Rectangle()
-                                .fill(Palette.accent)
-                                .frame(width: 3, height: 3)
-                            Text(reason.detail)
-                                .font(Typeface.mono(10))
-                                .foregroundStyle(Palette.inkMuted)
-                            Spacer(minLength: 0)
-                        }
-                    }
-                }
-                .padding(.leading, 2)
-                .padding(.bottom, 8)
-            }
+            .padding(.vertical, 7)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+        .accessibilityHint(connectionLine)
+    }
+
+    private var connectionLine: String {
+        let details = artist.reasons.prefix(3).map(\.detail)
+        return details.isEmpty ? "Connected artist" : details.joined(separator: " · ")
+    }
+}
+
+struct DigReleaseRow: View {
+    let release: ArtistProfile.ReleaseLine
+    let open: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: open) {
+            HStack(spacing: 12) {
+                ArtworkView(remoteURL: release.imageURL, side: 54, glyphScale: 0.23)
+                    .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(release.title)
+                        .font(Typeface.body(12.5, weight: .medium))
+                        .foregroundStyle(isHovering ? Palette.accent : Palette.ink)
+                        .lineLimit(2)
+                    Text([release.label, release.year].compactMap { $0 }.joined(separator: " · "))
+                        .font(Typeface.mono(9.5))
+                        .foregroundStyle(Palette.inkFaint)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 8)
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(isHovering ? Palette.accent : Palette.inkFaint)
+            }
+            .padding(.vertical, 6)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+    }
+}
+
+/// A sleeve-first release link. The intentionally square, tightly captioned
+/// tile borrows the physical rhythm of browsing a record bin.
+struct DigReleaseTile: View {
+    let release: ArtistProfile.ReleaseLine
+    let open: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: open) {
+            VStack(alignment: .leading, spacing: 9) {
+                ArtworkView(
+                    remoteURL: release.imageURL,
+                    previewRemoteURL: release.thumbnailURL,
+                    glyphScale: 0.22
+                )
+                    .overlay {
+                        Rectangle().strokeBorder(
+                            isHovering ? Palette.accent : Palette.outline,
+                            lineWidth: isHovering ? 2 : Metrics.hairline
+                        )
+                    }
+                Text(release.title)
+                    .font(Typeface.body(12.5, weight: .medium))
+                    .foregroundStyle(isHovering ? Palette.accent : Palette.ink)
+                    .lineLimit(2)
+                Text([release.label, release.year].compactMap { $0 }.joined(separator: " · "))
+                    .font(Typeface.mono(9.5))
+                    .foregroundStyle(Palette.inkFaint)
+                    .lineLimit(1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+        .accessibilityHint(release.discogsID == nil ? "Find and open release" : "Open release")
     }
 }
 

@@ -202,7 +202,7 @@ struct LotEpisodeDetailView: View {
                         }
                     }
                     Spacer(minLength: 12)
-                    LotLinkChips(links: artist.links)
+                    MediaLinkChips(links: artist.links)
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 10)

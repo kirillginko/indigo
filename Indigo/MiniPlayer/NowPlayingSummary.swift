@@ -103,6 +103,9 @@ struct NowPlayingSummary {
         case KioskProvider.providerID: return "Kiosk"
         case NoodsProvider.providerID: return "Noods"
         case LotProvider.providerID: return "The Lot"
+        case DublabProvider.providerID: return "dublab"
+        case AlharaProvider.providerID: return "alHara"
+        case CashmereProvider.providerID: return "Cashmere"
         case Track.sourceID: return "Local"
         default: return item.sourceID.uppercased()
         }

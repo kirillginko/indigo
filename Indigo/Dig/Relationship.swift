@@ -12,8 +12,14 @@ import Foundation
 
 nonisolated enum RelationshipKind: String, Hashable, Sendable {
     case sharedLabel
+    case sharedStyle
+    case aliasOrProject
+    case sharedBroadcast
+    case sharedCollection
+    case sameEra
     case sameArtist
     case appearsOnRelease
+    case collaborator
     case playedInShow
     case inYourLibrary
     case inYourCrate
@@ -22,6 +28,8 @@ nonisolated enum RelationshipKind: String, Hashable, Sendable {
 nonisolated enum RelationshipSource: String, Hashable, Sendable {
     /// Asserted by MusicBrainz.
     case musicBrainz
+    /// Asserted by Discogs artist membership or group data.
+    case discogs
     /// Observed in the listener's own files.
     case library
     /// Observed on air.
@@ -32,6 +40,7 @@ nonisolated enum RelationshipSource: String, Hashable, Sendable {
     var label: String {
         switch self {
         case .musicBrainz: "MusicBrainz"
+        case .discogs: "Discogs"
         case .library: "Your library"
         case .radio: "Radio"
         case .crate: "Your crate"

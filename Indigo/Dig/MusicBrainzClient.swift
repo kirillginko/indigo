@@ -57,22 +57,42 @@ actor RateGate {
     }
 }
 
+/// Once the public service rejects a request, fail optional enrichment fast
+/// for a short window instead of building a long queue of doomed requests.
+actor MusicBrainzCircuitBreaker {
+    private var retryAfter = Date.distantPast
+
+    func permitsRequest() -> Bool { Date() >= retryAfter }
+
+    func trip(for interval: TimeInterval = 30) {
+        retryAfter = max(retryAfter, Date().addingTimeInterval(interval))
+    }
+}
+
 nonisolated struct MusicBrainzClient: Sendable {
     private static let base = URL(string: "https://musicbrainz.org/ws/2/")!
     /// Their published ceiling is one per second; the margin keeps a burst of
     /// enrichments from tripping it.
     private static let gate = RateGate(interval: 1.1)
+    private static let circuit = MusicBrainzCircuitBreaker()
 
     /// Observed behaviour, not documentation: when MusicBrainz decides you are
     /// asking too often it stops answering rather than returning 503, so the
     /// request hangs until it times out. A timeout is therefore a throttle
     /// signal, not a failure, and is retried with backoff.
-    private static let maxAttempts = 2
+    private static let maxAttempts = 1
 
     private let transport: MusicBrainzTransport
+    private let usesCircuitBreaker: Bool
 
-    init(transport: MusicBrainzTransport = NetworkEnvironment.metadataSession) {
+    init() {
+        transport = NetworkEnvironment.metadataSession
+        usesCircuitBreaker = true
+    }
+
+    init(transport: MusicBrainzTransport) {
         self.transport = transport
+        usesCircuitBreaker = false
     }
 
     // MARK: - Endpoints
@@ -185,6 +205,9 @@ nonisolated struct MusicBrainzClient: Sendable {
     }
 
     private func attemptGet<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+        if usesCircuitBreaker, !(await Self.circuit.permitsRequest()) {
+            throw MusicBrainzError.rateLimited
+        }
         guard var components = URLComponents(
             url: Self.base.appendingPathComponent(path, isDirectory: false),
             resolvingAgainstBaseURL: false
@@ -212,6 +235,7 @@ nonisolated struct MusicBrainzClient: Sendable {
                 throw CancellationError()
             case .timedOut:
                 // Not a dead connection — a throttled one.
+                if usesCircuitBreaker { await Self.circuit.trip() }
                 throw MusicBrainzError.rateLimited
             default:
                 throw MusicBrainzError.transport(error.localizedDescription)
@@ -219,7 +243,10 @@ nonisolated struct MusicBrainzClient: Sendable {
         }
 
         if let http = response as? HTTPURLResponse {
-            if http.statusCode == 503 { throw MusicBrainzError.rateLimited }
+            if http.statusCode == 503 {
+                if usesCircuitBreaker { await Self.circuit.trip() }
+                throw MusicBrainzError.rateLimited
+            }
             guard (200..<300).contains(http.statusCode) else {
                 throw MusicBrainzError.badStatus(http.statusCode)
             }

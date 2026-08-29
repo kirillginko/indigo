@@ -1,0 +1,6 @@
+// Shared app configuration. Local and CI credentials override the empty
+// defaults through the optional, gitignored file below.
+DISCOGS_TOKEN =
+#include? "Secrets.xcconfig"
+
+INFOPLIST_KEY_IndigoDiscogsToken = $(DISCOGS_TOKEN)

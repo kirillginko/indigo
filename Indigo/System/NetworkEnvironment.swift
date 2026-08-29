@@ -10,7 +10,7 @@ import Foundation
 nonisolated enum NetworkEnvironment {
     static let userAgent: String = {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
-        return "Indigo/\(version) (macOS; +https://github.com/indigo-player)"
+        return "Indigo/\(version) (macOS; +https://github.com/kirillginko/indigo)"
     }()
 
     static let session: URLSession = {

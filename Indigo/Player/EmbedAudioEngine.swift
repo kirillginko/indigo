@@ -346,10 +346,30 @@ extension EmbedAudioEngine {
           document.head.appendChild(script);
         }
 
+        // Mixcloud resolves `ready` as soon as the frame answers, which is
+        // before it has actually loaded the cloudcast: until it has, the
+        // duration is null and play() is accepted and then quietly ignored.
+        // A real duration is the only signal it is actually ready to play.
+        function whenMixcloudLoaded(widget, done) {
+          var attempts = 0;
+          (function poll() {
+            widget.getDuration().then(function (d) {
+              if (d && d > 0) { done(d); return; }
+              if (++attempts > 40) { done(0); return; }
+              setTimeout(poll, 250);
+            }).catch(function () {
+              if (++attempts > 40) { done(0); return; }
+              setTimeout(poll, 250);
+            });
+          })();
+        }
+
         function loadMixcloud(url, autoplay) {
           ensureMixcloud(function () {
             var path = url;
-            try { path = new URL(url).pathname; } catch (e) {}
+            // `pathname` is already percent-encoded, so encoding it again
+            // would turn a show with an accent in its slug into a 404.
+            try { path = decodeURIComponent(new URL(url).pathname); } catch (e) {}
             var src = 'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed='
                     + encodeURIComponent(path);
             var widget = Mixcloud.PlayerWidget(makeFrame(src));
@@ -357,7 +377,6 @@ extension EmbedAudioEngine {
 
             widget.ready.then(function () {
               widget.setVolume(volume);
-              widget.getDuration().then(function (d) { send('loading', 0, d); });
               widget.events.play.on(function () { startTicker(); send('play'); });
               widget.events.pause.on(function () { stopTicker(); send('pause'); });
               widget.events.ended.on(function () { stopTicker(); send('finish'); });
@@ -367,7 +386,17 @@ extension EmbedAudioEngine {
               widget.events.error.on(function (error) {
                 send('error', null, null, String(error));
               });
-              if (autoplay) { widget.play(); }
+
+              whenMixcloudLoaded(widget, function (duration) {
+                if (!current || current.widget !== widget) { return; }
+                if (duration > 0) {
+                  send('loading', 0, duration);
+                } else {
+                  send('error', null, null, 'Mixcloud never loaded this show.');
+                  return;
+                }
+                if (autoplay) { widget.play(); }
+              });
             }).catch(function (error) {
               send('error', null, null, String(error));
             });

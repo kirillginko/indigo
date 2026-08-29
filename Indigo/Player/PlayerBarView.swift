@@ -18,6 +18,9 @@ struct PlayerBarView: View {
     @Environment(NTSProvider.self) private var nts
     @Environment(KioskProvider.self) private var kiosk
     @Environment(LotProvider.self) private var lot
+    @Environment(DublabProvider.self) private var dublab
+    @Environment(AlharaProvider.self) private var alhara
+    @Environment(CashmereProvider.self) private var cashmere
     @Environment(CrateService.self) private var crate
 
     var body: some View {
@@ -138,6 +141,15 @@ struct PlayerBarView: View {
            let ref = liveShow?.detailID.flatMap(NTSEpisodeRef.decode) {
             return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
         }
+        if item.id.hasPrefix("cashmere.episode.") {
+            return .detail(.cashmereEpisode(slug: String(item.id.dropFirst("cashmere.episode.".count))))
+        }
+        if item.id.hasPrefix("alhara.show.") {
+            return .detail(.alharaShow(slug: String(item.id.dropFirst("alhara.show.".count))))
+        }
+        if item.id.hasPrefix("dublab.broadcast.") {
+            return .detail(.dublabBroadcast(slug: String(item.id.dropFirst("dublab.broadcast.".count))))
+        }
         if item.id.hasPrefix("lot.episode.") {
             let identity = String(item.id.dropFirst("lot.episode.".count))
             if let ref = LotEpisodeRef.decode(identity) {
@@ -152,6 +164,9 @@ struct PlayerBarView: View {
             return .route(.kioskStation)
         case NoodsProvider.providerID: return .route(.noodsStation)
         case LotProvider.providerID: return .route(.lotStation)
+        case DublabProvider.providerID: return .route(.dublabStation)
+        case AlharaProvider.providerID: return .route(.alharaStation(item.id))
+        case CashmereProvider.providerID: return .route(.cashmereStation)
         default: return nil
         }
     }
@@ -204,6 +219,9 @@ struct PlayerBarView: View {
         switch item.sourceID {
         case KioskProvider.providerID: return kiosk.now
         case LotProvider.providerID: return lot.now
+        case DublabProvider.providerID: return dublab.now
+        case AlharaProvider.providerID: return alhara.now(for: item.id)
+        case CashmereProvider.providerID: return cashmere.now
         default: return nts.state(for: item.id)?.now
         }
     }

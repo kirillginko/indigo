@@ -247,16 +247,9 @@ nonisolated struct LotArtist: Identifiable, Hashable, Sendable {
     let isResident: Bool
     let photoURL: URL?
     /// Where else this artist can be heard, in the order the page lists them.
-    let links: [LotLink]
+    let links: [MediaLink]
 }
 
-nonisolated struct LotLink: Identifiable, Hashable, Sendable {
-    /// "Bandcamp", "Instagram" — the status vocabulary, not a sentence.
-    let label: String
-    let url: URL
-
-    var id: String { "\(label)|\(url.absoluteString)" }
-}
 
 nonisolated struct LotShow: Identifiable, Hashable, Sendable {
     let id: String
@@ -272,6 +265,21 @@ nonisolated struct LotShow: Identifiable, Hashable, Sendable {
 
     var artistLine: String? {
         artists.isEmpty ? nil : artists.map(\.name).joined(separator: ", ")
+    }
+
+    /// Detail pages occasionally publish a thinner copy of the same show
+    /// than the directory card. Never let that response erase artwork or
+    /// taxonomy the listener could already see before opening it.
+    func fillingMissingFields(from fallback: LotShow?) -> LotShow {
+        guard let fallback else { return self }
+        return LotShow(
+            id: id,
+            name: name.isEmpty ? fallback.name : name,
+            slug: slug.isEmpty ? fallback.slug : slug,
+            photoURL: photoURL ?? fallback.photoURL,
+            genres: genres.isEmpty ? fallback.genres : genres,
+            artists: artists.isEmpty ? fallback.artists : artists
+        )
     }
 }
 
@@ -420,7 +428,7 @@ nonisolated struct LotScheduleEntry: Identifiable, Hashable, Sendable {
     let summary: String?
     /// Where the booking says the artist can be found. The station writes
     /// these into the calendar note as bare addresses.
-    let links: [LotLink]
+    let links: [MediaLink]
     let startsAt: Date
     let endsAt: Date
     let isRecurring: Bool
@@ -507,9 +515,9 @@ extension LotArtistDTO {
             ("Instagram", socialInstagram),
             ("Facebook", socialFacebook),
             ("Website", linkWebsite)
-        ].compactMap { label, value -> LotLink? in
+        ].compactMap { label, value -> MediaLink? in
             guard let value, let url = URL(string: value), url.host != nil else { return nil }
-            return LotLink(label: label, url: url)
+            return MediaLink(label: label, url: url)
         }
 
         return LotArtist(
@@ -661,11 +669,11 @@ nonisolated enum LotTimestamp {
 nonisolated enum LotMarkup {
     static func plainText(_ html: String) -> String { parse(html).text }
 
-    static func parse(_ html: String) -> (text: String, links: [LotLink]) {
+    static func parse(_ html: String) -> (text: String, links: [MediaLink]) {
         var output = ""
         var anchorText = ""
         var href: String?
-        var links: [LotLink] = []
+        var links: [MediaLink] = []
         var seen = Set<String>()
         var index = html.startIndex
 
@@ -686,7 +694,7 @@ nonisolated enum LotMarkup {
                 let text = HTMLText.decode(anchorText).trimmingCharacters(in: .whitespaces)
                 if let address = href, let url = URL(string: address), url.host != nil {
                     if seen.insert(url.absoluteString).inserted {
-                        links.append(LotLink(label: label(for: url), url: url))
+                        links.append(MediaLink(label: MediaLink.label(for: url), url: url))
                     }
                     // Anchor text that is only the address again says nothing
                     // the chip does not already say.
@@ -729,27 +737,4 @@ nonisolated enum LotMarkup {
         return value.isEmpty ? nil : HTMLText.decode(value)
     }
 
-    /// "instagram.com" reads as Instagram; anything unrecognised keeps its
-    /// host, which is more honest than inventing a name for it.
-    private static func label(for url: URL) -> String {
-        let host = (url.host ?? "").lowercased().replacingOccurrences(of: "www.", with: "")
-        let known = [
-            "instagram.com": "Instagram",
-            "soundcloud.com": "SoundCloud",
-            "bandcamp.com": "Bandcamp",
-            "mixcloud.com": "Mixcloud",
-            "facebook.com": "Facebook",
-            "twitter.com": "Twitter",
-            "x.com": "X",
-            "youtube.com": "YouTube",
-            "spotify.com": "Spotify",
-            "ra.co": "RA",
-            "dice.fm": "Dice",
-            "linktr.ee": "Linktree"
-        ]
-        for (suffix, name) in known where host == suffix || host.hasSuffix("." + suffix) {
-            return name
-        }
-        return host.isEmpty ? "Link" : host
-    }
 }

@@ -71,6 +71,21 @@ nonisolated struct BroadcastSource {
             // Kiosk publishes no per-show page; its shows live in the archive
             // grid, so there is nothing to navigate to yet.
             return nil
+        case CashmereProvider.providerID:
+            let slug = showID.hasPrefix("cashmere.episode.")
+                ? String(showID.dropFirst("cashmere.episode.".count))
+                : showID
+            return slug.isEmpty ? nil : .cashmereEpisode(slug: slug)
+        case AlharaProvider.providerID:
+            let slug = showID.hasPrefix("alhara.show.")
+                ? String(showID.dropFirst("alhara.show.".count))
+                : showID
+            return slug.isEmpty ? nil : .alharaShow(slug: slug)
+        case DublabProvider.providerID:
+            let slug = showID.hasPrefix("dublab.broadcast.")
+                ? String(showID.dropFirst("dublab.broadcast.".count))
+                : showID
+            return slug.isEmpty ? nil : .dublabBroadcast(slug: slug)
         case LotProvider.providerID:
             let identity = showID.hasPrefix("lot.episode.")
                 ? String(showID.dropFirst("lot.episode.".count))
@@ -88,6 +103,9 @@ nonisolated struct BroadcastSource {
         case KioskProvider.providerID: "Kiosk"
         case NoodsProvider.providerID: "Noods"
         case LotProvider.providerID: "The Lot"
+        case DublabProvider.providerID: "dublab"
+        case AlharaProvider.providerID: "alHara"
+        case CashmereProvider.providerID: "Cashmere"
         case Track.sourceID: "Local"
         default: providerID.capitalized
         }

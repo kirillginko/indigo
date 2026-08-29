@@ -79,6 +79,10 @@ struct RootView: View {
                     ArtistDigView(artistName: name, artistMBID: mbid)
                 case .digLabel(let mbid, let name):
                     LabelDigView(labelMBID: mbid, labelName: name)
+                case .digDiscogsLabel(let name):
+                    DiscogsLabelDigView(labelName: name)
+                case .digRelease(let id, let title):
+                    DigReleaseView(releaseID: id, fallbackTitle: title)
                 case .noodsShow(let path):
                     NoodsShowDetailView(showPath: path)
                 case .noodsResident(let path):
@@ -89,6 +93,16 @@ struct RootView: View {
                     LotEpisodeDetailView(ref: LotEpisodeRef(show: show, episode: episode))
                 case .lotShow(let slug):
                     LotShowDetailView(showSlug: slug)
+                case .dublabBroadcast(let slug):
+                    DublabBroadcastDetailView(slug: slug)
+                case .dublabDJ(let slug):
+                    DublabDJDetailView(slug: slug)
+                case .alharaShow(let slug):
+                    AlharaShowDetailView(slug: slug)
+                case .cashmereEpisode(let slug):
+                    CashmereEpisodeDetailView(slug: slug)
+                case .cashmereShow(let slug):
+                    CashmereShowDetailView(slug: slug)
                 }
             } else {
                 switch appState.route {
@@ -111,6 +125,14 @@ struct RootView: View {
                 case .lotStation: LotStationView()
                 case .lotIndex: LotIndexView()
                 case .lotShows: LotShowsView()
+                case .dublabStation: DublabStationView()
+                case .dublabArchive: DublabArchiveView()
+                case .dublabDJs: DublabDJsView()
+                case .alharaStation(let id): AlharaStationView(stationID: id)
+                case .alharaArchive: AlharaArchiveView()
+                case .cashmereStation: CashmereStationView()
+                case .cashmereArchive: CashmereArchiveView()
+                case .cashmereShows: CashmereShowsView()
                 case .crate: CrateView()
                 case .dig: DigView()
                 }

@@ -109,6 +109,62 @@ nonisolated final class ArtworkStore: @unchecked Sendable {
     }
 }
 
+/// Remote covers need a cache above SwiftUI's view lifetime. Lazy grids tear
+/// tiles down while scrolling and `AsyncImage` can then replace a cover that
+/// already rendered with its failure placeholder during a transient retry.
+nonisolated final class RemoteArtworkStore: @unchecked Sendable {
+    static let shared = RemoteArtworkStore()
+
+    private let cache = NSCache<NSURL, PlatformImage>()
+    private let directory: URL
+    private let fileManager = FileManager.default
+
+    private init() {
+        cache.countLimit = 320
+        let base = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory())
+        directory = base.appendingPathComponent("Indigo/RemoteArtwork", isDirectory: true)
+        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+    }
+
+    func image(for url: URL) async -> PlatformImage? {
+        if let cached = cache.object(forKey: url as NSURL) { return cached }
+        let destination = diskURL(for: url)
+        if let data = try? Data(contentsOf: destination), let image = PlatformImage(data: data) {
+            cache.setObject(image, forKey: url as NSURL)
+            return image
+        }
+        do {
+            let (data, response) = try await NetworkEnvironment.session.data(from: url)
+            if let http = response as? HTTPURLResponse,
+               !(200..<300).contains(http.statusCode) { return nil }
+            guard let image = PlatformImage(data: data) else { return nil }
+            cache.setObject(image, forKey: url as NSURL)
+            try? data.write(to: destination, options: .atomic)
+            return image
+        } catch {
+            return nil
+        }
+    }
+
+    func prefetch(_ urls: [URL]) async {
+        for batchStart in stride(from: 0, to: urls.count, by: 4) {
+            let batch = Array(urls[batchStart..<min(batchStart + 4, urls.count)])
+            await withTaskGroup(of: Void.self) { group in
+                for url in batch {
+                    group.addTask { _ = await self.image(for: url) }
+                }
+            }
+        }
+    }
+
+    private func diskURL(for url: URL) -> URL {
+        let digest = SHA256.hash(data: Data(url.absoluteString.utf8))
+        let name = digest.map { String(format: "%02x", $0) }.joined()
+        return directory.appendingPathComponent(name).appendingPathExtension("img")
+    }
+}
+
 // MARK: - SwiftUI
 
 extension Image {
@@ -126,11 +182,26 @@ extension Image {
 struct ArtworkView: View {
     var localKey: String?
     var remoteURL: URL?
+    var previewRemoteURL: URL?
     var side: CGFloat?
     var glyphScale: CGFloat = 0.34
+    /// The station's own logo, shown when there is no picture of what is
+    /// actually on. Kept separate from `remoteURL` because a logo is not cover
+    /// art: it is drawn inset on the ground rather than cropped to fill, which
+    /// both reads as deliberate and keeps a small mark from being stretched.
+    var markURL: URL?
+    /// Last resort, when there is no image at all — the station's name set in
+    /// the app's own type, which says more than a grey square and claims
+    /// nothing it shouldn't.
+    var mark: String?
 
     @State private var image: PlatformImage?
     @State private var loadedKey: String?
+    @State private var remoteImage: PlatformImage?
+    @State private var loadedRemoteURL: URL?
+    @State private var previewImage: PlatformImage?
+    @State private var markImage: PlatformImage?
+    @State private var loadedMarkURL: URL?
 
     var body: some View {
         Rectangle()
@@ -142,14 +213,19 @@ struct ArtworkView: View {
                         .resizable()
                         .interpolation(.medium)
                         .aspectRatio(contentMode: .fill)
-                } else if let remoteURL {
-                    AsyncImage(url: remoteURL, transaction: Transaction(animation: .none)) { phase in
-                        switch phase {
-                        case .success(let remote):
-                            remote.resizable().aspectRatio(contentMode: .fill)
-                        default:
-                            placeholderGlyph
-                        }
+                } else if let displayedRemoteImage = remoteImage ?? previewImage {
+                    Image(platformImage: displayedRemoteImage)
+                        .resizable()
+                        .interpolation(.medium)
+                        .aspectRatio(contentMode: .fill)
+                } else if let markImage {
+                    GeometryReader { geo in
+                        Image(platformImage: markImage)
+                            .resizable()
+                            .interpolation(.high)
+                            .aspectRatio(contentMode: .fit)
+                            .padding(geo.size.width * 0.16)
+                            .frame(width: geo.size.width, height: geo.size.height)
                     }
                 } else {
                     placeholderGlyph
@@ -158,14 +234,30 @@ struct ArtworkView: View {
             .clipped()
             .frame(width: side, height: side)
             .task(id: localKey) { await load() }
+            .task(id: remoteURL) { await loadRemote() }
+            .task(id: previewRemoteURL) { await loadPreview() }
+            .task(id: markURL) { await loadMark() }
     }
 
+    @ViewBuilder
     private var placeholderGlyph: some View {
         GeometryReader { geo in
-            Image(systemName: "square.stack")
-                .font(.system(size: max(9, geo.size.width * glyphScale), weight: .ultraLight))
-                .foregroundStyle(Palette.inkFaint)
-                .frame(width: geo.size.width, height: geo.size.height)
+            if let mark, !mark.isEmpty {
+                Text(mark)
+                    .font(Typeface.banner(max(12, geo.size.width * 0.115)))
+                    .tracking(0.6)
+                    .textCase(.uppercase)
+                    .foregroundStyle(Palette.inkMuted)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.4)
+                    .padding(geo.size.width * 0.1)
+                    .frame(width: geo.size.width, height: geo.size.height)
+            } else {
+                Image(systemName: "square.stack")
+                    .font(.system(size: max(9, geo.size.width * glyphScale), weight: .ultraLight))
+                    .foregroundStyle(Palette.inkFaint)
+                    .frame(width: geo.size.width, height: geo.size.height)
+            }
         }
     }
 
@@ -182,5 +274,47 @@ struct ArtworkView: View {
         guard !Task.isCancelled else { return }
         image = loaded
         loadedKey = localKey
+    }
+
+    private func loadRemote() async {
+        guard let remoteURL else {
+            remoteImage = nil
+            loadedRemoteURL = nil
+            return
+        }
+        guard loadedRemoteURL != remoteURL else { return }
+        let loaded = await RemoteArtworkStore.shared.image(for: remoteURL)
+        guard !Task.isCancelled, self.remoteURL == remoteURL else { return }
+        // Keep the last successful cover if a refresh briefly fails. This is
+        // especially important for The Lot's large residency grid.
+        if let loaded {
+            remoteImage = loaded
+            loadedRemoteURL = remoteURL
+        }
+    }
+
+    private func loadMark() async {
+        guard let markURL else {
+            markImage = nil
+            loadedMarkURL = nil
+            return
+        }
+        guard loadedMarkURL != markURL else { return }
+        let loaded = await RemoteArtworkStore.shared.image(for: markURL)
+        guard !Task.isCancelled, self.markURL == markURL else { return }
+        if let loaded {
+            markImage = loaded
+            loadedMarkURL = markURL
+        }
+    }
+
+    private func loadPreview() async {
+        guard let previewRemoteURL else {
+            previewImage = nil
+            return
+        }
+        let loaded = await RemoteArtworkStore.shared.image(for: previewRemoteURL)
+        guard !Task.isCancelled, self.previewRemoteURL == previewRemoteURL else { return }
+        if let loaded { previewImage = loaded }
     }
 }

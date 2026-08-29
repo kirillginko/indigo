@@ -17,21 +17,30 @@ final class DigStore {
     /// Bumped when enrichment writes, so profiles are re-read.
     private(set) var revision = 0
     var notice: String?
+    private(set) var discogsLabelProfiles: [String: DiscogsLabelProfile] = [:
+    ]
 
     @ObservationIgnored let context: ModelContext
     @ObservationIgnored private let client: MusicBrainzClient
+    @ObservationIgnored private let discogsClient: DiscogsClient
     /// Keys already looked up this session, so revisiting a page doesn't
     /// re-hit a rate-limited public service.
     @ObservationIgnored private var attempted: Set<String> = []
     @ObservationIgnored private var backgroundWarmupStarted = false
 
-    init(context: ModelContext, client: MusicBrainzClient = MusicBrainzClient()) {
+    init(
+        context: ModelContext,
+        client: MusicBrainzClient = MusicBrainzClient(),
+        discogsClient: DiscogsClient = DiscogsClient()
+    ) {
         self.context = context
         self.client = client
+        self.discogsClient = discogsClient
     }
 
     private var engine: DigEngine { DigEngine(context: context) }
     private var enricher: MusicBrainzEnricher { MusicBrainzEnricher(context: context, client: client) }
+    private var discogsEnricher: DiscogsEnricher { DiscogsEnricher(context: context, client: discogsClient) }
 
     // MARK: - Profiles
 
@@ -45,6 +54,15 @@ final class DigStore {
         return engine.labelProfile(mbid: mbid, fallbackName: fallbackName)
     }
 
+    func releaseProfile(id: Int) -> DigReleaseProfile? {
+        let _ = revision
+        return engine.releaseProfile(id: id)
+    }
+
+    func discogsLabelProfile(named name: String) -> DiscogsLabelProfile? {
+        discogsLabelProfiles[RecordingKey.normalizeArtist(name)]
+    }
+
     /// Where "DIG →" on a recording should land. Prefers the MusicBrainz
     /// artist we already resolved so the page opens with a real graph.
     func destination(for recording: Recording) -> DetailPage? {
@@ -55,6 +73,11 @@ final class DigStore {
 
     func genres(for recording: Recording) -> [String] {
         let _ = revision
+        if let name = recording.artistName,
+           let discogs = discogsEnricher.cachedArtist(named: name), discogs.isFresh {
+            let tags = discogs.styles + discogs.genres
+            if !tags.isEmpty { return Array(tags.prefix(8)) }
+        }
         guard let mbid = engine.metadata(for: recording.id)?.artistMBID else { return [] }
         return enricher.cachedArtist(mbid)?.genreTags ?? []
     }
@@ -186,12 +209,56 @@ final class DigStore {
     /// RELATED is built from and nothing else on the page needs one.
     func enrichArtist(name: String, mbid: String?) async {
         let key = "artist:\(mbid ?? name)"
+        let discogsKey = "discogs:artist:\(RecordingKey.normalizeArtist(name))"
         // A notice belongs to the page that produced it. Cleared before the
         // guard, or an error from one artist follows you onto the next.
         notice = nil
-        guard !attempted.contains(key) else { return }
-        attempted.insert(key)
 
+        // Discogs is the foreground path: it returns the complete artist
+        // bundle concurrently and is not held behind MusicBrainz's global
+        // one-request-per-second gate.
+        if discogsClient.isConfigured, !attempted.contains(discogsKey) {
+            attempted.insert(discogsKey)
+            isEnriching = true
+            do {
+                if let artist = try await discogsEnricher.artist(named: name) {
+                    try? context.save()
+                    backfillLocalGenres(artistName: name, genres: artist.styles + artist.genres)
+                    revision &+= 1
+                    isEnriching = false
+                    let previews = artist.releaseThumbnailURLStrings.compactMap(URL.init(string:))
+                    Task.detached(priority: .utility) {
+                        await RemoteArtworkStore.shared.prefetch(Array(previews.prefix(12)))
+                    }
+                    // Recommendations arrive as a quiet second stage: the
+                    // page and sleeves are already usable while this fills in.
+                    do {
+                        try await discogsEnricher.recommendations(for: artist)
+                        try? context.save()
+                        revision &+= 1
+                    } catch {
+                        // Discovery enrichment is optional and never replaces
+                        // a populated page with provider diagnostics.
+                    }
+                    return
+                }
+                attempted.remove(discogsKey)
+            } catch is CancellationError {
+                isEnriching = false
+                return
+            } catch {
+                attempted.remove(discogsKey)
+                // Catalogue enrichment is an implementation detail. The page
+                // keeps its local/MusicBrainz data if the developer service is
+                // unavailable; listeners never manage provider credentials.
+            }
+        }
+
+        guard !attempted.contains(key) else {
+            isEnriching = false
+            return
+        }
+        attempted.insert(key)
         isEnriching = true
 
         // Stage one: who they are and what they released. Two requests, and
@@ -232,9 +299,9 @@ final class DigStore {
             if engine.recordings(byArtist: name).isEmpty {
                 materialiseRecordings(forArtist: name, limit: 2)
             }
-            // Two is enough; enriching eight was up to twenty-four requests
-            // for a single page, which is how the client got throttled.
-            for recording in engine.recordings(byArtist: name).prefix(2) {
+            // One representative recording is enough to discover a label.
+            // More fan-out makes a single click monopolise the public queue.
+            for recording in engine.recordings(byArtist: name).prefix(1) {
                 try await enricher.enrich(recording)
             }
             let labels = Set(
@@ -278,6 +345,63 @@ final class DigStore {
         }
     }
 
+    func enrichRelease(id: Int) async {
+        let key = "discogs:release:\(id)"
+        notice = nil
+        guard !attempted.contains(key) else { return }
+        attempted.insert(key)
+        isEnriching = true
+        defer { isEnriching = false }
+        do {
+            try await discogsEnricher.release(id: id)
+            try? context.save()
+            revision &+= 1
+        } catch is CancellationError {
+        } catch {
+            attempted.remove(key)
+            notice = message(for: error)
+        }
+    }
+
+    /// Resolves a text-only catalogue row only when the listener chooses it.
+    /// This keeps browsing complete without bulk-searching every title or
+    /// consuming the provider's request allowance in the background.
+    func resolveRelease(title: String, artist: String) async -> Int? {
+        isEnriching = true
+        defer { isEnriching = false }
+        do {
+            guard let id = try await discogsClient.releaseID(title: title, artist: artist) else { return nil }
+            try await discogsEnricher.release(id: id)
+            try? context.save()
+            revision &+= 1
+            return id
+        } catch {
+            return nil
+        }
+    }
+
+    func enrichDiscogsLabel(named name: String) async {
+        let key = RecordingKey.normalizeArtist(name)
+        guard !key.isEmpty, discogsLabelProfiles[key] == nil else { return }
+        isEnriching = true
+        defer { isEnriching = false }
+        do {
+            let results = try await discogsClient.labelCatalogue(named: name)
+            discogsLabelProfiles[key] = DiscogsLabelProfile(name: name, results: results)
+            let previews = results.compactMap { $0.thumbnail.flatMap(URL.init(string:)) }
+            Task.detached(priority: .utility) {
+                await RemoteArtworkStore.shared.prefetch(Array(previews.prefix(16)))
+            }
+        } catch {
+            // The label page remains quiet and retryable on the next visit.
+        }
+    }
+
+    func retryRelease(id: Int) async {
+        attempted.remove("discogs:release:\(id)")
+        await enrichRelease(id: id)
+    }
+
     /// Promotes local files to canonical recordings so they have somewhere to
     /// hang a release and a label.
     private func materialiseRecordings(forArtist name: String, limit: Int) {
@@ -297,6 +421,7 @@ final class DigStore {
     /// released, so this just runs the lookup again.
     func retryArtist(name: String, mbid: String?) async {
         attempted.remove("artist:\(mbid ?? name)")
+        attempted.remove("discogs:artist:\(RecordingKey.normalizeArtist(name))")
         await enrichArtist(name: name, mbid: mbid)
     }
 

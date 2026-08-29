@@ -19,6 +19,9 @@ struct CrateView: View {
     @Environment(NoodsBrowseStore.self) private var noodsBrowse
     @Environment(NTSBrowseStore.self) private var ntsBrowse
     @Environment(LotBrowseStore.self) private var lotBrowse
+    @Environment(DublabBrowseStore.self) private var dublabBrowse
+    @Environment(AlharaBrowseStore.self) private var alharaBrowse
+    @Environment(CashmereBrowseStore.self) private var cashmereBrowse
     @State private var selectedGenres: Set<String> = []
 
     var body: some View {
@@ -184,6 +187,15 @@ struct CrateView: View {
             case KioskProvider.providerID where showID.hasPrefix("kiosk.episode."):
                 appState.open(.kioskEpisode(slug: String(showID.dropFirst("kiosk.episode.".count))))
                 return
+            case CashmereProvider.providerID where showID.hasPrefix("cashmere.episode."):
+                appState.open(.cashmereEpisode(slug: String(showID.dropFirst("cashmere.episode.".count))))
+                return
+            case AlharaProvider.providerID where showID.hasPrefix("alhara.show."):
+                appState.open(.alharaShow(slug: String(showID.dropFirst("alhara.show.".count))))
+                return
+            case DublabProvider.providerID where showID.hasPrefix("dublab.broadcast."):
+                appState.open(.dublabBroadcast(slug: String(showID.dropFirst("dublab.broadcast.".count))))
+                return
             case LotProvider.providerID where showID.hasPrefix("lot.episode."):
                 let identity = String(showID.dropFirst("lot.episode.".count))
                 if let ref = LotEpisodeRef.decode(identity) {
@@ -239,6 +251,18 @@ struct CrateView: View {
                 guard let ref = LotEpisodeRef.decode(identity) else { continue }
                 await lotBrowse.loadEpisodeIfNeeded(ref: ref)
                 genres = lotBrowse.episode(ref: ref)?.genreNames ?? []
+            case DublabProvider.providerID where showID.hasPrefix("dublab.broadcast."):
+                let slug = String(showID.dropFirst("dublab.broadcast.".count))
+                await dublabBrowse.loadBroadcastIfNeeded(slug: slug)
+                genres = dublabBrowse.broadcast(slug: slug)?.genreNames ?? []
+            case AlharaProvider.providerID where showID.hasPrefix("alhara.show."):
+                let slug = String(showID.dropFirst("alhara.show.".count))
+                await alharaBrowse.loadDetailIfNeeded(slug: slug)
+                genres = alharaBrowse.show(slug: slug)?.genres ?? []
+            case CashmereProvider.providerID where showID.hasPrefix("cashmere.episode."):
+                let slug = String(showID.dropFirst("cashmere.episode.".count))
+                await cashmereBrowse.loadDetailIfNeeded(slug: slug)
+                genres = cashmereBrowse.episode(slug: slug)?.genres ?? []
             case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
                 let identity = String(showID.dropFirst("nts.episode.".count))
                 guard let ref = NTSEpisodeRef.decode(identity) else { continue }

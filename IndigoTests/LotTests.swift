@@ -16,6 +16,20 @@ final class LotTests: XCTestCase {
         try JSONDecoder().decode(T.self, from: Data(json.utf8))
     }
 
+    func testSparseShowDetailKeepsDirectoryArtwork() throws {
+        let photo = try XCTUnwrap(URL(string: "https://images.example/show.jpg"))
+        let directory = LotShow(
+            id: "show-id", name: "Residency", slug: "residency",
+            photoURL: photo, genres: [], artists: []
+        )
+        let detail = LotShow(
+            id: "show-id", name: "Residency", slug: "residency",
+            photoURL: nil, genres: [], artists: []
+        )
+
+        XCTAssertEqual(detail.fillingMissingFields(from: directory).photoURL, photo)
+    }
+
     // MARK: - Flight
 
     /// Row 1 is JSON and newline-terminated; rows 2 and 3 are length-prefixed

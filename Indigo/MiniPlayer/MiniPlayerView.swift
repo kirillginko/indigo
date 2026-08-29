@@ -16,6 +16,9 @@ struct MiniPlayerView: View {
     @Environment(NTSProvider.self) private var nts
     @Environment(KioskProvider.self) private var kiosk
     @Environment(LotProvider.self) private var lot
+    @Environment(DublabProvider.self) private var dublab
+    @Environment(AlharaProvider.self) private var alhara
+    @Environment(CashmereProvider.self) private var cashmere
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(\.openWindow) private var openWindow
@@ -181,6 +184,9 @@ struct MiniPlayerView: View {
         guard let item = player.current, item.isLive else { return nil }
         if item.sourceID == KioskProvider.providerID { return kiosk.onAir?.title }
         if item.sourceID == LotProvider.providerID { return lot.onAir?.title }
+        if item.sourceID == DublabProvider.providerID { return dublab.onAir?.showName }
+        if item.sourceID == AlharaProvider.providerID { return alhara.state(for: item.id).title }
+        if item.sourceID == CashmereProvider.providerID { return cashmere.onAir?.showName }
         return nts.state(for: item.id)?.now?.title
     }
 }

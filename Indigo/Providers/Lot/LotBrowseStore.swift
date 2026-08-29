@@ -132,6 +132,18 @@ final class LotBrowseStore {
                 if collected.count >= total { break }
             }
             shows = collected
+            // A detail request and the directory request can finish in either
+            // order on a cold open. Enrich already-open details once the
+            // directory's more complete cards arrive.
+            let currentDetails = showDetails
+            for (slug, detail) in currentDetails {
+                guard let directoryShow = collected.first(where: { $0.slug == slug }) else { continue }
+                showDetails[slug] = LotShowDetail(
+                    show: detail.show.fillingMissingFields(from: directoryShow),
+                    summary: detail.summary,
+                    episodes: detail.episodes
+                )
+            }
             showsTotal = max(total, collected.count)
             showsPhase = collected.isEmpty
                 ? .failed("The Lot isn't publishing any shows right now.")
@@ -159,7 +171,8 @@ final class LotBrowseStore {
 
         do {
             let page = try await api.fetchShowPage(slug: slug)
-            let show = page.show ?? shows.first { $0.slug == slug }
+            let directoryShow = shows.first { $0.slug == slug }
+            let show = page.show?.fillingMissingFields(from: directoryShow) ?? directoryShow
             guard let show else { throw LotError.malformedResponse }
 
             // The page server-renders only the first handful of broadcasts.

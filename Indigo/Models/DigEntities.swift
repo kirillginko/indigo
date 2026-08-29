@@ -132,3 +132,107 @@ nonisolated final class RecordingMetadata {
         self.lookupFailed = false
     }
 }
+
+/// Discogs data is kept separate because its identifiers and refresh policy
+/// are different from MusicBrainz. DIG composes both caches at read time.
+@Model
+nonisolated final class DiscogsArtist {
+    @Attribute(.unique) var nameKey: String
+    var discogsID: Int
+    var name: String
+    var realName: String?
+    var biography: String?
+    var imageURLString: String?
+    var profileURLString: String?
+    var aliasNames: [String]
+    var memberNames: [String]
+    var groupNames: [String]
+    var releaseTitles: [String]
+    var releaseYears: [String]
+    var releaseDiscogsIDs: [Int]
+    var releaseImageURLStrings: [String]
+    var releaseThumbnailURLStrings: [String] = []
+    var releaseLabels: [String]
+    var collaboratorNames: [String] = []
+    var labelNeighbourNames: [String] = []
+    var styleNeighbourNames: [String] = []
+    var recommendationsFetchedAt: Date?
+    var labelNames: [String]
+    var genres: [String]
+    var styles: [String]
+    var fetchedAt: Date
+    var cacheVersion: Int = 0
+
+    init(nameKey: String, discogsID: Int, name: String) {
+        self.nameKey = nameKey
+        self.discogsID = discogsID
+        self.name = name
+        aliasNames = []
+        memberNames = []
+        groupNames = []
+        releaseTitles = []
+        releaseYears = []
+        releaseDiscogsIDs = []
+        releaseImageURLStrings = []
+        releaseThumbnailURLStrings = []
+        releaseLabels = []
+        collaboratorNames = []
+        labelNeighbourNames = []
+        styleNeighbourNames = []
+        labelNames = []
+        genres = []
+        styles = []
+        fetchedAt = Date()
+    }
+
+    var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
+
+    var profileURL: URL? {
+        guard let profileURLString, !profileURLString.isEmpty else { return nil }
+        if let absolute = URL(string: profileURLString), absolute.scheme != nil { return absolute }
+        return URL(string: "https://www.discogs.com\(profileURLString)")
+    }
+
+    var isFresh: Bool { Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 }
+}
+
+@Model
+nonisolated final class DiscogsReleaseRecord {
+    @Attribute(.unique) var discogsID: Int
+    var title: String
+    var year: Int?
+    var artistNames: [String]
+    var labelNames: [String]
+    var catalogNumbers: [String]
+    var genres: [String]
+    var styles: [String]
+    var imageURLString: String?
+    var trackPositions: [String]
+    var trackTitles: [String]
+    var trackDurations: [String]
+    var notes: String?
+    var profileURLString: String?
+    var fetchedAt: Date
+
+    init(discogsID: Int, title: String) {
+        self.discogsID = discogsID
+        self.title = title
+        artistNames = []
+        labelNames = []
+        catalogNumbers = []
+        genres = []
+        styles = []
+        trackPositions = []
+        trackTitles = []
+        trackDurations = []
+        fetchedAt = Date()
+    }
+
+    var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
+    var profileURL: URL? {
+        guard let profileURLString else { return nil }
+        if let url = URL(string: profileURLString), url.scheme != nil { return url }
+        return URL(string: "https://www.discogs.com\(profileURLString)")
+    }
+    var isFresh: Bool { Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 }
+}

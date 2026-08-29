@@ -34,16 +34,6 @@ struct LabelDigView: View {
                         BufferingGlyph()
                             .accessibilityLabel("Loading")
                     }
-                    if let error = dig.notice {
-                        VStack(alignment: .leading, spacing: 10) {
-                            NoticeStrip(text: error) { dig.notice = nil }
-                            Button("Try Again") {
-                                Task { await dig.retryLabel(mbid: labelMBID) }
-                            }
-                            .buttonStyle(OutlineButtonStyle())
-                        }
-                    }
-
                     if let profile {
                         DigTallies(entries: [
                             ("Catalogue", "\(profile.catalogueSize)"),

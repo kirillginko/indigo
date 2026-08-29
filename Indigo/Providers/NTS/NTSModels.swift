@@ -118,6 +118,44 @@ nonisolated enum HTMLText {
         "lsquo": "\u{2018}", "rsquo": "\u{2019}", "ldquo": "\u{201C}", "rdquo": "\u{201D}"
     ]
 
+    /// Tags out, line breaks kept. Stations hand back rendered HTML for every
+    /// prose field they publish; Indigo renders text.
+    static func plainText(_ html: String) -> String? {
+        var output = ""
+        var insideTag = false
+        var tagName = ""
+
+        for character in html {
+            if character == "<" {
+                insideTag = true
+                tagName = ""
+                continue
+            }
+            if insideTag {
+                if character == ">" {
+                    insideTag = false
+                    let name = tagName.lowercased()
+                    if name.hasPrefix("br") || name.hasPrefix("/p") || name.hasPrefix("/div") {
+                        output.append("\n")
+                    }
+                } else {
+                    tagName.append(character)
+                }
+                continue
+            }
+            output.append(character)
+        }
+
+        let text = decode(output)
+            .replacingOccurrences(of: "\r", with: "\n")
+            .components(separatedBy: "\n")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? nil : text
+    }
+
     static func decode(_ input: String) -> String {
         guard input.contains("&") else { return input }
         var output = ""

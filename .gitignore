@@ -15,3 +15,7 @@ xcuserdata/
 
 # macOS
 .DS_Store
+
+# Developer-owned service credentials. Copy the example and keep the real
+# values out of source control.
+Config/Secrets.xcconfig

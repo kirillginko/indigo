@@ -116,7 +116,7 @@ struct LotStationView: View {
                         .foregroundStyle(Palette.inkMuted)
                         .lineSpacing(4)
                         .fixedSize(horizontal: false, vertical: true)
-                    LotLinkChips(links: lot.onAir?.links ?? [])
+                    MediaLinkChips(links: lot.onAir?.links ?? [])
                 } else {
                     Text("An independent radio station broadcasting from a shipping container in a triangular lot on the Greenpoint waterfront, on air seven days a week since 2016.")
                         .font(Typeface.body(12.5))
@@ -371,7 +371,7 @@ private struct LotScheduleRow: View {
                             .lineSpacing(4)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    LotLinkChips(links: entry.links)
+                    MediaLinkChips(links: entry.links)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, Metrics.gutter)

@@ -30,6 +30,14 @@ nonisolated enum Route: Hashable {
     case lotStation
     case lotIndex
     case lotShows
+    case dublabStation
+    case dublabArchive
+    case dublabDJs
+    case alharaStation(String)
+    case alharaArchive
+    case cashmereStation
+    case cashmereArchive
+    case cashmereShows
     case crate
     case dig
 
@@ -54,6 +62,14 @@ nonisolated enum Route: Hashable {
         case .lotStation: "The Lot Radio"
         case .lotIndex: "The Index"
         case .lotShows: "Shows"
+        case .dublabStation: "dublab"
+        case .dublabArchive: "Archive"
+        case .dublabDJs: "DJs"
+        case .alharaStation: "Radio alHara"
+        case .alharaArchive: "Archive"
+        case .cashmereStation: "Cashmere Radio"
+        case .cashmereArchive: "Archive"
+        case .cashmereShows: "Shows"
         case .crate: "Crate"
         case .dig: "Dig"
         }
@@ -70,11 +86,18 @@ nonisolated enum DetailPage: Hashable {
     case kioskEpisode(slug: String)
     case digArtist(mbid: String?, name: String)
     case digLabel(mbid: String, name: String)
+    case digDiscogsLabel(name: String)
+    case digRelease(id: Int, title: String)
     case noodsShow(path: String)
     case noodsResident(path: String)
     case noodsCollection(path: String)
     case lotEpisode(show: String, episode: String)
     case lotShow(slug: String)
+    case dublabBroadcast(slug: String)
+    case dublabDJ(slug: String)
+    case alharaShow(slug: String)
+    case cashmereEpisode(slug: String)
+    case cashmereShow(slug: String)
 }
 
 @Observable
@@ -128,11 +151,18 @@ final class AppState {
         case .kioskEpisode: return "Show"
         case .digArtist: return "Artist"
         case .digLabel: return "Label"
+        case .digDiscogsLabel: return "Label"
+        case .digRelease: return "Release"
         case .noodsShow: return "Show"
         case .noodsResident: return "Resident"
         case .noodsCollection: return "Collection"
         case .lotEpisode: return "Broadcast"
         case .lotShow: return "Show"
+        case .dublabBroadcast: return "Broadcast"
+        case .dublabDJ: return "DJ"
+        case .alharaShow: return "Show"
+        case .cashmereEpisode: return "Episode"
+        case .cashmereShow: return "Show"
         }
     }
 }
