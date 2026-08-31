@@ -49,7 +49,20 @@ nonisolated struct GraphStore {
     }
 
     /// Everything reachable from a node in one step, with the reasons.
+    ///
+    /// Read from what was worked out last time, when there is one. Deriving
+    /// this reads six tables whole; a stored answer is a single indexed query
+    /// and survives every unrelated write, which is what stopped background
+    /// enrichment from re-costing every page.
     func neighbors(of node: MusicNode) -> EdgeSet {
+        if let kept = stored(for: node) { return kept }
+        let computed = compute(node)
+        persist(computed, for: node)
+        return computed
+    }
+
+    /// The walk itself, with nothing remembered.
+    func compute(_ node: MusicNode) -> EdgeSet {
         let caches = self.caches
         var edges = EdgeSet()
         switch node.kind {
@@ -68,20 +81,91 @@ nonisolated struct GraphStore {
         return edges
     }
 
+    // MARK: - Keeping it
+
+    private func stored(for node: MusicNode) -> EdgeSet? {
+        let identity = node.id
+        var marker = FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == identity })
+        marker.fetchLimit = 1
+        guard ((try? context.fetch(marker))?.first) != nil else { return nil }
+
+        let rows = (try? context.fetch(
+            FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity })
+        )) ?? []
+        // A picture found after the edge was written must not be hidden by it.
+        // The portrait table is small and this is one fetch; rewalking the
+        // graph to pick up a thumbnail would defeat the point of keeping it.
+        let portraits = Dictionary(
+            ((try? context.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
+                .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var edges = EdgeSet()
+        for row in rows {
+            var edge = row.edge(from: node)
+            if edge.to.artworkURL == nil, let portrait = portraits[edge.to.key] {
+                var destination = edge.to
+                destination.artworkURL = portrait
+                edge = MusicEdge(
+                    from: edge.from, to: destination, kind: edge.kind, source: edge.source,
+                    reason: edge.reason, confidence: edge.confidence, occurrences: edge.occurrences
+                )
+            }
+            edges.insert(edge)
+        }
+        return edges
+    }
+
+    private func persist(_ edges: EdgeSet, for node: MusicNode) {
+        let identity = node.id
+        for existing in (try? context.fetch(
+            FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity })
+        )) ?? [] {
+            context.delete(existing)
+        }
+        for edge in edges.all { context.insert(StoredEdge(from: node, edge: edge)) }
+
+        var marker = FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == identity })
+        marker.fetchLimit = 1
+        if let existing = (try? context.fetch(marker))?.first {
+            existing.builtAt = Date()
+        } else {
+            context.insert(GraphSnapshot(nodeID: identity))
+        }
+        try? context.save()
+    }
+
+    /// Throws away what was worked out about a node, because what it was
+    /// worked out from has changed.
+    static func forget(_ node: MusicNode, in context: ModelContext) {
+        let identity = node.id
+        for row in (try? context.fetch(
+            FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity })
+        )) ?? [] {
+            context.delete(row)
+        }
+        var marker = FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == identity })
+        marker.fetchLimit = 1
+        if let existing = (try? context.fetch(marker))?.first { context.delete(existing) }
+    }
+
     /// The artists reachable from an artist, which is the RELATED list.
     /// Kept as a named entry point because it is asked for constantly and
     /// filtering a full walk down to one kind every time would be wasteful.
     func relatedArtists(to node: MusicNode) -> [(node: MusicNode, edges: [MusicEdge], confidence: Double)] {
-        let caches = self.caches
-        var edges = EdgeSet()
-        addArtistPeers(node, caches: caches, into: &edges)
-        return edges.byDestination.filter { $0.node.kind == .artist }
+        // The alias branch is not the peer list. Traumprinz is not a good way
+        // to broaden out from Traumprinz, however strongly the two are
+        // connected — that is what the aliases section is for.
+        let family = caches.aliasKeys(of: node.title, context: context)
+        return neighbors(of: node).byDestination.filter {
+            $0.node.kind == .artist && !family.contains($0.node.key)
+        }
     }
 
     // MARK: - Artist
 
     private func addArtistNeighbors(_ node: MusicNode, caches: Caches, into edges: inout EdgeSet) {
-        addAliasFamily(node, into: &edges)
+        addAliasFamily(node, caches: caches, into: &edges)
 
         addArtistCatalogue(node, caches: caches, into: &edges)
         addArtistBroadcasts(node, caches: caches, into: &edges)
@@ -90,8 +174,8 @@ nonisolated struct GraphStore {
 
     /// The alias branch. Distinct nodes joined by a strong edge, never merged
     /// into one — the names are different on purpose.
-    private func addAliasFamily(_ node: MusicNode, into edges: inout EdgeSet) {
-        let family = AliasResolver(context: context).family(of: node.title)
+    private func addAliasFamily(_ node: MusicNode, caches: Caches, into edges: inout EdgeSet) {
+        let family = caches.resolver(context: context).family(of: node.title)
         for member in family.members {
             let reason: String
             let kind: RelationshipKind
@@ -198,9 +282,12 @@ nonisolated struct GraphStore {
             _ source: RelationshipSource,
             _ reason: String,
             confidence: Double? = nil,
-            occurrences: Int = 1
+            occurrences: Int = 1,
+            key precomputed: String? = nil
         ) {
-            let key = RecordingKey.normalizeArtist(name)
+            // The caller usually already holds the normalised name; folding it
+            // again is the single most repeated cost in this walk.
+            let key = precomputed ?? RecordingKey.normalizeArtist(name)
             // An artist's own aliases belong on the alias branch, not in the
             // peer list, or every family member arrives twice. And "Various"
             // is a filing convention rather than a person — left in, it would
@@ -247,29 +334,27 @@ nonisolated struct GraphStore {
         // Artists already visited form an instant local graph, which is often
         // better than either catalogue: it is made of what this listener has
         // actually looked at.
-        if let discogs {
-            let subjectLabels = Set(discogs.labelNames.map(RecordingKey.normalize))
-            let subjectStyles = Set(discogs.styles.map(RecordingKey.normalize))
-            let subjectDecades = Set(discogs.releaseYears.compactMap(Self.decade))
-            for peer in caches.discogsArtists where !family.contains(peer.nameKey) {
-                let peerLabels = Set(peer.labelNames.map(RecordingKey.normalize))
-                if let shared = discogs.labelNames.first(where: { name in
-                    guard LabelName.isRealLabel(name) else { return false }
-                    let key = RecordingKey.normalize(name)
-                    return subjectLabels.contains(key) && peerLabels.contains(key)
-                }) {
-                    link(peer.name, .sharedLabel, .discogs, "Both release on \(shared)", confidence: 0.8)
+        if let subject = caches.shape(of: subject) {
+            // Normalised once, in `Caches`, rather than on every comparison.
+            //
+            // This loop runs over every artist the app has ever cached, and it
+            // used to normalise each of their labels, styles and years inside
+            // the comparison — tens of thousands of foldings for one page, at
+            // about twenty microseconds each. That was four fifths of the time
+            // it took to open an artist.
+            for peer in caches.shapes where peer.key != subject.key && !family.contains(peer.key) {
+                if let shared = subject.sharedLabel(with: peer) {
+                    link(peer.name, .sharedLabel, .discogs, "Both release on \(shared)",
+                         confidence: 0.8, key: peer.key)
                 }
-                let sharedStyles = subjectStyles.intersection(peer.styles.map(RecordingKey.normalize))
-                if let style = discogs.styles.first(where: {
-                    sharedStyles.contains(RecordingKey.normalize($0))
-                }) {
+                let sharedStyles = subject.styleKeys.intersection(peer.styleKeys)
+                if let style = subject.style(forKey: sharedStyles.first) {
                     link(peer.name, .sharedStyle, .discogs, "Shared sound: \(style)",
-                         occurrences: sharedStyles.count)
+                         occurrences: sharedStyles.count, key: peer.key)
                 }
-                let peerDecades = Set(peer.releaseYears.compactMap(Self.decade))
-                if let decade = subjectDecades.intersection(peerDecades).sorted().last {
-                    link(peer.name, .sameEra, .discogs, "Catalogues overlap in the \(decade)s")
+                if let decade = subject.decades.intersection(peer.decades).max() {
+                    link(peer.name, .sameEra, .discogs, "Catalogues overlap in the \(decade)s",
+                         key: peer.key)
                 }
             }
         }
@@ -293,7 +378,7 @@ nonisolated struct GraphStore {
         _ node: MusicNode,
         family: Set<String>,
         caches: Caches,
-        link: (String, RelationshipKind, RelationshipSource, String, Double?, Int) -> Void
+        link: (String, RelationshipKind, RelationshipSource, String, Double?, Int, String?) -> Void
     ) {
         var subjectShows: [String: String] = [:]
         for recording in caches.recordings(byArtistKey: node.key) {
@@ -321,7 +406,7 @@ nonisolated struct GraphStore {
             let reason = evidence.count == 1
                 ? "Played in the same broadcast: \(evidence.title)"
                 : "Played in \(RelationshipReason.occurrences(evidence.count, singular: "of the same show", plural: "of the same shows"))"
-            link(peer, .sharedBroadcast, .radio, reason, nil, evidence.count)
+            link(peer, .sharedBroadcast, .radio, reason, nil, evidence.count, nil)
         }
     }
 
@@ -329,7 +414,7 @@ nonisolated struct GraphStore {
         _ node: MusicNode,
         family: Set<String>,
         caches: Caches,
-        link: (String, RelationshipKind, RelationshipSource, String, Double?, Int) -> Void
+        link: (String, RelationshipKind, RelationshipSource, String, Double?, Int, String?) -> Void
     ) {
         let albums = Set(caches.tracks
             .filter { !DigEngine.artistKeys(for: $0).isDisjoint(with: family) }
@@ -339,7 +424,7 @@ nonisolated struct GraphStore {
         for track in caches.tracks where albums.contains(track.albumKey) {
             let peer = track.artist.isEmpty ? track.albumArtist : track.artist
             guard !peer.isEmpty else { continue }
-            link(peer, .sharedCollection, .library, "Together in your library: \(track.album)", nil, 1)
+            link(peer, .sharedCollection, .library, "Together in your library: \(track.album)", nil, 1, nil)
         }
     }
 
@@ -563,6 +648,7 @@ private nonisolated struct Caches {
     /// Grouped once. Filtering the whole recording table per peer turns a
     /// RELATED list of forty into forty full scans, which is what made
     /// opening an artist page slow.
+    private let shapeIndex: (values: [Shape], byKey: [String: Shape])
     private let portraitsByKey: [String: URL]
     private let recordingsByArtistKey: [String: [Recording]]
     private let mbidByArtistKey: [String: String]
@@ -583,6 +669,12 @@ private nonisolated struct Caches {
         metadata = Dictionary(entries.map { ($0.recordingID, $0) }, uniquingKeysWith: { first, _ in first })
         artistsByKey = Dictionary(discogsArtists.map { ($0.nameKey, $0) }, uniquingKeysWith: { first, _ in first })
         releasesByID = Dictionary(discogsReleases.map { ($0.discogsID, $0) }, uniquingKeysWith: { first, _ in first })
+
+        let shaped = discogsArtists.map(Shape.init)
+        shapeIndex = (
+            shaped,
+            Dictionary(shaped.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
+        )
 
         portraitsByKey = Dictionary(
             ((try? context.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
@@ -626,6 +718,46 @@ private nonisolated struct Caches {
 
     func discogsRelease(_ identifier: Int) -> DiscogsReleaseRecord? { releasesByID[identifier] }
 
+    /// An artist reduced to the keys the peer walk compares on, folded once.
+    nonisolated struct Shape {
+        let key: String
+        let name: String
+        /// Normalised label key to the spelling worth showing.
+        let labels: [String: String]
+        let styleKeys: Set<String>
+        private let styles: [String: String]
+        let decades: Set<Int>
+
+        init(_ artist: DiscogsArtist) {
+            key = artist.nameKey
+            name = artist.name
+            var foundLabels: [String: String] = [:]
+            for label in artist.labelNames where LabelName.isRealLabel(label) {
+                foundLabels[RecordingKey.normalize(label)] = label
+            }
+            labels = foundLabels
+            var foundStyles: [String: String] = [:]
+            for style in artist.styles { foundStyles[RecordingKey.normalize(style)] = style }
+            styles = foundStyles
+            styleKeys = Set(foundStyles.keys)
+            decades = Set(artist.releaseYears.compactMap {
+                guard let value = Int($0.prefix(4)), value > 0 else { return nil }
+                return value / 10 * 10
+            })
+        }
+
+        func sharedLabel(with peer: Shape) -> String? {
+            for (key, spelling) in labels where peer.labels[key] != nil { return spelling }
+            return nil
+        }
+
+        func style(forKey key: String?) -> String? { key.flatMap { styles[$0] } }
+    }
+
+    var shapes: [Shape] { shapeIndex.values }
+
+    func shape(of key: String) -> Shape? { shapeIndex.byKey[key] }
+
     /// A picture found by the background fill, for somebody nobody has dug
     /// into.
     func portrait(_ key: String) -> URL? { portraitsByKey[key] }
@@ -636,9 +768,15 @@ private nonisolated struct Caches {
     func aliasKeys(of name: String, context: ModelContext) -> Set<String> {
         let key = RecordingKey.normalizeArtist(name)
         if let known = families.value[key] { return known }
-        let resolved = AliasResolver(context: context).aliasKeys(of: name)
+        let resolved = resolver(context: context).aliasKeys(of: name)
         families.value[key] = resolved
         return resolved
+    }
+
+    /// A resolver over the artists already fetched, rather than one that goes
+    /// back to the store for them.
+    func resolver(context: ModelContext) -> AliasResolver {
+        AliasResolver(context: context, artists: discogsArtists)
     }
 
     func recordings(byArtistKey key: String) -> [Recording] {

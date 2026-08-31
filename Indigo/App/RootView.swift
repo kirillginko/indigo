@@ -42,6 +42,11 @@ struct RootView: View {
         }
         .ignoresSafeArea(.container, edges: .top)
         .overlay(alignment: .bottom) { noticeOverlay }
+        // Owned here because this view outlives every page. Started from a
+        // detail page it was cancelled by the first navigation and, thanks to
+        // its own start-once guard, never ran again — which is why rows filled
+        // in for a few seconds after launch and then stopped.
+        .task { await dig.fillPortraitsInBackground() }
         #if !os(macOS)
         .fileImporter(
             isPresented: Binding(

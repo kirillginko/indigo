@@ -21,6 +21,12 @@ struct DeepSectionView: View {
     /// empty level is a level nobody has looked at yet — and saying "nothing
     /// at this depth" about it is a failure announced in advance.
     var isReady = true
+    /// The first level, worked out by the page while it loaded.
+    ///
+    /// This section lives at the bottom of every page, so without it the walk
+    /// happened at the moment somebody scrolled down to it — which is exactly
+    /// when it must not. Lazy sections should render on appear, not compute.
+    var initial: DeepEngine.Descent?
     let open: (DetailPage) -> Void
 
     @Environment(DigStore.self) private var dig
@@ -37,8 +43,11 @@ struct DeepSectionView: View {
                     .foregroundStyle(Palette.inkFaint)
                     .padding(.bottom, 12)
 
-                if let descent = descent ?? dig.cachedDescent(from: origin, at: level) {
-                    if descent.results.isEmpty, self.descent == nil || !isReady {
+                let ready = descent
+                    ?? (level == .surface ? initial : nil)
+                    ?? dig.cachedDescent(from: origin, at: level)
+                if let descent = ready {
+                    if descent.results.isEmpty, (self.descent == nil && initial == nil) || !isReady {
                         // A cached descent for a different level is not an
                         // answer about this one, and neither is an empty walk
                         // over a store nothing has been fetched into yet.
@@ -66,8 +75,11 @@ struct DeepSectionView: View {
         // Walked once when the page or the level changes, never during a
         // redraw. Descending the graph reads most of the store, and doing
         // that on every hover is what made opening an artist page crawl.
+        // Only for a level the page did not already work out. The surface is
+        // handed in, so arriving at this section costs nothing.
         .task(id: TaskKey(origin: origin.id, level: level, revision: dig.revision)) {
-            descent = dig.descent(from: origin, at: level)
+            guard level != .surface || initial == nil else { return }
+            descent = await dig.descent(from: origin, at: level)
         }
     }
 

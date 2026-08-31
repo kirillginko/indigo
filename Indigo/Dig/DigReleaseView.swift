@@ -208,12 +208,15 @@ struct DigReleaseView: View {
             resolvedID = await dig.resolveRelease(title: fallbackTitle, artist: credit)
             hasLookedUp = true
         }
-        .task(id: dig.revision) { self.profile = identifier.flatMap { dig.releaseProfile(id: $0) } }
+        .task(id: dig.revision) {
+            guard let identifier else { return }
+            self.profile = await dig.releaseProfile(id: identifier)
+        }
         .task(id: identifier) {
             guard let identifier else { return }
-            self.profile = dig.releaseProfile(id: identifier)
+            self.profile = await dig.releaseProfile(id: identifier)
             await dig.enrichRelease(id: identifier)
-            self.profile = dig.releaseProfile(id: identifier)
+            self.profile = await dig.releaseProfile(id: identifier)
             hasLookedUp = true
             // Asked before the list is offered, so nothing that will refuse
             // ever appears in it.

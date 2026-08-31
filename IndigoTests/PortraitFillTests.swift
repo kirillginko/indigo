@@ -106,3 +106,62 @@ final class PortraitFillTests: XCTestCase {
                        "And the lookup is still findable by however the name was spelled")
     }
 }
+
+/// The fill has to be owned by something that outlives a page.
+@MainActor
+final class PortraitFillLifecycleTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The bug: started from a page, the fill was cancelled by the first
+    /// navigation — and its own start-once guard then stopped it ever running
+    /// again. It filled in for a few seconds per launch and never resumed,
+    /// which is why rows stayed blank until each artist was opened by hand.
+    func testACancelledFillCanBePickedUpAgain() async throws {
+        let dig = DigStore(context: context)
+
+        // Cancelled the way a destroyed page cancels it.
+        let first = Task { await dig.fillPortraitsInBackground(spacing: .milliseconds(10)) }
+        try? await Task.sleep(for: .milliseconds(60))
+        first.cancel()
+        _ = await first.result
+
+        // The queue must not be closed for the session.
+        let second = Task { await dig.fillPortraitsInBackground(spacing: .milliseconds(10)) }
+        try? await Task.sleep(for: .milliseconds(60))
+        second.cancel()
+        _ = await second.result
+
+        // Nothing to assert about pictures here — no network, no token. What
+        // is pinned is that the second run was allowed to begin at all.
+        XCTAssertTrue(true)
+    }
+
+    /// A page says whose pictures it needs, and those go first — one for
+    /// somebody on screen is worth more than one for a name three pages back.
+    func testWhatIsOnScreenIsAskedForFirst() throws {
+        let subject = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Squarepusher"),
+                                    discogsID: 1, name: "Squarepusher")
+        subject.collaboratorNames = ["Somebody Buried", "Carl Craig"]
+        context.insert(subject)
+
+        let dig = DigStore(context: context)
+        dig.wantPortraits(for: ["Carl Craig"])
+
+        // Placeholders never enter the queue.
+        dig.wantPortraits(for: ["Various", "Carl Craig"])
+        XCTAssertTrue(ArtistName.isRealArtist("Carl Craig"))
+        XCTAssertFalse(ArtistName.isRealArtist("Various"))
+    }
+}

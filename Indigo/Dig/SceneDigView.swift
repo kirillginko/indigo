@@ -114,11 +114,11 @@ struct SceneDigView: View {
             }
         }
         .task(id: city) {
-            self.scene = SceneEngine(context: dig.context).scene(city: city)
+            self.scene = await dig.scene(city: city)
             hasGathered = true
         }
         .task(id: dig.revision) {
-            self.scene = SceneEngine(context: dig.context).scene(city: city)
+            self.scene = await dig.scene(city: city)
         }
     }
 }

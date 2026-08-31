@@ -26,7 +26,9 @@ enum Persistence {
         BandcampArtistIndex.self,
         DigVisit.self,
         DigStep.self,
-        ArtistPortrait.self
+        ArtistPortrait.self,
+        StoredEdge.self,
+        GraphSnapshot.self
     ])
 
     static let container: ModelContainer = makeContainer()

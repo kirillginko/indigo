@@ -169,7 +169,7 @@ nonisolated struct DiscogsClient: Sendable {
         async let labelResults: DiscogsSearchResponse = recommendationSearch(field: "label", value: labels.first)
         async let styleResults: DiscogsSearchResponse = recommendationSearch(field: "style", value: styles.first)
         let (labelsResponse, stylesResponse) = try await (labelResults, styleResults)
-        return try await DiscogsRecommendationBundle(
+        return DiscogsRecommendationBundle(
             labelArtists: Self.neighbours(from: labelsResponse.results ?? []),
             styleArtists: Self.neighbours(from: stylesResponse.results ?? [])
         )

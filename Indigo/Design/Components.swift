@@ -597,32 +597,36 @@ nonisolated extension Array {
 /// the rules and the progress track, and it says the one thing a label was
 /// being used to say. Text asks to be read; this doesn't.
 ///
-/// Driven by `TimelineView` rather than an animation on state, so it costs
-/// nothing when it is off screen and never needs starting or stopping.
+/// Animated by Core Animation rather than by `TimelineView`.
+///
+/// A timeline on the `.animation` schedule asks SwiftUI to re-evaluate this
+/// view every single frame for as long as it is on screen — main-thread work
+/// competing with a scroll. A repeating animation on one offset is handed to
+/// the render server and costs the main thread nothing once started.
 struct WorkingBar: View {
     var width: CGFloat = 120
     /// One sweep, in seconds.
     var period: Double = 1.1
 
-    var body: some View {
-        TimelineView(.animation) { context in
-            let phase = context.date.timeIntervalSinceReferenceDate
-                .truncatingRemainder(dividingBy: period) / period
-            // Eased at both ends so it reads as a sweep rather than a loop.
-            let eased = (1 - cos(phase * 2 * .pi)) / 2
-            let travel = width * 0.72
+    @State private var sweeping = false
 
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(Palette.outline)
-                    .frame(width: width, height: Metrics.hairline)
-                Rectangle()
-                    .fill(Palette.ink)
-                    .frame(width: width * 0.28, height: 2)
-                    .offset(x: travel * eased)
-            }
-            .frame(width: width, height: 2, alignment: .leading)
+    var body: some View {
+        let travel = width * 0.72
+        ZStack(alignment: .leading) {
+            Rectangle()
+                .fill(Palette.outline)
+                .frame(width: width, height: Metrics.hairline)
+            Rectangle()
+                .fill(Palette.ink)
+                .frame(width: width * 0.28, height: 2)
+                .offset(x: sweeping ? travel : 0)
+                .animation(
+                    .easeInOut(duration: period / 2).repeatForever(autoreverses: true),
+                    value: sweeping
+                )
         }
+        .frame(width: width, height: 2, alignment: .leading)
+        .onAppear { sweeping = true }
         .accessibilityLabel("Loading")
     }
 }

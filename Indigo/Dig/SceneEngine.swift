@@ -142,13 +142,27 @@ nonisolated struct MusicScene: Identifiable, Sendable {
 nonisolated struct SceneEngine {
     let context: ModelContext
 
+    /// Built once for the life of this engine — see `DigEngine` for why.
+    private let shared = CacheBox()
+
+    private final class CacheBox {
+        var caches: SceneCaches?
+    }
+
+    private var caches: SceneCaches {
+        if let existing = shared.caches { return existing }
+        let fresh = SceneCaches(context: context)
+        shared.caches = fresh
+        return fresh
+    }
+
     init(context: ModelContext) {
         self.context = context
     }
 
     /// Every scene the cache can evidence, busiest first.
     func scenes() -> [MusicScene] {
-        let caches = SceneCaches(context: context)
+        let caches = self.caches
         return caches.cities.keys
             .compactMap { scene(cityKey: $0, caches: caches) }
             .filter(\.isSubstantial)
@@ -160,14 +174,14 @@ nonisolated struct SceneEngine {
     }
 
     func scene(city: String) -> MusicScene? {
-        scene(cityKey: RecordingKey.normalize(city), caches: SceneCaches(context: context))
+        scene(cityKey: RecordingKey.normalize(city), caches: caches)
     }
 
     /// Which scenes an artist belongs to. An artist can be in more than one —
     /// people move, and a Berlin record made by somebody from Manchester
     /// belongs to both stories.
     func scenes(forArtist name: String) -> [MusicScene] {
-        let caches = SceneCaches(context: context)
+        let caches = self.caches
         let key = RecordingKey.normalizeArtist(name)
         return caches.citiesForArtist[key, default: []]
             .compactMap { scene(cityKey: $0, caches: caches) }
@@ -230,7 +244,7 @@ nonisolated struct SceneEngine {
 
 /// One pass over the caches, arranged by artist so a scene can be assembled
 /// without going back to the store per member.
-private nonisolated struct SceneCaches {
+nonisolated struct SceneCaches {
     /// Normalised city key to the spelling worth showing.
     var cities: [String: String] = [:]
     var artistsForCity: [String: Set<String>] = [:]

@@ -25,7 +25,6 @@ struct CatalogDigView: View {
 
     var body: some View {
         let _ = crate.revision
-        let node = MusicNode.catalogNumber(number)
         let connections = connections
         let issued = connections.filter { $0.reasons.contains { $0.kind == .sameRelease } }
         let issuedIDs = Set(issued.map(\.to.id))
@@ -83,11 +82,11 @@ struct CatalogDigView: View {
             .scrollIndicators(.visible)
         }
         .task(id: number) {
-            self.connections = dig.connections(from: MusicNode.catalogNumber(number))
+            self.connections = await dig.connections(from: MusicNode.catalogNumber(number))
             hasLooked = true
         }
         .task(id: dig.revision) {
-            self.connections = dig.connections(from: MusicNode.catalogNumber(number))
+            self.connections = await dig.connections(from: MusicNode.catalogNumber(number))
         }
     }
 

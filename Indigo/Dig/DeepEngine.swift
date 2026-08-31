@@ -72,10 +72,37 @@ nonisolated struct DeepResult: Identifiable, Sendable {
 nonisolated struct DeepEngine {
     let context: ModelContext
 
+    /// Built once for the life of this engine — see `DigEngine` for why.
+    private let shared = CacheBox()
+
+    private final class CacheBox {
+        var caches: DeepCaches?
+    }
+
+    private var caches: DeepCaches {
+        if let existing = shared.caches { return existing }
+        let fresh = DeepCaches(context: context)
+        shared.caches = fresh
+        return fresh
+    }
+
     /// Above this, an object is treated as underground on its own merits even
     /// with no white-label marker on it: a tiny catalogue on a tiny imprint
     /// that the listener has never encountered.
     static let undergroundThreshold = 0.72
+
+    private let sharedGraph = GraphBox()
+
+    private final class GraphBox {
+        var store: GraphStore?
+    }
+
+    private var graph: GraphStore {
+        if let existing = sharedGraph.store { return existing }
+        let fresh = GraphStore(context: context)
+        sharedGraph.store = fresh
+        return fresh
+    }
 
     init(context: ModelContext) {
         self.context = context
@@ -84,8 +111,8 @@ nonisolated struct DeepEngine {
     /// Everything reachable from a node, each filed at the shallowest level
     /// that would have shown it.
     func results(from origin: MusicNode, distance: Int = 1) -> [DeepResult] {
-        let caches = DeepCaches(context: context)
-        return GraphStore(context: context).neighbors(of: origin).byDestination.map { candidate in
+        let caches = self.caches
+        return graph.neighbors(of: origin).byDestination.map { candidate in
             let signals = caches.signals(for: candidate.node, distance: distance)
             return DeepResult(
                 node: candidate.node,
@@ -189,7 +216,7 @@ nonisolated struct DeepEngine {
 /// The first version of this asked `libraryTrackCount(artist:)` for every
 /// candidate, and each of those scanned the whole track table. Twenty
 /// candidates on a decent library is twenty full scans — per redraw.
-private nonisolated struct DeepCaches {
+nonisolated struct DeepCaches {
     private let recordingsByID: [UUID: Recording]
     private let artistsByKey: [String: DiscogsArtist]
     private let libraryCounts: [String: Int]

@@ -68,9 +68,22 @@ nonisolated struct AliasFamily: Sendable {
 
 nonisolated struct AliasResolver {
     let context: ModelContext
+    /// The artist cache, when the caller already has it.
+    ///
+    /// Resolving a family reads every cached artist. A walk asks twice — once
+    /// for the alias branch and once to keep the family out of the peer list —
+    /// and each of those was fetching the whole table again. On a real
+    /// catalogue that was most of the time it took to open an artist page.
+    private let supplied: [DiscogsArtist]?
 
     init(context: ModelContext) {
         self.context = context
+        supplied = nil
+    }
+
+    init(context: ModelContext, artists: [DiscogsArtist]) {
+        self.context = context
+        supplied = artists
     }
 
     /// The family a name belongs to, walked transitively.
@@ -162,7 +175,7 @@ nonisolated struct AliasResolver {
     }
 
     private func cachedArtists() -> [String: DiscogsArtist] {
-        let all = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
+        let all = supplied ?? (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
         return Dictionary(all.map { ($0.nameKey, $0) }, uniquingKeysWith: { first, _ in first })
     }
 }

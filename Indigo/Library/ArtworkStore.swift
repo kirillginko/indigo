@@ -288,19 +288,34 @@ struct ArtworkView: View {
             }
             .clipped()
             .frame(width: side, height: side)
-            .task(id: localKey) { await load() }
-            .task(id: remoteURL) { await loadRemote() }
-            .task(id: previewRemoteURL) { await loadPreview() }
-            .task(id: markURL) { await loadMark() }
+            // One task, not four.
+            //
+            // A dig page builds dozens of these, and a lazy grid builds them
+            // while you are scrolling. Four `.task` modifiers apiece is four
+            // tasks created and cancelled per tile per pass, on the main
+            // actor, which is felt as the scroll catching.
+            .task(id: Sources(localKey, remoteURL, previewRemoteURL, markURL)) {
+                await loadAll()
+            }
     }
 
     @ViewBuilder
     private var placeholderGlyph: some View {
-        GeometryReader { geo in
-            if placeholder == .whiteLabel, mark?.isEmpty ?? true {
-                WhiteLabelMark()
-                    .frame(width: geo.size.width, height: geo.size.height)
-            } else if let mark, !mark.isEmpty {
+        // The two common cases size themselves, so the overwhelming majority
+        // of tiles cost no layout pass at all. Only the text mark — a station
+        // with no logo, which is rare — still needs to measure.
+        if placeholder == .whiteLabel, mark?.isEmpty ?? true {
+            WhiteLabelMark()
+        } else if mark?.isEmpty ?? true {
+            Image(systemName: "square.stack")
+                .resizable()
+                .scaledToFit()
+                .fontWeight(.ultraLight)
+                .foregroundStyle(Palette.inkFaint)
+                .scaleEffect(glyphScale)
+        } else {
+            GeometryReader { geo in
+                if let mark, !mark.isEmpty {
                 Text(mark)
                     .font(Typeface.banner(max(12, geo.size.width * 0.115)))
                     .tracking(0.6)
@@ -310,11 +325,7 @@ struct ArtworkView: View {
                     .minimumScaleFactor(0.4)
                     .padding(geo.size.width * 0.1)
                     .frame(width: geo.size.width, height: geo.size.height)
-            } else {
-                Image(systemName: "square.stack")
-                    .font(.system(size: max(9, geo.size.width * glyphScale), weight: .ultraLight))
-                    .foregroundStyle(Palette.inkFaint)
-                    .frame(width: geo.size.width, height: geo.size.height)
+                }
             }
         }
     }
@@ -327,6 +338,31 @@ struct ArtworkView: View {
         let natural = max(image.size.width, image.size.height)
         guard natural > 0 else { return false }
         return natural * 3 >= width
+    }
+
+    /// What this tile was asked to show. Its identity is what decides whether
+    /// the one task needs to run again.
+    private struct Sources: Hashable {
+        let local: String?
+        let remote: URL?
+        let preview: URL?
+        let mark: URL?
+
+        init(_ local: String?, _ remote: URL?, _ preview: URL?, _ mark: URL?) {
+            self.local = local
+            self.remote = remote
+            self.preview = preview
+            self.mark = mark
+        }
+    }
+
+    private func loadAll() async {
+        // The small one first where there is one, so something appears before
+        // the full-size picture has finished.
+        await load()
+        await loadPreview()
+        await loadRemote()
+        await loadMark()
     }
 
     private func load() async {
@@ -409,30 +445,47 @@ nonisolated enum ArtworkPlaceholder: Hashable, Sendable {
 /// nothing this exists to replace. In a dark grid it reads exactly as the
 /// real thing does in a record bin.
 struct WhiteLabelMark: View {
-    /// Fixed rather than tokenised, for the reason above.
+    /// Drawn in a `Canvas` rather than composed from shapes in a
+    /// `GeometryReader`.
+    ///
+    /// A grid of these is built while the listener scrolls, and a
+    /// GeometryReader plus five nested shapes apiece is a layout pass per
+    /// tile. A canvas is one draw call and no layout at all.
     private let paper = Color(red: 0.96, green: 0.955, blue: 0.94)
     private let groove = Color(red: 0.78, green: 0.775, blue: 0.76)
     private let spindle = Color(red: 0.15, green: 0.15, blue: 0.16)
 
     var body: some View {
-        GeometryReader { geo in
-            let side = min(geo.size.width, geo.size.height)
-            ZStack {
-                paper
-                Circle()
-                    .strokeBorder(groove.opacity(0.7), lineWidth: max(1, side * 0.006))
-                    .padding(side * 0.06)
-                Circle()
-                    .strokeBorder(groove.opacity(0.5), lineWidth: max(1, side * 0.005))
-                    .padding(side * 0.30)
-                Circle()
-                    .strokeBorder(groove.opacity(0.35), lineWidth: max(1, side * 0.004))
-                    .padding(side * 0.36)
-                Circle()
-                    .fill(spindle)
-                    .frame(width: side * 0.085, height: side * 0.085)
+        Canvas(opaque: false, rendersAsynchronously: false) { context, size in
+            let side = min(size.width, size.height)
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(paper))
+
+            let centre = CGPoint(x: size.width / 2, y: size.height / 2)
+            func ring(_ inset: CGFloat, _ opacity: Double, _ width: CGFloat) {
+                let radius = side / 2 - inset
+                guard radius > 0 else { return }
+                let box = CGRect(
+                    x: centre.x - radius, y: centre.y - radius,
+                    width: radius * 2, height: radius * 2
+                )
+                context.stroke(
+                    Path(ellipseIn: box),
+                    with: .color(groove.opacity(opacity)),
+                    lineWidth: max(1, width)
+                )
             }
-            .frame(width: geo.size.width, height: geo.size.height)
+            ring(side * 0.06, 0.7, side * 0.006)
+            ring(side * 0.30, 0.5, side * 0.005)
+            ring(side * 0.36, 0.35, side * 0.004)
+
+            let hole = side * 0.085
+            context.fill(
+                Path(ellipseIn: CGRect(
+                    x: centre.x - hole / 2, y: centre.y - hole / 2,
+                    width: hole, height: hole
+                )),
+                with: .color(spindle)
+            )
         }
         .accessibilityLabel("No sleeve")
     }

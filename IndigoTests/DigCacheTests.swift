@@ -52,7 +52,7 @@ final class DigCacheTests: XCTestCase {
     /// The case that started this: dig an artist, open one of their records,
     /// come back. The artist page must not be rebuilt from nothing.
     @MainActor
-    func testReturningToAnArtistDoesNotStartOver() throws {
+    func testReturningToAnArtistDoesNotStartOver() async throws {
         let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
@@ -67,7 +67,7 @@ final class DigCacheTests: XCTestCase {
         XCTAssertNil(dig.cachedArtistProfile(name: "Skee Mask", mbid: nil),
                      "Nothing to draw before it has ever been opened")
 
-        _ = dig.artistProfile(name: "Skee Mask", mbid: nil)
+        _ = await dig.artistProfile(name: "Skee Mask", mbid: nil)
 
         // Opening a release writes, which bumps the revision for everything.
         let release = DiscogsReleaseRecord(discogsID: 5, title: "Compro")

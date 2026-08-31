@@ -15,7 +15,13 @@
 
 import Foundation
 
-extension RelationshipKind {
+/// Deliberately `nonisolated`.
+///
+/// The module defaults to main-actor isolation, so an extension without this
+/// belongs to the main actor — and `GraphStore` reads `baseConfidence` on
+/// every edge it builds, from inside `DigWorker`, which is not the main actor.
+/// Under Swift 5 that is a warning; under Swift 6 it does not build.
+nonisolated extension RelationshipKind {
     /// The short technical label shown beside a reason.
     var label: String {
         switch self {

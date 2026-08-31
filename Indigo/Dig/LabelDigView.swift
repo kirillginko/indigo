@@ -93,15 +93,15 @@ struct LabelDigView: View {
             .scrollIndicators(.visible)
         }
         .task(id: dig.revision) {
-            self.profile = dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
-            readCatalogue()
+            self.profile = await dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
+            await readCatalogue()
         }
         .task(id: labelMBID) {
-            self.profile = dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
-            readCatalogue()
+            self.profile = await dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
+            await readCatalogue()
             await dig.enrichLabel(mbid: labelMBID)
-            self.profile = dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
-            readCatalogue()
+            self.profile = await dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
+            await readCatalogue()
             hasEnriched = true
         }
     }
@@ -113,13 +113,13 @@ struct LabelDigView: View {
     @State private var catalogueNumbers: [MusicGraph.Connection] = []
     @State private var undergroundCuts: [DeepResult] = []
 
-    private func readCatalogue() {
+    private func readCatalogue() async {
         let subject = node(profile ?? LabelProfile(
             name: labelName, mbid: labelMBID, origin: nil, founded: nil, artists: [],
             releases: [], catalogueSize: 0, libraryTrackCount: 0, crateCount: 0,
             radioAppearances: 0
         ))
-        catalogueNumbers = dig.connections(from: subject)
+        catalogueNumbers = await dig.connections(from: subject)
             .filter { $0.to.kind == .catalogNumber }
             .sorted { lhs, rhs in
                 let left = CatalogNumber.split(lhs.to.title)
@@ -129,7 +129,7 @@ struct LabelDigView: View {
                 }
                 return left.number < right.number
             }
-        undergroundCuts = DeepEngine(context: dig.context).results(from: subject, at: .underground)
+        undergroundCuts = await dig.undergroundCuts(for: subject)
     }
 
     /// The run itself. Catalogue numbers are the label's spine, and reading

@@ -492,7 +492,7 @@ final class DigTests: XCTestCase {
         )
         await store.enrichArtist(name: "Kelly Moran", mbid: nil)
 
-        let profile = store.artistProfile(name: "Kelly Moran", mbid: nil)
+        let profile = await store.artistProfile(name: "Kelly Moran", mbid: nil)
         XCTAssertFalse(profile.isBare, "Stage one should have populated the page")
         XCTAssertEqual(profile.releases.first?.title, "Origin")
         XCTAssertNil(store.notice, "A populated page must not be labelled a failure")
@@ -512,7 +512,8 @@ final class DigTests: XCTestCase {
         await store.enrichArtist(name: "Nobody Known", mbid: nil)
 
         XCTAssertNotNil(store.notice)
-        XCTAssertTrue(store.artistProfile(name: "Nobody Known", mbid: nil).isBare)
+        let bare = await store.artistProfile(name: "Nobody Known", mbid: nil)
+        XCTAssertTrue(bare.isBare)
     }
 
     // MARK: Counting
@@ -722,19 +723,21 @@ final class LoadingStateTests: XCTestCase {
     /// found nothing, said so, and only then went and asked. Emptiness before
     /// the catalogues have been asked is not evidence of anything.
     @MainActor
-    func testAnEmptyStoreIsNotAnAnswer() throws {
+    func testAnEmptyStoreIsNotAnAnswer() async throws {
         let dig = DigStore(context: context)
-        let beforeAsking = dig.artistProfile(name: "Skee Mask", mbid: nil)
+        let beforeAsking = await dig.artistProfile(name: "Skee Mask", mbid: nil)
         XCTAssertTrue(beforeAsking.isBare, "Nothing known yet")
 
         let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Skee Mask"),
                                    discogsID: 1, name: "Skee Mask")
         artist.releaseTitles = ["Compro"]
         context.insert(artist)
+        try? context.save()
 
         // The same page, a moment later, once something has arrived.
         let dug = DigStore(context: context)
-        XCTAssertFalse(dug.artistProfile(name: "Skee Mask", mbid: nil).isBare)
+        let after = await dug.artistProfile(name: "Skee Mask", mbid: nil)
+        XCTAssertFalse(after.isBare)
     }
 
     /// A record with an identifier is looked up by the catalogue, so the

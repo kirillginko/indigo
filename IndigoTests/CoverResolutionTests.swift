@@ -252,12 +252,13 @@ final class CoverResolutionTests: XCTestCase {
             """
         ], recorder: recorder)
 
-        XCTAssertNil(dig.artistProfile(name: "Seefeel", mbid: nil).releases.first?.imageURL,
-                     "Blank to begin with")
+        let before = await dig.artistProfile(name: "Seefeel", mbid: nil)
+        XCTAssertNil(before.releases.first?.imageURL, "Blank to begin with")
 
         await dig.fillMissingReleaseArtwork(forArtist: "Seefeel", mbid: nil)
 
-        let release = try XCTUnwrap(dig.artistProfile(name: "Seefeel", mbid: nil).releases.first)
+        let after = await dig.artistProfile(name: "Seefeel", mbid: nil)
+        let release = try XCTUnwrap(after.releases.first)
         XCTAssertEqual(release.imageURL?.absoluteString, "https://img.test/squared.jpg")
         XCTAssertEqual(release.label, "Warp Records")
     }
@@ -265,7 +266,7 @@ final class CoverResolutionTests: XCTestCase {
     /// The page reads the profile on every redraw — including every hover —
     /// and each miss walks the whole graph. Nothing but a write should cost
     /// that.
-    func testTheProfileIsNotRebuiltForEveryRedraw() throws {
+    func testTheProfileIsNotRebuiltForEveryRedraw() async throws {
         let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Seefeel"),
                                    discogsID: 1, name: "Seefeel")
         artist.releaseTitles = ["Quique"]
@@ -275,12 +276,14 @@ final class CoverResolutionTests: XCTestCase {
         let recorder = RecordingTransport.Recorder()
         let dig = makeStore(routes: [:], recorder: recorder)
 
-        let first = dig.artistProfile(name: "Seefeel", mbid: nil)
-        let second = dig.artistProfile(name: "Seefeel", mbid: nil)
+        let first = await dig.artistProfile(name: "Seefeel", mbid: nil)
+        let second = await dig.artistProfile(name: "Seefeel", mbid: nil)
         XCTAssertEqual(first.releases.map(\.id), second.releases.map(\.id))
 
         // A different artist must not be served the cached one.
-        XCTAssertNotEqual(dig.artistProfile(name: "Somebody Else", mbid: nil).name, "Seefeel")
-        XCTAssertEqual(dig.artistProfile(name: "Seefeel", mbid: nil).styles, ["Ambient"])
+        let other = await dig.artistProfile(name: "Somebody Else", mbid: nil)
+        XCTAssertNotEqual(other.name, "Seefeel")
+        let again = await dig.artistProfile(name: "Seefeel", mbid: nil)
+        XCTAssertEqual(again.styles, ["Ambient"])
     }
 }

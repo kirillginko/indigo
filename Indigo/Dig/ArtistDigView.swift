@@ -34,6 +34,9 @@ struct ArtistDigView: View {
     /// How much of the discography is on screen. Grows on request rather than
     /// rendering hundreds of sleeves nobody asked to see.
     @State private var releaseLimit = 24
+    /// The first level of DEEP, worked out while the page loads rather than
+    /// when somebody scrolls down to it.
+    @State private var surfaceDescent: DeepEngine.Descent?
 
     /// True while there is genuinely nothing to show yet — no cached page from
     /// last time, and the catalogues not yet asked.
@@ -284,7 +287,8 @@ struct ArtistDigView: View {
 
                     DeepSectionView(
                         origin: .artist(profile.name, mbid: profile.mbid),
-                        isReady: hasEnriched
+                        isReady: hasEnriched,
+                        initial: surfaceDescent
                     ) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
@@ -292,15 +296,15 @@ struct ArtistDigView: View {
             }
             .scrollIndicators(.visible)
         }
-        .task(id: dig.revision) { readProfile() }
+        .task(id: dig.revision) { await readProfile() }
         .task(id: artistMBID ?? artistName) {
-            readProfile()
-            artistScenes = SceneEngine(context: dig.context).scenes(forArtist: artistName)
+            await readProfile()
+            artistScenes = await dig.scenes(forArtist: artistName)
 
             // The catalogue first: everything after it needs the artist's own
             // links, which is where the Bandcamp address comes from.
             await dig.enrichArtist(name: artistName, mbid: artistMBID)
-            readProfile()
+            await readProfile()
             hasEnriched = true
 
             // Then both together. Bandcamp used to be queued behind the
@@ -313,16 +317,18 @@ struct ArtistDigView: View {
             async let bandcamp: Void = dig.enrichBandcamp(forArtist: artistName)
             _ = await (sleeves, bandcamp)
 
-            readProfile()
-            artistScenes = SceneEngine(context: dig.context).scenes(forArtist: artistName)
+            await readProfile()
+            artistScenes = await dig.scenes(forArtist: artistName)
+            surfaceDescent = await dig.descent(
+                from: .artist(artistName, mbid: artistMBID), at: .surface
+            )
             await dig.verifyListenable(
-                releaseIDs: dig.artistProfile(name: artistName, mbid: artistMBID)
+                releaseIDs: await dig.artistProfile(name: artistName, mbid: artistMBID)
                     .releases.compactMap(\.discogsID)
             )
         }
         // Runs once per launch and keeps going for as long as the app is
         // open, filling in the rows nobody has dug into.
-        .task { await dig.fillPortraitsInBackground() }
         // Newly revealed rows get the same treatment the first ones did,
         // rather than being the only blank part of the page.
         .task(id: releaseLimit) {
@@ -334,8 +340,8 @@ struct ArtistDigView: View {
         }
     }
 
-    private func readProfile() {
-        let found = dig.artistProfile(name: artistName, mbid: artistMBID)
+    private func readProfile() async {
+        let found = await dig.artistProfile(name: artistName, mbid: artistMBID)
         profile = found
         lanes = Connections.split(found.related)
         warmArtwork(found)
@@ -349,6 +355,8 @@ struct ArtistDigView: View {
     /// raggedly; warming the thumbnails first means most of them are already
     /// in hand. Thumbnails only — the full sleeves are fetched by whichever
     /// tiles are actually on screen.
+    @State private var warmed: Int = 0
+
     private func warmArtwork(_ profile: ArtistProfile) {
         // What is actually near the top of the page. Warming everything
         // competed with the requests that fill the tiles the listener can
@@ -357,6 +365,16 @@ struct ArtistDigView: View {
             .compactMap { $0.thumbnailURL ?? $0.imageURL }
             + profile.related.prefix(12).compactMap(\.imageURL)
         guard !thumbnails.isEmpty else { return }
+        // Only when the set has actually changed. The profile is re-read on
+        // every write to the store — including each batch of background
+        // portraits — and starting the same three dozen prefetches again each
+        // time is work that competes with the requests still outstanding.
+        var hasher = Hasher()
+        for url in thumbnails { hasher.combine(url) }
+        let signature = hasher.finalize()
+        guard signature != warmed else { return }
+        warmed = signature
+
         Task.detached(priority: .utility) {
             await RemoteArtworkStore.shared.prefetch(thumbnails)
         }

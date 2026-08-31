@@ -155,6 +155,24 @@ nonisolated struct LabelProfile: Sendable {
 nonisolated struct DigEngine {
     let context: ModelContext
 
+    /// One graph store for the life of this engine.
+    ///
+    /// Building its caches reads six tables whole, which is most of the cost
+    /// of a profile. An engine that is kept alive across calls — see
+    /// `DigWorker` — therefore pays that once rather than per question.
+    private let shared = GraphBox()
+
+    private final class GraphBox {
+        var store: GraphStore?
+    }
+
+    private var graph: GraphStore {
+        if let existing = shared.store { return existing }
+        let fresh = GraphStore(context: context)
+        shared.store = fresh
+        return fresh
+    }
+
     init(context: ModelContext) {
         self.context = context
     }
@@ -443,8 +461,7 @@ nonisolated struct DigEngine {
     /// artist: a label, a broadcast or a white label had nowhere to be put.
     /// This stays as the shape the existing pages read.
     func relatedArtists(to name: String) -> [RelatedArtist] {
-        GraphStore(context: context)
-            .relatedArtists(to: .artist(name))
+        graph.relatedArtists(to: .artist(name))
             .map { RelatedArtist(name: $0.node.title, mbid: $0.node.mbid,
                                  reasons: $0.edges.map(\.relationship),
                                  imageURL: $0.node.artworkURL) }
@@ -453,7 +470,7 @@ nonisolated struct DigEngine {
     /// Everything next to something, of any kind — the step DEEP takes.
     func connections(from node: MusicNode) -> [MusicGraph.Connection] {
         var graph = MusicGraph()
-        graph.absorb(GraphStore(context: context).neighbors(of: node).all)
+        graph.absorb(self.graph.neighbors(of: node).all)
         return graph.connections(from: node)
     }
 

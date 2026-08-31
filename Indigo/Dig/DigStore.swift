@@ -21,6 +21,19 @@ final class DigStore {
     ]
 
     @ObservationIgnored let context: ModelContext
+    /// Walks the graph off the main thread. See `DigWorker`.
+    @ObservationIgnored private let worker: DigWorker
+
+    /// The worker reads its own context, so it sees what has been *saved*.
+    ///
+    /// Everything that writes here saves as it goes, but a caller that has
+    /// just inserted and not yet saved would otherwise get an answer computed
+    /// without their change in it — a subtle, occasional wrongness that would
+    /// be miserable to track down. Saving nothing costs nothing.
+    private func settle() {
+        guard context.hasChanges else { return }
+        try? context.save()
+    }
     @ObservationIgnored private let client: MusicBrainzClient
     @ObservationIgnored private let discogsClient: DiscogsClient
     /// Keys already looked up this session, so revisiting a page doesn't
@@ -35,6 +48,7 @@ final class DigStore {
         discogsClient: DiscogsClient = DiscogsClient()
     ) {
         self.context = context
+        worker = DigWorker(modelContainer: context.container)
         self.client = client
         self.discogsClient = discogsClient
     }
@@ -55,11 +69,17 @@ final class DigStore {
 
     @ObservationIgnored private var profiles = DigCache<ArtistProfile>()
 
-    func artistProfile(name: String, mbid: String?) -> ArtistProfile {
+    /// The current profile, worked out off the main thread.
+    ///
+    /// Only the answer comes back here; the reading and the walking happen on
+    /// the worker's own context, so a page filling in does not stop a scroll.
+    func artistProfile(name: String, mbid: String?) async -> ArtistProfile {
         let key = Self.artistKey(name: name, mbid: mbid)
-        if let fresh = profiles.fresh(key, revision: revision) { return fresh }
-        let profile = engine.artistProfile(name: name, mbid: mbid)
-        profiles.store(profile, key: key, revision: revision)
+        let asked = revision
+        if let fresh = profiles.fresh(key, revision: asked) { return fresh }
+        settle()
+        let profile = await worker.artistProfile(name: name, mbid: mbid, generation: asked)
+        profiles.store(profile, key: key, revision: asked)
         return profile
     }
 
@@ -80,22 +100,26 @@ final class DigStore {
     @ObservationIgnored private var labels = DigCache<LabelProfile>()
     @ObservationIgnored private var releases = DigCache<DigReleaseProfile>()
 
-    func labelProfile(mbid: String, fallbackName: String) -> LabelProfile? {
-        if let fresh = labels.fresh(mbid, revision: revision) { return fresh }
-        guard let profile = engine.labelProfile(mbid: mbid, fallbackName: fallbackName) else {
+    func labelProfile(mbid: String, fallbackName: String) async -> LabelProfile? {
+        let asked = revision
+        if let fresh = labels.fresh(mbid, revision: asked) { return fresh }
+        settle()
+        guard let profile = await worker.labelProfile(mbid: mbid, fallbackName: fallbackName, generation: asked) else {
             return nil
         }
-        labels.store(profile, key: mbid, revision: revision)
+        labels.store(profile, key: mbid, revision: asked)
         return profile
     }
 
     func cachedLabelProfile(mbid: String) -> LabelProfile? { labels.any(mbid) }
 
-    func releaseProfile(id: Int) -> DigReleaseProfile? {
+    func releaseProfile(id: Int) async -> DigReleaseProfile? {
         let key = String(id)
-        if let fresh = releases.fresh(key, revision: revision) { return fresh }
-        guard let profile = engine.releaseProfile(id: id) else { return nil }
-        releases.store(profile, key: key, revision: revision)
+        let asked = revision
+        if let fresh = releases.fresh(key, revision: asked) { return fresh }
+        settle()
+        guard let profile = await worker.releaseProfile(id: id, generation: asked) else { return nil }
+        releases.store(profile, key: key, revision: asked)
         return profile
     }
 
@@ -140,7 +164,7 @@ final class DigStore {
     /// bumps the revision, so the grid fills in one tile at a time rather than
     /// all at once at the end.
     func fillMissingReleaseArtwork(forArtist name: String, mbid: String?, limit: Int = 24) async {
-        let missing = engine.artistProfile(name: name, mbid: mbid).releases
+        let missing = await artistProfile(name: name, mbid: mbid).releases
             .filter { $0.imageURL == nil && $0.thumbnailURL == nil }
         guard !missing.isEmpty else { return }
 
@@ -204,6 +228,30 @@ final class DigStore {
         revision &+= 1
     }
 
+    /// Throws away what was worked out about a node, because the catalogue it
+    /// was worked out from has just changed.
+    func forgetGraph(for node: MusicNode) {
+        GraphStore.forget(node, in: context)
+        try? context.save()
+    }
+
+    /// Puts a newly found portrait onto the edges that already point at that
+    /// artist.
+    ///
+    /// A stored edge carries its destination's picture, so a portrait arriving
+    /// later would otherwise not show until the source node was walked again.
+    /// Rewriting one column on the rows that name them is a great deal cheaper
+    /// than rebuilding anybody's graph.
+    private func paint(_ name: String, with address: String) {
+        let key = RecordingKey.normalizeArtist(name)
+        let artist = MusicNodeKind.artist.rawValue
+        let rows = (try? context.fetch(FetchDescriptor<StoredEdge>(predicate: #Predicate {
+            $0.toKey == key && $0.toKindRaw == artist && $0.toArtworkURLString == nil
+        }))) ?? []
+        guard !rows.isEmpty else { return }
+        for row in rows { row.toArtworkURLString = address }
+    }
+
     /// Fills in artist thumbnails slowly, in the background, forever.
     ///
     /// The rows that have no picture are the ones nobody has dug into, and
@@ -223,15 +271,34 @@ final class DigStore {
         portraitPriority = names.filter { ArtistName.isRealArtist($0) }
     }
 
+    /// Must be owned by something that outlives a page.
+    ///
+    /// This used to be started from the artist page, which is destroyed on
+    /// every navigation — so the task was cancelled the first time anybody
+    /// went anywhere, and the "started" guard then stopped it ever running
+    /// again. It filled in for about four seconds per launch, which is why
+    /// rows stayed blank until each artist was opened by hand.
     func fillPortraitsInBackground(spacing: Duration = .milliseconds(1500)) async {
         guard !portraitFillStarted, discogsClient.isConfigured else { return }
         portraitFillStarted = true
+        // Released on the way out, so a run that is cancelled can be picked up
+        // again rather than the queue being closed for the session.
+        defer { portraitFillStarted = false }
 
         // Let the page the listener is actually looking at finish first.
         try? await Task.sleep(for: .seconds(4))
 
+        // How many background pictures have been stored without telling the
+        // page about them.
+        var quiet = 0
+
         while !Task.isCancelled {
-            guard let next = nextPortraitNeeded() else { return }
+            guard let next = nextPortraitNeeded() else {
+                if quiet > 0 { revision &+= 1 }
+                return
+            }
+            // Consumed above, so the flag is set there instead.
+            let wasOnScreen = lastWasOnScreen
             let found: String?
             do {
                 found = try await discogsClient.artistThumbnail(named: next)
@@ -251,12 +318,27 @@ final class DigStore {
             )
             // Nothing found is a real answer, and worth remembering so the
             // same name is not asked after on every launch.
-            if let found { record.imageURLString = found } else { record.lookupFailed = true }
+            if let found {
+                record.imageURLString = found
+                paint(next, with: found)
+            } else {
+                record.lookupFailed = true
+            }
             // Replaces any earlier attempt for the same name.
             if let existing = portrait(for: next) { context.delete(existing) }
             context.insert(record)
             try? context.save()
-            revision &+= 1
+
+            // Telling the page costs it a full rebuild of its graph, so this
+            // is deliberately not done per picture. A name the listener is
+            // looking at is worth that immediately; the rest arrive in
+            // batches, which is invisible for filling in pictures and four
+            // times less work.
+            quiet += 1
+            if wasOnScreen || quiet >= 5 {
+                quiet = 0
+                revision &+= 1
+            }
 
             try? await Task.sleep(for: spacing)
         }
@@ -272,7 +354,42 @@ final class DigStore {
 
     /// The next name worth a picture: somebody named as a connection, who has
     /// neither been dug into nor already looked up.
+    /// Names still wanting a picture, worked out once and then worked
+    /// through.
+    ///
+    /// This used to rescan every cached artist and every previous lookup on
+    /// each tick — two full table scans a second and a half, forever, for a
+    /// job that is filling in thumbnails.
+    /// Whether the name just handed out came from the on-screen list, which
+    /// decides whether the page is told about it at once.
+    @ObservationIgnored private var lastWasOnScreen = false
+    @ObservationIgnored private var portraitQueue: [String] = []
+    @ObservationIgnored private var portraitQueueBuiltAt = 0
+
     private func nextPortraitNeeded() -> String? {
+        // The on-screen list is consumed rather than re-searched: each name
+        // is checked once and then gone, instead of every name being looked
+        // up again on every tick.
+        while let next = portraitPriority.first {
+            portraitPriority.removeFirst()
+            if portrait(for: next) == nil {
+                lastWasOnScreen = true
+                return next
+            }
+        }
+        lastWasOnScreen = false
+        if portraitQueue.isEmpty || portraitQueueBuiltAt != revision {
+            portraitQueue = pendingPortraits()
+            portraitQueueBuiltAt = revision
+        }
+        while let next = portraitQueue.first {
+            portraitQueue.removeFirst()
+            if portrait(for: next) == nil { return next }
+        }
+        return nil
+    }
+
+    private func pendingPortraits() -> [String] {
         let artists = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
         let dug = Set(artists.filter { $0.imageURLString?.isEmpty == false }.map(\.nameKey))
         let looked = Dictionary(
@@ -280,18 +397,7 @@ final class DigStore {
             uniquingKeysWith: { first, _ in first }
         )
 
-        func wanted(_ name: String) -> Bool {
-            let key = RecordingKey.normalizeArtist(name)
-            guard !key.isEmpty, !dug.contains(key) else { return false }
-            if let attempt = looked[key], !attempt.isWorthRetrying { return false }
-            return true
-        }
-
-        // Whatever is on screen first. A picture that arrives for somebody the
-        // listener is looking at is worth more than one for a name three pages
-        // back.
-        if let onScreen = portraitPriority.first(where: wanted) { return onScreen }
-
+        var pending: [String] = []
         var seen = Set<String>()
         for artist in artists {
             let named = artist.labelNeighbourNames + artist.styleNeighbourNames
@@ -301,10 +407,10 @@ final class DigStore {
                 let key = RecordingKey.normalizeArtist(name)
                 guard !key.isEmpty, !dug.contains(key), seen.insert(key).inserted else { continue }
                 if let attempt = looked[key], !attempt.isWorthRetrying { continue }
-                return name
+                pending.append(name)
             }
         }
-        return nil
+        return pending
     }
 
     /// Reads an artist's Bandcamp, when their catalogue entry gives an
@@ -324,6 +430,7 @@ final class DigStore {
               !found.isEmpty
         else { return }
         try? context.save()
+        forgetGraph(for: .artist(name))
         revision &+= 1
     }
 
@@ -438,11 +545,13 @@ final class DigStore {
     /// what made scrolling stutter.
     @ObservationIgnored private var descents = DigCache<DeepEngine.Descent>()
 
-    func descent(from origin: MusicNode, at level: DeepLevel) -> DeepEngine.Descent {
+    func descent(from origin: MusicNode, at level: DeepLevel) async -> DeepEngine.Descent {
         let key = "\(origin.id)|\(level.rawValue)"
-        if let fresh = descents.fresh(key, revision: revision) { return fresh }
-        let found = DeepEngine(context: context).descent(from: origin, at: level)
-        descents.store(found, key: key, revision: revision)
+        let asked = revision
+        if let fresh = descents.fresh(key, revision: asked) { return fresh }
+        settle()
+        let found = await worker.descent(from: origin, at: level, generation: asked)
+        descents.store(found, key: key, revision: asked)
         return found
     }
 
@@ -451,9 +560,28 @@ final class DigStore {
     }
 
     /// Everything next to something, of any kind — the step DIG takes.
-    func connections(from node: MusicNode) -> [MusicGraph.Connection] {
+    func connections(from node: MusicNode) async -> [MusicGraph.Connection] {
         let _ = revision
-        return engine.connections(from: node)
+        settle()
+        return await worker.connections(from: node, generation: revision)
+    }
+
+    func scenes(forArtist name: String) async -> [MusicScene] {
+        let _ = revision
+        settle()
+        return await worker.scenes(forArtist: name, generation: revision)
+    }
+
+    func scene(city: String) async -> MusicScene? {
+        let _ = revision
+        settle()
+        return await worker.scene(city: city, generation: revision)
+    }
+
+    func undergroundCuts(for node: MusicNode) async -> [DeepResult] {
+        let _ = revision
+        settle()
+        return await worker.undergroundCuts(for: node, generation: revision)
     }
 
     func genres(for recording: Recording) -> [String] {
@@ -907,6 +1035,9 @@ final class DigStore {
             do {
                 if let artist = try await discogsEnricher.artist(named: name) {
                     try? context.save()
+                    // What the graph knew about this artist was worked out
+                    // from the catalogue entry that has just been replaced.
+                    forgetGraph(for: .artist(name))
                     backfillLocalGenres(artistName: name, genres: artist.styles + artist.genres)
                     revision &+= 1
                     isEnriching = false
@@ -1003,7 +1134,7 @@ final class DigStore {
             // RELATED column; saying so in red over a page that loaded fine
             // reads as a failure when nothing the listener asked for failed.
             attempted.remove(key)
-            if engine.artistProfile(name: name, mbid: mbid).isBare {
+            if await artistProfile(name: name, mbid: mbid).isBare {
                 notice = message(for: error)
             }
         }
