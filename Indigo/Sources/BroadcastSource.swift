@@ -71,6 +71,11 @@ nonisolated struct BroadcastSource {
             // Kiosk publishes no per-show page; its shows live in the archive
             // grid, so there is nothing to navigate to yet.
             return nil
+        case LYLProvider.providerID:
+            let slug = showID.hasPrefix("lyl.episode.")
+                ? String(showID.dropFirst("lyl.episode.".count))
+                : showID
+            return slug.isEmpty ? nil : .lylEpisode(slug: slug)
         case CashmereProvider.providerID:
             let slug = showID.hasPrefix("cashmere.episode.")
                 ? String(showID.dropFirst("cashmere.episode.".count))
@@ -106,6 +111,7 @@ nonisolated struct BroadcastSource {
         case DublabProvider.providerID: "dublab"
         case AlharaProvider.providerID: "alHara"
         case CashmereProvider.providerID: "Cashmere"
+        case LYLProvider.providerID: "LYL"
         case Track.sourceID: "Local"
         default: providerID.capitalized
         }
@@ -115,5 +121,29 @@ nonisolated struct BroadcastSource {
         guard let seconds, seconds >= 0 else { return nil }
         let total = Int(seconds.rounded())
         return String(format: "@ %02d:%02d:%02d", total / 3600, (total % 3600) / 60, total % 60)
+    }
+}
+
+/// A station's own logo, for when there is no picture of what is actually on.
+///
+/// Kept in one place next to `BroadcastSource.label(for:)` because the same
+/// question — "which station is this?" — is asked by the player bar, the
+/// browse grids and the now-playing summary, and three copies of the answer
+/// is how one of them ends up out of date.
+nonisolated enum StationMark {
+    static func logoURL(for providerID: String?) -> URL? {
+        switch providerID {
+        case AlharaProvider.providerID: AlharaProvider.logoURL
+        case DublabProvider.providerID: DublabProvider.logoURL
+        case LYLProvider.providerID: LYLProvider.logoURL
+        case CashmereProvider.providerID: CashmereProvider.logoURL
+        default: nil
+        }
+    }
+
+    /// The station's name, for the last-resort text mark.
+    static func name(for providerID: String?) -> String? {
+        guard let providerID, logoURL(for: providerID) != nil else { return nil }
+        return BroadcastSource.label(for: providerID)
     }
 }

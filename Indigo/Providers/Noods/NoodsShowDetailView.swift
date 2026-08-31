@@ -180,6 +180,11 @@ struct NoodsShowDetailView: View {
                         .font(Typeface.body(12.5))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
+                    RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: "noods", showID: detail.show.slug,
+                        showTitle: detail.show.title, airedAt: detail.show.airedAt,
+                        entryID: "\(index)", title: entry, artist: nil, offsetSeconds: nil
+                    ))
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .frame(minHeight: Metrics.rowHeight)

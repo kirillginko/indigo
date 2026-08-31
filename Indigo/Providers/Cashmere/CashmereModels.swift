@@ -69,6 +69,31 @@ nonisolated struct CashmereEpisodeDTO: Decodable, Sendable {
         nonisolated struct Node: Decodable, Sendable {
             let sourceUrl: String?
             let altText: String?
+            /// WordPress's "url 600w, url 1024w, …" list of the same picture
+            /// at every size it made.
+            let srcSet: String?
+
+            /// The smallest cut that still covers `width`. `sourceUrl` is the
+            /// untouched original — often a megabyte — and a grid of two dozen
+            /// tiles has no business downloading two dozen of those.
+            func url(atLeast width: Int) -> URL? {
+                let candidates = (srcSet ?? "")
+                    .components(separatedBy: ",")
+                    .compactMap { entry -> (url: String, width: Int)? in
+                        let parts = entry.trimmingCharacters(in: .whitespaces)
+                            .components(separatedBy: " ")
+                            .filter { !$0.isEmpty }
+                        guard parts.count >= 2,
+                              let measure = Int(parts[1].replacingOccurrences(of: "w", with: ""))
+                        else { return nil }
+                        return (parts[0], measure)
+                    }
+                    .sorted { $0.width < $1.width }
+
+                let pick = candidates.first { $0.width >= width } ?? candidates.last
+                if let pick, let url = URL(string: pick.url) { return url }
+                return sourceUrl.flatMap { URL(string: $0) }
+            }
         }
     }
 }
@@ -235,7 +260,9 @@ extension CashmereEpisodeDTO {
             // happened to be published.
             airedAt: CashmereTimestamp.parseAirDate(acf?.episodeDate)
                 ?? CashmereTimestamp.parsePublished(dateGmt),
-            artworkURL: featuredImage?.node?.sourceUrl.flatMap { URL(string: $0) },
+            // 600 covers a 300pt hero on a retina display and every tile
+            // below it, which is as much as anything here is ever drawn at.
+            artworkURL: featuredImage?.node?.url(atLeast: 600),
             genres: clean(acf?.episodeFilterGenre),
             moods: clean(acf?.episodeFilterMood),
             mixcloudURL: acf?.episodeMixcloudLink.flatMap { link in

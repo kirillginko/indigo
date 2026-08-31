@@ -16,39 +16,51 @@ extension CrateService {
     /// Until identification lands, a live stream has no track to keep — the
     /// honest thing to crate is the show, which is also what the listener
     /// means by "save this" while a DJ set is on.
-    func isCrated(nowPlaying item: MediaItem) -> Bool {
+    func isCrated(nowPlaying item: MediaItem, liveShow: RadioShow? = nil) -> Bool {
         if item.kind == .track, let recording = existingRecording(forLocalPath: item.id) {
             return contains(recording: recording)
         }
-        return contains(broadcast: item.id, providerID: item.sourceID)
+        return contains(broadcast: broadcastID(for: item, liveShow: liveShow), providerID: item.sourceID)
     }
 
-    func toggle(nowPlaying item: MediaItem, showTitle: String? = nil) {
+    func toggle(nowPlaying item: MediaItem, liveShow: RadioShow? = nil) {
         if item.kind == .track {
             toggleLocalTrack(item)
             return
         }
-        if let existing = self.item(forBroadcast: item.id, providerID: item.sourceID) {
+        let broadcastID = broadcastID(for: item, liveShow: liveShow)
+        if let existing = self.item(forBroadcast: broadcastID, providerID: item.sourceID) {
             remove(existing)
             return
         }
+        let isArchivedNTS = item.isLive && broadcastID.hasPrefix("nts.episode.")
         add(
-            broadcast: item.id,
+            broadcast: broadcastID,
             providerID: item.sourceID,
-            title: showTitle ?? item.title,
-            subtitle: subtitle(for: item, showTitle: showTitle),
-            artworkURL: item.remoteArtworkURL,
-            playbackURL: item.playbackURL,
-            embedProvider: item.embedProvider,
-            isLiveStream: item.isLive,
-            genres: item.genres
+            title: liveShow?.title ?? item.title,
+            subtitle: subtitle(for: item, liveShow: liveShow),
+            artworkURL: liveShow?.artworkURL ?? item.remoteArtworkURL,
+            // A station stream is never the archive source. The crate page
+            // resolves the exact episode's published SoundCloud/Mixcloud URL.
+            playbackURL: isArchivedNTS ? nil : item.playbackURL,
+            embedProvider: isArchivedNTS ? nil : item.embedProvider,
+            isLiveStream: isArchivedNTS ? false : item.isLive,
+            genres: (liveShow?.genres ?? []) + (liveShow?.moods ?? item.genres)
         )
+    }
+
+    private func broadcastID(for item: MediaItem, liveShow: RadioShow?) -> String {
+        if item.isLive, item.sourceID == NTSProvider.providerID,
+           let detailID = liveShow?.detailID, NTSEpisodeRef.decode(detailID) != nil {
+            return "nts.episode.\(detailID)"
+        }
+        return item.id
     }
 
     /// A live station's headline is the show that's on air, so the crated
     /// entry keeps the station as its subtitle rather than losing it.
-    private func subtitle(for item: MediaItem, showTitle: String?) -> String? {
-        if showTitle != nil, item.isLive { return item.title }
+    private func subtitle(for item: MediaItem, liveShow: RadioShow?) -> String? {
+        if liveShow != nil, item.isLive { return item.title }
         return [item.subtitle, item.detail]
             .compactMap { $0 }
             .filter { !$0.isEmpty }

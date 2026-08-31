@@ -526,7 +526,7 @@ extension LotArtistDTO {
             slug: slug ?? name.lowercased(),
             aka: aka.map(HTMLText.decode),
             isResident: thisIsAResident ?? false,
-            photoURL: photo?.url.flatMap { URL(string: $0) },
+            photoURL: LotImage.sized(photo?.url),
             links: links
         )
     }
@@ -541,7 +541,7 @@ extension LotShowDTO {
             id: sys?.id ?? identity,
             name: name,
             slug: identity,
-            photoURL: photo?.url.flatMap { URL(string: $0) },
+            photoURL: LotImage.sized(photo?.url),
             genres: (genres?.items ?? []).compactMap { $0.asGenre() },
             artists: (artists?.items ?? []).compactMap { $0.asArtist() }
         )
@@ -583,8 +583,8 @@ extension LotEpisodeDTO {
             endedAt: LotTimestamp.parse(endTimestamp),
             streamURL: transcodedFile?.hls.flatMap { URL(string: $0) },
             tracklist: tracks,
-            imageURL: image?.url.flatMap { URL(string: $0) },
-            thumbnailURLs: (thumbnailsCollection?.items ?? []).compactMap { $0.url.flatMap(URL.init(string:)) },
+            imageURL: LotImage.sized(image?.url),
+            thumbnailURLs: (thumbnailsCollection?.items ?? []).compactMap { LotImage.sized($0.url) },
             location: location?.name.map(HTMLText.decode),
             genres: (genres?.items ?? []).compactMap { $0.asGenre() },
             artists: (artists?.items ?? []).compactMap { $0.asArtist() },
@@ -642,6 +642,27 @@ extension LotLiveDTO {
 
 /// Contentful stamps entries with fractional seconds and Zulu time; the
 /// calendar comes through with a New York offset.
+/// The Lot's pictures come from Contentful, which serves the untouched
+/// original — regularly two or three megabytes — unless asked otherwise. Its
+/// Images API takes a width on the query string, and a tile drawn at 300pt on
+/// a retina display never needs more than six hundred pixels.
+nonisolated enum LotImage {
+    static func sized(_ address: String?, width: Int = 600) -> URL? {
+        guard let address, var components = URLComponents(string: address) else { return nil }
+        guard components.host?.contains("ctfassets.net") == true else {
+            return URL(string: address)
+        }
+        var items = components.queryItems ?? []
+        items.removeAll { $0.name == "w" || $0.name == "fm" || $0.name == "q" }
+        items.append(URLQueryItem(name: "w", value: String(width)))
+        // Contentful re-encodes on the fly; asking for a sensible quality
+        // keeps a photograph from arriving as a lossless original.
+        items.append(URLQueryItem(name: "q", value: "80"))
+        components.queryItems = items
+        return components.url ?? URL(string: address)
+    }
+}
+
 nonisolated enum LotTimestamp {
     private static let fractional: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()

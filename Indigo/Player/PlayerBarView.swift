@@ -21,20 +21,28 @@ struct PlayerBarView: View {
     @Environment(DublabProvider.self) private var dublab
     @Environment(AlharaProvider.self) private var alhara
     @Environment(CashmereProvider.self) private var cashmere
+    @Environment(LYLProvider.self) private var lyl
     @Environment(CrateService.self) private var crate
 
     var body: some View {
-        HStack(spacing: 0) {
-            identity
-                .frame(width: 356)
-            VRule(color: Palette.rule)
-            transport
-                .frame(maxWidth: .infinity)
-            VRule(color: Palette.rule)
-            volume
-                .frame(width: 168)
+        ZStack {
+            PlayerGradientBackdrop()
+
+            HStack(spacing: 0) {
+                identity
+                    .frame(width: 356)
+                VRule(color: Palette.outline.opacity(0.72))
+                transport
+                    .frame(maxWidth: .infinity)
+                VRule(color: Palette.outline.opacity(0.72))
+                volume
+                    .frame(width: 168)
+            }
         }
-        .background(Palette.paperChrome)
+        // Keep the player legible as a dark object regardless of the system
+        // appearance used by the surrounding window.
+        .environment(\.colorScheme, .dark)
+        .contentShape(Rectangle())
     }
 
     // MARK: - Identity
@@ -54,8 +62,8 @@ struct PlayerBarView: View {
                 // Reading `revision` keeps the glyph in step with crating done
                 // anywhere else in the app.
                 let _ = crate.revision
-                CrateGlyphButton(isCrated: crate.isCrated(nowPlaying: item)) {
-                    crate.toggle(nowPlaying: item, showTitle: liveShow?.title)
+                CrateGlyphButton(isCrated: crate.isCrated(nowPlaying: item, liveShow: liveShow)) {
+                    crate.toggle(nowPlaying: item, liveShow: liveShow)
                 }
             }
         }
@@ -82,7 +90,11 @@ struct PlayerBarView: View {
             localKey: player.current?.artworkKey,
             remoteURL: liveShow?.artworkURL ?? player.current?.remoteArtworkURL,
             side: Metrics.playerBarHeight,
-            glyphScale: 0.26
+            glyphScale: 0.26,
+            // Several stations publish no picture of what is on air. Falling
+            // back to the station's own mark is better than an empty square
+            // in the one place the listener always has in view.
+            markURL: StationMark.logoURL(for: player.current?.sourceID)
         )
         .contentShape(Rectangle())
     }
@@ -141,6 +153,9 @@ struct PlayerBarView: View {
            let ref = liveShow?.detailID.flatMap(NTSEpisodeRef.decode) {
             return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
         }
+        if item.id.hasPrefix("lyl.episode.") {
+            return .detail(.lylEpisode(slug: String(item.id.dropFirst("lyl.episode.".count))))
+        }
         if item.id.hasPrefix("cashmere.episode.") {
             return .detail(.cashmereEpisode(slug: String(item.id.dropFirst("cashmere.episode.".count))))
         }
@@ -167,6 +182,7 @@ struct PlayerBarView: View {
         case DublabProvider.providerID: return .route(.dublabStation)
         case AlharaProvider.providerID: return .route(.alharaStation(item.id))
         case CashmereProvider.providerID: return .route(.cashmereStation)
+        case LYLProvider.providerID: return .route(.lylStation)
         default: return nil
         }
     }
@@ -222,6 +238,7 @@ struct PlayerBarView: View {
         case DublabProvider.providerID: return dublab.now
         case AlharaProvider.providerID: return alhara.now(for: item.id)
         case CashmereProvider.providerID: return cashmere.now
+        case LYLProvider.providerID: return lyl.now
         default: return nts.state(for: item.id)?.now
         }
     }
@@ -349,6 +366,28 @@ struct PlayerBarView: View {
         case ..<0.7: "speaker.wave.2"
         default: "speaker.wave.3"
         }
+    }
+}
+
+/// A restrained vertical colour wash laid over Indigo's original black player.
+private struct PlayerGradientBackdrop: View {
+    var body: some View {
+        ZStack {
+            Color.black
+
+            LinearGradient(
+                stops: [
+                    .init(color: Color(red: 0.30, green: 0.24, blue: 0.02).opacity(0.04), location: 0.00),
+                    .init(color: Color(red: 0.72, green: 0.56, blue: 0.04).opacity(0.24), location: 0.48),
+                    .init(color: Color(red: 1.00, green: 0.78, blue: 0.08).opacity(0.52), location: 1.00)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .blendMode(.screen)
+        }
+        .accessibilityHidden(true)
+        .allowsHitTesting(false)
     }
 }
 

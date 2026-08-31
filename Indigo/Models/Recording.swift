@@ -153,6 +153,31 @@ nonisolated final class Recording {
     }
 }
 
+extension Recording {
+    /// Repairs a recording whose entire credit ended up in its title.
+    ///
+    /// Rows imported from a station that publishes plain lines look like
+    /// `title: "SPACE AFRIKA - MLN ft. Tony Njoku", artistName: nil`. Left
+    /// that way the recording has no artist to dig into, and every catalogue
+    /// lookup asks after a track by that name credited to nobody — which
+    /// nothing has, so it never gains a release or a sleeve either.
+    ///
+    /// Only ever fills a hole: a recording that already names its artist is
+    /// left exactly as it is.
+    @discardableResult
+    func recreditFromTitle() -> Bool {
+        guard artistName?.isEmpty ?? true,
+              let current = title,
+              let credit = TrackCredit.split(current)
+        else { return false }
+        artistName = credit.artist
+        title = credit.title
+        matchKey = RecordingKey.match(artist: artistName, title: title)
+        updatedAt = Date()
+        return true
+    }
+}
+
 extension IdentificationStatus {
     /// Ordering used when folding a new claim into an existing recording.
     nonisolated var confidenceRank: Int {

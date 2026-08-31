@@ -15,6 +15,7 @@ struct NTSEpisodeView: View {
 
     @Environment(AppState.self) private var appState
     @Environment(NTSBrowseStore.self) private var browse
+    @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(CrateService.self) private var crate
 
@@ -91,6 +92,13 @@ struct NTSEpisodeView: View {
                 .padding(.bottom, 30)
 
                 tracklist(detail)
+                    // Fill in what the rows are actually of, now that
+                    // somebody is looking at them.
+                    .task(id: detail.summary.id) {
+                        await dig.resolveBroadcastTracklist(
+                            providerID: "nts", showID: detail.summary.id
+                        )
+                    }
             }
             .padding(.bottom, 24)
         }
@@ -133,11 +141,34 @@ struct NTSEpisodeView: View {
             // NTS times only some tracks. Mixing "2:34" and "4" in one column
             // reads as nonsense, so the column commits to one or the other.
             let timed = detail.tracklist.contains { $0.offsetLabel != nil }
+            // Resolved once for the episode rather than once per row. A row
+            // that looks its own release up re-runs the fetch every time it
+            // redraws, and a tracklist redraws on every hover.
+            let releases = resolvedReleases(detail)
             ForEach(Array(detail.tracklist.enumerated()), id: \.element.id) { index, entry in
-                TracklistRow(index: index + 1, entry: entry, showsTimestamps: timed)
+                TracklistRow(
+                    index: index + 1,
+                    entry: entry,
+                    detail: detail,
+                    showsTimestamps: timed,
+                    release: releases[entry.id] ?? (nil, nil)
+                )
                 Rule()
             }
         }
+    }
+
+    /// What each row turned out to be, keyed by tracklist entry.
+    private func resolvedReleases(_ detail: NTSEpisodeDetail) -> [String: (line: String?, artwork: URL?)] {
+        let _ = dig.revision
+        let engine = RadioNeighborhoodEngine(context: dig.context)
+        var found: [String: (line: String?, artwork: URL?)] = [:]
+        for entry in detail.tracklist {
+            guard let recording = engine.recording(for: entry, in: detail) else { continue }
+            let release = dig.releaseDetail(for: recording)
+            if release.line != nil || release.artwork != nil { found[entry.id] = release }
+        }
+        return found
     }
 
     // MARK: Listening
@@ -215,8 +246,13 @@ struct NTSEpisodeView: View {
 private struct TracklistRow: View {
     let index: Int
     let entry: NTSTracklistEntry
+    let detail: NTSEpisodeDetail
     let showsTimestamps: Bool
+    /// Resolved by the episode, not by the row — see `resolvedReleases`.
+    let release: (line: String?, artwork: URL?)
 
+    @Environment(CrateService.self) private var crate
+    @Environment(DigStore.self) private var dig
     @State private var isHovering = false
 
     private var marker: String {
@@ -225,6 +261,7 @@ private struct TracklistRow: View {
     }
 
     var body: some View {
+        let _ = crate.revision
         HStack(spacing: 12) {
             Text(marker)
                 .font(Typeface.mono(10))
@@ -234,19 +271,42 @@ private struct TracklistRow: View {
                 .monospacedDigit()
                 .frame(width: 46, alignment: .trailing)
 
-            Text(entry.title)
-                .font(Typeface.body(12.5))
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ArtworkView(remoteURL: release.artwork, side: 30, glyphScale: 0.3)
+                .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.title)
+                    .font(Typeface.body(12.5))
+                    .lineLimit(1)
+                // Nothing at all until the catalogue has answered. An empty
+                // line reserved for a release reads as a missing release.
+                if let line = release.line {
+                    Text(line)
+                        .font(Typeface.mono(9.5))
+                        .foregroundStyle(Palette.inkFaint)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(entry.artist)
                 .font(Typeface.body(12))
                 .foregroundStyle(Palette.inkMuted)
                 .lineLimit(1)
                 .frame(width: 260, alignment: .leading)
+
+            CrateGlyphButton(isCrated: crate.isCrated(tracklistEntry: entry, in: detail)) {
+                if let recording = crate.toggle(tracklistEntry: entry, in: detail) {
+                    Task { await dig.enrichCratedRecording(recording) }
+                }
+            }
+            .help(crate.isCrated(tracklistEntry: entry, in: detail)
+                  ? "Remove \(entry.title) from crate"
+                  : "Add \(entry.title) to crate")
         }
         .padding(.horizontal, Metrics.gutter)
-        .frame(height: Metrics.rowHeight)
+        .padding(.vertical, 6)
+        .frame(minHeight: Metrics.rowHeight)
         .background(isHovering ? Palette.wash : Color.clear)
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }

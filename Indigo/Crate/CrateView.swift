@@ -22,6 +22,7 @@ struct CrateView: View {
     @Environment(DublabBrowseStore.self) private var dublabBrowse
     @Environment(AlharaBrowseStore.self) private var alharaBrowse
     @Environment(CashmereBrowseStore.self) private var cashmereBrowse
+    @Environment(LYLBrowseStore.self) private var lylBrowse
     @State private var selectedGenres: Set<String> = []
 
     var body: some View {
@@ -29,6 +30,7 @@ struct CrateView: View {
         // Reading `revision` here subscribes the view to crate writes, so
         // adding or removing refreshes the list without a manual reload.
         let _ = crate.revision
+        let _ = dig.revision
         let allItems = crate.items()
         let genres = GenreTags.available(in: allItems.flatMap(itemGenres))
         let query = LibraryKey.normalize(appState.searchText)
@@ -53,7 +55,7 @@ struct CrateView: View {
             if allItems.isEmpty {
                 EmptyStateView(
                     headline: "Nothing crated yet",
-                    message: "Crate a track while it's playing, or keep a whole show. Everything you keep remembers where you heard it."
+                    message: "Keep a track, show, artist, release or label. Everything you crate stays ready to play or dig into again."
                 ) {
                     EmptyView()
                 }
@@ -79,6 +81,7 @@ struct CrateView: View {
                                         item: item,
                                         localArtworkKey: localTrack?.artworkKey,
                                         genres: itemGenres(item),
+                                        canPlay: source(for: item) != nil,
                                         isCurrent: isCurrent(item),
                                         isPlaying: isCurrent(item) && player.isPlaying,
                                         digDestination: item.recording.flatMap { dig.destination(for: $0) },
@@ -100,8 +103,13 @@ struct CrateView: View {
             }
         }
         .task {
+            // Needs no network, so it runs before anything that waits on one:
+            // this is what restores the artist — and the DIG button — on rows
+            // kept before the credit was read apart.
+            dig.repairRadioCredits()
             crate.backfillLocalGenres()
             await hydrateMissingRadioGenres()
+            await dig.enrichRadioCrateInBackground()
         }
     }
 
@@ -175,17 +183,30 @@ struct CrateView: View {
     }
 
     private func open(_ item: CrateItem) {
+        if let destination = digDestination(for: item) {
+            appState.open(destination)
+            return
+        }
         if let track = localTrack(for: item) {
             appState.open(.album(track.albumKey))
             return
         }
         if let showID = item.showID {
             switch item.providerID {
+            case NTSProvider.providerID where item.isLiveStream && !showID.hasPrefix("nts.episode."):
+                // Older crate entries only know the station and show title.
+                // Search the NTS archive instead of reopening today's stream.
+                appState.select(.ntsSearch)
+                appState.searchText = item.displayTitle
+                return
             case NoodsProvider.providerID where showID.hasPrefix("noods.show."):
                 appState.open(.noodsShow(path: "shows/\(showID.dropFirst("noods.show.".count))"))
                 return
             case KioskProvider.providerID where showID.hasPrefix("kiosk.episode."):
                 appState.open(.kioskEpisode(slug: String(showID.dropFirst("kiosk.episode.".count))))
+                return
+            case LYLProvider.providerID where showID.hasPrefix("lyl.episode."):
+                appState.open(.lylEpisode(slug: String(showID.dropFirst("lyl.episode.".count))))
                 return
             case CashmereProvider.providerID where showID.hasPrefix("cashmere.episode."):
                 appState.open(.cashmereEpisode(slug: String(showID.dropFirst("cashmere.episode.".count))))
@@ -211,8 +232,29 @@ struct CrateView: View {
             default: break
             }
         }
-        if let recording = item.recording, let page = dig.destination(for: recording) {
+        // The row opens the track's own page — where it was heard, and what
+        // was heard beside it. The DIG button still means the artist.
+        if let recording = item.recording, let page = dig.recordingDestination(for: recording) {
             appState.open(page)
+        }
+    }
+
+    private func digDestination(for item: CrateItem) -> DetailPage? {
+        guard let identifier = item.showID else { return nil }
+        switch (item.kind, item.providerID) {
+        case (.artist, "dig.artist.mbid"):
+            return .digArtist(mbid: identifier, name: item.displayTitle)
+        case (.artist, "dig.artist.name"):
+            return .digArtist(mbid: nil, name: item.displayTitle)
+        case (.release, "dig.release.discogs"):
+            guard let id = Int(identifier) else { return nil }
+            return .digRelease(id: id, title: item.displayTitle)
+        case (.label, "dig.label.mbid"):
+            return .digLabel(mbid: identifier, name: item.displayTitle)
+        case (.label, "dig.label.discogs"):
+            return .digDiscogsLabel(name: item.displayTitle)
+        default:
+            return nil
         }
     }
 
@@ -238,6 +280,14 @@ struct CrateView: View {
             guard let provider = item.providerID, let showID = item.showID else { continue }
             let genres: [String]
             switch provider {
+            case NTSProvider.providerID where item.isLiveStream && !showID.hasPrefix("nts.episode."):
+                guard let ref = await ntsBrowse.archivedEpisode(
+                    matching: item.displayTitle, near: item.addedAt
+                ) else { continue }
+                await ntsBrowse.loadDetailIfNeeded(show: ref.show, episode: ref.episode)
+                let detail = ntsBrowse.detail(show: ref.show, episode: ref.episode)
+                crate.migrateLegacyNTSBroadcast(item, ref: ref, media: detail?.mediaItem())
+                genres = detail.map { $0.summary.genres + $0.summary.moods } ?? []
             case KioskProvider.providerID where showID.hasPrefix("kiosk.episode."):
                 let slug = String(showID.dropFirst("kiosk.episode.".count))
                 await kioskBrowse.loadEpisodeDetailIfNeeded(slug: slug)
@@ -263,11 +313,19 @@ struct CrateView: View {
                 let slug = String(showID.dropFirst("cashmere.episode.".count))
                 await cashmereBrowse.loadDetailIfNeeded(slug: slug)
                 genres = cashmereBrowse.episode(slug: slug)?.genres ?? []
+            case LYLProvider.providerID where showID.hasPrefix("lyl.episode."):
+                let slug = String(showID.dropFirst("lyl.episode.".count))
+                await lylBrowse.loadDetailIfNeeded(slug: slug)
+                genres = lylBrowse.episode(slug: slug)?.styles ?? []
             case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
                 let identity = String(showID.dropFirst("nts.episode.".count))
                 guard let ref = NTSEpisodeRef.decode(identity) else { continue }
                 await ntsBrowse.loadDetailIfNeeded(show: ref.show, episode: ref.episode)
-                if let summary = ntsBrowse.detail(show: ref.show, episode: ref.episode)?.summary {
+                if let detail = ntsBrowse.detail(show: ref.show, episode: ref.episode) {
+                    if let media = detail.mediaItem() {
+                        crate.updateArchivedBroadcast(item, from: media)
+                    }
+                    let summary = detail.summary
                     genres = summary.genres + summary.moods
                 } else {
                     genres = []
@@ -301,6 +359,7 @@ private struct CrateRow: View {
     let item: CrateItem
     let localArtworkKey: String?
     let genres: [String]
+    let canPlay: Bool
     let isCurrent: Bool
     let isPlaying: Bool
     let digDestination: DetailPage?
@@ -356,12 +415,14 @@ private struct CrateRow: View {
             }
 
             HStack(spacing: 2) {
-                Button(action: play) {
-                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                        .font(.system(size: 10))
+                if canPlay {
+                    Button(action: play) {
+                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                            .font(.system(size: 10))
+                    }
+                    .buttonStyle(GlyphButtonStyle())
+                    .accessibilityLabel(isPlaying ? "Pause" : "Play")
                 }
-                .buttonStyle(GlyphButtonStyle())
-                .accessibilityLabel(isPlaying ? "Pause" : "Play")
 
                 Button(action: remove) {
                     Image(systemName: "xmark")

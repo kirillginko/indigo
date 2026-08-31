@@ -116,7 +116,7 @@ nonisolated struct CashmereAPI: Sendable {
     databaseId slug title uri dateGmt
     acf { episodeDate episodeMixcloudLink episodeFilterGenre episodeFilterMood episodeFilterFocuseddiverse }
     categories { edges { node { databaseId name slug count } } }
-    featuredImage { node { sourceUrl altText } }
+    featuredImage { node { sourceUrl altText srcSet } }
     """
 
     func fetchEpisodes(

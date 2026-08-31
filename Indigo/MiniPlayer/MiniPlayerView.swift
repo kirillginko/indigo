@@ -19,6 +19,7 @@ struct MiniPlayerView: View {
     @Environment(DublabProvider.self) private var dublab
     @Environment(AlharaProvider.self) private var alhara
     @Environment(CashmereProvider.self) private var cashmere
+    @Environment(LYLProvider.self) private var lyl
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(\.openWindow) private var openWindow
@@ -26,7 +27,7 @@ struct MiniPlayerView: View {
     var body: some View {
         let _ = crate.revision
         let summary = NowPlayingSummary.make(
-            item: player.current, showTitle: liveShowTitle, context: crate.context
+            item: player.current, showTitle: liveShow?.title, context: crate.context
         )
 
         VStack(alignment: .leading, spacing: 0) {
@@ -151,8 +152,8 @@ struct MiniPlayerView: View {
             Spacer(minLength: 6)
 
             if let item = player.current {
-                CrateButton(isCrated: crate.isCrated(nowPlaying: item)) {
-                    crate.toggle(nowPlaying: item, showTitle: liveShowTitle)
+                CrateButton(isCrated: crate.isCrated(nowPlaying: item, liveShow: liveShow)) {
+                    crate.toggle(nowPlaying: item, liveShow: liveShow)
                 }
                 if let destination = digDestination(summary) {
                     DigButton {
@@ -180,13 +181,14 @@ struct MiniPlayerView: View {
         return .digArtist(mbid: nil, name: artist)
     }
 
-    private var liveShowTitle: String? {
+    private var liveShow: RadioShow? {
         guard let item = player.current, item.isLive else { return nil }
-        if item.sourceID == KioskProvider.providerID { return kiosk.onAir?.title }
-        if item.sourceID == LotProvider.providerID { return lot.onAir?.title }
-        if item.sourceID == DublabProvider.providerID { return dublab.onAir?.showName }
-        if item.sourceID == AlharaProvider.providerID { return alhara.state(for: item.id).title }
-        if item.sourceID == CashmereProvider.providerID { return cashmere.onAir?.showName }
-        return nts.state(for: item.id)?.now?.title
+        if item.sourceID == KioskProvider.providerID { return kiosk.now }
+        if item.sourceID == LotProvider.providerID { return lot.now }
+        if item.sourceID == DublabProvider.providerID { return dublab.now }
+        if item.sourceID == AlharaProvider.providerID { return alhara.now(for: item.id) }
+        if item.sourceID == CashmereProvider.providerID { return cashmere.now }
+        if item.sourceID == LYLProvider.providerID { return lyl.now }
+        return nts.state(for: item.id)?.now
     }
 }

@@ -32,6 +32,9 @@ nonisolated struct ArtistProfile: Sendable {
     let libraryTrackCount: Int
     let crateCount: Int
     let radioAppearances: [AppearanceLine]
+    /// Recordings of this artist's records, gathered from the releases already
+    /// catalogued. Playable in the app's own transport.
+    let listen: [DigReleaseProfile.ListenLine]
 
     nonisolated struct ReleaseLine: Identifiable, Hashable, Sendable {
         let title: String
@@ -55,6 +58,17 @@ nonisolated struct ArtistProfile: Sendable {
         var id: String { label }
     }
 
+    /// What a page can draw before the graph has been walked: the name it was
+    /// opened with, and nothing claimed that is not known.
+    static func placeholder(name: String, mbid: String?) -> ArtistProfile {
+        ArtistProfile(
+            name: name, mbid: mbid, origin: nil, disambiguation: nil, realName: nil,
+            biography: nil, imageURL: nil, genres: [], styles: [], aliases: [],
+            discogsURL: nil, releases: [], labels: [], related: [],
+            libraryTrackCount: 0, crateCount: 0, radioAppearances: [], listen: []
+        )
+    }
+
     /// True when there is nothing but a name — the state where DIG should say
     /// so instead of rendering a page of empty headings.
     var isBare: Bool {
@@ -76,12 +90,29 @@ nonisolated struct DigReleaseProfile: Sendable {
     let tracks: [TrackLine]
     let notes: String?
     let sourceURL: URL?
+    /// Recordings catalogued alongside this release, playable in the app's own
+    /// transport through YouTube's official player.
+    let listen: [ListenLine]
     let related: [RelatedArtist]
+
+    nonisolated struct ListenLine: Identifiable, Sendable {
+        let url: URL
+        let title: String
+        let seconds: Int?
+        var id: String { url.absoluteString }
+
+        var durationLabel: String? {
+            guard let seconds, seconds > 0 else { return nil }
+            return String(format: "%d:%02d", seconds / 60, seconds % 60)
+        }
+    }
 
     nonisolated struct TrackLine: Identifiable, Sendable {
         let position: String
         let title: String
         let duration: String?
+        /// Named on compilations, absent on everything else.
+        var artist: String?
         var id: String { "\(position)|\(title)" }
     }
 }
@@ -126,26 +157,17 @@ nonisolated struct DigEngine {
             labelNames[labelName] = entry.labelMBID
         }
         for label in discogs?.labelNames ?? [] where labelNames[label] == nil {
-            labelNames[label] = nil
+            // Assigning nil into a dictionary whose values are themselves
+            // optional removes the key. `updateValue` is what actually stores
+            // "known label, unknown MBID" — the ordinary case for anything
+            // Discogs knows and MusicBrainz does not.
+            labelNames.updateValue(nil, forKey: label)
         }
         let labels = labelNames
+            .filter { LabelName.isRealLabel($0.key) }
             .sorted { $0.key < $1.key }
             .map { ArtistProfile.LabelRef(name: $0.key, mbid: $0.value) }
 
-        let discogsReleases = (discogs?.releaseTitles ?? []).enumerated().map { index, title in
-            ArtistProfile.ReleaseLine(
-                title: title,
-                year: index < (discogs?.releaseYears.count ?? 0) ? discogs?.releaseYears[index] : nil,
-                discogsID: index < (discogs?.releaseDiscogsIDs.count ?? 0)
-                    ? discogs?.releaseDiscogsIDs[index] : nil,
-                imageURL: index < (discogs?.releaseImageURLStrings.count ?? 0)
-                    ? discogs?.releaseImageURLStrings[index].nonEmptyURL : nil,
-                thumbnailURL: index < (discogs?.releaseThumbnailURLStrings.count ?? 0)
-                    ? discogs?.releaseThumbnailURLStrings[index].nonEmptyURL : nil,
-                label: index < (discogs?.releaseLabels.count ?? 0)
-                    ? discogs?.releaseLabels[index].nonEmpty : nil
-            )
-        }
         let artistKey = RecordingKey.normalizeArtist(name)
         let resolvedReleases = ((try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [])
             .filter { release in
@@ -155,6 +177,32 @@ nonisolated struct DigEngine {
             resolvedReleases.map { (Self.releaseKey($0.title), $0) },
             uniquingKeysWith: { first, _ in first }
         )
+        let resolvedByID = Dictionary(
+            resolvedReleases.map { ($0.discogsID, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
+        let discogsReleases = (discogs?.releaseTitles ?? []).enumerated().map { index, title in
+            let identifier = index < (discogs?.releaseDiscogsIDs.count ?? 0)
+                ? discogs?.releaseDiscogsIDs[index] : nil
+            // The artist's own catalogue row often carries no cover, while the
+            // release we have already opened does. Reading the sleeve back off
+            // the release cache is what stops a tile staying blank until
+            // somebody clicks it.
+            let resolved = identifier.flatMap { resolvedByID[$0] }
+                ?? resolvedByTitle[Self.releaseKey(title)]
+            return ArtistProfile.ReleaseLine(
+                title: title,
+                year: index < (discogs?.releaseYears.count ?? 0) ? discogs?.releaseYears[index] : nil,
+                discogsID: identifier,
+                imageURL: (index < (discogs?.releaseImageURLStrings.count ?? 0)
+                    ? discogs?.releaseImageURLStrings[index].nonEmptyURL : nil) ?? resolved?.imageURL,
+                thumbnailURL: index < (discogs?.releaseThumbnailURLStrings.count ?? 0)
+                    ? discogs?.releaseThumbnailURLStrings[index].nonEmptyURL : nil,
+                label: (index < (discogs?.releaseLabels.count ?? 0)
+                    ? discogs?.releaseLabels[index].nonEmpty : nil) ?? resolved?.labelNames.first
+            )
+        }
         let mbReleases = (cached?.releases ?? []).map {
             let resolved = resolvedByTitle[Self.releaseKey($0.title)]
             return ArtistProfile.ReleaseLine(
@@ -184,11 +232,24 @@ nonisolated struct DigEngine {
             discogsURL: discogs?.profileURL,
             releases: releases,
             labels: labels,
-            related: relatedArtists(to: name, labels: labels, discogs: discogs),
+            related: relatedArtists(to: name),
             libraryTrackCount: libraryTrackCount(artist: name),
             crateCount: crateCount(artist: name),
-            radioAppearances: appearanceLines(for: byArtist)
+            radioAppearances: appearanceLines(for: byArtist),
+            listen: Self.listenLines(from: resolvedReleases)
         )
+    }
+
+    /// Everything playable across an artist's catalogued releases, newest
+    /// first and deduplicated — the same recording is often attached to a
+    /// pressing and its reissue.
+    private static func listenLines(from releases: [DiscogsReleaseRecord]) -> [DigReleaseProfile.ListenLine] {
+        var seen = Set<String>()
+        return releases
+            .sorted { ($0.year ?? 0) > ($1.year ?? 0) }
+            .flatMap(\.videos)
+            .filter { seen.insert($0.url.absoluteString).inserted }
+            .map { DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds) }
     }
 
     private static func releaseKey(_ title: String) -> String {
@@ -206,13 +267,13 @@ nonisolated struct DigEngine {
             DigReleaseProfile.TrackLine(
                 position: index < record.trackPositions.count ? record.trackPositions[index] : "",
                 title: title,
-                duration: index < record.trackDurations.count ? record.trackDurations[index].nonEmpty : nil
+                duration: index < record.trackDurations.count ? record.trackDurations[index].nonEmpty : nil,
+                artist: index < record.trackArtists.count ? record.trackArtists[index].nonEmpty : nil
             )
         }
         var relatedByName: [String: RelatedArtist] = [:]
         for artist in record.artistNames {
-            let cachedArtist = DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: artist)
-            for peer in relatedArtists(to: artist, labels: [], discogs: cachedArtist) {
+            for peer in relatedArtists(to: artist) {
                 relatedByName[peer.name] = peer
             }
         }
@@ -221,6 +282,9 @@ nonisolated struct DigEngine {
             labels: labels, genres: record.genres, styles: record.styles,
             imageURL: record.imageURL, tracks: tracks, notes: record.notes,
             sourceURL: record.profileURL,
+            listen: record.videos.map {
+                DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds)
+            },
             related: relatedByName.values.sorted {
                 $0.weight == $1.weight ? $0.name < $1.name : $0.weight > $1.weight
             }
@@ -229,127 +293,24 @@ nonisolated struct DigEngine {
 
     /// The spec's RELATED list. Every entry has to survive the question
     /// "why?" — so the only edges built here are ones with a stated reason.
-    func relatedArtists(
-        to name: String,
-        labels: [ArtistProfile.LabelRef],
-        discogs: DiscogsArtist? = nil
-    ) -> [RelatedArtist] {
-        var found: [String: [Relationship]] = [:]
-        let subject = RecordingKey.normalizeArtist(name)
+    ///
+    /// The reasoning itself lives in `GraphStore` now. It used to live here,
+    /// which quietly meant DIG could only ever relate an artist to another
+    /// artist: a label, a broadcast or a white label had nowhere to be put.
+    /// This stays as the shape the existing pages read.
+    func relatedArtists(to name: String) -> [RelatedArtist] {
+        GraphStore(context: context)
+            .relatedArtists(to: .artist(name))
+            .map { RelatedArtist(name: $0.node.title, mbid: $0.node.mbid,
+                                 reasons: $0.edges.map(\.relationship),
+                                 imageURL: $0.node.artworkURL) }
+    }
 
-        for label in labels {
-            guard let mbid = label.mbid,
-                  let cached = MusicBrainzEnricher(context: context).cachedLabel(mbid)
-            else { continue }
-            for peer in cached.roster where RecordingKey.normalizeArtist(peer.name) != subject {
-                found[peer.name, default: []].append(
-                    Relationship(
-                        kind: .sharedLabel,
-                        source: .musicBrainz,
-                        detail: "Same label: \(cached.name)",
-                        confidence: 0.9
-                    )
-                )
-            }
-        }
-
-        for member in discogs?.memberNames ?? [] where RecordingKey.normalizeArtist(member) != subject {
-            found[member, default: []].append(
-                Relationship(kind: .aliasOrProject, source: .discogs,
-                             detail: "Member of \(discogs?.name ?? name)", confidence: 0.85)
-            )
-        }
-        for group in discogs?.groupNames ?? [] where RecordingKey.normalizeArtist(group) != subject {
-            found[group, default: []].append(
-                Relationship(kind: .aliasOrProject, source: .discogs,
-                             detail: "Artist project / group", confidence: 0.85)
-            )
-        }
-        for alias in discogs?.aliasNames ?? [] where RecordingKey.normalizeArtist(alias) != subject {
-            found[alias, default: []].append(
-                Relationship(kind: .aliasOrProject, source: .discogs,
-                             detail: "Alias of \(discogs?.name ?? name)", confidence: 0.95)
-            )
-        }
-        for collaborator in discogs?.collaboratorNames ?? [] where RecordingKey.normalizeArtist(collaborator) != subject {
-            found[collaborator, default: []].append(
-                Relationship(kind: .collaborator, source: .discogs,
-                             detail: "Credited collaborator", confidence: 0.88)
-            )
-        }
-        for peer in discogs?.labelNeighbourNames ?? [] where RecordingKey.normalizeArtist(peer) != subject {
-            let label = discogs?.labelNames.first ?? "a label"
-            found[peer, default: []].append(
-                Relationship(kind: .sharedLabel, source: .discogs,
-                             detail: "Also on \(label)", confidence: 0.72)
-            )
-        }
-        for peer in discogs?.styleNeighbourNames ?? [] where RecordingKey.normalizeArtist(peer) != subject {
-            let style = discogs?.styles.first ?? "a related style"
-            found[peer, default: []].append(
-                Relationship(kind: .sharedStyle, source: .discogs,
-                             detail: "Also tagged \(style)", confidence: 0.58)
-            )
-        }
-
-        // Previously visited artists form a local, instant graph. Shared
-        // labels and styles are useful routes even when MusicBrainz has no
-        // relationship record for either artist.
-        if let discogs {
-            let all = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
-            let subjectLabels = Set(discogs.labelNames.map(RecordingKey.normalizeArtist))
-            let subjectStyles = Set(discogs.styles.map(RecordingKey.normalizeArtist))
-            for peer in all where peer.nameKey != subject {
-                let sharedLabels = subjectLabels.intersection(peer.labelNames.map(RecordingKey.normalizeArtist))
-                if let label = discogs.labelNames.first(where: {
-                    sharedLabels.contains(RecordingKey.normalizeArtist($0))
-                }) {
-                    found[peer.name, default: []].append(
-                        Relationship(kind: .sharedLabel, source: .discogs,
-                                     detail: "Both release on \(label)", confidence: 0.8)
-                    )
-                }
-                let sharedStyles = subjectStyles.intersection(peer.styles.map(RecordingKey.normalizeArtist))
-                if let style = discogs.styles.first(where: {
-                    sharedStyles.contains(RecordingKey.normalizeArtist($0))
-                }) {
-                    found[peer.name, default: []].append(
-                        Relationship(kind: .sharedStyle, source: .discogs,
-                                     detail: "Shared sound: \(style)", confidence: 0.45)
-                    )
-                }
-                let subjectDecades = Set(discogs.releaseYears.compactMap(Self.decade))
-                let peerDecades = Set(peer.releaseYears.compactMap(Self.decade))
-                if let decade = subjectDecades.intersection(peerDecades).sorted().last {
-                    found[peer.name, default: []].append(
-                        Relationship(kind: .sameEra, source: .discogs,
-                                     detail: "Catalogues overlap in the \(decade)s", confidence: 0.3)
-                    )
-                }
-            }
-        }
-
-        addRadioConnections(for: name, subject: subject, into: &found)
-        addCollectionConnections(for: name, subject: subject, into: &found)
-
-        // Being in the crate is evidence too — the listener's own judgement,
-        // which is worth more than a catalogue edge in a discovery tool.
-        for (peerName, count) in cratedArtistCounts() where RecordingKey.normalizeArtist(peerName) != subject {
-            guard found[peerName] != nil else { continue }
-            found[peerName]?.append(
-                Relationship(
-                    kind: .inYourCrate,
-                    source: .crate,
-                    detail: "\(count) \(count == 1 ? "track" : "tracks") in your crate",
-                    confidence: 0.4
-                )
-            )
-        }
-
-        let identifiers = labelRosterIdentifiers(labels)
-        return found
-            .map { RelatedArtist(name: $0.key, mbid: identifiers[$0.key], reasons: $0.value) }
-            .sorted { $0.weight == $1.weight ? $0.name < $1.name : $0.weight > $1.weight }
+    /// Everything next to something, of any kind — the step DEEP takes.
+    func connections(from node: MusicNode) -> [MusicGraph.Connection] {
+        var graph = MusicGraph()
+        graph.absorb(GraphStore(context: context).neighbors(of: node).all)
+        return graph.connections(from: node)
     }
 
     private static func decade(_ year: String) -> Int? {
@@ -484,6 +445,7 @@ nonisolated struct DigEngine {
         let items = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
         return items.filter {
             RecordingKey.normalizeArtist($0.recording?.artistName) == key
+                || ($0.kind == .artist && RecordingKey.normalizeArtist($0.displayTitle) == key)
         }.count
     }
 
@@ -491,7 +453,8 @@ nonisolated struct DigEngine {
         let items = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
         var counts: [String: Int] = [:]
         for item in items {
-            guard let artist = item.recording?.artistName, !artist.isEmpty else { continue }
+            let artist = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            guard let artist, !artist.isEmpty else { continue }
             counts[artist, default: 0] += 1
         }
         return counts

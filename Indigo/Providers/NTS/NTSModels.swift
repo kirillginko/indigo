@@ -84,16 +84,19 @@ extension NTSBroadcast {
 }
 
 /// Packs the show/episode alias pair into the shared `RadioShow.detailID`.
-nonisolated enum NTSEpisodeRef {
+nonisolated struct NTSEpisodeRef: Hashable, Sendable {
+    let show: String
+    let episode: String
+
     static func encode(show: String?, episode: String?) -> String? {
         guard let show, let episode, !show.isEmpty, !episode.isEmpty else { return nil }
         return "\(show)/\(episode)"
     }
 
-    static func decode(_ value: String) -> (show: String, episode: String)? {
+    static func decode(_ value: String) -> NTSEpisodeRef? {
         let parts = value.split(separator: "/", maxSplits: 1).map(String.init)
         guard parts.count == 2 else { return nil }
-        return (parts[0], parts[1])
+        return NTSEpisodeRef(show: parts[0], episode: parts[1])
     }
 }
 

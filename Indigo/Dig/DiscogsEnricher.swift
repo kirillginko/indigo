@@ -12,7 +12,12 @@ nonisolated struct DiscogsEnricher {
 
     @discardableResult
     func artist(named name: String, force: Bool = false) async throws -> DiscogsArtist? {
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 2,
+        // Version 3 added the artist's own links, which is how Indigo learns a
+        // Bandcamp address without searching Bandcamp; version 4 kept the
+        // thumbnails that arrive with each neighbour. Rows cached before those
+        // look current but are missing the fields, so they are refetched once
+        // rather than silently never filling in.
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 4,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
 
@@ -38,6 +43,7 @@ nonisolated struct DiscogsEnricher {
             ?? detail.images?.first?.uri ?? bundle.searchImageURL
         record.profileURLString = detail.uri
         record.aliasNames = detail.aliases?.compactMap(\.name) ?? []
+        record.externalURLStrings = detail.urls ?? []
         record.memberNames = detail.members?.compactMap(\.name) ?? []
         record.groupNames = detail.groups?.compactMap(\.name) ?? []
         let catalogue = bundle.catalogue.filter { $0.id != nil }
@@ -70,7 +76,7 @@ nonisolated struct DiscogsEnricher {
             }.filter { RecordingKey.normalizeArtist($0) != key }
         )
         record.fetchedAt = Date()
-        record.cacheVersion = 2
+        record.cacheVersion = 4
         return record
     }
 
@@ -79,12 +85,16 @@ nonisolated struct DiscogsEnricher {
            Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 { return }
         let bundle = try await client.recommendations(labels: artist.labelNames, styles: artist.styles)
         let subject = artist.nameKey
-        artist.labelNeighbourNames = Self.unique(bundle.labelArtists.filter {
-            RecordingKey.normalizeArtist($0) != subject
+        let labelNeighbours = Self.unique(bundle.labelArtists.filter {
+            RecordingKey.normalizeArtist($0.name) != subject
         })
-        artist.styleNeighbourNames = Self.unique(bundle.styleArtists.filter {
-            RecordingKey.normalizeArtist($0) != subject
+        let styleNeighbours = Self.unique(bundle.styleArtists.filter {
+            RecordingKey.normalizeArtist($0.name) != subject
         })
+        artist.labelNeighbourNames = labelNeighbours.map(\.name)
+        artist.labelNeighbourImageURLStrings = labelNeighbours.map { $0.thumbnailURL ?? "" }
+        artist.styleNeighbourNames = styleNeighbours.map(\.name)
+        artist.styleNeighbourImageURLStrings = styleNeighbours.map { $0.thumbnailURL ?? "" }
         artist.recommendationsFetchedAt = Date()
     }
 
@@ -99,7 +109,16 @@ nonisolated struct DiscogsEnricher {
     @discardableResult
     func release(id: Int, force: Bool = false) async throws -> DiscogsReleaseRecord {
         if !force, let cached = cachedRelease(id: id), cached.isFresh { return cached }
-        let detail = try await client.release(id: id)
+        return store(try await client.release(id: id), id: id)
+    }
+
+    /// Writes a release Discogs has already described.
+    ///
+    /// Split from `release(id:)` so a caller can fetch several at once —
+    /// which is network-bound and parallel — and then write them one at a
+    /// time, which is what a single ModelContext requires.
+    @discardableResult
+    func store(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
         let record = cachedRelease(id: id) ?? {
             let value = DiscogsReleaseRecord(discogsID: id, title: detail.title)
             context.insert(value)
@@ -118,11 +137,19 @@ nonisolated struct DiscogsEnricher {
         record.trackPositions = tracks.map { $0.position ?? "" }
         record.trackTitles = tracks.map { $0.title ?? "Untitled" }
         record.trackDurations = tracks.map { $0.duration ?? "" }
+        record.trackArtists = tracks.map { $0.artistName ?? "" }
+        let videos = (detail.videos ?? []).filter {
+            $0.uri.flatMap(URL.init(string:)).map(YouTubeLink.isYouTube) ?? false
+        }
+        record.videoURLStrings = videos.map { $0.uri ?? "" }
+        record.videoTitles = videos.map { $0.title ?? "" }
+        record.videoDurations = videos.map { $0.duration ?? 0 }
         record.notes = detail.notes
         record.profileURLString = detail.uri
         record.fetchedAt = Date()
         return record
     }
+
 
     func cachedRelease(id: Int) -> DiscogsReleaseRecord? {
         var descriptor = FetchDescriptor<DiscogsReleaseRecord>(predicate: #Predicate { $0.discogsID == id })
@@ -133,6 +160,11 @@ nonisolated struct DiscogsEnricher {
     private static func unique(_ values: [String]) -> [String] {
         var seen = Set<String>()
         return values.filter { seen.insert($0.lowercased()).inserted }.prefix(12).map { $0 }
+    }
+
+    private static func unique(_ values: [DiscogsNeighbour]) -> [DiscogsNeighbour] {
+        var seen = Set<String>()
+        return values.filter { seen.insert($0.name.lowercased()).inserted }.prefix(12).map { $0 }
     }
 
     private static func releaseTitle(_ title: String, artist: String) -> String {

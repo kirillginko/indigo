@@ -141,6 +141,11 @@ struct KioskEpisodeDetailView: View {
                                     .frame(width: 28, alignment: .trailing)
                                 Text(track).font(Typeface.body(12.5))
                                 Spacer(minLength: 0)
+                                RadioTracklistCrateButton(item: RadioTracklistItem(
+                                    providerID: "kiosk", showID: detail.episode.slug,
+                                    showTitle: detail.episode.title, airedAt: detail.episode.airedAt,
+                                    entryID: "\(index)", title: track, artist: nil, offsetSeconds: nil
+                                ))
                             }
                             .padding(.horizontal, Metrics.gutter)
                             .frame(minHeight: Metrics.rowHeight)

@@ -39,6 +39,9 @@ final class PlaybackCoordinator {
     @ObservationIgnored private var consecutiveFailures = 0
     /// A seek waiting on the engine to report how long the item is.
     @ObservationIgnored private var pendingSeek: Task<Void, Never>?
+    /// Recordings already retried by their other route, so a broken one falls
+    /// through to the next track rather than looping between two dead ends.
+    @ObservationIgnored private var triedAlternates: Set<String> = []
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
@@ -323,6 +326,11 @@ final class PlaybackCoordinator {
     }
 
     private func handleLocalFailure(_ message: String) {
+        // A station that mirrors its archive gets one attempt at the mirror
+        // before this is called a failure. Older files go missing far more
+        // often than the copies on SoundCloud and Mixcloud do.
+        if retryUsingAlternate() { return }
+
         consecutiveFailures += 1
         let name = current?.title ?? "That file"
         notice = "\(name) couldn't be played. \(message)"
@@ -335,11 +343,46 @@ final class PlaybackCoordinator {
         next()
     }
 
+    /// Called when a provider refuses a particular recording, so whatever
+    /// offered it can stop offering it. Set by the app; the player has no
+    /// business knowing where the catalogue lives.
+    var onUnplayableRecording: ((URL) -> Void)?
+
     private func handleEmbedStateChange() {
         if case .failed(let message) = embed.state {
+            if retryUsingAlternate() { return }
+
+            // One locked-down video should not end the listening. A release
+            // carries eight of them and the next is usually fine, so a
+            // recording the provider will not play is skipped the way a
+            // scratched track is — noted, and moved past.
+            if embed.lastFailureIsRecordingSpecific, let url = current?.playbackURL {
+                // So it is never offered again. Being shown something and
+                // watching it skip itself is worse than never being offered
+                // it at all.
+                onUnplayableRecording?(url)
+            }
+            if embed.lastFailureIsRecordingSpecific, queue.hasNext {
+                notice = "Skipped \(current?.title ?? "a track"). \(message)"
+                next()
+                return
+            }
             notice = "\(current?.title ?? "This episode") couldn't be played. \(message)"
         }
         publishNowPlaying()
+    }
+
+    /// Restarts the current recording by whatever other route its provider
+    /// published. Answers whether there was one left to try.
+    private func retryUsingAlternate() -> Bool {
+        guard let item = current,
+              !triedAlternates.contains(item.id),
+              let alternate = item.usingAlternate()
+        else { return false }
+        triedAlternates.insert(item.id)
+        queue.replaceCurrent(with: alternate)
+        startCurrent(autoplay: true)
+        return true
     }
 
     private func handleStreamStateChange() {

@@ -72,10 +72,16 @@ nonisolated final class Track {
         self.albumArtist = albumArtist
         self.album = album
         self.genre = genre
-        self.albumKey = LibraryKey.album(
-            album: album,
-            albumArtist: albumArtist.isEmpty ? artist : albumArtist
-        )
+        // Keyed on the album artist the files actually declare, and on the
+        // album alone when they declare none.
+        //
+        // Falling back to the *track* artist here invents a claim the files
+        // never made — "this album belongs to Artist A" — and for a
+        // compilation that is exactly wrong: every track gets a different key
+        // and one record is shredded into one album per performer. Untagged
+        // compilations are common, and this was silently destroying all of
+        // them.
+        self.albumKey = LibraryKey.album(album: album, albumArtist: albumArtist)
         self.artistKey = LibraryKey.normalize(albumArtist.isEmpty ? artist : albumArtist)
         self.sortTitle = LibraryKey.normalize(title)
         self.searchIndex = LibraryKey.searchIndex(title: title, artist: artist, album: album)

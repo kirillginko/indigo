@@ -15,14 +15,44 @@ import Foundation
 import Observation
 import WebKit
 
+/// What the page reported, read apart.
+///
+/// The bridge prefixes provider-level codes onto the message — "youtube:150:…"
+/// — because YouTube returns the same code for "the owner disabled embedding"
+/// and "this origin is not allowed", and the app should not tell the listener
+/// the first when it might be the second.
+nonisolated struct EmbedFailure: Sendable {
+    let message: String
+    let isRecordingSpecific: Bool
+
+    init(reported: String) {
+        let parts = reported.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false)
+        guard parts.count == 3, parts[0] == "youtube", let code = Int(parts[1]) else {
+            message = reported
+            isRecordingSpecific = false
+            return
+        }
+        message = String(parts[2])
+        // 100 gone, 101 and 150 refused, 2 unrecognised. All of them are about
+        // this recording; anything else is the player.
+        isRecordingSpecific = [2, 100, 101, 150].contains(code)
+    }
+}
+
 nonisolated enum EmbedProvider: String, Codable, Hashable, Sendable {
     case soundcloud
     case mixcloud
+    /// Played through YouTube's official IFrame Player API, for the same
+    /// reason as the other two: their terms permit playback in their player
+    /// and prohibit resolving the underlying stream. Indigo does not extract
+    /// audio from YouTube and must not be made to.
+    case youtube
 
     var displayName: String {
         switch self {
         case .soundcloud: "SoundCloud"
         case .mixcloud: "Mixcloud"
+        case .youtube: "YouTube"
         }
     }
 }
@@ -83,9 +113,15 @@ final class EmbedAudioEngine: NSObject {
         duration = 0
         setState(.loading)
 
+        // YouTube's player takes a video id, not an address. Extracted here
+        // rather than in the page so the bridge stays a transport and every
+        // URL shape a provider link can arrive in is handled in one place.
+        let address = provider == .youtube
+            ? (YouTubeLink.videoID(from: url) ?? url.absoluteString)
+            : url.absoluteString
         let payload = [
             "provider": provider.rawValue,
-            "url": url.absoluteString,
+            "url": address,
             "autoplay": autoplay ? "1" : "0"
         ]
         guard let json = try? JSONSerialization.data(withJSONObject: payload),
@@ -122,6 +158,14 @@ final class EmbedAudioEngine: NSObject {
         run("indigoVolume(\(volume))")
     }
 
+    /// Whether the last failure was about that particular recording rather
+    /// than about the player itself.
+    ///
+    /// The difference decides what the transport should do: a video the
+    /// uploader has locked down is a reason to move to the next one, and a
+    /// broken player is a reason to stop and say so.
+    private(set) var lastFailureIsRecordingSpecific = false
+
     func retry() {
         guard let request = currentRequest else { return }
         load(provider: request.provider, url: request.url, autoplay: true)
@@ -129,10 +173,17 @@ final class EmbedAudioEngine: NSObject {
 
     // MARK: - Bridge
 
+    /// The origin the bridge page claims.
+    ///
+    /// It has to be a real https address — every one of these widgets refuses
+    /// to hand-shake from `about:blank` or `file://` — and it is passed to
+    /// YouTube's player as `origin`, which the player checks. It used to be
+    /// SoundCloud's, which was fine for SoundCloud and a plausible reason for
+    /// YouTube to refuse the frame.
+    static let origin = "https://w.soundcloud.com"
+
     private func loadBridge() {
-        // A real https base origin: the widget scripts and their postMessage
-        // handshake both refuse to work from about:blank or file://.
-        webView.loadHTMLString(Self.bridgeHTML, baseURL: URL(string: "https://w.soundcloud.com/indigo"))
+        webView.loadHTMLString(Self.bridgeHTML, baseURL: URL(string: Self.origin + "/indigo"))
     }
 
     private func run(_ script: String) {
@@ -201,7 +252,10 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
             setState(.paused)
             onFinished?()
         case "error":
-            setState(.failed(detail ?? "This episode could not be played."))
+            let reported = detail ?? "This episode could not be played."
+            let failure = EmbedFailure(reported: reported)
+            lastFailureIsRecordingSpecific = failure.isRecordingSpecific
+            setState(.failed(failure.message))
         default:
             break
         }
@@ -266,6 +320,11 @@ extension EmbedAudioEngine {
                   send('progress', ms / 1000, total / 1000);
                 });
               });
+            } else if (current.provider === 'youtube') {
+              // YouTube answers synchronously, unlike the other two.
+              try {
+                send('progress', current.widget.getCurrentTime(), current.widget.getDuration());
+              } catch (e) {}
             } else {
               Promise.all([current.widget.getPosition(), current.widget.getDuration()])
                 .then(function (values) { send('progress', values[0], values[1]); })
@@ -411,17 +470,93 @@ extension EmbedAudioEngine {
           var autoplay = config.autoplay === '1';
           if (config.provider === 'mixcloud') {
             loadMixcloud(config.url, autoplay);
+          } else if (config.provider === 'youtube') {
+            loadYouTube(config.url, autoplay);
           } else {
             loadSoundCloud(config.url, autoplay);
           }
         };
 
+        // --- YouTube --------------------------------------------------------
+
+        function ensureYouTube(done) {
+          if (window.YT && window.YT.Player) { done(); return; }
+          window.onYouTubeIframeAPIReady = function () { done(); };
+          if (document.getElementById('yt-api')) { return; }
+          var script = document.createElement('script');
+          script.id = 'yt-api';
+          script.src = 'https://www.youtube.com/iframe_api';
+          script.onerror = function () {
+            send('error', null, null, 'The YouTube player could not be reached.');
+          };
+          document.head.appendChild(script);
+        }
+
+        function loadYouTube(videoID, autoplay) {
+          ensureYouTube(function () {
+            var host = document.createElement('div');
+            document.getElementById('host').appendChild(host);
+            var player = new YT.Player(host, {
+              videoId: videoID,
+              // No chrome. The listener is here for the music, and the
+              // transport they are already using is the app's own.
+              playerVars: {
+                autoplay: autoplay ? 1 : 0, controls: 0, disablekb: 1,
+                modestbranding: 1, rel: 0, playsinline: 1, fs: 0,
+                enablejsapi: 1, origin: window.location.origin
+              },
+              events: {
+                onReady: function (event) {
+                  event.target.setVolume(volume * 100);
+                  send('loading', 0, event.target.getDuration());
+                  if (autoplay) { event.target.playVideo(); }
+                },
+                onStateChange: function (event) {
+                  if (event.data === YT.PlayerState.PLAYING) {
+                    startTicker();
+                    send('play', null, event.target.getDuration());
+                  } else if (event.data === YT.PlayerState.PAUSED) {
+                    stopTicker();
+                    send('pause');
+                  } else if (event.data === YT.PlayerState.ENDED) {
+                    stopTicker();
+                    send('finish');
+                  }
+                },
+                onError: function (event) {
+                  // Reported by code rather than as one message, because they
+                  // are not the same problem: 100 is a video that no longer
+                  // exists, 101 and 150 are a frame that was refused, and 2 is
+                  // a malformed id, which would be our fault.
+                  var code = event && event.data;
+                  var detail;
+                  if (code === 100) {
+                    detail = 'That recording is no longer on YouTube.';
+                  } else if (code === 101 || code === 150) {
+                    detail = 'The uploader does not allow this one to play outside YouTube.';
+                  } else if (code === 2) {
+                    detail = 'YouTube did not recognise that video.';
+                  } else {
+                    detail = 'YouTube could not play that one.';
+                  }
+                  send('error', null, null, 'youtube:' + code + ':' + detail);
+                }
+              }
+            });
+            current = { provider: 'youtube', widget: player };
+          });
+        }
+
         window.indigoPlay = function () {
-          if (current) { current.widget.play(); }
+          if (!current) { return; }
+          if (current.provider === 'youtube') { current.widget.playVideo(); }
+          else { current.widget.play(); }
         };
 
         window.indigoPause = function () {
-          if (current) { current.widget.pause(); }
+          if (!current) { return; }
+          if (current.provider === 'youtube') { current.widget.pauseVideo(); return; }
+          current.widget.pause();
         };
 
         window.indigoStop = function () {
@@ -433,6 +568,8 @@ extension EmbedAudioEngine {
           if (!current) { return; }
           if (current.provider === 'soundcloud') {
             current.widget.seekTo(seconds * 1000);
+          } else if (current.provider === 'youtube') {
+            current.widget.seekTo(seconds, true);
           } else {
             current.widget.seek(seconds);
           }
@@ -441,7 +578,7 @@ extension EmbedAudioEngine {
         window.indigoVolume = function (value) {
           volume = value;
           if (!current) { return; }
-          if (current.provider === 'soundcloud') {
+          if (current.provider === 'soundcloud' || current.provider === 'youtube') {
             current.widget.setVolume(value * 100);
           } else {
             current.widget.setVolume(value);

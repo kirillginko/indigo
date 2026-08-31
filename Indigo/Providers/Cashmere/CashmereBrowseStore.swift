@@ -36,6 +36,9 @@ final class CashmereBrowseStore {
     private(set) var showsPhase: Phase = .idle
 
     private(set) var showEpisodes: [String: [CashmereEpisode]] = [:]
+    /// One episode per show, purely so its tile has a face and a genre.
+    private(set) var showPreviews: [String: CashmereEpisode] = [:]
+    @ObservationIgnored private var loadingPreviews: Set<String> = []
     private(set) var loadingShows: Set<String> = []
     private(set) var showErrors: [String: String] = [:]
 
@@ -161,6 +164,27 @@ final class CashmereBrowseStore {
     }
 
     func show(slug: String) -> CashmereShow? { shows.first { $0.slug == slug } }
+
+    /// A WordPress category carries no picture and no genres of its own, so a
+    /// show tile has nothing to draw until one of its episodes is in hand.
+    /// Grids are lazy, so this only ever runs for tiles actually on screen.
+    func preview(forShow slug: String) -> CashmereEpisode? {
+        showPreviews[slug]
+            ?? showEpisodes[slug]?.first
+            ?? episodes.first { $0.showSlug == slug }
+    }
+
+    func loadShowPreviewIfNeeded(slug: String) async {
+        guard preview(forShow: slug) == nil, !loadingPreviews.contains(slug) else { return }
+        loadingPreviews.insert(slug)
+        defer { loadingPreviews.remove(slug) }
+
+        guard let page = try? await api.fetchEpisodes(first: 1, showSlug: slug),
+              let episode = page.episodes.first
+        else { return }
+        showPreviews[slug] = episode
+        remember([episode])
+    }
     func episodes(ofShow slug: String) -> [CashmereEpisode] { showEpisodes[slug] ?? [] }
     func isLoadingShow(_ slug: String) -> Bool { loadingShows.contains(slug) }
     func showError(_ slug: String) -> String? { showErrors[slug] }

@@ -228,8 +228,17 @@ struct LotEpisodeDetailView: View {
             } else {
                 LazyVStack(spacing: 0) {
                     ForEach(episode.tracklist) { track in
-                        LotTrackRow(track: track, isPlayable: episode.isPlayable) {
-                            LotPlayback.play(episode, from: track, using: player)
+                        HStack(spacing: 0) {
+                            LotTrackRow(track: track, isPlayable: episode.isPlayable) {
+                                LotPlayback.play(episode, from: track, using: player)
+                            }
+                            RadioTracklistCrateButton(item: RadioTracklistItem(
+                                providerID: "lot", showID: episode.ref?.encoded ?? episode.id,
+                                showTitle: episode.title, airedAt: episode.airedAt,
+                                entryID: "\(track.index)", title: track.title,
+                                artist: track.artist, offsetSeconds: track.offset
+                            ))
+                            .padding(.trailing, Metrics.gutter)
                         }
                         Rule()
                     }

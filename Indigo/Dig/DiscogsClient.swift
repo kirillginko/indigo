@@ -94,6 +94,23 @@ nonisolated struct DiscogsClient: Sendable {
         )
     }
 
+    /// Just a picture of an artist, in one request.
+    ///
+    /// The full `artist(named:)` bundle is four requests and fetches a
+    /// discography nobody asked for. When all that is wanted is a thumbnail
+    /// for a row, this is a quarter of the cost — which is what makes filling
+    /// in a page of forty neighbours possible at all.
+    func artistThumbnail(named name: String) async throws -> String? {
+        let response: DiscogsSearchResponse = try await get("database/search", query: [
+            URLQueryItem(name: "q", value: name),
+            URLQueryItem(name: "type", value: "artist"),
+            URLQueryItem(name: "per_page", value: "5")
+        ])
+        guard let match = Self.bestArtistMatch(name: name, results: response.results ?? [])
+        else { return nil }
+        return match.thumbnail ?? match.coverImage
+    }
+
     func release(id: Int) async throws -> DiscogsReleaseDetail {
         try await get("releases/\(id)")
     }
@@ -112,6 +129,31 @@ nonisolated struct DiscogsClient: Sendable {
         })?.id ?? response.results?.first?.id
     }
 
+    /// The release a *track* appears on.
+    ///
+    /// The route that actually matters for radio music. A tracklist gives you
+    /// a song, and a song is almost never the name of a record — so searching
+    /// for a release called "Rev8617" finds nothing, while asking which
+    /// release contains a track called "Rev8617" returns Compro, which is the
+    /// album the listener heard a piece of.
+    ///
+    /// Ordered results are left in Discogs' own relevance order and the
+    /// earliest pressing wins ties, so a track resolves to the record it came
+    /// out on rather than to a later compilation that also carries it.
+    func releaseID(track: String, artist: String) async throws -> Int? {
+        let response: DiscogsSearchResponse = try await get("database/search", query: [
+            URLQueryItem(name: "track", value: track),
+            URLQueryItem(name: "artist", value: artist),
+            URLQueryItem(name: "type", value: "release"),
+            URLQueryItem(name: "per_page", value: "5")
+        ])
+        guard let results = response.results, !results.isEmpty else { return nil }
+        let earliest = results
+            .filter { ($0.year.flatMap(Int.init) ?? 0) > 0 }
+            .min { ($0.year.flatMap(Int.init) ?? 0) < ($1.year.flatMap(Int.init) ?? 0) }
+        return earliest?.id ?? results.first?.id
+    }
+
     func labelCatalogue(named name: String) async throws -> [DiscogsSearchResult] {
         let response: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "label", value: name),
@@ -128,8 +170,8 @@ nonisolated struct DiscogsClient: Sendable {
         async let styleResults: DiscogsSearchResponse = recommendationSearch(field: "style", value: styles.first)
         let (labelsResponse, stylesResponse) = try await (labelResults, styleResults)
         return try await DiscogsRecommendationBundle(
-            labelArtists: Self.artistNames(from: labelsResponse.results ?? []),
-            styleArtists: Self.artistNames(from: stylesResponse.results ?? [])
+            labelArtists: Self.neighbours(from: labelsResponse.results ?? []),
+            styleArtists: Self.neighbours(from: stylesResponse.results ?? [])
         )
     }
 
@@ -142,14 +184,24 @@ nonisolated struct DiscogsClient: Sendable {
         ])
     }
 
-    static func artistNames(from results: [DiscogsSearchResult]) -> [String] {
+    /// Discogs writes a release result as "Artist - Title" and includes a
+    /// thumbnail with it. Both halves are worth keeping: the name is the
+    /// connection and the thumbnail is the only picture of these artists that
+    /// can be had without a request each.
+    static func neighbours(from results: [DiscogsSearchResult]) -> [DiscogsNeighbour] {
         var seen = Set<String>()
         return results.compactMap { result in
             guard let separator = result.title.range(of: " - ") else { return nil }
             let artist = String(result.title[..<separator.lowerBound]).trimmingCharacters(in: .whitespaces)
             let key = RecordingKey.normalizeArtist(artist)
-            return !key.isEmpty && seen.insert(key).inserted ? artist : nil
+            guard !key.isEmpty, seen.insert(key).inserted else { return nil }
+            // The small cut. A 38-point row has no use for a 600-pixel sleeve.
+            return DiscogsNeighbour(name: artist, thumbnailURL: result.thumbnail ?? result.coverImage)
         }
+    }
+
+    static func artistNames(from results: [DiscogsSearchResult]) -> [String] {
+        neighbours(from: results).map(\.name)
     }
 
     static func bestArtistMatch(name: String, results: [DiscogsSearchResult]) -> DiscogsSearchResult? {

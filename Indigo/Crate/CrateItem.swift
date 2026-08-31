@@ -15,6 +15,10 @@ nonisolated enum CrateItemKind: String, Codable, CaseIterable, Sendable {
     case recording
     /// A whole broadcast: an NTS episode, a Kiosk show.
     case broadcast
+    /// Catalogue entities kept while browsing DIG.
+    case artist
+    case release
+    case label
 }
 
 @Model
@@ -73,6 +77,27 @@ nonisolated final class CrateItem {
         self.genreTagsRaw = Self.cleanGenres(genres).joined(separator: "\n")
     }
 
+    init(
+        digKind: CrateItemKind,
+        providerID: String,
+        entityID: String,
+        title: String,
+        subtitle: String?,
+        artworkURL: URL?,
+        genres: [String] = []
+    ) {
+        precondition([.artist, .release, .label].contains(digKind))
+        self.id = UUID()
+        self.kindRaw = digKind.rawValue
+        self.addedAt = Date()
+        self.providerID = providerID
+        self.showID = entityID
+        self.showTitle = title
+        self.showSubtitle = subtitle
+        self.artworkURLString = artworkURL?.absoluteString
+        self.genreTagsRaw = Self.cleanGenres(genres).joined(separator: "\n")
+    }
+
     var kind: CrateItemKind {
         CrateItemKind(rawValue: kindRaw) ?? .recording
     }
@@ -83,13 +108,16 @@ nonisolated final class CrateItem {
         switch kind {
         case .recording: recording?.displayTitle ?? "Unknown"
         case .broadcast: showTitle ?? "Broadcast"
+        case .artist: showTitle ?? "Artist"
+        case .release: showTitle ?? "Release"
+        case .label: showTitle ?? "Label"
         }
     }
 
     var displaySubtitle: String? {
         switch kind {
         case .recording: recording?.displayArtist
-        case .broadcast: showSubtitle
+        case .broadcast, .artist, .release, .label: showSubtitle
         }
     }
 
@@ -112,6 +140,8 @@ nonisolated final class CrateItem {
             case "kiosk": return "Kiosk Radio"
             default: return providerID?.capitalized
             }
+        case .artist, .release, .label:
+            return "DIG"
         }
     }
 
@@ -140,6 +170,9 @@ nonisolated final class CrateItem {
         switch kind {
         case .recording: recording?.identificationStatus.label
         case .broadcast: "Show"
+        case .artist: "Artist"
+        case .release: "Release"
+        case .label: "Label"
         }
     }
 
@@ -156,6 +189,12 @@ nonisolated final class CrateItem {
             }
         case .broadcast:
             StatusItem("Show")
+        case .artist:
+            StatusItem("Artist")
+        case .release:
+            StatusItem("Release")
+        case .label:
+            StatusItem("Label")
         }
     }
 
@@ -165,6 +204,13 @@ nonisolated final class CrateItem {
     /// The item the player needs to hear this again, when the crate itself
     /// knows one. Recordings go through SourceResolver instead.
     func broadcastMediaItem() -> MediaItem? {
+        // Legacy builds stored the NTS station stream while presenting the
+        // on-air show as the crated item. Replaying that entry later starts a
+        // different live show, so fail closed instead of playing the wrong set.
+        if providerID == "nts", isLiveStream,
+           showID == "nts.1" || showID == "nts.2" {
+            return nil
+        }
         guard kind == .broadcast,
               let playbackURLString,
               let url = URL(string: playbackURLString),

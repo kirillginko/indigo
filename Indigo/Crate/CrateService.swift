@@ -26,6 +26,13 @@ final class CrateService {
         self.context = context
     }
 
+    /// Deallocating a main-actor-isolated observable hops to the executor to
+    /// run its deinit, and that hop aborts the process. The app never sees it
+    /// — this service lives as long as the window — but anything that creates
+    /// one and lets it go takes the whole test host down with it. Nothing
+    /// here needs the main actor to be torn down.
+    nonisolated deinit {}
+
     // MARK: - Reading
 
     func items() -> [CrateItem] {
@@ -62,6 +69,14 @@ final class CrateService {
         )
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
+    }
+
+    func item(forDig kind: CrateItemKind, identifier: String, providerID: String) -> CrateItem? {
+        items().first { $0.kind == kind && $0.showID == identifier && $0.providerID == providerID }
+    }
+
+    func contains(dig kind: CrateItemKind, identifier: String, providerID: String) -> Bool {
+        item(forDig: kind, identifier: identifier, providerID: providerID) != nil
     }
 
     // MARK: - Writing
@@ -105,6 +120,45 @@ final class CrateService {
         context.insert(item)
         save()
         return item
+    }
+
+    @discardableResult
+    func add(
+        dig kind: CrateItemKind,
+        identifier: String,
+        providerID: String,
+        title: String,
+        subtitle: String?,
+        artworkURL: URL?,
+        genres: [String] = []
+    ) -> CrateItem {
+        if let existing = item(forDig: kind, identifier: identifier, providerID: providerID) { return existing }
+        let item = CrateItem(
+            digKind: kind, providerID: providerID, entityID: identifier,
+            title: title, subtitle: subtitle, artworkURL: artworkURL, genres: genres
+        )
+        context.insert(item)
+        save()
+        return item
+    }
+
+    func toggle(
+        dig kind: CrateItemKind,
+        identifier: String,
+        providerID: String,
+        title: String,
+        subtitle: String?,
+        artworkURL: URL?,
+        genres: [String] = []
+    ) {
+        if let existing = item(forDig: kind, identifier: identifier, providerID: providerID) {
+            remove(existing)
+        } else {
+            add(
+                dig: kind, identifier: identifier, providerID: providerID,
+                title: title, subtitle: subtitle, artworkURL: artworkURL, genres: genres
+            )
+        }
     }
 
     func remove(_ item: CrateItem) {
@@ -169,6 +223,49 @@ final class CrateService {
         save()
     }
 
+    func updateArchivedBroadcast(_ item: CrateItem, from media: MediaItem) {
+        guard item.kind == .broadcast, !media.isLive else { return }
+        var changed = false
+        if item.playbackURLString != media.playbackURL.absoluteString {
+            item.playbackURLString = media.playbackURL.absoluteString
+            changed = true
+        }
+        if item.embedProviderRaw != media.embedProvider?.rawValue {
+            item.embedProviderRaw = media.embedProvider?.rawValue
+            changed = true
+        }
+        if item.artworkURLString == nil, let artwork = media.remoteArtworkURL?.absoluteString {
+            item.artworkURLString = artwork
+            changed = true
+        }
+        if !media.genres.isEmpty, item.genreTags != GenreTags.available(in: media.genres) {
+            item.setGenres(media.genres)
+            changed = true
+        }
+        if item.isLiveStream {
+            item.isLiveStream = false
+            changed = true
+        }
+        if changed { save() }
+    }
+
+    func migrateLegacyNTSBroadcast(_ item: CrateItem, ref: NTSEpisodeRef, media: MediaItem?) {
+        guard item.kind == .broadcast, item.providerID == NTSProvider.providerID else { return }
+        item.showID = "nts.episode.\(ref.show)/\(ref.episode)"
+        item.isLiveStream = false
+        // Remove the old station stream even if NTS has not published archive
+        // audio yet. Playing nothing is better than playing a different show.
+        item.playbackURLString = nil
+        item.embedProviderRaw = nil
+        if let media {
+            item.playbackURLString = media.playbackURL.absoluteString
+            item.embedProviderRaw = media.embedProvider?.rawValue
+            item.artworkURLString = media.remoteArtworkURL?.absoluteString ?? item.artworkURLString
+            item.setGenres(media.genres)
+        }
+        save()
+    }
+
     private func localGenres(for recording: Recording) -> [String] {
         let paths = Set(recording.sources.filter { $0.kind == .localFile }.map(\.identifier))
         guard !paths.isEmpty else { return [] }
@@ -179,7 +276,7 @@ final class CrateService {
 
     // MARK: - Persistence
 
-    private func save() {
+    func save() {
         do {
             try context.save()
             revision &+= 1

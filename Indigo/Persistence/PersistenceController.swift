@@ -21,7 +21,12 @@ enum Persistence {
         MusicLabel.self,
         RecordingMetadata.self,
         DiscogsArtist.self,
-        DiscogsReleaseRecord.self
+        DiscogsReleaseRecord.self,
+        BandcampRelease.self,
+        BandcampArtistIndex.self,
+        DigVisit.self,
+        DigStep.self,
+        ArtistPortrait.self
     ])
 
     static let container: ModelContainer = makeContainer()

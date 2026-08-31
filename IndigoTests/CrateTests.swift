@@ -53,6 +53,43 @@ final class CrateTests: XCTestCase {
         XCTAssertEqual(crate.count, 0)
     }
 
+    func testDIGEntitiesCanBeCratedWithoutLocalLibraryRecords() throws {
+        crate.add(
+            dig: .artist, identifier: "artist-123", providerID: "dig.artist.mbid",
+            title: "Seefeel", subtitle: "Artist",
+            artworkURL: URL(string: "https://example.com/seefeel.jpg"), genres: ["Ambient", "Shoegaze"]
+        )
+        crate.add(
+            dig: .release, identifier: "456", providerID: "dig.release.discogs",
+            title: "Quique", subtitle: "Seefeel · 1993",
+            artworkURL: URL(string: "https://example.com/quique.jpg")
+        )
+        crate.add(
+            dig: .label, identifier: "warp", providerID: "dig.label.discogs",
+            title: "Warp", subtitle: "Label", artworkURL: nil
+        )
+
+        XCTAssertEqual(crate.count, 3)
+        XCTAssertEqual(Set(crate.items().map(\.kind)), [.artist, .release, .label])
+        XCTAssertTrue(crate.contains(dig: .artist, identifier: "artist-123", providerID: "dig.artist.mbid"))
+        XCTAssertEqual(crate.items().first(where: { $0.kind == .artist })?.genreTags, ["Ambient", "Shoegaze"])
+        XCTAssertTrue(crate.items().allSatisfy { $0.recording == nil && $0.sourceLine == "DIG" })
+        XCTAssertEqual(DigEngine(context: context).crateCount(artist: "Seefeel"), 1)
+    }
+
+    func testDIGEntityToggleUsesStableProviderIdentity() {
+        crate.toggle(
+            dig: .label, identifier: "warp", providerID: "dig.label.discogs",
+            title: "Warp", subtitle: "Label", artworkURL: nil
+        )
+        crate.toggle(
+            dig: .label, identifier: "warp", providerID: "dig.label.discogs",
+            title: "Warp Records", subtitle: "Label", artworkURL: nil
+        )
+
+        XCTAssertEqual(crate.count, 0)
+    }
+
     /// Deleting a crate entry must not delete the recording behind it — the
     /// music, and its provenance, outlive the decision to keep it.
     func testRemovingFromCrateKeepsTheRecording() throws {
@@ -89,6 +126,101 @@ final class CrateTests: XCTestCase {
         XCTAssertTrue(item.displayTitle.hasPrefix("UNKNOWN/"))
         XCTAssertEqual(item.statusLabel, "Unknown")
         XCTAssertEqual(item.sourceLine, "NTS 1 / Ben UFO @ 01:21:43")
+    }
+
+    func testCratingAnNTSTracklistEntryKeepsEpisodeAndTimestamp() throws {
+        let detail = NTSEpisodeDetail(
+            summary: NTSEpisodeSummary(
+                showAlias: "ben-ufo", episodeAlias: "2026-08-28", name: "Ben UFO",
+                summary: nil, location: nil, genres: [], moods: [], artworkURL: nil,
+                broadcastAt: Date(timeIntervalSince1970: 1_788_000_000), isPublished: true
+            ),
+            tracklist: [
+                NTSTracklistEntry(id: "track#0", artist: "Skee Mask", title: "Rev8617", offset: 4_472)
+            ],
+            audio: []
+        )
+        let entry = try XCTUnwrap(detail.tracklist.first)
+
+        crate.toggle(tracklistEntry: entry, in: detail)
+
+        let item = try XCTUnwrap(crate.items().first)
+        XCTAssertEqual(item.kind, .recording)
+        XCTAssertEqual(item.displayTitle, "Rev8617")
+        XCTAssertEqual(item.displaySubtitle, "Skee Mask")
+        XCTAssertEqual(item.sourceLine, "NTS / Ben UFO @ 01:14:32")
+        XCTAssertTrue(crate.isCrated(tracklistEntry: entry, in: detail))
+
+        crate.toggle(tracklistEntry: entry, in: detail)
+        XCTAssertEqual(crate.count, 0)
+    }
+
+    func testRepeatedPlaceholderRowsCrateIndependently() throws {
+        let detail = NTSEpisodeDetail(
+            summary: NTSEpisodeSummary(
+                showAlias: "papo2oo4", episodeAlias: "mix", name: "Papo2oo4 & YL",
+                summary: nil, location: nil, genres: [], moods: [], artworkURL: nil,
+                broadcastAt: Date(timeIntervalSince1970: 1_788_000_000), isPublished: true
+            ),
+            tracklist: [
+                NTSTracklistEntry(id: "a#0", artist: "Papo2oo4 & YL",
+                                  title: "Unreleased (Prod. Subjxct 5)", offset: 8),
+                NTSTracklistEntry(id: "b#1", artist: "Papo2oo4 & YL",
+                                  title: "Unreleased (Prod. Subjxct 5)", offset: 904)
+            ],
+            audio: []
+        )
+        RadioNeighborhoodEngine(context: context).ingest(detail)
+
+        crate.toggle(tracklistEntry: detail.tracklist[0], in: detail)
+
+        XCTAssertTrue(crate.isCrated(tracklistEntry: detail.tracklist[0], in: detail))
+        XCTAssertFalse(crate.isCrated(tracklistEntry: detail.tracklist[1], in: detail))
+        XCTAssertEqual(crate.count, 1)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<Recording>()), 2)
+    }
+
+    func testProviderNeutralTracklistRowsCrateIndependently() {
+        let first = RadioTracklistItem(
+            providerID: "lyl", showID: "episode-1", showTitle: "Guest Mix", airedAt: nil,
+            entryID: "0", title: "Unknown — Untitled", artist: nil, offsetSeconds: nil
+        )
+        let second = RadioTracklistItem(
+            providerID: "lyl", showID: "episode-1", showTitle: "Guest Mix", airedAt: nil,
+            entryID: "1", title: "Unknown — Untitled", artist: nil, offsetSeconds: nil
+        )
+
+        crate.toggle(radioTracklistItem: first)
+
+        XCTAssertTrue(crate.isCrated(radioTracklistItem: first))
+        XCTAssertFalse(crate.isCrated(radioTracklistItem: second))
+        XCTAssertEqual(crate.count, 1)
+    }
+
+    func testProviderTextTracklistRecoversArtistAndTitleForDIG() throws {
+        let row = RadioTracklistItem(
+            providerID: "lyl", showID: "episode-1", showTitle: "Guest Mix", airedAt: nil,
+            entryID: "0", title: "Skee Mask — Rev8617", artist: nil, offsetSeconds: nil
+        )
+
+        let recording = try XCTUnwrap(crate.toggle(radioTracklistItem: row))
+
+        XCTAssertEqual(recording.artistName, "Skee Mask")
+        XCTAssertEqual(recording.title, "Rev8617")
+        XCTAssertEqual(DigStore(context: context).destination(for: recording),
+                       .digArtist(mbid: nil, name: "Skee Mask"))
+    }
+
+    func testStructuredTracklistCreditIsNotReparsed() throws {
+        let row = RadioTracklistItem(
+            providerID: "lot", showID: "episode-1", showTitle: "Guest Mix", airedAt: nil,
+            entryID: "0", title: "A - Z", artist: "Actress", offsetSeconds: nil
+        )
+
+        let recording = try XCTUnwrap(crate.toggle(radioTracklistItem: row))
+
+        XCTAssertEqual(recording.artistName, "Actress")
+        XCTAssertEqual(recording.title, "A - Z")
     }
 
     // MARK: Broadcasts
@@ -131,12 +263,41 @@ final class CrateTests: XCTestCase {
             title: "NTS 1", subtitle: "Moxie", detail: "NTS",
             playbackURL: URL(string: "https://stream.example/1")!
         )
-        crate.toggle(nowPlaying: station, showTitle: "Moxie")
+        crate.toggle(nowPlaying: station, liveShow: RadioShow(
+            title: "Moxie", host: nil, summary: nil, location: nil,
+            genres: [], moods: [], artworkURL: nil,
+            startsAt: nil, endsAt: nil, detailID: nil
+        ))
 
         let item = crate.items().first
         XCTAssertEqual(item?.displayTitle, "Moxie")
         XCTAssertEqual(item?.displaySubtitle, "NTS 1")
         XCTAssertEqual(item?.isLiveStream, true)
+    }
+
+    func testCratingLiveNTSKeepsExactEpisodeAndNeverTheStationStream() throws {
+        let station = MediaItem(
+            id: "nts.1", sourceID: NTSProvider.providerID, kind: .radioStation,
+            title: "NTS 1", subtitle: "James McNew", detail: "NTS",
+            playbackURL: URL(string: "https://stream-relay-geo.ntslive.net/stream")!
+        )
+        let show = RadioShow(
+            title: "James McNew", host: "James McNew", summary: nil, location: "New York",
+            genres: ["Rock"], moods: ["Eclectic"],
+            artworkURL: URL(string: "https://images.example/james.jpg"),
+            startsAt: nil, endsAt: nil, detailID: "james-mcnew/james-mcnew-29th-august-2026"
+        )
+
+        crate.toggle(nowPlaying: station, liveShow: show)
+
+        let item = try XCTUnwrap(crate.items().first)
+        XCTAssertEqual(item.showID, "nts.episode.james-mcnew/james-mcnew-29th-august-2026")
+        XCTAssertEqual(item.displayTitle, "James McNew")
+        XCTAssertEqual(item.genreTags, ["Rock", "Eclectic"])
+        XCTAssertNil(item.playbackURLString)
+        XCTAssertFalse(item.isLiveStream)
+        XCTAssertNil(item.broadcastMediaItem())
+        XCTAssertTrue(crate.isCrated(nowPlaying: station, liveShow: show))
     }
 
     // MARK: Local files

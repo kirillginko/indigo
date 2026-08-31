@@ -24,7 +24,6 @@ nonisolated enum Route: Hashable {
     case kioskShows
     case noodsStation
     case noodsShows
-    case noodsFilter
     case noodsResidents
     case noodsCollections
     case lotStation
@@ -38,6 +37,9 @@ nonisolated enum Route: Hashable {
     case cashmereStation
     case cashmereArchive
     case cashmereShows
+    case lylStation
+    case lylArchive
+    case lylShows
     case crate
     case dig
 
@@ -56,7 +58,6 @@ nonisolated enum Route: Hashable {
         case .kioskShows: "Shows"
         case .noodsStation: "Noods Radio"
         case .noodsShows: "Discover"
-        case .noodsFilter: "Filter"
         case .noodsResidents: "Residents"
         case .noodsCollections: "Collections"
         case .lotStation: "The Lot Radio"
@@ -70,6 +71,9 @@ nonisolated enum Route: Hashable {
         case .cashmereStation: "Cashmere Radio"
         case .cashmereArchive: "Archive"
         case .cashmereShows: "Shows"
+        case .lylStation: "LYL Radio"
+        case .lylArchive: "Archive"
+        case .lylShows: "Shows"
         case .crate: "Crate"
         case .dig: "Dig"
         }
@@ -88,6 +92,15 @@ nonisolated enum DetailPage: Hashable {
     case digLabel(mbid: String, name: String)
     case digDiscogsLabel(name: String)
     case digRelease(id: Int, title: String)
+    /// A record named only in an artist's own listing, with no catalogue
+    /// entry to open. It still has a page.
+    case digReleaseNamed(title: String, artist: String)
+    /// One piece of music: where it was heard, and what was heard beside it.
+    case digRecording(id: UUID, title: String)
+    /// A catalogue number, treated as somewhere you can go.
+    case digCatalog(number: String)
+    /// A place and a stretch of time.
+    case digScene(city: String)
     case noodsShow(path: String)
     case noodsResident(path: String)
     case noodsCollection(path: String)
@@ -98,6 +111,8 @@ nonisolated enum DetailPage: Hashable {
     case alharaShow(slug: String)
     case cashmereEpisode(slug: String)
     case cashmereShow(slug: String)
+    case lylEpisode(slug: String)
+    case lylShow(slug: String)
 }
 
 @Observable
@@ -111,6 +126,12 @@ final class AppState {
     private(set) var searchFocusRequests = 0
 
     var detail: DetailPage? { path.last }
+
+    /// Where the listener was before this page. The step that got them here,
+    /// which is the half of a dig worth remembering.
+    var previousDetail: DetailPage? {
+        path.count > 1 ? path[path.count - 2] : nil
+    }
 
     func select(_ route: Route) {
         searchText = ""
@@ -153,6 +174,10 @@ final class AppState {
         case .digLabel: return "Label"
         case .digDiscogsLabel: return "Label"
         case .digRelease: return "Release"
+        case .digReleaseNamed: return "Release"
+        case .digRecording: return "Track"
+        case .digCatalog: return "Catalogue"
+        case .digScene: return "Scene"
         case .noodsShow: return "Show"
         case .noodsResident: return "Resident"
         case .noodsCollection: return "Collection"
@@ -163,6 +188,8 @@ final class AppState {
         case .alharaShow: return "Show"
         case .cashmereEpisode: return "Episode"
         case .cashmereShow: return "Show"
+        case .lylEpisode: return "Episode"
+        case .lylShow: return "Show"
         }
     }
 }

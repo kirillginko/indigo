@@ -8,6 +8,7 @@
 
 import Foundation
 import Observation
+import SwiftData
 
 @Observable
 final class NTSBrowseStore {
@@ -57,7 +58,12 @@ final class NTSBrowseStore {
     private(set) var loadingEpisodeDetails: Set<String> = []
 
     @ObservationIgnored private let api = NTSAPI()
+    @ObservationIgnored private let context: ModelContext?
     @ObservationIgnored private var searchTask: Task<Void, Never>?
+
+    init(context: ModelContext? = nil) {
+        self.context = context
+    }
 
     // MARK: Episode feeds
 
@@ -198,6 +204,10 @@ final class NTSBrowseStore {
             let dto = try await api.fetchEpisode(showAlias: show, episodeAlias: episode)
             if let detail = dto.asDetail() {
                 episodeDetails[key] = detail
+                if let context {
+                    RadioNeighborhoodEngine(context: context).ingest(detail)
+                    try? context.save()
+                }
             } else {
                 episodeDetailErrors[key] = "NTS didn't return anything for this episode."
             }
@@ -242,6 +252,29 @@ final class NTSBrowseStore {
     func retrySearch() async {
         guard !activeQuery.isEmpty else { return }
         await performSearch(query: activeQuery, scope: activeScope, offset: 0)
+    }
+
+    /// Repairs crate entries made by older builds, which saved only the live
+    /// station and show title. Search episodes without disturbing the visible
+    /// search screen, then choose the broadcast nearest the moment it was kept.
+    func archivedEpisode(matching title: String, near savedAt: Date) async -> NTSEpisodeRef? {
+        do {
+            let response = try await api.search(query: title, scope: .episode, offset: 0)
+            let titleKey = LibraryKey.normalize(title)
+            let candidates = response.results.enumerated().compactMap { index, dto -> NTSSearchResult? in
+                dto.asResult(index: index)
+            }.filter {
+                $0.kind == .episode && $0.showAlias != nil && $0.episodeAlias != nil
+                    && LibraryKey.normalize($0.title) == titleKey
+            }
+            let best = candidates.min { lhs, rhs in
+                distance(lhs.date, from: savedAt) < distance(rhs.date, from: savedAt)
+            }
+            guard let show = best?.showAlias, let episode = best?.episodeAlias else { return nil }
+            return NTSEpisodeRef(show: show, episode: episode)
+        } catch {
+            return nil
+        }
     }
 
     private func performSearch(query: String, scope: NTSSearchScope, offset: Int) async {
@@ -320,5 +353,18 @@ final class NTSBrowseStore {
 
     private func message(for error: Error) -> String {
         (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+    }
+
+    private func distance(_ value: String?, from date: Date) -> TimeInterval {
+        guard let value else { return .greatestFiniteMagnitude }
+        let iso = ISO8601DateFormatter()
+        if let parsed = iso.date(from: value) { return abs(parsed.timeIntervalSince(date)) }
+        for format in ["yyyy-MM-dd", "d MMM yyyy", "dd.MM.yyyy"] {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = format
+            if let parsed = formatter.date(from: value) { return abs(parsed.timeIntervalSince(date)) }
+        }
+        return .greatestFiniteMagnitude
     }
 }

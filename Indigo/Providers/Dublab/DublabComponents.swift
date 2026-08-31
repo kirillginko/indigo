@@ -109,8 +109,13 @@ struct DublabBroadcastTile: View {
                             .padding(.vertical, 4)
                             .background(Palette.paper)
                             .padding(8)
-                    } else if broadcast.isGuestSession, isHovering {
-                        Text("Guest")
+                    } else if isHovering,
+                              let badge = BroadcastBadge.text(
+                                  // dublab publishes no tracklists.
+                                  tracks: 0,
+                                  genres: broadcast.genreNames
+                              ) {
+                        Text(badge)
                             .microLabel(1.1, size: 9)
                             .foregroundStyle(Palette.inverseInk)
                             .padding(.horizontal, 6)

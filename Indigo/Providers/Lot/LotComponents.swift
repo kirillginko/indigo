@@ -110,8 +110,12 @@ struct LotEpisodeTile: View {
                             .padding(.vertical, 4)
                             .background(Palette.paper)
                             .padding(8)
-                    } else if !episode.tracklist.isEmpty, isHovering {
-                        Text("\(episode.tracklist.count) tracks")
+                    } else if isHovering,
+                              let badge = BroadcastBadge.text(
+                                  tracks: episode.tracklist.count,
+                                  genres: episode.genreNames
+                              ) {
+                        Text(badge)
                             .microLabel(1.1, size: 9)
                             .foregroundStyle(Palette.inverseInk)
                             .padding(.horizontal, 6)

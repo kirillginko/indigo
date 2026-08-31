@@ -41,6 +41,13 @@ nonisolated struct PlaybackQueue: Sendable {
         index = 0
     }
 
+    /// Swaps what sits under the cursor, for retrying the same recording by
+    /// another route without disturbing the running order.
+    mutating func replaceCurrent(with item: MediaItem) {
+        guard items.indices.contains(index) else { return }
+        items[index] = item
+    }
+
     @discardableResult
     mutating func advance() -> MediaItem? {
         guard hasNext else { return nil }

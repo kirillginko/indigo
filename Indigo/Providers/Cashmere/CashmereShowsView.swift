@@ -32,11 +32,7 @@ struct CashmereShowsView: View {
             Rule(color: Palette.outline)
             content
         }
-        .task {
-            async let shows: Void = browse.loadShowsIfNeeded()
-            async let archive: Void = browse.loadArchiveIfNeeded()
-            _ = await (shows, archive)
-        }
+        .task { await browse.loadShowsIfNeeded() }
     }
 
     @ViewBuilder
@@ -60,11 +56,9 @@ struct CashmereShowsView: View {
             ScrollView {
                 LazyVGrid(columns: BrowseGrid.columns, spacing: 26) {
                     ForEach(visible) { show in
-                        CashmereShowTile(
-                            show: show,
-                            open: { appState.open(.cashmereShow(slug: show.slug)) },
-                            artworkURL: artwork(for: show)
-                        )
+                        CashmereShowTile(show: show) {
+                            appState.open(.cashmereShow(slug: show.slug))
+                        }
                     }
                 }
                 .padding(.horizontal, Metrics.gutter)
@@ -72,13 +66,6 @@ struct CashmereShowsView: View {
             }
             .scrollIndicators(.visible)
         }
-    }
-
-    /// A category carries no picture of its own, so the grid borrows one from
-    /// whichever of its episodes is already in hand.
-    private func artwork(for show: CashmereShow) -> URL? {
-        browse.episodes(ofShow: show.slug).first?.artworkURL
-            ?? browse.episodes.first { $0.showSlug == show.slug }?.artworkURL
     }
 
     private var visible: [CashmereShow] {

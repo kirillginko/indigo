@@ -10,7 +10,12 @@ import SwiftUI
 import SwiftData
 
 private enum RadioSidebarGroup: CaseIterable, Hashable {
-    case nts, kiosk, noods, lot, dublab, alhara, cashmere
+    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl
+
+    var shade: Double {
+        guard let index = Self.allCases.firstIndex(of: self) else { return 0 }
+        return Double(index) / Double(max(Self.allCases.count - 1, 1))
+    }
 }
 
 struct SidebarView: View {
@@ -22,6 +27,7 @@ struct SidebarView: View {
     @Environment(DublabProvider.self) private var dublab
     @Environment(AlharaProvider.self) private var alhara
     @Environment(CashmereProvider.self) private var cashmere
+    @Environment(LYLProvider.self) private var lyl
     @Environment(CrateService.self) private var crate
     @Environment(PlaybackCoordinator.self) private var player
 
@@ -84,7 +90,6 @@ struct SidebarView: View {
                             indent: 10
                         )
                         row(.noodsShows, label: "Discover", trailing: nil, indent: 10)
-                        row(.noodsFilter, label: "Filter", trailing: nil, indent: 10)
                         row(.noodsResidents, label: "Residents", trailing: nil, indent: 10)
                         row(.noodsCollections, label: "Collections", trailing: nil, indent: 10)
                     }
@@ -142,6 +147,19 @@ struct SidebarView: View {
                         )
                         row(.cashmereArchive, label: "Archive", trailing: nil, indent: 10)
                         row(.cashmereShows, label: "Shows", trailing: nil, indent: 10)
+                    }
+
+                    radioSection("LYL Radio", location: "Lyon, France", group: .lyl)
+                    if expandedRadios.contains(.lyl) {
+                        row(
+                            .lylStation,
+                            label: "Live",
+                            trailing: player.isCurrent(lyl.station.id) ? "live" : nil,
+                            isLive: player.isCurrent(lyl.station.id) && player.isPlaying,
+                            indent: 10
+                        )
+                        row(.lylArchive, label: "Archive", trailing: nil, indent: 10)
+                        row(.lylShows, label: "Shows", trailing: nil, indent: 10)
                     }
                     }
 
@@ -228,27 +246,43 @@ struct SidebarView: View {
                     HStack(spacing: 7) {
                         Text(title)
                             .font(Typeface.mono(10.5, weight: .semibold))
-                            .foregroundStyle(active ? Palette.ink : Palette.inkMuted)
+                            .foregroundStyle(radioForeground(for: group).opacity(active ? 1 : 0.82))
                         if isPlaying {
                             LivePulseDot()
                         }
                     }
                     Text(location)
                         .font(Typeface.mono(8.5))
-                        .foregroundStyle(Palette.inkFaint)
+                        .foregroundStyle(radioForeground(for: group).opacity(0.58))
                 }
                 Spacer(minLength: 4)
                 Image(systemName: expanded ? "chevron.up" : "chevron.down")
                     .font(.system(size: 8, weight: .bold))
             }
-            .foregroundStyle(Palette.inkFaint)
+            .foregroundStyle(radioForeground(for: group).opacity(0.62))
             .padding(.horizontal, 14)
             .padding(.top, 12)
             .padding(.bottom, 6)
+            .background(radioShade(for: group))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(expanded ? "Collapse" : "Expand") \(title)")
+    }
+
+    /// The original dark indigo family, now stretched across a wider value
+    /// range so adjacent stations remain unmistakably separate.
+    private func radioShade(for group: RadioSidebarGroup?) -> Color {
+        let shade = group?.shade ?? 0
+        return Color(
+            hue: 0.68,
+            saturation: 0.42 + (shade * 0.10),
+            brightness: 0.43 - (shade * 0.29)
+        )
+    }
+
+    private func radioForeground(for group: RadioSidebarGroup?) -> Color {
+        Color.white
     }
 
     private func row(
@@ -259,6 +293,9 @@ struct SidebarView: View {
         indent: CGFloat = 0
     ) -> some View {
         let selected = appState.route == route && appState.detail == nil
+        let group = indent > 0 ? radioGroup(for: route) : nil
+        let foreground = group.map { radioForeground(for: $0) } ?? Palette.ink
+        let secondaryForeground = group.map { radioForeground(for: $0).opacity(0.55) } ?? Palette.inkFaint
         return Button {
             appState.select(route)
         } label: {
@@ -272,15 +309,21 @@ struct SidebarView: View {
                 if let trailing {
                     Text(trailing)
                         .microLabel(0.9)
-                        .foregroundStyle(selected ? Palette.inverseInk.opacity(0.7) : Palette.inkFaint)
+                        .foregroundStyle(
+                            selected ? Palette.inverseInk.opacity(0.7) : secondaryForeground
+                        )
                 }
             }
-            .foregroundStyle(selected ? Palette.inverseInk : Palette.ink)
+            .foregroundStyle(selected ? Palette.inverseInk : foreground)
             .padding(.leading, 14 + indent)
             .padding(.trailing, 14)
             .frame(height: Metrics.rowHeight)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(selected ? Palette.inverse : Color.clear)
+            .background(
+                selected
+                    ? Palette.inverse
+                    : (indent > 0 ? radioShade(for: group) : Color.clear)
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -290,11 +333,12 @@ struct SidebarView: View {
         switch route {
         case .station, .ntsLatest, .ntsShows, .ntsMixtapes, .ntsSearch: .nts
         case .kioskStation, .kioskMoods, .kioskShows: .kiosk
-        case .noodsStation, .noodsShows, .noodsFilter, .noodsResidents, .noodsCollections: .noods
+        case .noodsStation, .noodsShows, .noodsResidents, .noodsCollections: .noods
         case .lotStation, .lotIndex, .lotShows: .lot
         case .dublabStation, .dublabArchive, .dublabDJs: .dublab
         case .alharaStation, .alharaArchive: .alhara
         case .cashmereStation, .cashmereArchive, .cashmereShows: .cashmere
+        case .lylStation, .lylArchive, .lylShows: .lyl
         default: nil
         }
     }
@@ -331,6 +375,8 @@ struct SidebarView: View {
             return alhara.visibleStations.contains { player.isCurrent($0.id) }
         case .cashmere:
             return player.isCurrent(cashmere.station.id)
+        case .lyl:
+            return player.isCurrent(lyl.station.id)
         }
     }
 

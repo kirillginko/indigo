@@ -16,38 +16,35 @@ struct ArtistDigView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(PlaybackCoordinator.self) private var player
+
+    @State private var artistScenes: [MusicScene] = []
+
+    /// Held rather than computed in `body`.
+    ///
+    /// Building a profile walks the whole graph, and doing that during the
+    /// render pass means a new page cannot draw until it finishes — which is
+    /// exactly what navigation felt like. The shell paints first and fills in.
+    @State private var profile: ArtistProfile?
+    @State private var lanes = Connections()
 
     var body: some View {
-        let profile = dig.artistProfile(name: artistName, mbid: artistMBID)
-        let collaborators = profile.related.filter { artist in
-            artist.reasons.contains { $0.kind == .collaborator || $0.kind == .appearsOnRelease }
-        }
-        let projects = profile.related.filter { artist in
-            artist.reasons.contains { $0.kind == .aliasOrProject }
-        }
-        let labelArtists = profile.related.filter { artist in
-            !collaborators.contains(where: { $0.id == artist.id })
-                && !projects.contains(where: { $0.id == artist.id })
-                && artist.reasons.contains { $0.kind == .sharedLabel }
-        }
-        let soundArtists = profile.related.filter { artist in
-            !collaborators.contains(where: { $0.id == artist.id })
-                && !labelArtists.contains(where: { $0.id == artist.id })
-                && artist.reasons.contains { $0.kind == .sharedStyle }
-        }
-        let personalArtists = profile.related.filter { artist in
-            !collaborators.contains(where: { $0.id == artist.id })
-                && !labelArtists.contains(where: { $0.id == artist.id })
-                && !soundArtists.contains(where: { $0.id == artist.id })
-                && artist.reasons.contains { $0.kind == .sharedBroadcast || $0.kind == .sharedCollection }
-        }
-        let eraArtists = profile.related.filter { artist in
-            !collaborators.contains(where: { $0.id == artist.id })
-                && !projects.contains(where: { $0.id == artist.id })
-                && !labelArtists.contains(where: { $0.id == artist.id })
-                && !soundArtists.contains(where: { $0.id == artist.id })
-                && !personalArtists.contains(where: { $0.id == artist.id })
-        }
+        let _ = crate.revision
+        // The page it was last showing, drawn immediately, before anything is
+        // recomputed. Coming back to a page you were reading seconds ago
+        // should not put a loading bar in front of it.
+        let profile = profile
+            ?? dig.cachedArtistProfile(name: artistName, mbid: artistMBID)
+            ?? ArtistProfile.placeholder(name: artistName, mbid: artistMBID)
+        let crateProvider = profile.mbid == nil ? "dig.artist.name" : "dig.artist.mbid"
+        let crateID = profile.mbid ?? RecordingKey.normalizeArtist(profile.name)
+        let isCrated = crate.contains(dig: .artist, identifier: crateID, providerID: crateProvider)
+        let collaborators = lanes.collaborators
+        let projects = lanes.projects
+        let labelArtists = lanes.labelArtists
+        let soundArtists = lanes.soundArtists
+        let personalArtists = lanes.personalArtists
+        let eraArtists = lanes.eraArtists
 
         VStack(spacing: 0) {
             PageHeader(
@@ -55,14 +52,26 @@ struct ArtistDigView: View {
                 breadcrumb: appState.breadcrumbTitle,
                 onBack: { appState.popDetail() },
                 subtitle: subtitle(profile)
-            )
+            ) {
+                CrateButton(isCrated: isCrated) {
+                    crate.toggle(
+                        dig: .artist, identifier: crateID, providerID: crateProvider,
+                        title: profile.name, subtitle: "Artist", artworkURL: profile.imageURL,
+                        genres: profile.styles + profile.genres
+                    )
+                }
+            }
             Rule(color: Palette.outline)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 26) {
-                    if dig.isEnriching {
-                        BufferingGlyph()
-                            .accessibilityLabel("Loading")
+                // Lazy: the sections below the fold cost nothing until they
+                // are scrolled to, so the page is usable while the rest of it
+                // is still being worked out.
+                LazyVStack(alignment: .leading, spacing: 26) {
+                    if (self.profile == nil
+                        && dig.cachedArtistProfile(name: artistName, mbid: artistMBID) == nil)
+                        || dig.isEnriching {
+                        WorkingBar()
                     }
                     HStack(alignment: .top, spacing: 26) {
                         ArtworkView(remoteURL: profile.imageURL, side: 220, glyphScale: 0.24)
@@ -105,18 +114,18 @@ struct ArtistDigView: View {
                         .buttonStyle(.plain)
                     }
 
-                    if !profile.styles.isEmpty || !profile.genres.isEmpty || !profile.aliases.isEmpty {
-                        HStack(alignment: .top, spacing: 34) {
-                            if !profile.styles.isEmpty || !profile.genres.isEmpty {
-                                DigSection(title: "Genres / styles") {
-                                    Text((profile.styles + profile.genres).joined(separator: " · "))
-                                        .font(Typeface.mono(10))
-                                        .foregroundStyle(Palette.inkMuted)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .padding(.top, 5)
+                    if profile.aliases.count > 6 {
+                        VStack(alignment: .leading, spacing: 26) {
+                            genresSection(profile)
+                            DigSection(title: "Aliases", trailing: "\(profile.aliases.count)") {
+                                DigLinkGrid(items: profile.aliases) { alias in
+                                    appState.open(.digArtist(mbid: nil, name: alias))
                                 }
-                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
+                        }
+                    } else if !profile.styles.isEmpty || !profile.genres.isEmpty || !profile.aliases.isEmpty {
+                        HStack(alignment: .top, spacing: 34) {
+                            genresSection(profile)
                             if !profile.aliases.isEmpty {
                                 DigSection(title: "Aliases") {
                                     VStack(alignment: .leading, spacing: 0) {
@@ -132,7 +141,12 @@ struct ArtistDigView: View {
                         }
                     }
 
-                    if profile.isBare {
+                    // Only once the graph has actually been read. The shell
+                    // draws from a placeholder so the page appears at once,
+                    // and a placeholder is bare by definition — announcing
+                    // "nothing found" before looking would be a lie told
+                    // quickly.
+                    if self.profile != nil, profile.isBare {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Nothing to dig into yet.")
                                 .font(Typeface.body(12.5))
@@ -144,6 +158,8 @@ struct ArtistDigView: View {
                         }
                         .padding(.vertical, 8)
                     }
+
+                    listen(profile)
 
                     if !profile.releases.isEmpty {
                         DigSection(title: "Browse releases", trailing: "\(profile.releases.count)") {
@@ -162,42 +178,41 @@ struct ArtistDigView: View {
                         }
                     }
 
-                    HStack(alignment: .top, spacing: 34) {
-                        VStack(alignment: .leading, spacing: 26) {
-                            if !profile.radioAppearances.isEmpty {
-                                DigSection(title: "Radio appearances") {
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        ForEach(profile.radioAppearances) { appearance in
-                                            DigLine(
-                                                text: appearance.label,
-                                                detail: appearance.count > 1 ? "×\(appearance.count)" : nil
-                                            )
-                                        }
+                    VStack(alignment: .leading, spacing: 26) {
+                        if !profile.radioAppearances.isEmpty {
+                            DigSection(title: "Radio appearances") {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    ForEach(profile.radioAppearances) { appearance in
+                                        DigLine(
+                                            text: appearance.label,
+                                            detail: appearance.count > 1 ? "×\(appearance.count)" : nil
+                                        )
                                     }
                                 }
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        VStack(alignment: .leading, spacing: 26) {
-                            if !profile.labels.isEmpty {
-                                DigSection(title: "Labels") {
+                        if !profile.labels.isEmpty {
+                            DigSection(title: "Labels", trailing: profile.labels.count > 6
+                                       ? "\(profile.labels.count)" : nil) {
+                                if profile.labels.count > 6 {
+                                    DigLinkGrid(items: profile.labels.map(\.name)) { name in
+                                        guard let label = profile.labels.first(where: { $0.name == name }) else { return }
+                                        openLabel(label)
+                                    }
+                                } else {
                                     VStack(alignment: .leading, spacing: 0) {
                                         ForEach(profile.labels) { label in
                                             DigLine(text: label.name) {
-                                                if let mbid = label.mbid {
-                                                    appState.open(.digLabel(mbid: mbid, name: label.name))
-                                                } else {
-                                                    appState.open(.digDiscogsLabel(name: label.name))
-                                                }
+                                                openLabel(label)
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                     if !profile.related.isEmpty {
                         DigSection(title: "Continue digging", trailing: "\(profile.related.count) routes") {
@@ -212,14 +227,189 @@ struct ArtistDigView: View {
                             .padding(.top, 14)
                         }
                     }
+
+                    scenes
+
+                    DeepSectionView(
+                        origin: .artist(profile.name, mbid: profile.mbid)
+                    ) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)
             }
             .scrollIndicators(.visible)
         }
+        .task(id: dig.revision) { readProfile() }
         .task(id: artistMBID ?? artistName) {
+            readProfile()
+            artistScenes = SceneEngine(context: dig.context).scenes(forArtist: artistName)
             await dig.enrichArtist(name: artistName, mbid: artistMBID)
+            await dig.fillMissingReleaseArtwork(forArtist: artistName, mbid: artistMBID)
+            artistScenes = SceneEngine(context: dig.context).scenes(forArtist: artistName)
+            await dig.verifyListenable(
+                releaseIDs: dig.artistProfile(name: artistName, mbid: artistMBID)
+                    .releases.compactMap(\.discogsID)
+            )
+        }
+        // Runs once per launch and keeps going for as long as the app is
+        // open, filling in the rows nobody has dug into.
+        .task { await dig.fillPortraitsInBackground() }
+    }
+
+    private func readProfile() {
+        let found = dig.artistProfile(name: artistName, mbid: artistMBID)
+        profile = found
+        lanes = Connections.split(found.related)
+    }
+
+    /// The connection lanes, worked out in a single pass.
+    ///
+    /// Each of these used to be a filter that scanned every lane before it, so
+    /// a well-connected artist cost several thousand comparisons — on every
+    /// redraw, including every hover. Claiming each artist once as it is
+    /// placed does the same job in one walk.
+    struct Connections {
+        var collaborators: [RelatedArtist] = []
+        var projects: [RelatedArtist] = []
+        var labelArtists: [RelatedArtist] = []
+        var soundArtists: [RelatedArtist] = []
+        var personalArtists: [RelatedArtist] = []
+        var eraArtists: [RelatedArtist] = []
+
+        /// Ordered by how well the connection is explained: an alias or a
+        /// credit is a fact, a shared decade is barely a hint, so an artist
+        /// lands in the strongest lane that claims them.
+        static func split(_ related: [RelatedArtist]) -> Connections {
+            var lanes = Connections()
+            for artist in related {
+                let kinds = Set(artist.reasons.map(\.kind))
+                if !kinds.isDisjoint(with: [.collaborator, .appearsOnRelease]) {
+                    lanes.collaborators.append(artist)
+                } else if kinds.contains(.aliasOrProject) {
+                    lanes.projects.append(artist)
+                } else if kinds.contains(.sharedLabel) {
+                    lanes.labelArtists.append(artist)
+                } else if kinds.contains(.sharedStyle) {
+                    lanes.soundArtists.append(artist)
+                } else if !kinds.isDisjoint(with: [.sharedBroadcast, .sharedCollection]) {
+                    lanes.personalArtists.append(artist)
+                } else {
+                    lanes.eraArtists.append(artist)
+                }
+            }
+            return lanes
+        }
+    }
+
+    /// Hearing them, without leaving the page.
+    ///
+    /// Gathered from the releases already catalogued — somebody who was
+    /// cataloguing that pressing linked these recordings to it, which beats
+    /// searching for a name and hoping. Playback goes through YouTube's own
+    /// player, which is what their terms permit; Indigo never resolves the
+    /// underlying stream.
+    @ViewBuilder
+    private func listen(_ profile: ArtistProfile) -> some View {
+        if !profile.listen.isEmpty {
+            DigSection(title: "Listen", trailing: "\(profile.listen.count)") {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(profile.listen.prefix(12)) { line in
+                        ListenRow(
+                            title: line.title,
+                            duration: line.durationLabel,
+                            isCurrent: player.current?.playbackURL == line.url,
+                            isPlaying: player.current?.playbackURL == line.url && player.isPlaying,
+                            isCrated: crate.isCrated(listening: line.url),
+                            play: { play(profile, from: line) },
+                            keep: {
+                                crate.toggle(
+                                    listening: line.url, title: line.title,
+                                    artist: profile.name, artworkURL: profile.imageURL
+                                )
+                            }
+                        )
+                        Rule()
+                    }
+                }
+            }
+        }
+    }
+
+    /// Queues the artist's whole catalogue from whichever recording was
+    /// pressed, so it keeps going.
+    private func play(_ profile: ArtistProfile, from line: DigReleaseProfile.ListenLine) {
+        let items = profile.listen.map { entry in
+            MediaItem(
+                id: "youtube.\(entry.url.absoluteString)",
+                sourceID: "youtube",
+                kind: .track,
+                title: entry.title,
+                subtitle: profile.name,
+                detail: profile.name,
+                remoteArtworkURL: profile.imageURL,
+                playbackURL: entry.url,
+                embedProvider: .youtube
+            )
+        }
+        let index = profile.listen.firstIndex { $0.id == line.id } ?? 0
+        player.play(items, startingAt: index)
+    }
+
+    /// Where this artist sits. More than one is normal — people move, and a
+    /// Berlin record made by somebody from Manchester belongs to both stories.
+    ///
+    /// Worked out in a task rather than in `body`: gathering a scene reads
+    /// most of the store, and doing that again on every hover is how a page
+    /// that renders instantly starts to feel slow.
+    @ViewBuilder
+    private var scenes: some View {
+        let found = artistScenes
+        if !found.isEmpty {
+            DigSection(title: "Scenes", trailing: found.count > 1 ? "\(found.count)" : nil) {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(found) { scene in
+                        DigLine(
+                            text: "\(scene.title) / \(scene.eraLabel)",
+                            detail: [
+                                scene.artists.count > 1 ? "\(scene.artists.count) artists" : nil,
+                                scene.tags.prefix(3).joined(separator: " · ").nilIfEmpty
+                            ].compactMap { $0 }.joined(separator: "  ")
+                        ) {
+                            appState.open(.digScene(city: scene.city))
+                        }
+                        Rule()
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func genresSection(_ profile: ArtistProfile) -> some View {
+        if !profile.styles.isEmpty || !profile.genres.isEmpty {
+            DigSection(title: "Genres / styles") {
+                TagFlow(tags: uniqueTags(profile))
+                    .padding(.top, 6)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func openLabel(_ label: ArtistProfile.LabelRef) {
+        if let mbid = label.mbid {
+            appState.open(.digLabel(mbid: mbid, name: label.name))
+        } else {
+            appState.open(.digDiscogsLabel(name: label.name))
+        }
+    }
+
+    /// Styles first, then any genre the styles did not already cover —
+    /// Discogs lists "Electronic" alongside "Techno" constantly, and printing
+    /// both says less than printing one.
+    private func uniqueTags(_ profile: ArtistProfile) -> [String] {
+        var seen = Set<String>()
+        return (profile.styles + profile.genres).filter {
+            !$0.isEmpty && seen.insert(RecordingKey.normalize($0)).inserted
         }
     }
 
@@ -235,10 +425,12 @@ struct ArtistDigView: View {
             appState.open(.digRelease(id: id, title: release.title))
             return
         }
-        Task {
-            guard let id = await dig.resolveRelease(title: release.title, artist: artistName) else { return }
-            appState.open(.digRelease(id: id, title: release.title))
-        }
+        // Opens immediately either way. This used to resolve first and go
+        // nowhere at all when the search came back empty — so the records with
+        // no catalogue entry, which are the interesting ones, were the only
+        // ones that did nothing when clicked. The page does the lookup itself
+        // now, and says so when there is nothing to find.
+        appState.open(.digReleaseNamed(title: release.title, artist: artistName))
     }
 
     @ViewBuilder

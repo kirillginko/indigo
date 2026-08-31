@@ -97,8 +97,12 @@ struct AlharaShowTile: View {
                     }
                 }
                 .overlay(alignment: .topLeading) {
-                    if isHovering, let duration = show.duration {
-                        Text(TimeFormat.clock(duration))
+                    if isHovering,
+                       let badge = BroadcastBadge.text(
+                           tracks: show.tracklist.count,
+                           genres: show.genres
+                       ) {
+                        Text(badge)
                             .microLabel(1.1, size: 9)
                             .foregroundStyle(Palette.inverseInk)
                             .monospacedDigit()

@@ -12,6 +12,7 @@ struct RootView: View {
     @Environment(AppState.self) private var appState
     @Environment(LibraryStore.self) private var library
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(DigStore.self) private var dig
 
     var body: some View {
         VStack(spacing: 0) {
@@ -60,6 +61,7 @@ struct RootView: View {
         ZStack {
             Palette.paper
             if let detail = appState.detail {
+                Group {
                 switch detail {
                 case .album(let id):
                     AlbumDetailView(albumID: id)
@@ -83,6 +85,14 @@ struct RootView: View {
                     DiscogsLabelDigView(labelName: name)
                 case .digRelease(let id, let title):
                     DigReleaseView(releaseID: id, fallbackTitle: title)
+                case .digReleaseNamed(let title, let artist):
+                    DigReleaseView(releaseID: nil, fallbackTitle: title, artistName: artist)
+                case .digRecording(let id, let title):
+                    RecordingDigView(recordingID: id, fallbackTitle: title)
+                case .digCatalog(let number):
+                    CatalogDigView(number: number)
+                case .digScene(let city):
+                    SceneDigView(city: city)
                 case .noodsShow(let path):
                     NoodsShowDetailView(showPath: path)
                 case .noodsResident(let path):
@@ -103,7 +113,29 @@ struct RootView: View {
                     CashmereEpisodeDetailView(slug: slug)
                 case .cashmereShow(let slug):
                     CashmereShowDetailView(slug: slug)
+                case .lylEpisode(let slug):
+                    LYLEpisodeDetailView(slug: slug)
+                case .lylShow(let slug):
+                    LYLShowDetailView(slug: slug)
                 }
+                }
+                // A fresh view per page, rather than SwiftUI reusing the last
+                // one because it happens to be the same type. Reuse is why
+                // artist → artist kept the scroll position of the page you
+                // just left, dropping you halfway down a record you had not
+                // seen — and why a page's own state, like how deep you had
+                // dug, followed you onto the next one.
+                .id(detail)
+                // One place, rather than a call in every dig view: a page
+                // opening is the event, wherever it was opened from.
+                .task(id: detail) { dig.remember(detail, from: appState.previousDetail) }
+                    .task {
+                        // Wired here because both are in scope and neither
+                        // should know how to find the other.
+                        player.onUnplayableRecording = { [weak dig] url in
+                            dig?.markUnplayable(url)
+                        }
+                    }
             } else {
                 switch appState.route {
                 case .tracks: TracksView()
@@ -119,7 +151,6 @@ struct RootView: View {
                 case .kioskShows: KioskShowsView()
                 case .noodsStation: NoodsStationView()
                 case .noodsShows: NoodsShowsView()
-                case .noodsFilter: NoodsFilterView()
                 case .noodsResidents: NoodsResidentsView()
                 case .noodsCollections: NoodsCollectionsView()
                 case .lotStation: LotStationView()
@@ -133,6 +164,9 @@ struct RootView: View {
                 case .cashmereStation: CashmereStationView()
                 case .cashmereArchive: CashmereArchiveView()
                 case .cashmereShows: CashmereShowsView()
+                case .lylStation: LYLStationView()
+                case .lylArchive: LYLArchiveView()
+                case .lylShows: LYLShowsView()
                 case .crate: CrateView()
                 case .dig: DigView()
                 }

@@ -75,6 +75,35 @@ struct DigLine: View {
     }
 }
 
+/// Dense navigable names use the width of the page instead of turning one
+/// half-column into a very long list. Short collections should keep `DigLine`;
+/// this is for labels, aliases and other catalogue-sized sets.
+struct DigLinkGrid: View {
+    let items: [String]
+    let open: (String) -> Void
+
+    var body: some View {
+        LazyVGrid(
+            columns: [GridItem(.adaptive(minimum: 220), spacing: 10)],
+            alignment: .leading,
+            spacing: 8
+        ) {
+            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                DigLine(text: item) { open(item) }
+                    .padding(.horizontal, 10)
+                    .frame(minHeight: 38)
+                    .overlay(
+                        Rectangle().strokeBorder(
+                            Palette.outline,
+                            lineWidth: Metrics.hairline
+                        )
+                    )
+            }
+        }
+        .padding(.top, 4)
+    }
+}
+
 /// The spec is explicit: never an opaque recommendation. Every related entry
 /// can be expanded to show exactly what the connection rests on.
 struct ConnectionExplainer: View {
@@ -85,10 +114,14 @@ struct ConnectionExplainer: View {
 
     var body: some View {
         Button(action: open) {
-            HStack(alignment: .center, spacing: 12) {
+            HStack(alignment: .center, spacing: 11) {
                 Rectangle()
                     .fill(isHovering ? Palette.accent : Palette.outline)
-                    .frame(width: 3, height: 30)
+                    .frame(width: 3, height: 38)
+                ArtworkView(remoteURL: artist.imageURL, side: 38, glyphScale: 0.3)
+                    .overlay(Rectangle().strokeBorder(
+                        isHovering ? Palette.accent : Palette.outline, lineWidth: Metrics.hairline
+                    ))
                 VStack(alignment: .leading, spacing: 3) {
                     Text(artist.name)
                         .font(Typeface.body(12.5, weight: .medium))
@@ -100,6 +133,9 @@ struct ConnectionExplainer: View {
                         .lineLimit(2)
                 }
                 Spacer(minLength: 8)
+                if let why {
+                    ConfidenceMark(band: why.confidence)
+                }
                 Image(systemName: "arrow.right")
                     .font(.system(size: 8, weight: .bold))
                     .foregroundStyle(isHovering ? Palette.accent : Palette.inkFaint)
@@ -112,9 +148,13 @@ struct ConnectionExplainer: View {
         .accessibilityHint(connectionLine)
     }
 
+    private var why: WhyThis? { WhyThis(reasons: artist.reasons) }
+
+    /// Strongest evidence first. The order used to be whatever the builder
+    /// happened to append in, so a row could lead with "catalogues overlap in
+    /// the 2010s" while the shared label sat behind it.
     private var connectionLine: String {
-        let details = artist.reasons.prefix(3).map(\.detail)
-        return details.isEmpty ? "Connected artist" : details.joined(separator: " · ")
+        why?.summary(limit: 3) ?? "Connected artist"
     }
 }
 
@@ -127,7 +167,8 @@ struct DigReleaseRow: View {
     var body: some View {
         Button(action: open) {
             HStack(spacing: 12) {
-                ArtworkView(remoteURL: release.imageURL, side: 54, glyphScale: 0.23)
+                ArtworkView(remoteURL: release.imageURL, side: 54, glyphScale: 0.23,
+                            placeholder: .whiteLabel)
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(release.title)
@@ -166,7 +207,8 @@ struct DigReleaseTile: View {
                 ArtworkView(
                     remoteURL: release.imageURL,
                     previewRemoteURL: release.thumbnailURL,
-                    glyphScale: 0.22
+                    glyphScale: 0.22,
+                    placeholder: .whiteLabel
                 )
                     .overlay {
                         Rectangle().strokeBorder(
@@ -236,5 +278,118 @@ struct DigTallies: View {
             }
             Spacer(minLength: 0)
         }
+    }
+}
+
+
+/// How much of a connection to believe, as a band rather than a number —
+/// a percentage would imply a precision none of these sources have.
+///
+/// The mark is three ticks with the unearned ones left hollow, so the answer
+/// reads at a glance down a column without the row having to spend its width
+/// on a word.
+struct ConfidenceMark: View {
+    let band: RelationshipConfidence
+
+    private var filled: Int {
+        switch band {
+        case .high: 3
+        case .medium: 2
+        case .low: 1
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(0..<3, id: \.self) { index in
+                Rectangle()
+                    .fill(index < filled ? Palette.ink : Palette.outline)
+                    .frame(width: 3, height: 9)
+            }
+        }
+        .accessibilityElement()
+        .accessibilityLabel("Confidence \(band.label.lowercased())")
+        .help("Confidence: \(band.label)")
+    }
+}
+
+/// A catalogue number, set as a shelf label is: monospaced, boxed, and
+/// clickable, because the number is the object rather than a note about one.
+struct CatalogChip: View {
+    let number: String
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(number.uppercased())
+                .font(Typeface.mono(10))
+                .foregroundStyle(isHovering ? Palette.accent : Palette.ink)
+                .lineLimit(1)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .overlay(Rectangle().strokeBorder(
+                    isHovering ? Palette.accent : Palette.outline, lineWidth: Metrics.hairline
+                ))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+    }
+}
+
+/// One playable recording, with the two things you can do with it.
+///
+/// The keep button sits beside the play button rather than inside it: a row
+/// that starts playing because you tried to keep it is the kind of small
+/// betrayal that makes people stop trusting a list.
+struct ListenRow: View {
+    let title: String
+    var duration: String?
+    var provider: String = "YouTube"
+    let isCurrent: Bool
+    let isPlaying: Bool
+    let isCrated: Bool
+    let play: () -> Void
+    let keep: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Button(action: play) {
+                HStack(spacing: 12) {
+                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(isCurrent ? Palette.accent
+                                         : (isHovering ? Palette.ink : Palette.inkFaint))
+                        .frame(width: 16)
+
+                    Text(title)
+                        .font(Typeface.body(12.5))
+                        .foregroundStyle(isCurrent ? Palette.accent : Palette.ink)
+                        .lineLimit(1)
+
+                    Spacer(minLength: 8)
+
+                    if let duration {
+                        Text(duration)
+                            .font(Typeface.mono(9.5))
+                            .foregroundStyle(Palette.inkFaint)
+                    }
+                    Text(provider)
+                        .microLabel(1.1, size: 8)
+                        .foregroundStyle(Palette.inkFaint)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .onHover { isHovering = $0 }
+
+            CrateGlyphButton(isCrated: isCrated, action: keep)
+        }
+        .padding(.vertical, 8)
     }
 }

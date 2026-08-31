@@ -304,51 +304,64 @@ struct NoticeStrip: View {
 /// Provider-neutral multi-select genre picker used by local and saved media.
 /// Matching is intentionally inclusive: selecting Ambient and Jazz shows
 /// either, which remains useful for files carrying one conventional ID3 tag.
+/// The genre filter, everywhere.
+///
+/// One shape for every station: a header you open, and the tags inside it.
+/// Some stations used to hide theirs behind a menu and others spent a third of
+/// the page on it, which made the same control feel like three different
+/// controls depending on where you had navigated from.
+///
+/// Closed by default, because the shows are what the page is for. Selection
+/// never changes the accordion state; only its disclosure button does.
 struct GenreFilterBar: View {
-    let genres: [String]
+    let groups: [GenreFilterGroup]
     @Binding var selection: Set<String>
+
     @State private var isExpanded = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isHovering = false
+
+    init(genres: [String], selection: Binding<Set<String>>) {
+        groups = genres.isEmpty ? [] : [GenreFilterGroup(name: nil, genres: genres)]
+        _selection = selection
+    }
+
+    /// For stations that publish their tags in named groups.
+    init(groups: [GenreFilterGroup], selection: Binding<Set<String>>) {
+        self.groups = groups.filter { !$0.genres.isEmpty }
+        _selection = selection
+    }
 
     var body: some View {
-        if !genres.isEmpty {
+        if !groups.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 0) {
                     Button {
-                        withAnimation(reduceMotion ? nil : .easeOut(duration: 0.16)) {
-                            isExpanded.toggle()
-                        }
+                        isExpanded.toggle()
                     } label: {
                         HStack(spacing: 9) {
                             Text("Genres").microLabel(1.5)
 
-                            if selection.isEmpty {
-                                Text("All")
-                                    .microLabel(0.9)
-                                    .foregroundStyle(Palette.inkFaint)
-                            } else {
-                                Text(selection.count == 1
-                                     ? selection.sorted().first ?? "1 selected"
-                                     : "\(selection.count) selected")
-                                    .microLabel(0.9)
-                                    .foregroundStyle(Palette.accent)
-                                    .lineLimit(1)
-                            }
+                            Text(selection.isEmpty ? "All" : "\(selection.count) selected")
+                                .microLabel(0.9)
+                                .foregroundStyle(selection.isEmpty ? Palette.inkFaint : Palette.accent)
 
                             Spacer(minLength: 12)
-                            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 8.5, weight: .bold))
-                                .foregroundStyle(Palette.inkMuted)
+
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundStyle(isHovering ? Palette.accent : Palette.inkFaint)
+                                .rotationEffect(.degrees(isExpanded ? 0 : -90))
                         }
                         .padding(.horizontal, Metrics.gutter)
                         .frame(height: 38)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(isExpanded ? "Collapse genre filters" : "Expand genre filters")
+                    .onHover { isHovering = $0 }
+                    .accessibilityLabel(isExpanded ? "Hide genres" : "Show genres")
 
                     if !selection.isEmpty {
-                        VRule()
+                        VRule().frame(height: 38)
                         Button("Clear") { selection.removeAll() }
                             .buttonStyle(.plain)
                             .microLabel(1.0)
@@ -356,39 +369,51 @@ struct GenreFilterBar: View {
                             .frame(height: 38)
                     }
                 }
+                .frame(height: 38)
 
                 if isExpanded {
                     Rule()
-                    ScrollView {
-                        WrapLayout(spacing: 6, lineSpacing: 6) {
-                            ForEach(genres, id: \.self) { genre in
-                                GenreFilterChip(
-                                    text: genre,
-                                    isSelected: selection.contains(genre)
-                                ) {
-                                    if selection.contains(genre) { selection.remove(genre) }
-                                    else { selection.insert(genre) }
+                    VStack(alignment: .leading, spacing: 14) {
+                        ForEach(groups) { group in
+                            VStack(alignment: .leading, spacing: 8) {
+                                if let name = group.name {
+                                    Text(name)
+                                        .microLabel(1.4, size: 8.5)
+                                        .foregroundStyle(Palette.inkFaint)
                                 }
+                                FlowLayout(spacing: 6, lineSpacing: 6) {
+                                    ForEach(group.genres, id: \.self) { genre in
+                                        GenreFilterChip(
+                                            text: genre,
+                                            isSelected: selection.contains(genre)
+                                        ) {
+                                            if selection.contains(genre) {
+                                                selection.remove(genre)
+                                            } else {
+                                                selection.insert(genre)
+                                            }
+                                        }
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
-                        .padding(.horizontal, Metrics.gutter)
-                        .padding(.vertical, 12)
                     }
-                    .frame(height: drawerHeight)
-                    .scrollIndicators(.visible)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .padding(.horizontal, Metrics.gutter)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .background(Palette.paperChrome)
-            .clipped()
         }
     }
+}
 
-    private var drawerHeight: CGFloat {
-        // A bounded drawer preserves the result viewport even for a catalogue
-        // with dozens of tags. Short lists do not receive dead space.
-        min(176, max(48, CGFloat((genres.count + 4) / 5) * 31 + 18))
-    }
+/// A named set of tags, for stations that publish theirs grouped.
+nonisolated struct GenreFilterGroup: Identifiable, Hashable, Sendable {
+    let name: String?
+    let genres: [String]
+    var id: String { name ?? "all" }
 }
 
 private struct GenreFilterChip: View {
@@ -432,6 +457,20 @@ nonisolated enum GenreTags {
     }
 }
 
+// MARK: - Tiles
+
+/// The one useful thing to say about a broadcast at a glance: how many tracks
+/// were logged in it, or failing that what it sounds like. Every station's
+/// grid says it in the same corner, so a listener learns to read it once —
+/// and a station that publishes neither says nothing rather than filling the
+/// space with something it happens to know, like a duration or a format.
+nonisolated enum BroadcastBadge {
+    static func text(tracks: Int, genres: [String]) -> String? {
+        if tracks > 0 { return tracks == 1 ? "1 track" : "\(tracks) tracks" }
+        return genres.first { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+    }
+}
+
 // MARK: - Formatting
 
 nonisolated enum TimeFormat {
@@ -444,5 +483,146 @@ nonisolated enum TimeFormat {
         return h > 0
             ? String(format: "%d:%02d:%02d", h, m, s)
             : String(format: "%d:%02d", m, s)
+    }
+}
+
+nonisolated extension String {
+    /// Nil rather than an empty string, so an absent value can be dropped from
+    /// a joined line instead of leaving a stray separator behind.
+    var nilIfEmpty: String? { isEmpty ? nil : self }
+}
+
+/// Lays subviews left to right, wrapping when the line runs out, each at its
+/// own natural width.
+///
+/// A grid cannot do this. `LazyVGrid(.adaptive:)` gives every column the same
+/// width, so "PUNK" gets as much room as "PSYCHEDELIC ROCK" and the long ones
+/// break mid-word anyway — which is exactly what a row of tags must not do.
+/// Tags are words, and words are the width they are.
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 7
+    var lineSpacing: CGFloat = 7
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? .infinity
+        let rows = rows(subviews, within: width)
+        let height = rows.reduce(0) { $0 + $1.height } +
+            lineSpacing * CGFloat(max(0, rows.count - 1))
+        let widest = rows.map(\.width).max() ?? 0
+        return CGSize(width: proposal.width ?? widest, height: height)
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        var y = bounds.minY
+        for row in rows(subviews, within: bounds.width) {
+            var x = bounds.minX
+            for index in row.indices {
+                let size = subviews[index].sizeThatFits(.unspecified)
+                subviews[index].place(
+                    at: CGPoint(x: x, y: y + (row.height - size.height) / 2),
+                    proposal: ProposedViewSize(size)
+                )
+                x += size.width + spacing
+            }
+            y += row.height + lineSpacing
+        }
+    }
+
+    private struct Row {
+        var indices: [Int] = []
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+    }
+
+    private func rows(_ subviews: Subviews, within width: CGFloat) -> [Row] {
+        var rows: [Row] = []
+        var current = Row()
+        for index in subviews.indices {
+            let size = subviews[index].sizeThatFits(.unspecified)
+            let needed = current.indices.isEmpty ? size.width : current.width + spacing + size.width
+            if !current.indices.isEmpty, needed > width {
+                rows.append(current)
+                current = Row()
+            }
+            current.width = current.indices.isEmpty ? size.width : current.width + spacing + size.width
+            current.height = max(current.height, size.height)
+            current.indices.append(index)
+        }
+        if !current.indices.isEmpty { rows.append(current) }
+        return rows
+    }
+}
+
+/// A row of tags, each the width of its own word.
+struct TagFlow: View {
+    let tags: [String]
+
+    var body: some View {
+        FlowLayout(spacing: 7, lineSpacing: 7) {
+            ForEach(tags, id: \.self) { tag in
+                TagChip(text: tag)
+            }
+        }
+    }
+}
+
+nonisolated extension Array {
+    /// Fixed-size batches. Used to keep a burst of network work to a size a
+    /// service will actually accept.
+    func chunked(into size: Int) -> [[Element]] {
+        guard size > 0 else { return isEmpty ? [] : [self] }
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
+        }
+    }
+}
+
+/// Work in progress, without words.
+///
+/// A sweeping bar rather than a spinner: it belongs to the same drawing as
+/// the rules and the progress track, and it says the one thing a label was
+/// being used to say. Text asks to be read; this doesn't.
+///
+/// Driven by `TimelineView` rather than an animation on state, so it costs
+/// nothing when it is off screen and never needs starting or stopping.
+struct WorkingBar: View {
+    var width: CGFloat = 120
+    /// One sweep, in seconds.
+    var period: Double = 1.1
+
+    var body: some View {
+        TimelineView(.animation) { context in
+            let phase = context.date.timeIntervalSinceReferenceDate
+                .truncatingRemainder(dividingBy: period) / period
+            // Eased at both ends so it reads as a sweep rather than a loop.
+            let eased = (1 - cos(phase * 2 * .pi)) / 2
+            let travel = width * 0.72
+
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .fill(Palette.outline)
+                    .frame(width: width, height: Metrics.hairline)
+                Rectangle()
+                    .fill(Palette.ink)
+                    .frame(width: width * 0.28, height: 2)
+                    .offset(x: travel * eased)
+            }
+            .frame(width: width, height: 2, alignment: .leading)
+        }
+        .accessibilityLabel("Loading")
+    }
+}
+
+/// The whole-pane version, for a page that has nothing to show yet.
+struct WorkingPane: View {
+    var body: some View {
+        WorkingBar()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.vertical, 60)
     }
 }

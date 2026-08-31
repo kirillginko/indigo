@@ -185,6 +185,9 @@ struct ArtworkView: View {
     var previewRemoteURL: URL?
     var side: CGFloat?
     var glyphScale: CGFloat = 0.34
+    /// What to draw when there is no picture. A record with no sleeve is not
+    /// the same absence as a show with no photograph.
+    var placeholder: ArtworkPlaceholder = .glyph
     /// The station's own logo, shown when there is no picture of what is
     /// actually on. Kept separate from `remoteURL` because a logo is not cover
     /// art: it is drawn inset on the ground rather than cropped to fill, which
@@ -220,12 +223,26 @@ struct ArtworkView: View {
                         .aspectRatio(contentMode: .fill)
                 } else if let markImage {
                     GeometryReader { geo in
-                        Image(platformImage: markImage)
-                            .resizable()
-                            .interpolation(.high)
-                            .aspectRatio(contentMode: .fit)
-                            .padding(geo.size.width * 0.16)
-                            .frame(width: geo.size.width, height: geo.size.height)
+                        if Self.canCarry(markImage, at: geo.size.width) {
+                            Image(platformImage: markImage)
+                                .resizable()
+                                .interpolation(.high)
+                                .aspectRatio(contentMode: .fit)
+                                // Enough inset that a square logo doesn't
+                                // touch the rule around the tile, and no
+                                // more. At 0.16 a mark read as a stamp lost
+                                // in a box.
+                                .padding(geo.size.width * 0.07)
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        } else {
+                            // Some stations publish nothing bigger than a
+                            // 32-pixel favicon. Blown up to fill a tile that
+                            // is a blurry smear, and shrunk to stay sharp it
+                            // is a speck — so the name is used instead, which
+                            // is at least legible at any size.
+                            placeholderGlyph
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        }
                     }
                 } else {
                     placeholderGlyph
@@ -242,7 +259,10 @@ struct ArtworkView: View {
     @ViewBuilder
     private var placeholderGlyph: some View {
         GeometryReader { geo in
-            if let mark, !mark.isEmpty {
+            if placeholder == .whiteLabel, mark?.isEmpty ?? true {
+                WhiteLabelMark()
+                    .frame(width: geo.size.width, height: geo.size.height)
+            } else if let mark, !mark.isEmpty {
                 Text(mark)
                     .font(Typeface.banner(max(12, geo.size.width * 0.115)))
                     .tracking(0.6)
@@ -259,6 +279,16 @@ struct ArtworkView: View {
                     .frame(width: geo.size.width, height: geo.size.height)
             }
         }
+    }
+
+    /// Whether a mark has the pixels to fill a tile this size. Three times its
+    /// own width is about as far as a logo stretches before it stops looking
+    /// like artwork and starts looking like a mistake.
+    static func canCarry(_ image: PlatformImage, at width: CGFloat) -> Bool {
+        guard width > 0 else { return true }
+        let natural = max(image.size.width, image.size.height)
+        guard natural > 0 else { return false }
+        return natural * 3 >= width
     }
 
     private func load() async {
@@ -316,5 +346,56 @@ struct ArtworkView: View {
         let loaded = await RemoteArtworkStore.shared.image(for: previewRemoteURL)
         guard !Task.isCancelled, self.previewRemoteURL == previewRemoteURL else { return }
         if let loaded { previewImage = loaded }
+    }
+}
+
+
+/// What to draw in place of a picture.
+nonisolated enum ArtworkPlaceholder: Hashable, Sendable {
+    /// The neutral stack-of-records glyph.
+    case glyph
+    /// A blank record label. For releases, where the absence of a sleeve is
+    /// itself meaningful — a white label, a test press, something nobody
+    /// photographed — rather than merely a gap in the data.
+    case whiteLabel
+}
+
+/// A blank record label: paper, rings, and a spindle hole. No printing,
+/// because there wasn't any.
+///
+/// Drawn rather than shipped as an image so it scales to any tile and costs
+/// nothing to load — a placeholder must never be the slow part of a grid.
+///
+/// Deliberately light in both themes. A white label *is* white; rendering it
+/// in the app's dark ground would make it a grey square, which is the generic
+/// nothing this exists to replace. In a dark grid it reads exactly as the
+/// real thing does in a record bin.
+struct WhiteLabelMark: View {
+    /// Fixed rather than tokenised, for the reason above.
+    private let paper = Color(red: 0.96, green: 0.955, blue: 0.94)
+    private let groove = Color(red: 0.78, green: 0.775, blue: 0.76)
+    private let spindle = Color(red: 0.15, green: 0.15, blue: 0.16)
+
+    var body: some View {
+        GeometryReader { geo in
+            let side = min(geo.size.width, geo.size.height)
+            ZStack {
+                paper
+                Circle()
+                    .strokeBorder(groove.opacity(0.7), lineWidth: max(1, side * 0.006))
+                    .padding(side * 0.06)
+                Circle()
+                    .strokeBorder(groove.opacity(0.5), lineWidth: max(1, side * 0.005))
+                    .padding(side * 0.30)
+                Circle()
+                    .strokeBorder(groove.opacity(0.35), lineWidth: max(1, side * 0.004))
+                    .padding(side * 0.36)
+                Circle()
+                    .fill(spindle)
+                    .frame(width: side * 0.085, height: side * 0.085)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .accessibilityLabel("No sleeve")
     }
 }

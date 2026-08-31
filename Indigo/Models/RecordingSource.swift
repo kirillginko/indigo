@@ -18,11 +18,16 @@ nonisolated enum AudioSourceKind: String, Codable, CaseIterable, Sendable {
     case localFile
     /// An archived broadcast that contains this recording.
     case broadcastAppearance
+    /// A link that plays this recording directly, through whichever provider's
+    /// own player it belongs to. Ranked below the two above: somebody's file
+    /// and somebody's radio show are both better than a video of it.
+    case streamingLink
 
     var label: String {
         switch self {
         case .localFile: "Local"
         case .broadcastAppearance: "Broadcast"
+        case .streamingLink: "Link"
         }
     }
 }
@@ -32,7 +37,7 @@ nonisolated final class RecordingSource {
     @Attribute(.unique) var id: UUID
     var kindRaw: String
     /// A file path for `.localFile`; a provider-defined broadcast handle for
-    /// `.broadcastAppearance`.
+    /// `.broadcastAppearance`; the address itself for `.streamingLink`.
     var identifier: String
     /// Which provider the identifier belongs to, for broadcast sources.
     var providerID: String?

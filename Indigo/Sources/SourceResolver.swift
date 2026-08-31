@@ -10,6 +10,8 @@
 //          ↓ NO
 //      Known broadcast?   YES ─→ OPEN / SEEK SHOW
 //          ↓ NO
+//      Kept a link?       YES ─→ PLAY IN ITS OWN PLAYER
+//          ↓ NO
 //      No playable source
 //
 
@@ -27,7 +29,8 @@ nonisolated struct SourceResolver {
     func resolve(_ recording: Recording) -> [AudioSource] {
         let local = LocalFileSource(context: context).sources(for: recording)
         let broadcast = BroadcastSource(context: context).sources(for: recording)
-        return (local + broadcast).sorted { $0.rank < $1.rank }
+        let links = StreamingLinkSource(context: context).sources(for: recording)
+        return (local + broadcast + links).sorted { $0.rank < $1.rank }
     }
 
     /// What pressing play should do.

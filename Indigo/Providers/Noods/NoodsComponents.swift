@@ -33,6 +33,17 @@ struct NoodsShowTile: View {
                             .padding(.vertical, 4)
                             .background(Palette.paper)
                             .padding(8)
+                    } else if isHovering,
+                              // A Noods tracklist only arrives with the show
+                              // itself, so the grid has the genre to go on.
+                              let badge = BroadcastBadge.text(tracks: 0, genres: show.genres) {
+                        Text(badge)
+                            .microLabel(1.1, size: 9)
+                            .foregroundStyle(Palette.inverseInk)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 4)
+                            .background(Palette.inverse)
+                            .padding(8)
                     }
                 }
                 // Nested so the tile opens the show and this still plays.
@@ -197,5 +208,32 @@ struct NoodsShowGrid: View {
             }
         }
         .padding(.horizontal, Metrics.gutter)
+    }
+}
+
+// MARK: - Genres
+
+/// A genre toggle. Selected inverts, like the sidebar's current route.
+struct NoodsGenreChip: View {
+    let text: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(text)
+                .microLabel(1.1, size: 9)
+                .foregroundStyle(isSelected ? Palette.inverseInk : Palette.inkMuted)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(isSelected ? Palette.inverse : (isHovering ? Palette.wash : Color.clear))
+                .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

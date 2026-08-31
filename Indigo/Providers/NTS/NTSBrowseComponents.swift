@@ -21,8 +21,14 @@ struct NTSEpisodeTile: View {
                 ArtworkView(remoteURL: episode.artworkURL)
                     .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
                     .overlay(alignment: .topLeading) {
-                        if isHovering {
-                            Text("Tracklist")
+                        // NTS only sends a tracklist with the episode itself,
+                        // so the grid has the genres to go on.
+                        if isHovering,
+                           let badge = BroadcastBadge.text(
+                               tracks: 0,
+                               genres: episode.genres + episode.moods
+                           ) {
+                            Text(badge)
                                 .microLabel(1.2, size: 9)
                                 .foregroundStyle(Palette.inverseInk)
                                 .padding(.horizontal, 6)

@@ -23,6 +23,15 @@ nonisolated enum RelationshipKind: String, Hashable, Sendable {
     case playedInShow
     case inYourLibrary
     case inYourCrate
+    case sameRelease
+    case sameAlias
+    case playedBySameSelector
+    case frequentlyPlayedNearby
+    case sameScene
+    case sameCity
+    case sameUserTrail
+    case sharedCratePattern
+    case manualRelation
 }
 
 nonisolated enum RelationshipSource: String, Hashable, Sendable {
@@ -36,6 +45,10 @@ nonisolated enum RelationshipSource: String, Hashable, Sendable {
     case radio
     /// The listener said so by crating it.
     case crate
+    /// Explicitly added by the listener or an editor.
+    case manual
+    /// Privacy-preserving aggregate discovery paths.
+    case trails
 
     var label: String {
         switch self {
@@ -44,6 +57,8 @@ nonisolated enum RelationshipSource: String, Hashable, Sendable {
         case .library: "Your library"
         case .radio: "Radio"
         case .crate: "Your crate"
+        case .manual: "Manual"
+        case .trails: "Anonymous trails"
         }
     }
 }
@@ -59,6 +74,10 @@ nonisolated struct Relationship: Identifiable, Hashable, Sendable {
     let confidence: Double
 
     var id: String { "\(kind.rawValue)|\(detail)" }
+
+    var confidenceBand: RelationshipConfidence {
+        RelationshipConfidence.band(confidence)
+    }
 }
 
 /// An artist reached from somewhere else, carrying the reasons it was reached.
@@ -66,10 +85,13 @@ nonisolated struct RelatedArtist: Identifiable, Hashable, Sendable {
     let name: String
     let mbid: String?
     let reasons: [Relationship]
+    /// The artist's portrait, when a catalogue we have already read supplied
+    /// one. A row of names is a list; a row of faces is a shelf.
+    var imageURL: URL?
 
     var id: String { mbid ?? name }
 
     /// Strongest evidence first, so the list is ordered by how well Indigo can
     /// justify it rather than alphabetically.
-    var weight: Double { reasons.reduce(0) { $0 + $1.confidence } }
+    var weight: Double { ConfidenceMath.combined(reasons.map(\.confidence)) }
 }

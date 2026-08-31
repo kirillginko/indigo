@@ -41,17 +41,29 @@ nonisolated struct DiscogsLabelProfile: Sendable {
 struct DiscogsLabelDigView: View {
     let labelName: String
     @Environment(AppState.self) private var appState
+    @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
 
     var body: some View {
+        let _ = crate.revision
         let profile = dig.discogsLabelProfile(named: labelName)
+        let crateID = RecordingKey.normalizeArtist(labelName)
+        let isCrated = crate.contains(dig: .label, identifier: crateID, providerID: "dig.label.discogs")
         VStack(spacing: 0) {
             PageHeader(title: labelName, breadcrumb: appState.breadcrumbTitle,
-                       onBack: { appState.popDetail() }, subtitle: "Label")
+                       onBack: { appState.popDetail() }, subtitle: "Label") {
+                CrateButton(isCrated: isCrated) {
+                    crate.toggle(
+                        dig: .label, identifier: crateID, providerID: "dig.label.discogs",
+                        title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil,
+                        genres: profile?.styles ?? []
+                    )
+                }
+            }
             Rule(color: Palette.outline)
             ScrollView {
-                VStack(alignment: .leading, spacing: 26) {
-                    if dig.isEnriching { BufferingGlyph().accessibilityLabel("Loading label") }
+                LazyVStack(alignment: .leading, spacing: 26) {
+                    if dig.isEnriching { WorkingBar() }
                     if let profile {
                         DigTallies(entries: [("Catalogue", "\(profile.releases.count)"),
                                              ("Artists", "\(profile.artists.count)"),
@@ -67,8 +79,17 @@ struct DiscogsLabelDigView: View {
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 18)], spacing: 22) {
                                 ForEach(profile.releases) { release in
                                     DigReleaseTile(release: release) {
-                                        guard let id = release.discogsID else { return }
-                                        appState.open(.digRelease(id: id, title: release.title))
+                                        // Always opens. A tile that does
+                                        // nothing when clicked reads as a
+                                        // broken app, not as a record with no
+                                        // catalogue entry.
+                                        if let id = release.discogsID {
+                                            appState.open(.digRelease(id: id, title: release.title))
+                                        } else {
+                                            appState.open(.digReleaseNamed(
+                                                title: release.title, artist: release.label ?? ""
+                                            ))
+                                        }
                                     }
                                 }
                             }.padding(.top, 14)

@@ -27,8 +27,20 @@ nonisolated struct DiscogsSearchResult: Decodable, Sendable {
 }
 
 nonisolated struct DiscogsRecommendationBundle: Sendable {
-    let labelArtists: [String]
-    let styleArtists: [String]
+    let labelArtists: [DiscogsNeighbour]
+    let styleArtists: [DiscogsNeighbour]
+}
+
+/// An artist reached through a shared label or style, and a picture of one of
+/// their records.
+///
+/// The picture costs nothing: it arrives in the same search response the name
+/// does, and was being discarded. It is a sleeve rather than a portrait —
+/// which for a row that exists because you both put records out on the same
+/// imprint is arguably the more useful image anyway.
+nonisolated struct DiscogsNeighbour: Sendable, Hashable {
+    let name: String
+    let thumbnailURL: String?
 }
 
 nonisolated struct DiscogsArtistReference: Decodable, Sendable {
@@ -97,6 +109,26 @@ nonisolated struct DiscogsTrackLine: Decodable, Sendable {
     let position: String?
     let title: String?
     let duration: String?
+    /// Set on compilations, where the release is credited to "Various" and
+    /// each track names who is actually on it. That is the whole point of a
+    /// compilation and was being thrown away.
+    let artists: [DiscogsArtistReference]?
+
+    var artistName: String? {
+        let names = (artists ?? []).compactMap(\.name).filter { !$0.isEmpty }
+        return names.isEmpty ? nil : names.joined(separator: " & ")
+    }
+}
+
+/// A video Discogs' editors have attached to a release.
+///
+/// Curated rather than searched for: somebody who was cataloguing this exact
+/// pressing linked this exact recording. That is a far better match than
+/// asking a search engine for the track's name and hoping.
+nonisolated struct DiscogsVideo: Decodable, Sendable {
+    let uri: String?
+    let title: String?
+    let duration: Int?
 }
 
 nonisolated struct DiscogsReleaseDetail: Decodable, Sendable {
@@ -105,6 +137,7 @@ nonisolated struct DiscogsReleaseDetail: Decodable, Sendable {
     let year: Int?
     let artists: [DiscogsArtistReference]?
     let labels: [DiscogsLabelReference]?
+    let videos: [DiscogsVideo]?
     let genres: [String]?
     let styles: [String]?
     let images: [DiscogsImage]?

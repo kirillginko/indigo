@@ -105,8 +105,12 @@ struct CashmereEpisodeTile: View {
                             .padding(.vertical, 4)
                             .background(Palette.paper)
                             .padding(8)
-                    } else if isHovering, let mood = episode.moods.first {
-                        Text(mood)
+                    } else if isHovering,
+                              let badge = BroadcastBadge.text(
+                                  tracks: 0,
+                                  genres: episode.genres + episode.moods
+                              ) {
+                        Text(badge)
                             .microLabel(1.1, size: 9)
                             .foregroundStyle(Palette.inverseInk)
                             .padding(.horizontal, 6)
@@ -143,15 +147,36 @@ struct CashmereEpisodeTile: View {
 struct CashmereShowTile: View {
     let show: CashmereShow
     let open: () -> Void
-    /// The most recent episode's artwork — the show itself has none.
-    let artworkURL: URL?
 
+    @Environment(CashmereBrowseStore.self) private var browse
     @State private var isHovering = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            ArtworkView(remoteURL: artworkURL)
+        // The show itself has neither a picture nor genres; one of its
+        // episodes has both.
+        let preview = browse.preview(forShow: show.slug)
+        return VStack(alignment: .leading, spacing: 9) {
+            ArtworkView(
+                remoteURL: preview?.artworkURL,
+                markURL: CashmereProvider.logoURL,
+                mark: "Cashmere Radio"
+            )
                 .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
+                .overlay(alignment: .topLeading) {
+                    if isHovering,
+                       let badge = BroadcastBadge.text(
+                           tracks: 0,
+                           genres: (preview?.genres ?? []) + (preview?.moods ?? [])
+                       ) {
+                        Text(badge)
+                            .microLabel(1.1, size: 9)
+                            .foregroundStyle(Palette.inverseInk)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 4)
+                            .background(Palette.inverse)
+                            .padding(8)
+                    }
+                }
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(show.name)
@@ -167,6 +192,7 @@ struct CashmereShowTile: View {
         .contentShape(Rectangle())
         .onTapGesture(perform: open)
         .onHover { isHovering = $0 }
+        .task { await browse.loadShowPreviewIfNeeded(slug: show.slug) }
         .accessibilityLabel("Open \(show.name)")
     }
 }

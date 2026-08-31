@@ -15,6 +15,14 @@ struct DigView: View {
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
 
+    // Worked out in a task, not in `body`. Suggestions walk the graph out of
+    // every place the listener keeps returning to, and doing that on each
+    // redraw made opening DIG feel like loading it.
+    @State private var recentVisits: [DigVisit] = []
+    @State private var frequentVisits: [DigVisit] = []
+    @State private var trySuggestions: [DigHistory.Suggestion] = []
+    @State private var nextSteps: [String: String] = [:]
+
     var body: some View {
         let _ = crate.revision
         let _ = dig.revision
@@ -37,6 +45,18 @@ struct DigView: View {
                 }
             } else {
                 ScrollView {
+                    memory
+
+                    HStack {
+                        Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
+                        Spacer()
+                        Text("\(entries.count)").microLabel(1.2).foregroundStyle(Palette.inkFaint)
+                    }
+                    .padding(.horizontal, Metrics.gutter)
+                    .padding(.top, 8)
+                    .padding(.bottom, 9)
+                    Rule(color: Palette.outline)
+
                     LazyVStack(spacing: 0) {
                         ForEach(entries) { entry in
                             DigStartRow(entry: entry) {
@@ -50,6 +70,93 @@ struct DigView: View {
                 .scrollIndicators(.visible)
             }
         }
+        .task(id: dig.revision) { await refreshMemory() }
+    }
+
+    private func refreshMemory() async {
+        let history = DigHistory(context: dig.context)
+        recentVisits = history.recent(limit: 4)
+        frequentVisits = history.haunts()
+        nextSteps = Dictionary(
+            recentVisits.compactMap { visit in
+                history.usualNextStep(from: visit.node).map { (visit.nodeID, $0.title) }
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
+        trySuggestions = history.suggestions()
+    }
+
+    /// What this listener has actually been doing. Their own history first,
+    /// before any catalogue or aggregate — it is better evidence about them
+    /// than anything else available, and it needs nobody's data but theirs.
+    @ViewBuilder
+    private var memory: some View {
+        let recent = recentVisits
+        let haunts = frequentVisits
+        let suggestions = trySuggestions
+
+        if !recent.isEmpty || !haunts.isEmpty || !suggestions.isEmpty {
+            VStack(alignment: .leading, spacing: 26) {
+                if !recent.isEmpty {
+                    DigSection(title: "Continue digging") {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(recent, id: \.nodeID) { visit in
+                                DigLine(
+                                    text: continueLine(visit),
+                                    detail: visit.kind.label
+                                ) {
+                                    if let page = visit.node.destination { appState.open(page) }
+                                }
+                                Rule()
+                            }
+                        }
+                    }
+                }
+
+                if !haunts.isEmpty {
+                    DigSection(title: "You often dig through") {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(haunts, id: \.nodeID) { visit in
+                                DigLine(
+                                    text: visit.title,
+                                    detail: "\(visit.visits) visits"
+                                ) {
+                                    if let page = visit.node.destination { appState.open(page) }
+                                }
+                                Rule()
+                            }
+                        }
+                    }
+                }
+
+                if !suggestions.isEmpty {
+                    DigSection(title: "Try") {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(suggestions) { suggestion in
+                                DigLine(
+                                    text: suggestion.node.title,
+                                    detail: [suggestion.why?.headline, "via \(suggestion.via.title)"]
+                                        .compactMap { $0 }.joined(separator: " · ")
+                                ) {
+                                    if let page = suggestion.node.destination { appState.open(page) }
+                                }
+                                Rule()
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, Metrics.gutter)
+            .padding(.top, 22)
+            .padding(.bottom, 6)
+        }
+    }
+
+    /// "Ilian Tape → Stenny" when there is a step they usually take from
+    /// there, and just the place when there isn't.
+    private func continueLine(_ visit: DigVisit) -> String {
+        guard let next = nextSteps[visit.nodeID] else { return visit.title }
+        return "\(visit.title) → \(next)"
     }
 
     struct StartingPoint: Identifiable, Hashable {
@@ -76,8 +183,12 @@ struct DigView: View {
 
         var names: [String: (crate: Int, mbid: String?)] = [:]
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-            guard let artist = item.recording?.artistName, !artist.isEmpty else { continue }
+            let artist = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            // "Various" is where a catalogue files a compilation, not somebody
+            // to go and dig into.
+            guard let artist, ArtistName.isRealArtist(artist) else { continue }
             let mbid = item.recording.flatMap { engine.metadata(for: $0.id)?.artistMBID }
+                ?? (item.providerID == "dig.artist.mbid" ? item.showID : nil)
             let existing = names[artist]
             names[artist] = ((existing?.crate ?? 0) + 1, existing?.mbid ?? mbid)
         }
@@ -97,7 +208,7 @@ struct DigView: View {
             }
         }
         for (key, _) in library {
-            guard let name = display[key], !name.isEmpty else { continue }
+            guard let name = display[key], ArtistName.isRealArtist(name) else { continue }
             if names[name] == nil { names[name] = (0, nil) }
         }
 

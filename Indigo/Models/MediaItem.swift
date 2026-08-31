@@ -38,6 +38,11 @@ nonisolated struct MediaItem: Identifiable, Hashable, Sendable {
     let duration: TimeInterval?
     /// Set when playback goes through a hosted widget rather than AVPlayer.
     let embedProvider: EmbedProvider?
+    /// A second way to hear the same recording, tried once if the first fails.
+    /// Some stations publish their own file *and* mirror it to SoundCloud or
+    /// Mixcloud; the file is better when it works, and older ones often don't.
+    let alternatePlaybackURL: URL?
+    let alternateEmbedProvider: EmbedProvider?
 
     var isLive: Bool { kind == .radioStation || kind == .radioShow }
     var isEmbedded: Bool { embedProvider != nil }
@@ -54,7 +59,9 @@ nonisolated struct MediaItem: Identifiable, Hashable, Sendable {
         remoteArtworkURL: URL? = nil,
         playbackURL: URL,
         duration: TimeInterval? = nil,
-        embedProvider: EmbedProvider? = nil
+        embedProvider: EmbedProvider? = nil,
+        alternatePlaybackURL: URL? = nil,
+        alternateEmbedProvider: EmbedProvider? = nil
     ) {
         self.id = id
         self.sourceID = sourceID
@@ -68,5 +75,27 @@ nonisolated struct MediaItem: Identifiable, Hashable, Sendable {
         self.playbackURL = playbackURL
         self.duration = duration
         self.embedProvider = embedProvider
+        self.alternatePlaybackURL = alternatePlaybackURL
+        self.alternateEmbedProvider = alternateEmbedProvider
+    }
+
+    /// The same recording, reached the other way. Nil once there is no other
+    /// way left to try.
+    func usingAlternate() -> MediaItem? {
+        guard let alternatePlaybackURL else { return nil }
+        return MediaItem(
+            id: id,
+            sourceID: sourceID,
+            kind: kind,
+            title: title,
+            subtitle: subtitle,
+            detail: detail,
+            genres: genres,
+            artworkKey: artworkKey,
+            remoteArtworkURL: remoteArtworkURL,
+            playbackURL: alternatePlaybackURL,
+            duration: duration,
+            embedProvider: alternateEmbedProvider
+        )
     }
 }

@@ -210,10 +210,16 @@ actor LibraryIndexer {
         track.fileSize = size
         track.isrc = meta.isrc
         track.artworkKey = artworkKey
-        track.albumKey = LibraryKey.album(
-            album: meta.album,
-            albumArtist: meta.albumArtist.isEmpty ? meta.artist : meta.albumArtist
-        )
+        // Keyed on the album artist the files actually declare, and on the
+        // album alone when they declare none.
+        //
+        // Falling back to the *track* artist here invents a claim the files
+        // never made — "this album belongs to Artist A" — and for a
+        // compilation that is exactly wrong: every track gets a different key
+        // and one record is shredded into one album per performer. Untagged
+        // compilations are common, and this was silently destroying all of
+        // them.
+        track.albumKey = LibraryKey.album(album: meta.album, albumArtist: meta.albumArtist)
         track.artistKey = LibraryKey.normalize(meta.albumArtist.isEmpty ? meta.artist : meta.albumArtist)
         track.sortTitle = LibraryKey.normalize(meta.title)
         track.searchIndex = LibraryKey.searchIndex(

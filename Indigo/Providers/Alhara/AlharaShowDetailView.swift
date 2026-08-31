@@ -181,6 +181,12 @@ struct AlharaShowDetailView: View {
                                 .foregroundStyle(Palette.inkFaint)
                                 .monospacedDigit()
                                 .frame(width: 78, alignment: .trailing)
+                            RadioTracklistCrateButton(item: RadioTracklistItem(
+                                providerID: "alhara", showID: show.slug,
+                                showTitle: show.title, airedAt: show.publishedAt,
+                                entryID: "\(track.index)", title: track.title,
+                                artist: track.artist, offsetSeconds: track.offset
+                            ))
                         }
                         .padding(.horizontal, Metrics.gutter)
                         .padding(.vertical, 8)

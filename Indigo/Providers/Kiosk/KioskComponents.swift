@@ -108,6 +108,17 @@ struct KioskEpisodeTile: View {
                                 .padding(.vertical, 4)
                                 .background(Palette.paper)
                                 .padding(8)
+                        } else if isHovering,
+                                  // Kiosk publishes no tracklists, but it tags
+                                  // every broadcast by genre.
+                                  let badge = BroadcastBadge.text(tracks: 0, genres: episode.genres) {
+                            Text(badge)
+                                .microLabel(1.1, size: 9)
+                                .foregroundStyle(Palette.inverseInk)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 4)
+                                .background(Palette.inverse)
+                                .padding(8)
                         }
                     }
                     .overlay(alignment: .topTrailing) {

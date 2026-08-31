@@ -53,6 +53,138 @@ final class DigTests: XCTestCase {
         recorder = nil; store = nil; context = nil; container = nil
     }
 
+    // MARK: Phase 3 graph
+
+    func testMusicGraphCombinesExplainableEvidenceWithoutExceedingCertainty() {
+        var graph = MusicGraph()
+        let source = MusicNode.artist("Skee Mask")
+        let destination = MusicNode.artist("Stenny")
+        graph.connect(
+            from: source, to: destination,
+            reason: Relationship(kind: .sharedLabel, source: .discogs,
+                                 detail: "Both release on Ilian Tape", confidence: 0.72)
+        )
+        graph.connect(
+            from: source, to: destination,
+            reason: Relationship(kind: .sharedBroadcast, source: .radio,
+                                 detail: "Played in 4 of the same shows", confidence: 0.58)
+        )
+
+        let edge = graph.connections(from: source).first
+        XCTAssertEqual(edge?.reasons.count, 2)
+        XCTAssertEqual(edge?.confidence ?? 0, 0.8824, accuracy: 0.0001)
+        XCTAssertEqual(edge?.confidenceBand, .high)
+        XCTAssertEqual(edge?.primaryReason?.kind, .sharedLabel)
+    }
+
+    func testMusicGraphDeduplicatesRepeatedReasons() {
+        var graph = MusicGraph()
+        let source = MusicNode.label("Ilian Tape")
+        let destination = MusicNode.catalogNumber("IT 001")
+        let reason = Relationship(kind: .appearsOnRelease, source: .discogs,
+                                  detail: "Catalogue entry IT001", confidence: 0.95)
+
+        graph.connect(from: source, to: destination, reason: reason)
+        graph.connect(from: source, to: destination, reason: reason)
+
+        XCTAssertEqual(graph.connections(from: source).first?.reasons, [reason])
+        XCTAssertEqual(destination.key, MusicNode.catalogNumber("IT-001").key)
+    }
+
+    func testRadioNeighborhoodIncludesShowsSelectorsAndImmediateUnknowns() throws {
+        let subject = try store.upsert(title: "Rev8617", artistName: "Skee Mask")
+        let neighbor = try store.createUnknown(
+            providerID: "nts", showID: "ben-ufo/2026-08-28",
+            heardAt: Date(timeIntervalSince1970: 1_788_000_300), offsetSeconds: 330
+        )
+        let distant = try store.upsert(title: "Distant Track", artistName: "Someone Else")
+        let showDate = Date(timeIntervalSince1970: 1_788_000_000)
+
+        store.note(appearance: MediaAppearance(
+            providerID: "nts", stationName: "NTS 1", showTitle: "Ben UFO",
+            showID: "ben-ufo/2026-08-28", heardAt: showDate,
+            offsetSeconds: 300, isLive: false, method: .providerTracklist
+        ), on: subject)
+        store.note(appearance: MediaAppearance(
+            providerID: "nts", stationName: "NTS 1", showTitle: "Ben UFO",
+            showID: "ben-ufo/2026-08-28", heardAt: showDate.addingTimeInterval(30),
+            offsetSeconds: 330, isLive: false, method: .none
+        ), on: neighbor)
+        store.note(appearance: MediaAppearance(
+            providerID: "nts", stationName: "NTS 1", showTitle: "Ben UFO",
+            showID: "ben-ufo/2026-08-28", heardAt: showDate.addingTimeInterval(900),
+            offsetSeconds: 1_200, isLive: false, method: .providerTracklist
+        ), on: distant)
+
+        let edges = RadioNeighborhoodEngine(context: context).graph(around: subject)
+            .connections(from: MusicNode.recording(subject))
+
+        XCTAssertTrue(edges.contains { $0.to.kind == .broadcast })
+        XCTAssertTrue(edges.contains { $0.to.kind == .selector && $0.to.title == "Ben UFO" })
+        let unknown = try XCTUnwrap(edges.first { $0.to.recordingID == neighbor.id })
+        XCTAssertTrue(unknown.reasons.contains { $0.kind == .sharedBroadcast })
+        XCTAssertTrue(unknown.reasons.contains { $0.kind == .frequentlyPlayedNearby })
+        XCTAssertFalse(edges.first { $0.to.recordingID == distant.id }?.reasons.contains {
+            $0.kind == .frequentlyPlayedNearby
+        } ?? true)
+    }
+
+    func testRepeatedRadioCoAppearancesReinforceOneExplainedEdge() throws {
+        let subject = try store.upsert(title: "Rev8617", artistName: "Skee Mask")
+        let peer = try store.upsert(title: "Consumer's Tool", artistName: "Stenny")
+
+        for index in 0..<3 {
+            let show = "show/\(index)"
+            store.note(appearance: MediaAppearance(
+                providerID: "nts", showTitle: "Selector \(index)", showID: show,
+                heardAt: Date().addingTimeInterval(Double(index)), offsetSeconds: 100,
+                isLive: false, method: .providerTracklist
+            ), on: subject)
+            store.note(appearance: MediaAppearance(
+                providerID: "nts", showTitle: "Selector \(index)", showID: show,
+                heardAt: Date().addingTimeInterval(Double(index + 10)), offsetSeconds: 200,
+                isLive: false, method: .providerTracklist
+            ), on: peer)
+        }
+
+        let edge = RadioNeighborhoodEngine(context: context).graph(around: subject)
+            .connections(from: MusicNode.recording(subject))
+            .first { $0.to.recordingID == peer.id }
+
+        XCTAssertEqual(edge?.reasons.first { $0.kind == .sharedBroadcast }?.detail,
+                       "Played in 3 of the same radio shows")
+        XCTAssertEqual(edge?.confidenceBand, .high)
+    }
+
+    func testNTSTracklistIngestionCreatesReusableRadioProvenance() throws {
+        let detail = NTSEpisodeDetail(
+            summary: NTSEpisodeSummary(
+                showAlias: "ben-ufo", episodeAlias: "2026-08-28",
+                name: "Ben UFO", summary: nil, location: nil,
+                genres: [], moods: [], artworkURL: nil,
+                broadcastAt: Date(timeIntervalSince1970: 1_788_000_000), isPublished: true
+            ),
+            tracklist: [
+                NTSTracklistEntry(id: "one", artist: "Skee Mask", title: "Rev8617", offset: 300),
+                NTSTracklistEntry(id: "two", artist: "Stenny", title: "Consumer's Tool", offset: 420)
+            ],
+            audio: []
+        )
+        let engine = RadioNeighborhoodEngine(context: context)
+
+        engine.ingest(detail)
+        engine.ingest(detail)
+
+        let recordings = try context.fetch(FetchDescriptor<Recording>())
+        XCTAssertEqual(recordings.count, 2)
+        XCTAssertEqual(recordings.flatMap(\.appearances).count, 2,
+                       "Reloading a tracklist must not duplicate its appearances")
+        XCTAssertTrue(recordings.allSatisfy {
+            $0.appearances.first?.method == .providerTracklist
+                && $0.appearances.first?.showID == "ben-ufo/2026-08-28"
+        })
+    }
+
     // MARK: Fixtures
 
     private let recordingSearch = """
@@ -488,5 +620,84 @@ final class DigTests: XCTestCase {
     func testAnArtistWithNothingBehindItReportsAsBare() {
         let profile = DigEngine(context: context).artistProfile(name: "Nobody At All", mbid: nil)
         XCTAssertTrue(profile.isBare)
+    }
+}
+
+// MARK: - Connection lanes
+
+/// Each lane used to be a filter that scanned every lane before it, so a
+/// well-connected artist cost several thousand comparisons on every redraw.
+final class ConnectionLaneTests: XCTestCase {
+    private func artist(_ name: String, _ kinds: [RelationshipKind]) -> RelatedArtist {
+        RelatedArtist(
+            name: name, mbid: nil,
+            reasons: kinds.map {
+                Relationship(kind: $0, source: .discogs, detail: "because", confidence: 0.7)
+            }
+        )
+    }
+
+    /// An artist belongs in exactly one lane, or the page lists them twice.
+    func testEveryArtistLandsInExactlyOneLane() {
+        let related = [
+            artist("Credited", [.collaborator]),
+            artist("Alias", [.aliasOrProject]),
+            artist("Labelmate", [.sharedLabel]),
+            artist("Similar", [.sharedStyle]),
+            artist("Heard together", [.sharedBroadcast]),
+            artist("Contemporary", [.sameEra])
+        ]
+        let lanes = ArtistDigView.Connections.split(related)
+        let placed = lanes.collaborators + lanes.projects + lanes.labelArtists
+            + lanes.soundArtists + lanes.personalArtists + lanes.eraArtists
+
+        XCTAssertEqual(placed.count, related.count)
+        XCTAssertEqual(Set(placed.map(\.name)).count, related.count, "Nobody appears twice")
+    }
+
+    /// An alias is a fact and a shared decade is barely a hint, so somebody
+    /// reached by both belongs under the stronger one.
+    func testTheStrongestReasonDecidesTheLane() {
+        let lanes = ArtistDigView.Connections.split([
+            artist("Both", [.sameEra, .sharedLabel, .collaborator])
+        ])
+        XCTAssertEqual(lanes.collaborators.map(\.name), ["Both"])
+        XCTAssertTrue(lanes.labelArtists.isEmpty)
+        XCTAssertTrue(lanes.eraArtists.isEmpty)
+    }
+
+    /// A page has to be drawable before the graph has been walked.
+    func testAPlaceholderProfileIsSafeToDraw() {
+        let placeholder = ArtistProfile.placeholder(name: "Skee Mask", mbid: "mb-1")
+        XCTAssertEqual(placeholder.name, "Skee Mask")
+        XCTAssertEqual(placeholder.mbid, "mb-1")
+        XCTAssertTrue(placeholder.isBare, "Which is why the view must not announce it")
+        XCTAssertTrue(placeholder.related.isEmpty)
+        XCTAssertTrue(placeholder.listen.isEmpty)
+    }
+}
+
+/// The loading indicator says the one thing a label was being used to say.
+final class WorkingBarTests: XCTestCase {
+    /// Driven by the clock rather than by state, so it costs nothing off
+    /// screen and never needs starting or stopping. What is pinned here is
+    /// that the sweep stays inside its own track — an indicator that walks out
+    /// of its bounds is worse than no indicator.
+    func testTheSweepStaysInsideItsTrack() {
+        let width: Double = 120
+        let period: Double = 1.1
+        let segment = width * 0.28
+        let travel = width * 0.72
+
+        for step in 0...40 {
+            let phase = (Double(step) / 40 * period)
+                .truncatingRemainder(dividingBy: period) / period
+            let eased = (1 - cos(phase * 2 * .pi)) / 2
+            let offset = travel * eased
+
+            XCTAssertGreaterThanOrEqual(offset, 0)
+            XCTAssertLessThanOrEqual(offset + segment, width + 0.001,
+                                     "The bar must not run past its own track")
+        }
     }
 }

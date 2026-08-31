@@ -6,14 +6,47 @@
 import SwiftUI
 
 struct DigReleaseView: View {
-    let releaseID: Int
+    /// Nil for a record no catalogue has claimed yet. That is a real state,
+    /// not a failure: the artist's own listing names releases Discogs has no
+    /// entry for, and a page that refuses to open for those is a page that
+    /// refuses to open for exactly the obscure records this app is about.
+    let releaseID: Int?
     let fallbackTitle: String
+    /// Whose record it is, when we arrived from their page. Needed to look it
+    /// up, and worth showing while we do.
+    var artistName: String?
 
     @Environment(AppState.self) private var appState
+    @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(PlaybackCoordinator.self) private var player
+
+    /// Filled in if the record turns out to be catalogued after all.
+    @State private var resolvedID: Int?
+    @State private var hasLookedUp = false
+
+    private var identifier: Int? { releaseID ?? resolvedID }
+
+    /// Empty means we arrived without knowing whose record it is — off a
+    /// label page, say — which is a reason not to guess rather than a reason
+    /// to search for nobody.
+    private var credit: String? {
+        guard let artistName, !artistName.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return nil
+        }
+        return artistName
+    }
+
+    /// Held rather than read in `body` — see `ArtistDigView`. Building it
+    /// reads the release, its label and every artist on it, and doing that in
+    /// the render pass is why opening a record felt slow.
+    @State private var profile: DigReleaseProfile?
 
     var body: some View {
-        let profile = dig.releaseProfile(id: releaseID)
+        let _ = crate.revision
+        let profile = self.profile ?? identifier.flatMap { dig.cachedReleaseProfile(id: $0) }
+        let crateID = String(identifier ?? 0)
+        let isCrated = crate.contains(dig: .release, identifier: crateID, providerID: "dig.release.discogs")
 
         VStack(spacing: 0) {
             PageHeader(
@@ -21,22 +54,41 @@ struct DigReleaseView: View {
                 breadcrumb: appState.breadcrumbTitle,
                 onBack: { appState.popDetail() },
                 subtitle: subtitle(profile)
-            )
+            ) {
+                CrateButton(isCrated: isCrated) {
+                    crate.toggle(
+                        dig: .release, identifier: crateID, providerID: "dig.release.discogs",
+                        title: profile?.title ?? fallbackTitle,
+                        subtitle: releaseSubtitle(profile), artworkURL: profile?.imageURL,
+                        genres: (profile?.styles ?? []) + (profile?.genres ?? [])
+                    )
+                }
+            }
             Rule(color: Palette.outline)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 26) {
-                    if dig.isEnriching { BufferingGlyph().accessibilityLabel("Loading release") }
+                // Lazy, so the tracklist and everything under it cost nothing
+                // until they are scrolled to.
+                LazyVStack(alignment: .leading, spacing: 26) {
+                    if profile == nil, !hasLookedUp {
+                        WorkingPane()
+                    } else if dig.isEnriching {
+                        WorkingBar()
+                    }
+                    if profile == nil, hasLookedUp {
+                        unclaimed
+                    }
                     if let profile {
                         HStack(alignment: .top, spacing: 26) {
-                            ArtworkView(remoteURL: profile.imageURL, side: 240, glyphScale: 0.23)
+                            ArtworkView(remoteURL: profile.imageURL, side: 240, glyphScale: 0.23,
+                                        placeholder: .whiteLabel)
                                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
                             VStack(alignment: .leading, spacing: 24) {
                                 if !profile.artists.isEmpty {
                                     DigSection(title: "Artists") {
                                         VStack(alignment: .leading, spacing: 0) {
-                                            ForEach(profile.artists, id: \.self) { artist in
+                                            ForEach(credited(profile), id: \.self) { artist in
                                                 DigLine(text: artist) {
                                                     appState.open(.digArtist(mbid: nil, name: artist))
                                                 }
@@ -55,18 +107,21 @@ struct DigReleaseView: View {
                                         }
                                     }
                                 }
+                                pressing(profile)
                                 if !profile.genres.isEmpty || !profile.styles.isEmpty {
                                     DigSection(title: "Genres / styles") {
-                                        Text((profile.styles + profile.genres).joined(separator: " · "))
-                                            .font(Typeface.mono(10))
-                                            .foregroundStyle(Palette.inkMuted)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                            .padding(.top, 5)
+                                        // Set the same way the artist page and
+                                        // the radio pages set them. They are
+                                        // the same kind of thing.
+                                        TagFlow(tags: uniqueTags(profile))
+                                            .padding(.top, 6)
                                     }
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
+
+                        listen(profile)
 
                         if !profile.tracks.isEmpty {
                             DigSection(title: "Tracklist", trailing: "\(profile.tracks.count)") {
@@ -77,9 +132,20 @@ struct DigReleaseView: View {
                                                 .font(Typeface.mono(9.5))
                                                 .foregroundStyle(Palette.inkFaint)
                                                 .frame(width: 34, alignment: .leading)
-                                            Text(track.title)
-                                                .font(Typeface.body(12.5))
-                                                .foregroundStyle(Palette.ink)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(track.title)
+                                                    .font(Typeface.body(12.5))
+                                                    .foregroundStyle(Palette.ink)
+                                                // Named only where the record
+                                                // itself is credited to
+                                                // nobody, which is the case
+                                                // it matters in.
+                                                if let artist = track.artist {
+                                                    Text(artist)
+                                                        .font(Typeface.mono(9.5))
+                                                        .foregroundStyle(Palette.inkMuted)
+                                                }
+                                            }
                                             Spacer(minLength: 8)
                                             if let duration = track.duration {
                                                 Text(duration)
@@ -133,7 +199,190 @@ struct DigReleaseView: View {
             }
             .scrollIndicators(.visible)
         }
-        .task(id: releaseID) { await dig.enrichRelease(id: releaseID) }
+        .task(id: fallbackTitle) {
+            guard releaseID == nil, let credit else { hasLookedUp = true; return }
+            resolvedID = await dig.resolveRelease(title: fallbackTitle, artist: credit)
+            hasLookedUp = true
+        }
+        .task(id: dig.revision) { self.profile = identifier.flatMap { dig.releaseProfile(id: $0) } }
+        .task(id: identifier) {
+            guard let identifier else { return }
+            self.profile = dig.releaseProfile(id: identifier)
+            await dig.enrichRelease(id: identifier)
+            self.profile = dig.releaseProfile(id: identifier)
+            // Asked before the list is offered, so nothing that will refuse
+            // ever appears in it.
+            await dig.verifyListenable(releaseIDs: [identifier])
+        }
+    }
+
+    /// Hearing it.
+    ///
+    /// These are the recordings whoever catalogued this pressing linked to it,
+    /// which is a far better match than asking a search engine for the track's
+    /// name and hoping. They play in Indigo's own transport through YouTube's
+    /// official player — Indigo does not resolve the underlying stream, which
+    /// their terms prohibit and which would break the moment they changed it.
+    @ViewBuilder
+    private func listen(_ profile: DigReleaseProfile) -> some View {
+        if !profile.listen.isEmpty {
+            DigSection(title: "Listen", trailing: "\(profile.listen.count)") {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(profile.listen) { line in
+                        ListenRow(
+                            title: line.title,
+                            duration: line.durationLabel,
+                            isCurrent: player.current?.playbackURL == line.url,
+                            isPlaying: player.current?.playbackURL == line.url && player.isPlaying,
+                            isCrated: crate.isCrated(listening: line.url),
+                            play: { play(profile, from: line) },
+                            keep: {
+                                crate.toggle(
+                                    listening: line.url, title: line.title,
+                                    artist: profile.artists.first { ArtistName.isRealArtist($0) },
+                                    release: profile.title, artworkURL: profile.imageURL
+                                )
+                            }
+                        )
+                        Rule()
+                    }
+                }
+            }
+        }
+    }
+
+    /// Queues the whole record from whichever recording was pressed, so it
+    /// keeps going the way a side of vinyl does.
+    private func play(_ profile: DigReleaseProfile, from line: DigReleaseProfile.ListenLine) {
+        let items = profile.listen.map { entry in
+            MediaItem(
+                id: "youtube.\(entry.url.absoluteString)",
+                sourceID: "youtube",
+                kind: .track,
+                title: entry.title,
+                subtitle: profile.artists.first { ArtistName.isRealArtist($0) } ?? profile.title,
+                detail: profile.title,
+                remoteArtworkURL: profile.imageURL,
+                playbackURL: entry.url,
+                embedProvider: .youtube
+            )
+        }
+        let index = profile.listen.firstIndex { $0.id == line.id } ?? 0
+        player.play(items, startingAt: index)
+    }
+
+    /// Who is actually on the record.
+    ///
+    /// A compilation is credited to "Various", which is nobody — so the names
+    /// worth offering are the ones on the tracks. That is what a compilation
+    /// *is*: the place several artists appear together, and the reason it is
+    /// worth digging into at all.
+    private func credited(_ profile: DigReleaseProfile) -> [String] {
+        let stated = profile.artists.filter { ArtistName.isRealArtist($0) }
+        guard stated.isEmpty else { return stated }
+
+        var seen = Set<String>()
+        return profile.tracks
+            .compactMap(\.artist)
+            .filter { ArtistName.isRealArtist($0)
+                && seen.insert(RecordingKey.normalizeArtist($0)).inserted }
+    }
+
+    /// What can be said about a record no catalogue has an entry for.
+    ///
+    /// Which is not nothing: it has a name, somebody made it, and the fact
+    /// that no catalogue holds it is itself the most interesting thing on the
+    /// page. Saying so is the whole of §3 — incomplete metadata is valid.
+    @ViewBuilder
+    private var unclaimed: some View {
+        HStack(alignment: .top, spacing: 26) {
+            ArtworkView(side: 240, glyphScale: 0.23, placeholder: .whiteLabel)
+                .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+
+            VStack(alignment: .leading, spacing: 18) {
+                DigSection(title: "Pressing") {
+                    VStack(alignment: .leading, spacing: 9) {
+                        Text(ReleaseKind.unknown.label)
+                            .microLabel(1.4, size: 9)
+                            .foregroundStyle(Palette.ink)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                        Text("No catalogue has an entry for this record. It is named in \(credit.map { "\($0)'s" } ?? "the artist's") own listing and nowhere else Indigo can reach.")
+                            .font(Typeface.body(12))
+                            .foregroundStyle(Palette.inkMuted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.top, 5)
+                }
+
+                if let credit {
+                    DigSection(title: "Artist") {
+                        DigLine(text: credit) {
+                            appState.open(.digArtist(mbid: nil, name: credit))
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// Styles first, then any genre the styles did not already cover.
+    private func uniqueTags(_ profile: DigReleaseProfile) -> [String] {
+        var seen = Set<String>()
+        return (profile.styles + profile.genres).filter {
+            !$0.isEmpty && seen.insert(RecordingKey.normalize($0)).inserted
+        }
+    }
+
+    /// What kind of object this is, and the numbers that lead back to the
+    /// shelf it came off.
+    ///
+    /// A release with almost no metadata is a valid release rather than a
+    /// broken one, so missing fields are stated as unknown rather than hidden
+    /// — a white label with no artist and no title is exactly the thing worth
+    /// keeping, and a page that quietly omits both makes it look like a bug.
+    @ViewBuilder
+    private func pressing(_ profile: DigReleaseProfile) -> some View {
+        let numbers = profile.labels.compactMap(\.catalogNumber).filter { !$0.isEmpty }
+        let kind = ReleaseClassifier.classify(
+            title: profile.title, notes: profile.notes, catalogNumber: numbers.first,
+            artistNames: profile.artists
+        )
+        DigSection(title: "Pressing") {
+            VStack(alignment: .leading, spacing: 9) {
+                HStack(spacing: 8) {
+                    Text(kind.label)
+                        .microLabel(1.4, size: 9)
+                        .foregroundStyle(Palette.ink)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                    Text(profile.year.map(String.init) ?? "YEAR UNKNOWN")
+                        .font(Typeface.mono(9.5))
+                        .foregroundStyle(Palette.inkFaint)
+                    Spacer(minLength: 0)
+                }
+                if numbers.isEmpty {
+                    Text("No catalogue number")
+                        .font(Typeface.mono(9.5))
+                        .foregroundStyle(Palette.inkFaint)
+                } else {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 116), spacing: 10)],
+                        alignment: .leading, spacing: 10
+                    ) {
+                        ForEach(numbers, id: \.self) { number in
+                            CatalogChip(number: number) {
+                                appState.open(.digCatalog(number: number))
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.top, 5)
+        }
     }
 
     private func subtitle(_ profile: DigReleaseProfile?) -> String? {
@@ -141,5 +390,12 @@ struct DigReleaseView: View {
         var parts = profile.artists
         if let year = profile.year { parts.append(String(year)) }
         return parts.joined(separator: " · ")
+    }
+
+    private func releaseSubtitle(_ profile: DigReleaseProfile?) -> String {
+        guard let profile else { return "Release" }
+        var parts = profile.artists
+        if let year = profile.year { parts.append(String(year)) }
+        return parts.isEmpty ? "Release" : parts.joined(separator: " · ")
     }
 }
