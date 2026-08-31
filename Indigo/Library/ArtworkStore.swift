@@ -118,6 +118,8 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
     private let cache = NSCache<NSURL, PlatformImage>()
     private let directory: URL
     private let fileManager = FileManager.default
+    private var missing: [URL: Date] = [:]
+    private let missingLock = NSLock()
 
     private init() {
         cache.countLimit = 320
@@ -134,22 +136,58 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
             cache.setObject(image, forKey: url as NSURL)
             return image
         }
+        // A picture that is not there stays not there. Lazy grids rebuild a
+        // tile every time it scrolls back, so without this a single missing
+        // sleeve is refetched on every pass — and a page of them is a page
+        // spending its bandwidth on nothing.
+        if isKnownMissing(url) { return nil }
+
         do {
             let (data, response) = try await NetworkEnvironment.session.data(from: url)
-            if let http = response as? HTTPURLResponse,
-               !(200..<300).contains(http.statusCode) { return nil }
-            guard let image = PlatformImage(data: data) else { return nil }
+            if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                noteMissing(url)
+                return nil
+            }
+            guard let image = PlatformImage(data: data) else {
+                noteMissing(url)
+                return nil
+            }
             cache.setObject(image, forKey: url as NSURL)
             try? data.write(to: destination, options: .atomic)
             return image
         } catch {
+            // A dropped connection is not an answer about the picture, so it
+            // is not remembered as one.
             return nil
         }
     }
 
+    /// Addresses that answered with nothing, and when. Kept for an hour: long
+    /// enough to stop a grid retrying on every scroll, short enough that a
+    /// service having a bad minute does not cost the rest of the session.
+    private func isKnownMissing(_ url: URL) -> Bool {
+        missingLock.lock()
+        defer { missingLock.unlock() }
+        guard let noted = missing[url] else { return false }
+        guard Date().timeIntervalSince(noted) < 3600 else {
+            missing.removeValue(forKey: url)
+            return false
+        }
+        return true
+    }
+
+    private func noteMissing(_ url: URL) {
+        missingLock.lock()
+        defer { missingLock.unlock() }
+        if missing.count > 500 { missing.removeAll() }
+        missing[url] = Date()
+    }
+
     func prefetch(_ urls: [URL]) async {
-        for batchStart in stride(from: 0, to: urls.count, by: 4) {
-            let batch = Array(urls[batchStart..<min(batchStart + 4, urls.count)])
+        // Six at a time. These are thumbnails — tens of kilobytes each — and
+        // the point is to have them ready before a tile asks.
+        for batchStart in stride(from: 0, to: urls.count, by: 6) {
+            let batch = Array(urls[batchStart..<min(batchStart + 6, urls.count)])
             await withTaskGroup(of: Void.self) { group in
                 for url in batch {
                     group.addTask { _ = await self.image(for: url) }

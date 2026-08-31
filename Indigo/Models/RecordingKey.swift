@@ -66,6 +66,26 @@ nonisolated enum RecordingKey {
         return normalize(name)
     }
 
+    /// Every artist named in a credit, normalised.
+    ///
+    /// `normalizeArtist` keeps only the primary name, which is right for
+    /// deciding what a recording *is* — but wrong for deciding whose page it
+    /// belongs on. "Rainy Miller x Space Afrika" is a record by both of them,
+    /// and showing it on neither because it is filed under the first is how a
+    /// collaboration disappears.
+    static func creditedArtists(_ value: String?) -> [String] {
+        guard let value, !value.isEmpty else { return [] }
+        var parts = [value]
+        for separator in [" x ", " X ", " & ", " and ", " with ", " vs. ", " vs ", ", ",
+                          " feat. ", " feat ", " ft. ", " ft ", " featuring "] {
+            parts = parts.flatMap { $0.components(separatedBy: separator) }
+        }
+        var seen = Set<String>()
+        return parts
+            .map { normalize($0) }
+            .filter { !$0.isEmpty && seen.insert($0).inserted }
+    }
+
     /// The dedup key for a canonical recording. Empty when there isn't enough
     /// metadata to claim identity, which is exactly the unknown case — and an
     /// empty key must never match another empty key.

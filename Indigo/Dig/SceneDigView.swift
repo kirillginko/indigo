@@ -96,7 +96,7 @@ struct SceneDigView: View {
                             }
                         }
 
-                        DeepSectionView(origin: scene.node) { appState.open($0) }
+                        DeepSectionView(origin: scene.node, isReady: hasGathered) { appState.open($0) }
                     }
                     .padding(.horizontal, Metrics.gutter)
                     .padding(.vertical, 22)

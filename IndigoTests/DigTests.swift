@@ -701,3 +701,62 @@ final class WorkingBarTests: XCTestCase {
         }
     }
 }
+
+/// A page must not announce a failure it has not yet had.
+final class LoadingStateTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The sequence that produced the complaint: the page read an empty store,
+    /// found nothing, said so, and only then went and asked. Emptiness before
+    /// the catalogues have been asked is not evidence of anything.
+    @MainActor
+    func testAnEmptyStoreIsNotAnAnswer() throws {
+        let dig = DigStore(context: context)
+        let beforeAsking = dig.artistProfile(name: "Skee Mask", mbid: nil)
+        XCTAssertTrue(beforeAsking.isBare, "Nothing known yet")
+
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Skee Mask"),
+                                   discogsID: 1, name: "Skee Mask")
+        artist.releaseTitles = ["Compro"]
+        context.insert(artist)
+
+        // The same page, a moment later, once something has arrived.
+        let dug = DigStore(context: context)
+        XCTAssertFalse(dug.artistProfile(name: "Skee Mask", mbid: nil).isBare)
+    }
+
+    /// A record with an identifier is looked up by the catalogue, so the
+    /// "no catalogue has this" state belongs only to one that has none.
+    func testARecordWithAnIdentifierIsNotUnclaimed() {
+        XCTAssertEqual(
+            DetailPage.digRelease(id: 12_345, title: "Compro"),
+            .digRelease(id: 12_345, title: "Compro")
+        )
+        XCTAssertNotEqual(
+            DetailPage.digRelease(id: 12_345, title: "Compro"),
+            .digReleaseNamed(title: "Compro", artist: "Skee Mask")
+        )
+    }
+
+    /// A row says what it is, not which service is carrying it. Naming the
+    /// provider on every line is noise where it does not change the row.
+    func testARowNeedNotNameItsService() {
+        let unnamed = ListenRow(
+            title: "Rev8617", duration: "5:00", isCurrent: false, isPlaying: false,
+            isCrated: false, play: {}, keep: {}
+        )
+        XCTAssertNil(unnamed.provider)
+    }
+}

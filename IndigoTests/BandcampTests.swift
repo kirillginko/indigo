@@ -227,4 +227,192 @@ final class BandcampTests: XCTestCase {
 
         XCTAssertGreaterThan(onlyThere.score, catalogued.score)
     }
+
+    // MARK: Collaborations
+
+    /// "Rainy Miller x Space Afrika" is a record by both of them. Filing it
+    /// under the first name only is how a collaboration disappears from the
+    /// other artist's page.
+    func testACollaborationBelongsToEveryoneOnIt() {
+        let credited = RecordingKey.creditedArtists("Rainy Miller x Space Afrika")
+        XCTAssertEqual(credited, ["rainy miller", "space afrika"])
+
+        XCTAssertEqual(RecordingKey.creditedArtists("Skee Mask"), ["skee mask"])
+        XCTAssertEqual(RecordingKey.creditedArtists("A & B, C"), ["a", "b", "c"])
+        XCTAssertTrue(RecordingKey.creditedArtists(nil).isEmpty)
+    }
+
+    func testACollaborationIsFoundFromEitherName() throws {
+        let record = BandcampRelease(
+            urlString: "https://x.bandcamp.com/album/a-grisaille-wedding",
+            title: "A Grisaille Wedding", artistName: "Rainy Miller x Space Afrika"
+        )
+        context.insert(record)
+
+        let enricher = BandcampEnricher(context: context)
+        XCTAssertEqual(enricher.cachedReleases(forArtist: "Space Afrika").map(\.title),
+                       ["A Grisaille Wedding"])
+        XCTAssertEqual(enricher.cachedReleases(forArtist: "Rainy Miller").map(\.title),
+                       ["A Grisaille Wedding"])
+        XCTAssertTrue(enricher.cachedReleases(forArtist: "Somebody Else").isEmpty)
+    }
+
+    // MARK: As a source of data
+
+    /// For a lot of this music Bandcamp is not a footnote to the Discogs
+    /// entry — it is the only record of the work, so its tags and imprints
+    /// belong beside the ones a catalogue knows.
+    func testBandcampTagsAndLabelsReachTheArtistPage() throws {
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Space Afrika"),
+                                   discogsID: 1, name: "Space Afrika")
+        artist.genres = ["Electronic"]
+        context.insert(artist)
+
+        let release = BandcampRelease(
+            urlString: "https://x.bandcamp.com/album/quiet-storm",
+            title: "Quiet Storm", artistName: "Space Afrika", labelName: "sferic",
+            year: "2026", keywords: ["Electronic", "trip hop", "Manchester"]
+        )
+        context.insert(release)
+
+        let profile = DigEngine(context: context).artistProfile(name: "Space Afrika", mbid: nil)
+        XCTAssertTrue(profile.genres.contains("trip hop"), "A tag only Bandcamp knows")
+        XCTAssertEqual(profile.genres.filter { $0.lowercased() == "electronic" }.count, 1,
+                       "And nothing said twice")
+        XCTAssertTrue(profile.labels.map(\.name).contains("sferic"))
+        XCTAssertFalse(profile.genres.contains("Manchester"), "A city is not a genre")
+        XCTAssertEqual(profile.bandcamp.map(\.title), ["Quiet Storm"])
+    }
+
+    /// A pressing plant is not an imprint. Discogs' release *search* carries a
+    /// `label` array holding every company credited — the plant, the mastering
+    /// house, the distributor — and reading that as an artist's labels put
+    /// Space Afrika on GZ Media and Bonati Mastering alongside Dais.
+    func testAnArtistsLabelsAreImprintsNotCompanies() throws {
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Space Afrika"),
+                                   discogsID: 1, name: "Space Afrika")
+        // What the per-release listing gives, which is the label itself.
+        artist.labelNames = ["Dais Records", "sferic"]
+        context.insert(artist)
+
+        let labels = DigEngine(context: context).artistProfile(name: "Space Afrika", mbid: nil)
+            .labels.map(\.name)
+        XCTAssertEqual(Set(labels), ["Dais Records", "sferic"])
+    }
+
+    /// Every Bandcamp row carries a sleeve, because for a lot of these records
+    /// it is the only picture of them anywhere.
+    func testEveryBandcampRowCarriesItsSleeve() throws {
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Space Afrika"),
+                                   discogsID: 1, name: "Space Afrika")
+        context.insert(artist)
+
+        let release = BandcampRelease(
+            urlString: "https://x.bandcamp.com/album/quiet-storm",
+            title: "Quiet Storm", artistName: "Space Afrika", labelName: "sferic",
+            year: "2026", imageURLString: "https://f4.bcbits.com/img/quiet.jpg",
+            keywords: ["ambient"]
+        )
+        context.insert(release)
+
+        let row = try XCTUnwrap(
+            DigEngine(context: context).artistProfile(name: "Space Afrika", mbid: nil).bandcamp.first
+        )
+        XCTAssertEqual(row.title, "Quiet Storm")
+        XCTAssertEqual(row.label, "sferic")
+        XCTAssertEqual(row.year, "2026")
+        XCTAssertEqual(row.imageURL?.absoluteString, "https://f4.bcbits.com/img/quiet.jpg")
+        XCTAssertEqual(row.pageURL.absoluteString, "https://x.bandcamp.com/album/quiet-storm")
+    }
+}
+
+// MARK: - Image sizes
+
+/// Bandcamp advertises the largest cut — 1200 pixels, well over half a
+/// megabyte — and that is what gets stored. Rendering it into a 148-point tile
+/// downloads roughly twenty-seven times more than the tile can show.
+final class BandcampImageTests: XCTestCase {
+    private func url(_ address: String) throws -> URL {
+        try XCTUnwrap(URL(string: address))
+    }
+
+    func testTheRightCutIsAskedFor() throws {
+        let stored = try url("https://f4.bcbits.com/img/a2279058220_10.jpg")
+
+        XCTAssertEqual(
+            BandcampImage.sized(stored, BandcampImage.thumbnail)?.absoluteString,
+            "https://f4.bcbits.com/img/a2279058220_9.jpg"
+        )
+        XCTAssertEqual(
+            BandcampImage.sized(stored, BandcampImage.cover)?.absoluteString,
+            "https://f4.bcbits.com/img/a2279058220_16.jpg"
+        )
+    }
+
+    /// Anything that is not one of their addresses is handed back untouched —
+    /// a Discogs sleeve must not be rewritten into a URL that does not exist.
+    func testOtherAddressesAreLeftAlone() throws {
+        let discogs = try url("https://i.discogs.com/abc/R-12028123.jpeg")
+        XCTAssertEqual(BandcampImage.sized(discogs, BandcampImage.cover), discogs)
+
+        let odd = try url("https://f4.bcbits.com/img/nosize.jpg")
+        XCTAssertEqual(BandcampImage.sized(odd, BandcampImage.cover), odd)
+        XCTAssertNil(BandcampImage.sized(nil, BandcampImage.cover))
+    }
+
+    /// The small cut arrives first and stands in while the other loads, so a
+    /// grid fills rather than staying empty.
+    func testEveryTileHasSomethingToShowImmediately() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let context = ModelContext(container)
+
+        context.insert(DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Space Afrika"),
+                                     discogsID: 1, name: "Space Afrika"))
+        let release = BandcampRelease(
+            urlString: "https://x.bandcamp.com/album/quiet-storm",
+            title: "Quiet Storm", artistName: "Space Afrika",
+            imageURLString: "https://f4.bcbits.com/img/a2279058220_10.jpg"
+        )
+        context.insert(release)
+
+        let row = try XCTUnwrap(
+            DigEngine(context: context).artistProfile(name: "Space Afrika", mbid: nil).bandcamp.first
+        )
+        XCTAssertEqual(row.thumbnailURL?.absoluteString,
+                       "https://f4.bcbits.com/img/a2279058220_9.jpg")
+        XCTAssertEqual(row.imageURL?.absoluteString,
+                       "https://f4.bcbits.com/img/a2279058220_16.jpg")
+    }
+
+    /// A record Discogs pictures with nothing, and the artist's own Bandcamp
+    /// has a sleeve for. Already cached, so it costs no request at all.
+    func testABandcampSleeveFillsInAReleaseDiscogsHasNoPictureFor() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let context = ModelContext(container)
+
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Space Afrika"),
+                                   discogsID: 1, name: "Space Afrika")
+        artist.releaseTitles = ["Honest Labour"]
+        artist.releaseImageURLStrings = [""]
+        artist.releaseThumbnailURLStrings = [""]
+        context.insert(artist)
+
+        let release = BandcampRelease(
+            urlString: "https://x.bandcamp.com/album/honest-labour",
+            title: "Honest Labour", artistName: "Space Afrika",
+            imageURLString: "https://f4.bcbits.com/img/a0599943016_10.jpg"
+        )
+        context.insert(release)
+
+        let line = try XCTUnwrap(
+            DigEngine(context: context).artistProfile(name: "Space Afrika", mbid: nil)
+                .releases.first { $0.title == "Honest Labour" }
+        )
+        XCTAssertEqual(line.imageURL?.absoluteString,
+                       "https://f4.bcbits.com/img/a0599943016_16.jpg")
+        XCTAssertEqual(line.thumbnailURL?.absoluteString,
+                       "https://f4.bcbits.com/img/a0599943016_9.jpg")
+    }
 }

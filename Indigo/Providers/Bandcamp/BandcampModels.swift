@@ -124,9 +124,13 @@ nonisolated final class BandcampRelease {
     var artistName: String
     /// Normalised, so a release can be found from a credit spelled differently.
     var artistKey: String
+    /// Everyone named in the credit. A collaboration belongs on both artists'
+    /// pages, not only the one whose name came first.
+    var artistKeys: [String] = []
     var labelName: String?
     var year: String?
     var imageURLString: String?
+    var embedURLString: String?
     var trackTitles: [String]
     /// Normalised track titles, so "MLN ft. Tony Njoku" can be matched against
     /// what a radio station wrote down.
@@ -141,6 +145,7 @@ nonisolated final class BandcampRelease {
         labelName: String? = nil,
         year: String? = nil,
         imageURLString: String? = nil,
+        embedURLString: String? = nil,
         trackTitles: [String] = [],
         keywords: [String] = []
     ) {
@@ -148,9 +153,11 @@ nonisolated final class BandcampRelease {
         self.title = title
         self.artistName = artistName
         self.artistKey = RecordingKey.normalizeArtist(artistName)
+        self.artistKeys = RecordingKey.creditedArtists(artistName)
         self.labelName = labelName
         self.year = year
         self.imageURLString = imageURLString
+        self.embedURLString = embedURLString
         self.trackTitles = trackTitles
         self.trackKeys = trackTitles.map(RecordingKey.normalizeTitle)
         self.keywords = keywords
@@ -159,6 +166,12 @@ nonisolated final class BandcampRelease {
 
     var url: URL? { URL(string: urlString) }
     var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
+
+    /// Bandcamp's own player for this record, if the page advertised one.
+    var embedURL: URL? {
+        guard let embedURLString, !embedURLString.isEmpty else { return nil }
+        return URL(string: embedURLString)
+    }
 
     /// Whether this release contains a track a station named. Matched on the
     /// normalised title, then on the title with the featured-artist tail off,
@@ -192,4 +205,35 @@ nonisolated final class BandcampArtistIndex {
     }
 
     var isFresh: Bool { Date().timeIntervalSince(fetchedAt) < 7 * 24 * 60 * 60 }
+}
+
+/// Bandcamp serves the same artwork at several sizes, chosen by a number in
+/// the filename.
+///
+/// The page advertises the largest — 1200 pixels, well over half a megabyte —
+/// and that is what gets stored. Rendering it into a 148-point tile downloads
+/// roughly twenty-seven times more than the tile can show, which is most of
+/// why a grid of sleeves was slow to fill.
+nonisolated enum BandcampImage {
+    /// 210 pixels, about 23KB. Loads immediately and stands in while the
+    /// proper one arrives.
+    static let thumbnail = 9
+    /// 700 pixels, about 160KB. Enough for any tile in the app.
+    static let cover = 16
+
+    static func sized(_ url: URL?, _ size: Int) -> URL? {
+        guard let url, url.host()?.hasSuffix("bcbits.com") == true else { return url }
+        let name = url.lastPathComponent
+        guard let underscore = name.lastIndex(of: "_"),
+              let dot = name.lastIndex(of: "."),
+              underscore < dot,
+              Int(name[name.index(after: underscore)..<dot]) != nil
+        else { return url }
+
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let stem = name[name.startIndex..<underscore]
+        let ext = name[dot...]
+        components?.path = url.deletingLastPathComponent().path() + "\(stem)_\(size)\(ext)"
+        return components?.url ?? url
+    }
 }

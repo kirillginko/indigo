@@ -12,12 +12,11 @@ nonisolated struct DiscogsEnricher {
 
     @discardableResult
     func artist(named name: String, force: Bool = false) async throws -> DiscogsArtist? {
-        // Version 3 added the artist's own links, which is how Indigo learns a
-        // Bandcamp address without searching Bandcamp; version 4 kept the
-        // thumbnails that arrive with each neighbour. Rows cached before those
-        // look current but are missing the fields, so they are refetched once
-        // rather than silently never filling in.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 4,
+        // Rolled whenever what is stored changes shape: 3 added the artist's
+        // own links, 4 kept the thumbnails arriving with each neighbour, 5
+        // stopped filing pressing plants as imprints. A row cached before any
+        // of those looks current while being wrong, so it is refetched once.
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 5,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
 
@@ -63,9 +62,15 @@ nonisolated struct DiscogsEnricher {
             record.releaseThumbnailURLStrings = Array(repeating: "", count: fallback.count)
             record.releaseLabels = fallback.map { $0.label ?? "" }
         }
+        // Only the label each release names for itself.
+        //
+        // The search catalogue also carries a `label` array, but it holds
+        // every company credited on the record — the pressing plant, the
+        // mastering house, the distributor, the magazine that ran the mix. As
+        // an artist's imprints that reads as nonsense: Space Afrika listed on
+        // GZ Media and Bonati Mastering alongside Dais and sferic.
         record.labelNames = Array(Set(
-            releases.compactMap(\.label).filter { !$0.isEmpty }
-                + bundle.catalogue.flatMap { $0.label ?? [] }.filter { !$0.isEmpty }
+            releases.compactMap(\.label).filter { LabelName.isRealLabel($0) }
         )).sorted()
         record.genres = Self.unique(bundle.catalogue.flatMap { $0.genre ?? [] })
         record.styles = Self.unique(bundle.catalogue.flatMap { $0.style ?? [] })
@@ -76,7 +81,7 @@ nonisolated struct DiscogsEnricher {
             }.filter { RecordingKey.normalizeArtist($0) != key }
         )
         record.fetchedAt = Date()
-        record.cacheVersion = 4
+        record.cacheVersion = 5
         return record
     }
 

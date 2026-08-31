@@ -17,6 +17,10 @@ import SwiftUI
 
 struct DeepSectionView: View {
     let origin: MusicNode
+    /// Whether the page has finished asking the catalogues. Until it has, an
+    /// empty level is a level nobody has looked at yet — and saying "nothing
+    /// at this depth" about it is a failure announced in advance.
+    var isReady = true
     let open: (DetailPage) -> Void
 
     @Environment(DigStore.self) private var dig
@@ -34,9 +38,10 @@ struct DeepSectionView: View {
                     .padding(.bottom, 12)
 
                 if let descent = descent ?? dig.cachedDescent(from: origin, at: level) {
-                    if descent.results.isEmpty, self.descent == nil {
+                    if descent.results.isEmpty, self.descent == nil || !isReady {
                         // A cached descent for a different level is not an
-                        // answer about this one.
+                        // answer about this one, and neither is an empty walk
+                        // over a store nothing has been fetched into yet.
                         WorkingBar().padding(.vertical, 14)
                     } else if descent.results.isEmpty {
                         Text(emptyMessage)

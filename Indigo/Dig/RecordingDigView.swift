@@ -91,7 +91,7 @@ struct RecordingDigView: View {
 
                     playedAlongside(connections)
 
-                    DeepSectionView(origin: node) { appState.open($0) }
+                    DeepSectionView(origin: node, isReady: neighbourhood != nil) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)

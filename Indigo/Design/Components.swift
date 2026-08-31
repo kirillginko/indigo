@@ -373,7 +373,13 @@ struct GenreFilterBar: View {
 
                 if isExpanded {
                     Rule()
-                    VStack(alignment: .leading, spacing: 14) {
+                    // Capped and scrollable. A station with a couple of
+                    // hundred tags was pushing every show off the screen,
+                    // which turns a filter into a wall — and the shows are
+                    // what the page is for. Short lists still size to their
+                    // own content and never scroll.
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 14) {
                         ForEach(groups) { group in
                             VStack(alignment: .leading, spacing: 8) {
                                 if let name = group.name {
@@ -398,10 +404,13 @@ struct GenreFilterBar: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
+                        }
+                        .padding(.horizontal, Metrics.gutter)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .padding(.horizontal, Metrics.gutter)
-                    .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxHeight: 240)
+                    .scrollBounceBehavior(.basedOnSize)
                 }
             }
             .background(Palette.paperChrome)

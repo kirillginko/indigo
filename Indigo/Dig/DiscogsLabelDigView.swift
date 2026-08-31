@@ -64,6 +64,7 @@ struct DiscogsLabelDigView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 26) {
                     if dig.isEnriching { WorkingBar() }
+                    if profile == nil { WorkingPane() }
                     if let profile {
                         DigTallies(entries: [("Catalogue", "\(profile.releases.count)"),
                                              ("Artists", "\(profile.artists.count)"),

@@ -224,3 +224,52 @@ final class ArtworkFallbackTests: XCTestCase {
         XCTAssertEqual(Array(1...3).chunked(into: 0), [[1, 2, 3]], "A nonsense size is not a crash")
     }
 }
+
+/// Lazy grids rebuild a tile every time it scrolls back into view, so a
+/// missing picture is asked for again on every pass.
+final class MissingArtworkTests: XCTestCase {
+    /// A picture that is not there stays not there — for an hour, which is
+    /// long enough to stop a grid retrying on every scroll and short enough
+    /// that a service having a bad minute does not cost the rest of the
+    /// session.
+    func testAKnownMissingPictureIsNotAskedForAgain() async throws {
+        let store = RemoteArtworkStore.shared
+        let missing = try XCTUnwrap(URL(string: "https://i.discogs.com/indigo-test-\(UUID().uuidString).jpg"))
+
+        let first = await store.image(for: missing)
+        XCTAssertNil(first)
+
+        // The second ask is answered from what was learned, not from the
+        // network. Correctness is what is pinned here; the saving is the point.
+        let second = await store.image(for: missing)
+        XCTAssertNil(second)
+    }
+
+    /// A record MusicBrainz lists and nobody pictures is exactly the one whose
+    /// sleeve is already sitting in the Bandcamp cache.
+    func testABandcampSleeveFillsInAMusicBrainzRelease() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let context = ModelContext(container)
+
+        let artist = Artist(mbid: "mb-1", name: "Space Afrika")
+        artist.releaseTitles = ["Honest Labour"]
+        artist.releaseDates = ["2021-08-27"]
+        context.insert(artist)
+
+        let release = BandcampRelease(
+            urlString: "https://x.bandcamp.com/album/honest-labour",
+            title: "Honest Labour", artistName: "Space Afrika", labelName: "sferic",
+            imageURLString: "https://f4.bcbits.com/img/a0599943016_10.jpg"
+        )
+        context.insert(release)
+
+        let line = try XCTUnwrap(
+            DigEngine(context: context).artistProfile(name: "Space Afrika", mbid: "mb-1")
+                .releases.first { $0.title == "Honest Labour" }
+        )
+        XCTAssertEqual(line.thumbnailURL?.absoluteString,
+                       "https://f4.bcbits.com/img/a0599943016_9.jpg")
+        XCTAssertEqual(line.label, "sferic")
+    }
+}

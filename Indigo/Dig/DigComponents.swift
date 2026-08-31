@@ -348,7 +348,9 @@ struct CatalogChip: View {
 struct ListenRow: View {
     let title: String
     var duration: String?
-    var provider: String = "YouTube"
+    /// Named only where it changes what the row is. A track is a track; which
+    /// service happens to be carrying it is not the interesting part.
+    var provider: String?
     let isCurrent: Bool
     let isPlaying: Bool
     let isCrated: Bool
@@ -379,9 +381,11 @@ struct ListenRow: View {
                             .font(Typeface.mono(9.5))
                             .foregroundStyle(Palette.inkFaint)
                     }
-                    Text(provider)
-                        .microLabel(1.1, size: 8)
-                        .foregroundStyle(Palette.inkFaint)
+                    if let provider {
+                        Text(provider)
+                            .microLabel(1.1, size: 8)
+                            .foregroundStyle(Palette.inkFaint)
+                    }
                 }
                 .contentShape(Rectangle())
             }

@@ -19,6 +19,7 @@ struct LabelDigView: View {
 
     /// Held rather than read in `body` — see `ArtistDigView`.
     @State private var profile: LabelProfile?
+    @State private var hasEnriched = false
 
     var body: some View {
         let _ = crate.revision
@@ -43,7 +44,10 @@ struct LabelDigView: View {
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 26) {
-                    if profile == nil {
+                    // A label profile is returned even when nothing is
+                    // cached, so its emptiness is not evidence of anything
+                    // until the catalogue has been asked.
+                    if profile == nil || (!hasEnriched && (profile?.artists.isEmpty ?? true)) {
                         WorkingPane()
                     } else if dig.isEnriching {
                         WorkingBar()
@@ -98,6 +102,7 @@ struct LabelDigView: View {
             await dig.enrichLabel(mbid: labelMBID)
             self.profile = dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
             readCatalogue()
+            hasEnriched = true
         }
     }
 
@@ -165,8 +170,11 @@ struct LabelDigView: View {
                     ForEach(cuts) { cut in
                         DigLine(
                             text: cut.node.title,
-                            detail: [cut.signals.releaseKind.label, cut.node.subtitle]
-                                .compactMap { $0 }.joined(separator: " · "),
+                            detail: [
+                                cut.signals.releaseKind == .unknown
+                                    ? nil : cut.signals.releaseKind.label,
+                                cut.node.subtitle
+                            ].compactMap { $0 }.joined(separator: " · "),
                             action: cut.node.destination.map { page in { appState.open(page) } }
                         )
                         Rule()

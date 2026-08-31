@@ -324,3 +324,45 @@ final class CoAppearanceTests: XCTestCase {
         )
     }
 }
+
+/// A page must not announce "nothing at this depth" about a store nothing has
+/// been fetched into yet.
+final class DeepReadinessTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The walk over an empty store returns nothing, which is true and means
+    /// nothing — the catalogues have not been asked yet.
+    func testAnEmptyWalkIsNotAnEmptyAnswer() {
+        let descent = DeepEngine(context: context).descent(from: .artist("Nobody"), at: .surface)
+        XCTAssertTrue(descent.results.isEmpty)
+        XCTAssertNil(descent.next, "And there is nowhere deeper to offer either")
+    }
+
+    /// Once something is actually known, the same walk has something to say.
+    func testAWalkOverAStockedStoreAnswers() throws {
+        let subject = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Skee Mask"),
+                                    discogsID: 1, name: "Skee Mask")
+        subject.labelNames = ["Ilian Tape"]
+        context.insert(subject)
+
+        let peer = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Stenny"),
+                                 discogsID: 2, name: "Stenny")
+        peer.labelNames = ["Ilian Tape"]
+        context.insert(peer)
+
+        let descent = DeepEngine(context: context).descent(from: .artist("Skee Mask"), at: .label)
+        XCTAssertTrue(descent.results.contains { $0.node.title == "Stenny" })
+    }
+}

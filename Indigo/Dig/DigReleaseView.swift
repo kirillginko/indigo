@@ -200,7 +200,11 @@ struct DigReleaseView: View {
             .scrollIndicators(.visible)
         }
         .task(id: fallbackTitle) {
-            guard releaseID == nil, let credit else { hasLookedUp = true; return }
+            // Only for a record with no identifier. One that has an id is
+            // looked up by the task below, and saying "no catalogue has this"
+            // before that has run announces a failure in advance.
+            guard releaseID == nil else { return }
+            guard let credit else { hasLookedUp = true; return }
             resolvedID = await dig.resolveRelease(title: fallbackTitle, artist: credit)
             hasLookedUp = true
         }
@@ -210,6 +214,7 @@ struct DigReleaseView: View {
             self.profile = dig.releaseProfile(id: identifier)
             await dig.enrichRelease(id: identifier)
             self.profile = dig.releaseProfile(id: identifier)
+            hasLookedUp = true
             // Asked before the list is offered, so nothing that will refuse
             // ever appears in it.
             await dig.verifyListenable(releaseIDs: [identifier])
@@ -295,25 +300,63 @@ struct DigReleaseView: View {
     /// page. Saying so is the whole of §3 — incomplete metadata is valid.
     @ViewBuilder
     private var unclaimed: some View {
+        let known = bandcamp
         HStack(alignment: .top, spacing: 26) {
-            ArtworkView(side: 240, glyphScale: 0.23, placeholder: .whiteLabel)
-                .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+            ArtworkView(
+                remoteURL: BandcampImage.sized(known?.imageURL, BandcampImage.cover),
+                previewRemoteURL: BandcampImage.sized(known?.imageURL, BandcampImage.thumbnail),
+                side: 240, glyphScale: 0.23, placeholder: .whiteLabel
+            )
+            .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
             VStack(alignment: .leading, spacing: 18) {
                 DigSection(title: "Pressing") {
                     VStack(alignment: .leading, spacing: 9) {
-                        Text(ReleaseKind.unknown.label)
-                            .microLabel(1.4, size: 9)
-                            .foregroundStyle(Palette.ink)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                        HStack(spacing: 8) {
+                            if let year = known?.year {
+                                Text(year)
+                                    .font(Typeface.mono(9.5))
+                                    .foregroundStyle(Palette.inkFaint)
+                            }
+                            Spacer(minLength: 0)
+                        }
                         Text("No catalogue has an entry for this record. It is named in \(credit.map { "\($0)'s" } ?? "the artist's") own listing and nowhere else Indigo can reach.")
                             .font(Typeface.body(12))
                             .foregroundStyle(Palette.inkMuted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.top, 5)
+                }
+
+                if let known {
+                    if let label = known.labelName, LabelName.isRealLabel(label) {
+                        DigSection(title: "Label") {
+                            DigLine(text: label) { appState.open(.digDiscogsLabel(name: label)) }
+                        }
+                    }
+                    if !known.trackTitles.isEmpty {
+                        DigSection(title: "Tracklist", trailing: "\(known.trackTitles.count)") {
+                            VStack(alignment: .leading, spacing: 0) {
+                                ForEach(Array(known.trackTitles.enumerated()), id: \.offset) { index, title in
+                                    DigLine(text: title, detail: "\(index + 1)")
+                                    Rule(color: Palette.outline.opacity(0.55))
+                                }
+                            }
+                        }
+                    }
+                    // The way out, once — rather than every tile in the grid
+                    // being one.
+                    if let page = URL(string: known.urlString) {
+                        Link(destination: page) {
+                            HStack(spacing: 7) {
+                                Text("Open on Bandcamp").microLabel(1.2, size: 9)
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 8, weight: .bold))
+                            }
+                            .foregroundStyle(Palette.inkFaint)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
 
                 if let credit {
@@ -326,6 +369,18 @@ struct DigReleaseView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    /// What Bandcamp knows about this record, when no catalogue has it.
+    ///
+    /// A record only its maker has published is not a gap to apologise for —
+    /// it is most of the point — so the page shows the sleeve, the year, the
+    /// imprint and the tracks rather than a shrug.
+    private var bandcamp: BandcampRelease? {
+        guard let credit else { return nil }
+        return BandcampEnricher(context: dig.context)
+            .cachedReleases(forArtist: credit)
+            .first { RecordingKey.normalizeTitle($0.title) == RecordingKey.normalizeTitle(fallbackTitle) }
     }
 
     /// Styles first, then any genre the styles did not already cover.
@@ -353,15 +408,24 @@ struct DigReleaseView: View {
         DigSection(title: "Pressing") {
             VStack(alignment: .leading, spacing: 9) {
                 HStack(spacing: 8) {
-                    Text(kind.label)
-                        .microLabel(1.4, size: 9)
-                        .foregroundStyle(Palette.ink)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 5)
-                        .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
-                    Text(profile.year.map(String.init) ?? "YEAR UNKNOWN")
-                        .font(Typeface.mono(9.5))
-                        .foregroundStyle(Palette.inkFaint)
+                    // Only when the record actually says what it is. Almost
+                    // nothing carries a marker, so labelling every ordinary
+                    // release "UNKNOWN RELEASE" told the listener nothing and
+                    // made the whole catalogue look broken. The kinds worth
+                    // naming — white label, dubplate, test press — still are.
+                    if kind != .unknown {
+                        Text(kind.label)
+                            .microLabel(1.4, size: 9)
+                            .foregroundStyle(Palette.ink)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                    }
+                    if let year = profile.year {
+                        Text(String(year))
+                            .font(Typeface.mono(9.5))
+                            .foregroundStyle(Palette.inkFaint)
+                    }
                     Spacer(minLength: 0)
                 }
                 if numbers.isEmpty {

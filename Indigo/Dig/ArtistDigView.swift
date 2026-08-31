@@ -6,6 +6,7 @@
 //  biography — it's that every line is somewhere else you can go.
 //
 
+import AppKit
 import SwiftUI
 import SwiftData
 
@@ -27,6 +28,18 @@ struct ArtistDigView: View {
     /// exactly what navigation felt like. The shell paints first and fills in.
     @State private var profile: ArtistProfile?
     @State private var lanes = Connections()
+    /// Set once the catalogues have actually been asked. "Nothing found"
+    /// before that is a failure announced in advance.
+    @State private var hasEnriched = false
+    /// How much of the discography is on screen. Grows on request rather than
+    /// rendering hundreds of sleeves nobody asked to see.
+    @State private var releaseLimit = 24
+
+    /// True while there is genuinely nothing to show yet — no cached page from
+    /// last time, and the catalogues not yet asked.
+    private func isWaiting(_ profile: ArtistProfile) -> Bool {
+        !hasEnriched && profile.isBare
+    }
 
     var body: some View {
         let _ = crate.revision
@@ -68,13 +81,24 @@ struct ArtistDigView: View {
                 // are scrolled to, so the page is usable while the rest of it
                 // is still being worked out.
                 LazyVStack(alignment: .leading, spacing: 26) {
-                    if (self.profile == nil
-                        && dig.cachedArtistProfile(name: artistName, mbid: artistMBID) == nil)
-                        || dig.isEnriching {
-                        WorkingBar()
-                    }
+                    // Nothing is drawn until there is something to draw. The
+                    // page used to lay out its whole scaffolding around a
+                    // placeholder sleeve and an empty column, announce that it
+                    // had found nothing, and then fill in — which reads as a
+                    // failure followed by a correction rather than as loading.
+                    if isWaiting(profile) {
+                        WorkingPane()
+                    } else {
+                    if dig.isEnriching { WorkingBar() }
                     HStack(alignment: .top, spacing: 26) {
-                        ArtworkView(remoteURL: profile.imageURL, side: 220, glyphScale: 0.24)
+                        // The name when there is no portrait. An empty
+                        // bordered square says nothing at all — least of all
+                        // that this is who the page is about.
+                        ArtworkView(
+                            remoteURL: profile.imageURL,
+                            side: 220, glyphScale: 0.24,
+                            mark: profile.imageURL == nil ? profile.name : nil
+                        )
                             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
                         VStack(alignment: .leading, spacing: 20) {
                             DigTallies(entries: [
@@ -104,7 +128,7 @@ struct ArtistDigView: View {
                     if let discogsURL = profile.discogsURL {
                         Link(destination: discogsURL) {
                             HStack(spacing: 7) {
-                                Text("Data provided by Discogs")
+                                Text("Source")
                                     .microLabel(1.2, size: 9)
                                 Image(systemName: "arrow.up.right")
                                     .font(.system(size: 8, weight: .bold))
@@ -146,7 +170,7 @@ struct ArtistDigView: View {
                     // and a placeholder is bare by definition — announcing
                     // "nothing found" before looking would be a lie told
                     // quickly.
-                    if self.profile != nil, profile.isBare {
+                    if hasEnriched, profile.isBare {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Nothing to dig into yet.")
                                 .font(Typeface.body(12.5))
@@ -162,19 +186,46 @@ struct ArtistDigView: View {
                     listen(profile)
 
                     if !profile.releases.isEmpty {
-                        DigSection(title: "Browse releases", trailing: "\(profile.releases.count)") {
+                        DigSection(
+                            title: "Browse releases",
+                            trailing: profile.releases.count > releaseLimit
+                                ? "\(releaseLimit) of \(profile.releases.count)"
+                                : "\(profile.releases.count)"
+                        ) {
                             LazyVGrid(
                                 columns: [GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 18, alignment: .top)],
                                 alignment: .leading,
                                 spacing: 22
                             ) {
-                                ForEach(profile.releases.prefix(24)) { release in
+                                ForEach(profile.releases.prefix(releaseLimit)) { release in
                                     DigReleaseTile(release: release) {
                                         openRelease(release)
                                     }
                                 }
                             }
                             .padding(.top, 14)
+
+                            if profile.releases.count > releaseLimit {
+                                Button {
+                                    releaseLimit += 24
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Text("More releases").microLabel(1.4, size: 9.5)
+                                        Text("\(profile.releases.count - releaseLimit) left")
+                                            .font(Typeface.mono(9))
+                                            .foregroundStyle(Palette.inkFaint)
+                                    }
+                                    .foregroundStyle(Palette.ink)
+                                    .padding(.horizontal, 13)
+                                    .padding(.vertical, 8)
+                                    .overlay(Rectangle().strokeBorder(
+                                        Palette.outline, lineWidth: Metrics.hairline
+                                    ))
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.top, 16)
+                            }
                         }
                     }
 
@@ -229,9 +280,11 @@ struct ArtistDigView: View {
                     }
 
                     scenes
+                    }
 
                     DeepSectionView(
-                        origin: .artist(profile.name, mbid: profile.mbid)
+                        origin: .artist(profile.name, mbid: profile.mbid),
+                        isReady: hasEnriched
                     ) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
@@ -243,8 +296,24 @@ struct ArtistDigView: View {
         .task(id: artistMBID ?? artistName) {
             readProfile()
             artistScenes = SceneEngine(context: dig.context).scenes(forArtist: artistName)
+
+            // The catalogue first: everything after it needs the artist's own
+            // links, which is where the Bandcamp address comes from.
             await dig.enrichArtist(name: artistName, mbid: artistMBID)
-            await dig.fillMissingReleaseArtwork(forArtist: artistName, mbid: artistMBID)
+            readProfile()
+            hasEnriched = true
+
+            // Then both together. Bandcamp used to be queued behind the
+            // artwork pass — two dozen releases of network — so on a page
+            // anyone left inside ten seconds it simply never ran, which is
+            // why none of it was reaching DIG.
+            async let sleeves: Void = dig.fillMissingReleaseArtwork(
+                forArtist: artistName, mbid: artistMBID
+            )
+            async let bandcamp: Void = dig.enrichBandcamp(forArtist: artistName)
+            _ = await (sleeves, bandcamp)
+
+            readProfile()
             artistScenes = SceneEngine(context: dig.context).scenes(forArtist: artistName)
             await dig.verifyListenable(
                 releaseIDs: dig.artistProfile(name: artistName, mbid: artistMBID)
@@ -254,12 +323,43 @@ struct ArtistDigView: View {
         // Runs once per launch and keeps going for as long as the app is
         // open, filling in the rows nobody has dug into.
         .task { await dig.fillPortraitsInBackground() }
+        // Newly revealed rows get the same treatment the first ones did,
+        // rather than being the only blank part of the page.
+        .task(id: releaseLimit) {
+            guard releaseLimit > 24, let shown = self.profile else { return }
+            warmArtwork(shown)
+            await dig.fillMissingReleaseArtwork(
+                forArtist: artistName, mbid: artistMBID, limit: releaseLimit
+            )
+        }
     }
 
     private func readProfile() {
         let found = dig.artistProfile(name: artistName, mbid: artistMBID)
         profile = found
         lanes = Connections.split(found.related)
+        warmArtwork(found)
+        // The rows on this page go to the front of the portrait queue.
+        dig.wantPortraits(for: found.related.prefix(18).filter { $0.imageURL == nil }.map(\.name))
+    }
+
+    /// Pulls the small cuts down before the tiles ask for them.
+    ///
+    /// A grid that starts every request only as each tile appears fills in
+    /// raggedly; warming the thumbnails first means most of them are already
+    /// in hand. Thumbnails only — the full sleeves are fetched by whichever
+    /// tiles are actually on screen.
+    private func warmArtwork(_ profile: ArtistProfile) {
+        // What is actually near the top of the page. Warming everything
+        // competed with the requests that fill the tiles the listener can
+        // see, which made the grid slower rather than faster.
+        let thumbnails = profile.releases.prefix(releaseLimit)
+            .compactMap { $0.thumbnailURL ?? $0.imageURL }
+            + profile.related.prefix(12).compactMap(\.imageURL)
+        guard !thumbnails.isEmpty else { return }
+        Task.detached(priority: .utility) {
+            await RemoteArtworkStore.shared.prefetch(thumbnails)
+        }
     }
 
     /// The connection lanes, worked out in a single pass.

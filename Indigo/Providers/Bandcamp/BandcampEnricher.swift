@@ -19,6 +19,9 @@ import SwiftData
 nonisolated struct BandcampEnricher {
     let context: ModelContext
     let client: BandcampClient
+    /// Called after each release is stored, so a page can show what has
+    /// arrived rather than waiting for all of it.
+    var onProgress: (() -> Void)?
 
     /// Bandcamp is read a page at a time and each page is a real request, so
     /// an artist's catalogue is walked in a bounded pass rather than
@@ -36,7 +39,9 @@ nonisolated struct BandcampEnricher {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return [] }
         let all = (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? []
-        return all.filter { $0.artistKey == key }
+        // Matched against everyone in the credit, so a collaboration appears
+        // on both artists' pages rather than only the first name's.
+        return all.filter { $0.artistKey == key || $0.artistKeys.contains(key) }
     }
 
     /// The record a track is on, if Bandcamp has already been read for this
@@ -101,8 +106,14 @@ nonisolated struct BandcampEnricher {
             }
             guard let info = try? await client.release(at: url) else { continue }
             stored.append(store(info, fallbackArtist: name))
+            // Saved as each page answers, so nothing is lost if the listener
+            // moves on. But the page is only told about the first one: every
+            // notification rebuilds the graph, and eight rebuilds to fill one
+            // section is the stutter this app has been trying to get rid of.
+            // One early so something appears, and the rest arrive together.
+            try? context.save()
+            if stored.count == 1 { onProgress?() }
         }
-        try? context.save()
         return stored
     }
 
@@ -169,6 +180,7 @@ nonisolated struct BandcampEnricher {
             existing.title = info.title
             existing.artistName = artist
             existing.artistKey = RecordingKey.normalizeArtist(artist)
+            existing.artistKeys = RecordingKey.creditedArtists(artist)
             existing.labelName = info.labelName
             existing.year = info.year
             existing.imageURLString = info.imageURL?.absoluteString

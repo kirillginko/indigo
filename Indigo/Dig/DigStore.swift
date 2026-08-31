@@ -215,7 +215,15 @@ final class DigStore {
     /// Deliberately unhurried. Nobody is waiting on this — the page is
     /// already usable, and a picture that arrives a minute later is still a
     /// picture.
-    func fillPortraitsInBackground(spacing: Duration = .seconds(3)) async {
+    /// Names the page currently open would like pictures for, so the fill
+    /// works on what the listener can see before it works on the rest.
+    @ObservationIgnored private var portraitPriority: [String] = []
+
+    func wantPortraits(for names: [String]) {
+        portraitPriority = names.filter { ArtistName.isRealArtist($0) }
+    }
+
+    func fillPortraitsInBackground(spacing: Duration = .milliseconds(1500)) async {
         guard !portraitFillStarted, discogsClient.isConfigured else { return }
         portraitFillStarted = true
 
@@ -272,6 +280,18 @@ final class DigStore {
             uniquingKeysWith: { first, _ in first }
         )
 
+        func wanted(_ name: String) -> Bool {
+            let key = RecordingKey.normalizeArtist(name)
+            guard !key.isEmpty, !dug.contains(key) else { return false }
+            if let attempt = looked[key], !attempt.isWorthRetrying { return false }
+            return true
+        }
+
+        // Whatever is on screen first. A picture that arrives for somebody the
+        // listener is looking at is worth more than one for a name three pages
+        // back.
+        if let onScreen = portraitPriority.first(where: wanted) { return onScreen }
+
         var seen = Set<String>()
         for artist in artists {
             let named = artist.labelNeighbourNames + artist.styleNeighbourNames
@@ -285,6 +305,26 @@ final class DigStore {
             }
         }
         return nil
+    }
+
+    /// Reads an artist's Bandcamp, when their catalogue entry gives an
+    /// address for it.
+    ///
+    /// Nothing here searches Bandcamp — their robots.txt forbids it — so an
+    /// artist whose Discogs entry names no Bandcamp simply has none as far as
+    /// Indigo is concerned.
+    func enrichBandcamp(forArtist name: String, limit: Int = 8) async {
+        guard let page = discogsEnricher.cachedArtist(named: name)?.bandcampURL else { return }
+        var enricher = BandcampEnricher(context: context)
+        enricher.onProgress = { [weak self] in
+            guard let self else { return }
+            self.revision &+= 1
+        }
+        guard let found = try? await enricher.enrich(artist: name, page: page, limit: limit),
+              !found.isEmpty
+        else { return }
+        try? context.save()
+        revision &+= 1
     }
 
     /// Asks whether each recording can actually be played, and remembers the
@@ -571,7 +611,7 @@ final class DigStore {
            let page = discogsEnricher.cachedArtist(named: artistName)?.bandcampURL,
            let release = await BandcampEnricher(context: context)
                .findRelease(containing: initialTitle, byArtist: artistName, page: page) {
-            cover = cover ?? release.imageURL
+            cover = cover ?? BandcampImage.sized(release.imageURL, BandcampImage.cover)
             if metadata.releaseTitle == nil { metadata.releaseTitle = release.title }
             if metadata.labelName == nil { metadata.labelName = release.labelName }
             if metadata.releaseDate == nil { metadata.releaseDate = release.year }
@@ -741,7 +781,12 @@ final class DigStore {
     func releaseDetail(for recording: Recording) -> (line: String?, artwork: URL?) {
         let _ = revision
         guard let metadata = engine.metadata(for: recording.id) else { return (nil, nil) }
-        return (metadata.releaseLine, metadata.artworkURL)
+        // Falls through to the shared ladder, so a track whose album Indigo
+        // pictures elsewhere is not blank here.
+        let artwork = metadata.artworkURL ?? metadata.releaseTitle.flatMap {
+            DigArtwork(context: context).release(title: $0, artist: recording.artistName).full
+        }
+        return (metadata.releaseLine, artwork)
     }
 
     /// Reads apart every crated radio credit that was kept as one string.

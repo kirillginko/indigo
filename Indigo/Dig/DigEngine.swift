@@ -26,7 +26,22 @@ nonisolated struct ArtistProfile: Sendable {
     let styles: [String]
     let aliases: [String]
     let discogsURL: URL?
+    /// What this artist put out on Bandcamp, with the player each one
+    /// advertises. Often the only record of music that is nowhere else.
+    let bandcamp: [BandcampLine]
     let releases: [ReleaseLine]
+
+    nonisolated struct BandcampLine: Identifiable, Hashable, Sendable {
+        let title: String
+        let year: String?
+        let label: String?
+        let pageURL: URL
+        let imageURL: URL?
+        /// The small cut, which arrives at once and stands in while the other
+        /// loads.
+        let thumbnailURL: URL?
+        var id: String { pageURL.absoluteString }
+    }
     let labels: [LabelRef]
     let related: [RelatedArtist]
     let libraryTrackCount: Int
@@ -43,7 +58,14 @@ nonisolated struct ArtistProfile: Sendable {
         let imageURL: URL?
         let thumbnailURL: URL?
         let label: String?
-        var id: String { discogsID.map { "discogs:\($0)" } ?? "\(title)|\(year ?? "")" }
+        /// Identity is the record, not what is currently known about it.
+        ///
+        /// This used to include the year and the Discogs id, both of which
+        /// arrive partway through enrichment — so a row's identity changed
+        /// under it, and the list treated the same record as one row vanishing
+        /// and a different one appearing further down. Which is exactly what
+        /// it looked like.
+        var id: String { "release:\(RecordingKey.normalizeTitle(title))" }
     }
 
     nonisolated struct LabelRef: Identifiable, Hashable, Sendable {
@@ -64,7 +86,7 @@ nonisolated struct ArtistProfile: Sendable {
         ArtistProfile(
             name: name, mbid: mbid, origin: nil, disambiguation: nil, realName: nil,
             biography: nil, imageURL: nil, genres: [], styles: [], aliases: [],
-            discogsURL: nil, releases: [], labels: [], related: [],
+            discogsURL: nil, bandcamp: [], releases: [], labels: [], related: [],
             libraryTrackCount: 0, crateCount: 0, radioAppearances: [], listen: []
         )
     }
@@ -150,13 +172,26 @@ nonisolated struct DigEngine {
         let byArtist = recordings(byArtist: name)
         let entries = byArtist.compactMap { metadata(for: $0.id) }
 
+        // Bandcamp is a first-class source here, not a postscript. A great
+        // deal of this music is on it and in no catalogue at all, so its tags
+        // and its imprints belong beside the ones Discogs knows.
+        let bandcampReleases = BandcampEnricher(context: context).cachedReleases(forArtist: name)
+        let places = PlaceIndex(context: context)
+        let bandcampTags = bandcampReleases
+            .flatMap { places.split(keywords: $0.keywords).tags }
+        let bandcampLabels = bandcampReleases.compactMap(\.labelName)
+        let bandcampByTitle = Dictionary(
+            bandcampReleases.map { (Self.releaseKey($0.title), $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
         // Labels come from what this artist's music actually came out on.
         var labelNames: [String: String?] = [:]
         for entry in entries {
             guard let labelName = entry.labelName else { continue }
             labelNames[labelName] = entry.labelMBID
         }
-        for label in discogs?.labelNames ?? [] where labelNames[label] == nil {
+        for label in (discogs?.labelNames ?? []) + bandcampLabels where labelNames[label] == nil {
             // Assigning nil into a dictionary whose values are themselves
             // optional removes the key. `updateValue` is what actually stores
             // "known label, unknown MBID" — the ordinary case for anything
@@ -191,32 +226,120 @@ nonisolated struct DigEngine {
             // somebody clicks it.
             let resolved = identifier.flatMap { resolvedByID[$0] }
                 ?? resolvedByTitle[Self.releaseKey(title)]
+            // The artist's own Bandcamp often has a sleeve for a record
+            // Discogs pictures with nothing. It is already cached, so this
+            // costs no request at all — which is the fastest an image gets.
+            let fromBandcamp = bandcampByTitle[Self.releaseKey(title)]
             return ArtistProfile.ReleaseLine(
                 title: title,
-                year: index < (discogs?.releaseYears.count ?? 0) ? discogs?.releaseYears[index] : nil,
+                // `.nonEmpty`, because the listing stores a blank string
+                // rather than nothing — and a blank is not a year. Left as-is
+                // it wins the merge against a real one.
+                year: index < (discogs?.releaseYears.count ?? 0)
+                    ? discogs?.releaseYears[index].nonEmpty : nil,
                 discogsID: identifier,
                 imageURL: (index < (discogs?.releaseImageURLStrings.count ?? 0)
-                    ? discogs?.releaseImageURLStrings[index].nonEmptyURL : nil) ?? resolved?.imageURL,
-                thumbnailURL: index < (discogs?.releaseThumbnailURLStrings.count ?? 0)
-                    ? discogs?.releaseThumbnailURLStrings[index].nonEmptyURL : nil,
+                    ? discogs?.releaseImageURLStrings[index].nonEmptyURL : nil)
+                    ?? resolved?.imageURL
+                    ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.cover),
+                thumbnailURL: (index < (discogs?.releaseThumbnailURLStrings.count ?? 0)
+                    ? discogs?.releaseThumbnailURLStrings[index].nonEmptyURL : nil)
+                    ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.thumbnail),
                 label: (index < (discogs?.releaseLabels.count ?? 0)
                     ? discogs?.releaseLabels[index].nonEmpty : nil) ?? resolved?.labelNames.first
             )
         }
         let mbReleases = (cached?.releases ?? []).map {
             let resolved = resolvedByTitle[Self.releaseKey($0.title)]
+            // The same Bandcamp fallback the Discogs rows get. A record that
+            // MusicBrainz lists and nobody pictures is exactly the one whose
+            // sleeve is sitting in the Bandcamp cache already.
+            let fromBandcamp = bandcampByTitle[Self.releaseKey($0.title)]
             return ArtistProfile.ReleaseLine(
                 title: $0.title, year: $0.year, discogsID: resolved?.discogsID,
-                imageURL: resolved?.imageURL, thumbnailURL: nil,
-                label: resolved?.labelNames.first
+                imageURL: resolved?.imageURL
+                    ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.cover),
+                thumbnailURL: BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.thumbnail),
+                label: resolved?.labelNames.first ?? fromBandcamp?.labelName
             )
         }
-        // Discogs rows are navigable and carry sleeves, so they always win a
-        // title collision with MusicBrainz's text-only catalogue entry.
-        var releaseTitles = Set<String>()
-        let releases = (discogsReleases + mbReleases).filter {
-            releaseTitles.insert(Self.releaseKey($0.title)).inserted
+        // Records Indigo has already resolved for this artist, whether or not
+        // their catalogue listing mentions them.
+        //
+        // A Discogs artist entry can name no releases at all while the app
+        // holds a dozen of their records — pulled in one at a time by crated
+        // tracks and cover lookups. Building the discography only from the
+        // listing threw all of those away, so a page could show twenty-five
+        // things to listen to and no records to show for them.
+        let resolvedLines = resolvedReleases.map { record in
+            ArtistProfile.ReleaseLine(
+                title: record.title,
+                year: record.year.map(String.init),
+                discogsID: record.discogsID,
+                imageURL: record.imageURL,
+                thumbnailURL: nil,
+                label: record.labelNames.first { LabelName.isRealLabel($0) }
+            )
         }
+
+        // Records only the artist published, folded into the same list.
+        //
+        // A discography is a discography. Keeping Bandcamp apart implied its
+        // records were a lesser kind of thing, when for a lot of this music it
+        // is the only place the work exists at all — so they take their place
+        // in the run by title, and only the ones no catalogue already covers
+        // are added.
+        let bandcampOnly = bandcampReleases.map { release in
+            ArtistProfile.ReleaseLine(
+                title: release.title,
+                year: release.year,
+                discogsID: nil,
+                imageURL: BandcampImage.sized(release.imageURL, BandcampImage.cover),
+                thumbnailURL: BandcampImage.sized(release.imageURL, BandcampImage.thumbnail),
+                label: release.labelName
+            )
+        }
+
+        // Discogs rows are navigable and carry sleeves, so they always win a
+        // title collision with MusicBrainz's text-only catalogue entry; both
+        // outrank a Bandcamp row for the same record, which is last only
+        // because the others can be dug into further.
+        // Merged, not first-past-the-post.
+        //
+        // The same record arrives from the artist listing, the resolved
+        // release cache, MusicBrainz and Bandcamp, and each knows different
+        // things about it — the listing often has the title and nothing else
+        // while the resolved record has the sleeve. Keeping whichever arrived
+        // first threw the picture away, which is why a tile could be blank
+        // here and full on the record's own page.
+        var merged: [String: ArtistProfile.ReleaseLine] = [:]
+        var order: [String] = []
+        for line in discogsReleases + mbReleases + resolvedLines + bandcampOnly {
+            let key = Self.releaseKey(line.title)
+            guard let existing = merged[key] else {
+                merged[key] = line
+                order.append(key)
+                continue
+            }
+            // Whichever half actually says something. A blank string is not
+            // an answer, and letting one win means a record shows no year
+            // because the first source to mention it left the field empty.
+            merged[key] = ArtistProfile.ReleaseLine(
+                title: existing.title,
+                year: existing.year?.nonEmpty ?? line.year?.nonEmpty,
+                discogsID: existing.discogsID ?? line.discogsID,
+                imageURL: existing.imageURL ?? line.imageURL,
+                thumbnailURL: existing.thumbnailURL ?? line.thumbnailURL,
+                label: existing.label?.nonEmpty ?? line.label?.nonEmpty
+            )
+        }
+        let releases = order.compactMap { merged[$0] }
+            .sorted { lhs, rhs in
+                let left = Int(lhs.year?.prefix(4) ?? "") ?? 0
+                let right = Int(rhs.year?.prefix(4) ?? "") ?? 0
+                if left != right { return left > right }
+                return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            }
 
         return ArtistProfile(
             name: discogs?.name ?? cached?.name ?? name,
@@ -226,10 +349,18 @@ nonisolated struct DigEngine {
             realName: discogs?.realName,
             biography: discogs?.biography.map(DiscogsEnricher.cleanProfile),
             imageURL: discogs?.imageURL,
-            genres: discogs?.genres ?? cached?.genreTags ?? [],
+            genres: Self.merged(discogs?.genres ?? cached?.genreTags ?? [], with: bandcampTags),
             styles: discogs?.styles ?? [],
             aliases: discogs?.aliasNames ?? [],
             discogsURL: discogs?.profileURL,
+            bandcamp: bandcampReleases.map {
+                ArtistProfile.BandcampLine(
+                    title: $0.title, year: $0.year, label: $0.labelName,
+                    pageURL: URL(string: $0.urlString) ?? URL(string: "https://bandcamp.com")!,
+                    imageURL: BandcampImage.sized($0.imageURL, BandcampImage.cover),
+                    thumbnailURL: BandcampImage.sized($0.imageURL, BandcampImage.thumbnail)
+                )
+            },
             releases: releases,
             labels: labels,
             related: relatedArtists(to: name),
@@ -250,6 +381,14 @@ nonisolated struct DigEngine {
             .flatMap(\.videos)
             .filter { seen.insert($0.url.absoluteString).inserted }
             .map { DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds) }
+    }
+
+    /// Tags from two sources, without repeating what either already said.
+    private static func merged(_ first: [String], with second: [String]) -> [String] {
+        var seen = Set<String>()
+        return (first + second).filter {
+            !$0.isEmpty && seen.insert(RecordingKey.normalize($0)).inserted
+        }
     }
 
     private static func releaseKey(_ title: String) -> String {
@@ -277,10 +416,15 @@ nonisolated struct DigEngine {
                 relatedByName[peer.name] = peer
             }
         }
+        // The same ladder every other surface uses, so a record does not have
+        // a sleeve in the grid and a blank square on its own page.
+        let artwork = DigArtwork(context: context).release(
+            title: record.title, artist: record.artistNames.first { ArtistName.isRealArtist($0) }
+        )
         return DigReleaseProfile(
             id: id, title: record.title, year: record.year, artists: record.artistNames,
             labels: labels, genres: record.genres, styles: record.styles,
-            imageURL: record.imageURL, tracks: tracks, notes: record.notes,
+            imageURL: record.imageURL ?? artwork.full, tracks: tracks, notes: record.notes,
             sourceURL: record.profileURL,
             listen: record.videos.map {
                 DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds)

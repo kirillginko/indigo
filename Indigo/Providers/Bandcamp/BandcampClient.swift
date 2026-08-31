@@ -103,6 +103,26 @@ nonisolated struct BandcampClient: Sendable {
         return block.isEmpty ? nil : block
     }
 
+    /// The player the page advertises for itself.
+    ///
+    /// Read from `og:video`, which is the tag's purpose — Bandcamp is stating
+    /// how it wants to be embedded. Only their own address is accepted, so a
+    /// page that advertised something else could not talk this app into
+    /// loading it.
+    static func embedURL(in html: String) -> URL? {
+        guard let range = html.range(of: "property=\"og:video\"") else { return nil }
+        let rest = html[range.upperBound...]
+        guard let start = rest.range(of: "content=\""),
+              let end = rest[start.upperBound...].firstIndex(of: "\"")
+        else { return nil }
+        let address = String(rest[start.upperBound..<end])
+        guard let url = URL(string: address),
+              url.host()?.lowercased() == "bandcamp.com",
+              url.path().hasPrefix("/EmbeddedPlayer")
+        else { return nil }
+        return url
+    }
+
     static func origin(of url: URL) -> String {
         guard let scheme = url.scheme, let host = url.host() else { return "" }
         return "\(scheme)://\(host)"

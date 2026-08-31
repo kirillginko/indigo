@@ -17,6 +17,9 @@ extension CrateService {
     /// honest thing to crate is the show, which is also what the listener
     /// means by "save this" while a DJ set is on.
     func isCrated(nowPlaying item: MediaItem, liveShow: RadioShow? = nil) -> Bool {
+        if item.kind == .track, item.embedProvider != nil {
+            return isCrated(listening: item.playbackURL)
+        }
         if item.kind == .track, let recording = existingRecording(forLocalPath: item.id) {
             return contains(recording: recording)
         }
@@ -25,6 +28,20 @@ extension CrateService {
 
     func toggle(nowPlaying item: MediaItem, liveShow: RadioShow? = nil) {
         if item.kind == .track {
+            // A track playing through somebody's player is not a file, and
+            // looking it up by path finds nothing — which is why the button
+            // did nothing at all for anything played out of DIG.
+            if let provider = item.embedProvider {
+                toggle(
+                    listening: item.playbackURL,
+                    title: item.title,
+                    artist: item.subtitle,
+                    release: item.detail,
+                    artworkURL: item.remoteArtworkURL,
+                    provider: provider
+                )
+                return
+            }
             toggleLocalTrack(item)
             return
         }
