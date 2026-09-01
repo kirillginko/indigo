@@ -620,13 +620,21 @@ struct WorkingBar: View {
                 .fill(Palette.ink)
                 .frame(width: width * 0.28, height: 2)
                 .offset(x: sweeping ? travel : 0)
-                .animation(
-                    .easeInOut(duration: period / 2).repeatForever(autoreverses: true),
-                    value: sweeping
-                )
         }
         .frame(width: width, height: 2, alignment: .leading)
-        .onAppear { sweeping = true }
+        // Started explicitly, a beat after the view exists.
+        //
+        // An implicit `.animation(value:)` driven from `onAppear` sets the
+        // value in the same pass that creates the view, and SwiftUI has
+        // nothing to animate from — so the bar simply sat still, which reads
+        // as the app being stuck rather than busy.
+        .task {
+            guard !sweeping else { return }
+            try? await Task.sleep(for: .milliseconds(30))
+            withAnimation(.easeInOut(duration: period / 2).repeatForever(autoreverses: true)) {
+                sweeping = true
+            }
+        }
         .accessibilityLabel("Loading")
     }
 }

@@ -83,11 +83,18 @@ struct CrateView: View {
                                     // ways it could be played, on every redraw.
                                     let playable = resolved[item.id]
                                     let current = isCurrent(playable)
+                                    // Playable until proven otherwise. The map
+                                    // is filled a moment after the list draws,
+                                    // and a row that says it cannot be played
+                                    // while we are still working it out is
+                                    // worse than one that finds out on press —
+                                    // which `play` does anyway.
+                                    let canPlay = playable != nil || !hasResolved
                                     CrateRow(
                                         item: item,
                                         localArtworkKey: localTrack?.artworkKey,
                                         genres: itemGenres(item),
-                                        canPlay: playable != nil,
+                                        canPlay: canPlay,
                                         isCurrent: current,
                                         isPlaying: current && player.isPlaying,
                                         digDestination: destinations[item.id],
@@ -169,6 +176,7 @@ struct CrateView: View {
     /// rather than while it is being drawn.
     @State private var resolved: [UUID: AudioSource] = [:]
     @State private var destinations: [UUID: DetailPage] = [:]
+    @State private var hasResolved = false
 
     private func readRows() {
         var sources: [UUID: AudioSource] = [:]
@@ -181,6 +189,7 @@ struct CrateView: View {
         }
         resolved = sources
         destinations = pages
+        hasResolved = true
     }
 
     private func isCurrent(_ source: AudioSource?) -> Bool {

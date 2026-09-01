@@ -18,7 +18,17 @@ nonisolated struct StreamingLinkSource {
     let context: ModelContext
 
     func sources(for recording: Recording) -> [AudioSource] {
-        recording.sources
+        // The sleeve the recording already has. Without it a kept track plays
+        // with an empty square in the player bar, which is the one picture the
+        // listener always has in front of them.
+        let identifier = recording.id
+        var descriptor = FetchDescriptor<RecordingMetadata>(
+            predicate: #Predicate { $0.recordingID == identifier }
+        )
+        descriptor.fetchLimit = 1
+        let artwork = (try? context.fetch(descriptor))?.first?.artworkURL
+
+        return recording.sources
             .filter { $0.kind == .streamingLink }
             .compactMap { link -> AudioSource? in
                 guard let url = URL(string: link.identifier),
@@ -33,6 +43,7 @@ nonisolated struct StreamingLinkSource {
                         title: recording.displayTitle,
                         subtitle: recording.displayArtist,
                         detail: provider.displayName,
+                        remoteArtworkURL: artwork,
                         playbackURL: url,
                         embedProvider: provider
                     )),

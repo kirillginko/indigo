@@ -113,3 +113,59 @@ final class ListeningCrateTests: XCTestCase {
         XCTAssertEqual(((try? context.fetch(FetchDescriptor<Recording>())) ?? []).count, 1)
     }
 }
+
+/// The player bar is the one picture the listener always has in front of
+/// them, so whatever is playing has to bring its sleeve with it.
+@MainActor
+final class KeptTrackArtworkTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+    private var crate: CrateService!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+        crate = CrateService(context: context)
+    }
+
+    override func tearDown() {
+        crate = nil
+        context = nil
+        container = nil
+    }
+
+    func testAKeptTrackCarriesItsSleeveIntoThePlayer() throws {
+        let link = try XCTUnwrap(URL(string: "https://www.youtube.com/watch?v=irfj8pQwhno"))
+        let recording = try XCTUnwrap(crate.toggle(
+            listening: link, title: "Rev8617", artist: "Skee Mask", release: "Compro"
+        ))
+
+        let metadata = RecordingMetadata(recordingID: recording.id)
+        metadata.releaseTitle = "Compro"
+        metadata.artworkURLString = "https://img.test/compro.jpg"
+        context.insert(metadata)
+
+        let source = try XCTUnwrap(SourceResolver(context: context).best(recording))
+        guard case .play(let item) = source.action else {
+            return XCTFail("A kept link should play")
+        }
+        XCTAssertEqual(item.remoteArtworkURL?.absoluteString, "https://img.test/compro.jpg")
+        XCTAssertEqual(item.title, "Rev8617")
+    }
+
+    /// No sleeve found is not a failure — it just plays without one.
+    func testATrackWithNoSleeveStillPlays() throws {
+        let link = try XCTUnwrap(URL(string: "https://www.youtube.com/watch?v=aaaaaaaaaaa"))
+        let recording = try XCTUnwrap(crate.toggle(
+            listening: link, title: "Untitled", artist: "Nobody"
+        ))
+
+        let source = try XCTUnwrap(SourceResolver(context: context).best(recording))
+        guard case .play(let item) = source.action else {
+            return XCTFail("A kept link should play")
+        }
+        XCTAssertNil(item.remoteArtworkURL)
+        XCTAssertEqual(item.embedProvider, .youtube)
+    }
+}
