@@ -77,14 +77,20 @@ struct CrateView: View {
                             Section {
                                 ForEach(day.items) { item in
                                     let localTrack = localTrack(for: item)
+                                    // Worked out once. Every one of these used
+                                    // to resolve the row's source again — three
+                                    // times per row, each a fresh walk of the
+                                    // ways it could be played, on every redraw.
+                                    let playable = resolved[item.id]
+                                    let current = isCurrent(playable)
                                     CrateRow(
                                         item: item,
                                         localArtworkKey: localTrack?.artworkKey,
                                         genres: itemGenres(item),
-                                        canPlay: source(for: item) != nil,
-                                        isCurrent: isCurrent(item),
-                                        isPlaying: isCurrent(item) && player.isPlaying,
-                                        digDestination: item.recording.flatMap { dig.destination(for: $0) },
+                                        canPlay: playable != nil,
+                                        isCurrent: current,
+                                        isPlaying: current && player.isPlaying,
+                                        digDestination: destinations[item.id],
                                         open: { open(item) },
                                         play: { play(item) },
                                         dig: { page in appState.open(page) },
@@ -102,6 +108,8 @@ struct CrateView: View {
                 .scrollIndicators(.visible)
             }
         }
+        .task(id: crate.revision) { readRows() }
+        .task(id: dig.revision) { readRows() }
         .task {
             // Needs no network, so it runs before anything that waits on one:
             // this is what restores the artist — and the DIG button — on rows
@@ -155,8 +163,28 @@ struct CrateView: View {
         return SourceResolver(context: crate.context).best(recording)
     }
 
-    private func isCurrent(_ item: CrateItem) -> Bool {
-        guard case .play(let media) = source(for: item)?.action else { return false }
+    /// Where each row can be played from, and where its DIG button goes.
+    ///
+    /// Both read the store, so they are worked out when the crate changes
+    /// rather than while it is being drawn.
+    @State private var resolved: [UUID: AudioSource] = [:]
+    @State private var destinations: [UUID: DetailPage] = [:]
+
+    private func readRows() {
+        var sources: [UUID: AudioSource] = [:]
+        var pages: [UUID: DetailPage] = [:]
+        for item in crate.items() {
+            if let found = source(for: item) { sources[item.id] = found }
+            if let recording = item.recording, let page = dig.destination(for: recording) {
+                pages[item.id] = page
+            }
+        }
+        resolved = sources
+        destinations = pages
+    }
+
+    private func isCurrent(_ source: AudioSource?) -> Bool {
+        guard case .play(let media) = source?.action else { return false }
         return player.isCurrent(media.id)
     }
 

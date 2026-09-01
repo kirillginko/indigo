@@ -311,7 +311,13 @@ struct ArtistDigView: View {
             // Bandcamp alongside doubled the request stream while somebody was
             // trying to read the page, and every batch that landed invalidated
             // what they were looking at.
-            await dig.fillMissingReleaseArtwork(forArtist: artistName, mbid: artistMBID)
+            // Only what is above the fold to begin with. Two dozen releases
+            // is up to four dozen requests before anything else on the page
+            // gets a turn, for tiles most people never scroll to — and the
+            // rest are fetched on demand when "More releases" reveals them.
+            await dig.fillMissingReleaseArtwork(
+                forArtist: artistName, mbid: artistMBID, limit: 12
+            )
             await readProfile()
             artistScenes = await dig.scenes(forArtist: artistName)
             surfaceDescent = await dig.descent(
