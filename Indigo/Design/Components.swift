@@ -597,43 +597,42 @@ nonisolated extension Array {
 /// the rules and the progress track, and it says the one thing a label was
 /// being used to say. Text asks to be read; this doesn't.
 ///
-/// Animated by Core Animation rather than by `TimelineView`.
-///
-/// A timeline on the `.animation` schedule asks SwiftUI to re-evaluate this
-/// view every single frame for as long as it is on screen — main-thread work
-/// competing with a scroll. A repeating animation on one offset is handed to
-/// the render server and costs the main thread nothing once started.
+/// A sweeping bar rather than a spinner: it belongs to the same drawing as
+/// the rules and the progress track, and it says the one thing a label was
+/// being used to say. Text asks to be read; this doesn't.
 struct WorkingBar: View {
     var width: CGFloat = 120
     /// One sweep, in seconds.
     var period: Double = 1.1
 
-    @State private var sweeping = false
-
     var body: some View {
-        let travel = width * 0.72
-        ZStack(alignment: .leading) {
-            Rectangle()
-                .fill(Palette.outline)
-                .frame(width: width, height: Metrics.hairline)
-            Rectangle()
-                .fill(Palette.ink)
-                .frame(width: width * 0.28, height: 2)
-                .offset(x: sweeping ? travel : 0)
-        }
-        .frame(width: width, height: 2, alignment: .leading)
-        // Started explicitly, a beat after the view exists.
+        // Driven by the clock, not by state.
         //
-        // An implicit `.animation(value:)` driven from `onAppear` sets the
-        // value in the same pass that creates the view, and SwiftUI has
-        // nothing to animate from — so the bar simply sat still, which reads
-        // as the app being stuck rather than busy.
-        .task {
-            guard !sweeping else { return }
-            try? await Task.sleep(for: .milliseconds(30))
-            withAnimation(.easeInOut(duration: period / 2).repeatForever(autoreverses: true)) {
-                sweeping = true
+        // A `repeatForever` animation is the cheaper way to do this, and it
+        // does not survive here: these bars live on pages that re-render
+        // whenever enrichment writes, and every re-render restarts the
+        // animation from nothing — so it sat still and read as the app being
+        // stuck. A timeline cannot be interrupted that way.
+        //
+        // Thirty a second rather than every frame, and only this view is
+        // re-evaluated: enough to read as motion, little enough not to be felt
+        // against a scroll.
+        TimelineView(.periodic(from: .now, by: 1.0 / 30.0)) { context in
+            let phase = context.date.timeIntervalSinceReferenceDate
+                .truncatingRemainder(dividingBy: period) / period
+            // Eased at both ends, so it reads as a sweep rather than a loop.
+            let eased = (1 - cos(phase * 2 * .pi)) / 2
+
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .fill(Palette.outline)
+                    .frame(width: width, height: Metrics.hairline)
+                Rectangle()
+                    .fill(Palette.ink)
+                    .frame(width: width * 0.28, height: 2)
+                    .offset(x: width * 0.72 * eased)
             }
+            .frame(width: width, height: 2, alignment: .leading)
         }
         .accessibilityLabel("Loading")
     }

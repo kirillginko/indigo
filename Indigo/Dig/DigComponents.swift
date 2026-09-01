@@ -400,3 +400,74 @@ struct ListenRow: View {
         .padding(.vertical, 8)
     }
 }
+
+/// The shape of a page that has not arrived yet.
+///
+/// An empty pane with a bar in the middle tells the listener nothing about
+/// where they are or what is coming. Drawing the page's own furniture — the
+/// sleeve, the tallies, a run of tiles — says "this is an artist, their
+/// records are on their way", and means nothing jumps when the real thing
+/// lands in the same shape.
+struct DigSkeleton: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 26) {
+            HStack(alignment: .top, spacing: 26) {
+                Rectangle()
+                    .fill(Palette.placeholder)
+                    .frame(width: 220, height: 220)
+                    .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack(alignment: .top, spacing: 26) {
+                        ForEach(["Your library", "Your crate", "Radio"], id: \.self) { label in
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(label)
+                                    .microLabel(1.4, size: 9)
+                                    .foregroundStyle(Palette.inkFaint)
+                                Bone(width: 22, height: 15)
+                            }
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    WorkingBar()
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            DigSection(title: "Browse releases") {
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 18, alignment: .top)],
+                    alignment: .leading, spacing: 22
+                ) {
+                    ForEach(0..<5, id: \.self) { _ in
+                        VStack(alignment: .leading, spacing: 9) {
+                            Rectangle()
+                                .fill(Palette.placeholder)
+                                .aspectRatio(1, contentMode: .fit)
+                                .overlay(Rectangle().strokeBorder(
+                                    Palette.outline, lineWidth: Metrics.hairline
+                                ))
+                            Bone(width: 96, height: 11)
+                            Bone(width: 62, height: 9)
+                        }
+                    }
+                }
+                .padding(.top, 14)
+            }
+        }
+        .accessibilityLabel("Loading artist")
+    }
+}
+
+/// A stand-in for a line of text that has not arrived.
+private struct Bone: View {
+    let width: CGFloat
+    let height: CGFloat
+
+    var body: some View {
+        Rectangle()
+            .fill(Palette.placeholder)
+            .frame(width: width, height: height)
+    }
+}

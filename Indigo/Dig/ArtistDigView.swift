@@ -90,7 +90,7 @@ struct ArtistDigView: View {
                     // had found nothing, and then fill in — which reads as a
                     // failure followed by a correction rather than as loading.
                     if isWaiting(profile) {
-                        WorkingPane()
+                        DigSkeleton()
                     } else {
                     if dig.isEnriching { WorkingBar() }
                     HStack(alignment: .top, spacing: 26) {
