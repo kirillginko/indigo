@@ -15,7 +15,29 @@ import SwiftData
 final class DigStore {
     private(set) var isEnriching = false
     /// Bumped when enrichment writes, so profiles are re-read.
+    ///
+    /// This is expensive by design: reading a profile again means walking the
+    /// graph and re-reading the catalogue. Only write to it when what a page
+    /// *says* has changed.
     private(set) var revision = 0
+
+    /// Bumped when a picture arrives and nothing else has changed.
+    ///
+    /// Kept apart from `revision` because a thumbnail turning up for one row
+    /// is not a reason to rebuild an artist's graph. The background fill runs
+    /// for as long as the app is open; on the shared counter it was asking
+    /// every visible page to rebuild itself every second or two, which is
+    /// what made scrolling catch.
+    private(set) var artworkRevision = 0
+
+    /// Portraits found by the background fill, by normalised name. Held in
+    /// memory so a row can resolve one without a fetch of its own.
+    private(set) var portraits: [String: URL] = [:]
+
+    func portraitURL(for name: String) -> URL? {
+        let _ = artworkRevision
+        return portraits[RecordingKey.normalizeArtist(name)]
+    }
     var notice: String?
     private(set) var discogsLabelProfiles: [String: DiscogsLabelProfile] = [:
     ]
@@ -287,6 +309,11 @@ final class DigStore {
 
         // Let the page the listener is actually looking at finish first.
         try? await Task.sleep(for: .seconds(4))
+        portraits = Dictionary(
+            ((try? context.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
+                .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
+            uniquingKeysWith: { first, _ in first }
+        )
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -294,7 +321,7 @@ final class DigStore {
 
         while !Task.isCancelled {
             guard let next = nextPortraitNeeded() else {
-                if quiet > 0 { revision &+= 1 }
+                if quiet > 0 { artworkRevision &+= 1 }
                 return
             }
             // Consumed above, so the flag is set there instead.
@@ -334,10 +361,13 @@ final class DigStore {
             // looking at is worth that immediately; the rest arrive in
             // batches, which is invisible for filling in pictures and four
             // times less work.
+            // Only the picture counter. Rows watching it redraw and pick the
+            // new address out of `portraits`; nothing is rebuilt.
+            if let found { portraits[record.nameKey] = URL(string: found) }
             quiet += 1
             if wasOnScreen || quiet >= 5 {
                 quiet = 0
-                revision &+= 1
+                artworkRevision &+= 1
             }
 
             try? await Task.sleep(for: spacing)

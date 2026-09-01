@@ -165,3 +165,56 @@ final class PortraitFillLifecycleTests: XCTestCase {
         XCTAssertFalse(ArtistName.isRealArtist("Various"))
     }
 }
+
+/// A picture arriving is not a reason to rebuild anybody's graph.
+@MainActor
+final class PortraitInvalidationTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The two counters mean different things, and the expensive one must not
+    /// move when only a thumbnail has changed. The background fill runs for as
+    /// long as the app is open — on the shared counter it asked every visible
+    /// page to rebuild itself every second or two, which is what made
+    /// scrolling catch.
+    func testAThumbnailDoesNotInvalidateAProfile() async throws {
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Skee Mask"),
+                                   discogsID: 1, name: "Skee Mask")
+        artist.labelNames = ["Ilian Tape"]
+        context.insert(artist)
+        try context.save()
+
+        let dig = DigStore(context: context)
+        _ = await dig.artistProfile(name: "Skee Mask", mbid: nil)
+        let settled = dig.revision
+
+        // What the drip does when a picture lands.
+        let portrait = ArtistPortrait(nameKey: RecordingKey.normalizeArtist("Stenny"), name: "Stenny")
+        portrait.imageURLString = "https://img.test/stenny.jpg"
+        context.insert(portrait)
+        try context.save()
+
+        XCTAssertEqual(dig.revision, settled,
+                       "The counter that rebuilds pages must not move for a picture")
+        XCTAssertNotNil(dig.cachedArtistProfile(name: "Skee Mask", mbid: nil),
+                        "So the page it was showing is still good")
+    }
+
+    /// And the picture still has to reach the row, by the cheap route.
+    func testAPictureStillReachesTheRow() throws {
+        let dig = DigStore(context: context)
+        XCTAssertNil(dig.portraitURL(for: "Stenny"))
+        XCTAssertNil(dig.portraitURL(for: "Various"), "Never a placeholder")
+    }
+}

@@ -307,16 +307,11 @@ struct ArtistDigView: View {
             await readProfile()
             hasEnriched = true
 
-            // Then both together. Bandcamp used to be queued behind the
-            // artwork pass — two dozen releases of network — so on a page
-            // anyone left inside ten seconds it simply never ran, which is
-            // why none of it was reaching DIG.
-            async let sleeves: Void = dig.fillMissingReleaseArtwork(
-                forArtist: artistName, mbid: artistMBID
-            )
-            async let bandcamp: Void = dig.enrichBandcamp(forArtist: artistName)
-            _ = await (sleeves, bandcamp)
-
+            // The sleeves the page is showing, and nothing else yet. Running
+            // Bandcamp alongside doubled the request stream while somebody was
+            // trying to read the page, and every batch that landed invalidated
+            // what they were looking at.
+            await dig.fillMissingReleaseArtwork(forArtist: artistName, mbid: artistMBID)
             await readProfile()
             artistScenes = await dig.scenes(forArtist: artistName)
             surfaceDescent = await dig.descent(
@@ -326,6 +321,12 @@ struct ArtistDigView: View {
                 releaseIDs: await dig.artistProfile(name: artistName, mbid: artistMBID)
                     .releases.compactMap(\.discogsID)
             )
+
+            // Last, once the page has settled. Bandcamp is read a page a
+            // second, so it is both the longest-running of these and the least
+            // urgent — the discography is on screen long before it finishes.
+            await dig.enrichBandcamp(forArtist: artistName)
+            await readProfile()
         }
         // Runs once per launch and keeps going for as long as the app is
         // open, filling in the rows nobody has dug into.
@@ -564,7 +565,10 @@ struct ArtistDigView: View {
                     spacing: 10
                 ) {
                     ForEach(artists.prefix(12)) { peer in
-                        ConnectionExplainer(artist: peer) {
+                        ConnectionExplainer(
+                            artist: peer,
+                            portrait: dig.portraitURL(for: peer.name)
+                        ) {
                             appState.open(.digArtist(mbid: peer.mbid, name: peer.name))
                         }
                     }

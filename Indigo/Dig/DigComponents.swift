@@ -108,6 +108,9 @@ struct DigLinkGrid: View {
 /// can be expanded to show exactly what the connection rests on.
 struct ConnectionExplainer: View {
     let artist: RelatedArtist
+    /// Resolved by the page from `DigStore.portraits`, so a picture found in
+    /// the background reaches this row without anything being rebuilt.
+    var portrait: URL?
     let open: () -> Void
 
     @State private var isHovering = false
@@ -118,7 +121,7 @@ struct ConnectionExplainer: View {
                 Rectangle()
                     .fill(isHovering ? Palette.accent : Palette.outline)
                     .frame(width: 3, height: 38)
-                ArtworkView(remoteURL: artist.imageURL, side: 38, glyphScale: 0.3)
+                ArtworkView(remoteURL: artist.imageURL ?? portrait, side: 38, glyphScale: 0.3)
                     .overlay(Rectangle().strokeBorder(
                         isHovering ? Palette.accent : Palette.outline, lineWidth: Metrics.hairline
                     ))
