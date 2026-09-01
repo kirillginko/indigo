@@ -51,7 +51,11 @@ struct DeepSectionView: View {
                         // A cached descent for a different level is not an
                         // answer about this one, and neither is an empty walk
                         // over a store nothing has been fetched into yet.
-                        WorkingBar().padding(.vertical, 14)
+                        // No bar of its own. The page already has one at its
+                        // head while it is loading, and two moving things
+                        // saying the same thing reads as two things being
+                        // wrong rather than one thing being underway.
+                        Color.clear.frame(height: 1)
                     } else if descent.results.isEmpty {
                         Text(emptyMessage)
                             .font(Typeface.body(12))
@@ -78,7 +82,13 @@ struct DeepSectionView: View {
         // Only for a level the page did not already work out. The surface is
         // handed in, so arriving at this section costs nothing.
         .task(id: TaskKey(origin: origin.id, level: level, revision: dig.revision)) {
-            guard level != .surface || initial == nil else { return }
+            // Not until the page it belongs to has loaded, and not on every
+            // write while it does. This walks the graph from a cache of its
+            // own, and it is the last thing on the page — there is nothing to
+            // be gained by doing it while somebody is waiting for the record.
+            guard isReady else { return }
+            try? await Task.sleep(for: .milliseconds(350))
+            guard !Task.isCancelled else { return }
             descent = await dig.descent(from: origin, at: level)
         }
     }
@@ -110,8 +120,11 @@ struct DeepSectionView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-            } else {
-                // Saying so is better than a button that does nothing.
+            } else if isReady {
+                // Saying so is better than a button that does nothing — but
+                // only once there is something to have reached the bottom of.
+                // Announced before the page had loaded it read as a verdict
+                // on an empty page.
                 Text("Bottom of the dig")
                     .microLabel(1.2, size: 9)
                     .foregroundStyle(Palette.inkFaint)

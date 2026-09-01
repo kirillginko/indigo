@@ -66,14 +66,29 @@ nonisolated struct DiscogsClient: Sendable {
 
     var isConfigured: Bool { token != nil }
 
-    func artist(named name: String) async throws -> DiscogsArtistBundle? {
+    /// The search that finds them, and nothing else.
+    ///
+    /// Split out because it already carries what a page needs to stop looking
+    /// empty — their name as catalogued, and a picture of them. The rest of
+    /// the bundle is a second round trip, and waiting for it before drawing
+    /// anything meant the portrait arrived twice as late as it had to.
+    func artistHead(named name: String) async throws -> DiscogsSearchResult? {
         let search: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "q", value: name),
             URLQueryItem(name: "type", value: "artist"),
             URLQueryItem(name: "per_page", value: "5")
         ])
-        guard let match = Self.bestArtistMatch(name: name, results: search.results ?? []),
-              let id = match.id else { return nil }
+        return Self.bestArtistMatch(name: name, results: search.results ?? [])
+    }
+
+    func artist(named name: String) async throws -> DiscogsArtistBundle? {
+        guard let match = try await artistHead(named: name) else { return nil }
+        return try await artist(named: name, head: match)
+    }
+
+    /// Everything else, once they have been found.
+    func artist(named name: String, head match: DiscogsSearchResult) async throws -> DiscogsArtistBundle? {
+        guard let id = match.id else { return nil }
 
         async let detail: DiscogsArtistDetail = get("artists/\(id)")
         async let releases: DiscogsArtistReleases = get("artists/\(id)/releases", query: [
@@ -90,6 +105,7 @@ nonisolated struct DiscogsClient: Sendable {
             detail: detail,
             releases: releases,
             searchImageURL: match.coverImage,
+            searchThumbnailURL: match.thumbnail,
             catalogue: catalogue.results ?? []
         )
     }
@@ -223,23 +239,121 @@ nonisolated struct DiscogsClient: Sendable {
     /// can be had without a request each.
     static func neighbours(from results: [DiscogsSearchResult]) -> [DiscogsNeighbour] {
         var seen = Set<String>()
-        return results.compactMap { result in
-            guard let separator = result.title.range(of: " - ") else { return nil }
-            let artist = String(result.title[..<separator.lowerBound]).trimmingCharacters(in: .whitespaces)
-            let key = RecordingKey.normalizeArtist(artist)
-            guard !key.isEmpty, seen.insert(key).inserted else { return nil }
+        var found: [DiscogsNeighbour] = []
+        for result in results {
+            guard let separator = result.title.range(of: " - ") else { continue }
+            let credit = String(result.title[..<separator.lowerBound])
+                .trimmingCharacters(in: .whitespaces)
             // The small cut. A 38-point row has no use for a 600-pixel sleeve.
-            return DiscogsNeighbour(name: artist, thumbnailURL: result.thumbnail ?? result.coverImage)
+            let thumbnail = result.thumbnail ?? result.coverImage
+            for artist in Self.creditedNames(credit) {
+                let key = RecordingKey.normalizeArtist(artist)
+                guard !key.isEmpty, seen.insert(key).inserted else { continue }
+                found.append(DiscogsNeighbour(name: artist, thumbnailURL: thumbnail))
+            }
         }
+        return found
+    }
+
+    /// The artists named in a release credit, rather than the credit itself.
+    ///
+    /// A row read straight off a release title said "Hayden James, Bob Moses
+    /// (5)" or "Flight Facilities With Emma Louise", and nothing is filed
+    /// under either — so the row showed a sleeve and then opened onto an
+    /// empty page.
+    ///
+    /// Split only where the credit says it is a collaboration. A comma alone
+    /// does not: "Earth, Wind & Fire" is one act, and cutting it into three
+    /// would replace one row that works with three that do not. So commas are
+    /// only honoured when the credit carries a marker that Discogs itself put
+    /// there — a "Feat.", a "With", a slash, or a disambiguating number.
+    static func creditedNames(_ credit: String) -> [String] {
+        // Almost every name is just a name.
+        //
+        // This runs once per edge, and a page has tens of thousands of them.
+        // Reaching for two regular expressions and a dozen string splits to
+        // decide that "Space Afrika" is "Space Afrika" doubled the cost of
+        // walking the graph. A scan for the handful of characters that could
+        // possibly matter settles the common case first.
+        let punctuation: Set<Character> = ["(", "*", ",", "/", "&"]
+        if !credit.contains(where: { punctuation.contains($0) }),
+           credit.range(of: " feat", options: .caseInsensitive) == nil,
+           credit.range(of: " ft", options: .caseInsensitive) == nil,
+           credit.range(of: " with ", options: .caseInsensitive) == nil {
+            return [credit]
+        }
+
+        let strong = [" / ", " Feat. ", " feat. ", " Feat ", " feat ",
+                      " Featuring ", " featuring ", " Ft. ", " ft. ", " With ", " with "]
+        // An asterisk is Discogs saying "credited under a variant name", and
+        // it only ever appears on one member of a joint credit — so it marks
+        // the credit as joint just as surely as a number does.
+        let marked = strong.contains { credit.contains($0) }
+            || credit.contains("*")
+            || credit.range(of: #"\(\d+\)"#, options: .regularExpression) != nil
+
+        var parts = [credit]
+        for separator in strong {
+            parts = parts.flatMap { $0.components(separatedBy: separator) }
+        }
+        if marked {
+            // "&" is left alone unless the credit is marked, because it is
+            // part of a great many single acts — Earth, Wind & Fire among
+            // them — and splitting those invents artists nobody has heard of.
+            for separator in [", ", " & ", " And ", " and "] {
+                parts = parts.flatMap { $0.components(separatedBy: separator) }
+            }
+        }
+        var seen = Set<String>()
+        return parts
+            .map { Self.withoutDisambiguator($0.trimmingCharacters(in: .whitespaces)) }
+            .filter { !$0.isEmpty && seen.insert(RecordingKey.normalizeArtist($0)).inserted }
     }
 
     static func artistNames(from results: [DiscogsSearchResult]) -> [String] {
         neighbours(from: results).map(\.name)
     }
 
+    /// The artist that was asked for, or nobody.
+    ///
+    /// This used to fall back to the first result, which is how searching for
+    /// somebody Discogs has never heard of opened a complete page — portrait,
+    /// biography, aliases, discography — belonging to a stranger who happened
+    /// to rank first for the name. It was also slow in exactly the case it
+    /// was wrong: a miss cost four requests and a dozen sleeve fetches for a
+    /// catalogue nobody had asked for, where saying so costs one and stops.
+    ///
+    /// Discogs' own disambiguator is stripped before comparing, so the artist
+    /// really called Bandulu still matches the row filed as "Bandulu (3)".
+    /// `normalizeArtist` does not do this itself — it folds punctuation to
+    /// spaces, which turns that row into "bandulu 3" and would match nobody.
     static func bestArtistMatch(name: String, results: [DiscogsSearchResult]) -> DiscogsSearchResult? {
         let wanted = RecordingKey.normalizeArtist(name)
-        return results.first { RecordingKey.normalizeArtist($0.title) == wanted } ?? results.first
+        guard !wanted.isEmpty else { return nil }
+        return results.first {
+            RecordingKey.normalizeArtist(Self.withoutDisambiguator($0.title)) == wanted
+        }
+    }
+
+    /// "Nirvana (2)" → "Nirvana", "Flowdan*" → "Flowdan".
+    ///
+    /// Both marks belong to Discogs' filing rather than to the artist: the
+    /// number distinguishes two people who share a name, and the asterisk
+    /// says a record credited them under a variant spelling. Carried into the
+    /// app they become names nothing is filed under — so every "Bing (14)"
+    /// and "VA*" offered as a connection was a row that opened onto nothing,
+    /// which is worse than not offering it.
+    static func withoutDisambiguator(_ title: String) -> String {
+        // Anywhere, not only at the end. "Sima Kim* & Saito Koji" carries its
+        // asterisk in the middle, and stripping only a trailing one left the
+        // mark sitting inside the name.
+        var value = title.replacingOccurrences(
+            of: #"\s*\(\d+\)"#, with: "", options: .regularExpression
+        )
+        value = value.replacingOccurrences(of: "*", with: "")
+        return value
+            .replacingOccurrences(of: #"\s{2,}"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
     }
 
     private static func normalized(_ value: String) -> String {
@@ -267,7 +381,9 @@ nonisolated struct DiscogsClient: Sendable {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await transport.data(for: request)
+            (data, response) = try await Trace.stage("discogs.request", path) {
+                try await transport.data(for: request)
+            }
         } catch let error as URLError {
             if error.code == .notConnectedToInternet || error.code == .networkConnectionLost {
                 throw DiscogsError.offline

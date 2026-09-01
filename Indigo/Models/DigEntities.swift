@@ -162,6 +162,15 @@ nonisolated final class DiscogsArtist {
     var realName: String?
     var biography: String?
     var imageURLString: String?
+    /// The small one, which Discogs sends with both the search result and the
+    /// artist detail and which was being thrown away.
+    ///
+    /// A portrait is a full-size photograph and takes its own round trip to
+    /// arrive, so the page sat with an empty square while the biography was
+    /// already on screen. A hundred-and-fifty pixel version drawn at tile
+    /// size is the picture, coarsely — which reads as it arriving rather than
+    /// as it having failed.
+    var thumbnailURLString: String?
     var profileURLString: String?
     var aliasNames: [String]
     var memberNames: [String]
@@ -260,6 +269,15 @@ nonisolated final class DiscogsReleaseRecord {
     var genres: [String]
     var styles: [String]
     var imageURLString: String?
+    /// The small cut of the sleeve, kept alongside the full one.
+    ///
+    /// Discogs hands both back — a six-hundred-pixel cover and a hundred-and
+    /// -fifty-pixel version of it — and only the cover was being stored. So a
+    /// record could have a sleeve in a grid, where the thumbnail came free
+    /// with the artist's catalogue listing, and a blank square on its own
+    /// page, where the only source was this row. The two halves belong
+    /// together or a picture goes missing every time a surface changes.
+    var thumbnailURLString: String? = nil
     var trackPositions: [String]
     var trackTitles: [String]
     var trackDurations: [String]
@@ -293,6 +311,7 @@ nonisolated final class DiscogsReleaseRecord {
     }
 
     var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
+    var thumbnailURL: URL? { thumbnailURLString.flatMap(URL.init(string:)) }
 
     /// Playable recordings of this release, titled as whoever catalogued them
     /// wrote them down.

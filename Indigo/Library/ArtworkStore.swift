@@ -129,6 +129,13 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
         try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
     }
 
+    /// The picture, only if it is already in memory. Synchronous on purpose:
+    /// a view being rebuilt can then draw it in its first frame instead of
+    /// showing a grey square and awaiting a value it already has.
+    func cachedImage(for url: URL) -> PlatformImage? {
+        cache.object(forKey: url as NSURL)
+    }
+
     func image(for url: URL) async -> PlatformImage? {
         if let cached = cache.object(forKey: url as NSURL) { return cached }
         let destination = diskURL(for: url)
@@ -235,6 +242,42 @@ struct ArtworkView: View {
     /// the app's own type, which says more than a grey square and claims
     /// nothing it shouldn't.
     var mark: String?
+    /// Whether to fill the square while there is nothing to show.
+    ///
+    /// A grey block reads as a picture that failed rather than one that has
+    /// not arrived — "it looks like the page stopped loading". Where the
+    /// surrounding page already says what is going on, the tile is better as
+    /// an empty frame.
+    var showsGround = true
+
+    /// What the store already holds, read straight through on the first
+    /// frame.
+    ///
+    /// `image(for:)` is `async`, so even a memory-cache hit costs a
+    /// suspension — and navigating back rebuilds every tile on the page, so
+    /// every one of them drew grey and then filled in from a cache that had
+    /// the picture the whole time. `??` is lazy, so this costs a lookup only
+    /// for tiles with nothing to show yet.
+    private var cachedFull: PlatformImage? {
+        guard let remoteURL else { return nil }
+        return RemoteArtworkStore.shared.cachedImage(for: remoteURL)
+    }
+
+    private var cachedPreview: PlatformImage? {
+        guard let preview = distinctPreviewURL else { return nil }
+        return RemoteArtworkStore.shared.cachedImage(for: preview)
+    }
+
+    /// The small cut, only when it is actually a different picture.
+    ///
+    /// Callers now ask for a cover and a preview that each fall back to the
+    /// other, so a record with only one address supplies the same URL twice.
+    /// Fetched as two things that is a wasted request and an extra suspension
+    /// in front of the picture, for no second picture.
+    private var distinctPreviewURL: URL? {
+        guard let previewRemoteURL, previewRemoteURL != remoteURL else { return nil }
+        return previewRemoteURL
+    }
 
     @State private var image: PlatformImage?
     @State private var loadedKey: String?
@@ -246,7 +289,7 @@ struct ArtworkView: View {
 
     var body: some View {
         Rectangle()
-            .fill(Palette.placeholder)
+            .fill(showsGround ? Palette.placeholder : Color.clear)
             .aspectRatio(1, contentMode: .fit)
             .overlay {
                 if let image {
@@ -254,10 +297,23 @@ struct ArtworkView: View {
                         .resizable()
                         .interpolation(.medium)
                         .aspectRatio(contentMode: .fill)
-                } else if let displayedRemoteImage = remoteImage ?? previewImage {
-                    Image(platformImage: displayedRemoteImage)
+                } else if let full = remoteImage ?? cachedFull {
+                    Image(platformImage: full)
                         .resizable()
                         .interpolation(.medium)
+                        .aspectRatio(contentMode: .fill)
+                } else if let preview = previewImage ?? cachedPreview {
+                    // The record itself, at the size we have it so far.
+                    //
+                    // Drawn without smoothing on purpose. A hundred-and-fifty
+                    // pixel sleeve stretched over a tile and interpolated is a
+                    // blurry smear, and a smear reads as a fault. Left with
+                    // its own pixels it reads as the picture arriving —
+                    // because it is the picture, just fewer of it — and the
+                    // full one replaces it with nothing unrelated in between.
+                    Image(platformImage: preview)
+                        .resizable()
+                        .interpolation(.none)
                         .aspectRatio(contentMode: .fill)
                 } else if let markImage {
                     GeometryReader { geo in
@@ -304,7 +360,14 @@ struct ArtworkView: View {
         // The two common cases size themselves, so the overwhelming majority
         // of tiles cost no layout pass at all. Only the text mark — a station
         // with no logo, which is rare — still needs to measure.
-        if placeholder == .whiteLabel, mark?.isEmpty ?? true {
+        if remoteURL != nil || previewRemoteURL != nil {
+            // A picture is on its way, so nothing is drawn over the ground.
+            //
+            // The glyph and the white-label mark both say "this has no
+            // artwork", and saying it while the artwork is in flight puts a
+            // wrong answer between the empty tile and the right one.
+            Color.clear
+        } else if placeholder == .whiteLabel, mark?.isEmpty ?? true {
             WhiteLabelMark()
         } else if mark?.isEmpty ?? true {
             Image(systemName: "square.stack")
@@ -357,12 +420,22 @@ struct ArtworkView: View {
     }
 
     private func loadAll() async {
-        // The small one first where there is one, so something appears before
-        // the full-size picture has finished.
+        // The local cache first, which is a disk read rather than a request.
         await load()
-        await loadPreview()
-        await loadRemote()
-        await loadMark()
+        // Then the remote ones together, rather than one behind the other.
+        //
+        // These were sequential, on the reasoning that the small one should
+        // appear first. It still does — it is a tenth of the size — but
+        // awaiting it before the cover was even *asked for* meant a preview
+        // that was slow, or that got cancelled when the profile was re-read,
+        // stopped the cover from ever being requested at all. That is the
+        // tile that stays blank until you navigate away and come back: the
+        // picture was never fetched, and returning re-reads a cache that
+        // something else had filled in the meantime.
+        async let preview: Void = loadPreview()
+        async let full: Void = loadRemote()
+        async let mark: Void = loadMark()
+        _ = await (preview, full, mark)
     }
 
     private func load() async {
@@ -413,7 +486,7 @@ struct ArtworkView: View {
     }
 
     private func loadPreview() async {
-        guard let previewRemoteURL else {
+        guard let previewRemoteURL = distinctPreviewURL else {
             previewImage = nil
             return
         }

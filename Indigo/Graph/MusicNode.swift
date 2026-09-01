@@ -84,6 +84,16 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
                   mbid: mbid, discogsID: discogsID)
     }
 
+    /// The same, for a caller that already folded the name.
+    ///
+    /// Folding a credit runs nine case-insensitive searches for a
+    /// collaboration marker before it normalises anything. The peer walk
+    /// builds hundreds of these a page from names it took the key from a
+    /// moment earlier, so asking again is the same answer at full price.
+    static func artist(_ name: String, key: String, mbid: String? = nil) -> MusicNode {
+        MusicNode(kind: .artist, key: key, title: name, mbid: mbid)
+    }
+
     static func label(_ name: String, mbid: String? = nil) -> MusicNode {
         MusicNode(kind: .label, key: RecordingKey.normalize(name), title: name, mbid: mbid)
     }

@@ -29,6 +29,7 @@ struct RootView: View {
             PlayerBarView()
                 .frame(height: Metrics.playerBarHeight)
         }
+        .indigoDefaultTypography()
         .background(Palette.paper)
         .foregroundStyle(Palette.ink)
         // Parked, not hidden from WebKit: the widget has to remain in the
@@ -47,6 +48,9 @@ struct RootView: View {
         // its own start-once guard, never ran again — which is why rows filled
         // in for a few seconds after launch and then stopped.
         .task { await dig.fillPortraitsInBackground() }
+        // Debug builds only, and it writes to a file rather than the log —
+        // see `MainThreadWatchdog`.
+        .task { MainThreadWatchdog.shared.start() }
         #if !os(macOS)
         .fileImporter(
             isPresented: Binding(

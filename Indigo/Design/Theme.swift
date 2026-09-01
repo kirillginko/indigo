@@ -79,6 +79,12 @@ enum Typeface {
     private static let bodyScale: CGFloat = 0.92
     private static let displayScale: CGFloat = 0.84
 
+    /// The inherited face for ordinary text and native controls. Keeping it
+    /// here makes an unlabeled Button, TextField or Text use the same optical
+    /// size as explicitly styled body copy instead of falling back to SF Pro.
+    static let defaultTextSize: CGFloat = 12.5
+    static var defaultFont: Font { body(defaultTextSize) }
+
     /// Nimbus ships two weights, so anything from semibold up is bold and
     /// everything else is regular. `fixedSize` because the layout is a fixed
     /// grid of hairlines — type that grows would break the rules it sits on.
@@ -132,6 +138,12 @@ enum Metrics {
 // MARK: - Text helpers
 
 extension View {
+    /// Installs Nimbus as the inherited application face. Explicit mono and
+    /// display roles below a root remain explicit and therefore win.
+    func indigoDefaultTypography() -> some View {
+        self.font(Typeface.defaultFont)
+    }
+
     /// Uppercase, tracked, monospaced — the NTS "system label" treatment.
     func microLabel(_ tracking: CGFloat = 1.3, size: CGFloat = 9.5) -> some View {
         self.font(Typeface.micro(size))

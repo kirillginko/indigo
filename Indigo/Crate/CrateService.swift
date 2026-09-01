@@ -47,7 +47,8 @@ final class CrateService {
     }
 
     func contains(recording: Recording) -> Bool {
-        item(for: recording) != nil
+        refreshMembershipIfNeeded()
+        return recordingMembership.contains(recording.id)
     }
 
     func contains(broadcast showID: String, providerID: String) -> Bool {
@@ -75,8 +76,61 @@ final class CrateService {
         items().first { $0.kind == kind && $0.showID == identifier && $0.providerID == providerID }
     }
 
+    // MARK: - Membership, held in memory
+
+    /// Whether something is in the crate, without going to the store.
+    ///
+    /// Views ask this from `body` — the CRATE button on every dig page, and
+    /// once per row in a Listen list — and `body` runs on every redraw, which
+    /// during a scroll is every frame. Answering it by fetching the whole
+    /// crate table, sorted, measured at 10.5ms against a frame budget of
+    /// 16.7. One button could not fit in a frame, so the scroll caught.
+    ///
+    /// The crate is small and changes only when somebody presses the button,
+    /// so it is folded into two sets and kept until `revision` moves.
+    @ObservationIgnored private var membershipAt = -1
+    @ObservationIgnored private var digMembership: Set<String> = []
+    @ObservationIgnored private var recordingMembership: Set<UUID> = []
+    @ObservationIgnored private var listeningMembership: [URL: Bool] = [:]
+
+    private static func digKey(
+        _ kind: CrateItemKind, _ identifier: String, _ providerID: String
+    ) -> String {
+        "\(kind.rawValue)|\(providerID)|\(identifier)"
+    }
+
+    /// Reading `revision` here is deliberate: it is what makes a view asking
+    /// about membership re-read when the crate changes.
+    func refreshMembershipIfNeeded() {
+        guard membershipAt != revision else { return }
+        var dig: Set<String> = []
+        var recordings: Set<UUID> = []
+        for item in items() {
+            if let showID = item.showID, let providerID = item.providerID {
+                dig.insert(Self.digKey(item.kind, showID, providerID))
+            }
+            if let id = item.recording?.id { recordings.insert(id) }
+        }
+        digMembership = dig
+        recordingMembership = recordings
+        listeningMembership = [:]
+        membershipAt = revision
+    }
+
     func contains(dig kind: CrateItemKind, identifier: String, providerID: String) -> Bool {
-        item(forDig: kind, identifier: identifier, providerID: providerID) != nil
+        refreshMembershipIfNeeded()
+        return digMembership.contains(Self.digKey(kind, identifier, providerID))
+    }
+
+    /// Remembered per address, because a Listen list asks about a dozen of
+    /// them on every redraw and each one was two fetches.
+    func rememberListening(_ url: URL, isCrated: Bool) {
+        listeningMembership[url] = isCrated
+    }
+
+    func knownListening(_ url: URL) -> Bool? {
+        refreshMembershipIfNeeded()
+        return listeningMembership[url]
     }
 
     // MARK: - Writing

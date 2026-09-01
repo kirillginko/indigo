@@ -124,7 +124,7 @@ final class GraphStoreTests: XCTestCase {
 
     /// The step the old code could not take: off the artist page and onto
     /// something that is not another artist.
-    func testAnArtistWalksOutToLabelsReleasesStylesAndCatalogueNumbers() {
+    func testAnArtistWalksOutToLabelsReleasesAndCatalogueNumbers() {
         artist("Skee Mask", labels: ["Ilian Tape"], styles: ["Techno"],
                releases: [("Compro", 12_345)])
 
@@ -133,7 +133,11 @@ final class GraphStoreTests: XCTestCase {
 
         XCTAssertEqual(byKind[.label]?.first?.node.title, "Ilian Tape")
         XCTAssertEqual(byKind[.release]?.first?.node.title, "Compro")
-        XCTAssertEqual(byKind[.style]?.first?.node.title, "Techno")
+        // A style is a lens, not a place. It has no destination and no
+        // neighbours, so offering it as a node put rows in DEEP that could
+        // not be opened. The shared style still connects two artists; it is
+        // just not somewhere to go on its own.
+        XCTAssertNil(byKind[.style])
         XCTAssertEqual(byKind[.release]?.first?.node.destination, .digRelease(id: 12_345, title: "Compro"))
     }
 

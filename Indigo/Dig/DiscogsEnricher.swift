@@ -10,15 +10,57 @@ nonisolated struct DiscogsEnricher {
     let context: ModelContext
     let client: DiscogsClient
 
+    /// Who they are, from the search alone.
+    ///
+    /// One round trip in, this is enough for the page to stop being empty:
+    /// the name as the catalogue spells it, and a picture. The discography
+    /// and the rest arrive a round trip later and fill in around it.
+    ///
+    /// Deliberately does not stamp `fetchedAt` or `cacheVersion` — this is a
+    /// partial row, and it must not be mistaken for a complete one by the
+    /// freshness check below.
+    @discardableResult
+    func artistIdentity(named name: String, head: DiscogsSearchResult) -> DiscogsArtist {
+        let key = RecordingKey.normalizeArtist(name)
+        let record = cachedArtist(named: name) ?? {
+            let value = DiscogsArtist(nameKey: key, discogsID: head.id ?? 0, name: name)
+            context.insert(value)
+            return value
+        }()
+        if let id = head.id { record.discogsID = id }
+        if record.imageURLString == nil {
+            record.imageURLString = head.coverImage ?? head.thumbnail
+        }
+        if record.thumbnailURLString == nil {
+            record.thumbnailURLString = head.thumbnail ?? head.coverImage
+        }
+        return record
+    }
+
     @discardableResult
     func artist(named name: String, force: Bool = false) async throws -> DiscogsArtist? {
         // Rolled whenever what is stored changes shape: 3 added the artist's
         // own links, 4 kept the thumbnails arriving with each neighbour, 5
-        // stopped filing pressing plants as imprints. A row cached before any
-        // of those looks current while being wrong, so it is refetched once.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 5,
+        // stopped filing pressing plants as imprints, 6 keeps the artist's
+        // own thumbnail so a portrait has something to show before the
+        // photograph arrives. A row cached before any of those looks current
+        // while being wrong, so it is refetched once.
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 6,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
+        return write(bundle, name: name)
+    }
+
+    /// The same, for a caller that has already done the search.
+    @discardableResult
+    func artist(named name: String, head: DiscogsSearchResult, force: Bool = false) async throws -> DiscogsArtist? {
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 6,
+           cached.isFresh { return cached }
+        guard let bundle = try await client.artist(named: name, head: head) else { return nil }
+        return write(bundle, name: name)
+    }
+
+    private func write(_ bundle: DiscogsArtistBundle, name: String) -> DiscogsArtist? {
 
         let detail = bundle.detail
         let releases = (bundle.releases.releases ?? []).filter {
@@ -35,16 +77,22 @@ nonisolated struct DiscogsEnricher {
             return value
         }()
         record.discogsID = detail.id
-        record.name = detail.name
-        record.realName = detail.realname
+        // The title of the page. Discogs files a second Oliwa as "Oliwa (2)",
+        // and left alone that number becomes the artist's name at the top of
+        // their own page.
+        record.name = DiscogsClient.withoutDisambiguator(detail.name)
+        record.realName = detail.realname.map(DiscogsClient.withoutDisambiguator)
         record.biography = detail.profile.map(Self.cleanProfile)
         record.imageURLString = detail.images?.first(where: { $0.type == "primary" })?.uri
             ?? detail.images?.first?.uri ?? bundle.searchImageURL
+        record.thumbnailURLString = detail.images?.first(where: { $0.type == "primary" })?.uri150
+            ?? detail.images?.first?.uri150 ?? bundle.searchThumbnailURL
+            ?? record.thumbnailURLString
         record.profileURLString = detail.uri
-        record.aliasNames = detail.aliases?.compactMap(\.name) ?? []
+        record.aliasNames = (detail.aliases?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
         record.externalURLStrings = detail.urls ?? []
-        record.memberNames = detail.members?.compactMap(\.name) ?? []
-        record.groupNames = detail.groups?.compactMap(\.name) ?? []
+        record.memberNames = (detail.members?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
+        record.groupNames = (detail.groups?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
         let catalogue = bundle.catalogue.filter { $0.id != nil }
         if !catalogue.isEmpty {
             record.releaseTitles = catalogue.map { Self.releaseTitle($0.title, artist: detail.name) }
@@ -77,11 +125,11 @@ nonisolated struct DiscogsEnricher {
         record.collaboratorNames = Self.unique(
             (bundle.releases.releases ?? []).compactMap { release in
                 guard release.role != nil, release.role != "Main" else { return nil }
-                return release.artist
+                return release.artist.map(DiscogsClient.withoutDisambiguator)
             }.filter { RecordingKey.normalizeArtist($0) != key }
         )
         record.fetchedAt = Date()
-        record.cacheVersion = 5
+        record.cacheVersion = 6
         return record
     }
 
@@ -144,6 +192,13 @@ nonisolated struct DiscogsEnricher {
         record.styles = detail.styles ?? []
         record.imageURLString = detail.images?.first(where: { $0.type == "primary" })?.uri
             ?? detail.images?.first?.uri
+        // Kept rather than discarded. It arrives in the same response, and
+        // without it this row can only ever answer half the question — which
+        // is how a record ended up with a sleeve in the grid and a blank
+        // square on its own page.
+        record.thumbnailURLString = detail.images?.first(where: { $0.type == "primary" })?.uri150
+            ?? detail.images?.first?.uri150
+            ?? record.thumbnailURLString
         let tracks = detail.tracklist ?? []
         record.trackPositions = tracks.map { $0.position ?? "" }
         record.trackTitles = tracks.map { $0.title ?? "Untitled" }

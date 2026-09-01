@@ -102,6 +102,7 @@ nonisolated struct DiscogsArtistBundle: Sendable {
     let detail: DiscogsArtistDetail
     let releases: DiscogsArtistReleases
     let searchImageURL: String?
+    let searchThumbnailURL: String?
     let catalogue: [DiscogsSearchResult]
 }
 

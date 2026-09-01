@@ -34,15 +34,6 @@ struct ArtistDigView: View {
     /// How much of the discography is on screen. Grows on request rather than
     /// rendering hundreds of sleeves nobody asked to see.
     @State private var releaseLimit = 24
-    /// The first level of DEEP, worked out while the page loads rather than
-    /// when somebody scrolls down to it.
-    @State private var surfaceDescent: DeepEngine.Descent?
-
-    /// True while there is genuinely nothing to show yet — no cached page from
-    /// last time, and the catalogues not yet asked.
-    private func isWaiting(_ profile: ArtistProfile) -> Bool {
-        !hasEnriched && profile.isBare
-    }
 
     var body: some View {
         let _ = crate.revision
@@ -72,7 +63,7 @@ struct ArtistDigView: View {
                 CrateButton(isCrated: isCrated) {
                     crate.toggle(
                         dig: .artist, identifier: crateID, providerID: crateProvider,
-                        title: profile.name, subtitle: "Artist", artworkURL: profile.imageURL,
+                        title: profile.name, subtitle: "Artist", artworkURL: profile.coverURL,
                         genres: profile.styles + profile.genres
                     )
                 }
@@ -84,23 +75,53 @@ struct ArtistDigView: View {
                 // are scrolled to, so the page is usable while the rest of it
                 // is still being worked out.
                 LazyVStack(alignment: .leading, spacing: 26) {
-                    // Nothing is drawn until there is something to draw. The
-                    // page used to lay out its whole scaffolding around a
-                    // placeholder sleeve and an empty column, announce that it
-                    // had found nothing, and then fill in — which reads as a
-                    // failure followed by a correction rather than as loading.
-                    if isWaiting(profile) {
-                        DigSkeleton()
-                    } else {
-                    if dig.isEnriching { WorkingBar() }
+                    // The page draws itself while it is loading, rather than
+                    // a drawing of itself.
+                    //
+                    // There was a scaffold here — a grey portrait, grey
+                    // tallies, five grey tiles — and it was a second copy of
+                    // this layout, so it drifted from it: different heights,
+                    // a different number of tiles, boxes standing in for
+                    // things that turned out not to exist. And because the
+                    // two are different view trees, the switch between them
+                    // is a teardown and a rebuild rather than a diff, paid at
+                    // the exact moment the record lands and the page is
+                    // busiest.
+                    //
+                    // Drawn from the placeholder profile it is the same tree
+                    // throughout: sections appear as they gain something to
+                    // say, and nothing on screen is ever a stand-in for
+                    // something that never arrives.
+                    // This page's own loading, not the store's.
+                    //
+                    // `isEnriching` is true whenever anything anywhere is
+                    // asking a catalogue — a crate row resolving, a tracklist
+                    // filling in — so a page that had finished would put the
+                    // bar back up because something else had started. It
+                    // belongs to the stage this page is waiting on.
+                    // No bar above the portrait at all.
+                    //
+                    // It was asked for twice: first as "too many loading
+                    // animations", then as "why keep the second loading bar
+                    // above the image". Reserving its space answered neither
+                    // — the page still had a moving thing on it saying what
+                    // the empty portrait underneath already said.
                     HStack(alignment: .top, spacing: 26) {
-                        // The name when there is no portrait. An empty
-                        // bordered square says nothing at all — least of all
-                        // that this is who the page is about.
+                        // No name set into the square. The header above
+                        // already says who this is, and a portrait that is
+                        // briefly the artist's name in type is a third thing
+                        // between the empty tile and the photograph.
+                        // The small one first, drawn coarsely, then the
+                        // photograph over it. The search that finds an artist
+                        // already carries the thumbnail, so something real is
+                        // there a round trip before the full picture — rather
+                        // than an empty square sitting beside a biography,
+                        // which reads as a load that failed.
                         ArtworkView(
-                            remoteURL: profile.imageURL,
+                            remoteURL: profile.coverURL,
+                            previewRemoteURL: profile.previewURL,
                             side: 220, glyphScale: 0.24,
-                            mark: profile.imageURL == nil ? profile.name : nil
+                            showsGround: false
                         )
                             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
                         VStack(alignment: .leading, spacing: 20) {
@@ -128,6 +149,26 @@ struct ArtistDigView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
+                    // Everything under the portrait arrives together.
+                    //
+                    // These used to appear one at a time as each gained
+                    // something to say — the source link, the genres, the
+                    // discography, the labels — and each one pushed
+                    // everything below it further down. Five separate
+                    // shifts while somebody is trying to read, for a page
+                    // that ends up the same shape either way. One reveal
+                    // moves the page once.
+                    //
+                    // The portrait and the tallies above are the fixed
+                    // head: one size, drawn immediately, never moved. And
+                    // a page that already has its record shows all of it
+                    // at once, so returning to an artist is never made to
+                    // wait for a catalogue it will not ask about.
+                    // The same condition the veil uses, so one moment does
+                    // both: the blur lifts and the page is there. Two
+                    // conditions meant the sections appeared empty under a
+                    // veil that had already gone.
+                    if hasEnriched || !profile.releases.isEmpty || !profile.related.isEmpty {
                     if let discogsURL = profile.discogsURL {
                         Link(destination: discogsURL) {
                             HStack(spacing: 7) {
@@ -288,15 +329,52 @@ struct ArtistDigView: View {
                     DeepSectionView(
                         origin: .artist(profile.name, mbid: profile.mbid),
                         isReady: hasEnriched,
-                        initial: surfaceDescent
+                        initial: nil
                     ) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)
+                // One treatment for the whole page rather than a spinner per
+                // section. See `LoadingVeil`.
+                // Veiled until the record is actually there.
+                //
+                // `isBare` stops being true the moment the artist's name and
+                // picture are written — one round trip before the
+                // discography — so the veil lifted onto a page that was still
+                // empty, which is precisely the "it failed" reading it exists
+                // to prevent. The discography is what the page is for, so
+                // that is what it waits for.
+                .loadingVeil(
+                    !hasEnriched && profile.releases.isEmpty && profile.related.isEmpty
+                )
             }
             .scrollIndicators(.visible)
         }
-        .task(id: dig.revision) { await readProfile() }
+        .task(id: dig.revision) {
+            // Writes arrive in bursts — the catalogue, then the
+            // neighbourhood, then the sleeves, then Bandcamp — and each one
+            // invalidated the page and sent it back to walk the graph again.
+            // The trace put that at four hundred walks in a session, three
+            // quarters of a second each, for perhaps forty answers worth
+            // having.
+            //
+            // A pause before reading collapses a burst into one read: each
+            // new revision cancels the last task before it has run. Nothing
+            // is skipped — the final state is always read — it is only the
+            // intermediate ones nobody sees that are.
+            //
+            // 350ms when a read cost the better part of a second. It does not
+            // any more, and the arithmetic changed with it: a cold artist's
+            // writes land whole round trips apart — the name, then the
+            // discography, then the neighbourhood — so the pause collapsed
+            // nothing between them and simply added itself to each stage. A
+            // third of a second, three times, in front of the listener. What
+            // it is actually for is the writes that arrive together, and
+            // those arrive within a frame or two of each other.
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
+            await readProfile()
+        }
         .task(id: artistMBID ?? artistName) {
             releaseOrder = []
             await readProfile()
@@ -304,7 +382,20 @@ struct ArtistDigView: View {
 
             // The catalogue first: everything after it needs the artist's own
             // links, which is where the Bandcamp address comes from.
+            //
+            // Nothing re-reads the profile after these steps. Each of them
+            // writes, every write moves `revision`, and the task above already
+            // answers that by rebuilding the page. Asking again here meant
+            // every write was paid for twice — two reads of the tables, two
+            // walks of the graph, two rebuilds of the whole view — and all of
+            // it after the top of the page was already on screen, which is
+            // what the stutter was.
             await dig.enrichArtist(name: artistName, mbid: artistMBID)
+            // The one exception, and it costs nothing: "nothing to dig into"
+            // is held behind `hasEnriched`, so that flag must not be raised
+            // over a profile from before the catalogue answered. Both this
+            // and the revision task ask for the same answer at the same
+            // revision, and the store now walks it once for both.
             await readProfile()
             hasEnriched = true
 
@@ -319,21 +410,25 @@ struct ArtistDigView: View {
             await dig.fillMissingReleaseArtwork(
                 forArtist: artistName, mbid: artistMBID, limit: 12
             )
-            await readProfile()
             artistScenes = await dig.scenes(forArtist: artistName)
-            surfaceDescent = await dig.descent(
-                from: .artist(artistName, mbid: artistMBID), at: .surface
-            )
-            await dig.verifyListenable(
-                releaseIDs: await dig.artistProfile(name: artistName, mbid: artistMBID)
-                    .releases.compactMap(\.discogsID)
-            )
+            // The descent is not computed here any more.
+            //
+            // It walks the graph again, from a second cache of its own, for a
+            // section at the very bottom of the page that most openings never
+            // reach — and it did it while somebody was waiting for the
+            // discography. `DeepSectionView` works it out when it is actually
+            // on screen.
+            // Playability is asked about on the release page, which asks
+            // before it offers the list. Asking here checked two dozen
+            // recordings on YouTube in four batches — four more writes, four
+            // more rebuilds of a page that had finished loading — for an
+            // answer this page never shows. An unverified recording is
+            // offered anyway, so nothing was waiting on the verdict.
 
             // Last, once the page has settled. Bandcamp is read a page a
             // second, so it is both the longest-running of these and the least
             // urgent — the discography is on screen long before it finishes.
             await dig.enrichBandcamp(forArtist: artistName)
-            await readProfile()
         }
         // Runs once per launch and keeps going for as long as the app is
         // open, filling in the rows nobody has dug into.
@@ -358,7 +453,13 @@ struct ArtistDigView: View {
 
     private func settled(_ releases: [ArtistProfile.ReleaseLine]) -> [ArtistProfile.ReleaseLine] {
         guard !releaseOrder.isEmpty else { return releases }
-        let placed = Dictionary(uniqueKeysWithValues: releaseOrder.enumerated().map { ($1, $0) })
+        // Tolerant on purpose. The first appearance is the place the record
+        // keeps, which is this function's whole intent — and a view must not
+        // be able to bring the app down over a repeated key.
+        let placed = Dictionary(
+            releaseOrder.enumerated().map { ($1, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
         return releases.enumerated().sorted { lhs, rhs in
             let left = placed[lhs.element.id]
             let right = placed[rhs.element.id]
@@ -396,7 +497,7 @@ struct ArtistDigView: View {
         // competed with the requests that fill the tiles the listener can
         // see, which made the grid slower rather than faster.
         let thumbnails = profile.releases.prefix(releaseLimit)
-            .compactMap { $0.thumbnailURL ?? $0.imageURL }
+            .compactMap(\.previewURL)
             + profile.related.prefix(12).compactMap(\.imageURL)
         guard !thumbnails.isEmpty else { return }
         // Only when the set has actually changed. The profile is re-read on
@@ -479,7 +580,7 @@ struct ArtistDigView: View {
                             keep: {
                                 crate.toggle(
                                     listening: line.url, title: line.title,
-                                    artist: profile.name, artworkURL: profile.imageURL
+                                    artist: profile.name, artworkURL: profile.coverURL
                                 )
                             }
                         )
@@ -501,7 +602,7 @@ struct ArtistDigView: View {
                 title: entry.title,
                 subtitle: profile.name,
                 detail: profile.name,
-                remoteArtworkURL: profile.imageURL,
+                remoteArtworkURL: profile.coverURL,
                 playbackURL: entry.url,
                 embedProvider: .youtube
             )

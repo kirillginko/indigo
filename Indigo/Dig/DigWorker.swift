@@ -20,23 +20,60 @@
 import Foundation
 import SwiftData
 
-@ModelActor
+/// Deliberately a plain actor rather than `@ModelActor`.
+///
+/// `@ModelActor` supplies a `DefaultSerialModelExecutor`, and a serial
+/// executor is only obliged to serialise — not to own a thread. In practice
+/// it can run a job inline on whichever thread enqueued it, and when that
+/// thread is the main one the whole point of this type is lost: the table
+/// reads and the graph walk happen on the thread that is drawing the page.
+///
+/// A test pinned this down. `runsOffTheMainThread()` passed when run alone
+/// and failed inside the full suite — the same call landing on a different
+/// thread depending on what else was running, which is exactly the kind of
+/// intermittent stall that makes a scroll catch.
+///
+/// A plain actor has no custom executor, so its jobs go to the cooperative
+/// pool, which is never the main thread. The context is made here and never
+/// leaves, which is the same guarantee `@ModelActor` was giving.
 actor DigWorker {
+    let modelContainer: ModelContainer
+    let modelContext: ModelContext
+
+    init(modelContainer: ModelContainer) {
+        self.modelContainer = modelContainer
+        self.modelContext = ModelContext(modelContainer)
+    }
+
     /// One engine, kept until something is written.
     ///
     /// Its caches are six whole tables, and a single page asks several
     /// questions — the profile, the descent, the scenes, the connections.
     /// Rebuilding that for each of them was most of the time it took to open
     /// anything.
+    private var graph: GraphStore?
     private var engine: DigEngine?
     private var deep: DeepEngine?
     private var scenes: SceneEngine?
     private var generation = -1
 
+    /// Whether this actor's work actually happens off the main thread.
+    ///
+    /// `@ModelActor` supplies its own serial executor, and a serial executor
+    /// is not obliged to own a thread — it only has to serialise. If it runs
+    /// jobs on whichever thread enqueued them, every "background" walk in
+    /// here happens on the main one, which is the opposite of why this type
+    /// exists.
+    func runsOffTheMainThread() -> Bool { !Thread.isMainThread }
+
     private func refresh(_ asked: Int) {
         guard generation != asked else { return }
-        engine = DigEngine(context: modelContext)
-        deep = DeepEngine(context: modelContext)
+        // One graph per generation, and it inherits the last one's tables
+        // when nothing has been inserted since. See `Caches.rowCounts`.
+        let next = GraphStore(context: modelContext, inheriting: graph)
+        graph = next
+        engine = DigEngine(context: modelContext, graph: next)
+        deep = DeepEngine(context: modelContext, graph: next)
         scenes = SceneEngine(context: modelContext)
         generation = asked
     }

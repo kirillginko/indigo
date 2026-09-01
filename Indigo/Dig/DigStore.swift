@@ -95,12 +95,34 @@ final class DigStore {
     ///
     /// Only the answer comes back here; the reading and the walking happen on
     /// the worker's own context, so a page filling in does not stop a scroll.
+    /// Walks already running, by the answer each is working out.
+    ///
+    /// Two callers can want the same profile at the same moment — the task
+    /// that follows navigation and the one that follows `revision` — and
+    /// both miss the cache, because neither has finished to fill it. Without
+    /// this they both walk, and the second answer is thrown away.
+    @ObservationIgnored private var walking: [String: Task<ArtistProfile, Never>] = [:]
+
     func artistProfile(name: String, mbid: String?) async -> ArtistProfile {
         let key = Self.artistKey(name: name, mbid: mbid)
         let asked = revision
         if let fresh = profiles.fresh(key, revision: asked) { return fresh }
+
+        // One walk per answer, however many callers want it. The ticket is
+        // the revision as well as the artist: an answer from before a write
+        // is not the one somebody asking after it wants.
+        let ticket = "\(asked)|\(key)"
+        if let running = walking[ticket] { return await running.value }
+
         settle()
-        let profile = await worker.artistProfile(name: name, mbid: mbid, generation: asked)
+        let running = Task { [worker] in
+            await Trace.stage("graph.walk", name) {
+                await worker.artistProfile(name: name, mbid: mbid, generation: asked)
+            }
+        }
+        walking[ticket] = running
+        let profile = await running.value
+        walking[ticket] = nil
         profiles.store(profile, key: key, revision: asked)
         return profile
     }
@@ -185,7 +207,19 @@ final class DigStore {
     /// it and came back. Bounded and progressive: each release that answers
     /// bumps the revision, so the grid fills in one tile at a time rather than
     /// all at once at the end.
+    /// Deliberately not held behind the foreground gate.
+    ///
+    /// The gate exists so the nine requests a cold artist needs are not
+    /// queued behind a background fill. Sleeves are not among those nine —
+    /// they are pictures arriving on a page that already works, exactly like
+    /// the portraits are. Gating them made a connection row's face turn up
+    /// long after everything else on the page, which is a worse trade than
+    /// the one the gate was making in the first place.
     func fillMissingReleaseArtwork(forArtist name: String, mbid: String?, limit: Int = 24) async {
+        await digReleaseArtwork(forArtist: name, mbid: mbid, limit: limit)
+    }
+
+    private func digReleaseArtwork(forArtist name: String, mbid: String?, limit: Int) async {
         let missing = await artistProfile(name: name, mbid: mbid).releases
             .filter { $0.imageURL == nil && $0.thumbnailURL == nil }
         guard !missing.isEmpty else { return }
@@ -293,6 +327,47 @@ final class DigStore {
         portraitPriority = names.filter { ArtistName.isRealArtist($0) }
     }
 
+    // MARK: - Who gets the request budget
+
+    /// How many things the listener is actually waiting for.
+    ///
+    /// Discogs allows sixty requests a minute. The background portrait fill
+    /// takes one every second and a half — forty of them — and a cold artist
+    /// needs nine: a search to find them, three for their bundle, five for
+    /// the neighbourhood. Over the budget those nine are throttled, which is
+    /// how opening somebody came to take six seconds while the app was busy
+    /// fetching thumbnails for rows nobody had looked at yet.
+    ///
+    /// The fill is explicitly work nobody is waiting on. So it stands aside
+    /// for work somebody is.
+    @ObservationIgnored private var foregroundDigs = 0
+    @ObservationIgnored private var foregroundEndedAt: ContinuousClock.Instant?
+
+    /// Whether a page is currently fetching something the listener asked for.
+    ///
+    /// Stays true for a moment after the last one finishes: a page load is a
+    /// run of requests with small gaps in it, and a fill that restarted in
+    /// every gap would be back in the way before the next stage began.
+    var isDiggingInForeground: Bool {
+        if foregroundDigs > 0 { return true }
+        guard let foregroundEndedAt else { return false }
+        return ContinuousClock.now - foregroundEndedAt < .milliseconds(750)
+    }
+
+    /// Whether anything the listener is currently looking at still wants a
+    /// face. These jump the gate; the backlog behind them does not.
+    private var hasPortraitsOnScreen: Bool { !portraitPriority.isEmpty }
+
+    /// Marks work as the kind somebody is waiting for.
+    private func inForeground<T>(_ body: () async -> T) async -> T {
+        foregroundDigs += 1
+        defer {
+            foregroundDigs -= 1
+            if foregroundDigs == 0 { foregroundEndedAt = .now }
+        }
+        return await body()
+    }
+
     /// Must be owned by something that outlives a page.
     ///
     /// This used to be started from the artist page, which is destroyed on
@@ -320,6 +395,23 @@ final class DigStore {
         var quiet = 0
 
         while !Task.isCancelled {
+            // Nobody is waiting on the backlog, and somebody is waiting on
+            // the page.
+            //
+            // Forty requests a minute out of a budget of sixty, spent on rows
+            // that have not been looked at, while a cold artist's nine queue
+            // behind them and get throttled. The backlog waits its turn.
+            //
+            // The names the listener can actually see are a different matter.
+            // There are eighteen of them, they are the faces on the rows
+            // being read right now, and holding them until every last sleeve
+            // and Bandcamp page has landed is how a connection row came to
+            // fill in long after the page it is on.
+            while isDiggingInForeground, !hasPortraitsOnScreen {
+                try? await Task.sleep(for: .milliseconds(250))
+                if Task.isCancelled { return }
+            }
+
             guard let next = nextPortraitNeeded() else {
                 if quiet > 0 { artworkRevision &+= 1 }
                 return
@@ -331,6 +423,13 @@ final class DigStore {
                 found = try await discogsClient.artistThumbnail(named: next)
             } catch is CancellationError {
                 return
+            } catch DiscogsError.rateLimited {
+                // Being told to slow down is the one answer this loop must
+                // actually obey. Retrying at the usual pace keeps the app over
+                // the limit, and it is the page's requests — not these — that
+                // are refused alongside them.
+                try? await Task.sleep(for: .seconds(30))
+                continue
             } catch {
                 // A dropped connection is not an answer about this artist.
                 // Marking it failed would bar the name for a month over a
@@ -451,11 +550,11 @@ final class DigStore {
     /// Indigo is concerned.
     func enrichBandcamp(forArtist name: String, limit: Int = 8) async {
         guard let page = discogsEnricher.cachedArtist(named: name)?.bandcampURL else { return }
-        var enricher = BandcampEnricher(context: context)
-        enricher.onProgress = { [weak self] in
-            guard let self else { return }
-            self.revision &+= 1
-        }
+        // Deliberately not reporting progress. This asked the page to redraw
+        // as soon as the first record was read and again when the rest were —
+        // two rebuilds so one row could appear a second early, at the end of
+        // a page that is already whole.
+        let enricher = BandcampEnricher(context: context)
         guard let found = try? await enricher.enrich(artist: name, page: page, limit: limit),
               !found.isEmpty
         else { return }
@@ -1050,6 +1149,10 @@ final class DigStore {
     /// couple of recordings, is a label looked up, because a label is what
     /// RELATED is built from and nothing else on the page needs one.
     func enrichArtist(name: String, mbid: String?) async {
+        await inForeground { await digArtist(name: name, mbid: mbid) }
+    }
+
+    private func digArtist(name: String, mbid: String?) async {
         let key = "artist:\(mbid ?? name)"
         let discogsKey = "discogs:artist:\(RecordingKey.normalizeArtist(name))"
         // A notice belongs to the page that produced it. Cleared before the
@@ -1063,7 +1166,22 @@ final class DigStore {
             attempted.insert(discogsKey)
             isEnriching = true
             do {
-                if let artist = try await discogsEnricher.artist(named: name) {
+                // Their name and their picture, one round trip in.
+                //
+                // The bundle is two round trips: a search to find them, then
+                // their detail, discography and catalogue together. Nothing
+                // was drawn until both had landed, so the portrait arrived
+                // twice as late as it needed to. The search already carries
+                // it — so it is written and the page told, and the rest fills
+                // in around a page that is already the right shape.
+                let head = try await discogsClient.artistHead(named: name)
+                if let head {
+                    discogsEnricher.artistIdentity(named: name, head: head)
+                    try? context.save()
+                    revision &+= 1
+                }
+
+                if let head, let artist = try await discogsEnricher.artist(named: name, head: head) {
                     try? context.save()
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.

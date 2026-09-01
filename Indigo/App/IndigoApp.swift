@@ -105,6 +105,7 @@ struct IndigoApp: App {
         // window being closed, which is the point of a mini player.
         Window("Mini Player", id: IndigoWindow.mini) {
             MiniPlayerView()
+                .indigoDefaultTypography()
                 .environment(appState)
                 .environment(player)
                 .environment(nts)
@@ -135,6 +136,7 @@ struct IndigoApp: App {
         // it is a setting and a progress report, not part of browsing.
         MenuBarExtra {
             LibraryMenuBarContent()
+                .indigoDefaultTypography()
                 .environment(library)
         } label: {
             LibraryMenuBarLabel()

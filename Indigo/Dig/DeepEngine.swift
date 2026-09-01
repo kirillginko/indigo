@@ -104,8 +104,14 @@ nonisolated struct DeepEngine {
         return fresh
     }
 
-    init(context: ModelContext) {
+    /// Shares one walked graph with whoever else answers for this page.
+    ///
+    /// Assembling a `GraphStore`'s caches reads several whole tables. Each
+    /// engine built its own, so a page that asks for a profile and a descent
+    /// paid for the same tables twice.
+    init(context: ModelContext, graph: GraphStore? = nil) {
         self.context = context
+        sharedGraph.store = graph
     }
 
     /// Everything reachable from a node, each filed at the shallowest level

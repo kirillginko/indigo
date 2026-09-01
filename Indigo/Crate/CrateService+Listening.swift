@@ -29,8 +29,10 @@ extension CrateService {
     }
 
     func isCrated(listening url: URL) -> Bool {
-        guard let recording = recording(forListening: url) else { return false }
-        return contains(recording: recording)
+        if let known = knownListening(url) { return known }
+        let answer = recording(forListening: url).map { contains(recording: $0) } ?? false
+        rememberListening(url, isCrated: answer)
+        return answer
     }
 
     /// Keeps, or lets go of, a track heard through a provider's player.

@@ -42,7 +42,40 @@ nonisolated struct DigArtwork {
 
     /// What a release looks like, from whichever source has a picture.
     func release(title: String, artist: String?) -> Pair {
-        Pair.first([discogsRelease(title: title, artist: artist), bandcamp(title: title, artist: artist)])
+        Pair.first([
+            discogsRelease(title: title, artist: artist),
+            // The rung that was missing, and the one the grid was standing on.
+            //
+            // A record's sleeve in an artist's discography comes from that
+            // artist's catalogue listing, not from the release cache — the
+            // release itself is only fetched when somebody opens it. So the
+            // tile had a picture and the record's own page, which asked only
+            // the release cache, had a blank square. That is the same record
+            // and the same picture; it was just filed somewhere this ladder
+            // never looked.
+            artistListing(title: title, artist: artist),
+            bandcamp(title: title, artist: artist)
+        ])
+    }
+
+    /// The sleeve as it appears in an artist's own discography.
+    private func artistListing(title: String, artist: String?) -> Pair {
+        guard let artist else { return Pair() }
+        let key = RecordingKey.normalizeArtist(artist)
+        guard !key.isEmpty else { return Pair() }
+        var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.nameKey == key })
+        descriptor.fetchLimit = 1
+        guard let record = (try? context.fetch(descriptor))?.first else { return Pair() }
+        let wanted = RecordingKey.normalizeTitle(title)
+        guard let index = record.releaseTitles.firstIndex(where: {
+            RecordingKey.normalizeTitle($0) == wanted
+        }) else { return Pair() }
+        return Pair(
+            full: index < record.releaseImageURLStrings.count
+                ? URL(string: record.releaseImageURLStrings[index]) : nil,
+            thumbnail: index < record.releaseThumbnailURLStrings.count
+                ? URL(string: record.releaseThumbnailURLStrings[index]) : nil
+        )
     }
 
     private func discogsRelease(title: String, artist: String?) -> Pair {
@@ -55,7 +88,7 @@ nonisolated struct DigArtwork {
                 guard let artistKey else { return true }
                 return record.artistNames.contains { RecordingKey.normalizeArtist($0) == artistKey }
             }
-        return Pair(full: match?.imageURL, thumbnail: nil)
+        return Pair(full: match?.imageURL, thumbnail: match?.thumbnailURL)
     }
 
     private func bandcamp(title: String, artist: String?) -> Pair {

@@ -59,7 +59,7 @@ struct DigReleaseView: View {
                     crate.toggle(
                         dig: .release, identifier: crateID, providerID: "dig.release.discogs",
                         title: profile?.title ?? fallbackTitle,
-                        subtitle: releaseSubtitle(profile), artworkURL: profile?.imageURL,
+                        subtitle: releaseSubtitle(profile), artworkURL: profile?.coverURL,
                         genres: (profile?.styles ?? []) + (profile?.genres ?? [])
                     )
                 }
@@ -80,7 +80,9 @@ struct DigReleaseView: View {
                     }
                     if let profile {
                         HStack(alignment: .top, spacing: 26) {
-                            ArtworkView(remoteURL: profile.imageURL, side: 240, glyphScale: 0.23,
+                            ArtworkView(remoteURL: profile.coverURL,
+                                        previewRemoteURL: profile.previewURL,
+                                        side: 240, glyphScale: 0.23,
                                         placeholder: .whiteLabel)
                                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
@@ -248,7 +250,7 @@ struct DigReleaseView: View {
                                 crate.toggle(
                                     listening: line.url, title: line.title,
                                     artist: profile.artists.first { ArtistName.isRealArtist($0) },
-                                    release: profile.title, artworkURL: profile.imageURL
+                                    release: profile.title, artworkURL: profile.coverURL
                                 )
                             }
                         )
@@ -270,7 +272,7 @@ struct DigReleaseView: View {
                 title: entry.title,
                 subtitle: profile.artists.first { ArtistName.isRealArtist($0) } ?? profile.title,
                 detail: profile.title,
-                remoteArtworkURL: profile.imageURL,
+                remoteArtworkURL: profile.coverURL,
                 playbackURL: entry.url,
                 embedProvider: .youtube
             )
@@ -304,10 +306,17 @@ struct DigReleaseView: View {
     @ViewBuilder
     private var unclaimed: some View {
         let known = bandcamp
+        // The same ladder every other surface uses, rather than Bandcamp
+        // alone. A record reached from an artist's discography already had a
+        // sleeve on the tile that was clicked; asking only Bandcamp for it
+        // here is what made that picture disappear on the way in.
+        let sleeve = DigArtwork(context: dig.context).release(title: fallbackTitle, artist: credit)
         HStack(alignment: .top, spacing: 26) {
             ArtworkView(
-                remoteURL: BandcampImage.sized(known?.imageURL, BandcampImage.cover),
-                previewRemoteURL: BandcampImage.sized(known?.imageURL, BandcampImage.thumbnail),
+                remoteURL: sleeve.full ?? sleeve.thumbnail
+                    ?? BandcampImage.sized(known?.imageURL, BandcampImage.cover),
+                previewRemoteURL: sleeve.thumbnail ?? sleeve.full
+                    ?? BandcampImage.sized(known?.imageURL, BandcampImage.thumbnail),
                 side: 240, glyphScale: 0.23, placeholder: .whiteLabel
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

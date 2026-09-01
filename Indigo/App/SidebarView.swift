@@ -11,11 +11,14 @@ import SwiftData
 
 private enum RadioSidebarGroup: CaseIterable, Hashable {
     case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl
+}
 
-    var shade: Double {
-        guard let index = Self.allCases.firstIndex(of: self) else { return 0 }
-        return Double(index) / Double(max(Self.allCases.count - 1, 1))
-    }
+/// The sidebar reads like descending through a record collection: every band
+/// has its own gradient, and each successive band begins a little deeper.
+private enum SidebarBand: Int {
+    case library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, explore
+
+    var depth: Double { Double(rawValue) / 10.0 }
 }
 
 struct SidebarView: View {
@@ -32,7 +35,18 @@ struct SidebarView: View {
     @Environment(PlaybackCoordinator.self) private var player
 
     @Query private var tracks: [Track]
+    /// Somewhere to keep the fold that is not view state, so writing to it
+    /// during a read does not invalidate anything.
+    @State private var held = LibraryCounts()
+
+    private final class LibraryCounts {
+        var trackCount = -1
+        var value: (tracks: Int, albums: Int, artists: Int) = (0, 0, 0)
+    }
+
+    @State private var isLibraryExpanded = true
     @State private var isRadioExpanded = true
+    @State private var isExploreExpanded = true
     @State private var expandedRadios: Set<RadioSidebarGroup> = [.nts]
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -43,10 +57,16 @@ struct SidebarView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    section("Library")
-                    row(.tracks, label: "Tracks", trailing: count(counts.tracks))
-                    row(.albums, label: "Albums", trailing: count(counts.albums))
-                    row(.artists, label: "Artists", trailing: count(counts.artists))
+                    directoryHeader("Library", expanded: isLibraryExpanded, band: .library) {
+                        isLibraryExpanded.toggle()
+                    }
+                    // Read once. Three reads meant three fetches.
+                    let library = counts
+                    if isLibraryExpanded {
+                        row(.tracks, label: "Tracks", trailing: count(library.tracks), band: .library)
+                        row(.albums, label: "Albums", trailing: count(library.albums), band: .library)
+                        row(.artists, label: "Artists", trailing: count(library.artists), band: .library)
+                    }
 
                     radioDirectoryHeader
                     if isRadioExpanded {
@@ -163,9 +183,13 @@ struct SidebarView: View {
                     }
                     }
 
-                    section("Collection")
-                    row(.crate, label: "Crate", trailing: crateCount)
-                    row(.dig, label: "Dig", trailing: nil)
+                    directoryHeader("Explore", expanded: isExploreExpanded, band: .explore) {
+                        isExploreExpanded.toggle()
+                    }
+                    if isExploreExpanded {
+                        row(.crate, label: "Crate", trailing: crateCount, band: .explore)
+                        row(.dig, label: "Dig", trailing: nil, band: .explore)
+                    }
                 }
                 .padding(.bottom, 12)
             }
@@ -174,8 +198,17 @@ struct SidebarView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .background(Palette.paperChrome)
+        // The darkest band is also the sidebar's floor. When directories are
+        // collapsed, the newly exposed space continues the colour story all
+        // the way down instead of revealing the neutral chrome background.
+        .background(bandGradient(.explore))
         .onChange(of: appState.route) { _, route in
+            if route == .tracks || route == .albums || route == .artists {
+                isLibraryExpanded = true
+            }
+            if route == .crate || route == .dig {
+                isExploreExpanded = true
+            }
             if let group = radioGroup(for: route) {
                 isRadioExpanded = true
                 expandedRadios.insert(group)
@@ -184,6 +217,22 @@ struct SidebarView: View {
     }
 
     // MARK: Pieces
+
+    private func bandGradient(_ band: SidebarBand) -> some View {
+        let depth = band.depth
+        return LinearGradient(
+            colors: [
+                Color(hue: 0.60 + depth * 0.12,
+                      saturation: 0.28 + depth * 0.40,
+                      brightness: 0.68 - depth * 0.52),
+                Color(hue: 0.62 + depth * 0.11,
+                      saturation: 0.36 + depth * 0.38,
+                      brightness: 0.55 - depth * 0.44)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 
     private var wordmark: some View {
         HStack(spacing: 6) {
@@ -200,35 +249,44 @@ struct SidebarView: View {
         .padding(.bottom, 14)
     }
 
-    private func section(_ title: String) -> some View {
-        Text(title)
-            .microLabel(1.6)
-            .foregroundStyle(Palette.inkFaint)
-            .padding(.horizontal, 14)
-            .padding(.top, 18)
-            .padding(.bottom, 7)
-    }
-
-    private var radioDirectoryHeader: some View {
+    private func directoryHeader(
+        _ title: String,
+        expanded: Bool,
+        band: SidebarBand,
+        toggle: @escaping () -> Void
+    ) -> some View {
         Button {
             withAnimation(reduceMotion ? nil : .easeOut(duration: 0.16)) {
-                isRadioExpanded.toggle()
+                toggle()
             }
         } label: {
             HStack(spacing: 8) {
-                Text("Radio").microLabel(1.6)
+                Text(title)
+                    .font(Typeface.body(12.5, weight: .bold))
+                    .textCase(.uppercase)
+                    // Nimbus needs much less air than the mono labels. A
+                    // restrained track keeps the directory names crisp
+                    // without turning them into utility metadata.
+                    .tracking(0.65)
                 Spacer(minLength: 4)
-                Image(systemName: isRadioExpanded ? "chevron.up" : "chevron.down")
+                Image(systemName: expanded ? "chevron.up" : "chevron.down")
                     .font(.system(size: 8, weight: .bold))
             }
-            .foregroundStyle(Palette.inkFaint)
+            .foregroundStyle(Color.white.opacity(0.72))
             .padding(.horizontal, 14)
-            .padding(.top, 18)
-            .padding(.bottom, 7)
+            .padding(.top, 15)
+            .padding(.bottom, 9)
+            .background(bandGradient(band))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(isRadioExpanded ? "Collapse" : "Expand") radio stations")
+        .accessibilityLabel("\(expanded ? "Collapse" : "Expand") \(title)")
+    }
+
+    private var radioDirectoryHeader: some View {
+        directoryHeader("Radio", expanded: isRadioExpanded, band: .radio) {
+            isRadioExpanded.toggle()
+        }
     }
 
     private func radioSection(_ title: String, location: String, group: RadioSidebarGroup) -> some View {
@@ -245,44 +303,31 @@ struct SidebarView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 7) {
                         Text(title)
-                            .font(Typeface.mono(10.5, weight: .semibold))
-                            .foregroundStyle(radioForeground(for: group).opacity(active ? 1 : 0.82))
+                            .font(Typeface.body(13, weight: .bold))
+                            .tracking(0.1)
+                            .foregroundStyle(Color.white.opacity(active ? 1 : 0.82))
                         if isPlaying {
                             LivePulseDot()
                         }
                     }
                     Text(location)
                         .font(Typeface.mono(8.5))
-                        .foregroundStyle(radioForeground(for: group).opacity(0.58))
+                        .foregroundStyle(Color.white.opacity(0.58))
                 }
                 Spacer(minLength: 4)
                 Image(systemName: expanded ? "chevron.up" : "chevron.down")
                     .font(.system(size: 8, weight: .bold))
             }
-            .foregroundStyle(radioForeground(for: group).opacity(0.62))
+            .foregroundStyle(Color.white.opacity(0.62))
             .padding(.horizontal, 14)
             .padding(.top, 12)
             .padding(.bottom, 6)
-            .background(radioShade(for: group))
+            .background(bandGradient(band(for: group)))
+            .overlay(Color.white.opacity(active ? 0.045 : 0))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(expanded ? "Collapse" : "Expand") \(title)")
-    }
-
-    /// The original dark indigo family, now stretched across a wider value
-    /// range so adjacent stations remain unmistakably separate.
-    private func radioShade(for group: RadioSidebarGroup?) -> Color {
-        let shade = group?.shade ?? 0
-        return Color(
-            hue: 0.68,
-            saturation: 0.42 + (shade * 0.10),
-            brightness: 0.43 - (shade * 0.29)
-        )
-    }
-
-    private func radioForeground(for group: RadioSidebarGroup?) -> Color {
-        Color.white
     }
 
     private func row(
@@ -290,12 +335,13 @@ struct SidebarView: View {
         label: String,
         trailing: String?,
         isLive: Bool = false,
-        indent: CGFloat = 0
+        indent: CGFloat = 0,
+        band explicitBand: SidebarBand? = nil
     ) -> some View {
         let selected = appState.route == route && appState.detail == nil
-        let group = indent > 0 ? radioGroup(for: route) : nil
-        let foreground = group.map { radioForeground(for: $0) } ?? Palette.ink
-        let secondaryForeground = group.map { radioForeground(for: $0).opacity(0.55) } ?? Palette.inkFaint
+        let resolvedBand = explicitBand ?? radioGroup(for: route).map(band(for:))
+        let foreground = Color.white.opacity(0.9)
+        let secondaryForeground = Color.white.opacity(0.52)
         return Button {
             appState.select(route)
         } label: {
@@ -319,11 +365,14 @@ struct SidebarView: View {
             .padding(.trailing, 14)
             .frame(height: Metrics.rowHeight)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                selected
-                    ? Palette.inverse
-                    : (indent > 0 ? radioShade(for: group) : Color.clear)
-            )
+            .background {
+                if selected {
+                    Palette.inverse
+                } else if let resolvedBand {
+                    bandGradient(resolvedBand)
+                        .overlay(Color.white.opacity(indent > 0 ? 0.012 : 0))
+                }
+            }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -340,6 +389,19 @@ struct SidebarView: View {
         case .cashmereStation, .cashmereArchive, .cashmereShows: .cashmere
         case .lylStation, .lylArchive, .lylShows: .lyl
         default: nil
+        }
+    }
+
+    private func band(for group: RadioSidebarGroup) -> SidebarBand {
+        switch group {
+        case .nts: .nts
+        case .kiosk: .kiosk
+        case .noods: .noods
+        case .lot: .lot
+        case .dublab: .dublab
+        case .alhara: .alhara
+        case .cashmere: .cashmere
+        case .lyl: .lyl
         }
     }
 
@@ -396,15 +458,33 @@ struct SidebarView: View {
         value > 0 ? value.formatted(.number) : nil
     }
 
-    /// One pass over the index — cheaper than building full album/artist groups.
+    /// The counts beside Tracks, Albums and Artists.
+    ///
+    /// This was computed, and `body` read it three times — once per row — so
+    /// one redraw fetched the whole `Track` table three times and walked it
+    /// three times, building two sets each pass. On the main thread, in the
+    /// sidebar, which is on screen on every page of the app.
+    ///
+    /// Sampling the running app put ninety of a hundred and four samples of
+    /// the sidebar's `body` inside this one getter, in a synchronous
+    /// CoreData fetch. That is a stutter every page pays, and it is why
+    /// scrolling caught while anything at all was being written.
+    ///
+    /// The walk is now kept until the library actually changes, and `body`
+    /// reads the answer once.
     private var counts: (tracks: Int, albums: Int, artists: Int) {
+        let all = tracks
+        if held.trackCount == all.count { return held.value }
         var albums = Set<String>()
         var artists = Set<String>()
-        for track in tracks {
+        for track in all {
             albums.insert(track.albumKey)
             artists.insert(track.artistKey)
         }
-        return (tracks.count, albums.count, artists.count)
+        let answer = (all.count, albums.count, artists.count)
+        held.trackCount = all.count
+        held.value = answer
+        return answer
     }
 }
 

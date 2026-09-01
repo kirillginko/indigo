@@ -22,6 +22,8 @@ nonisolated struct ArtistProfile: Sendable {
     let realName: String?
     let biography: String?
     let imageURL: URL?
+    /// The small version, shown coarsely while the full one is fetched.
+    let thumbnailURL: URL?
     let genres: [String]
     let styles: [String]
     let aliases: [String]
@@ -58,6 +60,23 @@ nonisolated struct ArtistProfile: Sendable {
         let imageURL: URL?
         let thumbnailURL: URL?
         let label: String?
+
+        // The two halves of a sleeve, and what to do when only one arrived.
+        //
+        // Sources fill these unevenly and always have: an artist's catalogue
+        // listing carries a thumbnail and often no cover, a release fetched by
+        // id carried a cover and — until now — no thumbnail at all. Views were
+        // each picking a field, so the same record showed a sleeve in the grid
+        // and a blank square on its own page, or the reverse. Neither half is
+        // worth nothing, so neither is allowed to mean nothing.
+
+        /// The biggest picture there is — or the small one, rather than a
+        /// blank square.
+        var coverURL: URL? { imageURL ?? thumbnailURL }
+
+        /// The small cut to stand in while the cover loads — or the cover
+        /// itself, when that is all there is.
+        var previewURL: URL? { thumbnailURL ?? imageURL }
         /// Identity is the record, not what is currently known about it.
         ///
         /// This used to include the year and the Discogs id, both of which
@@ -65,7 +84,23 @@ nonisolated struct ArtistProfile: Sendable {
         /// under it, and the list treated the same record as one row vanishing
         /// and a different one appearing further down. Which is exactly what
         /// it looked like.
-        var id: String { "release:\(RecordingKey.normalizeTitle(title))" }
+        ///
+        /// It also used to drop bracketed asides, which the merge that builds
+        /// these rows does not: "The Sunset Violent" and "The Sunset Violent
+        /// (LP)" survive that merge as two records, and were then handed
+        /// identical identities. Two rows claiming to be the same row is a
+        /// crash in anything that files them by it, and it was — every time
+        /// somebody opened an artist pressed on more than one format.
+        /// Identity and the merge now ask the same question.
+        var id: String { "release:\(Self.key(title))" }
+
+        /// One record, however the title was punctuated. Shared with the
+        /// merge in `DigEngine`, which is the point: what counts as the same
+        /// record has to be one answer, not two.
+        static func key(_ title: String) -> String {
+            title.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+                .replacingOccurrences(of: "[^a-z0-9]", with: "", options: .regularExpression)
+        }
     }
 
     nonisolated struct LabelRef: Identifiable, Hashable, Sendable {
@@ -85,11 +120,18 @@ nonisolated struct ArtistProfile: Sendable {
     static func placeholder(name: String, mbid: String?) -> ArtistProfile {
         ArtistProfile(
             name: name, mbid: mbid, origin: nil, disambiguation: nil, realName: nil,
-            biography: nil, imageURL: nil, genres: [], styles: [], aliases: [],
+            biography: nil, imageURL: nil, thumbnailURL: nil,
+            genres: [], styles: [], aliases: [],
             discogsURL: nil, bandcamp: [], releases: [], labels: [], related: [],
             libraryTrackCount: 0, crateCount: 0, radioAppearances: [], listen: []
         )
     }
+
+    /// The biggest picture of them there is, or the small one rather than an
+    /// empty frame. See `ReleaseLine` for why neither half may mean nothing.
+    var coverURL: URL? { imageURL ?? thumbnailURL }
+    /// The small cut to stand in while the portrait loads, or the portrait.
+    var previewURL: URL? { thumbnailURL ?? imageURL }
 
     /// True when there is nothing but a name — the state where DIG should say
     /// so instead of rendering a page of empty headings.
@@ -109,6 +151,9 @@ nonisolated struct DigReleaseProfile: Sendable {
     let genres: [String]
     let styles: [String]
     let imageURL: URL?
+    /// The small cut, which is often the only half a record has when it is
+    /// first opened — see `ArtistProfile.ReleaseLine`.
+    let thumbnailURL: URL?
     let tracks: [TrackLine]
     let notes: String?
     let sourceURL: URL?
@@ -116,6 +161,11 @@ nonisolated struct DigReleaseProfile: Sendable {
     /// transport through YouTube's official player.
     let listen: [ListenLine]
     let related: [RelatedArtist]
+
+    /// The biggest picture there is, or the small one rather than nothing.
+    var coverURL: URL? { imageURL ?? thumbnailURL }
+    /// The small cut to stand in while the cover loads, or the cover itself.
+    var previewURL: URL? { thumbnailURL ?? imageURL }
 
     nonisolated struct ListenLine: Identifiable, Sendable {
         let url: URL
@@ -173,13 +223,24 @@ nonisolated struct DigEngine {
         return fresh
     }
 
-    init(context: ModelContext) {
+    /// Shares one walked graph with whoever else answers for this page.
+    ///
+    /// Assembling a `GraphStore`'s caches reads several whole tables. Each
+    /// engine built its own, so a page that asks for a profile and a descent
+    /// paid for the same tables twice.
+    init(context: ModelContext, graph: GraphStore? = nil) {
         self.context = context
+        shared.store = graph
     }
 
     // MARK: - Artist
 
     func artistProfile(name: String, mbid: String?) -> ArtistProfile {
+        // Everything below reads the graph's fold — the recordings credited
+        // to this artist, their catalogue entries, the library and crate
+        // counts, the neighbourhood. Assembled once here rather than by
+        // whichever question reaches it first.
+        graph.prepare()
         // Falls back to the name when there is no MusicBrainz ID: an artist
         // reached from the library alone never has one, and that is exactly
         // the case the page must still fill in.
@@ -222,10 +283,20 @@ nonisolated struct DigEngine {
             .map { ArtistProfile.LabelRef(name: $0.key, mbid: $0.value) }
 
         let artistKey = RecordingKey.normalizeArtist(name)
-        let resolvedReleases = ((try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [])
-            .filter { release in
-                release.artistNames.contains { RecordingKey.normalizeArtist($0) == artistKey }
-            }
+        // The picture the row was already showing.
+        //
+        // A connection row draws from `ArtistPortrait`, filled in by the
+        // background fill; the page drew only from the artist's own catalogue
+        // entry. So a row could show somebody's face and their page open
+        // blank beside it — the same artist, two different places to look.
+        let storedPortrait: URL? = {
+            var descriptor = FetchDescriptor<ArtistPortrait>(
+                predicate: #Predicate { $0.nameKey == artistKey }
+            )
+            descriptor.fetchLimit = 1
+            return (try? context.fetch(descriptor))?.first?.imageURL
+        }()
+        let resolvedReleases = graph.releases(creditedTo: artistKey)
         let resolvedByTitle = Dictionary(
             resolvedReleases.map { (Self.releaseKey($0.title), $0) },
             uniquingKeysWith: { first, _ in first }
@@ -260,8 +331,13 @@ nonisolated struct DigEngine {
                     ? discogs?.releaseImageURLStrings[index].nonEmptyURL : nil)
                     ?? resolved?.imageURL
                     ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.cover),
+                // The same ladder the cover half climbs. It used to stop at
+                // the listing, so a record whose only picture came from the
+                // release cache had a cover and no thumbnail — and every
+                // surface that asked for the small one got nothing.
                 thumbnailURL: (index < (discogs?.releaseThumbnailURLStrings.count ?? 0)
                     ? discogs?.releaseThumbnailURLStrings[index].nonEmptyURL : nil)
+                    ?? resolved?.thumbnailURL
                     ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.thumbnail),
                 label: (index < (discogs?.releaseLabels.count ?? 0)
                     ? discogs?.releaseLabels[index].nonEmpty : nil) ?? resolved?.labelNames.first
@@ -277,7 +353,8 @@ nonisolated struct DigEngine {
                 title: $0.title, year: $0.year, discogsID: resolved?.discogsID,
                 imageURL: resolved?.imageURL
                     ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.cover),
-                thumbnailURL: BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.thumbnail),
+                thumbnailURL: resolved?.thumbnailURL
+                    ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.thumbnail),
                 label: resolved?.labelNames.first ?? fromBandcamp?.labelName
             )
         }
@@ -295,7 +372,7 @@ nonisolated struct DigEngine {
                 year: record.year.map(String.init),
                 discogsID: record.discogsID,
                 imageURL: record.imageURL,
-                thumbnailURL: nil,
+                thumbnailURL: record.thumbnailURL,
                 label: record.labelNames.first { LabelName.isRealLabel($0) }
             )
         }
@@ -360,13 +437,21 @@ nonisolated struct DigEngine {
             }
 
         return ArtistProfile(
-            name: discogs?.name ?? cached?.name ?? name,
+            // Cleaned on the way out, not only on the way in. A row cached
+            // before the fix still holds "Oliwa (2)", and that is the name at
+            // the top of their own page — the one place a Discogs filing
+            // number is most obviously not the artist's name.
+            name: DiscogsClient.withoutDisambiguator(
+                discogs?.name ?? cached?.name ?? name
+            ),
             mbid: mbid ?? cached?.mbid,
             origin: cached?.origin,
             disambiguation: cached?.disambiguation,
-            realName: discogs?.realName,
+            realName: discogs?.realName.map(DiscogsClient.withoutDisambiguator),
             biography: discogs?.biography.map(DiscogsEnricher.cleanProfile),
-            imageURL: discogs?.imageURL,
+            imageURL: discogs?.imageURL ?? storedPortrait,
+            thumbnailURL: discogs?.thumbnailURLString.flatMap(URL.init(string:))
+                ?? storedPortrait,
             genres: Self.merged(discogs?.genres ?? cached?.genreTags ?? [], with: bandcampTags),
             styles: discogs?.styles ?? [],
             aliases: discogs?.aliasNames ?? [],
@@ -410,8 +495,7 @@ nonisolated struct DigEngine {
     }
 
     private static func releaseKey(_ title: String) -> String {
-        title.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
-            .replacingOccurrences(of: "[^a-z0-9]", with: "", options: .regularExpression)
+        ArtistProfile.ReleaseLine.key(title)
     }
 
     func releaseProfile(id: Int) -> DigReleaseProfile? {
@@ -442,7 +526,9 @@ nonisolated struct DigEngine {
         return DigReleaseProfile(
             id: id, title: record.title, year: record.year, artists: record.artistNames,
             labels: labels, genres: record.genres, styles: record.styles,
-            imageURL: record.imageURL ?? artwork.full, tracks: tracks, notes: record.notes,
+            imageURL: record.imageURL ?? artwork.full,
+            thumbnailURL: record.thumbnailURL ?? artwork.thumbnail,
+            tracks: tracks, notes: record.notes,
             sourceURL: record.profileURL,
             listen: record.videos.map {
                 DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds)
@@ -477,52 +563,6 @@ nonisolated struct DigEngine {
     private static func decade(_ year: String) -> Int? {
         guard let value = Int(year.prefix(4)), value > 0 else { return nil }
         return value / 10 * 10
-    }
-
-    private func addRadioConnections(
-        for name: String,
-        subject: String,
-        into found: inout [String: [Relationship]]
-    ) {
-        let subjectShows = recordings(byArtist: name).flatMap(\.appearances).reduce(into: [String: String]()) {
-            guard let showID = $1.showID else { return }
-            $0["\($1.providerID)|\(showID)"] = $1.showTitle ?? $1.sourceLine
-        }
-        guard !subjectShows.isEmpty else { return }
-        let all = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
-        for recording in all {
-            guard let peer = recording.artistName,
-                  RecordingKey.normalizeArtist(peer) != subject else { continue }
-            if let match = recording.appearances.first(where: {
-                guard let showID = $0.showID else { return false }
-                return subjectShows["\($0.providerID)|\(showID)"] != nil
-            }), let showID = match.showID {
-                let title = subjectShows["\(match.providerID)|\(showID)"] ?? match.sourceLine
-                found[peer, default: []].append(
-                    Relationship(kind: .sharedBroadcast, source: .radio,
-                                 detail: "Played in the same broadcast: \(title)", confidence: 0.7)
-                )
-            }
-        }
-    }
-
-    private func addCollectionConnections(
-        for name: String,
-        subject: String,
-        into found: inout [String: [Relationship]]
-    ) {
-        let tracks = (try? context.fetch(FetchDescriptor<Track>())) ?? []
-        let albums = Set(tracks.filter { Self.artistKeys(for: $0).contains(subject) }
-            .map(\.albumKey).filter { !$0.isEmpty })
-        guard !albums.isEmpty else { return }
-        for track in tracks where albums.contains(track.albumKey) {
-            let peer = track.artist.isEmpty ? track.albumArtist : track.artist
-            guard !peer.isEmpty, RecordingKey.normalizeArtist(peer) != subject else { continue }
-            found[peer, default: []].append(
-                Relationship(kind: .sharedCollection, source: .library,
-                             detail: "Together in your library: \(track.album)", confidence: 0.65)
-            )
-        }
     }
 
     // MARK: - Label
@@ -564,11 +604,16 @@ nonisolated struct DigEngine {
 
     // MARK: - Local evidence
 
+    /// Everything credited to an artist.
+    ///
+    /// Read from the graph's fold rather than by fetching every recording and
+    /// normalising its credit. This is asked several times while a page
+    /// builds — and a page rebuilds itself on every write during a cold
+    /// load — so a scan here was paid for many times over per artist.
     func recordings(byArtist name: String) -> [Recording] {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return [] }
-        let all = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
-        return all.filter { RecordingKey.normalizeArtist($0.artistName) == key }
+        return graph.recordings(byArtistKey: key)
     }
 
     private func recordings(onLabel mbid: String) -> [Recording] {
@@ -581,11 +626,16 @@ nonisolated struct DigEngine {
         return all.filter { ids.contains($0.id) }
     }
 
+    /// How much of this artist the listener already owns.
+    ///
+    /// The same fold the graph walk uses. This used to fetch the whole track
+    /// table and normalise two credits for every file in it — the exact scan
+    /// that was taken out of the walk and left in the profile, where it ran
+    /// just as often and grew with the size of somebody's music folder.
     func libraryTrackCount(artist name: String) -> Int {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return 0 }
-        let all = (try? context.fetch(FetchDescriptor<Track>())) ?? []
-        return all.filter { Self.artistKeys(for: $0).contains(key) }.count
+        return graph.libraryTrackCount(forArtistKey: key)
     }
 
     /// Which artists a track counts towards. A track credited to one performer
@@ -603,11 +653,7 @@ nonisolated struct DigEngine {
     func crateCount(artist name: String) -> Int {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return 0 }
-        let items = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
-        return items.filter {
-            RecordingKey.normalizeArtist($0.recording?.artistName) == key
-                || ($0.kind == .artist && RecordingKey.normalizeArtist($0.displayTitle) == key)
-        }.count
+        return graph.crateCount(forArtistKey: key)
     }
 
     private func cratedArtistCounts() -> [String: Int] {
@@ -653,8 +699,13 @@ nonisolated struct DigEngine {
         return ((try? context.fetch(descriptor))?.first) != nil
     }
 
+    /// What a recording's catalogue entry says.
+    ///
+    /// Asked once per recording while a profile is built, and it used to be a
+    /// fetch each time. The tables were already read into a dictionary by the
+    /// graph; this reads that.
     func metadata(for recordingID: UUID) -> RecordingMetadata? {
-        MusicBrainzEnricher(context: context).metadata(for: recordingID)
+        graph.metadata(for: recordingID)
     }
 }
 
