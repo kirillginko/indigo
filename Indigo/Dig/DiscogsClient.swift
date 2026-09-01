@@ -165,14 +165,47 @@ nonisolated struct DiscogsClient: Sendable {
 
     /// Two bounded searches expand the graph without issuing one request per
     /// recommendation. Results are cached on the artist by DiscogsEnricher.
-    func recommendations(labels: [String], styles: [String]) async throws -> DiscogsRecommendationBundle {
-        async let labelResults: DiscogsSearchResponse = recommendationSearch(field: "label", value: labels.first)
-        async let styleResults: DiscogsSearchResponse = recommendationSearch(field: "style", value: styles.first)
-        let (labelsResponse, stylesResponse) = try await (labelResults, styleResults)
+    /// Who else is nearby, asked several ways.
+    ///
+    /// This used to ask about one label and one style — the first of each —
+    /// which is why the same handful of names came back every time. An artist
+    /// on three imprints working in four styles has a far wider neighbourhood
+    /// than their first label's roster, and it is the overlap between those
+    /// answers that makes a recommendation worth offering.
+    ///
+    /// Bounded deliberately: two of each, plus one that asks for a style
+    /// within the years the artist was actually working, which is what makes
+    /// an era mean something rather than "the same decade".
+    func recommendations(
+        labels: [String],
+        styles: [String],
+        years: ClosedRange<Int>? = nil
+    ) async throws -> DiscogsRecommendationBundle {
+        async let firstLabel = recommendationSearch(field: "label", value: labels.first)
+        async let secondLabel = recommendationSearch(field: "label", value: labels.dropFirst().first)
+        async let firstStyle = recommendationSearch(field: "style", value: styles.first)
+        async let secondStyle = recommendationSearch(field: "style", value: styles.dropFirst().first)
+        async let era = eraSearch(style: styles.first, years: years)
+
+        let responses = try await [firstLabel, secondLabel, firstStyle, secondStyle, era]
         return DiscogsRecommendationBundle(
-            labelArtists: Self.neighbours(from: labelsResponse.results ?? []),
-            styleArtists: Self.neighbours(from: stylesResponse.results ?? [])
+            labelArtists: Self.neighbours(from: (responses[0].results ?? []) + (responses[1].results ?? [])),
+            styleArtists: Self.neighbours(
+                from: (responses[2].results ?? []) + (responses[3].results ?? []) + (responses[4].results ?? [])
+            )
         )
+    }
+
+    /// A style, narrowed to when the artist was actually working. Records made
+    /// alongside theirs rather than merely in the same decade.
+    private func eraSearch(style: String?, years: ClosedRange<Int>?) async throws -> DiscogsSearchResponse {
+        guard let style, !style.isEmpty, let years else { return DiscogsSearchResponse(results: []) }
+        return try await get("database/search", query: [
+            URLQueryItem(name: "style", value: style),
+            URLQueryItem(name: "year", value: String(years.lowerBound + (years.count / 2))),
+            URLQueryItem(name: "type", value: "release"),
+            URLQueryItem(name: "per_page", value: "20")
+        ])
     }
 
     private func recommendationSearch(field: String, value: String?) async throws -> DiscogsSearchResponse {

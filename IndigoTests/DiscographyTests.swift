@@ -200,3 +200,80 @@ final class ReleaseMergeTests: XCTestCase {
         XCTAssertTrue(ReleaseKind.whiteLabel.isUnderground)
     }
 }
+
+/// Working at the same time is not a connection — everybody who put a record
+/// out in the 2010s did.
+final class EraConnectionTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    @discardableResult
+    private func artist(_ name: String, id: Int, labels: [String], styles: [String], years: [String]) -> DiscogsArtist {
+        let record = DiscogsArtist(nameKey: RecordingKey.normalizeArtist(name), discogsID: id, name: name)
+        record.labelNames = labels
+        record.styles = styles
+        record.releaseYears = years
+        record.releaseTitles = years.map { "Release \($0)" }
+        context.insert(record)
+        return record
+    }
+
+    /// A stranger who happened to release in the same decade is not offered at
+    /// all — that filled the list with names the app could say nothing about.
+    func testADecadeAloneIsNotAConnection() throws {
+        artist("Subject", id: 1, labels: ["Ilian Tape"], styles: ["Techno"], years: ["2018"])
+        artist("Stranger", id: 2, labels: ["Some Other Label"], styles: ["Folk"], years: ["2018"])
+
+        let related = DigEngine(context: context).relatedArtists(to: "Subject")
+        XCTAssertFalse(related.contains { $0.name == "Stranger" })
+    }
+
+    /// But two artists on the same imprint whose catalogues overlap are
+    /// contemporaries rather than coincidences — and the reason says which.
+    func testAnEraQualifiesAConnectionThatAlreadyExists() throws {
+        artist("Subject", id: 1, labels: ["Ilian Tape"], styles: ["Techno"], years: ["2018"])
+        artist("Labelmate", id: 2, labels: ["Ilian Tape"], styles: ["Ambient"], years: ["2018"])
+
+        let peer = try XCTUnwrap(
+            DigEngine(context: context).relatedArtists(to: "Subject")
+                .first { $0.name == "Labelmate" }
+        )
+        let era = try XCTUnwrap(peer.reasons.first { $0.kind == .sameEra })
+        XCTAssertEqual(era.detail, "Ilian Tape in the 2010s",
+                       "It names what it is qualifying, not a bare decade")
+        XCTAssertTrue(peer.reasons.contains { $0.kind == .sharedLabel })
+    }
+
+    /// A record's place in the list is fixed when it is first shown. Years
+    /// arrive during enrichment, and re-sorting as they land makes records
+    /// slide past each other under the reader's eyes.
+    func testTheOrderShownFirstIsTheOrderKept() {
+        let first = ["release:a", "release:b", "release:c"]
+        let placed = Dictionary(uniqueKeysWithValues: first.enumerated().map { ($1, $0) })
+
+        // "d" is found later and has no place yet.
+        let arrived = ["release:c", "release:d", "release:a", "release:b"]
+        let settled = arrived.enumerated().sorted { lhs, rhs in
+            switch (placed[lhs.element], placed[rhs.element]) {
+            case let (a?, b?): return a < b
+            case (nil, _?): return false
+            case (_?, nil): return true
+            default: return lhs.offset < rhs.offset
+            }
+        }.map(\.element)
+
+        XCTAssertEqual(settled, ["release:a", "release:b", "release:c", "release:d"],
+                       "Known records hold their places; new ones join the end")
+    }
+}

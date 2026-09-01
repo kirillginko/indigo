@@ -88,7 +88,13 @@ nonisolated struct DiscogsEnricher {
     func recommendations(for artist: DiscogsArtist, force: Bool = false) async throws {
         if !force, let fetchedAt = artist.recommendationsFetchedAt,
            Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 { return }
-        let bundle = try await client.recommendations(labels: artist.labelNames, styles: artist.styles)
+        // The years the artist was actually working, so the era question is
+        // about their contemporaries rather than about a decade.
+        let years = artist.releaseYears.compactMap { Int($0.prefix(4)) }.filter { $0 > 1900 }
+        let span = years.min().flatMap { low in years.max().map { low...$0 } }
+        let bundle = try await client.recommendations(
+            labels: artist.labelNames, styles: artist.styles, years: span
+        )
         let subject = artist.nameKey
         let labelNeighbours = Self.unique(bundle.labelArtists.filter {
             RecordingKey.normalizeArtist($0.name) != subject

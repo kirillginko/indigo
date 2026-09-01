@@ -343,18 +343,33 @@ nonisolated struct GraphStore {
             // about twenty microseconds each. That was four fifths of the time
             // it took to open an artist.
             for peer in caches.shapes where peer.key != subject.key && !family.contains(peer.key) {
-                if let shared = subject.sharedLabel(with: peer) {
-                    link(peer.name, .sharedLabel, .discogs, "Both release on \(shared)",
+                let sharedLabel = subject.sharedLabel(with: peer)
+                let sharedStyles = subject.styleKeys.intersection(peer.styleKeys)
+                let sharedStyle = subject.style(forKey: sharedStyles.first)
+
+                if let sharedLabel {
+                    link(peer.name, .sharedLabel, .discogs, "Both release on \(sharedLabel)",
                          confidence: 0.8, key: peer.key)
                 }
-                let sharedStyles = subject.styleKeys.intersection(peer.styleKeys)
-                if let style = subject.style(forKey: sharedStyles.first) {
-                    link(peer.name, .sharedStyle, .discogs, "Shared sound: \(style)",
+                if let sharedStyle {
+                    link(peer.name, .sharedStyle, .discogs, "Shared sound: \(sharedStyle)",
                          occurrences: sharedStyles.count, key: peer.key)
                 }
-                if let decade = subject.decades.intersection(peer.decades).max() {
-                    link(peer.name, .sameEra, .discogs, "Catalogues overlap in the \(decade)s",
-                         key: peer.key)
+
+                // Working at the same time is not a connection. Everybody who
+                // put a record out in the 2010s did, and offering that as a
+                // reason filled the list with strangers.
+                //
+                // It is worth something as a *qualifier*: two artists on the
+                // same imprint, or in the same style, whose catalogues also
+                // overlap are contemporaries rather than coincidences. So it
+                // is only said where there is already something to say it
+                // about, and it says what it is qualifying.
+                if let decade = subject.decades.intersection(peer.decades).max(),
+                   sharedLabel != nil || sharedStyle != nil {
+                    let what = sharedLabel ?? sharedStyle ?? ""
+                    link(peer.name, .sameEra, .discogs,
+                         "\(what) in the \(decade)s", key: peer.key)
                 }
             }
         }

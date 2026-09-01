@@ -200,7 +200,7 @@ struct ArtistDigView: View {
                                 alignment: .leading,
                                 spacing: 22
                             ) {
-                                ForEach(profile.releases.prefix(releaseLimit)) { release in
+                                ForEach(settled(profile.releases).prefix(releaseLimit)) { release in
                                     DigReleaseTile(release: release) {
                                         openRelease(release)
                                     }
@@ -298,6 +298,7 @@ struct ArtistDigView: View {
         }
         .task(id: dig.revision) { await readProfile() }
         .task(id: artistMBID ?? artistName) {
+            releaseOrder = []
             await readProfile()
             artistScenes = await dig.scenes(forArtist: artistName)
 
@@ -347,9 +348,35 @@ struct ArtistDigView: View {
         }
     }
 
+    /// The order the releases were first shown in.
+    ///
+    /// Years arrive during enrichment, and re-sorting as they land makes
+    /// records slide past each other under the reader's eyes. Whatever order
+    /// the first full answer produced is the order the page keeps; records
+    /// found later join the end rather than pushing the rest around.
+    @State private var releaseOrder: [String] = []
+
+    private func settled(_ releases: [ArtistProfile.ReleaseLine]) -> [ArtistProfile.ReleaseLine] {
+        guard !releaseOrder.isEmpty else { return releases }
+        let placed = Dictionary(uniqueKeysWithValues: releaseOrder.enumerated().map { ($1, $0) })
+        return releases.enumerated().sorted { lhs, rhs in
+            let left = placed[lhs.element.id]
+            let right = placed[rhs.element.id]
+            switch (left, right) {
+            case let (a?, b?): return a < b
+            case (nil, _?): return false
+            case (_?, nil): return true
+            default: return lhs.offset < rhs.offset
+            }
+        }.map(\.element)
+    }
+
     private func readProfile() async {
         let found = await dig.artistProfile(name: artistName, mbid: artistMBID)
         profile = found
+        if releaseOrder.isEmpty, !found.releases.isEmpty {
+            releaseOrder = found.releases.map(\.id)
+        }
         lanes = Connections.split(found.related)
         warmArtwork(found)
         // The rows on this page go to the front of the portrait queue.
@@ -418,9 +445,12 @@ struct ArtistDigView: View {
                     lanes.soundArtists.append(artist)
                 } else if !kinds.isDisjoint(with: [.sharedBroadcast, .sharedCollection]) {
                     lanes.personalArtists.append(artist)
-                } else {
+                } else if kinds.contains(.sameEra) {
                     lanes.eraArtists.append(artist)
                 }
+                // Anything reached by nothing nameable is not offered. A
+                // connection that cannot say what it rests on is the one thing
+                // this app is not allowed to show.
             }
             return lanes
         }
