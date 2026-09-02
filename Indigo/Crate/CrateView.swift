@@ -17,6 +17,8 @@ struct CrateView: View {
     @Environment(DigStore.self) private var dig
     @Environment(KioskBrowseStore.self) private var kioskBrowse
     @Environment(NoodsBrowseStore.self) private var noodsBrowse
+    @Environment(IdaBrowseStore.self) private var idaBrowse
+    @Environment(Radio80000BrowseStore.self) private var radio80000Browse
     @Environment(NTSBrowseStore.self) private var ntsBrowse
     @Environment(LotBrowseStore.self) private var lotBrowse
     @Environment(DublabBrowseStore.self) private var dublabBrowse
@@ -248,6 +250,14 @@ struct CrateView: View {
             case CashmereProvider.providerID where showID.hasPrefix("cashmere.episode."):
                 appState.open(.cashmereEpisode(slug: String(showID.dropFirst("cashmere.episode.".count))))
                 return
+            case IdaProvider.providerID where showID.hasPrefix("ida.episode."):
+                appState.open(.idaEpisode(slug: String(showID.dropFirst("ida.episode.".count))))
+                return
+            case Radio80000Provider.providerID where showID.hasPrefix("radio80000.episode."):
+                appState.open(.radio80000Episode(
+                    id: String(showID.dropFirst("radio80000.episode.".count))
+                ))
+                return
             case AlharaProvider.providerID where showID.hasPrefix("alhara.show."):
                 appState.open(.alharaShow(slug: String(showID.dropFirst("alhara.show.".count))))
                 return
@@ -354,6 +364,14 @@ struct CrateView: View {
                 let slug = String(showID.dropFirst("lyl.episode.".count))
                 await lylBrowse.loadDetailIfNeeded(slug: slug)
                 genres = lylBrowse.episode(slug: slug)?.styles ?? []
+            case IdaProvider.providerID where showID.hasPrefix("ida.episode."):
+                let slug = String(showID.dropFirst("ida.episode.".count))
+                await idaBrowse.loadDetailIfNeeded(slug: slug)
+                genres = idaBrowse.episode(slug: slug)?.genres ?? []
+            case Radio80000Provider.providerID where showID.hasPrefix("radio80000.episode."):
+                let id = String(showID.dropFirst("radio80000.episode.".count))
+                await radio80000Browse.loadDetailIfNeeded(id: id)
+                genres = radio80000Browse.episode(id: id)?.genres ?? []
             case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
                 let identity = String(showID.dropFirst("nts.episode.".count))
                 guard let ref = NTSEpisodeRef.decode(identity) else { continue }

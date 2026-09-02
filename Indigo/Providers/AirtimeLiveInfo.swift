@@ -6,8 +6,8 @@
 //  and it publishes the same `live-info-v2` document wherever it is installed:
 //  what show is on the air, what file is playing inside it, and what is next.
 //
-//  dublab and Cashmere both broadcast through it, so the shape lives here
-//  rather than in whichever provider happened to need it first.
+//  dublab, Cashmere and Radio 80000 all broadcast through it, so the shapes
+//  live here rather than in whichever provider happened to need them first.
 //
 
 import Foundation
@@ -96,5 +96,68 @@ nonisolated enum AirtimeTimestamp {
             if let date = formatter.date(from: value) { return date }
         }
         return nil
+    }
+}
+
+/// Airtime's published calendar: this week and the next, as one object keyed
+/// by weekday name — "monday" … "sunday", then "nextmonday" … "nextsunday".
+///
+/// It is the same document on every Airtime install, and it is a good deal
+/// more than `live-info`'s "what is on next": a fortnight of slots, which is
+/// what makes a schedule a listener can plan around. Stations that publish a
+/// calendar of their own on their own site are better read there — dublab
+/// does — but for a station whose schedule only exists inside Airtime, this
+/// is it.
+nonisolated struct AirtimeWeekInfoDTO: Decodable, Sendable {
+    /// Weekday key → that day's slots, in the order Airtime lists them.
+    let days: [String: [Slot]]
+
+    nonisolated struct Slot: Decodable, Sendable {
+        let name: String?
+        let description: String?
+        /// Some stations point this at the show's page on their own site.
+        let url: String?
+        let image_path: String?
+        let start_timestamp: String?
+        let end_timestamp: String?
+        /// Airtime's own id for the show, stable across its instances.
+        let id: Int?
+        let instance_id: Int?
+    }
+
+    /// The payload mixes the fourteen day arrays with scalars like
+    /// `AIRTIME_API_VERSION`, so it is decoded key by key and anything that is
+    /// not a list of slots is skipped rather than throwing.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AnyKey.self)
+        var found: [String: [Slot]] = [:]
+        for key in container.allKeys {
+            guard let slots = try? container.decode([Slot].self, forKey: key) else { continue }
+            found[key.stringValue.lowercased()] = slots
+        }
+        days = found
+    }
+
+    private struct AnyKey: CodingKey {
+        let stringValue: String
+        let intValue: Int? = nil
+        init?(stringValue: String) { self.stringValue = stringValue }
+        init?(intValue: Int) { nil }
+    }
+
+    /// Every slot in the fortnight, in time order. The day keys carry no date
+    /// themselves — the timestamps inside them do — so ordering is done on
+    /// those rather than on the order the days arrived in.
+    func slots(zone: TimeZone) -> [(slot: Slot, starts: Date, ends: Date)] {
+        days.values
+            .flatMap { $0 }
+            .compactMap { slot in
+                guard let starts = AirtimeTimestamp.parse(slot.start_timestamp, zone: zone),
+                      let ends = AirtimeTimestamp.parse(slot.end_timestamp, zone: zone),
+                      ends > starts
+                else { return nil }
+                return (slot, starts, ends)
+            }
+            .sorted { $0.starts < $1.starts }
     }
 }

@@ -107,6 +107,14 @@ struct NowPlayingSummary {
         case AlharaProvider.providerID: return "alHara"
         case CashmereProvider.providerID: return "Cashmere"
         case LYLProvider.providerID: return "LYL"
+        case IdaProvider.providerID:
+            // "IDA/TLN" for a channel, plain "IDA" for anything archived.
+            if item.kind == .radioStation,
+               let channel = IdaChannel.allCases.first(where: { $0.stationID == item.id }) {
+                return "IDA/\(channel.shortName)"
+            }
+            return "IDA"
+        case Radio80000Provider.providerID: return "80K"
         case Track.sourceID: return "Local"
         default: return item.sourceID.uppercased()
         }

@@ -40,6 +40,13 @@ nonisolated enum Route: Hashable {
     case lylStation
     case lylArchive
     case lylShows
+    /// IDA runs two channels at once, so a station route names which.
+    case idaStation(String)
+    case idaEpisodes
+    case idaShows
+    case radio80000Station
+    case radio80000Latest
+    case radio80000Shows
     case crate
     case dig
 
@@ -74,6 +81,12 @@ nonisolated enum Route: Hashable {
         case .lylStation: "LYL Radio"
         case .lylArchive: "Archive"
         case .lylShows: "Shows"
+        case .idaStation: "IDA Radio"
+        case .idaEpisodes: "Episodes"
+        case .idaShows: "Shows"
+        case .radio80000Station: "Radio 80000"
+        case .radio80000Latest: "Latest"
+        case .radio80000Shows: "Shows"
         case .crate: "Crate"
         case .dig: "Dig"
         }
@@ -113,6 +126,12 @@ nonisolated enum DetailPage: Hashable {
     case cashmereShow(slug: String)
     case lylEpisode(slug: String)
     case lylShow(slug: String)
+    case idaEpisode(slug: String)
+    case idaShow(slug: String)
+    /// Radio 80000 broadcasts live on two platforms, so the id says which —
+    /// see `Radio80000EpisodeID`.
+    case radio80000Episode(id: String)
+    case radio80000Show(slug: String)
 }
 
 @Observable
@@ -190,6 +209,10 @@ final class AppState {
         case .cashmereShow: return "Show"
         case .lylEpisode: return "Episode"
         case .lylShow: return "Show"
+        case .idaEpisode: return "Episode"
+        case .idaShow: return "Show"
+        case .radio80000Episode: return "Broadcast"
+        case .radio80000Show: return "Show"
         }
     }
 }

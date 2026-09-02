@@ -126,6 +126,14 @@ struct RootView: View {
                     LYLEpisodeDetailView(slug: slug)
                 case .lylShow(let slug):
                     LYLShowDetailView(slug: slug)
+                case .idaEpisode(let slug):
+                    IdaEpisodeDetailView(slug: slug)
+                case .idaShow(let slug):
+                    IdaShowDetailView(slug: slug)
+                case .radio80000Episode(let id):
+                    Radio80000EpisodeDetailView(episodeID: id)
+                case .radio80000Show(let slug):
+                    Radio80000ShowDetailView(slug: slug)
                 }
                 }
                 // A fresh view per page, rather than SwiftUI reusing the last
@@ -176,6 +184,12 @@ struct RootView: View {
                 case .lylStation: LYLStationView()
                 case .lylArchive: LYLArchiveView()
                 case .lylShows: LYLShowsView()
+                case .idaStation(let id): IdaStationView(stationID: id)
+                case .idaEpisodes: IdaEpisodesView()
+                case .idaShows: IdaShowsView()
+                case .radio80000Station: Radio80000StationView()
+                case .radio80000Latest: Radio80000LatestView()
+                case .radio80000Shows: Radio80000ShowsView()
                 case .crate: CrateView()
                 case .dig: DigView()
                 }

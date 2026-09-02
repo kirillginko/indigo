@@ -156,6 +156,13 @@ struct PlayerBarView: View {
         if item.id.hasPrefix("lyl.episode.") {
             return .detail(.lylEpisode(slug: String(item.id.dropFirst("lyl.episode.".count))))
         }
+        if item.id.hasPrefix("radio80000.episode.") {
+            let id = String(item.id.dropFirst("radio80000.episode.".count))
+            return .detail(.radio80000Episode(id: id))
+        }
+        if item.id.hasPrefix("ida.episode.") {
+            return .detail(.idaEpisode(slug: String(item.id.dropFirst("ida.episode.".count))))
+        }
         if item.id.hasPrefix("cashmere.episode.") {
             return .detail(.cashmereEpisode(slug: String(item.id.dropFirst("cashmere.episode.".count))))
         }
@@ -183,6 +190,8 @@ struct PlayerBarView: View {
         case AlharaProvider.providerID: return .route(.alharaStation(item.id))
         case CashmereProvider.providerID: return .route(.cashmereStation)
         case LYLProvider.providerID: return .route(.lylStation)
+        case IdaProvider.providerID: return .route(.idaStation(item.id))
+        case Radio80000Provider.providerID: return .route(.radio80000Station)
         default: return nil
         }
     }

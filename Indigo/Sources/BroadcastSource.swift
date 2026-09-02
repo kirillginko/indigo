@@ -91,6 +91,16 @@ nonisolated struct BroadcastSource {
                 ? String(showID.dropFirst("dublab.broadcast.".count))
                 : showID
             return slug.isEmpty ? nil : .dublabBroadcast(slug: slug)
+        case IdaProvider.providerID:
+            let slug = showID.hasPrefix("ida.episode.")
+                ? String(showID.dropFirst("ida.episode.".count))
+                : showID
+            return slug.isEmpty ? nil : .idaEpisode(slug: slug)
+        case Radio80000Provider.providerID:
+            let id = showID.hasPrefix("radio80000.episode.")
+                ? String(showID.dropFirst("radio80000.episode.".count))
+                : showID
+            return id.isEmpty ? nil : .radio80000Episode(id: id)
         case LotProvider.providerID:
             let identity = showID.hasPrefix("lot.episode.")
                 ? String(showID.dropFirst("lot.episode.".count))
@@ -112,6 +122,8 @@ nonisolated struct BroadcastSource {
         case AlharaProvider.providerID: "alHara"
         case CashmereProvider.providerID: "Cashmere"
         case LYLProvider.providerID: "LYL"
+        case IdaProvider.providerID: "IDA"
+        case Radio80000Provider.providerID: "Radio 80000"
         case Track.sourceID: "Local"
         default: providerID.capitalized
         }
@@ -137,6 +149,8 @@ nonisolated enum StationMark {
         case DublabProvider.providerID: DublabProvider.logoURL
         case LYLProvider.providerID: LYLProvider.logoURL
         case CashmereProvider.providerID: CashmereProvider.logoURL
+        case IdaProvider.providerID: IdaProvider.logoURL
+        case Radio80000Provider.providerID: Radio80000Provider.logoURL
         default: nil
         }
     }

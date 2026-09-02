@@ -10,15 +10,15 @@ import SwiftUI
 import SwiftData
 
 private enum RadioSidebarGroup: CaseIterable, Hashable {
-    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl
+    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000
 }
 
 /// The sidebar reads like descending through a record collection: every band
 /// has its own gradient, and each successive band begins a little deeper.
 private enum SidebarBand: Int {
-    case library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, explore
+    case library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, explore
 
-    var depth: Double { Double(rawValue) / 10.0 }
+    var depth: Double { Double(rawValue) / 12.0 }
 }
 
 struct SidebarView: View {
@@ -31,6 +31,8 @@ struct SidebarView: View {
     @Environment(AlharaProvider.self) private var alhara
     @Environment(CashmereProvider.self) private var cashmere
     @Environment(LYLProvider.self) private var lyl
+    @Environment(IdaProvider.self) private var ida
+    @Environment(Radio80000Provider.self) private var radio80000
     @Environment(CrateService.self) private var crate
     @Environment(PlaybackCoordinator.self) private var player
 
@@ -180,6 +182,36 @@ struct SidebarView: View {
                         )
                         row(.lylArchive, label: "Archive", trailing: nil, indent: 10)
                         row(.lylShows, label: "Shows", trailing: nil, indent: 10)
+                    }
+
+                    radioSection("IDA Radio", location: "Tallinn, Estonia", group: .ida)
+                    if expandedRadios.contains(.ida) {
+                        // IDA runs Tallinn and Helsinki on separate schedules,
+                        // so both channels are listed rather than one "Live".
+                        ForEach(ida.stations) { station in
+                            row(
+                                .idaStation(station.id),
+                                label: station.strapline,
+                                trailing: player.isCurrent(station.id) ? "live" : nil,
+                                isLive: player.isCurrent(station.id) && player.isPlaying,
+                                indent: 10
+                            )
+                        }
+                        row(.idaEpisodes, label: "Episodes", trailing: nil, indent: 10)
+                        row(.idaShows, label: "Shows", trailing: nil, indent: 10)
+                    }
+
+                    radioSection("Radio 80000", location: "Munich, Germany", group: .radio80000)
+                    if expandedRadios.contains(.radio80000) {
+                        row(
+                            .radio80000Station,
+                            label: "Live",
+                            trailing: player.isCurrent(radio80000.station.id) ? "live" : nil,
+                            isLive: player.isCurrent(radio80000.station.id) && player.isPlaying,
+                            indent: 10
+                        )
+                        row(.radio80000Latest, label: "Latest", trailing: nil, indent: 10)
+                        row(.radio80000Shows, label: "Shows", trailing: nil, indent: 10)
                     }
                     }
 
@@ -388,6 +420,8 @@ struct SidebarView: View {
         case .alharaStation, .alharaArchive: .alhara
         case .cashmereStation, .cashmereArchive, .cashmereShows: .cashmere
         case .lylStation, .lylArchive, .lylShows: .lyl
+        case .idaStation, .idaEpisodes, .idaShows: .ida
+        case .radio80000Station, .radio80000Latest, .radio80000Shows: .radio80000
         default: nil
         }
     }
@@ -402,6 +436,8 @@ struct SidebarView: View {
         case .alhara: .alhara
         case .cashmere: .cashmere
         case .lyl: .lyl
+        case .ida: .ida
+        case .radio80000: .radio80000
         }
     }
 
@@ -439,6 +475,10 @@ struct SidebarView: View {
             return player.isCurrent(cashmere.station.id)
         case .lyl:
             return player.isCurrent(lyl.station.id)
+        case .ida:
+            return ida.stations.contains { player.isCurrent($0.id) }
+        case .radio80000:
+            return player.isCurrent(radio80000.station.id)
         }
     }
 
