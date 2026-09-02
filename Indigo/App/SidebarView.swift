@@ -10,15 +10,15 @@ import SwiftUI
 import SwiftData
 
 private enum RadioSidebarGroup: CaseIterable, Hashable {
-    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000
+    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr
 }
 
 /// The sidebar reads like descending through a record collection: every band
 /// has its own gradient, and each successive band begins a little deeper.
 private enum SidebarBand: Int {
-    case library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, explore
+    case library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr, explore
 
-    var depth: Double { Double(rawValue) / 12.0 }
+    var depth: Double { Double(rawValue) / 14.0 }
 }
 
 struct SidebarView: View {
@@ -33,6 +33,8 @@ struct SidebarView: View {
     @Environment(LYLProvider.self) private var lyl
     @Environment(IdaProvider.self) private var ida
     @Environment(Radio80000Provider.self) private var radio80000
+    @Environment(PanikProvider.self) private var panik
+    @Environment(RovrProvider.self) private var rovr
     @Environment(CrateService.self) private var crate
     @Environment(PlaybackCoordinator.self) private var player
 
@@ -213,12 +215,42 @@ struct SidebarView: View {
                         row(.radio80000Latest, label: "Latest", trailing: nil, indent: 10)
                         row(.radio80000Shows, label: "Shows", trailing: nil, indent: 10)
                     }
+
+                    radioSection("Radio Panik", location: "Brussels, Belgium", group: .panik)
+                    if expandedRadios.contains(.panik) {
+                        row(
+                            .panikStation,
+                            label: "Live",
+                            trailing: player.isCurrent(panik.station.id) ? "live" : nil,
+                            isLive: player.isCurrent(panik.station.id) && player.isPlaying,
+                            indent: 10
+                        )
+                        row(.panikPodcasts, label: "Podcasts", trailing: nil, indent: 10)
+                        row(.panikShows, label: "Shows", trailing: nil, indent: 10)
+                    }
+
+                    radioSection("ROVR", location: rovr.offsetLabel, group: .rovr)
+                    if expandedRadios.contains(.rovr) {
+                        ForEach(rovr.channels) { channel in
+                            row(
+                                .rovrStation(channel.id),
+                                label: channel.kind == .radio ? "Live" : channel.name,
+                                trailing: player.isCurrent(channel.id) ? "live" : nil,
+                                isLive: player.isCurrent(channel.id) && player.isPlaying,
+                                indent: 10
+                            )
+                        }
+                        row(.rovrArchive, label: "Archive", trailing: nil, indent: 10)
+                        row(.rovrShows, label: "Shows", trailing: nil, indent: 10)
+                        row(.rovrCurators, label: "Curators", trailing: nil, indent: 10)
+                    }
                     }
 
                     directoryHeader("Explore", expanded: isExploreExpanded, band: .explore) {
                         isExploreExpanded.toggle()
                     }
                     if isExploreExpanded {
+                        row(.explore, label: "For You", trailing: nil, band: .explore)
                         row(.crate, label: "Crate", trailing: crateCount, band: .explore)
                         row(.dig, label: "Dig", trailing: nil, band: .explore)
                     }
@@ -238,7 +270,7 @@ struct SidebarView: View {
             if route == .tracks || route == .albums || route == .artists {
                 isLibraryExpanded = true
             }
-            if route == .crate || route == .dig {
+            if route == .explore || route == .crate || route == .dig {
                 isExploreExpanded = true
             }
             if let group = radioGroup(for: route) {
@@ -422,6 +454,8 @@ struct SidebarView: View {
         case .lylStation, .lylArchive, .lylShows: .lyl
         case .idaStation, .idaEpisodes, .idaShows: .ida
         case .radio80000Station, .radio80000Latest, .radio80000Shows: .radio80000
+        case .panikStation, .panikPodcasts, .panikShows: .panik
+        case .rovrStation, .rovrArchive, .rovrShows, .rovrCurators: .rovr
         default: nil
         }
     }
@@ -438,6 +472,8 @@ struct SidebarView: View {
         case .lyl: .lyl
         case .ida: .ida
         case .radio80000: .radio80000
+        case .panik: .panik
+        case .rovr: .rovr
         }
     }
 
@@ -479,6 +515,10 @@ struct SidebarView: View {
             return ida.stations.contains { player.isCurrent($0.id) }
         case .radio80000:
             return player.isCurrent(radio80000.station.id)
+        case .panik:
+            return player.isCurrent(panik.station.id)
+        case .rovr:
+            return rovr.channels.contains { player.isCurrent($0.id) }
         }
     }
 

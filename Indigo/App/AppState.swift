@@ -47,6 +47,14 @@ nonisolated enum Route: Hashable {
     case radio80000Station
     case radio80000Latest
     case radio80000Shows
+    case panikStation
+    case panikPodcasts
+    case panikShows
+    case rovrStation(String)
+    case rovrArchive
+    case rovrShows
+    case rovrCurators
+    case explore
     case crate
     case dig
 
@@ -87,6 +95,14 @@ nonisolated enum Route: Hashable {
         case .radio80000Station: "Radio 80000"
         case .radio80000Latest: "Latest"
         case .radio80000Shows: "Shows"
+        case .panikStation: "Radio Panik"
+        case .panikPodcasts: "Podcasts"
+        case .panikShows: "Shows"
+        case .rovrStation: "ROVR"
+        case .rovrArchive: "Archive"
+        case .rovrShows: "Shows"
+        case .rovrCurators: "Curators"
+        case .explore: "Explore"
         case .crate: "Crate"
         case .dig: "Dig"
         }
@@ -132,11 +148,18 @@ nonisolated enum DetailPage: Hashable {
     /// see `Radio80000EpisodeID`.
     case radio80000Episode(id: String)
     case radio80000Show(slug: String)
+    /// "show/episode" — the path Panik files a broadcast under, which is also
+    /// all that is needed to fetch it back. See `PanikEpisodeID`.
+    case panikEpisode(id: String)
+    case panikShow(slug: String)
+    case rovrBroadcast(id: String)
+    case rovrShow(id: String)
+    case rovrCurator(id: String)
 }
 
 @Observable
 final class AppState {
-    private(set) var route: Route = .tracks
+    private(set) var route: Route = .explore
     /// Detail pages stacked on top of the current route. NTS browsing goes two
     /// deep (show → episode), so this is a stack rather than a single slot.
     private(set) var path: [DetailPage] = []
@@ -213,6 +236,11 @@ final class AppState {
         case .idaShow: return "Show"
         case .radio80000Episode: return "Broadcast"
         case .radio80000Show: return "Show"
+        case .panikEpisode: return "Broadcast"
+        case .panikShow: return "Show"
+        case .rovrBroadcast: return "Broadcast"
+        case .rovrShow: return "Show"
+        case .rovrCurator: return "Curator"
         }
     }
 }

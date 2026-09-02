@@ -115,6 +115,8 @@ struct NowPlayingSummary {
             }
             return "IDA"
         case Radio80000Provider.providerID: return "80K"
+        case PanikProvider.providerID: return "Panik"
+        case RovrProvider.providerID: return "ROVR"
         case Track.sourceID: return "Local"
         default: return item.sourceID.uppercased()
         }

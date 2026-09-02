@@ -19,6 +19,8 @@ struct CrateView: View {
     @Environment(NoodsBrowseStore.self) private var noodsBrowse
     @Environment(IdaBrowseStore.self) private var idaBrowse
     @Environment(Radio80000BrowseStore.self) private var radio80000Browse
+    @Environment(PanikBrowseStore.self) private var panikBrowse
+    @Environment(RovrBrowseStore.self) private var rovrBrowse
     @Environment(NTSBrowseStore.self) private var ntsBrowse
     @Environment(LotBrowseStore.self) private var lotBrowse
     @Environment(DublabBrowseStore.self) private var dublabBrowse
@@ -258,6 +260,14 @@ struct CrateView: View {
                     id: String(showID.dropFirst("radio80000.episode.".count))
                 ))
                 return
+            case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
+                appState.open(.panikEpisode(id: String(showID.dropFirst("panik.episode.".count))))
+                return
+            case RovrProvider.providerID where showID.hasPrefix("rovr.broadcast."):
+                appState.open(.rovrBroadcast(
+                    id: String(showID.dropFirst("rovr.broadcast.".count))
+                ))
+                return
             case AlharaProvider.providerID where showID.hasPrefix("alhara.show."):
                 appState.open(.alharaShow(slug: String(showID.dropFirst("alhara.show.".count))))
                 return
@@ -372,6 +382,17 @@ struct CrateView: View {
                 let id = String(showID.dropFirst("radio80000.episode.".count))
                 await radio80000Browse.loadDetailIfNeeded(id: id)
                 genres = radio80000Browse.episode(id: id)?.genres ?? []
+            case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
+                // Panik tags the show rather than the broadcast, so the show's
+                // own headings are the closest thing an episode has.
+                let id = String(showID.dropFirst("panik.episode.".count))
+                guard let slug = PanikEpisodeID.showSlug(of: id) else { continue }
+                await panikBrowse.loadShowsIfNeeded()
+                genres = panikBrowse.show(slug: slug)?.categories ?? []
+            case RovrProvider.providerID where showID.hasPrefix("rovr.broadcast."):
+                let id = String(showID.dropFirst("rovr.broadcast.".count))
+                await rovrBrowse.loadDetailIfNeeded(id: id)
+                genres = rovrBrowse.broadcast(id: id)?.tags ?? []
             case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
                 let identity = String(showID.dropFirst("nts.episode.".count))
                 guard let ref = NTSEpisodeRef.decode(identity) else { continue }

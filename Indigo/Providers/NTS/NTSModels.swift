@@ -118,7 +118,25 @@ nonisolated enum HTMLText {
     private static let named: [String: String] = [
         "amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'",
         "nbsp": "\u{00A0}", "hellip": "…", "mdash": "—", "ndash": "–",
-        "lsquo": "\u{2018}", "rsquo": "\u{2019}", "ldquo": "\u{201C}", "rdquo": "\u{201D}"
+        "lsquo": "\u{2018}", "rsquo": "\u{2019}", "ldquo": "\u{201C}", "rdquo": "\u{201D}",
+        // Accented Latin, because most of these stations do not broadcast in
+        // English. A station serving rendered HTML writes "Acouph&egrave;ne",
+        // and without these the accents survive as entity text all the way
+        // onto the screen — in show names, where it is most visible.
+        "agrave": "à", "aacute": "á", "acirc": "â", "atilde": "ã", "auml": "ä", "aring": "å",
+        "aelig": "æ", "ccedil": "ç", "egrave": "è", "eacute": "é", "ecirc": "ê", "euml": "ë",
+        "igrave": "ì", "iacute": "í", "icirc": "î", "iuml": "ï", "ntilde": "ñ",
+        "ograve": "ò", "oacute": "ó", "ocirc": "ô", "otilde": "õ", "ouml": "ö", "oslash": "ø",
+        "oelig": "œ", "szlig": "ß",
+        "ugrave": "ù", "uacute": "ú", "ucirc": "û", "uuml": "ü", "yacute": "ý", "yuml": "ÿ",
+        "Agrave": "À", "Aacute": "Á", "Acirc": "Â", "Atilde": "Ã", "Auml": "Ä", "Aring": "Å",
+        "AElig": "Æ", "Ccedil": "Ç", "Egrave": "È", "Eacute": "É", "Ecirc": "Ê", "Euml": "Ë",
+        "Igrave": "Ì", "Iacute": "Í", "Icirc": "Î", "Iuml": "Ï", "Ntilde": "Ñ",
+        "Ograve": "Ò", "Oacute": "Ó", "Ocirc": "Ô", "Otilde": "Õ", "Ouml": "Ö", "Oslash": "Ø",
+        "OElig": "Œ",
+        "Ugrave": "Ù", "Uacute": "Ú", "Ucirc": "Û", "Uuml": "Ü", "Yacute": "Ý",
+        "laquo": "«", "raquo": "»", "bull": "•", "middot": "·", "deg": "°",
+        "eur": "€", "euro": "€", "pound": "£", "copy": "©", "reg": "®", "trade": "™"
     ]
 
     /// Tags out, line breaks kept. Stations hand back rendered HTML for every

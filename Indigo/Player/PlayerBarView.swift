@@ -156,6 +156,12 @@ struct PlayerBarView: View {
         if item.id.hasPrefix("lyl.episode.") {
             return .detail(.lylEpisode(slug: String(item.id.dropFirst("lyl.episode.".count))))
         }
+        if item.id.hasPrefix("rovr.broadcast.") {
+            return .detail(.rovrBroadcast(id: String(item.id.dropFirst("rovr.broadcast.".count))))
+        }
+        if item.id.hasPrefix("panik.episode.") {
+            return .detail(.panikEpisode(id: String(item.id.dropFirst("panik.episode.".count))))
+        }
         if item.id.hasPrefix("radio80000.episode.") {
             let id = String(item.id.dropFirst("radio80000.episode.".count))
             return .detail(.radio80000Episode(id: id))
@@ -192,6 +198,10 @@ struct PlayerBarView: View {
         case LYLProvider.providerID: return .route(.lylStation)
         case IdaProvider.providerID: return .route(.idaStation(item.id))
         case Radio80000Provider.providerID: return .route(.radio80000Station)
+        case PanikProvider.providerID: return .route(.panikStation)
+        // ROVR's channel id is the station id, so the bar returns to whichever
+        // of them is playing rather than always to the scheduled radio.
+        case RovrProvider.providerID: return .route(.rovrStation(item.id))
         default: return nil
         }
     }
