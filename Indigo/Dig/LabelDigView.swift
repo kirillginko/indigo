@@ -48,9 +48,7 @@ struct LabelDigView: View {
                     // cached, so its emptiness is not evidence of anything
                     // until the catalogue has been asked.
                     if profile == nil || (!hasEnriched && (profile?.artists.isEmpty ?? true)) {
-                        WorkingPane()
-                    } else if dig.isEnriching {
-                        WorkingBar()
+                        DigSkeleton(hasImage: false, sections: 3)
                     }
                     if let profile {
                         DigTallies(entries: [
@@ -89,6 +87,11 @@ struct LabelDigView: View {
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)
+                // One treatment for the whole page. See `LoadingVeil`.
+                // A label profile comes back even when nothing is cached, so
+                // its emptiness only means something once the catalogue has
+                // actually been asked for.
+                .loadingVeil(profile == nil || (!hasEnriched && (profile?.artists.isEmpty ?? true)))
             }
             .scrollIndicators(.visible)
         }

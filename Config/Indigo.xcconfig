@@ -1,6 +1,30 @@
-// Shared app configuration. Local and CI credentials override the empty
-// defaults through the optional, gitignored file below.
-DISCOGS_TOKEN =
+// Shared app configuration.
+//
+// The Discogs token ships with the app again, because routing every search
+// through the backend cost more than it was worth — see DiscogsClient.get.
+// It is scrambled rather than written out in the clear, so it is not readable
+// with `strings` or `plutil`; that is a speed bump, not secrecy, and the token
+// should be treated as one that will eventually leak. Regenerate the blob with
+//
+//     ./Scripts/obfuscate-token.py <token>
+//
+// and keep the result in Secrets.xcconfig, which is gitignored. Never put it
+// here: an obfuscated credential in a tracked file is a published credential
+// with extra steps. An empty default keeps a clean checkout building.
+DISCOGS_TOKEN_OBFUSCATED =
 #include? "Secrets.xcconfig"
 
-INFOPLIST_KEY_IndigoDiscogsToken = $(DISCOGS_TOKEN)
+// Supabase identifies Indigo's own backend, and both values below ship in
+// every build by design: the ref appears in the URL of each request, and the
+// publishable key is the client key Supabase expects to be public. Row Level
+// Security is what actually guards the data, so these live here rather than
+// in Secrets.xcconfig — hiding them would break clean checkouts and buy no
+// safety. The service-role key is the real secret and must never come near
+// this file.
+//
+// MUST be the bare project ref, never the full URL. A `//` opens a comment in
+// xcconfig, so pasting https://<ref>.supabase.co here truncates the value to
+// `https:` and the build still succeeds. SupabaseConfiguration assembles the
+// URL from this ref and rejects anything that is not ref-shaped.
+SUPABASE_PROJECT_REF = leynozulpkjuufbbjjpa
+SUPABASE_PUBLISHABLE_KEY = sb_publishable_hP8GTN5m8YygAs6GzTbm0Q_sqkZPjzi

@@ -9,6 +9,9 @@ import SwiftData
 nonisolated struct DiscogsEnricher {
     let context: ModelContext
     let client: DiscogsClient
+    /// Indigo's own cache, tried before the provider. Defaults to the shared
+    /// one, which is inert under XCTest so fixture tests stay offline.
+    var catalog: CatalogReleaseSource = .shared
 
     /// Who they are, from the search alone.
     ///
@@ -43,9 +46,13 @@ nonisolated struct DiscogsEnricher {
         // own links, 4 kept the thumbnails arriving with each neighbour, 5
         // stopped filing pressing plants as imprints, 6 keeps the artist's
         // own thumbnail so a portrait has something to show before the
-        // photograph arrives. A row cached before any of those looks current
-        // while being wrong, so it is refetched once.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 6,
+        // photograph arrives, 7 strips a credit off a release title even when
+        // the sleeve spells it differently — rows written before that kept
+        // "Boards Of Canada = ボーズ・オブ・カナダ*" in front of every title,
+        // and a title like that resolves to no record at all. A row cached
+        // before any of those looks current while being wrong, so it is
+        // refetched once.
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 7,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
         return write(bundle, name: name)
@@ -54,7 +61,7 @@ nonisolated struct DiscogsEnricher {
     /// The same, for a caller that has already done the search.
     @discardableResult
     func artist(named name: String, head: DiscogsSearchResult, force: Bool = false) async throws -> DiscogsArtist? {
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 6,
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 7,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name, head: head) else { return nil }
         return write(bundle, name: name)
@@ -129,7 +136,7 @@ nonisolated struct DiscogsEnricher {
             }.filter { RecordingKey.normalizeArtist($0) != key }
         )
         record.fetchedAt = Date()
-        record.cacheVersion = 6
+        record.cacheVersion = 7
         return record
     }
 
@@ -168,7 +175,16 @@ nonisolated struct DiscogsEnricher {
     @discardableResult
     func release(id: Int, force: Bool = false) async throws -> DiscogsReleaseRecord {
         if !force, let cached = cachedRelease(id: id), cached.isFresh { return cached }
-        return store(try await client.release(id: id), id: id)
+        // Indigo's shared cache before the provider's own endpoint. On a hit
+        // this release was described by somebody else's request and Discogs is
+        // never asked at all — and a warm read out of Postgres is quicker than
+        // asking it would have been.
+        if let detail = await catalog.release(id: id) { return store(detail, id: id) }
+        // A miss, so the page waits on Discogs directly rather than on the
+        // backend's round trip to it. The shared copy is filled in behind us.
+        let detail = try await client.release(id: id)
+        catalog.populateInBackground(id: id)
+        return store(detail, id: id)
     }
 
     /// Writes a release Discogs has already described.
@@ -233,10 +249,29 @@ nonisolated struct DiscogsEnricher {
         return values.filter { seen.insert($0.name.lowercased()).inserted }.prefix(12).map { $0 }
     }
 
-    private static func releaseTitle(_ title: String, artist: String) -> String {
-        let prefix = "\(artist) - "
-        return title.lowercased().hasPrefix(prefix.lowercased())
-            ? String(title.dropFirst(prefix.count)) : title
+    /// "Boards Of Canada = ボーズ・オブ・カナダ* - Inferno" → "Inferno".
+    ///
+    /// Discogs writes the credit as it is printed on the sleeve, which can
+    /// carry a translation, an alias, or a numeric disambiguator — "Speedkiller
+    /// (2)". Matching the artist's name exactly misses every one of those and
+    /// leaves the credit glued to the front of the title, which then reaches
+    /// `releaseID(title:artist:)` as a `release_title` no catalogue can match,
+    /// and the record opens as one nobody has an entry for.
+    ///
+    /// So the credit only has to *begin* with the artist, on a word boundary.
+    static func releaseTitle(_ title: String, artist: String) -> String {
+        guard let divider = title.range(of: " - ") else { return title }
+
+        let credit = RecordingKey.normalize(String(title[..<divider.lowerBound]))
+        let wanted = RecordingKey.normalize(artist)
+        guard !wanted.isEmpty, credit == wanted || credit.hasPrefix(wanted + " ") else {
+            return title
+        }
+
+        let remainder = String(title[divider.upperBound...])
+        // Never leave nothing behind: a record actually called "X - " is worth
+        // less than a record still called what the catalogue calls it.
+        return remainder.trimmingCharacters(in: .whitespaces).isEmpty ? title : remainder
     }
 
 

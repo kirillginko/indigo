@@ -110,7 +110,14 @@ struct SceneDigView: View {
             } else {
                 // Not yet looked is not the same as nothing found. Saying the
                 // second before doing the first is a lie told quickly.
-                WorkingPane()
+                ScrollView {
+                    DigSkeleton(hasImage: false, sections: 3)
+                        .padding(.horizontal, Metrics.gutter)
+                        .padding(.vertical, 22)
+                        // One treatment for the whole page. See `LoadingVeil`.
+                        .loadingVeil(true)
+                }
+                .scrollIndicators(.visible)
             }
         }
         .task(id: city) {

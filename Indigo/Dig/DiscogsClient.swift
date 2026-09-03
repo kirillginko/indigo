@@ -35,36 +35,52 @@ protocol DiscogsTransport: Sendable {
 extension URLSession: DiscogsTransport {}
 
 nonisolated enum DiscogsConfiguration {
+    /// A developer's own token from the environment, else the one packaged
+    /// with this build.
+    ///
+    /// The packaged copy is scrambled rather than written out in the clear, so
+    /// it survives neither `strings` nor a `plutil` dump. That is the whole of
+    /// what it buys — see ObfuscatedSecret. A credential inside an application
+    /// belongs to whoever holds the application, and this one also travels in
+    /// an Authorization header where any proxy will show it. Keep it
+    /// rotatable, and watch what it does.
     static var token: String? {
-        if let value = ProcessInfo.processInfo.environment["DISCOGS_TOKEN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !value.isEmpty { return value }
-        // Unit tests opt into Discogs with an injected client. Never let a
-        // developer's packaged credential turn fixture tests into live calls.
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return nil }
-        guard let bundled = Bundle.main.object(forInfoDictionaryKey: "IndigoDiscogsToken") as? String else {
-            return nil
+        if let value = ProcessInfo.processInfo.environment["DISCOGS_TOKEN"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty {
+            // Unit tests opt into Discogs with an injected client. Never let a
+            // developer's credential turn fixture tests into live calls.
+            return ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil ? value : nil
         }
-        let value = bundled.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !value.isEmpty, !value.contains("$(") else { return nil }
-        return value
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return nil }
+
+        guard let bundled = Bundle.main.object(forInfoDictionaryKey: "IndigoDiscogsToken") as? String
+        else { return nil }
+        return ObfuscatedSecret.reveal(bundled)
     }
 }
 
 nonisolated struct DiscogsClient: Sendable {
     private let transport: DiscogsTransport
     private let suppliedToken: String?
+    /// Indigo's backend, which holds the Discogs credential server-side. Nil
+    /// for the test initialiser, which must stay on its injected transport.
+    private let gateway: CatalogDiscogsGateway?
 
     init() {
         transport = NetworkEnvironment.metadataSession
         suppliedToken = nil
+        gateway = .shared
     }
 
     init(transport: DiscogsTransport, token: String) {
         self.transport = transport
         suppliedToken = token
+        gateway = nil
     }
 
-    var isConfigured: Bool { token != nil }
+    /// Configured when either route to Discogs is open: Indigo's backend, or a
+    /// token supplied directly for development.
+    var isConfigured: Bool { gateway?.isEnabled == true || token != nil }
 
     /// The search that finds them, and nothing else.
     ///
@@ -132,17 +148,41 @@ nonisolated struct DiscogsClient: Sendable {
     }
 
     func releaseID(title: String, artist: String) async throws -> Int? {
-        let response: DiscogsSearchResponse = try await get("database/search", query: [
+        let byTitle: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "release_title", value: title),
             URLQueryItem(name: "artist", value: artist),
             URLQueryItem(name: "type", value: "release"),
             URLQueryItem(name: "per_page", value: "5")
         ])
-        let wanted = Self.normalized(title)
-        return response.results?.first(where: {
+
+        if let id = Self.bestReleaseMatch(title: title, in: byTitle) { return id }
+
+        // `release_title` is matched against the title alone, so a stored title
+        // that still carries its credit — "Boards Of Canada = ボーズ・オブ・
+        // カナダ* - Inferno" — matches nothing at all, and the record reads as
+        // one no catalogue has heard of. A plain search does find it, because
+        // it looks at the whole credit line.
+        //
+        // Only worth the second request when the first came back empty, which
+        // for a well-formed title it does not.
+        guard title.contains(" - ") else { return nil }
+
+        let byQuery: DiscogsSearchResponse = try await get("database/search", query: [
+            URLQueryItem(name: "q", value: title),
+            URLQueryItem(name: "type", value: "release"),
+            URLQueryItem(name: "per_page", value: "5")
+        ])
+        return Self.bestReleaseMatch(title: title, in: byQuery)
+    }
+
+    /// The result whose own title matches, else the catalogue's first answer.
+    private static func bestReleaseMatch(title: String, in response: DiscogsSearchResponse) -> Int? {
+        guard let results = response.results, !results.isEmpty else { return nil }
+        let wanted = normalized(title.split(separator: " - ", maxSplits: 1).last.map(String.init) ?? title)
+        return results.first {
             let resultTitle = $0.title.split(separator: " - ", maxSplits: 1).last.map(String.init) ?? $0.title
-            return Self.normalized(resultTitle) == wanted
-        })?.id ?? response.results?.first?.id
+            return normalized(resultTitle) == wanted
+        }?.id ?? results.first?.id
     }
 
     /// The release a *track* appears on.
@@ -368,7 +408,32 @@ nonisolated struct DiscogsClient: Sendable {
         return trimmed.isEmpty ? nil : trimmed
     }
 
+    /// Direct when this build carries a credential, Indigo's backend when it
+    /// does not.
+    ///
+    /// The backend is not the faster route for what comes through here. These
+    /// are overwhelmingly searches, and a search reads no quicker out of
+    /// Postgres than out of Discogs — about a fifth of a second either way —
+    /// so routing them through an Edge Function only adds a hop, and the first
+    /// search for anything nobody has asked for before adds half a second on
+    /// top. That was felt as the label page and the artist portrait crawling.
+    ///
+    /// Release lookups are the opposite case and still go through the backend:
+    /// read far more often than written, they normalize into the graph, and
+    /// Postgres genuinely beats Discogs for them. See CatalogReleaseSource.
     private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+        if token != nil { return try await direct(path, query: query) }
+
+        if let gateway, gateway.isEnabled {
+            return try await Trace.stage("discogs.backend", path) {
+                try await gateway.get(T.self, path: path, query: query)
+            }
+        }
+
+        throw DiscogsError.notConfigured
+    }
+
+    private func direct<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
         guard let token else { throw DiscogsError.notConfigured }
         var components = URLComponents(string: "https://api.discogs.com/\(path)")
         components?.queryItems = query.isEmpty ? nil : query

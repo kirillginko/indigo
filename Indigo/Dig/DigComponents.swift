@@ -410,3 +410,56 @@ struct ListenRow: View {
 /// sleeve, the tallies, a run of tiles — says "this is an artist, their
 /// records are on their way", and means nothing jumps when the real thing
 /// lands in the same shape.
+
+/// The shape of a DIG page before anything has arrived.
+///
+/// The veil softens what is on a page and lets it breathe, which needs there
+/// to be something on the page. An artist arrives with a name and a picture
+/// before its discography, so there is always something to soften; a release
+/// opened cold has nothing at all, and veiling nothing leaves the blank frame
+/// that reads as a page which gave up.
+///
+/// So this stands in: the page's own proportions, in blank rules, veiled with
+/// everything else. It is furniture, never content — it carries no text, so it
+/// can never be mistaken for a record whose title failed to load.
+struct DigSkeleton: View {
+    /// Whether this page leads with a square — a sleeve or a portrait.
+    var hasImage = true
+    /// Roughly how much sits under the fold. Only affects how far the shape
+    /// runs down the page.
+    var sections = 2
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 26) {
+            HStack(alignment: .top, spacing: 26) {
+                if hasImage {
+                    Rectangle()
+                        .fill(Palette.wash)
+                        .frame(width: 240, height: 240)
+                        .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                }
+                VStack(alignment: .leading, spacing: 18) {
+                    ForEach(0..<3, id: \.self) { row in
+                        bar(width: row == 0 ? 190 : (row == 1 ? 140 : 165))
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            ForEach(0..<max(0, sections), id: \.self) { _ in
+                VStack(alignment: .leading, spacing: 12) {
+                    bar(width: 92, height: 7)
+                    ForEach(0..<3, id: \.self) { row in
+                        bar(width: row == 1 ? 220 : 260)
+                    }
+                }
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
+    private func bar(width: CGFloat, height: CGFloat = 11) -> some View {
+        Rectangle()
+            .fill(Palette.wash)
+            .frame(width: width, height: height)
+    }
+}

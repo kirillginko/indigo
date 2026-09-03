@@ -43,7 +43,7 @@ struct CatalogDigView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 30) {
                     if !hasLooked {
-                        WorkingPane()
+                        DigSkeleton(hasImage: false, sections: 2)
                     } else if issued.isEmpty, nearby.isEmpty {
                         EmptyStateView(
                             headline: number.uppercased(),
@@ -78,6 +78,8 @@ struct CatalogDigView: View {
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)
+                // One treatment for the whole page. See `LoadingVeil`.
+                .loadingVeil(!hasLooked)
             }
             .scrollIndicators(.visible)
         }

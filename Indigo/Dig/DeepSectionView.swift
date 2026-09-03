@@ -71,8 +71,13 @@ struct DeepSectionView: View {
                     }
                     controls(descent)
                 } else {
-                    WorkingBar()
+                    // DEEP is computed after the page around it has settled,
+                    // so this is the last thing still arriving on an otherwise
+                    // finished page. Veiled, so it reads as the same one thing
+                    // happening rather than a second, different kind of wait.
+                    DigSkeleton(hasImage: false, sections: 0)
                         .padding(.vertical, 14)
+                        .loadingVeil(true)
                 }
             }
         }
