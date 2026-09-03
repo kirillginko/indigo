@@ -109,6 +109,48 @@ final class NowPlayingLinkTests: XCTestCase {
         XCTAssertEqual(NowPlayingLink.destination(for: item), .route(.station("2")))
     }
 
+    // MARK: - Ordering
+    //
+    // The bug this class exists for was not a missing branch but a branch in
+    // the wrong place: a generic answer that fired before the specific one and
+    // hid it. Clicking "Ametsub – Sunglare Drive" in the Crate reaches Ametsub,
+    // and the bar has to agree — which means whatever sits between `page` and
+    // `fallback` must actually get asked.
+
+    /// A track with no page of its own leaves room for the recording. If this
+    /// returns a station or the library instead of nil, the recording is never
+    /// consulted and every track opens somewhere generic.
+    func testAnItemWithNoPageOfItsOwnLeavesRoomForTheRecording() {
+        // A radio track: the source is known, but the item is not an episode.
+        XCTAssertNil(NowPlayingLink.page(
+            for: item("nts.live.2", source: NTSProvider.providerID)))
+
+        // An unindexed local file: previously answered ".route(.tracks)" here,
+        // which is what shadowed the artist page.
+        XCTAssertNil(NowPlayingLink.page(
+            for: item("/Music/stray.flac", source: Track.sourceID),
+            localAlbumKey: { _ in nil }))
+    }
+
+    /// An item that *does* have its own page still answers immediately, so the
+    /// reordering costs an episode nothing.
+    func testAnItemWithItsOwnPageStillAnswersFirst() {
+        XCTAssertEqual(NowPlayingLink.page(for: item("kiosk.episode.jkl",
+                                                     source: KioskProvider.providerID)),
+                       .detail(.kioskEpisode(slug: "jkl")))
+        XCTAssertEqual(NowPlayingLink.page(for: item("/Music/a.flac", source: Track.sourceID),
+                                           localAlbumKey: { _ in "Boards|Geogaddi" }),
+                       .detail(.album("Boards|Geogaddi")))
+    }
+
+    /// And the generic answers are still there, just last.
+    func testFallbackStillCoversEverySource() {
+        XCTAssertEqual(NowPlayingLink.fallback(
+            for: item("/Music/stray.flac", source: Track.sourceID)), .route(.tracks))
+        XCTAssertEqual(NowPlayingLink.fallback(
+            for: item("lot.live.1", source: LotProvider.providerID)), .route(.lotStation))
+    }
+
     // MARK: - Malformed
 
     /// A bare prefix carries no identity, so it must not open a page for a

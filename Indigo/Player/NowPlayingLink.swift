@@ -27,20 +27,31 @@ nonisolated enum NowPlayingLink: Equatable, Sendable {
     ///   - localAlbumKey: the album a local file belongs to, looked up by the
     ///     caller because it needs SwiftData.
     ///   - liveNTSEpisode: the episode NTS says is on air, when one is.
-    static func destination(
+    /// The page this item is *itself* — its album, its episode, its broadcast.
+    ///
+    /// Split from `fallback` because what sits between them matters: the music
+    /// playing usually has a page about the music, and the Crate opens that
+    /// before it will settle for a station or a library listing. Clicking
+    /// "Ametsub – Sunglare Drive" there reaches Ametsub, and it reaches him by
+    /// being asked about the recording before anything generic answers first.
+    static func page(
         for item: MediaItem,
-        localAlbumKey: @Sendable (String) -> String? = { _ in nil },
-        liveNTSEpisode: NTSEpisodeRef? = nil
+        localAlbumKey: @Sendable (String) -> String? = { _ in nil }
     ) -> NowPlayingLink? {
         if item.sourceID == Track.sourceID {
             if let key = localAlbumKey(item.id) { return .detail(.album(key)) }
-            // A file Indigo is playing but has not indexed still belongs
-            // somewhere; the library is the honest answer.
-            return .route(.tracks)
+            return nil
         }
+        return archived(item)
+    }
 
-        if let link = archived(item) { return link }
-
+    /// Where to go when nothing more specific exists: the show in the archive,
+    /// the station, or the library. Always tried last, and never before the
+    /// recording — a station is a worse answer than the record being played.
+    static func fallback(
+        for item: MediaItem,
+        liveNTSEpisode: NTSEpisodeRef? = nil
+    ) -> NowPlayingLink? {
         if item.sourceID == NTSProvider.providerID {
             // NTS names what is on air, so a live channel can open the episode.
             if let ref = liveNTSEpisode {
@@ -53,7 +64,22 @@ nonisolated enum NowPlayingLink: Equatable, Sendable {
             if !title.isEmpty { return .search(.ntsSearch, query: title) }
         }
 
-        return station(for: item)
+        if let link = station(for: item) { return link }
+
+        // A local file Indigo is playing but has not indexed still belongs
+        // somewhere, and the library is the honest answer.
+        return item.sourceID == Track.sourceID ? .route(.tracks) : nil
+    }
+
+    /// Both tiers with nothing between them. For callers with no recording to
+    /// offer — the tests, and anywhere the music is not the point.
+    static func destination(
+        for item: MediaItem,
+        localAlbumKey: @Sendable (String) -> String? = { _ in nil },
+        liveNTSEpisode: NTSEpisodeRef? = nil
+    ) -> NowPlayingLink? {
+        page(for: item, localAlbumKey: localAlbumKey)
+            ?? fallback(for: item, liveNTSEpisode: liveNTSEpisode)
     }
 
     /// A recording with a page of its own.

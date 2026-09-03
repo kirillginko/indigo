@@ -132,22 +132,27 @@ struct PlayerBarView: View {
     /// supplies only the two things that need its context — the album a local
     /// file belongs to, and whatever NTS says is on air.
     private func destination(for item: MediaItem) -> NowPlayingLink? {
-        if let link = NowPlayingLink.destination(
+        // The item's own page first: its album, its episode, its broadcast.
+        if let link = NowPlayingLink.page(
             for: item,
-            localAlbumKey: { path in localTrack(path: path)?.albumKey },
-            liveNTSEpisode: liveShow?.detailID.flatMap(NTSEpisodeRef.decode)
+            localAlbumKey: { path in localTrack(path: path)?.albumKey }
         ) { return link }
 
-        // The Crate's last resort, and the bar's: a piece of music with no
-        // page of its own still has the page about the music — where it was
-        // heard, and what was heard beside it.
+        // Then the music itself, before anything generic. This is the Crate's
+        // order, and the reason clicking a track there reaches its artist
+        // rather than the station it happened to come off.
         let summary = NowPlayingSummary.make(
             item: item, showTitle: liveShow?.title, context: crate.context
         )
-        guard let recording = summary.recording,
-              let page = dig.recordingDestination(for: recording)
-        else { return nil }
-        return .detail(page)
+        if let recording = summary.recording,
+           let page = dig.recordingDestination(for: recording) {
+            return .detail(page)
+        }
+
+        return NowPlayingLink.fallback(
+            for: item,
+            liveNTSEpisode: liveShow?.detailID.flatMap(NTSEpisodeRef.decode)
+        )
     }
 
     private func localTrack(path: String) -> Track? {
