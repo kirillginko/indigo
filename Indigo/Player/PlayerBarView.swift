@@ -127,83 +127,15 @@ struct PlayerBarView: View {
         .accessibilityLabel("\(spoken). \(under)")
     }
 
-    private enum NowPlayingDestination {
-        case route(Route)
-        case detail(DetailPage)
-    }
-
-    private func destination(for item: MediaItem) -> NowPlayingDestination? {
-        if item.sourceID == Track.sourceID, let track = localTrack(path: item.id) {
-            return .detail(.album(track.albumKey))
-        }
-        if item.id.hasPrefix("noods.show.") {
-            let slug = String(item.id.dropFirst("noods.show.".count))
-            return .detail(.noodsShow(path: "shows/\(slug)"))
-        }
-        if item.id.hasPrefix("nts.episode.") {
-            let identity = String(item.id.dropFirst("nts.episode.".count))
-            if let ref = NTSEpisodeRef.decode(identity) {
-                return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
-            }
-        }
-        if item.id.hasPrefix("nts.mixtape.") {
-            return .detail(.ntsMixtape(alias: String(item.id.dropFirst("nts.mixtape.".count))))
-        }
-        if item.sourceID == NTSProvider.providerID,
-           let ref = liveShow?.detailID.flatMap(NTSEpisodeRef.decode) {
-            return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
-        }
-        if item.id.hasPrefix("lyl.episode.") {
-            return .detail(.lylEpisode(slug: String(item.id.dropFirst("lyl.episode.".count))))
-        }
-        if item.id.hasPrefix("rovr.broadcast.") {
-            return .detail(.rovrBroadcast(id: String(item.id.dropFirst("rovr.broadcast.".count))))
-        }
-        if item.id.hasPrefix("panik.episode.") {
-            return .detail(.panikEpisode(id: String(item.id.dropFirst("panik.episode.".count))))
-        }
-        if item.id.hasPrefix("radio80000.episode.") {
-            let id = String(item.id.dropFirst("radio80000.episode.".count))
-            return .detail(.radio80000Episode(id: id))
-        }
-        if item.id.hasPrefix("ida.episode.") {
-            return .detail(.idaEpisode(slug: String(item.id.dropFirst("ida.episode.".count))))
-        }
-        if item.id.hasPrefix("cashmere.episode.") {
-            return .detail(.cashmereEpisode(slug: String(item.id.dropFirst("cashmere.episode.".count))))
-        }
-        if item.id.hasPrefix("alhara.show.") {
-            return .detail(.alharaShow(slug: String(item.id.dropFirst("alhara.show.".count))))
-        }
-        if item.id.hasPrefix("dublab.broadcast.") {
-            return .detail(.dublabBroadcast(slug: String(item.id.dropFirst("dublab.broadcast.".count))))
-        }
-        if item.id.hasPrefix("lot.episode.") {
-            let identity = String(item.id.dropFirst("lot.episode.".count))
-            if let ref = LotEpisodeRef.decode(identity) {
-                return .detail(.lotEpisode(show: ref.show, episode: ref.episode))
-            }
-        }
-        switch item.sourceID {
-        case KioskProvider.providerID:
-            if item.id.hasPrefix("kiosk.episode.") {
-                return .detail(.kioskEpisode(slug: String(item.id.dropFirst("kiosk.episode.".count))))
-            }
-            return .route(.kioskStation)
-        case NoodsProvider.providerID: return .route(.noodsStation)
-        case LotProvider.providerID: return .route(.lotStation)
-        case DublabProvider.providerID: return .route(.dublabStation)
-        case AlharaProvider.providerID: return .route(.alharaStation(item.id))
-        case CashmereProvider.providerID: return .route(.cashmereStation)
-        case LYLProvider.providerID: return .route(.lylStation)
-        case IdaProvider.providerID: return .route(.idaStation(item.id))
-        case Radio80000Provider.providerID: return .route(.radio80000Station)
-        case PanikProvider.providerID: return .route(.panikStation)
-        // ROVR's channel id is the station id, so the bar returns to whichever
-        // of them is playing rather than always to the scheduled radio.
-        case RovrProvider.providerID: return .route(.rovrStation(item.id))
-        default: return nil
-        }
+    /// Lifted into `NowPlayingLink` so every source can be tested; the view
+    /// supplies only the two things that need its context — the album a local
+    /// file belongs to, and whatever NTS says is on air.
+    private func destination(for item: MediaItem) -> NowPlayingLink? {
+        NowPlayingLink.destination(
+            for: item,
+            localAlbumKey: { path in localTrack(path: path)?.albumKey },
+            liveNTSEpisode: liveShow?.detailID.flatMap(NTSEpisodeRef.decode)
+        )
     }
 
     private func localTrack(path: String) -> Track? {
