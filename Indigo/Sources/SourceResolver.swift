@@ -38,6 +38,23 @@ nonisolated struct SourceResolver {
         resolve(recording).first
     }
 
+    /// A crate card can have artwork even before recording metadata is enriched.
+    /// Keep it as a fallback without replacing a source's own sleeve/local art.
+    func best(_ item: CrateItem) -> AudioSource? {
+        if let broadcast = item.broadcastMediaItem() {
+            return AudioSource(kind: .broadcastAppearance, action: .play(broadcast),
+                               label: BroadcastSource.label(for: item.providerID ?? ""),
+                               detail: nil, rank: 0)
+        }
+        guard let recording = item.recording, let source = best(recording) else { return nil }
+        guard case .play(var media) = source.action,
+              media.remoteArtworkURL == nil, media.artworkKey == nil,
+              let artwork = item.artworkURL else { return source }
+        media.remoteArtworkURL = artwork
+        return AudioSource(kind: source.kind, action: .play(media), label: source.label,
+                           detail: source.detail, rank: source.rank)
+    }
+
     /// True when there is nothing to hear — the state the UI has to render
     /// honestly rather than showing a play button that does nothing.
     func isUnavailable(_ recording: Recording) -> Bool {

@@ -52,6 +52,9 @@ final class LocalAudioEngine {
         if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
     }
 
+    @ObservationIgnored private let levelMonitor = AudioLevelMonitor()
+    func audioLevel() -> Float { levelMonitor.level() }
+
     // MARK: - Transport
 
     func load(url: URL, knownDuration: TimeInterval?, autoplay: Bool) {
@@ -70,6 +73,7 @@ final class LocalAudioEngine {
         // into an empty buffer, reports itself as playing, and the playhead
         // never moves. Anything off the network is allowed to buffer first.
         player.automaticallyWaitsToMinimizeStalling = !url.isFileURL
+        levelMonitor.attach(to: item)
         player.replaceCurrentItem(with: item)
         observe(item)
         if autoplay { player.play() } else { player.pause() }
@@ -85,6 +89,7 @@ final class LocalAudioEngine {
     }
 
     func stop() {
+        levelMonitor.reset()
         player.pause()
         player.replaceCurrentItem(with: nil)
         preparedItem = nil

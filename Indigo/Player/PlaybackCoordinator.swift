@@ -83,6 +83,18 @@ final class PlaybackCoordinator {
         }
     }
 
+    /// Polled only by the backdrop; audio callbacks never invalidate the player UI.
+    func audioLevel() -> Float {
+        guard isPlaying, !isBuffering, volume > 0 else { return 0 }
+        let level: Float
+        switch source {
+        case .local: level = local.audioLevel()
+        case .stream: level = stream.audioLevel()
+        case .embed, .none: level = 0
+        }
+        return level * Float(volume)
+    }
+
     var isBuffering: Bool {
         (source == .stream && stream.state == .buffering)
             || (source == .embed && embed.state == .loading)

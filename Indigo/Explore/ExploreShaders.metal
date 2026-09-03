@@ -1,157 +1,80 @@
 #include <metal_stdlib>
 using namespace metal;
 
-// A hash with no grain of its own.
-//
-// The obvious two-line one has structure along the axes, and at grain scale
-// that structure is what you actually see: fine vertical striping laid over
-// the whole field, easily mistaken for banding in the gradient. This one
-// mixes all three components before folding, and leaves none.
 static float ihash(float2 p) {
     float3 q = fract(float3(p.x, p.y, p.x) * 0.1031);
     q += dot(q, q.yzx + 33.33);
     return fract((q.x + q.y) * q.z);
 }
 
-static float inoise(float2 p) {
-    float2 i = floor(p), f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(ihash(i), ihash(i + float2(1, 0)), f.x),
-               mix(ihash(i + float2(0, 1)), ihash(i + 1.0), f.x), f.y);
+// Broad, bent wavefronts: the field has a gesture before it is cut into strips.
+// Unequal wavelengths and a slow cross-current keep it from becoming a grid.
+static float exploreWave(float2 p, float phase) {
+    float bend = sin(p.y * 1.65 + sin(p.x * 1.12 + phase) * 1.8);
+    float sweep = p.x * 2.3 + p.y * 1.15 + bend * 2.15;
+    float cross = cos(p.y * 2.05 - p.x * 0.72 + phase * 0.6);
+    return sin(sweep + cross * 1.25) * 0.72
+         + sin(p.y * 2.8 - p.x * 1.35 + bend * 0.8) * 0.28;
 }
 
-// Four octaves, not six. The extra two are what turned the field to smoke:
-// each one adds finer filaments, and past a point the picture is all wisp and
-// no shape. Fewer, larger octaves keep it as rounded masses — the lava lamp
-// rather than the smoke.
-static float ifbm(float2 p) {
-    float value = 0.0, amplitude = 0.5, total = 0.0;
-    for (int octave = 0; octave < 4; octave++) {
-        value += amplitude * inoise(p);
-        total += amplitude;
-        p = p * 2.03 + float2(19.1, 7.7);
-        amplitude *= 0.5;
-    }
-    // Divided through by the amplitudes actually summed, so the result sits in
-    // 0…1 around a half however many octaves are used. Without it the octave
-    // count and the contrast below are secretly coupled: dropping from six to
-    // four narrows the range, every value lands under the middle, and the
-    // whole field collapses to the dark end of the ramp.
-    return value / max(total, 0.0001);
-}
-
-// One continuous field of slow blobs, drifting right to left, read through a
-// row of vertical strips that each displace it.
-//
-// The strips shift the field up or down and zoom it in or out — they are
-// windows onto the same lamp held at different heights and distances. The
-// travel is the other axis entirely and belongs to the field, not the strips,
-// so the blobs cross behind a fixed grille rather than sliding along it.
 [[ stitchable ]] half4 exploreOffsetField(float2 position, half4 source,
-                                           float2 size, float time, float seed) {
-    float2 uv = position / max(size, float2(1.0));
+                                          float2 size, float time, float seed) {
+    // Fixed point scale keeps the shapes consistent as the crate grows taller.
+    const float scale = 430.0;
+    float stripWidth = clamp(size.x / 15.0, 48.0, 86.0);
+    float strip = floor(position.x / stripWidth);
+    float lift = ihash(float2(strip + 3.7, seed * 0.013));
+    float2 p = position / scale;
 
-    const float bars = 19.0;
-    // A blob is this many points across, whatever shape the pane happens to be.
-    //
-    // Not a fraction of the pane, which is the trap: this view grows taller
-    // with the size of the listener's crate, so a field measured against its
-    // own height stretches to a couple of enormous smears for anybody who has
-    // saved a lot — the same shader, at a scale set by an unrelated number.
-    const float pointsPerBlob = 760.0;
-    // How far a strip may lift the field, and how far it may zoom it. Both are
-    // per strip and fixed — it is the field that moves, not these.
-    //
-    // The lift is deliberately small. A strip is meant to nudge the picture,
-    // not to cut it loose: shifted far enough that neighbours no longer rhyme,
-    // the grille stops reading as one scene seen through slats and starts
-    // reading as twenty unrelated pictures hung in a row.
-    const float verticalShift = 0.46;
-    const float scaleSpread = 0.30;
-    const float warpIntensity = 1.50;  // unused by the two-level warp below
+    // Shared slow waves keep adjacent bars related while each cut stays crisp.
+    // Scale breathes within ±8%; alternating bars add a deeper stagger.
+    float rhythm = strip * 0.58 + seed * 0.017;
+    float zoom = 1.0 + 0.08 * sin(rhythm + time * 0.22);
+    float verticalOffset = 0.15 * sin(rhythm * 0.87 - time * 0.19);
+    float alternating = fmod(strip, 2.0);
+    verticalOffset += alternating * (0.19 + 0.05 * sin(time * 0.17 + seed * 0.01));
+    // Anchor at a fixed height, so adding crate items cannot move the pattern.
+    float2 anchor = float2((strip + 0.5) * stripWidth / scale, 1.0);
+    p = anchor + (p - anchor) / zoom;
+    p.y += verticalOffset;
+    p += float2(seed * 0.007, seed * 0.003);
+    const float motionSpeed = 4.0;
+    p.x += time * 0.018 * motionSpeed;
+    float wave = exploreWave(p, time * 0.008 * motionSpeed);
+    float value = smoothstep(-0.85, 0.85, wave);
 
-    float barIndex = floor(uv.x * bars);
-    float withinBar = fract(uv.x * bars);
-    float lift = ihash(float2(barIndex + 3.7, seed * 0.013));
-    float zoom = ihash(float2(barIndex + 91.3, seed * 0.029));
+    const half3 blue = half3(0.157, 0.392, 0.941);
+    const half3 turquoise = half3(0.216, 0.847, 0.816);
+    const half3 mint = half3(0.573, 0.957, 0.816);
+    const half3 paper = half3(0.949, 0.961, 0.937);
+    half3 color = mix(blue, turquoise, half(smoothstep(0.12, 0.49, value)));
+    color = mix(color, mint, half(smoothstep(0.44, 0.68, value)));
+    color = mix(color, paper, half(smoothstep(0.65, 0.88, value)));
 
-    // Straight from the pixel, divided by a fixed length. Both axes get the
-    // same divisor, so a blob is as round as it is tall without any need to
-    // reason about the pane's proportions.
-    float2 p = position / pointsPerBlob;
+    // Hard cuts in the image create the bars; no lines or translucent overlays.
+    color *= half(0.98 + lift * 0.04);
 
-    // Stated in points per second, so the drift is the same speed on any pane.
-    // Added, not subtracted: the sample point advancing to the right is the
-    // picture travelling to the left.
-    const float driftPointsPerSecond = 26.0;
-    float travel = time * driftPointsPerSecond / pointsPerBlob;
-    float evolve = time * 0.0022;
-
-    // Two readings of the same strip: one that travels and one that does not.
-    float2 grainAnchor = p;
-    p.x += travel;
-    p.y += (lift - 0.5) * verticalShift;
-    grainAnchor.y += (lift - 0.5) * verticalShift;
-
-    // Zoom about the middle of the pane rather than the origin, so a strip
-    // scales the picture in place instead of also flinging it sideways.
-    float2 middle = size * 0.5 / pointsPerBlob;
-    float stretch = 1.0 + (zoom - 0.5) * scaleSpread;
-    p = middle + (p - middle) * stretch;
-    grainAnchor = middle + (grainAnchor - middle) * stretch;
-
-    // A single large field, warped twice.
-    //
-    // Seen without the strips over it, the reference is not a pattern at all:
-    // it is two or three big shapes across the whole frame — an S-curve, a
-    // lens, a slow swirl — with nothing repeating anywhere in it. The rhythm
-    // that seemed to be in it was the strips chopping it up.
-    //
-    // Which is why the lattice of rings had to go. Regular geometry can be
-    // dressed up with noise but it stays regular underneath, and against this
-    // it read as wallpaper. Feeding the field back through itself twice is
-    // what produces curl at every size at once: the swirls and hooks are the
-    // warp folding the warp, and there is no way to that from a grid.
-    float2 first = float2(ifbm(p + float2(evolve, 0.0)),
-                          ifbm(p + float2(5.2, 1.3)));
-    float2 second = float2(ifbm(p + 2.60 * first + float2(1.7, 9.2) + evolve * 1.30),
-                           ifbm(p + 2.60 * first + float2(8.3, 2.8) - evolve * 0.90));
-    float value = ifbm(p + 2.60 * second);
-
-    // fbm sits close to its average; this opens it out to use the whole ramp
-    // without hardening the edges, which would cost the shapes their liquid
-    // look.
-    value = clamp((value - 0.5) * 2.30 + 0.5, 0.0, 1.0);
-
-    const half3 white = half3(1.0);
-    const half3 cyan = half3(0.090, 0.902, 0.863);
-    const half3 green = half3(0.302, 1.000, 0.733);
-    const half3 blue = half3(0.208, 0.525, 1.000);
-    half3 color = mix(blue, cyan, half(smoothstep(0.04, 0.34, value)));
-    color = mix(color, green, half(smoothstep(0.38, 0.63, value)));
-    color = mix(color, white, half(smoothstep(0.68, 0.96, value)));
-
-    // Strips are cut, not blended: the seam is the point, so it stays hard.
-    color *= half(0.974 + 0.046 * lift);
-    // A hair of lift at the very edge, so a seam between two dark strips does
-    // not read as a crack in the render.
-    float edge = min(withinBar, 1.0 - withinBar);
-    color += half3(half(smoothstep(0.05, 0.0, edge) * 0.026));
-
-    // Grain belongs to the layer, but not to its travel.
-    //
-    // Sampled off the pixel it sits above everything like dust on the glass,
-    // unmoved by any of this, which is what makes it read as an artefact of
-    // the display rather than as part of the picture. Sampled off the
-    // travelling coordinate it goes the other way and swims, which at grain
-    // scale is a shimmer rather than a texture.
-    //
-    // So it takes the strip's own lift and zoom — it is bedded into the layer
-    // and breaks at the seams with everything else — but not the drift. The
-    // texture sits still while the picture moves through it.
-    float g = ihash(grainAnchor * pointsPerBlob * 1.15 + float2(seed, seed * 0.37)) - 0.5;
-    g = sign(g) * pow(abs(g) * 2.0, 0.42) * 0.5;
-    color += half3(half(g * 0.150));
-
+    // Stationary fine grain avoids sparkling during the slow movement.
+    float grain = ihash(floor(position * 1.7) + float2(seed, seed * 0.37)) - 0.5;
+    color += half3(half(grain * 0.095));
     return half4(clamp(color, half3(0.0), half3(1.0)), 1.0);
+}
+
+// A continuous gold field across the player. Sound expands its wavefronts;
+// a restrained luminance keeps the transport text legible.
+[[ stitchable ]] half4 playerFlowField(float2 position, half4 source,
+                                      float2 size, float time, float energy) {
+    float2 uv = position / max(size, float2(1));
+    float2 p = float2(position.x / 340.0, uv.y * 0.65);
+    // Sampling upward carries the visible field down through the player.
+    p.y -= time * 0.075;
+    p.y += energy * 0.28;
+    float wave = exploreWave(p, time * 0.032);
+    float field = smoothstep(-0.9, 0.95, wave);
+    float glow = (0.22 + field * 0.44 + energy * 0.16)
+               * mix(0.65, 1.0, smoothstep(0.0, 1.0, uv.y));
+    half3 color = mix(half3(0.10, 0.07, 0.012), half3(0.95, 0.64, 0.075), half(field));
+    color *= half(glow);
+    color += half( (ihash(floor(position * 1.5)) - 0.5) * 0.018 );
+    return half4(clamp(color, half3(0), half3(1)), 1);
 }

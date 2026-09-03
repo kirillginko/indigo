@@ -87,6 +87,45 @@ final class SourceResolverTests: XCTestCase {
         XCTAssertTrue(resolver.isUnavailable(unknown))
     }
 
+    func testCrateArtworkReachesResolvedPlayback() throws {
+        let recording = try store.upsert(title: "For Arg", artistName: "Angelo Harmsworth")
+        let link = RecordingSource(kind: .streamingLink,
+                                   identifier: "https://soundcloud.com/artist/for-arg",
+                                   providerID: "soundcloud")
+        context.insert(link)
+        link.recording = recording
+        recording.sources.append(link)
+        let item = CrateItem(recording: recording)
+        item.artworkURLString = "https://example.com/angelo-cover.jpg"
+        context.insert(item)
+
+        let resolver = SourceResolver(context: context)
+        let original = try XCTUnwrap(resolver.best(recording))
+        let resolved = try XCTUnwrap(resolver.best(item))
+        guard case .play(let before) = original.action,
+              case .play(let after) = resolved.action else {
+            return XCTFail("Expected streaming playback")
+        }
+        XCTAssertNil(before.remoteArtworkURL)
+        XCTAssertEqual(after.remoteArtworkURL, item.artworkURL)
+        XCTAssertEqual(after.id, before.id)
+        XCTAssertEqual(after.playbackURL, before.playbackURL)
+        XCTAssertEqual(after.embedProvider, before.embedProvider)
+    }
+
+    func testCrateArtworkDoesNotReplaceLocalSleeve() throws {
+        let recording = try store.upsert(title: "Hubble", artistName: "Actress")
+        let track = makeTrack(path: "/Music/Hubble.flac", title: "Hubble", artist: "Actress")
+        track.artworkKey = "local-sleeve"
+        let item = CrateItem(recording: recording)
+        item.artworkURLString = "https://example.com/crate.jpg"
+        context.insert(item)
+        let source = try XCTUnwrap(SourceResolver(context: context).best(item))
+        guard case .play(let media) = source.action else { return XCTFail("Expected local playback") }
+        XCTAssertEqual(media.artworkKey, "local-sleeve")
+        XCTAssertNil(media.remoteArtworkURL)
+    }
+
     // MARK: The match ladder
 
     func testISRCOutranksDisagreeingText() throws {

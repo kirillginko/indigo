@@ -32,7 +32,7 @@ nonisolated struct MediaItem: Identifiable, Hashable, Sendable {
     /// Key into `ArtworkStore` for artwork extracted from a local file.
     let artworkKey: String?
     /// Remote artwork, used by network providers.
-    let remoteArtworkURL: URL?
+    var remoteArtworkURL: URL?
     let playbackURL: URL
     /// Nil for live streams, and unknown until an embed reports it.
     let duration: TimeInterval?

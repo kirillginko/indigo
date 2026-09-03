@@ -16,7 +16,7 @@ private enum RadioSidebarGroup: CaseIterable, Hashable {
 /// The sidebar reads like descending through a record collection: every band
 /// has its own gradient, and each successive band begins a little deeper.
 private enum SidebarBand: Int {
-    case library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr, explore
+    case explore, library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr
 
     var depth: Double { Double(rawValue) / 14.0 }
 }
@@ -61,6 +61,15 @@ struct SidebarView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
+                    directoryHeader("Explore", expanded: isExploreExpanded, band: .explore) {
+                        isExploreExpanded.toggle()
+                    }
+                    if isExploreExpanded {
+                        row(.explore, label: "For You", trailing: nil, band: .explore)
+                        row(.crate, label: "Crate", trailing: crateCount, band: .explore)
+                        row(.dig, label: "Dig", trailing: nil, band: .explore)
+                    }
+
                     directoryHeader("Library", expanded: isLibraryExpanded, band: .library) {
                         isLibraryExpanded.toggle()
                     }
@@ -246,14 +255,7 @@ struct SidebarView: View {
                     }
                     }
 
-                    directoryHeader("Explore", expanded: isExploreExpanded, band: .explore) {
-                        isExploreExpanded.toggle()
-                    }
-                    if isExploreExpanded {
-                        row(.explore, label: "For You", trailing: nil, band: .explore)
-                        row(.crate, label: "Crate", trailing: crateCount, band: .explore)
-                        row(.dig, label: "Dig", trailing: nil, band: .explore)
-                    }
+
                 }
                 .padding(.bottom, 12)
             }
@@ -265,7 +267,7 @@ struct SidebarView: View {
         // The darkest band is also the sidebar's floor. When directories are
         // collapsed, the newly exposed space continues the colour story all
         // the way down instead of revealing the neutral chrome background.
-        .background(bandGradient(.explore))
+        .background(bandGradient(.rovr))
         .onChange(of: appState.route) { _, route in
             if route == .tracks || route == .albums || route == .artists {
                 isLibraryExpanded = true

@@ -43,6 +43,9 @@ final class StreamAudioEngine {
         removeNotificationObservers()
     }
 
+    @ObservationIgnored private let levelMonitor = AudioLevelMonitor()
+    func audioLevel() -> Float { levelMonitor.level() }
+
     // MARK: - Transport
 
     func play(url: URL) {
@@ -67,6 +70,7 @@ final class StreamAudioEngine {
     }
 
     func stop() {
+        levelMonitor.reset()
         reconnectTask?.cancel()
         reconnectAttempts = 0
         isUserPaused = false
@@ -108,6 +112,7 @@ final class StreamAudioEngine {
             "AVURLAssetHTTPHeaderFieldsKey": ["User-Agent": NetworkEnvironment.userAgent]
         ])
         let item = AVPlayerItem(asset: asset)
+        levelMonitor.attach(to: item)
         player.replaceCurrentItem(with: item)
         observe(item)
         player.play()

@@ -161,17 +161,7 @@ struct CrateView: View {
     /// best — it never picks a provider. A crated broadcast is already an
     /// address, so it short-circuits.
     private func source(for item: CrateItem) -> AudioSource? {
-        if let broadcast = item.broadcastMediaItem() {
-            return AudioSource(
-                kind: .broadcastAppearance,
-                action: .play(broadcast),
-                label: BroadcastSource.label(for: item.providerID ?? ""),
-                detail: nil,
-                rank: 0
-            )
-        }
-        guard let recording = item.recording else { return nil }
-        return SourceResolver(context: crate.context).best(recording)
+        SourceResolver(context: crate.context).best(item)
     }
 
     /// Where each row can be played from, and where its DIG button goes.

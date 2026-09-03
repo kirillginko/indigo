@@ -388,23 +388,35 @@ struct PlayerBarView: View {
     }
 }
 
-/// A restrained vertical colour wash laid over Indigo's original black player.
+/// The timeline lives below the controls, so only the small backdrop redraws.
 private struct PlayerGradientBackdrop: View {
-    var body: some View {
-        ZStack {
-            Color.black
+    @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var motion: TimeInterval = 0
+    @State private var lastFrame: Date?
+    @State private var energy: Float = 0
 
-            LinearGradient(
-                stops: [
-                    .init(color: Color(red: 0.30, green: 0.24, blue: 0.02).opacity(0.04), location: 0.00),
-                    .init(color: Color(red: 0.72, green: 0.56, blue: 0.04).opacity(0.24), location: 0.48),
-                    .init(color: Color(red: 1.00, green: 0.78, blue: 0.08).opacity(0.52), location: 1.00)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .blendMode(.screen)
+    private var animating: Bool { player.isPlaying && !player.isBuffering && !reduceMotion }
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: !animating)) { timeline in
+            GeometryReader { proxy in
+                Rectangle().fill(.black)
+                    .colorEffect(ShaderLibrary.playerFlowField(
+                        .float2(proxy.size), .float(motion), .float(reduceMotion ? 0 : energy)
+                    ))
+            }
+            .onChange(of: timeline.date) { _, date in
+                guard animating else { lastFrame = nil; energy = 0; return }
+                let delta = min(0.1, max(0, date.timeIntervalSince(lastFrame ?? date)))
+                lastFrame = date
+                let target = player.audioLevel()
+                let response = target > energy ? 14.0 : 4.0
+                energy += (target - energy) * Float(1 - exp(-delta * response))
+                motion += delta * (1 + Double(energy) * 1.8)
+            }
         }
+        .onChange(of: animating) { _, _ in lastFrame = nil; energy = 0 }
         .accessibilityHidden(true)
         .allowsHitTesting(false)
     }
