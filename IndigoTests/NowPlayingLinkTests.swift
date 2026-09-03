@@ -88,10 +88,25 @@ final class NowPlayingLinkTests: XCTestCase {
                        .detail(.ntsEpisode(show: "a-show", episode: "an-episode")))
     }
 
-    /// And still goes somewhere when it does not.
-    func testLiveNTSWithoutAnEpisodeStillOpensTheChannel() {
-        XCTAssertEqual(link("2", source: NTSProvider.providerID, live: nil),
-                       .route(.station("2")))
+    /// And when it does not, the channel id is all there is — opening a
+    /// station by it lands on one nobody recognises, which is what "Claire
+    /// Milbrath opened unknown station" was. The show has a name, so the bar
+    /// goes looking for it in the archive, exactly as the Crate does.
+    func testLiveNTSWithoutAnEpisodeSearchesTheArchiveByName() {
+        let item = MediaItem(id: "2", sourceID: NTSProvider.providerID, kind: .episode,
+                             title: "Claire Milbrath",
+                             playbackURL: URL(string: "https://example.invalid/s")!)
+        XCTAssertEqual(NowPlayingLink.destination(for: item),
+                       .search(.ntsSearch, query: "Claire Milbrath"))
+    }
+
+    /// A stream with no title has nothing to search for, so it falls back to
+    /// the channel rather than opening an empty search.
+    func testLiveNTSWithoutATitleFallsBackToTheChannel() {
+        let item = MediaItem(id: "2", sourceID: NTSProvider.providerID, kind: .episode,
+                             title: "   ",
+                             playbackURL: URL(string: "https://example.invalid/s")!)
+        XCTAssertEqual(NowPlayingLink.destination(for: item), .route(.station("2")))
     }
 
     // MARK: - Malformed

@@ -23,6 +23,7 @@ struct PlayerBarView: View {
     @Environment(CashmereProvider.self) private var cashmere
     @Environment(LYLProvider.self) private var lyl
     @Environment(CrateService.self) private var crate
+    @Environment(DigStore.self) private var dig
 
     var body: some View {
         ZStack {
@@ -131,11 +132,22 @@ struct PlayerBarView: View {
     /// supplies only the two things that need its context — the album a local
     /// file belongs to, and whatever NTS says is on air.
     private func destination(for item: MediaItem) -> NowPlayingLink? {
-        NowPlayingLink.destination(
+        if let link = NowPlayingLink.destination(
             for: item,
             localAlbumKey: { path in localTrack(path: path)?.albumKey },
             liveNTSEpisode: liveShow?.detailID.flatMap(NTSEpisodeRef.decode)
+        ) { return link }
+
+        // The Crate's last resort, and the bar's: a piece of music with no
+        // page of its own still has the page about the music — where it was
+        // heard, and what was heard beside it.
+        let summary = NowPlayingSummary.make(
+            item: item, showTitle: liveShow?.title, context: crate.context
         )
+        guard let recording = summary.recording,
+              let page = dig.recordingDestination(for: recording)
+        else { return nil }
+        return .detail(page)
     }
 
     private func localTrack(path: String) -> Track? {
@@ -148,6 +160,9 @@ struct PlayerBarView: View {
         switch destination(for: item) {
         case .route(let route): appState.select(route)
         case .detail(let page): appState.open(page)
+        case .search(let route, let query):
+            appState.select(route)
+            appState.searchText = query
         case nil: break
         }
     }

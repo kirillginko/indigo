@@ -16,6 +16,10 @@ import Foundation
 nonisolated enum NowPlayingLink: Equatable, Sendable {
     case route(Route)
     case detail(DetailPage)
+    /// A live broadcast has no page of its own. The archive is where the show
+    /// ends up, so the bar goes looking for it by name — the same move the
+    /// Crate makes for a stream it only knows the title of.
+    case search(Route, query: String)
 
     /// What the bar should open for `item`.
     ///
@@ -37,10 +41,16 @@ nonisolated enum NowPlayingLink: Equatable, Sendable {
 
         if let link = archived(item) { return link }
 
-        // A live stream has no episode of its own. NTS names what is on air,
-        // so it can open the episode; everyone else opens their station.
-        if item.sourceID == NTSProvider.providerID, let ref = liveNTSEpisode {
-            return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
+        if item.sourceID == NTSProvider.providerID {
+            // NTS names what is on air, so a live channel can open the episode.
+            if let ref = liveNTSEpisode {
+                return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
+            }
+            // Otherwise the channel id is all there is, and opening a station
+            // by it lands on one nobody recognises. The show has a name, and
+            // the archive is where it will be.
+            let title = item.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !title.isEmpty { return .search(.ntsSearch, query: title) }
         }
 
         return station(for: item)
