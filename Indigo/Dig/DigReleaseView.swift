@@ -71,9 +71,7 @@ struct DigReleaseView: View {
                 // until they are scrolled to.
                 LazyVStack(alignment: .leading, spacing: 26) {
                     if profile == nil, !hasLookedUp {
-                        WorkingPane()
-                    } else if dig.isEnriching {
-                        WorkingBar()
+                        DigSkeleton(sections: 2)
                     }
                     if profile == nil, hasLookedUp {
                         unclaimed
@@ -198,6 +196,15 @@ struct DigReleaseView: View {
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)
+                // One treatment for the whole page rather than a bar above it
+                // and a pane inside it. See `LoadingVeil`.
+                //
+                // Waits on the record itself, not on `isEnriching`: a page
+                // that already has the release should not soften again every
+                // time a later write lands. And once the lookup has finished
+                // with nothing, `unclaimed` is the answer — veiling that would
+                // promise something still coming.
+                .loadingVeil(profile == nil && !hasLookedUp)
             }
             .scrollIndicators(.visible)
         }

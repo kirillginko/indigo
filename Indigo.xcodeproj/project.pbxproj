@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		584F04C7304A0069003B93A1 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 584F04C6304A0069003B93A1 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		581130393040B144002E7036 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -53,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				584F04C7304A0069003B93A1 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,6 +127,7 @@
 			);
 			name = Indigo;
 			packageProductDependencies = (
+				584F04C6304A0069003B93A1 /* Supabase */,
 			);
 			productName = Indigo;
 			productReference = 5811302B3040B143002E7036 /* Indigo.app */;
@@ -205,6 +211,9 @@
 			);
 			mainGroup = 581130223040B143002E7036;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				584F04C5304A0069003B93A1 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5811302C3040B143002E7036 /* Products */;
 			projectDirPath = "";
@@ -633,6 +642,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		584F04C5304A0069003B93A1 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		584F04C6304A0069003B93A1 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 584F04C5304A0069003B93A1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 581130233040B143002E7036 /* Project object */;
 }

@@ -63,8 +63,7 @@ struct DiscogsLabelDigView: View {
             Rule(color: Palette.outline)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 26) {
-                    if dig.isEnriching { WorkingBar() }
-                    if profile == nil { WorkingPane() }
+                    if profile == nil { DigSkeleton(hasImage: false, sections: 3) }
                     if let profile {
                         DigTallies(entries: [("Catalogue", "\(profile.releases.count)"),
                                              ("Artists", "\(profile.artists.count)"),
@@ -108,7 +107,10 @@ struct DiscogsLabelDigView: View {
                             }
                         }
                     }
-                }.padding(.horizontal, Metrics.gutter).padding(.vertical, 22)
+                }
+                .padding(.horizontal, Metrics.gutter).padding(.vertical, 22)
+                // One treatment for the whole page. See `LoadingVeil`.
+                .loadingVeil(profile == nil)
             }
         }.task(id: labelName) { await dig.enrichDiscogsLabel(named: labelName) }
     }

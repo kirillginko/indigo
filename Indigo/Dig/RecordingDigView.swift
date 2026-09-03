@@ -108,7 +108,14 @@ struct RecordingDigView: View {
     private func appearances(_ recording: Recording) -> some View {
         let heard = recording.appearances.sorted { $0.heardAt > $1.heardAt }
         if heard.isEmpty, neighbourhood == nil {
-            DigSection(title: "Known appearances") { WorkingBar().padding(.vertical, 10) }
+            // Veiled rather than swept. The rest of this page is local and
+            // already there, so this is the one part still arriving — but it
+            // should arrive the way everything else in Indigo does.
+            DigSection(title: "Known appearances") {
+                DigSkeleton(hasImage: false, sections: 0)
+                    .padding(.vertical, 10)
+                    .loadingVeil(true)
+            }
         } else if heard.isEmpty {
             DigSection(title: "Known appearances") {
                 Text("Not heard on air yet.")

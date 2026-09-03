@@ -19,7 +19,11 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>IndigoDiscogsToken</key>
-	<string>$(DISCOGS_TOKEN)</string>
+	<string>$(DISCOGS_TOKEN_OBFUSCATED)</string>
+	<key>IndigoSupabaseProjectRef</key>
+	<string>$(SUPABASE_PROJECT_REF)</string>
+	<key>IndigoSupabasePublishableKey</key>
+	<string>$(SUPABASE_PUBLISHABLE_KEY)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 </dict>
