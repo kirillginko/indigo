@@ -58,6 +58,10 @@ struct LabelDigView: View {
                             ("Radio", "\(profile.radioAppearances)")
                         ])
 
+                        // What no catalogue can tell you about a label:
+                        // that its records keep turning up in the same shows.
+                        LabelRadioSection(labelName: profile.name)
+
                         HStack(alignment: .top, spacing: 34) {
                             DigSection(title: "Artists", trailing: "\(profile.artists.count)") {
                                 VStack(alignment: .leading, spacing: 0) {

@@ -144,14 +144,14 @@ struct NTSEpisodeView: View {
             // Resolved once for the episode rather than once per row. A row
             // that looks its own release up re-runs the fetch every time it
             // redraws, and a tracklist redraws on every hover.
-            let releases = resolvedReleases(detail)
+            let rows = resolvedRows(detail)
             ForEach(Array(detail.tracklist.enumerated()), id: \.element.id) { index, entry in
                 TracklistRow(
                     index: index + 1,
                     entry: entry,
                     detail: detail,
                     showsTimestamps: timed,
-                    release: releases[entry.id] ?? (nil, nil)
+                    release: rows[entry.id] ?? (nil, nil, nil)
                 )
                 Rule()
             }
@@ -159,14 +159,20 @@ struct NTSEpisodeView: View {
     }
 
     /// What each row turned out to be, keyed by tracklist entry.
-    private func resolvedReleases(_ detail: NTSEpisodeDetail) -> [String: (line: String?, artwork: URL?)] {
+    ///
+    /// Carries the recording as well as the sleeve now: the id is what makes
+    /// the title openable, and it exists for a row whether or not a catalogue
+    /// has produced artwork for it.
+    private func resolvedRows(
+        _ detail: NTSEpisodeDetail
+    ) -> [String: (recordingID: UUID?, line: String?, artwork: URL?)] {
         let _ = dig.revision
         let engine = RadioNeighborhoodEngine(context: dig.context)
-        var found: [String: (line: String?, artwork: URL?)] = [:]
+        var found: [String: (recordingID: UUID?, line: String?, artwork: URL?)] = [:]
         for entry in detail.tracklist {
             guard let recording = engine.recording(for: entry, in: detail) else { continue }
             let release = dig.releaseDetail(for: recording)
-            if release.line != nil || release.artwork != nil { found[entry.id] = release }
+            found[entry.id] = (recording.id, release.line, release.artwork)
         }
         return found
     }
@@ -248,12 +254,14 @@ private struct TracklistRow: View {
     let entry: NTSTracklistEntry
     let detail: NTSEpisodeDetail
     let showsTimestamps: Bool
-    /// Resolved by the episode, not by the row — see `resolvedReleases`.
-    let release: (line: String?, artwork: URL?)
+    /// Resolved by the episode, not by the row — see `resolvedRows`.
+    let release: (recordingID: UUID?, line: String?, artwork: URL?)
 
+    @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @State private var isHovering = false
+    @State private var isHoveringTitle = false
 
     private var marker: String {
         guard showsTimestamps else { return "\(index)" }
@@ -275,9 +283,32 @@ private struct TracklistRow: View {
                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(entry.title)
-                    .font(Typeface.body(12.5))
-                    .lineLimit(1)
+                // The spec's line: every track is somewhere you can go. The
+                // page it opens is where this piece of music was heard and
+                // what was heard beside it, which is the question a tracklist
+                // makes you want to ask.
+                //
+                // A row only becomes a link once local ingestion has given it
+                // a recording. That happens when the episode loads, so it is
+                // a moment rather than a wait — but until then the title is
+                // text, because a link to nothing is worse than no link.
+                if let recordingID = release.recordingID {
+                    Button {
+                        appState.open(.digRecording(id: recordingID, title: entry.title))
+                    } label: {
+                        Text(entry.title)
+                            .font(Typeface.body(12.5, weight: .medium))
+                            .foregroundStyle(isHoveringTitle ? Palette.accent : Palette.ink)
+                            .lineLimit(1)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .onHover { isHoveringTitle = $0 }
+                } else {
+                    Text(entry.title)
+                        .font(Typeface.body(12.5))
+                        .lineLimit(1)
+                }
                 // Nothing at all until the catalogue has answered. An empty
                 // line reserved for a release reads as a missing release.
                 if let line = release.line {
@@ -289,11 +320,12 @@ private struct TracklistRow: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text(entry.artist)
-                .font(Typeface.body(12))
-                .foregroundStyle(Palette.inkMuted)
-                .lineLimit(1)
-                .frame(width: 260, alignment: .leading)
+            // The way in. Every name here is an artist Indigo now keeps —
+            // ingesting a tracklist creates one for a name no catalogue has —
+            // and until this was navigable those were pages nothing could
+            // reach. A selector naming a record is the beginning of a dig, so
+            // it has to be the beginning of one on screen too.
+            TracklistArtist(name: entry.artist)
 
             CrateGlyphButton(isCrated: crate.isCrated(tracklistEntry: entry, in: detail)) {
                 if let recording = crate.toggle(tracklistEntry: entry, in: detail) {
@@ -311,5 +343,38 @@ private struct TracklistRow: View {
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
         .textSelection(.enabled)
+    }
+}
+
+/// The credit on a tracklist row, as a way into DIG.
+///
+/// "Unknown Artist" is what the ingester writes when a selector did not say,
+/// and it is not a page — it stays plain text rather than becoming a link to
+/// everything nobody identified.
+private struct TracklistArtist: View {
+    let name: String
+
+    @Environment(AppState.self) private var appState
+    @State private var isHovering = false
+
+    var body: some View {
+        if ArtistName.isRealArtist(name) {
+            Button { appState.open(.digArtist(mbid: nil, name: name)) } label: {
+                Text(name)
+                    .font(Typeface.body(12))
+                    .foregroundStyle(isHovering ? Palette.accent : Palette.inkMuted)
+                    .lineLimit(1)
+                    .frame(width: 260, alignment: .leading)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .onHover { isHovering = $0 }
+        } else {
+            Text(name)
+                .font(Typeface.body(12))
+                .foregroundStyle(Palette.inkFaint)
+                .lineLimit(1)
+                .frame(width: 260, alignment: .leading)
+        }
     }
 }

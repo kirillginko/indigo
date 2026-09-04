@@ -91,6 +91,19 @@ struct RecordingDigView: View {
 
                     playedAlongside(connections)
 
+                    // The two blocks above are the listener's own: what they
+                    // heard, and what they heard it near. This is the shared
+                    // record, and it is the artist's rather than this exact
+                    // recording's — almost no appearance has been matched to a
+                    // canonical recording yet, so claiming otherwise would be
+                    // claiming more than Indigo knows. The heading says which.
+                    if let artistName = recording.displayArtist {
+                        ArtistRadioSection(
+                            artistName: artistName,
+                            title: "This artist on radio"
+                        )
+                    }
+
                     DeepSectionView(origin: node, isReady: neighbourhood != nil) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
