@@ -24,10 +24,11 @@ struct PlayerBarView: View {
     @Environment(LYLProvider.self) private var lyl
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @State private var isIdentityHovering = false
 
     var body: some View {
         ZStack {
-            PlayerGradientBackdrop()
+            PlayerShaderBackdrop()
 
             HStack(spacing: 0) {
                 identity
@@ -52,9 +53,7 @@ struct PlayerBarView: View {
     /// the eye already expects from every player.
     private var identity: some View {
         HStack(spacing: 10) {
-            artworkButton
-
-            title
+            identityButton
                 .layoutPriority(1)
 
             Spacer(minLength: 6)
@@ -71,15 +70,30 @@ struct PlayerBarView: View {
         .padding(.trailing, 10)
     }
 
-    private var artworkButton: some View {
+    private var identityButton: some View {
         Group {
             if let item = player.current, destination(for: item) != nil {
-                Button { open(item) } label: { artwork }
+                Button { open(item) } label: {
+                    HStack(spacing: 10) {
+                        artwork
+                        titleLines(item)
+                            .layoutPriority(1)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(isIdentityHovering ? Color.white.opacity(0.09) : Color.clear)
+                    .contentShape(Rectangle())
+                }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open \(primaryTitle(for: item))")
                     .help("Open now playing")
+                    .onHover { isIdentityHovering = $0 }
+                    .animation(.easeOut(duration: 0.12), value: isIdentityHovering)
             } else {
-                artwork
+                HStack(spacing: 10) {
+                    artwork
+                    titleLines(player.current)
+                        .layoutPriority(1)
+                }
             }
         }
     }
@@ -98,17 +112,6 @@ struct PlayerBarView: View {
             markURL: StationMark.logoURL(for: player.current?.sourceID)
         )
         .contentShape(Rectangle())
-    }
-
-    @ViewBuilder
-    private var title: some View {
-        if let item = player.current, destination(for: item) != nil {
-            Button { open(item) } label: { titleLines(item) }
-                .buttonStyle(.plain)
-                .help("Open now playing")
-        } else {
-            titleLines(player.current)
-        }
     }
 
     private func titleLines(_ item: MediaItem?) -> some View {
@@ -147,6 +150,16 @@ struct PlayerBarView: View {
         if let recording = summary.recording,
            let page = dig.recordingDestination(for: recording) {
             return .detail(page)
+        }
+
+        // A newly played streaming track may not have a Recording in SwiftData
+        // yet. Its credited artist is still a real destination (and is the
+        // same fallback the mini player uses), so do not leave the artwork and
+        // title inert while identification catches up.
+        if item.kind == .track,
+           let artist = item.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !artist.isEmpty {
+            return .detail(.digArtist(mbid: nil, name: artist))
         }
 
         return NowPlayingLink.fallback(
@@ -341,34 +354,36 @@ struct PlayerBarView: View {
 }
 
 /// The timeline lives below the controls, so only the small backdrop redraws.
-private struct PlayerGradientBackdrop: View {
+struct PlayerShaderBackdrop: View {
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var motion: TimeInterval = 0
-    @State private var lastFrame: Date?
-    @State private var energy: Float = 0
+    var noiseBoost: Float = 1
 
     private var animating: Bool { player.isPlaying && !player.isBuffering && !reduceMotion }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: !animating)) { timeline in
             GeometryReader { proxy in
+                let frame = proxy.frame(in: .global)
+                // Every instance receives the same clock. Keeping the value
+                // small preserves float precision in the Metal shader.
+                // Track changes briefly enter buffering. Keep sampling the
+                // shared clock during that handoff instead of substituting
+                // zero, which visibly restarted the field for every song.
+                let sharedTime = reduceMotion
+                    ? 0
+                    : timeline.date.timeIntervalSinceReferenceDate
+                        .truncatingRemainder(dividingBy: 4096)
+                let energy = animating ? player.audioLevel() : 0
                 Rectangle().fill(.black)
                     .colorEffect(ShaderLibrary.playerFlowField(
-                        .float2(proxy.size), .float(motion), .float(reduceMotion ? 0 : energy)
+                        .float2(frame.minX, frame.minY),
+                        .float(sharedTime),
+                        .float(energy),
+                        .float(noiseBoost)
                     ))
             }
-            .onChange(of: timeline.date) { _, date in
-                guard animating else { lastFrame = nil; energy = 0; return }
-                let delta = min(0.1, max(0, date.timeIntervalSince(lastFrame ?? date)))
-                lastFrame = date
-                let target = player.audioLevel()
-                let response = target > energy ? 14.0 : 4.0
-                energy += (target - energy) * Float(1 - exp(-delta * response))
-                motion += delta * (1 + Double(energy) * 1.8)
-            }
         }
-        .onChange(of: animating) { _, _ in lastFrame = nil; energy = 0 }
         .accessibilityHidden(true)
         .allowsHitTesting(false)
     }

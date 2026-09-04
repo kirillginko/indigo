@@ -72,6 +72,20 @@ final class NowPlayingLinkTests: XCTestCase {
                        .detail(.kioskEpisode(slug: "jkl")))
     }
 
+    /// The Crate wraps the provider's original media id when replaying a kept
+    /// broadcast. The player should still return to that broadcast, exactly as
+    /// tapping its Crate row does, rather than falling back to the station.
+    func testAReplayedCrateBroadcastOpensItsOriginalEpisode() {
+        XCTAssertEqual(link("crate.kiosk.kiosk.episode.jkl",
+                            source: KioskProvider.providerID),
+                       .detail(.kioskEpisode(slug: "jkl")))
+
+        let lot = LotEpisodeRef(show: "public-records", episode: "night-shift")
+        XCTAssertEqual(link("crate.lot.lot.episode.\(lot.encoded)",
+                            source: LotProvider.providerID),
+                       .detail(.lotEpisode(show: "public-records", episode: "night-shift")))
+    }
+
     // MARK: - Live streams
 
     func testALiveStreamOpensItsStation() {

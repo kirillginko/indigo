@@ -63,18 +63,22 @@ static float exploreWave(float2 p, float phase) {
 // A continuous gold field across the player. Sound expands its wavefronts;
 // a restrained luminance keeps the transport text legible.
 [[ stitchable ]] half4 playerFlowField(float2 position, half4 source,
-                                      float2 size, float time, float energy) {
-    float2 uv = position / max(size, float2(1));
-    float2 p = float2(position.x / 340.0, uv.y * 0.65);
+                                      float2 origin, float time, float energy,
+                                      float noiseBoost) {
+    // Sample one window-wide field. SwiftUI supplies each surface's global
+    // origin, so the header, sidebar and player reveal adjacent parts of the
+    // same pattern instead of restarting it in local coordinates.
+    float2 canvasPosition = position + origin;
+    float2 p = float2(canvasPosition.x / 340.0, canvasPosition.y / 340.0 * 0.65);
     // Sampling upward carries the visible field down through the player.
     p.y -= time * 0.075;
     p.y += energy * 0.28;
     float wave = exploreWave(p, time * 0.032);
     float field = smoothstep(-0.9, 0.95, wave);
-    float glow = (0.22 + field * 0.44 + energy * 0.16)
-               * mix(0.65, 1.0, smoothstep(0.0, 1.0, uv.y));
+    float glow = 0.22 + field * 0.44 + energy * 0.16;
     half3 color = mix(half3(0.10, 0.07, 0.012), half3(0.95, 0.64, 0.075), half(field));
     color *= half(glow);
-    color += half( (ihash(floor(position * 1.5)) - 0.5) * 0.018 );
+    color += half( (ihash(floor(canvasPosition * 1.5)) - 0.5)
+                  * 0.018 * noiseBoost );
     return half4(clamp(color, half3(0), half3(1)), 1);
 }

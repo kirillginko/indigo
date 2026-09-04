@@ -84,9 +84,21 @@ nonisolated enum NowPlayingLink: Equatable, Sendable {
 
     /// A recording with a page of its own.
     private static func archived(_ item: MediaItem) -> NowPlayingLink? {
+        // Replaying a broadcast from the Crate wraps its original stable id so
+        // the player can distinguish that queue entry from a provider's live
+        // object. Peel only that known wrapper; the remainder is the same id
+        // the provider's archive player would have supplied directly.
+        let itemID: String
+        let cratePrefix = "crate.\(item.sourceID)."
+        if item.id.hasPrefix(cratePrefix) {
+            itemID = String(item.id.dropFirst(cratePrefix.count))
+        } else {
+            itemID = item.id
+        }
+
         func identity(_ prefix: String) -> String? {
-            guard item.id.hasPrefix(prefix) else { return nil }
-            let value = String(item.id.dropFirst(prefix.count))
+            guard itemID.hasPrefix(prefix) else { return nil }
+            let value = String(itemID.dropFirst(prefix.count))
             return value.isEmpty ? nil : value
         }
 

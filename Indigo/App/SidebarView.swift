@@ -8,17 +8,18 @@
 
 import SwiftUI
 import SwiftData
+#if os(macOS)
+import AppKit
+#endif
 
 private enum RadioSidebarGroup: CaseIterable, Hashable {
     case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr
 }
 
-/// The sidebar reads like descending through a record collection: every band
-/// has its own gradient, and each successive band begins a little deeper.
+/// Logical groups remain useful for routing, but the sidebar itself uses one
+/// dark translucent surface rather than separate colour bands.
 private enum SidebarBand: Int {
     case explore, library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr
-
-    var depth: Double { Double(rawValue) / 14.0 }
 }
 
 struct SidebarView: View {
@@ -264,10 +265,7 @@ struct SidebarView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        // The darkest band is also the sidebar's floor. When directories are
-        // collapsed, the newly exposed space continues the colour story all
-        // the way down instead of revealing the neutral chrome background.
-        .background(bandGradient(.rovr))
+        .background(sidebarMaterial)
         .onChange(of: appState.route) { _, route in
             if route == .tracks || route == .albums || route == .artists {
                 isLibraryExpanded = true
@@ -284,20 +282,21 @@ struct SidebarView: View {
 
     // MARK: Pieces
 
-    private func bandGradient(_ band: SidebarBand) -> some View {
-        let depth = band.depth
-        return LinearGradient(
-            colors: [
-                Color(hue: 0.60 + depth * 0.12,
-                      saturation: 0.28 + depth * 0.40,
-                      brightness: 0.68 - depth * 0.52),
-                Color(hue: 0.62 + depth * 0.11,
-                      saturation: 0.36 + depth * 0.38,
-                      brightness: 0.55 - depth * 0.44)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+    private var sidebarMaterial: some View {
+        IndigoGlassBackground(tint: 0.46, shaderOpacity: 0.3)
+    }
+
+    private func bandSurface(_ band: SidebarBand) -> Color {
+        let _ = band
+        return Color.black.opacity(0.08)
+    }
+
+    private var sidebarInk: Color {
+        Color.white
+    }
+
+    private var sidebarSecondaryInk: Color {
+        Color.white.opacity(0.58)
     }
 
     private var wordmark: some View {
@@ -338,11 +337,11 @@ struct SidebarView: View {
                 Image(systemName: expanded ? "chevron.up" : "chevron.down")
                     .font(.system(size: 8, weight: .bold))
             }
-            .foregroundStyle(Color.white.opacity(0.72))
+            .foregroundStyle(sidebarInk.opacity(0.72))
             .padding(.horizontal, 14)
             .padding(.top, 15)
             .padding(.bottom, 9)
-            .background(bandGradient(band))
+            .background(bandSurface(band))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -371,25 +370,25 @@ struct SidebarView: View {
                         Text(title)
                             .font(Typeface.body(13, weight: .bold))
                             .tracking(0.1)
-                            .foregroundStyle(Color.white.opacity(active ? 1 : 0.82))
+                            .foregroundStyle(sidebarInk.opacity(active ? 1 : 0.82))
                         if isPlaying {
                             LivePulseDot()
                         }
                     }
                     Text(location)
                         .font(Typeface.mono(8.5))
-                        .foregroundStyle(Color.white.opacity(0.58))
+                        .foregroundStyle(sidebarSecondaryInk)
                 }
                 Spacer(minLength: 4)
                 Image(systemName: expanded ? "chevron.up" : "chevron.down")
                     .font(.system(size: 8, weight: .bold))
             }
-            .foregroundStyle(Color.white.opacity(0.62))
+            .foregroundStyle(sidebarInk.opacity(0.62))
             .padding(.horizontal, 14)
             .padding(.top, 12)
             .padding(.bottom, 6)
-            .background(bandGradient(band(for: group)))
-            .overlay(Color.white.opacity(active ? 0.045 : 0))
+            .background(bandSurface(band(for: group)))
+            .overlay(sidebarInk.opacity(active ? 0.045 : 0))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -406,8 +405,8 @@ struct SidebarView: View {
     ) -> some View {
         let selected = appState.route == route && appState.detail == nil
         let resolvedBand = explicitBand ?? radioGroup(for: route).map(band(for:))
-        let foreground = Color.white.opacity(0.9)
-        let secondaryForeground = Color.white.opacity(0.52)
+        let foreground = sidebarInk.opacity(0.9)
+        let secondaryForeground = sidebarSecondaryInk
         return Button {
             appState.select(route)
         } label: {
@@ -422,21 +421,21 @@ struct SidebarView: View {
                     Text(trailing)
                         .microLabel(0.9)
                         .foregroundStyle(
-                            selected ? Palette.inverseInk.opacity(0.7) : secondaryForeground
+                            selected ? sidebarInk.opacity(0.7) : secondaryForeground
                         )
                 }
             }
-            .foregroundStyle(selected ? Palette.inverseInk : foreground)
+            .foregroundStyle(selected ? sidebarInk : foreground)
             .padding(.leading, 14 + indent)
             .padding(.trailing, 14)
             .frame(height: Metrics.rowHeight)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background {
                 if selected {
-                    Palette.inverse
+                    Color.white.opacity(0.16)
                 } else if let resolvedBand {
-                    bandGradient(resolvedBand)
-                        .overlay(Color.white.opacity(indent > 0 ? 0.012 : 0))
+                    bandSurface(resolvedBand)
+                        .overlay(sidebarInk.opacity(indent > 0 ? 0.012 : 0))
                 }
             }
             .contentShape(Rectangle())
@@ -567,6 +566,59 @@ struct SidebarView: View {
         held.trackCount = all.count
         held.value = answer
         return answer
+    }
+}
+
+#if os(macOS)
+/// AppKit's sidebar material samples behind the window, matching the native
+/// translucent treatment used by media apps instead of merely tinting Indigo's
+/// own paper background.
+private struct SidebarVisualEffect: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = WindowSamplingVisualEffectView()
+        view.material = .underWindowBackground
+        view.blendingMode = .behindWindow
+        view.state = .active
+        return view
+    }
+
+    func updateNSView(_ view: NSVisualEffectView, context: Context) {
+        view.material = .underWindowBackground
+        view.blendingMode = .behindWindow
+        view.state = .active
+    }
+}
+
+private final class WindowSamplingVisualEffectView: NSVisualEffectView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard let window else { return }
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.titlebarAppearsTransparent = true
+    }
+}
+#endif
+
+/// One shared material treatment for persistent app chrome. Tint controls how
+/// dark it reads without replacing the blur with an opaque fill.
+struct IndigoGlassBackground: View {
+    let tint: Double
+    let shaderOpacity: Double
+
+    var body: some View {
+        ZStack {
+            #if os(macOS)
+            SidebarVisualEffect()
+            #else
+            Rectangle().fill(.ultraThinMaterial)
+            #endif
+            Color.black.opacity(tint)
+            PlayerShaderBackdrop(noiseBoost: 3.5)
+                .opacity(shaderOpacity)
+                .blendMode(.screen)
+        }
+        .environment(\.colorScheme, .dark)
     }
 }
 
