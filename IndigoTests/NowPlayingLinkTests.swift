@@ -1,0 +1,190 @@
+//
+//  NowPlayingLinkTests.swift
+//  IndigoTests
+//
+//  The player bar only draws its artwork and title as buttons when there is
+//  somewhere to send them. A source nothing here recognises therefore does not
+//  fail loudly — it silently stops being clickable, which is how "nothing in
+//  the player links anywhere" happens without a single error.
+//
+//  So every source Indigo can play is covered, and the last test asserts that
+//  a new one cannot be added without being covered too.
+//
+
+import XCTest
+@testable import Indigo
+
+final class NowPlayingLinkTests: XCTestCase {
+    private func item(_ id: String, source: String) -> MediaItem {
+        MediaItem(id: id, sourceID: source, kind: .episode, title: "Something",
+                  playbackURL: URL(string: "https://example.invalid/stream")!)
+    }
+
+    private func link(_ id: String, source: String,
+                      album: String? = nil,
+                      live: NTSEpisodeRef? = nil) -> NowPlayingLink? {
+        NowPlayingLink.destination(
+            for: item(id, source: source),
+            localAlbumKey: { _ in album },
+            liveNTSEpisode: live)
+    }
+
+    // MARK: - Local files
+
+    func testALocalTrackOpensItsAlbum() {
+        XCTAssertEqual(link("/Music/a.flac", source: Track.sourceID, album: "Boards|Geogaddi"),
+                       .detail(.album("Boards|Geogaddi")))
+    }
+
+    /// A file being played but not indexed still belongs somewhere. Before,
+    /// this fell through every branch and left the bar inert.
+    func testAnUnindexedLocalTrackStillGoesSomewhere() {
+        XCTAssertEqual(link("/Music/stray.flac", source: Track.sourceID, album: nil),
+                       .route(.tracks))
+    }
+
+    // MARK: - Archived recordings
+
+    func testEveryArchivedSourceResolves() {
+        let cases: [(String, String)] = [
+            ("noods.show.some-slug", NoodsProvider.providerID),
+            ("nts.mixtape.poolside", NTSProvider.providerID),
+            ("lyl.episode.abc", LYLProvider.providerID),
+            ("rovr.broadcast.99", RovrProvider.providerID),
+            ("panik.episode.77", PanikProvider.providerID),
+            ("radio80000.episode.12", Radio80000Provider.providerID),
+            ("ida.episode.xyz", IdaProvider.providerID),
+            ("cashmere.episode.abc", CashmereProvider.providerID),
+            ("alhara.show.def", AlharaProvider.providerID),
+            ("dublab.broadcast.ghi", DublabProvider.providerID),
+            ("kiosk.episode.jkl", KioskProvider.providerID),
+        ]
+        for (id, source) in cases {
+            XCTAssertNotNil(link(id, source: source), "\(id) resolved to nothing")
+        }
+    }
+
+    /// Kiosk episodes were reachable only through the source switch, which
+    /// returned the station — so an episode opened the station instead of
+    /// itself.
+    func testAKioskEpisodeOpensTheEpisodeNotTheStation() {
+        XCTAssertEqual(link("kiosk.episode.jkl", source: KioskProvider.providerID),
+                       .detail(.kioskEpisode(slug: "jkl")))
+    }
+
+    /// The Crate wraps the provider's original media id when replaying a kept
+    /// broadcast. The player should still return to that broadcast, exactly as
+    /// tapping its Crate row does, rather than falling back to the station.
+    func testAReplayedCrateBroadcastOpensItsOriginalEpisode() {
+        XCTAssertEqual(link("crate.kiosk.kiosk.episode.jkl",
+                            source: KioskProvider.providerID),
+                       .detail(.kioskEpisode(slug: "jkl")))
+
+        let lot = LotEpisodeRef(show: "public-records", episode: "night-shift")
+        XCTAssertEqual(link("crate.lot.lot.episode.\(lot.encoded)",
+                            source: LotProvider.providerID),
+                       .detail(.lotEpisode(show: "public-records", episode: "night-shift")))
+    }
+
+    // MARK: - Live streams
+
+    func testALiveStreamOpensItsStation() {
+        XCTAssertEqual(link("cashmere.stream.1", source: CashmereProvider.providerID),
+                       .route(.cashmereStation))
+        XCTAssertEqual(link("lot.live.1", source: LotProvider.providerID),
+                       .route(.lotStation))
+    }
+
+    /// NTS names what is on air, so a live channel can open the episode.
+    func testLiveNTSPrefersTheEpisodeOnAir() {
+        let ref = NTSEpisodeRef(show: "a-show", episode: "an-episode")
+        XCTAssertEqual(link("2", source: NTSProvider.providerID, live: ref),
+                       .detail(.ntsEpisode(show: "a-show", episode: "an-episode")))
+    }
+
+    /// And when it does not, the channel id is all there is — opening a
+    /// station by it lands on one nobody recognises, which is what "Claire
+    /// Milbrath opened unknown station" was. The show has a name, so the bar
+    /// goes looking for it in the archive, exactly as the Crate does.
+    func testLiveNTSWithoutAnEpisodeSearchesTheArchiveByName() {
+        let item = MediaItem(id: "2", sourceID: NTSProvider.providerID, kind: .episode,
+                             title: "Claire Milbrath",
+                             playbackURL: URL(string: "https://example.invalid/s")!)
+        XCTAssertEqual(NowPlayingLink.destination(for: item),
+                       .search(.ntsSearch, query: "Claire Milbrath"))
+    }
+
+    /// A stream with no title has nothing to search for, so it falls back to
+    /// the channel rather than opening an empty search.
+    func testLiveNTSWithoutATitleFallsBackToTheChannel() {
+        let item = MediaItem(id: "2", sourceID: NTSProvider.providerID, kind: .episode,
+                             title: "   ",
+                             playbackURL: URL(string: "https://example.invalid/s")!)
+        XCTAssertEqual(NowPlayingLink.destination(for: item), .route(.station("2")))
+    }
+
+    // MARK: - Ordering
+    //
+    // The bug this class exists for was not a missing branch but a branch in
+    // the wrong place: a generic answer that fired before the specific one and
+    // hid it. Clicking "Ametsub – Sunglare Drive" in the Crate reaches Ametsub,
+    // and the bar has to agree — which means whatever sits between `page` and
+    // `fallback` must actually get asked.
+
+    /// A track with no page of its own leaves room for the recording. If this
+    /// returns a station or the library instead of nil, the recording is never
+    /// consulted and every track opens somewhere generic.
+    func testAnItemWithNoPageOfItsOwnLeavesRoomForTheRecording() {
+        // A radio track: the source is known, but the item is not an episode.
+        XCTAssertNil(NowPlayingLink.page(
+            for: item("nts.live.2", source: NTSProvider.providerID)))
+
+        // An unindexed local file: previously answered ".route(.tracks)" here,
+        // which is what shadowed the artist page.
+        XCTAssertNil(NowPlayingLink.page(
+            for: item("/Music/stray.flac", source: Track.sourceID),
+            localAlbumKey: { _ in nil }))
+    }
+
+    /// An item that *does* have its own page still answers immediately, so the
+    /// reordering costs an episode nothing.
+    func testAnItemWithItsOwnPageStillAnswersFirst() {
+        XCTAssertEqual(NowPlayingLink.page(for: item("kiosk.episode.jkl",
+                                                     source: KioskProvider.providerID)),
+                       .detail(.kioskEpisode(slug: "jkl")))
+        XCTAssertEqual(NowPlayingLink.page(for: item("/Music/a.flac", source: Track.sourceID),
+                                           localAlbumKey: { _ in "Boards|Geogaddi" }),
+                       .detail(.album("Boards|Geogaddi")))
+    }
+
+    /// And the generic answers are still there, just last.
+    func testFallbackStillCoversEverySource() {
+        XCTAssertEqual(NowPlayingLink.fallback(
+            for: item("/Music/stray.flac", source: Track.sourceID)), .route(.tracks))
+        XCTAssertEqual(NowPlayingLink.fallback(
+            for: item("lot.live.1", source: LotProvider.providerID)), .route(.lotStation))
+    }
+
+    // MARK: - Malformed
+
+    /// A bare prefix carries no identity, so it must not open a page for a
+    /// recording called "".
+    func testAnEmptyIdentityDoesNotOpenAnEmptyPage() {
+        XCTAssertNil(link("lyl.episode.", source: "unknown.source"))
+    }
+
+    /// The guard against this list going stale: every provider Indigo ships
+    /// must resolve to something from its own live stream.
+    func testEveryProviderIndigoShipsIsReachable() {
+        let providers = [
+            NTSProvider.providerID, KioskProvider.providerID, NoodsProvider.providerID,
+            LotProvider.providerID, DublabProvider.providerID, AlharaProvider.providerID,
+            CashmereProvider.providerID, LYLProvider.providerID, IdaProvider.providerID,
+            Radio80000Provider.providerID, PanikProvider.providerID, RovrProvider.providerID,
+        ]
+        for provider in providers {
+            XCTAssertNotNil(link("\(provider).stream.1", source: provider),
+                            "\(provider) has no destination — its bar would be inert")
+        }
+    }
+}

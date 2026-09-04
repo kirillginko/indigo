@@ -23,10 +23,12 @@ struct PlayerBarView: View {
     @Environment(CashmereProvider.self) private var cashmere
     @Environment(LYLProvider.self) private var lyl
     @Environment(CrateService.self) private var crate
+    @Environment(DigStore.self) private var dig
+    @State private var isIdentityHovering = false
 
     var body: some View {
         ZStack {
-            PlayerGradientBackdrop()
+            PlayerShaderBackdrop()
 
             HStack(spacing: 0) {
                 identity
@@ -51,9 +53,7 @@ struct PlayerBarView: View {
     /// the eye already expects from every player.
     private var identity: some View {
         HStack(spacing: 10) {
-            artworkButton
-
-            title
+            identityButton
                 .layoutPriority(1)
 
             Spacer(minLength: 6)
@@ -70,15 +70,30 @@ struct PlayerBarView: View {
         .padding(.trailing, 10)
     }
 
-    private var artworkButton: some View {
+    private var identityButton: some View {
         Group {
             if let item = player.current, destination(for: item) != nil {
-                Button { open(item) } label: { artwork }
+                Button { open(item) } label: {
+                    HStack(spacing: 10) {
+                        artwork
+                        titleLines(item)
+                            .layoutPriority(1)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(isIdentityHovering ? Color.white.opacity(0.09) : Color.clear)
+                    .contentShape(Rectangle())
+                }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Open \(primaryTitle(for: item))")
                     .help("Open now playing")
+                    .onHover { isIdentityHovering = $0 }
+                    .animation(.easeOut(duration: 0.12), value: isIdentityHovering)
             } else {
-                artwork
+                HStack(spacing: 10) {
+                    artwork
+                    titleLines(player.current)
+                        .layoutPriority(1)
+                }
             }
         }
     }
@@ -99,17 +114,6 @@ struct PlayerBarView: View {
         .contentShape(Rectangle())
     }
 
-    @ViewBuilder
-    private var title: some View {
-        if let item = player.current, destination(for: item) != nil {
-            Button { open(item) } label: { titleLines(item) }
-                .buttonStyle(.plain)
-                .help("Open now playing")
-        } else {
-            titleLines(player.current)
-        }
-    }
-
     private func titleLines(_ item: MediaItem?) -> some View {
         let spoken = item.map { primaryTitle(for: $0) } ?? "Nothing playing"
         let under = item.map { secondaryTitle(for: $0) } ?? "Pick a track or a station"
@@ -127,83 +131,41 @@ struct PlayerBarView: View {
         .accessibilityLabel("\(spoken). \(under)")
     }
 
-    private enum NowPlayingDestination {
-        case route(Route)
-        case detail(DetailPage)
-    }
+    /// Lifted into `NowPlayingLink` so every source can be tested; the view
+    /// supplies only the two things that need its context — the album a local
+    /// file belongs to, and whatever NTS says is on air.
+    private func destination(for item: MediaItem) -> NowPlayingLink? {
+        // The item's own page first: its album, its episode, its broadcast.
+        if let link = NowPlayingLink.page(
+            for: item,
+            localAlbumKey: { path in localTrack(path: path)?.albumKey }
+        ) { return link }
 
-    private func destination(for item: MediaItem) -> NowPlayingDestination? {
-        if item.sourceID == Track.sourceID, let track = localTrack(path: item.id) {
-            return .detail(.album(track.albumKey))
+        // Then the music itself, before anything generic. This is the Crate's
+        // order, and the reason clicking a track there reaches its artist
+        // rather than the station it happened to come off.
+        let summary = NowPlayingSummary.make(
+            item: item, showTitle: liveShow?.title, context: crate.context
+        )
+        if let recording = summary.recording,
+           let page = dig.recordingDestination(for: recording) {
+            return .detail(page)
         }
-        if item.id.hasPrefix("noods.show.") {
-            let slug = String(item.id.dropFirst("noods.show.".count))
-            return .detail(.noodsShow(path: "shows/\(slug)"))
+
+        // A newly played streaming track may not have a Recording in SwiftData
+        // yet. Its credited artist is still a real destination (and is the
+        // same fallback the mini player uses), so do not leave the artwork and
+        // title inert while identification catches up.
+        if item.kind == .track,
+           let artist = item.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !artist.isEmpty {
+            return .detail(.digArtist(mbid: nil, name: artist))
         }
-        if item.id.hasPrefix("nts.episode.") {
-            let identity = String(item.id.dropFirst("nts.episode.".count))
-            if let ref = NTSEpisodeRef.decode(identity) {
-                return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
-            }
-        }
-        if item.id.hasPrefix("nts.mixtape.") {
-            return .detail(.ntsMixtape(alias: String(item.id.dropFirst("nts.mixtape.".count))))
-        }
-        if item.sourceID == NTSProvider.providerID,
-           let ref = liveShow?.detailID.flatMap(NTSEpisodeRef.decode) {
-            return .detail(.ntsEpisode(show: ref.show, episode: ref.episode))
-        }
-        if item.id.hasPrefix("lyl.episode.") {
-            return .detail(.lylEpisode(slug: String(item.id.dropFirst("lyl.episode.".count))))
-        }
-        if item.id.hasPrefix("rovr.broadcast.") {
-            return .detail(.rovrBroadcast(id: String(item.id.dropFirst("rovr.broadcast.".count))))
-        }
-        if item.id.hasPrefix("panik.episode.") {
-            return .detail(.panikEpisode(id: String(item.id.dropFirst("panik.episode.".count))))
-        }
-        if item.id.hasPrefix("radio80000.episode.") {
-            let id = String(item.id.dropFirst("radio80000.episode.".count))
-            return .detail(.radio80000Episode(id: id))
-        }
-        if item.id.hasPrefix("ida.episode.") {
-            return .detail(.idaEpisode(slug: String(item.id.dropFirst("ida.episode.".count))))
-        }
-        if item.id.hasPrefix("cashmere.episode.") {
-            return .detail(.cashmereEpisode(slug: String(item.id.dropFirst("cashmere.episode.".count))))
-        }
-        if item.id.hasPrefix("alhara.show.") {
-            return .detail(.alharaShow(slug: String(item.id.dropFirst("alhara.show.".count))))
-        }
-        if item.id.hasPrefix("dublab.broadcast.") {
-            return .detail(.dublabBroadcast(slug: String(item.id.dropFirst("dublab.broadcast.".count))))
-        }
-        if item.id.hasPrefix("lot.episode.") {
-            let identity = String(item.id.dropFirst("lot.episode.".count))
-            if let ref = LotEpisodeRef.decode(identity) {
-                return .detail(.lotEpisode(show: ref.show, episode: ref.episode))
-            }
-        }
-        switch item.sourceID {
-        case KioskProvider.providerID:
-            if item.id.hasPrefix("kiosk.episode.") {
-                return .detail(.kioskEpisode(slug: String(item.id.dropFirst("kiosk.episode.".count))))
-            }
-            return .route(.kioskStation)
-        case NoodsProvider.providerID: return .route(.noodsStation)
-        case LotProvider.providerID: return .route(.lotStation)
-        case DublabProvider.providerID: return .route(.dublabStation)
-        case AlharaProvider.providerID: return .route(.alharaStation(item.id))
-        case CashmereProvider.providerID: return .route(.cashmereStation)
-        case LYLProvider.providerID: return .route(.lylStation)
-        case IdaProvider.providerID: return .route(.idaStation(item.id))
-        case Radio80000Provider.providerID: return .route(.radio80000Station)
-        case PanikProvider.providerID: return .route(.panikStation)
-        // ROVR's channel id is the station id, so the bar returns to whichever
-        // of them is playing rather than always to the scheduled radio.
-        case RovrProvider.providerID: return .route(.rovrStation(item.id))
-        default: return nil
-        }
+
+        return NowPlayingLink.fallback(
+            for: item,
+            liveNTSEpisode: liveShow?.detailID.flatMap(NTSEpisodeRef.decode)
+        )
     }
 
     private func localTrack(path: String) -> Track? {
@@ -216,6 +178,9 @@ struct PlayerBarView: View {
         switch destination(for: item) {
         case .route(let route): appState.select(route)
         case .detail(let page): appState.open(page)
+        case .search(let route, let query):
+            appState.select(route)
+            appState.searchText = query
         case nil: break
         }
     }
@@ -389,34 +354,36 @@ struct PlayerBarView: View {
 }
 
 /// The timeline lives below the controls, so only the small backdrop redraws.
-private struct PlayerGradientBackdrop: View {
+struct PlayerShaderBackdrop: View {
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var motion: TimeInterval = 0
-    @State private var lastFrame: Date?
-    @State private var energy: Float = 0
+    var noiseBoost: Float = 1
 
     private var animating: Bool { player.isPlaying && !player.isBuffering && !reduceMotion }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: !animating)) { timeline in
             GeometryReader { proxy in
+                let frame = proxy.frame(in: .global)
+                // Every instance receives the same clock. Keeping the value
+                // small preserves float precision in the Metal shader.
+                // Track changes briefly enter buffering. Keep sampling the
+                // shared clock during that handoff instead of substituting
+                // zero, which visibly restarted the field for every song.
+                let sharedTime = reduceMotion
+                    ? 0
+                    : timeline.date.timeIntervalSinceReferenceDate
+                        .truncatingRemainder(dividingBy: 4096)
+                let energy = animating ? player.audioLevel() : 0
                 Rectangle().fill(.black)
                     .colorEffect(ShaderLibrary.playerFlowField(
-                        .float2(proxy.size), .float(motion), .float(reduceMotion ? 0 : energy)
+                        .float2(frame.minX, frame.minY),
+                        .float(sharedTime),
+                        .float(energy),
+                        .float(noiseBoost)
                     ))
             }
-            .onChange(of: timeline.date) { _, date in
-                guard animating else { lastFrame = nil; energy = 0; return }
-                let delta = min(0.1, max(0, date.timeIntervalSince(lastFrame ?? date)))
-                lastFrame = date
-                let target = player.audioLevel()
-                let response = target > energy ? 14.0 : 4.0
-                energy += (target - energy) * Float(1 - exp(-delta * response))
-                motion += delta * (1 + Double(energy) * 1.8)
-            }
         }
-        .onChange(of: animating) { _, _ in lastFrame = nil; energy = 0 }
         .accessibilityHidden(true)
         .allowsHitTesting(false)
     }
