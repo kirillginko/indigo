@@ -121,15 +121,30 @@ final class LotBrowseStore {
         do {
             var collected: [LotShow] = []
             var total = 0
+            var failure: (any Error)?
             // The directory is small and alphabetical; walking it whole is
             // what makes searching it honest. The page count is bounded so a
             // server that stops advancing can't spin here.
             for _ in 0..<12 {
-                let page = try await api.fetchShows(limit: LotAPI.maxPageSize, skip: collected.count)
-                total = page.total
-                guard !page.shows.isEmpty else { break }
-                collected += page.shows
-                if collected.count >= total { break }
+                do {
+                    let page = try await api.fetchShows(limit: LotAPI.maxPageSize, skip: collected.count)
+                    total = page.total
+                    guard !page.shows.isEmpty else { break }
+                    collected += page.shows
+                    if collected.count >= total { break }
+                } catch is CancellationError {
+                    throw CancellationError()
+                } catch {
+                    // A page failing part-way stops the walk. It does not
+                    // throw away the pages that did arrive: The Lot only
+                    // server-renders the first twenty residencies, so when
+                    // paging is unavailable those twenty are the whole of what
+                    // Indigo can know — and twenty is a directory. Discarding
+                    // them for an error screen was how a dead action id took
+                    // the Shows page down entirely.
+                    failure = error
+                    break
+                }
             }
             shows = collected
             // A detail request and the directory request can finish in either
@@ -145,9 +160,13 @@ final class LotBrowseStore {
                 )
             }
             showsTotal = max(total, collected.count)
-            showsPhase = collected.isEmpty
-                ? .failed("The Lot isn't publishing any shows right now.")
-                : .loaded
+            showsPhase = if !collected.isEmpty {
+                .loaded
+            } else if let failure {
+                .failed(message(for: failure))
+            } else {
+                .failed("The Lot isn't publishing any shows right now.")
+            }
         } catch is CancellationError {
             showsPhase = .idle
         } catch {
