@@ -288,6 +288,55 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------
+-- The way into DIG
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    result jsonb;
+    mine text[] := array['skee mask'];
+begin
+    result := public.dig_radio_for_artists(mine, 8);
+
+    -- Skee Mask was played in both episodes, so both broadcasts come back —
+    -- but only once each, however many of his records a show played.
+    if jsonb_array_length(result->'on_radio') <> 2 then
+        raise exception 'expected 2 broadcasts, got %', result->'on_radio';
+    end if;
+
+    -- Sofia Kourtesis was played next to him, and the listener does not have
+    -- her. That is the recommendation.
+    if jsonb_array_length(result->'alongside') <> 1 then
+        raise exception 'expected one neighbour, got %', result->'alongside';
+    end if;
+    if result->'alongside'->0->>'name' <> 'Sofia Kourtesis' then
+        raise exception 'wrong neighbour: %', result->'alongside';
+    end if;
+    if result->'alongside'->0->>'via' <> 'Skee Mask' then
+        raise exception 'a recommendation must say what it came from: %', result->'alongside';
+    end if;
+
+    -- And an artist they already have is never offered back to them.
+    result := public.dig_radio_for_artists(array['skee mask', 'sofia kourtesis'], 8);
+    if jsonb_array_length(result->'alongside') <> 0 then
+        raise exception 'recommended an artist the listener already has: %', result->'alongside';
+    end if;
+
+    -- A listener with nothing in common with radio gets nothing, not an error.
+    result := public.dig_radio_for_artists(array['nobody at all'], 8);
+    if jsonb_array_length(result->'on_radio') <> 0
+       or jsonb_array_length(result->'alongside') <> 0 then
+        raise exception 'invented a connection: %', result;
+    end if;
+
+    -- An empty library must not read as "match everything".
+    result := public.dig_radio_for_artists(array[]::text[], 8);
+    if jsonb_array_length(result->'on_radio') <> 0 then
+        raise exception 'an empty library matched every artist: %', result->'on_radio';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
 -- Worker secrets
 -- ---------------------------------------------------------------------------
 
