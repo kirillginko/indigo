@@ -10,6 +10,22 @@
 import SwiftUI
 import SwiftData
 
+/// Everything the Dig landing page draws, in one piece.
+///
+/// Held by `DigStore` rather than by the view. `@State` dies when the view
+/// leaves the hierarchy, so going to a release and coming back was rebuilding
+/// the page from the library — half a second of scanning to redraw something
+/// that had not changed, with the veil over it saying so.
+struct DigLanding {
+    var crateRevision: Int
+    var entries: [DigView.StartingPoint]
+    var recent: [DigVisit]
+    var haunts: [DigVisit]
+    var suggestions: [DigHistory.Suggestion]
+    var nextSteps: [String: String]
+    var radio: Catalog.DigRadio?
+}
+
 struct DigView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
@@ -41,20 +57,19 @@ struct DigView: View {
     /// every hover, and every time enrichment wrote a row anywhere. Once per
     /// change is the same answer for a fraction of the work.
     @State private var entries: [StartingPoint] = []
-    /// Which crate the held entries were worked out from.
-    ///
-    /// The page redraws on the dig revision too, and that is bumped by every
-    /// enrichment write — but starting points come from the crate and the
-    /// library, which enrichment does not touch. Without this the half-second
-    /// scan ran again every time a background fetch stored a row.
-    @State private var scannedCrate = -1
 
     /// What the page is a function of. Reading both here is also what
     /// subscribes `body` to them, so a change still redraws.
     private var revision: String { "\(crate.revision)-\(dig.revision)" }
 
     var body: some View {
-        let entries = entries
+        // What to draw this frame: what this view has worked out, or failing
+        // that whatever the store still holds. `.task` cannot run before the
+        // first render, so without this a return to DIG shows a skeleton for a
+        // frame to somebody who was reading the page a moment ago.
+        let shown = shown
+        let entries = shown.entries
+        let hasSomething = isReady || dig.landing != nil
 
         VStack(spacing: 0) {
             PageHeader(
@@ -66,7 +81,7 @@ struct DigView: View {
             // "Nothing to dig into" is only true once we have looked. Said
             // while still looking it is a failure announced in advance, and
             // this page opens on it every single time.
-            if isReady && entries.isEmpty {
+            if hasSomething && entries.isEmpty {
                 EmptyStateView(
                     headline: "Nothing to dig into yet",
                     message: "Crate something, or index a music folder. Dig follows artists into their labels, and labels into everyone else on them."
@@ -86,7 +101,7 @@ struct DigView: View {
                             .padding(.top, 22)
                     }
 
-                    memory
+                    memory(shown)
 
                     if !entries.isEmpty {
                         HStack {
@@ -117,7 +132,7 @@ struct DigView: View {
                 // once while it is still soft — and the moment the veil lifts
                 // is the moment the page is finished. One reveal, and nothing
                 // rearranging itself in front of somebody reading it.
-                .loadingVeil(!isReady)
+                .loadingVeil(!hasSomething)
             }
         }
         .task(id: revision) { await refresh() }
@@ -131,23 +146,77 @@ struct DigView: View {
     /// be able to hold DIG shut, and a backend answering promptly should not
     /// make the page move twice.
     private func refresh() async {
-        // The list first and on its own, so it is on screen — softened —
-        // while everything else is still being worked out.
-        if scannedCrate != crate.revision {
-            entries = startingPoints()
-            scannedCrate = crate.revision
+        // What the page looked like last time, put straight back. Returning to
+        // DIG is then a redraw rather than a rebuild — nothing to scan, nothing
+        // to wait for, and no veil over a page that is already complete.
+        let cached = dig.landing
+        if let cached {
+            apply(cached)
+            isReady = true
         }
+
+        // Starting points come from the crate and the library, and the page
+        // also redraws on the dig revision — which every enrichment write
+        // bumps. Scanning again for that would be half a second spent
+        // confirming nothing had changed.
+        let crateChanged = cached?.crateRevision != crate.revision
+        if crateChanged {
+            entries = startingPoints()
+        }
+
+        // Always re-read: they have just been somewhere, and where they have
+        // been is what this block is.
         await refreshMemory()
 
-        let names = entries.prefix(60).map(\.name)
-        let radioLoad = Task { await refreshRadio(for: names) }
-        await withTaskGroup(of: Void.self) { group in
-            group.addTask { await radioLoad.value }
-            group.addTask { try? await Task.sleep(for: .milliseconds(900)) }
-            await group.next()
-            group.cancelAll()
+        if crateChanged || radio == nil {
+            let names = entries.prefix(60).map(\.name)
+            let radioLoad = Task { await refreshRadio(for: names) }
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask { await radioLoad.value }
+                group.addTask { try? await Task.sleep(for: .milliseconds(900)) }
+                await group.next()
+                group.cancelAll()
+            }
         }
+
         isReady = true
+        dig.landing = DigLanding(
+            crateRevision: crate.revision,
+            entries: entries,
+            recent: recentVisits,
+            haunts: frequentVisits,
+            suggestions: trySuggestions,
+            nextSteps: nextSteps,
+            radio: radio
+        )
+    }
+
+    /// This view's own answer once it has one, and the store's until then.
+    private var shown: DigLanding {
+        if isReady || !entries.isEmpty {
+            return DigLanding(
+                crateRevision: crate.revision,
+                entries: entries,
+                recent: recentVisits,
+                haunts: frequentVisits,
+                suggestions: trySuggestions,
+                nextSteps: nextSteps,
+                radio: radio
+            )
+        }
+        return dig.landing ?? DigLanding(
+            crateRevision: -1, entries: [], recent: [], haunts: [],
+            suggestions: [], nextSteps: [:], radio: nil
+        )
+    }
+
+    private func apply(_ landing: DigLanding) {
+        entries = landing.entries
+        recentVisits = landing.recent
+        frequentVisits = landing.haunts
+        trySuggestions = landing.suggestions
+        nextSteps = landing.nextSteps
+        radio = landing.radio
     }
 
     /// Asked about the names already worked out, not about the library again.
@@ -175,12 +244,11 @@ struct DigView: View {
     /// before any catalogue or aggregate — it is better evidence about them
     /// than anything else available, and it needs nobody's data but theirs.
     @ViewBuilder
-    private var memory: some View {
-        let recent = recentVisits
-        let haunts = frequentVisits
-        let suggestions = trySuggestions
-
-        let radio = radio ?? Catalog.DigRadio(onRadio: [], alongside: [])
+    private func memory(_ shown: DigLanding) -> some View {
+        let recent = shown.recent
+        let haunts = shown.haunts
+        let suggestions = shown.suggestions
+        let radio = shown.radio ?? Catalog.DigRadio(onRadio: [], alongside: [])
 
         if !recent.isEmpty || !haunts.isEmpty || !suggestions.isEmpty || !radio.isEmpty {
             VStack(alignment: .leading, spacing: 26) {
@@ -189,7 +257,7 @@ struct DigView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             ForEach(recent, id: \.nodeID) { visit in
                                 DigLine(
-                                    text: continueLine(visit),
+                                    text: continueLine(visit, in: shown),
                                     detail: visit.kind.label
                                 ) {
                                     if let page = visit.node.destination { appState.open(page) }
@@ -279,8 +347,8 @@ struct DigView: View {
 
     /// "Ilian Tape → Stenny" when there is a step they usually take from
     /// there, and just the place when there isn't.
-    private func continueLine(_ visit: DigVisit) -> String {
-        guard let next = nextSteps[visit.nodeID] else { return visit.title }
+    private func continueLine(_ visit: DigVisit, in shown: DigLanding) -> String {
+        guard let next = shown.nextSteps[visit.nodeID] else { return visit.title }
         return "\(visit.title) → \(next)"
     }
 
