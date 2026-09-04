@@ -574,3 +574,87 @@ nonisolated extension Catalog {
         }
     }
 }
+
+// MARK: - Radio, for the way into DIG
+//
+// The one radio read that is not about an entity already on screen. It answers
+// what radio has to say about the artists this listener keeps — which is the
+// only form the question takes on a page where somebody is still deciding what
+// to open.
+
+nonisolated extension Catalog {
+    struct DigRadio: Codable, Sendable, Hashable {
+        var onRadio: [Play]
+        var alongside: [Neighbour]
+
+        /// One artist, in one broadcast. Deduplicated by the database, so a
+        /// show that played three of their records is one line here.
+        struct Play: Codable, Sendable, Hashable, Identifiable {
+            var artistID: UUID
+            var artistName: String
+            var showTitle: String?
+            var station: String?
+            var provider: String?
+            var episodeExternalID: String?
+            var airedAt: Date?
+            var rawTrackTitle: String?
+
+            var id: String { "\(artistID.uuidString)|\(episodeExternalID ?? "")" }
+
+            /// "Skee Mask on NTS — Ben UFO".
+            var line: String {
+                let where_ = [station?.nilIfEmpty, showTitle?.nilIfEmpty]
+                    .compactMap { $0 }.joined(separator: " — ")
+                return where_.isEmpty ? artistName : "\(artistName) on \(where_)"
+            }
+
+            var dateLabel: String? {
+                guard let airedAt else { return nil }
+                let formatter = DateFormatter()
+                formatter.dateFormat = "d MMM yyyy"
+                return formatter.string(from: airedAt)
+            }
+
+            enum CodingKeys: String, CodingKey {
+                case station, provider
+                case artistID = "artist_id"
+                case artistName = "artist_name"
+                case showTitle = "show_title"
+                case episodeExternalID = "episode_external_id"
+                case airedAt = "aired_at"
+                case rawTrackTitle = "raw_track_title"
+            }
+        }
+
+        /// Somebody played beside an artist the listener keeps, who they do not
+        /// keep themselves. The recommendation, and it carries what it rests on.
+        struct Neighbour: Codable, Sendable, Hashable, Identifiable {
+            var artistID: UUID
+            var name: String
+            var via: String?
+            var evidenceCount: Int
+
+            var id: UUID { artistID }
+
+            /// Never a score. What a selector actually did, and how often.
+            var reason: String {
+                let times = evidenceCount == 1 ? "once" : "\(evidenceCount) times"
+                guard let via = via?.nilIfEmpty else { return "Played back to back \(times)" }
+                return "Played next to \(via) \(times)"
+            }
+
+            enum CodingKeys: String, CodingKey {
+                case name, via
+                case artistID = "artist_id"
+                case evidenceCount = "evidence_count"
+            }
+        }
+
+        var isEmpty: Bool { onRadio.isEmpty && alongside.isEmpty }
+
+        enum CodingKeys: String, CodingKey {
+            case onRadio = "on_radio"
+            case alongside
+        }
+    }
+}

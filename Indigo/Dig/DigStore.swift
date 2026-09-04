@@ -89,6 +89,13 @@ final class DigStore {
 
     // MARK: - Profiles
 
+    /// The Dig landing page, as it was last drawn.
+    ///
+    /// Same bargain as `DigCache`: what was there, shown instantly and
+    /// corrected a moment later, rather than a page rebuilding itself in front
+    /// of somebody who was reading it ten seconds ago.
+    @ObservationIgnored var landing: DigLanding?
+
     @ObservationIgnored private var profiles = DigCache<ArtistProfile>()
 
     /// The current profile, worked out off the main thread.

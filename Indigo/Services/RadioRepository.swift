@@ -124,6 +124,25 @@ nonisolated struct RadioRepository: Sendable {
             .value
     }
 
+    /// What radio has to say about the artists this listener keeps.
+    ///
+    /// Names are normalized here rather than by the caller, so the way in to
+    /// DIG matches artists by the same rule every other lookup uses. Sent as a
+    /// set because the question is about a library, not an entity.
+    func digRadio(
+        forArtists names: [String],
+        limit: Int = 8
+    ) async throws -> Catalog.DigRadio {
+        let keys = Array(Set(names.map { RecordingKey.normalize($0) }).filter { !$0.isEmpty })
+        guard !keys.isEmpty else { return Catalog.DigRadio(onRadio: [], alongside: []) }
+
+        let client = try SupabaseService.requireClient()
+        return try await client
+            .rpc("dig_radio_for_artists", params: DigRadioParams(pNames: keys, pLimit: limit))
+            .execute()
+            .value
+    }
+
     /// An episode's tracklist as Indigo holds it, with the artist resolved
     /// where it could be — so every line is a way into DIG rather than text.
     func tracklist(forEpisode episodeID: UUID) async throws -> [Catalog.EpisodeTrack] {
@@ -258,6 +277,15 @@ nonisolated struct RadioRepository: Sendable {
     private struct EpisodeParams: Encodable, Sendable {
         let pEpisodeID: String
         enum CodingKeys: String, CodingKey { case pEpisodeID = "p_episode_id" }
+    }
+
+    private struct DigRadioParams: Encodable, Sendable {
+        let pNames: [String]
+        let pLimit: Int
+        enum CodingKeys: String, CodingKey {
+            case pNames = "p_names"
+            case pLimit = "p_limit"
+        }
     }
 
     private struct LabelParams: Encodable, Sendable {
