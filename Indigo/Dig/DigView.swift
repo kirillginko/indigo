@@ -22,6 +22,13 @@ struct DigView: View {
     @State private var frequentVisits: [DigVisit] = []
     @State private var trySuggestions: [DigHistory.Suggestion] = []
     @State private var nextSteps: [String: String] = [:]
+    /// What radio knows about the artists this listener keeps. The only part
+    /// of this page that asks the backend anything.
+    @State private var radio: Catalog.DigRadio?
+    /// The page appears once, whole. Everything above the list arrives from a
+    /// task, so drawing before it lands meant showing the artists and then
+    /// shoving them down a moment later.
+    @State private var isReady = false
 
     var body: some View {
         let _ = crate.revision
@@ -43,6 +50,12 @@ struct DigView: View {
                     Button("Open Crate") { appState.select(.crate) }
                         .buttonStyle(OutlineButtonStyle())
                 }
+            } else if !isReady {
+                // Deliberately nothing. A scaffold here would be a second copy
+                // of this layout that drifts from it, and the wait is one
+                // local fetch — the page is not absent long enough to need
+                // something standing in for it.
+                Spacer()
             } else {
                 ScrollView {
                     memory
@@ -70,7 +83,35 @@ struct DigView: View {
                 .scrollIndicators(.visible)
             }
         }
-        .task(id: dig.revision) { await refreshMemory() }
+        .task(id: dig.revision) { await refresh() }
+    }
+
+    /// Local history first, then a moment for radio — and then the page,
+    /// whether radio answered or not.
+    ///
+    /// The request is never cancelled by the deadline; it simply stops being
+    /// something the page waits on. A backend having a slow morning must not
+    /// be able to hold DIG shut, and a backend answering promptly should not
+    /// make the page move twice.
+    private func refresh() async {
+        await refreshMemory()
+
+        let radioLoad = Task { await refreshRadio() }
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await radioLoad.value }
+            group.addTask { try? await Task.sleep(for: .milliseconds(900)) }
+            await group.next()
+            group.cancelAll()
+        }
+        isReady = true
+    }
+
+    private func refreshRadio() async {
+        guard SupabaseService.isConfigured else { return }
+        // The names it is worth asking about. Sending the whole library would
+        // be a large request to answer a question about the top of a list.
+        let names = startingPoints().prefix(60).map(\.name)
+        radio = try? await RadioRepository.shared.digRadio(forArtists: Array(names))
     }
 
     private func refreshMemory() async {
@@ -95,7 +136,9 @@ struct DigView: View {
         let haunts = frequentVisits
         let suggestions = trySuggestions
 
-        if !recent.isEmpty || !haunts.isEmpty || !suggestions.isEmpty {
+        let radio = radio ?? Catalog.DigRadio(onRadio: [], alongside: [])
+
+        if !recent.isEmpty || !haunts.isEmpty || !suggestions.isEmpty || !radio.isEmpty {
             VStack(alignment: .leading, spacing: 26) {
                 if !recent.isEmpty {
                     DigSection(title: "Continue digging") {
@@ -129,6 +172,36 @@ struct DigView: View {
                     }
                 }
 
+                // Radio, about the artists they actually keep. This is the
+                // only thing on the page that knows something the listener's
+                // own history cannot: what happened on air while they were
+                // not listening.
+                if !radio.alongside.isEmpty {
+                    DigSection(title: "Played next to yours") {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(radio.alongside) { neighbour in
+                                DigLine(text: neighbour.name, detail: neighbour.reason) {
+                                    appState.open(.digArtist(mbid: nil, name: neighbour.name))
+                                }
+                                Rule()
+                            }
+                        }
+                    }
+                }
+
+                if !radio.onRadio.isEmpty {
+                    DigSection(title: "Yours, on radio") {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(radio.onRadio) { play in
+                                DigLine(text: play.line, detail: play.dateLabel) {
+                                    if let page = broadcast(play) { appState.open(page) }
+                                }
+                                Rule()
+                            }
+                        }
+                    }
+                }
+
                 if !suggestions.isEmpty {
                     DigSection(title: "Try") {
                         VStack(alignment: .leading, spacing: 0) {
@@ -150,6 +223,14 @@ struct DigView: View {
             .padding(.top, 22)
             .padding(.bottom, 6)
         }
+    }
+
+    /// The broadcast a play refers to, when Indigo has a page for it.
+    private func broadcast(_ play: Catalog.DigRadio.Play) -> DetailPage? {
+        guard play.provider == "nts", let external = play.episodeExternalID else { return nil }
+        let parts = external.split(separator: "/", maxSplits: 1).map(String.init)
+        guard parts.count == 2 else { return nil }
+        return .ntsEpisode(show: parts[0], episode: parts[1])
     }
 
     /// "Ilian Tape → Stenny" when there is a step they usually take from

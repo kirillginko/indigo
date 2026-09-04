@@ -155,3 +155,68 @@ final class RadioGraphTests: XCTestCase {
         XCTAssertTrue(summary.topArtists.isEmpty)
     }
 }
+
+// MARK: - The way into DIG
+
+extension RadioGraphTests {
+    private func digRadio(_ json: String) throws -> Catalog.DigRadio {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(Catalog.DigRadio.self, from: Data(json.utf8))
+    }
+
+    func testTheDigPageReadsWhatRadioSaysAboutTheListenersOwnArtists() throws {
+        let radio = try digRadio("""
+        {
+          "on_radio": [{
+            "artist_id": "6E2E4F4E-0000-4000-8000-0000000000B1",
+            "artist_name": "Skee Mask",
+            "show_title": "Ben UFO",
+            "station": "NTS",
+            "provider": "nts",
+            "episode_external_id": "ben-ufo/12th-june-2026",
+            "aired_at": "2026-06-12T20:00:00+00:00",
+            "raw_track_title": "Flyby VFR"
+          }],
+          "alongside": [{
+            "artist_id": "6E2E4F4E-0000-4000-8000-0000000000B2",
+            "name": "Objekt",
+            "via": "Skee Mask",
+            "evidence_count": 4
+          }]
+        }
+        """)
+
+        XCTAssertFalse(radio.isEmpty)
+        XCTAssertEqual(radio.onRadio.first?.line, "Skee Mask on NTS — Ben UFO")
+        XCTAssertEqual(radio.onRadio.first?.dateLabel, "12 Jun 2026")
+    }
+
+    /// A suggestion on the way into DIG has to say what it came from, or it is
+    /// the unexplained recommendation the whole app is a reaction against.
+    func testASuggestionNamesTheArtistItCameFrom() throws {
+        let radio = try digRadio("""
+        {
+          "on_radio": [],
+          "alongside": [
+            {"artist_id": "6E2E4F4E-0000-4000-8000-0000000000B2",
+             "name": "Objekt", "via": "Skee Mask", "evidence_count": 4},
+            {"artist_id": "6E2E4F4E-0000-4000-8000-0000000000B3",
+             "name": "Pearson Sound", "via": "Stenny", "evidence_count": 1}
+          ]
+        }
+        """)
+
+        XCTAssertEqual(radio.alongside[0].reason, "Played next to Skee Mask 4 times")
+        XCTAssertEqual(radio.alongside[1].reason, "Played next to Stenny once")
+    }
+
+    /// A listener whose music radio has never played gets a page without a
+    /// radio block, not a page announcing that it found nothing.
+    func testNothingInCommonWithRadioReadsAsEmpty() throws {
+        let radio = try digRadio("""
+        {"on_radio": [], "alongside": []}
+        """)
+        XCTAssertTrue(radio.isEmpty)
+    }
+}
