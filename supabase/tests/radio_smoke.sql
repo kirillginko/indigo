@@ -287,6 +287,71 @@ begin
     end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- Worker secrets
+-- ---------------------------------------------------------------------------
+
+do $$
+declare complaint text;
+begin
+    -- The exact value that was accepted, stored, and then failed every five
+    -- minutes for a month.
+    complaint := public.worker_url_problem(
+        'https://<project-ref>.supabase.co/functions/v1/enrichment-worker');
+    if complaint is null then raise exception 'a placeholder URL was accepted'; end if;
+
+    if public.worker_url_problem('') is null then raise exception 'an empty URL was accepted'; end if;
+    if public.worker_url_problem('http://x.supabase.co/functions/v1/enrichment-worker') is null then
+        raise exception 'a plaintext URL was accepted';
+    end if;
+    if public.worker_url_problem('https://example.supabase.co/rest/v1/rpc/whatever') is null then
+        raise exception 'a URL that names no Edge Function was accepted';
+    end if;
+
+    -- And the real thing has to pass, or the guard is just an outage.
+    if public.worker_url_problem(
+        'https://example.supabase.co/functions/v1/enrichment-worker') is not null then
+        raise exception 'a valid worker URL was refused: %',
+            public.worker_url_problem('https://example.supabase.co/functions/v1/enrichment-worker');
+    end if;
+
+    if public.worker_key_problem('<publishable-anon-key>') is null then
+        raise exception 'a placeholder key was accepted';
+    end if;
+    if public.worker_key_problem('sb_publishable_abc123') is not null then
+        raise exception 'a real key was refused';
+    end if;
+end $$;
+
+-- Refused where it is set, rather than reported as scheduled.
+do $$
+declare scheduled text;
+begin
+    begin
+        scheduled := public.schedule_indigo_enrichment(
+            'https://<project-ref>.supabase.co/functions/v1/enrichment-worker', 'key');
+        raise exception 'scheduling accepted a placeholder URL';
+    exception when others then
+        if sqlerrm like '%scheduling accepted%' then raise; end if;
+    end;
+end $$;
+
+-- And the status leads with the problem rather than burying it.
+do $$
+declare status jsonb;
+begin
+    perform public.set_indigo_secret(
+        'indigo_worker_url', 'https://<project-ref>.supabase.co/functions/v1/enrichment-worker');
+    status := public.enrichment_status();
+
+    if (status->>'healthy')::boolean then
+        raise exception 'status called a placeholder URL healthy';
+    end if;
+    if not (status->'problems')::text like '%placeholder%' then
+        raise exception 'status did not name the problem: %', status->'problems';
+    end if;
+end $$;
+
 rollback;
 
 \echo 'radio smoke: all checks passed'
