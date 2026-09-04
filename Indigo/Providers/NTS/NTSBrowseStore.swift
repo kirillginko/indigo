@@ -149,8 +149,16 @@ final class NTSBrowseStore {
         state.error = nil
         showEpisodes[showAlias] = state
 
+        // Opening a residency is how Indigo learns a programme exists at all.
+        // Ingesting an episode creates a shell for its show; this is what puts
+        // a name and a picture on one nobody has opened an episode of yet.
+        let isFirstPage = state.items.isEmpty
+
         do {
             let page = try await api.fetchEpisodes(showAlias: showAlias, offset: state.items.count)
+            if isFirstPage {
+                RadioRepository.shared.ingestNTSShowInBackground(alias: showAlias)
+            }
             var updated = episodes(of: showAlias)
             updated.items.append(contentsOf: dedupe(updated.items, page.results.compactMap { $0.asSummary() }))
             updated.total = page.total
@@ -208,6 +216,11 @@ final class NTSBrowseStore {
                     RadioNeighborhoodEngine(context: context).ingest(detail)
                     try? context.save()
                 }
+                // The same tracklist, kept twice on purpose. The line above is
+                // the listener's own provenance and stays on their machine;
+                // this is the shared record, and it is what makes an artist
+                // page able to name shows nobody here was listening to.
+                RadioRepository.shared.ingestNTSEpisodeInBackground(show: show, episode: episode)
             } else {
                 episodeDetailErrors[key] = "NTS didn't return anything for this episode."
             }

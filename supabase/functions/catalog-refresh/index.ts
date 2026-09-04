@@ -11,6 +11,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { normalizeDiscogsRelease } from "../_shared/discogs.ts";
+import { ingestNTSEpisode, ingestNTSShow } from "../_shared/nts.ts";
 
 // An allow-list, not a URL parameter. The request names a provider and a
 // resource; it never supplies a URL, so this cannot be turned into a proxy for
@@ -27,12 +28,42 @@ const PROVIDERS: Record<string, Record<string, (id: string) => string>> = {
     recording: (id) => `https://musicbrainz.org/ws/2/recording/${id}?inc=artist-credits&fmt=json`,
     artist: (id) => `https://musicbrainz.org/ws/2/artist/${id}?inc=url-rels&fmt=json`,
   },
+  // The same public JSON API the app already reads directly. It is fetched
+  // here rather than posted from the client because ingestion writes to the
+  // shared graph, and a tracklist supplied by whoever holds the publishable
+  // key is not evidence of anything.
+  nts: {
+    show: (id) => `https://www.nts.live/api/v2/shows/${id}`,
+    episode: (id) => {
+      const [show, episode] = id.split("/");
+      return `https://www.nts.live/api/v2/shows/${show}/episodes/${episode}`;
+    },
+  },
 };
 
 // Upstream ids are opaque handles: Discogs uses integers, MusicBrainz uses
 // UUIDs. Anything with a slash, dot or escape in it is not an id, and would be
 // an attempt to reshape the URL built above.
-const SAFE_ID = /^[A-Za-z0-9-]{1,64}$/;
+//
+// NTS is the exception, because its identity for a broadcast genuinely is two
+// slugs: the show and the episode within it. One slash, and each half still
+// has to be a slug — no dots, so no segment can be a traversal.
+const NTS_SLUG = "[A-Za-z0-9][A-Za-z0-9_-]{0,80}";
+const SAFE_IDS: Record<string, RegExp> = {
+  discogs: /^[A-Za-z0-9-]{1,64}$/,
+  musicbrainz: /^[A-Za-z0-9-]{1,64}$/,
+  nts: new RegExp(`^${NTS_SLUG}(\\/${NTS_SLUG})?$`),
+};
+
+/// Whether an id is the right shape for this provider *and* this resource.
+/// The pattern alone would let a show id name an episode endpoint, producing
+/// `shows/x/episodes/undefined`.
+function isSafeID(provider: string, resourceType: string, id: string): boolean {
+  if (!SAFE_IDS[provider]?.test(id)) return false;
+  if (provider !== "nts") return true;
+  const parts = id.split("/");
+  return resourceType === "episode" ? parts.length === 2 : parts.length === 1;
+}
 
 // The second request shape: an explicit Discogs path plus query, for the calls
 // that are searches rather than id lookups. Still an allow-list — a path that
@@ -151,7 +182,9 @@ Deno.serve(async (req: Request) => {
 
     const buildURL = resources[resourceType];
     if (!buildURL) return json({ error: "unknown_resource_type", resourceType }, 400);
-    if (!SAFE_ID.test(resourceID)) return json({ error: "invalid_resource_id" }, 400);
+    if (!isSafeID(provider, resourceType, resourceID)) {
+      return json({ error: "invalid_resource_id" }, 400);
+    }
 
     upstreamURL = buildURL(resourceID);
   }
@@ -194,7 +227,7 @@ Deno.serve(async (req: Request) => {
     // one indexed lookup — and it means the normalized tables catch up without
     // anyone having to expire the cache by hand.
     if (!(await isNormalized(supabase, provider, resourceType, resourceID))) {
-      await normalize(supabase, provider, resourceType, cached.payload);
+      await normalize(supabase, provider, resourceType, resourceID, cached.payload);
     }
     return json(cached.payload);
   }
@@ -255,7 +288,7 @@ Deno.serve(async (req: Request) => {
     // The fetch succeeded; failing to cache it is worth logging, not failing on.
     if (writeError) console.error("cache_write_failed", writeError.message);
 
-    await normalize(supabase, provider, resourceType, payload);
+    await normalize(supabase, provider, resourceType, resourceID, payload);
   })();
 
   // Supabase keeps the worker alive for this. Without it the response would
@@ -281,17 +314,33 @@ async function isNormalized(
   resourceType: string,
   resourceID: string,
 ): Promise<boolean> {
-  if (provider !== "discogs" || resourceType !== "release") return true;
+  if (provider === "discogs" && resourceType === "release") {
+    const { data } = await supabase
+      .from("external_ids")
+      .select("id")
+      .eq("provider", provider)
+      .eq("entity_type", "release")
+      .eq("external_id", resourceID)
+      .maybeSingle();
 
-  const { data } = await supabase
-    .from("external_ids")
-    .select("id")
-    .eq("provider", provider)
-    .eq("entity_type", "release")
-    .eq("external_id", resourceID)
-    .maybeSingle();
+    return Boolean(data);
+  }
 
-  return Boolean(data);
+  // An episode cached before the radio tables existed has a payload and no
+  // provenance behind it. One indexed lookup is what saves it from needing the
+  // cache expired by hand a year from now.
+  if (provider === "nts" && resourceType === "episode") {
+    const { data } = await supabase
+      .from("radio_episodes")
+      .select("id")
+      .eq("provider", provider)
+      .eq("external_id", resourceID)
+      .maybeSingle();
+
+    return Boolean(data);
+  }
+
+  return true;
 }
 
 /// Normalization is a bonus on top of the cache, never a reason to fail the
@@ -300,11 +349,19 @@ async function normalize(
   supabase: SupabaseClient,
   provider: string,
   resourceType: string,
+  resourceID: string,
   payload: unknown,
 ): Promise<void> {
   try {
     if (provider === "discogs" && resourceType === "release") {
       await normalizeDiscogsRelease(supabase, payload as Record<string, unknown>);
+    }
+    if (provider === "nts" && resourceType === "show") {
+      await ingestNTSShow(supabase, resourceID, payload as Record<string, unknown>);
+    }
+    if (provider === "nts" && resourceType === "episode") {
+      const [show, episode] = resourceID.split("/");
+      await ingestNTSEpisode(supabase, show, episode, payload as Record<string, unknown>);
     }
   } catch (cause) {
     console.error("normalize_failed", String(cause));
