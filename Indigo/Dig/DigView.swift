@@ -28,12 +28,33 @@ struct DigView: View {
     /// The page appears once, whole. Everything above the list arrives from a
     /// task, so drawing before it lands meant showing the artists and then
     /// shoving them down a moment later.
+    ///
+    /// Set once and never cleared. A later refresh updates what is on screen
+    /// without veiling it again — enrichment writes constantly, and a page
+    /// that went soft every time one landed would spend the evening blurring
+    /// at somebody trying to read it.
     @State private var isReady = false
+    /// Held rather than computed in `body`.
+    ///
+    /// Working these out reads every crate item and every track in the
+    /// library, and it was happening on each redraw — which on this page means
+    /// every hover, and every time enrichment wrote a row anywhere. Once per
+    /// change is the same answer for a fraction of the work.
+    @State private var entries: [StartingPoint] = []
+    /// Which crate the held entries were worked out from.
+    ///
+    /// The page redraws on the dig revision too, and that is bumped by every
+    /// enrichment write — but starting points come from the crate and the
+    /// library, which enrichment does not touch. Without this the half-second
+    /// scan ran again every time a background fetch stored a row.
+    @State private var scannedCrate = -1
+
+    /// What the page is a function of. Reading both here is also what
+    /// subscribes `body` to them, so a change still redraws.
+    private var revision: String { "\(crate.revision)-\(dig.revision)" }
 
     var body: some View {
-        let _ = crate.revision
-        let _ = dig.revision
-        let entries = startingPoints()
+        let entries = entries
 
         VStack(spacing: 0) {
             PageHeader(
@@ -42,7 +63,10 @@ struct DigView: View {
             )
             Rule(color: Palette.outline)
 
-            if entries.isEmpty {
+            // "Nothing to dig into" is only true once we have looked. Said
+            // while still looking it is a failure announced in advance, and
+            // this page opens on it every single time.
+            if isReady && entries.isEmpty {
                 EmptyStateView(
                     headline: "Nothing to dig into yet",
                     message: "Crate something, or index a music folder. Dig follows artists into their labels, and labels into everyone else on them."
@@ -50,40 +74,53 @@ struct DigView: View {
                     Button("Open Crate") { appState.select(.crate) }
                         .buttonStyle(OutlineButtonStyle())
                 }
-            } else if !isReady {
-                // Deliberately nothing. A scaffold here would be a second copy
-                // of this layout that drifts from it, and the wait is one
-                // local fetch — the page is not absent long enough to need
-                // something standing in for it.
-                Spacer()
             } else {
                 ScrollView {
+                    // Only until the library has been read, which is the one
+                    // stretch where there is genuinely nothing to soften. The
+                    // veil needs something to breathe on or the page reads as
+                    // stopped rather than arriving.
+                    if entries.isEmpty {
+                        DigSkeleton(hasImage: false, sections: 3)
+                            .padding(.horizontal, Metrics.gutter)
+                            .padding(.top, 22)
+                    }
+
                     memory
 
-                    HStack {
-                        Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
-                        Spacer()
-                        Text("\(entries.count)").microLabel(1.2).foregroundStyle(Palette.inkFaint)
-                    }
-                    .padding(.horizontal, Metrics.gutter)
-                    .padding(.top, 8)
-                    .padding(.bottom, 9)
-                    Rule(color: Palette.outline)
-
-                    LazyVStack(spacing: 0) {
-                        ForEach(entries) { entry in
-                            DigStartRow(entry: entry) {
-                                appState.open(.digArtist(mbid: entry.mbid, name: entry.name))
-                            }
-                            Rule()
+                    if !entries.isEmpty {
+                        HStack {
+                            Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
+                            Spacer()
+                            Text("\(entries.count)").microLabel(1.2).foregroundStyle(Palette.inkFaint)
                         }
+                        .padding(.horizontal, Metrics.gutter)
+                        .padding(.top, 8)
+                        .padding(.bottom, 9)
+                        Rule(color: Palette.outline)
+
+                        LazyVStack(spacing: 0) {
+                            ForEach(entries) { entry in
+                                DigStartRow(entry: entry) {
+                                    appState.open(.digArtist(mbid: entry.mbid, name: entry.name))
+                                }
+                                Rule()
+                            }
+                        }
+                        .padding(.bottom, 24)
                     }
-                    .padding(.bottom, 24)
                 }
                 .scrollIndicators(.visible)
+                // One treatment for the whole page. See `LoadingVeil`.
+                //
+                // The list arrives before the blocks above it do, so it moves
+                // once while it is still soft — and the moment the veil lifts
+                // is the moment the page is finished. One reveal, and nothing
+                // rearranging itself in front of somebody reading it.
+                .loadingVeil(!isReady)
             }
         }
-        .task(id: dig.revision) { await refresh() }
+        .task(id: revision) { await refresh() }
     }
 
     /// Local history first, then a moment for radio — and then the page,
@@ -94,9 +131,16 @@ struct DigView: View {
     /// be able to hold DIG shut, and a backend answering promptly should not
     /// make the page move twice.
     private func refresh() async {
+        // The list first and on its own, so it is on screen — softened —
+        // while everything else is still being worked out.
+        if scannedCrate != crate.revision {
+            entries = startingPoints()
+            scannedCrate = crate.revision
+        }
         await refreshMemory()
 
-        let radioLoad = Task { await refreshRadio() }
+        let names = entries.prefix(60).map(\.name)
+        let radioLoad = Task { await refreshRadio(for: names) }
         await withTaskGroup(of: Void.self) { group in
             group.addTask { await radioLoad.value }
             group.addTask { try? await Task.sleep(for: .milliseconds(900)) }
@@ -106,11 +150,11 @@ struct DigView: View {
         isReady = true
     }
 
-    private func refreshRadio() async {
+    /// Asked about the names already worked out, not about the library again.
+    /// Sending all of it would be a large request to answer a question about
+    /// the top of a list.
+    private func refreshRadio(for names: some Sequence<String>) async {
         guard SupabaseService.isConfigured else { return }
-        // The names it is worth asking about. Sending the whole library would
-        // be a large request to answer a question about the top of a list.
-        let names = startingPoints().prefix(60).map(\.name)
         radio = try? await RadioRepository.shared.digRadio(forArtists: Array(names))
     }
 

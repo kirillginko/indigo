@@ -156,6 +156,42 @@ final class DigPerformanceTests: XCTestCase {
 
     /// Reading the seven tables, which is what every write makes the next
     /// page do again.
+    /// The scan behind the way into DIG.
+    ///
+    /// The landing page works its starting points out of every crate item and
+    /// every track in the library. It was doing that inside `body`, so it ran
+    /// on every redraw — every hover, and every time enrichment wrote a row
+    /// anywhere. Half a second, repeatedly, for an answer that had not changed.
+    ///
+    /// Split three ways because "the scan is slow" is not actionable: what is
+    /// wanted is whether the time is in SwiftData or in the normaliser, and
+    /// those have completely different fixes.
+    func testCostOfTheLibraryScanBehindTheDigPage() {
+        var counted = 0
+        let fetchOnly = milliseconds {
+            counted = ((try? context.fetch(FetchDescriptor<Track>())) ?? []).count
+        }
+
+        let tracks = (try? context.fetch(FetchDescriptor<Track>())) ?? []
+        var keys = 0
+        let normalising = milliseconds {
+            for track in tracks { keys += DigEngine.artistKeys(for: track).count }
+        }
+
+        // The stored column, which the importer already normalised once.
+        var stored = 0
+        let storedCost = milliseconds {
+            for track in tracks where !track.artistKey.isEmpty { stored += 1 }
+        }
+
+        record("dig start: fetch \(fetchOnly)ms, normalise \(normalising)ms, "
+               + "stored-key read \(storedCost)ms over \(counted) tracks")
+
+        XCTAssertGreaterThan(counted, 0)
+        XCTAssertGreaterThan(keys, 0)
+        XCTAssertGreaterThan(stored, 0)
+    }
+
     func testCostOfReadingTheTables() {
         var built = 0
         let cost = milliseconds {
