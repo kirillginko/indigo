@@ -26,6 +26,9 @@ nonisolated enum CatalogLookup {
         static let recordings = "recordings"
         static let externalIDs = "external_ids"
         static let artwork = "artwork"
+        static let radioShows = "radio_shows"
+        static let radioEpisodes = "radio_episodes"
+        static let radioAppearances = "radio_appearances"
     }
 
     static func entity<Row: Decodable & Sendable>(

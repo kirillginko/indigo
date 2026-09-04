@@ -326,6 +326,18 @@ struct ArtistDigView: View {
                     scenes
                     }
 
+                    // Outside the block above on purpose. Everything in it is
+                    // gated on the catalogues having answered, and radio is
+                    // the one thing here that can speak for an artist no
+                    // catalogue has heard of — which is exactly the artist it
+                    // is worth speaking for. Hiding it until Discogs replied
+                    // meant it was hidden precisely when it was the only thing
+                    // on the page with anything to say.
+                    //
+                    // It draws nothing when there is nothing, so it needs no
+                    // condition of its own.
+                    ArtistRadioSection(artistName: profile.name)
+
                     DeepSectionView(
                         origin: .artist(profile.name, mbid: profile.mbid),
                         isReady: hasEnriched,

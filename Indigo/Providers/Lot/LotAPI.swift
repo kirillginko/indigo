@@ -87,15 +87,6 @@ nonisolated struct LotAPI: Sendable {
     private static let base = URL(string: "https://www.thelotradio.com/")!
     private static let origin = "https://www.thelotradio.com"
 
-    /// Server action ids, read out of the site's own client bundle. They are
-    /// content hashes of the module that exports each action, so they survive
-    /// ordinary redeploys and change when that module does — which is why
-    /// every call that uses one has a page-scraped fallback behind it.
-    private enum Action {
-        static let episodes = "40cc4f8d8e9b2710f1cbc160fd08603dab64742898"
-        static let shows = "4065fa077e3fba62939a802f259ab6da3aa3019c5a"
-    }
-
     /// The archive answers with at most a hundred entries per call.
     static let maxPageSize = 100
 
@@ -144,7 +135,7 @@ nonisolated struct LotAPI: Sendable {
         if let cursor { argument["cursor"] = cursor }
 
         do {
-            let data = try await action(Action.episodes, path: "the-index", arguments: [argument])
+            let data = try await action(LotServerActions.episodes, arguments: [argument])
             let page = try decode(LotEpisodePageDTO.self, from: data)
             return LotEpisodeFeed(
                 episodes: page.items.compactMap { $0.asEpisode() },
@@ -172,7 +163,7 @@ nonisolated struct LotAPI: Sendable {
     func fetchShows(limit: Int = 100, skip: Int = 0) async throws -> LotShowIndex {
         let argument: [String: Any] = ["limit": min(limit, Self.maxPageSize), "skip": skip]
         do {
-            let data = try await action(Action.shows, path: "shows", arguments: [argument])
+            let data = try await action(LotServerActions.shows, arguments: [argument])
             let page = try decode(LotShowPageDTO.self, from: data)
             return LotShowIndex(
                 shows: page.items.compactMap { $0.asShow() },
@@ -264,10 +255,41 @@ nonisolated struct LotAPI: Sendable {
 
     /// Invokes a server action. The response is a Flight stream whose first
     /// row points at the row holding the return value.
-    private func action(_ id: String, path: String, arguments: [Any]) async throws -> Data {
+    ///
+    /// An id that has gone stale answers 404, and that is recoverable rather
+    /// than fatal: the site names its own actions in its client bundle, so the
+    /// current id is read from there and the call tried once more. Only if
+    /// that fails too does this throw and let the page-scraped fallback stand.
+    private func action(_ descriptor: LotServerActions.Action, arguments: [Any]) async throws -> Data {
+        let id = await LotServerActions.shared.id(for: descriptor)
+        do {
+            return try await invoke(id, of: descriptor, arguments: arguments)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch LotError.badStatus(let code) where Self.isActionRejection(code) {
+            guard let fresh = await LotServerActions.shared.rediscover(descriptor, rejected: id) else {
+                throw LotError.badStatus(code)
+            }
+            return try await invoke(fresh, of: descriptor, arguments: arguments)
+        }
+    }
+
+    /// Next answers an unknown action id with 404, and a malformed one with
+    /// 400. Neither says anything about the archive itself, so both are worth
+    /// re-reading the site's wiring for.
+    private static func isActionRejection(_ code: Int) -> Bool {
+        code == 404 || code == 400
+    }
+
+    private func invoke(
+        _ id: String,
+        of descriptor: LotServerActions.Action,
+        arguments: [Any]
+    ) async throws -> Data {
         guard let body = try? JSONSerialization.data(withJSONObject: arguments) else {
             throw LotError.malformedResponse
         }
+        let path = descriptor.page
         var request = URLRequest(url: Self.base.appendingPathComponent(path, isDirectory: false))
         request.httpMethod = "POST"
         request.httpBody = body
