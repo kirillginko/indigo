@@ -42,7 +42,12 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable {
     var id: String { node.id }
 
     /// The line under the card: what this is, and what it came from.
+    ///
+    /// The origin is dropped when the reason already names it — a show offered
+    /// because it played somebody you keep has said so, and "· via Aphex Twin"
+    /// after "Played Aphex Twin, who you keep" is the same fact twice.
     var connection: String {
+        guard !reason.contains(via) else { return reason }
         guard corroboration > 1 else { return "\(reason) · via \(via)" }
         return "\(reason) · via \(via) and \(corroboration - 1) more"
     }
@@ -115,6 +120,36 @@ nonisolated struct ExploreSuggestionEngine {
                 score: found.score * (1 + 0.22 * Double(origins.count - 1))
             )
         }
+        // Shows judged on their tracklists, which the graph cannot reach.
+        //
+        // An edge to a broadcast exists only where an artist's records are in
+        // the local store *and* carry an appearance — five of those across a
+        // whole crate, while the appearance log held eighteen complete
+        // tracklists nobody was reading. See `ShowSuggestionEngine`.
+        let fromTracklists = ShowSuggestionEngine(context: context).suggestions(
+            taste: TasteProfile.collected(context: context),
+            known: seen,
+            keptArtistKeys: Set(known.compactMap {
+                $0.node.kind == .artist ? $0.node.key : nil
+            })
+        )
+        for suggestion in fromTracklists {
+            guard let existing = best[suggestion.id] else {
+                best[suggestion.id] = suggestion
+                continue
+            }
+            // Found both ways. Keep whichever score is better evidenced, and
+            // the tracklist's sentence either way: "Played Aphex Twin, who you
+            // keep" says something, and the graph's "Played on NTS / 239EF"
+            // only repeats the name already printed on the card.
+            best[suggestion.id] = ExploreSuggestion(
+                node: suggestion.node, reason: suggestion.reason, via: suggestion.via,
+                kind: suggestion.kind,
+                corroboration: max(existing.corroboration, suggestion.corroboration),
+                score: max(existing.score, suggestion.score)
+            )
+        }
+
         return Self.spread(
             best.values.sorted {
                 $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score
