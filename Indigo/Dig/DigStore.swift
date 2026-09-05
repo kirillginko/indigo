@@ -913,7 +913,7 @@ final class DigStore {
                .findRelease(containing: initialTitle, byArtist: artistName, page: page) {
             cover = cover ?? BandcampImage.sized(release.imageURL, BandcampImage.cover)
             if metadata.releaseTitle == nil { metadata.releaseTitle = release.title }
-            if metadata.labelName == nil { metadata.labelName = release.labelName }
+            if metadata.labelName == nil { metadata.labelName = release.imprint }
             if metadata.releaseDate == nil { metadata.releaseDate = release.year }
             if recording.albumTitle?.isEmpty ?? true { recording.albumTitle = release.title }
         }

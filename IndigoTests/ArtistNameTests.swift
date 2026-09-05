@@ -165,6 +165,87 @@ final class LabelNameTests: XCTestCase {
         }
     }
 
+    // MARK: Names Discogs and Bandcamp only look like they mean
+
+    /// Found on a real Dean Blunt page: his own imprint listed as "World Music
+    /// (8)". The artist endpoint carries Discogs' disambiguating number and
+    /// the release endpoint does not, so the same label appeared twice — and
+    /// the numbered one opened onto nothing, because label pages look up by
+    /// name.
+    func testAnArtistsOwnImprintIsOneLabelHoweverDiscogsSpelledIt() {
+        XCTAssertEqual(LabelName.names(inDiscogsField: "World Music (8)"), ["World Music"])
+        XCTAssertEqual(
+            LabelName.names(inDiscogsField: "World Music (8)"),
+            LabelName.names(inDiscogsField: "World Music")
+        )
+    }
+
+    /// Discogs' artist-releases endpoint joins every label on a record into
+    /// one field. Stored whole, "AMF Records (3), Virgin EMI Records" is one
+    /// imprint that has never existed.
+    func testTwoLabelsJoinedByACommaAreTwoLabels() {
+        XCTAssertEqual(
+            LabelName.names(inDiscogsField: "AMF Records (3), Virgin EMI Records"),
+            ["AMF Records", "Virgin EMI Records"]
+        )
+        XCTAssertEqual(
+            LabelName.names(inDiscogsField: "Arcane Music (3), Good Company Records (3)"),
+            ["Arcane Music", "Good Company Records"]
+        )
+    }
+
+    func testTheSameLabelNamedTwiceInOneFieldIsNamedOnce() {
+        XCTAssertEqual(
+            LabelName.names(inDiscogsField: "Warp Records, Warp Records (2)"),
+            ["Warp Records"]
+        )
+    }
+
+    func testAPlaceholderInsideAJoinDoesNotSurvive() {
+        XCTAssertEqual(
+            LabelName.names(inDiscogsField: "Not On Label (Dean Blunt Self-released), Rough Trade"),
+            ["Rough Trade"]
+        )
+        XCTAssertTrue(LabelName.names(inDiscogsField: "Not On Label").isEmpty)
+        XCTAssertTrue(LabelName.names(inDiscogsField: nil).isEmpty)
+        XCTAssertTrue(LabelName.names(inDiscogsField: "").isEmpty)
+    }
+
+    func testTheFirstRealLabelIsTheOneToCreditARelease() {
+        XCTAssertEqual(LabelName.primary(inDiscogsField: "Alfa, Edge Records (9)"), "Alfa")
+        XCTAssertNil(LabelName.primary(inDiscogsField: "Not On Label"))
+    }
+
+    func testAnOrdinaryLabelIsLeftAlone() {
+        XCTAssertEqual(LabelName.names(inDiscogsField: "Hyperdub"), ["Hyperdub"])
+        // A one-off bootleg imprint is a real name and stays. What was wrong
+        // was its billing, not its existence.
+        XCTAssertEqual(
+            LabelName.names(inDiscogsField: "Hanging Gardens Live Recording"),
+            ["Hanging Gardens Live Recording"]
+        )
+    }
+
+    /// Bandcamp's publisher is whoever owns the page, so an artist selling
+    /// their own music is filed as their own label. That is the same fact
+    /// "Not On Label" records, wearing an imprint's clothes.
+    func testAnArtistIsNotTheirOwnRecordLabel() {
+        XCTAssertTrue(LabelName.isSelfPublished(publisher: "Ametsub", artist: "Ametsub"))
+        XCTAssertTrue(LabelName.isSelfPublished(publisher: "Space Afrika", artist: "Space Afrika"))
+        // Spelled differently on the two halves of one page.
+        XCTAssertTrue(
+            LabelName.isSelfPublished(publisher: "THE CIRCLING SUN", artist: "The Circling Sun")
+        )
+    }
+
+    func testARealLabelPublishingAnArtistIsStillALabel() {
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "Hyperdub", artist: "Burial"))
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: nil, artist: "Burial"))
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "Hyperdub", artist: nil))
+        // Two empty names must not match each other.
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "", artist: ""))
+    }
+
     /// The bug as it appeared: two artists said to be connected because
     /// neither of them was on a label.
     func testSelfReleasedArtistsAreNotLabelmates() throws {

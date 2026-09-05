@@ -106,6 +106,10 @@ nonisolated struct ArtistProfile: Sendable {
     nonisolated struct LabelRef: Identifiable, Hashable, Sendable {
         let name: String
         let mbid: String?
+        /// How many of this artist's known releases came out on it. Zero when
+        /// the label is known only as a name attached to the artist, with no
+        /// record naming it — which is most of what MusicBrainz contributes.
+        var releaseCount: Int = 0
         var id: String { mbid ?? name }
     }
 
@@ -258,29 +262,75 @@ nonisolated struct DigEngine {
         let places = PlaceIndex(context: context)
         let bandcampTags = bandcampReleases
             .flatMap { places.split(keywords: $0.keywords).tags }
-        let bandcampLabels = bandcampReleases.compactMap(\.labelName)
+        let bandcampLabels = bandcampReleases.compactMap(\.imprint)
         let bandcampByTitle = Dictionary(
             bandcampReleases.map { (Self.releaseKey($0.title), $0) },
             uniquingKeysWith: { first, _ in first }
         )
 
         // Labels come from what this artist's music actually came out on.
+        //
+        // Names are folded on the way in. Discogs writes the eighth label
+        // called World Music as "World Music (8)" from one endpoint and as
+        // "World Music" from another, so without folding an artist's own
+        // imprint appears twice on his page and neither entry can be looked
+        // up. See `LabelName.names(inDiscogsField:)`.
         var labelNames: [String: String?] = [:]
+        var spelling: [String: String] = [:]
+        func note(_ raw: String, mbid: String?) {
+            for name in LabelName.names(inDiscogsField: raw) {
+                let key = RecordingKey.normalize(name)
+                guard !key.isEmpty else { continue }
+                spelling[key] = spelling[key] ?? name
+                // An MBID is worth more than the absence of one, so a label
+                // met first from Discogs and later from MusicBrainz keeps the
+                // identifier rather than the order it arrived in.
+                if let mbid { labelNames.updateValue(mbid, forKey: key) }
+                else if labelNames[key] == nil { labelNames.updateValue(nil, forKey: key) }
+            }
+        }
         for entry in entries {
             guard let labelName = entry.labelName else { continue }
-            labelNames[labelName] = entry.labelMBID
+            note(labelName, mbid: entry.labelMBID)
         }
-        for label in (discogs?.labelNames ?? []) + bandcampLabels where labelNames[label] == nil {
-            // Assigning nil into a dictionary whose values are themselves
-            // optional removes the key. `updateValue` is what actually stores
-            // "known label, unknown MBID" — the ordinary case for anything
-            // Discogs knows and MusicBrainz does not.
-            labelNames.updateValue(nil, forKey: label)
+        for label in (discogs?.labelNames ?? []) + bandcampLabels {
+            note(label, mbid: nil)
+        }
+        // And the label each of his records actually names. Discogs answers
+        // this from two endpoints that do not agree on which releases they
+        // return, so a label carrying three of an artist's records could be
+        // missing from the list built out of the other one — Dean Blunt's page
+        // had no Hippos In Tanks on it, which is where The Redeemer and The
+        // Narcissist II came out.
+        for label in discogs?.releaseLabels ?? [] {
+            note(label, mbid: nil)
+        }
+
+        // How much of this artist's music each one actually put out.
+        //
+        // Sorted alphabetically, a one-off live bootleg sits above the label
+        // an artist has been on for a decade — which reads as five equal
+        // imprints and is the opposite of what the list is for. Ranked by
+        // releases, the home imprint goes first and the one-offs fall to the
+        // bottom where they belong.
+        var releaseCounts: [String: Int] = [:]
+        for raw in discogs?.releaseLabels ?? [] {
+            for name in LabelName.names(inDiscogsField: raw) {
+                releaseCounts[RecordingKey.normalize(name), default: 0] += 1
+            }
         }
         let labels = labelNames
-            .filter { LabelName.isRealLabel($0.key) }
-            .sorted { $0.key < $1.key }
-            .map { ArtistProfile.LabelRef(name: $0.key, mbid: $0.value) }
+            .compactMap { key, mbid -> ArtistProfile.LabelRef? in
+                guard let name = spelling[key] else { return nil }
+                return ArtistProfile.LabelRef(
+                    name: name, mbid: mbid, releaseCount: releaseCounts[key] ?? 0
+                )
+            }
+            .sorted {
+                $0.releaseCount == $1.releaseCount
+                    ? $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+                    : $0.releaseCount > $1.releaseCount
+            }
 
         let artistKey = RecordingKey.normalizeArtist(name)
         // The picture the row was already showing.
@@ -355,7 +405,7 @@ nonisolated struct DigEngine {
                     ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.cover),
                 thumbnailURL: resolved?.thumbnailURL
                     ?? BandcampImage.sized(fromBandcamp?.imageURL, BandcampImage.thumbnail),
-                label: resolved?.labelNames.first ?? fromBandcamp?.labelName
+                label: resolved?.labelNames.first ?? fromBandcamp?.imprint
             )
         }
         // Records Indigo has already resolved for this artist, whether or not
@@ -391,7 +441,7 @@ nonisolated struct DigEngine {
                 discogsID: nil,
                 imageURL: BandcampImage.sized(release.imageURL, BandcampImage.cover),
                 thumbnailURL: BandcampImage.sized(release.imageURL, BandcampImage.thumbnail),
-                label: release.labelName
+                label: release.imprint
             )
         }
 
@@ -458,7 +508,7 @@ nonisolated struct DigEngine {
             discogsURL: discogs?.profileURL,
             bandcamp: bandcampReleases.map {
                 ArtistProfile.BandcampLine(
-                    title: $0.title, year: $0.year, label: $0.labelName,
+                    title: $0.title, year: $0.year, label: $0.imprint,
                     pageURL: URL(string: $0.urlString) ?? URL(string: "https://bandcamp.com")!,
                     imageURL: BandcampImage.sized($0.imageURL, BandcampImage.cover),
                     thumbnailURL: BandcampImage.sized($0.imageURL, BandcampImage.thumbnail)

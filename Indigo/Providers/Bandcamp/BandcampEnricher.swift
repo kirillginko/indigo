@@ -183,13 +183,20 @@ nonisolated struct BandcampEnricher {
         )
         descriptor.fetchLimit = 1
         let artist = info.artistName.isEmpty ? fallbackArtist : info.artistName
+        // Bandcamp's publisher is whoever owns the page, which for most of
+        // Bandcamp is the artist. Storing that as the label puts somebody's
+        // own name in the list of who put their records out, and makes every
+        // self-releasing artist a labelmate of themselves.
+        let label = LabelName.isSelfPublished(publisher: info.labelName, artist: artist)
+            ? nil
+            : info.labelName
 
         if let existing = (try? context.fetch(descriptor))?.first {
             existing.title = info.title
             existing.artistName = artist
             existing.artistKey = RecordingKey.normalizeArtist(artist)
             existing.artistKeys = RecordingKey.creditedArtists(artist)
-            existing.labelName = info.labelName
+            existing.labelName = label
             existing.year = info.year
             existing.imageURLString = info.imageURL?.absoluteString
             existing.trackTitles = info.trackTitles
@@ -203,7 +210,7 @@ nonisolated struct BandcampEnricher {
             urlString: address,
             title: info.title,
             artistName: artist,
-            labelName: info.labelName,
+            labelName: label,
             year: info.year,
             imageURLString: info.imageURL?.absoluteString,
             trackTitles: info.trackTitles,

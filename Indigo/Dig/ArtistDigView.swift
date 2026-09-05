@@ -298,7 +298,15 @@ struct ArtistDigView: View {
                                 } else {
                                     VStack(alignment: .leading, spacing: 0) {
                                         ForEach(profile.labels) { label in
-                                            DigLine(text: label.name) {
+                                            // The count says which of these is
+                                            // a home and which is a one-off,
+                                            // the same way the radio blocks
+                                            // above mark a repeated play.
+                                            DigLine(
+                                                text: label.name,
+                                                detail: label.releaseCount > 1
+                                                    ? "×\(label.releaseCount)" : nil
+                                            ) {
                                                 openLabel(label)
                                             }
                                         }

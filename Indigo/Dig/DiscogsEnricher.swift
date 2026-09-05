@@ -114,7 +114,9 @@ nonisolated struct DiscogsEnricher {
             record.releaseDiscogsIDs = catalogue.compactMap(\.id)
             record.releaseImageURLStrings = catalogue.map { $0.coverImage ?? "" }
             record.releaseThumbnailURLStrings = catalogue.map { $0.thumbnail ?? "" }
-            record.releaseLabels = catalogue.map { ($0.label ?? []).first ?? "" }
+            record.releaseLabels = catalogue.map {
+                ($0.label ?? []).lazy.compactMap { LabelName.primary(inDiscogsField: $0) }.first ?? ""
+            }
         } else {
             let fallback = Array(uniqueReleases.prefix(30))
             record.releaseTitles = fallback.compactMap(\.title)
@@ -122,7 +124,7 @@ nonisolated struct DiscogsEnricher {
             record.releaseDiscogsIDs = fallback.compactMap(\.id)
             record.releaseImageURLStrings = Array(repeating: "", count: fallback.count)
             record.releaseThumbnailURLStrings = Array(repeating: "", count: fallback.count)
-            record.releaseLabels = fallback.map { $0.label ?? "" }
+            record.releaseLabels = fallback.map { LabelName.primary(inDiscogsField: $0.label) ?? "" }
         }
         // Only the label each release names for itself.
         //
@@ -131,9 +133,7 @@ nonisolated struct DiscogsEnricher {
         // mastering house, the distributor, the magazine that ran the mix. As
         // an artist's imprints that reads as nonsense: Space Afrika listed on
         // GZ Media and Bonati Mastering alongside Dais and sferic.
-        record.labelNames = Array(Set(
-            releases.compactMap(\.label).filter { LabelName.isRealLabel($0) }
-        )).sorted()
+        record.labelNames = Self.unique(releases.flatMap { LabelName.names(inDiscogsField: $0.label) })
         record.genres = Self.unique(bundle.catalogue.flatMap { $0.genre ?? [] })
         record.styles = Self.unique(bundle.catalogue.flatMap { $0.style ?? [] })
         record.collaboratorNames = Self.unique(
@@ -213,7 +213,12 @@ nonisolated struct DiscogsEnricher {
         record.title = detail.title
         record.year = detail.year
         record.artistNames = detail.artists?.compactMap(\.name) ?? []
-        record.labelNames = detail.labels?.compactMap(\.name) ?? []
+        // Named one per entry here rather than joined, but they carry the
+        // same disambiguating numbers, and a label filed under "Aeon (5)" is
+        // a label the pages cannot look up.
+        record.labelNames = Self.unique(
+            (detail.labels ?? []).flatMap { LabelName.names(inDiscogsField: $0.name) }
+        )
         record.catalogNumbers = detail.labels?.compactMap(\.catno) ?? []
         record.genres = detail.genres ?? []
         record.styles = detail.styles ?? []

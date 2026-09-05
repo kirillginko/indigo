@@ -42,4 +42,59 @@ nonisolated enum LabelName {
         }
         return !isPlaceholder(name)
     }
+
+    /// The labels named by one Discogs label string.
+    ///
+    /// Plural, because Discogs' `/artists/{id}/releases` hands back every
+    /// label on a record joined into a single field: "AMF Records (3), Virgin
+    /// EMI Records" is two imprints, and stored whole it is one imprint that
+    /// does not exist. A real cache here held over a hundred of them, each one
+    /// a row that opened onto nothing.
+    ///
+    /// The disambiguating number goes too. Discogs files the eighth label
+    /// called World Music as "World Music (8)"; the same imprint arrives from
+    /// the release endpoint as plain "World Music", so keeping the suffix gave
+    /// one artist's own label two entries on his page — and neither of them
+    /// could be looked up by name, which is how the label pages find anything.
+    ///
+    /// Commas inside a genuine label name are the cost of this, and they are
+    /// rare. Splitting is still the better trade: a real label wrongly halved
+    /// leaves two names that mostly still resolve, and not splitting leaves a
+    /// name that never does.
+    static func names(inDiscogsField field: String?) -> [String] {
+        guard let field else { return [] }
+        var seen = Set<String>()
+        var found: [String] = []
+        for part in field.split(separator: ",") {
+            let name = DiscogsClient.withoutDisambiguator(String(part))
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard isRealLabel(name) else { continue }
+            guard seen.insert(RecordingKey.normalize(name)).inserted else { continue }
+            found.append(name)
+        }
+        return found
+    }
+
+    /// The single label to credit a release to, when only one line is going to
+    /// be shown for it. Nil when Discogs named none worth showing.
+    static func primary(inDiscogsField field: String?) -> String? {
+        names(inDiscogsField: field).first
+    }
+
+    /// Whether a publisher is really just the artist releasing their own
+    /// record.
+    ///
+    /// Bandcamp's JSON-LD names the page owner as the publisher, so an artist
+    /// who sells their own music is listed as their own label — which is most
+    /// of Bandcamp. It is the same fact "Not On Label" records, said
+    /// in a way that looks like an imprint, and treated as one it makes every
+    /// self-releasing artist a labelmate of themselves and puts their own name
+    /// in the list of who put their records out.
+    static func isSelfPublished(publisher: String?, artist: String?) -> Bool {
+        guard let publisher, let artist else { return false }
+        let label = RecordingKey.normalizeArtist(publisher)
+        let credited = RecordingKey.normalizeArtist(artist)
+        guard !label.isEmpty, !credited.isEmpty else { return false }
+        return label == credited
+    }
 }
