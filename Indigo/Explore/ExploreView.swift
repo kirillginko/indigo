@@ -115,9 +115,13 @@ struct ExploreView: View {
         let stationsTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.items.count, in: size) } : 0)
         let libraryTop = stationsTop + (showStations ? sectionHeight(for: recommendations.count, in: size) : 0)
 
+        // Directly over the trunk, which `ExploreGraphLines` roots at half the
+        // width. It was offset to the right of it, so it read as a caption
+        // for whatever happened to be under it rather than as the head of the
+        // line everything hangs from.
         ExploreStartLabel()
             .graphNode("start", section: "start", connects: false)
-            .position(x: size.width * 0.56, y: 28)
+            .position(x: size.width * 0.5, y: 46)
 
         if kept.isEmpty && tracks.isEmpty {
             Button("Find something to start with") { appState.select(.dig) }
@@ -258,7 +262,11 @@ struct ExploreView: View {
             : max(rawX, center + centerClearance)
         let x = max(halfCard + 28, min(size.width - halfCard - 28, separatedX))
 
-        let top = sectionTop + 104
+        // Well clear of the section heading above it. At 104 the first row of
+        // cards sat almost against the title and its description, so a
+        // section read as one crowded block rather than as a heading and the
+        // things under it.
+        let top = sectionTop + 148
         let pitch: CGFloat = 142
         let verticalDrift = CGFloat(sin(Double(ordinal + 1) * 1.91)) * 24
 
@@ -268,7 +276,9 @@ struct ExploreView: View {
     private func sectionHeight(for count: Int, in size: CGSize) -> CGFloat {
         guard count > 0 else { return 86 }
         let rows = Int((Double(count) / Double(columnCount(in: size))).rounded(.up))
-        return 110 + CGFloat(rows) * 142
+        // Matches the gap `place` leaves under a heading. The two have to move
+        // together or the next section's title lands on the last row of cards.
+        return 154 + CGFloat(rows) * 142
     }
 
     private func crateSectionTop(
@@ -359,7 +369,7 @@ struct ExploreView: View {
         case .library:
             rows = (min(8, tracks.count) + 1) / 2
         }
-        return max(760, 112 + CGFloat(rows) * 142 + CGFloat(visibleSectionCount(kept)) * 110)
+        return max(760, 112 + CGFloat(rows) * 142 + CGFloat(visibleSectionCount(kept)) * 154)
     }
     private func visibleSectionCount(_ kept: [CrateItem]) -> Int {
         switch filter {
@@ -487,16 +497,16 @@ private struct ExploreSectionLabel: View {
     let description: String
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 24) {
+        VStack(alignment: .leading, spacing: 3) {
             Text(title)
                 .font(Typeface.body(15, weight: .bold))
-            Spacer(minLength: 24)
             Text(description)
                 .font(Typeface.body(11.5))
+                .opacity(0.7)
         }
         .foregroundStyle(Color.black)
         .padding(.horizontal, 28)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .allowsHitTesting(false)
     }
 }

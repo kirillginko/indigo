@@ -103,6 +103,92 @@ final class ExploreSuggestionTests: XCTestCase {
         XCTAssertTrue(suggestions().isEmpty)
     }
 
+    // MARK: Somewhere worth going, not merely somewhere certain
+
+    /// The bug as it was reported: "Also records as Kate NV" offered to
+    /// somebody who keeps Kate NV.
+    ///
+    /// An alias is the best-evidenced edge in the entire graph — it outscores
+    /// everything — and it is worth nothing at all as a suggestion, because it
+    /// is the same person under another name. Confidence and worth are
+    /// different questions, and this block ranks on the second.
+    func testAnotherNameForTheSamePersonIsNotSomewhereToGo() {
+        let kate = artist("Kate NV", id: 1)
+        kate.aliasNames = ["Kate Shilonosova"]
+        artist("Kate Shilonosova", id: 2)
+        crate(artist: "Kate NV")
+
+        XCTAssertFalse(suggestions().contains { $0.node.title == "Kate Shilonosova" })
+    }
+
+    func testAnAliasEdgeDoesNotHideARealReasonForTheSameArtist() {
+        // Reached both ways: the alias must not silence the connection that
+        // was actually worth offering.
+        let kate = artist("Kate NV", id: 1, labels: ["RVNG Intl."])
+        kate.aliasNames = ["Kate Shilonosova"]
+        artist("Kate Shilonosova", id: 2, labels: ["RVNG Intl."])
+        crate(artist: "Kate NV")
+
+        // Still refused: the same person is the same person however many
+        // reasons point at her.
+        XCTAssertFalse(suggestions().contains { $0.node.title == "Kate Shilonosova" })
+    }
+
+    func testAPersonYouMadeARecordWithOutranksOneWhoMerelySoundsSimilar() {
+        artist("Dean Blunt", id: 1, styles: ["Ambient"])
+            .collaboratorNames = ["Tirzah"]
+        artist("Tirzah", id: 2, styles: ["Ambient"])
+        artist("Somebody Ambient", id: 3, styles: ["Ambient"])
+        crate(artist: "Dean Blunt")
+
+        let found = suggestions()
+        let tirzah = found.firstIndex { $0.node.title == "Tirzah" }
+        let similar = found.firstIndex { $0.node.title == "Somebody Ambient" }
+        XCTAssertNotNil(tirzah)
+        if let tirzah, let similar { XCTAssertLessThan(tirzah, similar) }
+    }
+
+    func testTwoRoutesToTheSamePlaceBeatOne() {
+        // Every collaborator edge carries the same weight, so without this
+        // a dozen of them tie and the order falls back on the alphabet — which
+        // is how a real collection produced a list beginning Aksak Maboul,
+        // Blue Foundation, Blue Iverson, Bottlesmoker.
+        artist("Dean Blunt", id: 1).collaboratorNames = ["Tirzah"]
+        artist("Kate NV", id: 2).collaboratorNames = ["Tirzah"]
+        artist("Cokiyu", id: 3).collaboratorNames = ["Somebody Else"]
+        artist("Tirzah", id: 4)
+        artist("Somebody Else", id: 5)
+        crate(artist: "Dean Blunt")
+        crate(artist: "Kate NV")
+        crate(artist: "Cokiyu")
+
+        let found = suggestions()
+        let tirzah = found.first { $0.node.title == "Tirzah" }
+        XCTAssertEqual(tirzah?.corroboration, 2)
+        XCTAssertEqual(found.first?.node.title, "Tirzah")
+        // And it says so, because that is the strongest argument this engine
+        // can make and hiding it would waste it.
+        XCTAssertTrue(tirzah?.connection.contains("and 1 more") ?? false)
+    }
+
+    func testOneKindOfRouteDoesNotTakeTheWholeBlock() {
+        // Collaboration is the most valuable route there is, which means that
+        // left alone it takes every row — and the label and radio
+        // neighbourhoods, the two things Indigo knows that a catalogue does
+        // not, never appear at all.
+        let origin = artist("Dean Blunt", id: 1, labels: ["World Music"])
+        origin.collaboratorNames = (0..<10).map { "Collaborator \($0)" }
+        for index in 0..<10 { artist("Collaborator \(index)", id: 100 + index) }
+        for index in 0..<5 { artist("Labelmate \(index)", id: 200 + index, labels: ["World Music"]) }
+        crate(artist: "Dean Blunt")
+
+        let found = suggestions()
+        let collaborators = found.filter { $0.kind == .collaborator }.count
+        XCTAssertLessThanOrEqual(collaborators, ExploreSuggestionEngine.perKind)
+        XCTAssertTrue(found.contains { $0.kind == .sharedLabel },
+                      "the label neighbourhood has to get a row")
+    }
+
     // MARK: Explaining itself
 
     func testEverySuggestionSaysWhatItRestsOn() {
