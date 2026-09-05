@@ -189,6 +189,106 @@ final class ExploreSuggestionTests: XCTestCase {
                       "the label neighbourhood has to get a row")
     }
 
+    /// Radio is the one place where what you are sent to matters as much as
+    /// why. A show is an hour of somebody's taste with a page and a
+    /// tracklist; an artist who merely turned up in the same episode was an
+    /// hour away from the one you know.
+    func testTheRadioRouteOffersTheShowRatherThanAStrangerInIt() {
+        XCTAssertGreaterThan(
+            ExploreSuggestionEngine.worth(MusicEdge(
+                from: .artist("Kate NV"),
+                to: .broadcast(providerID: "nts", showID: "a/b", title: "Some Show"),
+                kind: .playedInShow, source: .radio, reason: "Played on NTS", confidence: 0.7
+            )),
+            ExploreSuggestionEngine.worth(kind: .sharedBroadcast)
+        )
+        XCTAssertGreaterThan(
+            ExploreSuggestionEngine.worth(kind: .playedInShow),
+            ExploreSuggestionEngine.worth(kind: .playedBySameSelector)
+        )
+    }
+
+    /// The bug the show work uncovered.
+    ///
+    /// The crate files a broadcast under the id its player used
+    /// (`lyl.episode.glass-2026-07-16`) and `MediaAppearance` files the same
+    /// show under the id the tracklist used (`glass-2026-07-16`). Two
+    /// spellings meant two nodes, and EXPLORE offered somebody a show already
+    /// sitting in their crate — the exact failure the block exists to avoid.
+    func testAShowHasOneIdentityHoweverItWasSpelled() {
+        let fromCrate = MusicNode.broadcast(
+            providerID: "lyl", showID: "lyl.episode.glass-2026-07-16", title: "530°"
+        )
+        let fromRadio = MusicNode.broadcast(
+            providerID: "lyl", showID: "glass-2026-07-16", title: "530°"
+        )
+        XCTAssertEqual(fromCrate.id, fromRadio.id)
+        // And both still open, which is what the handle is for.
+        XCTAssertNotNil(fromCrate.destination)
+        XCTAssertEqual(fromCrate.destination, fromRadio.destination)
+    }
+
+    func testCanonicalisingAShowIdLeavesAnUnprefixedOneAlone() {
+        XCTAssertEqual(
+            BroadcastSource.canonicalShowID("239ef/239ef-13th-december-2021", providerID: "nts"),
+            "239ef/239ef-13th-december-2021"
+        )
+        // Another station's prefix is not this station's to strip.
+        XCTAssertEqual(
+            BroadcastSource.canonicalShowID("lyl.episode.x", providerID: "nts"),
+            "lyl.episode.x"
+        )
+        // A prefix and nothing else is not an id worth reducing to nothing.
+        XCTAssertEqual(
+            BroadcastSource.canonicalShowID("lyl.episode.", providerID: "lyl"),
+            "lyl.episode."
+        )
+    }
+
+    func testAShowGetsAPlaceEvenWhenItIsOutrankedByPeople() {
+        // On a real collection every available show scored below every
+        // labelmate, so a block of twelve had none in it at all. A show is an
+        // hour of somebody's taste that can be put on now; it does not compete
+        // on the same scale as a page to read, and should not have to.
+        let origin = artist("Dean Blunt", id: 1, labels: ["World Music"])
+        origin.collaboratorNames = (0..<10).map { "Collaborator \($0)" }
+        for index in 0..<10 { artist("Collaborator \(index)", id: 100 + index) }
+        for index in 0..<8 { artist("Labelmate \(index)", id: 200 + index, labels: ["World Music"]) }
+
+        // A record of his, played on air.
+        let store = RecordingStore(context: context)
+        let recording = try? store.upsert(title: "Black Metal", artistName: "Dean Blunt")
+        let appearance = MediaAppearance(
+            providerID: "nts", showTitle: "Some Show",
+            showID: "some-show/an-episode", isLive: false, method: .providerTracklist
+        )
+        context.insert(appearance)
+        appearance.recording = recording
+        crate(artist: "Dean Blunt")
+
+        XCTAssertTrue(suggestions().contains { $0.node.kind == .broadcast },
+                      "a show has to get a row")
+    }
+
+    func testTwoEpisodesOfOneProgrammeAreNotTwoIdenticalCards() {
+        let store = RecordingStore(context: context)
+        let recording = try? store.upsert(title: "Black Metal", artistName: "Dean Blunt")
+        for slug in ["239ef/one", "239ef/two"] {
+            let appearance = MediaAppearance(
+                providerID: "nts", showTitle: "239EF",
+                showID: slug, isLive: false, method: .providerTracklist
+            )
+            context.insert(appearance)
+            appearance.recording = recording
+        }
+        artist("Dean Blunt", id: 1)
+        crate(artist: "Dean Blunt")
+
+        // Two nodes, one name. To anybody looking at the page that is the
+        // same suggestion printed twice.
+        XCTAssertEqual(suggestions().filter { $0.node.title == "239EF" }.count, 1)
+    }
+
     // MARK: Explaining itself
 
     func testEverySuggestionSaysWhatItRestsOn() {

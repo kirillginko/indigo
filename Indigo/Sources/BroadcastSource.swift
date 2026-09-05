@@ -122,6 +122,27 @@ nonisolated struct BroadcastSource {
         }
     }
 
+    /// One spelling for a broadcast, whoever is doing the spelling.
+    ///
+    /// The same LYL show arrives as `lyl.episode.glass-2026-07-16` from the
+    /// crate, which files a broadcast under the id its player used, and as
+    /// `glass-2026-07-16` from `MediaAppearance`, which files it under the id
+    /// the tracklist used. Two spellings mean two nodes, and the consequence
+    /// showed up as EXPLORE offering somebody a show already sitting in their
+    /// crate — the exact failure that block exists to avoid.
+    ///
+    /// Stripped rather than added, because the bare form is what every
+    /// `destination` branch below already reduces to.
+    static func canonicalShowID(_ showID: String, providerID: String) -> String {
+        for noun in ["episode", "show", "broadcast"] {
+            let prefix = "\(providerID).\(noun)."
+            guard showID.hasPrefix(prefix) else { continue }
+            let bare = String(showID.dropFirst(prefix.count))
+            return bare.isEmpty ? showID : bare
+        }
+        return showID
+    }
+
     /// The section of the app a station lives in.
     ///
     /// The same table `NowPlayingLink` uses to send the player bar back to

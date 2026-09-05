@@ -123,11 +123,18 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
                   providerID: providerID, handle: handle)
     }
 
+    /// A broadcast, keyed on one spelling of its handle.
+    ///
+    /// The crate and the appearance log disagree about whether a show id
+    /// carries its provider's prefix, so the handle is reduced to the bare
+    /// form both of them mean. Without that the same show is two nodes, and
+    /// one of them is offered back to somebody who already kept the other.
     static func broadcast(providerID: String, showID: String, title: String?) -> MusicNode {
-        MusicNode(kind: .broadcast, key: "\(providerID)|\(showID)",
-                  title: title ?? BroadcastSource.label(for: providerID),
-                  subtitle: BroadcastSource.label(for: providerID),
-                  providerID: providerID, handle: showID)
+        let handle = BroadcastSource.canonicalShowID(showID, providerID: providerID)
+        return MusicNode(kind: .broadcast, key: "\(providerID)|\(handle)",
+                         title: title ?? BroadcastSource.label(for: providerID),
+                         subtitle: BroadcastSource.label(for: providerID),
+                         providerID: providerID, handle: handle)
     }
 
     /// A station, keyed on the provider that runs it.

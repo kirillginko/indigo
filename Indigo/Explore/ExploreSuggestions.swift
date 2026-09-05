@@ -88,7 +88,7 @@ nonisolated struct ExploreSuggestionEngine {
                 // The best *route*, which is not the same as the best-evidenced
                 // edge. See `worth(_:)`.
                 guard let route = connection.edges
-                    .map({ (edge: $0, value: $0.weight * Self.worth($0.kind)) })
+                    .map({ (edge: $0, value: $0.weight * Self.worth($0)) })
                     .filter({ $0.value > 0 })
                     .max(by: { $0.value < $1.value })
                 else { continue }
@@ -139,6 +139,15 @@ nonisolated struct ExploreSuggestionEngine {
     /// neighbourhoods — the two things Indigo knows that a catalogue does not
     /// — never appeared at all.
     static let perKind = 6
+    /// And at least this many shows, when there are any to offer.
+    ///
+    /// A show does not compete on the same scale as an artist and should not
+    /// have to. It is an hour of somebody's taste that can be put on now,
+    /// where an artist is a page to read — and on a real collection the
+    /// available shows scored below every labelmate, so a block of twelve had
+    /// none in it at all. Reserved rather than reweighted, because inflating
+    /// the score would have said the evidence was better than it is.
+    static let showFloor = 3
 
     private static func spread(
         _ ranked: [ExploreSuggestion], limit: Int
@@ -147,6 +156,23 @@ nonisolated struct ExploreSuggestionEngine {
         var chosen = Set<String>()
         var byOrigin: [String: Int] = [:]
         var byKind: [RelationshipKind: Int] = [:]
+        // Two episodes of one programme are two nodes and one name. Both
+        // showed up as cards reading "239EF", which to anybody looking at the
+        // page is the same suggestion printed twice.
+        var titles = Set<String>()
+
+        func take(_ suggestion: ExploreSuggestion) {
+            byOrigin[suggestion.via, default: 0] += 1
+            byKind[suggestion.kind, default: 0] += 1
+            chosen.insert(suggestion.id)
+            titles.insert(RecordingKey.normalize(suggestion.node.title))
+            kept.append(suggestion)
+        }
+
+        func isNew(_ suggestion: ExploreSuggestion) -> Bool {
+            !chosen.contains(suggestion.id)
+                && !titles.contains(RecordingKey.normalize(suggestion.node.title))
+        }
 
         // Filled in three passes, each one giving up a rule the one before it
         // kept. A collection with a single well-connected record in it has
@@ -158,19 +184,26 @@ nonisolated struct ExploreSuggestionEngine {
         func fill(origins: Bool, kinds: Bool) {
             for suggestion in ranked {
                 guard kept.count < limit else { return }
-                guard !chosen.contains(suggestion.id) else { continue }
+                guard isNew(suggestion) else { continue }
                 if origins, byOrigin[suggestion.via, default: 0] >= perOrigin { continue }
                 if kinds, byKind[suggestion.kind, default: 0] >= perKind { continue }
-                byOrigin[suggestion.via, default: 0] += 1
-                byKind[suggestion.kind, default: 0] += 1
-                chosen.insert(suggestion.id)
-                kept.append(suggestion)
+                take(suggestion)
             }
+        }
+        // The reserved show slots are claimed before anything competes for
+        // them, and then given up: the block reads in score order, so what
+        // is reserved is a place on the page rather than a place at the top.
+        for suggestion in ranked
+        where suggestion.node.kind == .broadcast && isNew(suggestion) {
+            guard kept.count < min(showFloor, limit) else { break }
+            take(suggestion)
         }
         fill(origins: true, kinds: true)
         fill(origins: false, kinds: true)
         fill(origins: false, kinds: false)
-        return kept
+        return kept.sorted {
+            $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score
+        }
     }
 
     /// How much a kind of connection is worth *going down*, which is a
@@ -188,7 +221,21 @@ nonisolated struct ExploreSuggestionEngine {
     /// they are what this block now favours.
     ///
     /// Zero means never offered, however certain the edge.
-    static func worth(_ kind: RelationshipKind) -> Double {
+    static func worth(_ edge: MusicEdge) -> Double {
+        // Radio is the one place where what you are being sent to matters as
+        // much as why. A show is a thing you can put on — it has a tracklist,
+        // an hour of somebody's taste, and a page — whereas an artist who
+        // merely turned up in the same episode is the thinnest connection
+        // radio can make. So the route to the show is the one worth taking,
+        // and the sideways hop to a stranger is demoted below almost
+        // everything else.
+        if edge.kind == .playedInShow {
+            return edge.to.kind == .broadcast ? 0.96 : 0.7
+        }
+        return worth(kind: edge.kind)
+    }
+
+    static func worth(kind: RelationshipKind) -> Double {
         switch kind {
         // The same person, or something already yours. Not somewhere to go.
         case .sameAlias, .sameArtist, .inYourLibrary, .inYourCrate: 0
@@ -201,11 +248,15 @@ nonisolated struct ExploreSuggestionEngine {
         // The label neighbourhood.
         case .sharedLabel: 0.92
 
-        // Radio: who a selector reaches for next to them. Weaker as evidence
-        // and often the most interesting thing on the list, which is the
-        // whole argument for Indigo knowing about radio at all.
-        case .playedInShow, .sharedBroadcast: 0.9
-        case .playedBySameSelector, .frequentlyPlayedNearby: 0.88
+        // Handled above, where the destination is known.
+        case .playedInShow: 0.96
+
+        // Artists reached sideways through radio. A selector reaching for two
+        // records across a run of shows means something; two names in one
+        // episode means they were an hour apart.
+        case .frequentlyPlayedNearby: 0.55
+        case .playedBySameSelector: 0.5
+        case .sharedBroadcast: 0.35
 
         // A record with both of them on it.
         case .sameRelease, .appearsOnRelease: 0.72

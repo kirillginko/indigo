@@ -107,7 +107,7 @@ struct ExploreView: View {
         let showCrate = filter == .all || filter == .crate
         let showStations = filter == .all || filter == .stations
         let showLibrary = filter == .all || filter == .library
-        let local = Array(tracks.prefix(8))
+        let local = localPicks
         let recommendations = stationRecommendations(from: kept)
         let crateSections = recommendationSections(from: kept)
         let nextTop: CGFloat = 112
@@ -206,6 +206,31 @@ struct ExploreView: View {
                     .position(place(i, below: libraryTop, in: size)).zIndex(2)
             }
         }
+    }
+
+    /// How many of the library to show at once.
+    private static let localPickCount = 8
+
+    /// Which local tracks to offer, moved along a little each day.
+    ///
+    /// It used to be the newest eight, forever — which meant somebody with a
+    /// library of twelve thousand files was shown the same eight of them every
+    /// time they opened the page, and the block quietly became furniture. The
+    /// window walks through the library instead, so a record filed two years
+    /// ago comes back around.
+    ///
+    /// Rotated by the day rather than shuffled: within a day the page is the
+    /// same page, which matters because a card that moves between two glances
+    /// is one nobody can point at. Recency still decides the order the window
+    /// travels in, so the walk starts at the newest and works back.
+    private var localPicks: [Track] {
+        let all = tracks
+        guard all.count > Self.localPickCount else { return all }
+        let day = Int(Date().timeIntervalSince1970 / 86_400)
+        let start = (day * Self.localPickCount) % all.count
+        // Wrapping, so the last day of the cycle is a full block rather than
+        // whatever happened to be left at the end of the list.
+        return (0..<Self.localPickCount).map { all[(start + $0) % all.count] }
     }
 
     /// A face for a suggestion, where one has already been found.
@@ -359,7 +384,7 @@ struct ExploreView: View {
         case .all:
             rows = (suggestions.count + 1) / 2
                 + recommendationSections(from: kept).reduce(0) { $0 + ($1.items.count + 1) / 2 }
-                + (stations.count + 1) / 2 + (min(8, tracks.count) + 1) / 2
+                + (stations.count + 1) / 2 + (localPicks.count + 1) / 2
         case .next:
             rows = (suggestions.count + 1) / 2
         case .crate:
@@ -367,7 +392,7 @@ struct ExploreView: View {
         case .stations:
             rows = (stations.count + 1) / 2
         case .library:
-            rows = (min(8, tracks.count) + 1) / 2
+            rows = (localPicks.count + 1) / 2
         }
         return max(760, 112 + CGFloat(rows) * 142 + CGFloat(visibleSectionCount(kept)) * 154)
     }
@@ -379,7 +404,7 @@ struct ExploreView: View {
         }
     }
     private func play(_ index: Int) {
-        let queue = Array(tracks.prefix(8)); guard queue.indices.contains(index) else { return }
+        let queue = localPicks; guard queue.indices.contains(index) else { return }
         if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index) }
     }
     private func play(_ item: CrateItem) {
@@ -497,16 +522,29 @@ private struct ExploreSectionLabel: View {
     let description: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(Typeface.body(15, weight: .bold))
-            Text(description)
-                .font(Typeface.body(11.5))
-                .opacity(0.7)
+        // Title left, description right, with the trunk passing between them.
+        // Both halves are held back from the middle by the same clearance the
+        // cards keep, so a long description cannot grow across the line —
+        // which is the only way this row and the graph can collide, the two
+        // never sharing a horizontal band with a card.
+        GeometryReader { proxy in
+            let half = max(120, proxy.size.width * 0.5 - 44)
+            HStack(alignment: .firstTextBaseline, spacing: 24) {
+                Text(title)
+                    .font(Typeface.body(15, weight: .bold))
+                    .frame(maxWidth: half, alignment: .leading)
+                Spacer(minLength: 24)
+                Text(description)
+                    .font(Typeface.body(11.5))
+                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: half, alignment: .trailing)
+            }
+            .frame(width: proxy.size.width, alignment: .leading)
         }
+        .frame(height: 34)
         .foregroundStyle(Color.black)
         .padding(.horizontal, 28)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
         .allowsHitTesting(false)
     }
 }
