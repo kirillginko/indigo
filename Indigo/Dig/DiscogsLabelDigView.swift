@@ -68,6 +68,8 @@ struct DiscogsLabelDigView: View {
                         DigTallies(entries: [("Catalogue", "\(profile.releases.count)"),
                                              ("Artists", "\(profile.artists.count)"),
                                              ("Related labels", "\(profile.relatedLabels.count)")])
+                        EncounterSection(node: .label(profile.name))
+
                         if !profile.styles.isEmpty {
                             DigSection(title: "Sound") {
                                 Text(profile.styles.prefix(12).joined(separator: " · "))

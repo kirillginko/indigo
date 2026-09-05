@@ -161,7 +161,10 @@ nonisolated struct GraphStore {
         // A style is a lens rather than a place, and a selector's neighbours
         // are radio evidence — RadioNeighborhoodEngine owns those, and its
         // findings arrive here through `MusicGraph.absorb`.
-        case .style, .selector: break
+        //
+        // A station's neighbours are everything it ever played, which is a
+        // listing rather than a walk; the listening log answers that one.
+        case .style, .selector, .station: break
         }
         return edges
     }

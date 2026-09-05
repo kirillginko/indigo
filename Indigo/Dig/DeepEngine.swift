@@ -336,7 +336,7 @@ nonisolated struct DeepCaches {
         case .catalogNumber:
             signals.releaseKind = releaseKinds[node.id] ?? .unknown
 
-        case .broadcast, .selector, .style, .scene:
+        case .broadcast, .selector, .style, .scene, .station:
             signals.releaseKind = .album
         }
         return signals

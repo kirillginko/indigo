@@ -129,6 +129,11 @@ struct DigReleaseView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
 
+                        // Above the tracklist and outside its condition: a
+                        // record they have already met is worth saying so
+                        // about whether or not Discogs listed its sides.
+                        EncounterSection(node: .release(profile.title, discogsID: identifier))
+
                         listen(profile)
 
                         if !profile.tracks.isEmpty {

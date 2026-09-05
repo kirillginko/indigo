@@ -58,6 +58,8 @@ struct LabelDigView: View {
                             ("Radio", "\(profile.radioAppearances)")
                         ])
 
+                        EncounterSection(node: .label(profile.name, mbid: profile.mbid))
+
                         // What no catalogue can tell you about a label:
                         // that its records keep turning up in the same shows.
                         LabelRadioSection(labelName: profile.name)

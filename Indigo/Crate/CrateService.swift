@@ -143,8 +143,25 @@ final class CrateService {
         let item = CrateItem(recording: recording)
         item.setGenres(localGenres(for: recording))
         context.insert(item)
+        note(item)
         save()
         return item
+    }
+
+    /// Writes a save into the listening log.
+    ///
+    /// Keeping something is the strongest thing a listener says without
+    /// typing, and it is the one signal that would otherwise be invisible to
+    /// the log: crating a record takes a second, so it never accumulates
+    /// enough playing time to count as listening. Only additions are noted —
+    /// taking a row back out of the crate is a correction, not a verdict, and
+    /// reading it as one would punish people for tidying up.
+    private func note(_ item: CrateItem) {
+        guard let node = item.node else { return }
+        ListeningLog(context: context).record(
+            node, action: .saved, tags: item.genreTags,
+            source: item.providerID.map { ListeningSource(providerID: $0, showTitle: item.showTitle) }
+        )
     }
 
     @discardableResult
@@ -172,6 +189,7 @@ final class CrateService {
             genres: genres
         )
         context.insert(item)
+        note(item)
         save()
         return item
     }
@@ -192,6 +210,7 @@ final class CrateService {
             title: title, subtitle: subtitle, artworkURL: artworkURL, genres: genres
         )
         context.insert(item)
+        note(item)
         save()
         return item
     }

@@ -26,6 +26,7 @@ enum Persistence {
         BandcampArtistIndex.self,
         DigVisit.self,
         DigStep.self,
+        ListeningEvent.self,
         ArtistPortrait.self,
         StoredEdge.self,
         GraphSnapshot.self

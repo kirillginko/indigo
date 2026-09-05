@@ -27,6 +27,11 @@ nonisolated enum MusicNodeKind: String, Hashable, Sendable, CaseIterable {
     case unknownRecording
     /// A show or episode on a station.
     case broadcast
+    /// The station itself, as distinct from anything it broadcast. Kept apart
+    /// from `broadcast` because "which stations do they favour" and "which
+    /// shows do they favour" are different questions, and folding the first
+    /// into the second answers neither.
+    case station
     /// Whoever played it — a DJ, a resident, a show host.
     case selector
     /// A catalogue number treated as somewhere you can go: WHT003, ITLP09.
@@ -45,6 +50,7 @@ nonisolated enum MusicNodeKind: String, Hashable, Sendable, CaseIterable {
         case .recording: "TRACK"
         case .unknownRecording: "UNKNOWN"
         case .broadcast: "SHOW"
+        case .station: "STATION"
         case .selector: "SELECTOR"
         case .catalogNumber: "CATALOG"
         case .style: "STYLE"
@@ -124,6 +130,18 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
                   providerID: providerID, handle: showID)
     }
 
+    /// A station, keyed on the provider that runs it.
+    ///
+    /// Deliberately not keyed on the channel: IDA runs two and NTS runs two,
+    /// and a listener who says they listen to NTS means the station rather
+    /// than channel 2. The channel is kept in `handle` so a node can still
+    /// open the one they were actually on.
+    static func station(providerID: String, stationID: String? = nil) -> MusicNode {
+        MusicNode(kind: .station, key: providerID,
+                  title: BroadcastSource.label(for: providerID),
+                  providerID: providerID, handle: stationID)
+    }
+
     /// Catalogue numbers are compared with their punctuation and spacing
     /// removed, because the same pressing is written "IT 001", "IT-001" and
     /// "IT001" by three different people describing one record.
@@ -188,9 +206,22 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
             return recordingID.map { .digRecording(id: $0, title: title) }
         case .catalogNumber:
             return .digCatalog(number: title)
-        case .selector, .style, .scene:
+        case .selector, .style, .scene, .station:
+            // A station is a section of the app rather than a page inside
+            // one, so it is reached through `route` instead. A style and a
+            // scene are lenses, and a selector is evidence.
             return nil
         }
+    }
+
+    /// The section of the app this node *is*, for the kinds that are one.
+    ///
+    /// Separate from `destination` because the sidebar and the detail stack
+    /// are different axes: opening NTS means selecting a station, not pushing
+    /// a page on top of wherever the listener happened to be.
+    var route: Route? {
+        guard kind == .station, let providerID else { return nil }
+        return BroadcastSource.route(providerID: providerID, stationID: handle)
     }
 
     /// True when the node stands for music nobody has named. DEEP treats

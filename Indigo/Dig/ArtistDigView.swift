@@ -336,6 +336,13 @@ struct ArtistDigView: View {
                     //
                     // It draws nothing when there is nothing, so it needs no
                     // condition of its own.
+                    // The listener's own history with this artist, above
+                    // Indigo's record of everyone's. "You have heard him four
+                    // times" is a better opening than "he has been played 900
+                    // times", and it is the answer to the question somebody
+                    // arrives on this page already asking.
+                    EncounterSection(node: .artist(profile.name, mbid: profile.mbid))
+
                     ArtistRadioSection(artistName: profile.name)
 
                     DeepSectionView(

@@ -122,6 +122,35 @@ nonisolated struct BroadcastSource {
         }
     }
 
+    /// The section of the app a station lives in.
+    ///
+    /// The same table `NowPlayingLink` uses to send the player bar back to
+    /// whatever is streaming, reached here from a provider id rather than
+    /// from a `MediaItem` — a remembered encounter has the id and not the
+    /// item. `stationID` names the channel for the stations that run more
+    /// than one, and is ignored by the rest.
+    static func route(providerID: String, stationID: String? = nil) -> Route? {
+        switch providerID {
+        // NTS files each channel under its own id. Without one there is no
+        // honest default, so the listener lands on the shows instead of on a
+        // channel nobody chose.
+        case NTSProvider.providerID: stationID.map { .station($0) } ?? .ntsShows
+        case KioskProvider.providerID: .kioskStation
+        case NoodsProvider.providerID: .noodsStation
+        case LotProvider.providerID: .lotStation
+        case DublabProvider.providerID: .dublabStation
+        case AlharaProvider.providerID: stationID.map { .alharaStation($0) } ?? .alharaArchive
+        case CashmereProvider.providerID: .cashmereStation
+        case LYLProvider.providerID: .lylStation
+        case IdaProvider.providerID: stationID.map { .idaStation($0) } ?? .idaShows
+        case Radio80000Provider.providerID: .radio80000Station
+        case PanikProvider.providerID: .panikStation
+        case RovrProvider.providerID: stationID.map { .rovrStation($0) } ?? .rovrShows
+        case Track.sourceID: .tracks
+        default: nil
+        }
+    }
+
     static func label(for providerID: String) -> String {
         switch providerID {
         case NTSProvider.providerID: "NTS"

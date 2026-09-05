@@ -89,6 +89,12 @@ struct RecordingDigView: View {
 
                     appearances(recording)
 
+                    // Where they were when it was *playing*, which is not the
+                    // same list as the one above: an appearance is a tracklist
+                    // naming this recording, and an encounter is the listener
+                    // having actually had it on.
+                    EncounterSection(node: node)
+
                     playedAlongside(connections)
 
                     // The two blocks above are the listener's own: what they

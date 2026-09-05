@@ -42,6 +42,17 @@ final class PlaybackCoordinator {
     /// Recordings already retried by their other route, so a broken one falls
     /// through to the next track rather than looping between two dead ends.
     @ObservationIgnored private var triedAlternates: Set<String> = []
+    /// How much of the current item has been heard. Kept here because this is
+    /// the only place that knows when audio is really running: `position` lies
+    /// about live streams and rewinds at the end of a track, and neither the
+    /// engines nor the views see pauses and item changes in one place.
+    @ObservationIgnored private var stint = ListeningStint()
+
+    /// Told when listening to an item ends: what it was, how many seconds of
+    /// it were actually heard, and how far through it got. Set by the app; the
+    /// player has no business knowing where the listening log lives.
+    var onListeningEnded: ((MediaItem, TimeInterval, Double) -> Void)?
+
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
@@ -292,6 +303,7 @@ final class PlaybackCoordinator {
 
     /// Stops everything and clears the bar. Used when the library disappears.
     func stopAll() {
+        endStint()
         local.stop()
         stream.stop()
         embed.stop()
@@ -305,6 +317,9 @@ final class PlaybackCoordinator {
 
     private func startCurrent(autoplay: Bool) {
         guard let item = queue.current else { return }
+        // Before `current` moves on, while the outgoing item is still the one
+        // the stint has been measuring.
+        endStint()
         pendingSeek?.cancel()
         current = item
 
@@ -334,6 +349,10 @@ final class PlaybackCoordinator {
 
     private func handleTrackFinished() {
         consecutiveFailures = 0
+        // Said now rather than read later: by the time `next` closes the
+        // stint the engine has rewound, and a track played to its end would
+        // be logged as one nobody stayed for.
+        stint.complete()
         next()
     }
 
@@ -407,7 +426,22 @@ final class PlaybackCoordinator {
         publishNowPlaying()
     }
 
+    /// Reports the outgoing item's listening, and starts a fresh stint.
+    private func endStint() {
+        // One last look before the engine is handed a different item. A track
+        // the listener skipped three-quarters of the way through gets no
+        // state change to announce that, so without this the only evidence
+        // left would be the clock.
+        stint.update(isPlaying: isPlaying, progress: progress)
+        let heard = stint.finish()
+        guard let item = current, heard.seconds > 0 else { return }
+        onListeningEnded?(item, heard.seconds, heard.completion)
+    }
+
     private func publishNowPlaying() {
+        // Every transport change lands here, which makes it the one place that
+        // sees a pause, a resume and a stall alike.
+        stint.update(isPlaying: isPlaying, progress: progress)
         nowPlaying.update(
             item: current,
             isPlaying: isPlaying,
