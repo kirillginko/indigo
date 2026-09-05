@@ -4,6 +4,7 @@ import SwiftUI
 struct ExploreView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
+    @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(KioskProvider.self) private var kiosk
     @Environment(NoodsProvider.self) private var noods
@@ -14,16 +15,6 @@ struct ExploreView: View {
     @Environment(RovrProvider.self) private var rovr
     @Query(sort: [SortDescriptor(\Track.addedAt, order: .reverse)]) private var tracks: [Track]
     @State private var filter = ExploreFilter.all
-
-    private let stations = [
-        ExploreStation("Kiosk Radio", "Brussels", .kioskStation, ["ambient", "jazz"]),
-        ExploreStation("Noods Radio", "Bristol", .noodsStation, ["dub", "ambient"]),
-        ExploreStation("Cashmere Radio", "Berlin", .cashmereStation, ["experimental", "jazz"]),
-        ExploreStation("LYL Radio", "Lyon", .lylStation, ["dub", "electronic"]),
-        ExploreStation("Radio alHara", "Bethlehem", .alharaStation("alhara.ra"), ["world", "ambient"]),
-        ExploreStation("The Lot Radio", "Brooklyn", .lotStation, ["house", "jazz"]),
-        ExploreStation("ROVR", "Your local time", .rovrStation("rovr.live"), ["electronic", "ambient"])
-    ]
 
     var body: some View {
         // The page the shader lives on. Every stall left in the trace happens
@@ -53,6 +44,12 @@ struct ExploreView: View {
         .foregroundStyle(Color.black)
         .background(MapColor.cobalt)
         .task { crate.backfillLocalGenres() }
+        // Kept on the store, so coming back to this page shows what it showed
+        // last time rather than emptying itself and filling in again. Keyed on
+        // the crate rather than on the graph: enrichment moves the graph
+        // several times a second and almost none of it changes what should be
+        // suggested.
+        .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
     }
 
     private func header(_ kept: [CrateItem]) -> some View {
@@ -96,23 +93,54 @@ struct ExploreView: View {
         // used to count from zero, so the first crated record, the first
         // station and the first local track were all placed as item nought and
         // landed on top of one another.
+        let offers = dig.exploreOffers
+        let suggestions = offers.next
+        let showNext = (filter == .all || filter == .next) && !suggestions.isEmpty
         let showCrate = filter == .all || filter == .crate
-        let showStations = filter == .all || filter == .stations
+        let showShows = (filter == .all || filter == .shows) && !offers.shows.isEmpty
         let showLibrary = filter == .all || filter == .library
-        let local = Array(tracks.prefix(8))
-        let recommendations = stationRecommendations(from: kept)
-        let crateSections = recommendationSections(from: kept)
-        let crateTop: CGFloat = 112
-        let stationsTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.items.count, in: size) } : 0)
-        let libraryTop = stationsTop + (showStations ? sectionHeight(for: recommendations.count, in: size) : 0)
+        let local = localPicks
+        let crateSections = recommendationSections(from: kept, adding: offers.artists)
+        let nextTop: CGFloat = 112
+        let crateTop = nextTop + (showNext ? sectionHeight(for: suggestions.count, in: size) : 0)
+        let showsTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.count, in: size) } : 0)
+        let libraryTop = showsTop + (showShows ? sectionHeight(for: offers.shows.count, in: size) : 0)
 
+        // Directly over the trunk, which `ExploreGraphLines` roots at half the
+        // width. It was offset to the right of it, so it read as a caption
+        // for whatever happened to be under it rather than as the head of the
+        // line everything hangs from.
         ExploreStartLabel()
             .graphNode("start", section: "start", connects: false)
-            .position(x: size.width * 0.56, y: 28)
+            .position(x: size.width * 0.5, y: 46)
 
         if kept.isEmpty && tracks.isEmpty {
             Button("Find something to start with") { appState.select(.dig) }
                 .buttonStyle(MapHeaderButtonStyle()).position(x: size.width * 0.58, y: 170)
+        }
+        // First, because it is the only block here that is not already yours.
+        // Everything below is the crate, the stations and the library — things
+        // this listener has already decided about — and a page that opens on
+        // those is an inventory rather than a way of finding anything.
+        if showNext {
+            ExploreSectionLabel(
+                title: "Where to go next",
+                description: "Reached from what you keep, and not yet heard"
+            )
+                .graphNode("section.next", section: "next", connects: false)
+                .position(x: size.width * 0.5, y: nextTop + 24)
+            ForEach(Array(suggestions.enumerated()), id: \.element.id) { i, suggestion in
+                Button {
+                    if let page = suggestion.node.destination { appState.open(page) }
+                } label: {
+                    MapLabel(suggestion.node.title, suggestion.node.kind.label,
+                             MapColor.lavender, artwork(for: suggestion),
+                             stableSeed(suggestion.node.id), cardWidth(in: size),
+                             connection: suggestion.connection)
+                }.buttonStyle(ExploreCardButtonStyle())
+                    .graphNode("next.\(suggestion.id)", section: "next", legend: true)
+                    .position(place(i, below: nextTop, in: size)).zIndex(5)
+            }
         }
         if showCrate {
             ForEach(Array(crateSections.enumerated()), id: \.element.id) { sectionIndex, section in
@@ -131,25 +159,41 @@ struct ExploreView: View {
                         .graphNode("crate.\(item.id)", section: section.id)
                         .position(place(i, below: top, in: size)).zIndex(4)
                 }
+                ForEach(Array(section.suggested.enumerated()), id: \.element.id) { i, suggestion in
+                    Button {
+                        if let page = suggestion.node.destination { appState.open(page) }
+                    } label: {
+                        MapLabel(suggestion.node.title, suggestion.node.kind.label,
+                                 MapColor.lavender, artwork(for: suggestion),
+                                 stableSeed(suggestion.id), cardWidth(in: size),
+                                 connection: suggestion.connection)
+                    }.buttonStyle(ExploreCardButtonStyle())
+                        .graphNode("suggested.\(suggestion.id)", section: section.id, legend: true)
+                        .position(place(section.items.count + i, below: top, in: size)).zIndex(4)
+                }
             }
         }
-        if showStations {
+        // Shows rather than stations. A station is a name and a city — the
+        // same seven for everybody, ranked against a bag of genre words —
+        // where a show is an hour somebody chose, and Indigo can say what is
+        // on it. See `ShowSuggestionEngine`.
+        if showShows {
             ExploreSectionLabel(
-                title: "Stations to try",
-                description: "Ranked by styles found in your crate"
+                title: "Radio shows to check out",
+                description: "By who they played and how they sound"
             )
-                .graphNode("section.stations", section: "stations", connects: false)
-                .position(x: size.width * 0.5, y: stationsTop + 24)
-            ForEach(Array(recommendations.enumerated()), id: \.element.station.id) { i, recommendation in
-                let station = recommendation.station
-                Button { play(station) } label: {
-                    MapLabel(station.name, station.city, MapColor.paleGreen, nil,
-                             stableSeed(station.name), cardWidth(in: size),
-                             connection: recommendation.connection)
+                .graphNode("section.radio", section: "radio", connects: false)
+                .position(x: size.width * 0.5, y: showsTop + 24)
+            ForEach(Array(offers.shows.enumerated()), id: \.element.id) { i, show in
+                Button {
+                    if let page = show.node.destination { appState.open(page) }
+                } label: {
+                    MapLabel(show.node.title, show.node.subtitle, MapColor.paleGreen,
+                             show.node.artworkURL, stableSeed(show.id), cardWidth(in: size),
+                             connection: show.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
-                    .contextMenu { Button("Open station") { appState.select(station.route) } }
-                    .graphNode("station.\(station.id)", section: "stations", legend: true)
-                    .position(place(i, below: stationsTop, in: size)).zIndex(3)
+                    .graphNode("radio.\(show.id)", section: "radio", legend: true)
+                    .position(place(i, below: showsTop, in: size)).zIndex(3)
             }
         }
         if showLibrary {
@@ -169,6 +213,42 @@ struct ExploreView: View {
                     .position(place(i, below: libraryTop, in: size)).zIndex(2)
             }
         }
+    }
+
+    /// How many of the library to show at once.
+    private static let localPickCount = 8
+
+    /// Which local tracks to offer, moved along a little each day.
+    ///
+    /// It used to be the newest eight, forever — which meant somebody with a
+    /// library of twelve thousand files was shown the same eight of them every
+    /// time they opened the page, and the block quietly became furniture. The
+    /// window walks through the library instead, so a record filed two years
+    /// ago comes back around.
+    ///
+    /// Rotated by the day rather than shuffled: within a day the page is the
+    /// same page, which matters because a card that moves between two glances
+    /// is one nobody can point at. Recency still decides the order the window
+    /// travels in, so the walk starts at the newest and works back.
+    private var localPicks: [Track] {
+        let all = tracks
+        guard all.count > Self.localPickCount else { return all }
+        let day = Int(Date().timeIntervalSince1970 / 86_400)
+        let start = (day * Self.localPickCount) % all.count
+        // Wrapping, so the last day of the cycle is a full block rather than
+        // whatever happened to be left at the end of the list.
+        return (0..<Self.localPickCount).map { all[(start + $0) % all.count] }
+    }
+
+    /// A face for a suggestion, where one has already been found.
+    ///
+    /// Only from what is in memory: the background portrait fill keeps an
+    /// index, and DIG's own artwork ladder needs a store read per card. A row
+    /// of names is a list and a row of faces is a shelf, but not at the price
+    /// of a dozen fetches on the thread that draws.
+    private func artwork(for suggestion: ExploreSuggestion) -> URL? {
+        suggestion.node.artworkURL
+            ?? (suggestion.node.kind == .artist ? dig.portraitURL(for: suggestion.node.title) : nil)
     }
 
     private func columnCount(in size: CGSize) -> Int { max(2, min(4, Int(size.width / 430))) }
@@ -214,7 +294,11 @@ struct ExploreView: View {
             : max(rawX, center + centerClearance)
         let x = max(halfCard + 28, min(size.width - halfCard - 28, separatedX))
 
-        let top = sectionTop + 104
+        // Well clear of the section heading above it. At 104 the first row of
+        // cards sat almost against the title and its description, so a
+        // section read as one crowded block rather than as a heading and the
+        // things under it.
+        let top = sectionTop + 148
         let pitch: CGFloat = 142
         let verticalDrift = CGFloat(sin(Double(ordinal + 1) * 1.91)) * 24
 
@@ -224,7 +308,9 @@ struct ExploreView: View {
     private func sectionHeight(for count: Int, in size: CGSize) -> CGFloat {
         guard count > 0 else { return 86 }
         let rows = Int((Double(count) / Double(columnCount(in: size))).rounded(.up))
-        return 110 + CGFloat(rows) * 142
+        // Matches the gap `place` leaves under a heading. The two have to move
+        // together or the next section's title lands on the last row of cards.
+        return 154 + CGFloat(rows) * 142
     }
 
     private func crateSectionTop(
@@ -234,95 +320,68 @@ struct ExploreView: View {
         in size: CGSize
     ) -> CGFloat {
         start + sections.prefix(index).reduce(0) {
-            $0 + sectionHeight(for: $1.items.count, in: size)
+            $0 + sectionHeight(for: $1.count, in: size)
         }
     }
 
-    private func recommendationSections(from items: [CrateItem]) -> [CrateRecommendationSection] {
+    private func recommendationSections(
+        from items: [CrateItem], adding artists: [ExploreSuggestion] = []
+    ) -> [CrateRecommendationSection] {
         let definitions: [(String, String, String, (CrateItem) -> Bool)] = [
             ("shows", "Shows", "Broadcasts and episodes you saved", { $0.kind == .broadcast }),
             ("releases", "Releases", "Records to return to", { $0.kind == .release }),
             ("labels", "Labels", "Catalogues connected to your taste", { $0.kind == .label }),
-            ("artists", "Artists", "People to begin another search from", { $0.kind == .artist }),
+            ("artists", "Artists", "People you keep, and people to meet", { $0.kind == .artist }),
             ("tracks", "Saved tracks", "Individual recordings in your crate", { $0.kind == .recording })
         ]
         return definitions.compactMap { id, title, description, includes in
             let matches = items.filter(includes)
-            return matches.isEmpty ? nil : CrateRecommendationSection(
-                id: id, title: title, description: description, items: matches
+            // Artists you keep, then artists to meet. Kept in one block rather
+            // than two, because they answer the same question — who to start
+            // another search from — and the cards say which is which: a
+            // suggestion carries the reason it is being offered, and a colour
+            // of its own.
+            let suggested = id == "artists" ? artists : []
+            guard !matches.isEmpty || !suggested.isEmpty else { return nil }
+            return CrateRecommendationSection(
+                id: id, title: title, description: description,
+                items: matches, suggested: suggested
             )
         }
     }
 
     private var crateItems: [CrateItem] { let _ = crate.revision; return crate.items() }
-    private func stationRecommendations(from kept: [CrateItem])
-        -> [(station: ExploreStation, connection: String)] {
-        // Build the taste index once, rather than fetching and sorting the crate
-        // inside every comparison and again for every explanation.
-        var weights: [String: Double] = [:]
-        var sources: [String: String] = [:]
-        for (index, item) in kept.prefix(40).enumerated() {
-            for tag in item.genreTags {
-                let key = LibraryKey.normalize(tag)
-                guard !key.isEmpty else { continue }
-                weights[key, default: 0] += max(0.2, 1 - Double(index) * 0.025)
-                if sources[key] == nil {
-                    sources[key] = item.displayTitle
-                }
-            }
-        }
-        let tastes = weights.keys.sorted {
-            let left = weights[$0, default: 0], right = weights[$1, default: 0]
-            return left == right ? $0 < $1 : left > right
-        }
-        var ranked: [(station: ExploreStation, connection: String, score: Int)] = []
-        for station in stations {
-            let matches = tastes.enumerated().filter { _, taste in
-                station.tags.contains { taste.contains($0) }
-            }
-            let score = matches.reduce(0) { $0 + max(1, 10 - $1.offset) }
-            let connection: String
-            if let match = matches.first, let title = sources[match.element] {
-                let genres = matches.prefix(2).map(\.element).joined(separator: " / ")
-                connection = "\(genres) ↔ \(title)"
-            } else {
-                connection = "\(station.city) · \(station.tags.joined(separator: " / "))"
-            }
-            ranked.append((station: station, connection: connection, score: score))
-        }
-        ranked.sort { lhs, rhs in
-            if lhs.score == rhs.score { return lhs.station.name < rhs.station.name }
-            return lhs.score > rhs.score
-        }
-        return ranked.map { (station: $0.station, connection: $0.connection) }
-    }
-
     private func recommendationHeight(_ kept: [CrateItem]) -> CGFloat {
         // Two columns is the narrowest supported layout, so this estimate is
         // conservative without leaving one full row of whitespace per card.
+        let offers = dig.exploreOffers
+        let sections = recommendationSections(from: kept, adding: offers.artists)
         let rows: Int
         switch filter {
         case .all:
-            rows = recommendationSections(from: kept).reduce(0) { $0 + ($1.items.count + 1) / 2 }
-                + (stations.count + 1) / 2 + (min(8, tracks.count) + 1) / 2
+            rows = (offers.next.count + 1) / 2
+                + sections.reduce(0) { $0 + ($1.count + 1) / 2 }
+                + (offers.shows.count + 1) / 2 + (localPicks.count + 1) / 2
+        case .next:
+            rows = (offers.next.count + 1) / 2
         case .crate:
-            rows = recommendationSections(from: kept).reduce(0) { $0 + ($1.items.count + 1) / 2 }
-        case .stations:
-            rows = (stations.count + 1) / 2
+            rows = sections.reduce(0) { $0 + ($1.count + 1) / 2 }
+        case .shows:
+            rows = (offers.shows.count + 1) / 2
         case .library:
-            rows = (min(8, tracks.count) + 1) / 2
+            rows = (localPicks.count + 1) / 2
         }
-        return max(760, 112 + CGFloat(rows) * 142 + CGFloat(visibleSectionCount(kept)) * 110)
+        return max(760, 112 + CGFloat(rows) * 142 + CGFloat(visibleSectionCount(kept)) * 154)
     }
     private func visibleSectionCount(_ kept: [CrateItem]) -> Int {
         switch filter {
-        case .all: recommendationSections(from: kept).count + 2
-        case .crate: recommendationSections(from: kept).count
-        case .stations, .library: 1
+        case .all: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count + 3
+        case .crate: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count
+        case .next, .shows, .library: 1
         }
     }
     private func play(_ index: Int) {
-        let queue = Array(tracks.prefix(8)); guard queue.indices.contains(index) else { return }
+        let queue = localPicks; guard queue.indices.contains(index) else { return }
         if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index) }
     }
     private func play(_ item: CrateItem) {
@@ -334,21 +393,6 @@ struct ExploreView: View {
         case .play(let media): play(media)
         case .openBroadcast(let page, _): appState.open(page)
         }
-    }
-
-    private func play(_ station: ExploreStation) {
-        let media: MediaItem?
-        switch station.route {
-        case .kioskStation: media = kiosk.mediaItem()
-        case .noodsStation: media = noods.mediaItem()
-        case .cashmereStation: media = cashmere.mediaItem()
-        case .lylStation: media = lyl.mediaItem()
-        case .alharaStation(let id): media = alhara.mediaItem(for: id)
-        case .lotStation: media = lot.mediaItem()
-        case .rovrStation(let id): media = rovr.mediaItem(for: id)
-        default: media = nil
-        }
-        if let media { play(media) }
     }
 
     private func play(_ media: MediaItem) {
@@ -390,10 +434,26 @@ struct ExploreView: View {
 }
 
 private enum ExploreFilter: String, CaseIterable, Identifiable {
-    case all, crate, stations, library
+    case all, next, crate, shows, library
     var id: String { rawValue }
-    var label: String { self == .all ? "All recommendations" : self == .crate ? "From your crate" : self == .stations ? "Stations to try" : "Your library" }
-    var color: Color { self == .all ? .black : self == .crate ? MapColor.green : self == .stations ? MapColor.paleGreen : MapColor.blue }
+    var label: String {
+        switch self {
+        case .all: "All recommendations"
+        case .next: "Where to go next"
+        case .crate: "From your crate"
+        case .shows: "Radio shows to check out"
+        case .library: "Your library"
+        }
+    }
+    var color: Color {
+        switch self {
+        case .all: .black
+        case .next: MapColor.lavender
+        case .crate: MapColor.green
+        case .shows: MapColor.paleGreen
+        case .library: MapColor.blue
+        }
+    }
 }
 
 private enum MapColor {
@@ -406,17 +466,15 @@ private enum MapColor {
     static let lavender = Color(red: 0.73, green: 0.83, blue: 0.98)
 }
 
-private struct ExploreStation: Identifiable {
-    let name: String; let city: String; let route: Route; let tags: [String]
-    var id: String { name }
-    init(_ n: String, _ c: String, _ r: Route, _ t: [String]) { name=n; city=c; route=r; tags=t }
-}
-
 private struct CrateRecommendationSection: Identifiable {
     let id: String
     let title: String
     let description: String
     let items: [CrateItem]
+    var suggested: [ExploreSuggestion] = []
+
+    /// Both halves, for laying out and for measuring.
+    var count: Int { items.count + suggested.count }
 }
 
 private struct ExploreSectionLabel: View {
@@ -424,13 +482,26 @@ private struct ExploreSectionLabel: View {
     let description: String
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 24) {
-            Text(title)
-                .font(Typeface.body(15, weight: .bold))
-            Spacer(minLength: 24)
-            Text(description)
-                .font(Typeface.body(11.5))
+        // Title left, description right, with the trunk passing between them.
+        // Both halves are held back from the middle by the same clearance the
+        // cards keep, so a long description cannot grow across the line —
+        // which is the only way this row and the graph can collide, the two
+        // never sharing a horizontal band with a card.
+        GeometryReader { proxy in
+            let half = max(120, proxy.size.width * 0.5 - 44)
+            HStack(alignment: .firstTextBaseline, spacing: 24) {
+                Text(title)
+                    .font(Typeface.body(15, weight: .bold))
+                    .frame(maxWidth: half, alignment: .leading)
+                Spacer(minLength: 24)
+                Text(description)
+                    .font(Typeface.body(11.5))
+                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: half, alignment: .trailing)
+            }
+            .frame(width: proxy.size.width, alignment: .leading)
         }
+        .frame(height: 34)
         .foregroundStyle(Color.black)
         .padding(.horizontal, 28)
         .frame(maxWidth: .infinity)
@@ -607,7 +678,15 @@ private struct ExploreGraphLines: View {
     var body: some View {
         Canvas { context, _ in
             guard !nodes.isEmpty else { return }
-            let frames = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, geometry[$0.bounds]) })
+            // Merged rather than required-unique. Two cards sharing an id is
+            // a mistake in whatever laid them out, and the honest response to
+            // it is one missing line — not `uniqueKeysWithValues` trapping
+            // inside a display list and taking the window with it, which is
+            // exactly what a section id colliding with a crate section's id
+            // did.
+            let frames = Dictionary(
+                nodes.map { ($0.id, geometry[$0.bounds]) }, uniquingKeysWith: { first, _ in first }
+            )
             // The cards reserve a matching clear corridor around this fixed
             // midpoint, so the trunk cannot drift into a recommendation.
             let centerX = geometry.size.width * 0.5

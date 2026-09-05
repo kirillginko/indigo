@@ -102,6 +102,43 @@ nonisolated final class CrateItem {
         CrateItemKind(rawValue: kindRaw) ?? .recording
     }
 
+    /// What this is, in the graph's terms.
+    ///
+    /// Two things in the app already switch on `(kind, providerID)` to decide
+    /// where a crated row opens — the crate list and the explore map — and
+    /// both are asking a narrower version of this question. Kept here so the
+    /// listening log can file a save against the same identity DIG navigates
+    /// to, rather than against a crate row nothing else knows about.
+    ///
+    /// Nil is a real answer: a broadcast whose provider forgot to say which
+    /// one, or a dig row saved under a provider tag written after this was.
+    var node: MusicNode? {
+        switch kind {
+        case .recording:
+            return recording.map { MusicNode.recording($0, artwork: artworkURL) }
+        case .broadcast:
+            guard let providerID, let showID else { return nil }
+            // A kept live stream is the station itself; there is no episode
+            // to point at, which is exactly what made it a stream.
+            return isLiveStream
+                ? .station(providerID: providerID, stationID: showID)
+                : .broadcast(providerID: providerID, showID: showID, title: showTitle)
+        case .artist:
+            guard let title = showTitle else { return nil }
+            return providerID == "dig.artist.mbid"
+                ? .artist(title, mbid: showID)
+                : .artist(title)
+        case .label:
+            guard let title = showTitle else { return nil }
+            return providerID == "dig.label.mbid"
+                ? .label(title, mbid: showID)
+                : .label(title)
+        case .release:
+            guard let title = showTitle else { return nil }
+            return .release(title, discogsID: showID.flatMap(Int.init))
+        }
+    }
+
     // MARK: Display
 
     var displayTitle: String {

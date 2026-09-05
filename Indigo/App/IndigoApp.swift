@@ -48,6 +48,9 @@ struct IndigoApp: App {
     @State private var library = LibraryStore(container: Persistence.container)
     @State private var crate = CrateService(context: Persistence.container.mainContext)
     @State private var dig = DigStore(context: Persistence.container.mainContext)
+    /// Writes down what gets listened to. Held here rather than inside the
+    /// player because the player has no store, and must not acquire one.
+    @State private var witness = PlaybackWitness(context: Persistence.container.mainContext)
 
     var body: some Scene {
         WindowGroup(id: IndigoWindow.main) {
@@ -84,6 +87,16 @@ struct IndigoApp: App {
                 .modelContainer(Persistence.container)
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
+                    witness.watch(player)
+                    // One-shot repair of rows that stored an artist as their
+                    // own label. Off the main actor and off the critical path:
+                    // nothing below waits for it, and it finds nothing to do
+                    // on every launch after the first.
+                    Task.detached {
+                        await BandcampEnricher.repairSelfPublishedLabels(
+                            in: Persistence.container
+                        )
+                    }
                     library.restore()
                     nts.startPolling()
                     kiosk.startPolling()

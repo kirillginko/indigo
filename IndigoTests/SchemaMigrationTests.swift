@@ -52,4 +52,57 @@ final class SchemaMigrationTests: XCTestCase {
         XCTAssertEqual(try newContext.fetchCount(FetchDescriptor<CrateItem>()), 1)
         XCTAssertEqual(try newContext.fetchCount(FetchDescriptor<Recording>()), 1)
     }
+
+    /// The listening log added an entity to a schema that is already on
+    /// people's machines with their crate in it. If adding one is not
+    /// lightweight, `Persistence` falls through to `destroyStore()` and the
+    /// crate goes with it — which is a far worse failure than the feature
+    /// simply not working.
+    func testAStoreWithoutTheListeningLogOpensWithItAndKeepsTheCrate() throws {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("indigo-listening-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storeURL = directory.appendingPathComponent("default.store")
+
+        let recordingID = try autoreleasepool { () -> UUID in
+            // Everything the shipping schema had before the log was added.
+            // Spelled out rather than derived, so that this stays a test of a
+            // specific migration rather than of whatever the schema is today.
+            let previous = Schema([
+                Track.self, Recording.self, MediaAppearance.self, RecordingSource.self,
+                CrateItem.self, Artist.self, MusicLabel.self, RecordingMetadata.self,
+                DiscogsArtist.self, DiscogsReleaseRecord.self, BandcampRelease.self,
+                BandcampArtistIndex.self, DigVisit.self, DigStep.self,
+                ArtistPortrait.self, StoredEdge.self, GraphSnapshot.self
+            ])
+            let container = try ModelContainer(
+                for: previous,
+                configurations: ModelConfiguration(schema: previous, url: storeURL)
+            )
+            let context = ModelContext(container)
+            let recording = try RecordingStore(context: context)
+                .upsert(title: "Vernal Equinox", artistName: "Jon Hassell")
+            context.insert(CrateItem(recording: recording))
+            try context.save()
+            return recording.id
+        }
+
+        let container = try ModelContainer(
+            for: Persistence.schema,
+            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL)
+        )
+        let context = ModelContext(container)
+
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<CrateItem>()), 1,
+                       "The crate must survive the listening log being added")
+        XCTAssertEqual(
+            try context.fetch(FetchDescriptor<Recording>()).first?.id, recordingID
+        )
+
+        // And the log works in the migrated store.
+        let log = ListeningLog(context: context)
+        XCTAssertNotNil(log.record(.artist("Jon Hassell"), action: .played, seconds: 900))
+        XCTAssertEqual(log.all().count, 1)
+    }
 }

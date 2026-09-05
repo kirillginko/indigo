@@ -47,6 +47,8 @@ struct ArtistDigView: View {
         let crateID = profile.mbid ?? RecordingKey.normalizeArtist(profile.name)
         let isCrated = crate.contains(dig: .artist, identifier: crateID, providerID: crateProvider)
         let collaborators = lanes.collaborators
+        let producers = lanes.producers
+        let personnel = lanes.personnel
         let projects = lanes.projects
         let labelArtists = lanes.labelArtists
         let soundArtists = lanes.soundArtists
@@ -298,7 +300,15 @@ struct ArtistDigView: View {
                                 } else {
                                     VStack(alignment: .leading, spacing: 0) {
                                         ForEach(profile.labels) { label in
-                                            DigLine(text: label.name) {
+                                            // The count says which of these is
+                                            // a home and which is a one-off,
+                                            // the same way the radio blocks
+                                            // above mark a repeated play.
+                                            DigLine(
+                                                text: label.name,
+                                                detail: label.releaseCount > 1
+                                                    ? "×\(label.releaseCount)" : nil
+                                            ) {
                                                 openLabel(label)
                                             }
                                         }
@@ -313,6 +323,12 @@ struct ArtistDigView: View {
                         DigSection(title: "Continue digging", trailing: "\(profile.related.count) routes") {
                             VStack(alignment: .leading, spacing: 22) {
                                 connectionLane("Collaborators", artists: collaborators)
+                                // Neutral titles, because the graph walks both
+                                // ways: on a producer's own page these are the
+                                // artists whose records they made. Which way
+                                // round it is, is in each row's own reason.
+                                connectionLane("Production", artists: producers)
+                                connectionLane("Personnel", artists: personnel)
                                 connectionLane("Aliases & projects", artists: projects)
                                 connectionLane("Label neighbours", artists: labelArtists)
                                 connectionLane("Same frequency", artists: soundArtists)
@@ -336,6 +352,13 @@ struct ArtistDigView: View {
                     //
                     // It draws nothing when there is nothing, so it needs no
                     // condition of its own.
+                    // The listener's own history with this artist, above
+                    // Indigo's record of everyone's. "You have heard him four
+                    // times" is a better opening than "he has been played 900
+                    // times", and it is the answer to the question somebody
+                    // arrives on this page already asking.
+                    EncounterSection(node: .artist(profile.name, mbid: profile.mbid))
+
                     ArtistRadioSection(artistName: profile.name)
 
                     DeepSectionView(
@@ -535,6 +558,8 @@ struct ArtistDigView: View {
     /// placed does the same job in one walk.
     struct Connections {
         var collaborators: [RelatedArtist] = []
+        var producers: [RelatedArtist] = []
+        var personnel: [RelatedArtist] = []
         var projects: [RelatedArtist] = []
         var labelArtists: [RelatedArtist] = []
         var soundArtists: [RelatedArtist] = []
@@ -550,6 +575,10 @@ struct ArtistDigView: View {
                 let kinds = Set(artist.reasons.map(\.kind))
                 if !kinds.isDisjoint(with: [.collaborator, .appearsOnRelease]) {
                     lanes.collaborators.append(artist)
+                } else if kinds.contains(.producer) {
+                    lanes.producers.append(artist)
+                } else if kinds.contains(.personnel) {
+                    lanes.personnel.append(artist)
                 } else if kinds.contains(.aliasOrProject) {
                     lanes.projects.append(artist)
                 } else if kinds.contains(.sharedLabel) {

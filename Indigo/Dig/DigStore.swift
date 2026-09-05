@@ -731,6 +731,51 @@ final class DigStore {
         descents.any("\(origin.id)|\(level.rawValue)")
     }
 
+    /// What EXPLORE has to offer, kept between visits.
+    ///
+    /// Held on the store rather than in the view's own state, because a view's
+    /// state is gone the moment somebody navigates away — so returning to the
+    /// page emptied the block, waited a second on the worker, and filled it in
+    /// again. Which reads as a page loading twice, and is the thing that made
+    /// it feel slow when nothing about it was.
+    private(set) var exploreOffers = ExploreOffers()
+    @ObservationIgnored private var offersCrateRevision = -1
+    @ObservationIgnored private var offersBuiltAt = Date.distantPast
+    @ObservationIgnored private var offersTask: Task<Void, Never>?
+
+    /// How long an answer stands before it is worth asking again.
+    ///
+    /// Not tied to `revision`, which is what this used to key on. Enrichment
+    /// bumps that several times a second while it works, so keying on it meant
+    /// the block was rebuilt on every visit and the cards moved under the
+    /// cursor a moment after the page opened. Almost none of those writes
+    /// changes what should be suggested.
+    @ObservationIgnored private static let offersLifetime: TimeInterval = 15 * 60
+
+    /// Recomputes when the crate has changed, when there is nothing yet, or
+    /// when the answer has simply been standing a while. Otherwise does
+    /// nothing at all — a set of recommendations that rearranges itself while
+    /// somebody is reading it is worse than one that is a quarter of an hour
+    /// out of date.
+    func refreshExploreOffers(crateRevision: Int) async {
+        let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
+        guard offersCrateRevision != crateRevision || exploreOffers.isEmpty || isStale
+        else { return }
+        offersTask?.cancel()
+        let asked = revision
+        let task = Task { [weak self] in
+            guard let self else { return }
+            self.settle()
+            let found = await self.worker.exploreOffers(generation: asked)
+            guard !Task.isCancelled else { return }
+            self.offersCrateRevision = crateRevision
+            self.offersBuiltAt = Date()
+            self.exploreOffers = found
+        }
+        offersTask = task
+        await task.value
+    }
+
     /// Everything next to something, of any kind — the step DIG takes.
     func connections(from node: MusicNode) async -> [MusicGraph.Connection] {
         let _ = revision
@@ -913,7 +958,7 @@ final class DigStore {
                .findRelease(containing: initialTitle, byArtist: artistName, page: page) {
             cover = cover ?? BandcampImage.sized(release.imageURL, BandcampImage.cover)
             if metadata.releaseTitle == nil { metadata.releaseTitle = release.title }
-            if metadata.labelName == nil { metadata.labelName = release.labelName }
+            if metadata.labelName == nil { metadata.labelName = release.imprint }
             if metadata.releaseDate == nil { metadata.releaseDate = release.year }
             if recording.albumTitle?.isEmpty ?? true { recording.albumTitle = release.title }
         }

@@ -167,6 +167,18 @@ nonisolated final class BandcampRelease {
     var url: URL? { URL(string: urlString) }
     var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
 
+    /// The label, once an artist publishing themselves is not counted as one.
+    ///
+    /// `labelName` holds Bandcamp's `publisher`, which is whoever owns the
+    /// page — so for most of Bandcamp it is the artist again. Everything reads
+    /// through this rather than the stored field, because a release already in
+    /// the cache is skipped rather than renewed: rows written before this was
+    /// understood are never refetched, so the stored value has to stay wrong
+    /// and be read correctly.
+    var imprint: String? {
+        LabelName.isSelfPublished(publisher: labelName, artist: artistName) ? nil : labelName
+    }
+
     /// Bandcamp's own player for this record, if the page advertised one.
     var embedURL: URL? {
         guard let embedURLString, !embedURLString.isEmpty else { return nil }

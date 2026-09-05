@@ -133,6 +133,53 @@ final class CrateService {
         return listeningMembership[url]
     }
 
+    // MARK: - Row cache
+
+    /// Where each row can be played from, and where its DIG button goes.
+    ///
+    /// Both read the store, so they are worked out when the crate changes
+    /// rather than while it is being drawn — and they live here rather than in
+    /// the view, because a view's state is discarded the moment somebody
+    /// navigates away. Held there, every return to the crate drew the whole
+    /// list unresolved and then resolved it a moment later, which is the
+    /// reshuffle you could see on the way in.
+    private(set) var resolvedSources: [UUID: AudioSource] = [:]
+    private(set) var digDestinations: [UUID: DetailPage] = [:]
+    /// False only before the first pass has ever run. A row is playable until
+    /// proven otherwise, so that a list drawn before the answers arrive does
+    /// not tell somebody their music cannot be played.
+    private(set) var hasResolvedRows = false
+    @ObservationIgnored private var resolvedRevision = -1
+    @ObservationIgnored private var resolvedDigRevision = -1
+
+    /// Recomputes the row cache when something it depends on has moved.
+    ///
+    /// `digDestination` is passed in rather than reached for: the crate has no
+    /// business knowing what DIG is, and this is the one thing on a row that
+    /// DIG decides.
+    func refreshRowCache(
+        digRevision: Int, digDestination: (Recording) -> DetailPage?
+    ) {
+        guard !hasResolvedRows
+                || resolvedRevision != revision
+                || resolvedDigRevision != digRevision
+        else { return }
+        var sources: [UUID: AudioSource] = [:]
+        var pages: [UUID: DetailPage] = [:]
+        let resolver = SourceResolver(context: context)
+        for item in items() {
+            if let found = resolver.best(item) { sources[item.id] = found }
+            if let recording = item.recording, let page = digDestination(recording) {
+                pages[item.id] = page
+            }
+        }
+        resolvedSources = sources
+        digDestinations = pages
+        resolvedRevision = revision
+        resolvedDigRevision = digRevision
+        hasResolvedRows = true
+    }
+
     // MARK: - Writing
 
     /// Crating the same thing twice is a no-op rather than a duplicate — the
@@ -143,8 +190,25 @@ final class CrateService {
         let item = CrateItem(recording: recording)
         item.setGenres(localGenres(for: recording))
         context.insert(item)
+        note(item)
         save()
         return item
+    }
+
+    /// Writes a save into the listening log.
+    ///
+    /// Keeping something is the strongest thing a listener says without
+    /// typing, and it is the one signal that would otherwise be invisible to
+    /// the log: crating a record takes a second, so it never accumulates
+    /// enough playing time to count as listening. Only additions are noted —
+    /// taking a row back out of the crate is a correction, not a verdict, and
+    /// reading it as one would punish people for tidying up.
+    private func note(_ item: CrateItem) {
+        guard let node = item.node else { return }
+        ListeningLog(context: context).record(
+            node, action: .saved, tags: item.genreTags,
+            source: item.providerID.map { ListeningSource(providerID: $0, showTitle: item.showTitle) }
+        )
     }
 
     @discardableResult
@@ -172,6 +236,7 @@ final class CrateService {
             genres: genres
         )
         context.insert(item)
+        note(item)
         save()
         return item
     }
@@ -192,6 +257,7 @@ final class CrateService {
             title: title, subtitle: subtitle, artworkURL: artworkURL, genres: genres
         )
         context.insert(item)
+        note(item)
         save()
         return item
     }

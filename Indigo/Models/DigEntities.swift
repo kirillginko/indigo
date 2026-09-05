@@ -283,6 +283,16 @@ nonisolated final class DiscogsReleaseRecord {
     var trackDurations: [String]
     /// Who is on each track, where the release itself is credited to nobody.
     var trackArtists: [String] = []
+    /// Everybody else on the record, positionally: the name, the job Discogs
+    /// wrote, and which tracks it was for.
+    ///
+    /// Three parallel arrays rather than a model of its own, following the
+    /// tracklist and the videos above. These are read together and never
+    /// queried apart, and a relationship would mean a second table to migrate
+    /// for something DIG only ever renders.
+    var creditNames: [String] = []
+    var creditRoles: [String] = []
+    var creditTracks: [String] = []
     /// Recordings of this release somebody catalogued it alongside. Positional
     /// arrays rather than a relationship: DIG only ever renders them.
     var videoURLStrings: [String] = []

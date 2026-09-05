@@ -289,7 +289,7 @@ nonisolated struct SceneCaches {
             let split = places.split(keywords: release.keywords)
             for city in split.places { place(city, artist: key, named: release.artistName) }
             for tag in split.tags { tagsForArtist[key, default: []].insert(tag) }
-            if let label = release.labelName, !label.isEmpty {
+            if let label = release.imprint, !label.isEmpty {
                 labelsForArtist[key, default: []].insert(label)
             }
             if let year = release.year.flatMap(Int.init) { yearsForArtist[key, default: []].append(year) }
