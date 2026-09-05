@@ -82,12 +82,29 @@ nonisolated struct DigArtwork {
         let wanted = RecordingKey.normalizeTitle(title)
         guard !wanted.isEmpty else { return Pair() }
         let artistKey = artist.map { RecordingKey.normalizeArtist($0) }
+        func isTheRecord(_ record: DiscogsReleaseRecord) -> Bool {
+            guard RecordingKey.normalizeTitle(record.title) == wanted else { return false }
+            guard let artistKey else { return true }
+            return record.artistNames.contains { RecordingKey.normalizeArtist($0) == artistKey }
+        }
+
+        // The catalogue's own spelling first, which is what nearly every
+        // caller is holding — a tracklist row's release line, an artist's
+        // discography entry. The store answers that without handing back the
+        // rest of the table, and handing back the rest of the table is what
+        // this used to do on the main actor once per row.
+        var exact = FetchDescriptor<DiscogsReleaseRecord>(predicate: #Predicate { $0.title == title })
+        exact.fetchLimit = 12
+        if let match = ((try? context.fetch(exact)) ?? []).first(where: isTheRecord) {
+            return Pair(full: match.imageURL, thumbnail: match.thumbnailURL)
+        }
+
+        // A different spelling of the same record — punctuation, an edition
+        // in brackets — is only findable by comparing the normalised form of
+        // every one of them. Rare, and worth the walk when it happens; never
+        // call this from a render pass.
         let match = ((try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [])
-            .first { record in
-                guard RecordingKey.normalizeTitle(record.title) == wanted else { return false }
-                guard let artistKey else { return true }
-                return record.artistNames.contains { RecordingKey.normalizeArtist($0) == artistKey }
-            }
+            .first(where: isTheRecord)
         return Pair(full: match?.imageURL, thumbnail: match?.thumbnailURL)
     }
 

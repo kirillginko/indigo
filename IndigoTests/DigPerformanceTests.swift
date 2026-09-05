@@ -474,6 +474,65 @@ final class DigPerformanceTests: XCTestCase {
     /// at a time. Every one of them moves `revision`, and the page reads the
     /// profile again. With the tables already in hand this is what the
     /// listener pays per burst — and it happens while they are scrolling.
+    /// The same ladder when nothing matches, which is the case the exact
+    /// lookup added to rather than replaced: an unclaimed record, or a
+    /// tracklist row whose release is not cached.
+    func testCostOfAskingAboutARecordNobodyHas() {
+        let artwork = DigArtwork(context: context)
+        let rows = 5
+        let cost = milliseconds {
+            for index in 0..<rows {
+                _ = artwork.release(title: "No Such Record \(index)", artist: "Artist \(index)")
+            }
+        }
+        record("DigArtwork.release(miss) x\(rows) \(cost)ms total, \(cost / rows)ms each")
+        XCTAssertLessThan(cost, 100_000, "measurement only")
+    }
+
+    /// A stored answer, read through a `GraphStore` nobody has warmed.
+    ///
+    /// This is the shape `DigHistory.suggestions()` uses — it builds its own
+    /// store per call, on the main actor — and it is meant to be a couple of
+    /// indexed queries. It was assembling the whole fold to colour in
+    /// portraits: 560ms of stopped main thread in a real session's trace,
+    /// once per revision, which is what paused the For You shader.
+    func testCostOfAStoredAnswerThroughAColdGraph() {
+        let node = MusicNode.artist("Artist 0")
+        _ = GraphStore(context: context).neighbors(of: node)
+        try? context.save()
+
+        let cold = GraphStore(context: context)
+        let cost = milliseconds { _ = cold.neighbors(of: node) }
+        record("GraphStore.neighbors(stored, cold) \(cost)ms")
+        XCTAssertLessThan(
+            cost, 100,
+            "A stored answer that reads six tables is not a stored answer"
+        )
+    }
+
+    /// The sleeve ladder, which a tracklist asks once per row — and which a
+    /// release page asks straight out of its `body`, so every re-render pays
+    /// it again on the main actor.
+    func testCostOfAskingWhatARecordLooksLike() {
+        let artwork = DigArtwork(context: context)
+        let rows = 20
+        let cost = milliseconds {
+            for index in 0..<rows {
+                _ = artwork.release(title: "Release \(index)", artist: "Artist \(index)")
+            }
+        }
+        record("DigArtwork.release x\(rows) \(cost)ms total, \(cost / rows)ms each")
+        XCTAssertLessThan(
+            cost, 100,
+            """
+            A tracklist asks this once a row and the release page asked it \
+            once a render. Walking every catalogued release apiece measured \
+            over 3000ms for twenty rows on this fixture; asking for the \
+            title measures under 40ms.
+            """
+        )
+    }
+
     func testCostOfRereadingAProfileMidLoad() {
         let graph = GraphStore(context: context)
         let engine = DigEngine(context: context, graph: graph)

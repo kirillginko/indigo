@@ -42,6 +42,14 @@ struct DigReleaseView: View {
     /// the render pass is why opening a record felt slow.
     @State private var profile: DigReleaseProfile?
 
+    /// The sleeve for a record no catalogue has claimed, for the same reason.
+    ///
+    /// This one is worse than the profile was: an unclaimed record is by
+    /// definition one the release cache has no entry for, so the ladder walks
+    /// every catalogued release before it can say so — and it was doing that
+    /// inside `unclaimed`, which is to say once per render.
+    @State private var unclaimedSleeve = DigArtwork.Pair()
+
     var body: some View {
         let _ = crate.revision
         let profile = self.profile ?? identifier.flatMap { dig.cachedReleaseProfile(id: $0) }
@@ -209,6 +217,8 @@ struct DigReleaseView: View {
             .scrollIndicators(.visible)
         }
         .task(id: fallbackTitle) {
+            unclaimedSleeve = DigArtwork(context: dig.context)
+                .release(title: fallbackTitle, artist: credit)
             // Only for a record with no identifier. One that has an id is
             // looked up by the task below, and saying "no catalogue has this"
             // before that has run announces a failure in advance.
@@ -317,7 +327,7 @@ struct DigReleaseView: View {
         // alone. A record reached from an artist's discography already had a
         // sleeve on the tile that was clicked; asking only Bandcamp for it
         // here is what made that picture disappear on the way in.
-        let sleeve = DigArtwork(context: dig.context).release(title: fallbackTitle, artist: credit)
+        let sleeve = unclaimedSleeve
         HStack(alignment: .top, spacing: 26) {
             ArtworkView(
                 remoteURL: sleeve.full ?? sleeve.thumbnail

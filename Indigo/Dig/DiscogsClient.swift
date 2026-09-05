@@ -433,7 +433,36 @@ nonisolated struct DiscogsClient: Sendable {
         throw DiscogsError.notConfigured
     }
 
+    /// How many times a refusal to serve is worth waiting out.
+    ///
+    /// Discogs allows sixty requests a minute and answers the sixty-first in
+    /// a millisecond with a 429. Thirteen per cent of the requests in a real
+    /// session's trace came back that way, and every one of them was thrown
+    /// straight through to the page: a cold artist issues nine requests, waits
+    /// for the ones that answer, and then shows nothing because one of them
+    /// was refused. Being told to slow down is not the same as being told
+    /// there is nothing there.
+    ///
+    /// Only the foreground path retries. The background portrait fill has its
+    /// own answer to a 429 — stand down for thirty seconds — and that is the
+    /// right one for work nobody is waiting on.
+    private static let attemptsWhenRefused = 3
+
     private func direct<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+        for attempt in 0..<Self.attemptsWhenRefused {
+            do {
+                return try await send(path, query: query)
+            } catch DiscogsError.rateLimited {
+                guard attempt < Self.attemptsWhenRefused - 1 else { break }
+                // A second, then two. Longer than that and the page has been
+                // blank so long that waiting is its own failure.
+                try await Task.sleep(for: .seconds(1 << attempt))
+            }
+        }
+        throw DiscogsError.rateLimited
+    }
+
+    private func send<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
         guard let token else { throw DiscogsError.notConfigured }
         var components = URLComponents(string: "https://api.discogs.com/\(path)")
         components?.queryItems = query.isEmpty ? nil : query

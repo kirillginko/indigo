@@ -53,4 +53,42 @@ final class NormalizationParityTests: XCTestCase {
                 "normalize(\(String(reflecting: input))) disagrees with normalize.ts")
         }
     }
+
+    /// `normalize` answers a plain ASCII string with a byte loop instead of
+    /// ICU, which is what makes it cheap enough to call for every credit on a
+    /// page. That is only sound while it says exactly what the general path
+    /// says — and the general path is the rule the table above pins down.
+    ///
+    /// Every ASCII character, alone and in company, rather than a handful
+    /// somebody thought of: the shortcut's whole risk is a character nobody
+    /// remembered.
+    func testTheASCIIShortcutSaysWhatTheGeneralPathSays() {
+        var samples = ["", " ", "  ", "Skee Mask - Rev8617 [Official Audio]"]
+        for code in 0..<128 {
+            let character = String(UnicodeScalar(UInt8(code)))
+            samples += [character, "a\(character)b", " \(character) ",
+                        "\(character)\(character)", "\(character)tail"]
+        }
+        for sample in samples {
+            XCTAssertEqual(
+                RecordingKey.normalize(sample), Self.generalPath(sample),
+                "The shortcut disagrees about \(String(reflecting: sample))")
+        }
+    }
+
+    /// The rule with no shortcut in it: fold the case, the width and the
+    /// diacritics, turn everything that is not alphanumeric into a gap, and
+    /// collapse the gaps.
+    private static func generalPath(_ value: String) -> String {
+        let folded = value.folding(
+            options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive],
+            locale: nil
+        )
+        let stripped = folded.unicodeScalars.map { scalar -> Character in
+            CharacterSet.alphanumerics.contains(scalar) ? Character(scalar) : " "
+        }
+        return String(stripped)
+            .split(separator: " ", omittingEmptySubsequences: true)
+            .joined(separator: " ")
+    }
 }

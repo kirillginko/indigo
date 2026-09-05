@@ -72,8 +72,12 @@ final class DigCacheTests: XCTestCase {
         // Opening a release writes, which bumps the revision for everything.
         let release = DiscogsReleaseRecord(discogsID: 5, title: "Compro")
         release.artistNames = ["Skee Mask"]
+        release.videoURLStrings = ["https://www.youtube.com/watch?v=aaaaaaaaaaa"]
+        release.videoTitles = ["Something"]
+        release.videoDurations = [300]
         context.insert(release)
-        dig.markUnplayable(URL(string: "https://www.youtube.com/watch?v=aaaaaaaaaaa")!)
+        try context.save()
+        await dig.markUnplayable(URL(string: "https://www.youtube.com/watch?v=aaaaaaaaaaa")!)
 
         let onReturn = try XCTUnwrap(dig.cachedArtistProfile(name: "Skee Mask", mbid: nil))
         XCTAssertEqual(onReturn.name, "Skee Mask")

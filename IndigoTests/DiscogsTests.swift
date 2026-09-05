@@ -7,6 +7,28 @@ import XCTest
 import SwiftData
 @testable import Indigo
 
+/// Refuses the first `refusals` requests the way Discogs refuses an
+/// over-budget one — a 429, answered instantly — then behaves.
+private struct RefusingDiscogsTransport: DiscogsTransport {
+    let refusals: Int
+    let body: String
+    let counter = Counter()
+
+    final class Counter: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value = 0
+        func next() -> Int { lock.withLock { defer { value += 1 }; return value } }
+        var count: Int { lock.withLock { value } }
+    }
+
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        let status = counter.next() < refusals ? 429 : 200
+        return (Data(body.utf8), HTTPURLResponse(
+            url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil
+        )!)
+    }
+}
+
 private struct StubDiscogsTransport: DiscogsTransport {
     let routes: [String: String]
     let recorder: Recorder
@@ -64,6 +86,72 @@ final class DiscogsTests: XCTestCase {
                   {"position":"A2","title":"Stone Cold","duration":"5:20"}],
      "notes":"Recorded in Munich."}
     """
+
+    /// What a search response costs to turn into values.
+    ///
+    /// `DiscogsClient` is a `nonisolated struct`, but this target is built
+    /// with `SWIFT_APPROACHABLE_CONCURRENCY`, so its async methods run on the
+    /// caller's actor — which is why the trace shows the same request as
+    /// `[MAIN]` from `DigStore` and `[bg]` from `DigWorker`. The decode sits
+    /// outside the traced region, so from `DigStore` it is unmeasured work on
+    /// the thread that draws.
+    func testWhatDecodingASearchCostsOnTheCallersActor() throws {
+        let results = (0..<50).map { index in
+            """
+            {"id":\(index),"title":"Some Artist \(index) - A Record With A Long Enough Name",
+             "thumb":"https://img.discogs.test/thumb-\(index).jpg",
+             "cover_image":"https://img.discogs.test/cover-\(index).jpg",
+             "genre":["Electronic","Rock"],
+             "style":["Techno","Ambient","Deep House","Experimental"],
+             "label":["Ilian Tape","Warp Records","Hessle Audio"],
+             "year":"2018"}
+            """
+        }.joined(separator: ",")
+        let payload = Data("{\"results\":[\(results)]}".utf8)
+
+        let started = ContinuousClock.now
+        var decoded = 0
+        for _ in 0..<20 {
+            decoded += (try JSONDecoder().decode(DiscogsSearchResponse.self, from: payload))
+                .results?.count ?? 0
+        }
+        let parts = (ContinuousClock.now - started).components
+        let each = Double(parts.seconds) * 1000 + Double(parts.attoseconds) / 1e15
+        XCTAssertEqual(decoded, 1000)
+        XCTAssertLessThan(
+            each / 20, 5,
+            "One search decode costs \(each / 20)ms; a cold artist does two dozen of them"
+        )
+    }
+
+    /// Being told to slow down is not being told there is nothing there.
+    ///
+    /// Discogs answers an over-budget request in a millisecond with a 429, and
+    /// a cold artist issues nine requests. Throwing the first refusal straight
+    /// through is how a page waits a long time and then comes back empty.
+    func testARefusedRequestIsWaitedOutRatherThanReportedAsNothing() async throws {
+        let transport = RefusingDiscogsTransport(refusals: 2, body: search)
+        let client = DiscogsClient(transport: transport, token: "t")
+
+        let head = try await client.artistHead(named: "Skee Mask")
+
+        XCTAssertNotNil(head, "The data was there; the app was only asked to wait")
+        XCTAssertEqual(transport.counter.count, 3, "Two refusals, then the answer")
+    }
+
+    /// But not forever: a page that has been blank for long enough is failing
+    /// whatever the reason, and the caller has cached data to fall back on.
+    func testAPersistentRefusalIsStillReported() async throws {
+        let transport = RefusingDiscogsTransport(refusals: 99, body: search)
+        let client = DiscogsClient(transport: transport, token: "t")
+
+        do {
+            _ = try await client.artistHead(named: "Skee Mask")
+            XCTFail("A refusal that never lifts has to surface")
+        } catch DiscogsError.rateLimited {
+            XCTAssertEqual(transport.counter.count, 3, "Tried, twice more, then gave up")
+        }
+    }
 
     func testDiscogsArtistBundleUsesExactMatchAndAuthentication() async throws {
         let recorder = StubDiscogsTransport.Recorder()

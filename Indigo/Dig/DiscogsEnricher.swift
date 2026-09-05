@@ -68,6 +68,13 @@ nonisolated struct DiscogsEnricher {
     }
 
     private func write(_ bundle: DiscogsArtistBundle, name: String) -> DiscogsArtist? {
+        Trace.step("enrich.artist", name) { writeArtist(bundle, name: name) }
+    }
+
+    /// Timed separately from the request that fetched it. A response arriving
+    /// is not the same event as a response being written, and on the app's
+    /// own context the second one happens on the thread that draws.
+    private func writeArtist(_ bundle: DiscogsArtistBundle, name: String) -> DiscogsArtist? {
 
         let detail = bundle.detail
         let releases = (bundle.releases.releases ?? []).filter {
@@ -194,6 +201,10 @@ nonisolated struct DiscogsEnricher {
     /// time, which is what a single ModelContext requires.
     @discardableResult
     func store(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
+        Trace.step("enrich.release", String(id)) { writeRelease(detail, id: id) }
+    }
+
+    private func writeRelease(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
         let record = cachedRelease(id: id) ?? {
             let value = DiscogsReleaseRecord(discogsID: id, title: detail.title)
             context.insert(value)

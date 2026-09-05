@@ -189,7 +189,7 @@ final class YouTubeTests: XCTestCase {
     /// The layer certain to catch an uploader's embedding setting: what the
     /// player found out the hard way, remembered wherever it appears.
     @MainActor
-    func testAFailureAtPlayTimeIsRememberedEverywhere() throws {
+    func testAFailureAtPlayTimeIsRememberedEverywhere() async throws {
         let address = "https://www.youtube.com/watch?v=aaaaaaaaaaa"
         for identifier in [1, 2] {
             let record = DiscogsReleaseRecord(discogsID: identifier, title: "Release \(identifier)")
@@ -199,7 +199,8 @@ final class YouTubeTests: XCTestCase {
             context.insert(record)
         }
 
-        DigStore(context: context).markUnplayable(try XCTUnwrap(URL(string: address)))
+        try context.save()
+        await DigStore(context: context).markUnplayable(try XCTUnwrap(URL(string: address)))
 
         for identifier in [1, 2] {
             let record = try XCTUnwrap(
@@ -208,6 +209,103 @@ final class YouTubeTests: XCTestCase {
             )
             XCTAssertEqual(record.videos.map(\.title), ["Fine"], "Release \(identifier)")
         }
+    }
+
+    // MARK: Titles as names rather than as advertising
+
+    /// A YouTube title is advertising as much as it is a name. What the
+    /// uploader says about the upload is what every row has in common, which
+    /// is the opposite of what a list of titles is for.
+    func testAnUploadersBillingIsNotPartOfTheName() {
+        let cases = [
+            "Skee Mask - Rev8617 [Official Audio]": "Skee Mask - Rev8617",
+            "Burial - Archangel (Official Video)": "Burial - Archangel",
+            "Aphex Twin - Xtal [HD]": "Aphex Twin - Xtal",
+            "Actress - Untitled 7 | Official Music Video": "Actress - Untitled 7",
+            "Jai Paul - BTSTU (Official Audio) [HQ]": "Jai Paul - BTSTU",
+            "Loraine James - Glitch Bitch - Official Video": "Loraine James - Glitch Bitch",
+            "Nídia - Capa Preta (XLR8R Premiere)": "Nídia - Capa Preta",
+            "Four Tet - Baby ()": "Four Tet - Baby"
+        ]
+        for (raw, expected) in cases {
+            XCTAssertEqual(YouTubeTitle.clean(raw), expected, raw)
+        }
+    }
+
+    /// An aside that says which recording this is has to survive: a live take
+    /// and a remix are different records, and flattening them loses one.
+    func testAnAsideThatNamesTheRecordingSurvives() {
+        for title in [
+            "Skee Mask - Rev8617 (Original Mix)",
+            "Objekt - Ganzfeld (Live at Dekmantel)",
+            "Pariah - Drumbaya (Blawan Remix)",
+            "Talk Talk - Ascension Day (Remaster)"
+        ] {
+            XCTAssertEqual(YouTubeTitle.clean(title), title)
+        }
+    }
+
+    /// A recording whose whole title is billing keeps it. An empty row says
+    /// less than a badly named one.
+    func testARecordingIsNeverLeftWithoutAName() {
+        XCTAssertEqual(YouTubeTitle.clean("[Official Video]"), "[Official Video]")
+        XCTAssertEqual(YouTubeTitle.clean("  Compro  "), "Compro")
+    }
+
+    /// The same recording is uploaded twice — once billed, once plain — and
+    /// catalogued against both a pressing and its reissue. Either way it is
+    /// one recording to somebody reading the list.
+    @MainActor
+    func testTheSameRecordingIsListedOnce() throws {
+        let recent = DiscogsReleaseRecord(discogsID: 1, title: "Pool")
+        recent.artistNames = ["Skee Mask"]
+        recent.year = 2021
+        recent.videoURLStrings = [
+            "https://www.youtube.com/watch?v=aaaaaaaaaaa",
+            // The same video, in the other shape the link takes.
+            "https://youtu.be/aaaaaaaaaaa?t=30"
+        ]
+        recent.videoTitles = ["Rev8617 [Official Audio]", "Rev8617"]
+        recent.videoDurations = [300, 300]
+        context.insert(recent)
+
+        let older = DiscogsReleaseRecord(discogsID: 2, title: "Compro")
+        older.artistNames = ["Skee Mask"]
+        older.year = 2018
+        older.videoURLStrings = [
+            // A different upload of the recording already listed above.
+            "https://www.youtube.com/watch?v=bbbbbbbbbbb",
+            "https://www.youtube.com/watch?v=ccccccccccc"
+        ]
+        older.videoTitles = ["Rev8617 (Official Video) [HD]", "Cerroverb"]
+        older.videoDurations = [300, 400]
+        context.insert(older)
+
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Skee Mask"),
+                                   discogsID: 9, name: "Skee Mask")
+        context.insert(artist)
+
+        let listen = DigEngine(context: context).artistProfile(name: "Skee Mask", mbid: nil).listen
+        XCTAssertEqual(listen.map(\.title), ["Rev8617", "Cerroverb"])
+    }
+
+    /// "Untitled" is the absence of a name, not a name — and white labels are
+    /// full of them, so it must never collapse two different recordings.
+    @MainActor
+    func testUntitledRecordingsAreNotMistakenForEachOther() throws {
+        let record = DiscogsReleaseRecord(discogsID: 1, title: "White Label")
+        record.artistNames = ["Anon"]
+        record.year = 2019
+        record.videoURLStrings = [
+            "https://www.youtube.com/watch?v=aaaaaaaaaaa",
+            "https://www.youtube.com/watch?v=bbbbbbbbbbb"
+        ]
+        record.videoTitles = ["", ""]
+        record.videoDurations = [300, 400]
+        context.insert(record)
+
+        let profile = DigEngine(context: context).releaseProfile(id: 1)
+        XCTAssertEqual(profile?.listen.count, 2)
     }
 
     /// A dropped connection must not be recorded as a verdict about the

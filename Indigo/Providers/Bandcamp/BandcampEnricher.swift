@@ -38,6 +38,14 @@ nonisolated struct BandcampEnricher {
     func cachedReleases(forArtist name: String) -> [BandcampRelease] {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return [] }
+        // Read and filtered here rather than asked of the store.
+        //
+        // `artistKeys` is a plain array attribute, which the store keeps as
+        // one opaque value — there is nothing inside it for a query to look
+        // at. A `#Predicate` naming it compiles, and passes against the
+        // in-memory container these tests use, because that runs the
+        // predicate as Swift; against the app's SQLite store it takes the
+        // process down. See `StorePredicateTests`.
         let all = (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? []
         // Matched against everyone in the credit, so a collaboration appears
         // on both artists' pages rather than only the first name's.

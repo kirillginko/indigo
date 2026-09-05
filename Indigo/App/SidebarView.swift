@@ -554,7 +554,11 @@ struct SidebarView: View {
     /// The walk is now kept until the library actually changes, and `body`
     /// reads the answer once.
     private var counts: (tracks: Int, albums: Int, artists: Int) {
-        let all = tracks
+        // `tracks` is an unbounded `@Query` over the library, and reading it
+        // is where SwiftData materialises the answer — on the main thread,
+        // again after every write that touches a Track. Measured because the
+        // memo below only saves the fold, never the read.
+        let all = Trace.slowStep("sidebar.tracks") { tracks }
         if held.trackCount == all.count { return held.value }
         var albums = Set<String>()
         var artists = Set<String>()
