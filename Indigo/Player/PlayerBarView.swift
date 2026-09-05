@@ -22,6 +22,10 @@ struct PlayerBarView: View {
     @Environment(AlharaProvider.self) private var alhara
     @Environment(CashmereProvider.self) private var cashmere
     @Environment(LYLProvider.self) private var lyl
+    @Environment(IdaProvider.self) private var ida
+    @Environment(Radio80000Provider.self) private var radio80000
+    @Environment(PanikProvider.self) private var panik
+    @Environment(RovrProvider.self) private var rovr
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @State private var isIdentityHovering = false
@@ -223,7 +227,19 @@ struct PlayerBarView: View {
         case AlharaProvider.providerID: return alhara.now(for: item.id)
         case CashmereProvider.providerID: return cashmere.now
         case LYLProvider.providerID: return lyl.now
-        default: return nts.state(for: item.id)?.now
+        // These four publish what is on and were not asked, so a listener got
+        // no picture in the bar, no show title, and no way to open the panel
+        // — the panel is gated on there being a show at all.
+        case IdaProvider.providerID:
+            return ida.channel(for: item.id).flatMap { ida.now(for: $0) }
+        case Radio80000Provider.providerID: return radio80000.now
+        case PanikProvider.providerID: return panik.now
+        case RovrProvider.providerID: return rovr.now
+        case NTSProvider.providerID: return nts.state(for: item.id)?.now
+        // Named rather than fallen through to. Every station that arrived
+        // after this switch was written asked NTS what was on its channel,
+        // got nothing, and looked like a station with nothing on.
+        default: return nil
         }
     }
 

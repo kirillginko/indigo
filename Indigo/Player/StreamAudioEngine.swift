@@ -105,7 +105,21 @@ final class StreamAudioEngine {
         // keep serving a dead item.
         player.pause()
         player = AVPlayer()
-        player.automaticallyWaitsToMinimizeStalling = true
+        // Everything through this engine is live, and "wait until stalling is
+        // unlikely" is a policy for a file whose length is known.
+        //
+        // IDA's Icecast answers a range request — `206`, `Accept-Ranges:
+        // bytes`, `Content-Range: bytes 0-1024/1073741823` — so AVPlayer sees
+        // a seekable file some seven hours long and buffers proportionally
+        // before it will start. The stations that start promptly answer the
+        // same request with a plain `200` and no length, which is a stream
+        // AVPlayer cannot pretend to seek in. Waiting is what turned IDA into
+        // a long spell of "Buffering".
+        //
+        // Starting immediately and recovering from stalls is the bargain this
+        // engine already makes everywhere else: it watches for stalls and
+        // reconnects without waiting first.
+        player.automaticallyWaitsToMinimizeStalling = false
         player.volume = Float(volume)
 
         let asset = AVURLAsset(url: url, options: [
