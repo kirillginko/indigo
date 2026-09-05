@@ -220,6 +220,29 @@ nonisolated struct DiscogsEnricher {
             (detail.labels ?? []).flatMap { LabelName.names(inDiscogsField: $0.name) }
         )
         record.catalogNumbers = detail.labels?.compactMap(\.catno) ?? []
+
+        // Everybody else on the record, minus the sleeve.
+        //
+        // Discogs credits the photographer and whoever did the layout in the
+        // same list as the producer. Kept apart here rather than at the point
+        // of drawing, so nothing downstream can accidentally offer a designer
+        // as a musical connection — see `CreditRole`.
+        var creditNames: [String] = []
+        var creditRoles: [String] = []
+        var creditTracks: [String] = []
+        for credit in detail.extraartists ?? [] {
+            guard CreditRole.isMusical(credit.role),
+                  let name = credit.credited.map(DiscogsClient.withoutDisambiguator),
+                  !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  let role = CreditRole.display(credit.role)
+            else { continue }
+            creditNames.append(name)
+            creditRoles.append(role)
+            creditTracks.append(credit.tracks ?? "")
+        }
+        record.creditNames = creditNames
+        record.creditRoles = creditRoles
+        record.creditTracks = creditTracks
         record.genres = detail.genres ?? []
         record.styles = detail.styles ?? []
         record.imageURLString = detail.images?.first(where: { $0.type == "primary" })?.uri

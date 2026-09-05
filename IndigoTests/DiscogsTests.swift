@@ -84,6 +84,10 @@ final class DiscogsTests: XCTestCase {
      "images":[{"type":"primary","uri":"https://img.test/pool-large.jpg","uri150":"https://img.test/pool.jpg"}],
      "tracklist":[{"position":"A1","title":"Nvivo","duration":"6:04"},
                   {"position":"A2","title":"Stone Cold","duration":"5:20"}],
+     "extraartists":[{"id":7,"name":"Rashad Becker","role":"Mastered By"},
+                     {"id":8,"name":"Zenker Brothers","anv":"Zenkers","role":"Producer"},
+                     {"id":9,"name":"Some Designer","role":"Artwork By"},
+                     {"id":11,"name":"A Player","role":"Bass","tracks":"A1 to A2"}],
      "notes":"Recorded in Munich."}
     """
 
@@ -222,6 +226,29 @@ final class DiscogsTests: XCTestCase {
         XCTAssertEqual(release.styles, ["Ambient", "Techno"])
         XCTAssertEqual(release.trackPositions, ["A1", "A2"])
         XCTAssertEqual(release.trackTitles, ["Nvivo", "Stone Cold"])
+
+        // The sleeve, minus the sleeve. Discogs lists whoever did the artwork
+        // in the same array as the producer, and only one of those is a
+        // musical connection — see `CreditRole`.
+        XCTAssertEqual(release.creditNames, ["Rashad Becker", "Zenkers", "A Player"])
+        XCTAssertEqual(release.creditRoles, ["Mastered By", "Producer", "Bass"])
+        XCTAssertEqual(release.creditTracks, ["", "", "A1 to A2"])
+        XCTAssertFalse(release.creditNames.contains("Some Designer"))
+    }
+
+    /// Discogs names the spelling a particular record used separately from the
+    /// canonical one. The record's own spelling is what belongs on its page.
+    func testACreditKeepsTheSpellingTheRecordUsed() async throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let context = ModelContext(container)
+        let client = DiscogsClient(transport: StubDiscogsTransport(
+            routes: ["releases/10": releaseDetail], recorder: StubDiscogsTransport.Recorder()
+        ), token: "secret")
+
+        let release = try await DiscogsEnricher(context: context, client: client).release(id: 10)
+        XCTAssertTrue(release.creditNames.contains("Zenkers"))
+        XCTAssertFalse(release.creditNames.contains("Zenker Brothers"))
     }
 
     func testDiscogsReferenceMarkupIsRemovedFromProfiles() {

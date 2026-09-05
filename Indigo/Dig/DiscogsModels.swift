@@ -132,11 +132,34 @@ nonisolated struct DiscogsVideo: Decodable, Sendable {
     let duration: Int?
 }
 
+/// Somebody credited on a record who is not one of its headline artists —
+/// the producer, the engineer, whoever played the bass. Discogs writes the job
+/// into `role`, several at a time and in its own casing; see `CreditRole`.
+nonisolated struct DiscogsCredit: Decodable, Sendable {
+    let id: Int?
+    let name: String?
+    /// The spelling this particular record used, when it differs. Discogs
+    /// calls it "artist name variation".
+    let anv: String?
+    let role: String?
+    /// Which tracks, when the credit is not for the whole record. Free text —
+    /// "A1", "A1 to A4", "B2, B3" — and shown rather than parsed.
+    let tracks: String?
+
+    /// The name as this record spelled it, falling back to the canonical one.
+    var credited: String? {
+        let variation = anv?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let variation, !variation.isEmpty { return variation }
+        return name
+    }
+}
+
 nonisolated struct DiscogsReleaseDetail: Decodable, Sendable {
     let id: Int
     let title: String
     let year: Int?
     let artists: [DiscogsArtistReference]?
+    let extraartists: [DiscogsCredit]?
     let labels: [DiscogsLabelReference]?
     let videos: [DiscogsVideo]?
     let genres: [String]?

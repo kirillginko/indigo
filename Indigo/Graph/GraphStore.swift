@@ -373,6 +373,18 @@ nonisolated struct GraphStore {
             ))
         }
 
+        // Whoever made those records, where Indigo has read the sleeve.
+        //
+        // Sparse on purpose: a release row exists once its page has been
+        // opened, so this fills in as somebody digs rather than costing a
+        // request per release up front. An artist page that has none of this
+        // yet simply has no production lane, which is the same shape as an
+        // artist nobody has credits for.
+        for identifier in discogs?.releaseDiscogsIDs ?? [] {
+            guard let record = caches.discogsRelease(identifier) else { continue }
+            addCredits(of: record, on: node, into: &edges)
+        }
+
         // Styles are not places, so they are no longer offered as ones.
         //
         // A style node cannot be opened — nothing in `AppState` routes to
@@ -690,7 +702,47 @@ nonisolated struct GraphStore {
                 reason: "Catalogued \(catalog.uppercased())", confidence: 0.92
             ))
         }
+        addCredits(of: record, on: node, into: &edges)
         // See above: a style is a lens, not a place to go.
+    }
+
+    /// Everybody on the sleeve, as people you can go to.
+    ///
+    /// The point of the whole phase: a record is not only its headline
+    /// artist. Following an engineer or a co-producer out of a release is
+    /// how a run of records that sound alike turns out to have one person
+    /// behind them, and that is a route no "similar artists" list can offer
+    /// because it is a fact rather than a resemblance.
+    ///
+    /// Sleeve credits — design, photography, pressing — were filtered out
+    /// when the record was written. See `CreditRole`.
+    private func addCredits(
+        of record: DiscogsReleaseRecord, on node: MusicNode, into edges: inout EdgeSet
+    ) {
+        let headline = Set(record.artistNames.map(RecordingKey.normalizeArtist))
+        for (index, name) in record.creditNames.enumerated() {
+            guard ArtistName.isRealArtist(name) else { continue }
+            // The headline artist producing their own record is not a second
+            // person to meet; the page is already about them.
+            guard !headline.contains(RecordingKey.normalizeArtist(name)) else { continue }
+            let role = index < record.creditRoles.count ? record.creditRoles[index] : ""
+            guard let kind = CreditRole.kind(of: role) else { continue }
+            let tracks = index < record.creditTracks.count ? record.creditTracks[index] : ""
+            edges.insert(MusicEdge(
+                from: node, to: .artist(name),
+                kind: kind == .production ? .producer : .personnel,
+                source: .discogs,
+                // The job as the record itself stated it, which is more
+                // informative than the bucket it was sorted into: "Mastered
+                // By" says something "Personnel" does not.
+                reason: tracks.isEmpty
+                    ? "\(role) on \(record.title)"
+                    : "\(role) on \(record.title) (\(tracks))",
+                confidence: kind == .production
+                    ? RelationshipKind.producer.baseConfidence
+                    : RelationshipKind.personnel.baseConfidence
+            ))
+        }
     }
 
     // MARK: - Broadcast

@@ -159,6 +159,8 @@ nonisolated struct DigReleaseProfile: Sendable {
     /// first opened — see `ArtistProfile.ReleaseLine`.
     let thumbnailURL: URL?
     let tracks: [TrackLine]
+    /// Everybody else on the sleeve, grouped by what they did.
+    let credits: [CreditGroup]
     let notes: String?
     let sourceURL: URL?
     /// Recordings catalogued alongside this release, playable in the app's own
@@ -180,6 +182,30 @@ nonisolated struct DigReleaseProfile: Sendable {
         var durationLabel: String? {
             guard let seconds, seconds > 0 else { return nil }
             return String(format: "%d:%02d", seconds / 60, seconds % 60)
+        }
+    }
+
+    /// One kind of contribution and everybody credited with it.
+    nonisolated struct CreditGroup: Identifiable, Sendable {
+        let kind: CreditRole.Kind
+        let people: [Person]
+        var id: String { kind.rawValue }
+        var title: String { kind.label }
+
+        nonisolated struct Person: Identifiable, Sendable {
+            let name: String
+            /// The job as the record itself stated it — "Mastered By" rather
+            /// than the bucket it was sorted into.
+            let role: String
+            /// Which tracks, when it was not the whole record.
+            let tracks: String?
+            var id: String { "\(name)|\(role)|\(tracks ?? "")" }
+
+            /// "Mastered By", or "Mastered By · A1 to A4".
+            var detail: String {
+                guard let tracks, !tracks.isEmpty else { return role }
+                return "\(role) · \(tracks)"
+            }
         }
     }
 
@@ -524,6 +550,33 @@ nonisolated struct DigEngine {
         )
     }
 
+    /// The sleeve, grouped by what each person did.
+    ///
+    /// The same person is often credited several ways on one record — written
+    /// by and produced by and playing the bass — and each of those is a
+    /// separate line rather than a merged one, because "Producer, Bass" is
+    /// what the record says and joining them would be Indigo's summary of it.
+    /// What is merged is an exact repeat, which Discogs does emit.
+    static func creditGroups(from record: DiscogsReleaseRecord) -> [DigReleaseProfile.CreditGroup] {
+        var byKind: [CreditRole.Kind: [DigReleaseProfile.CreditGroup.Person]] = [:]
+        var seen = Set<String>()
+        for (index, name) in record.creditNames.enumerated() {
+            guard ArtistName.isRealArtist(name) else { continue }
+            let role = index < record.creditRoles.count ? record.creditRoles[index] : ""
+            guard let kind = CreditRole.kind(of: role) else { continue }
+            let tracks = index < record.creditTracks.count
+                ? record.creditTracks[index].nonEmpty : nil
+            let person = DigReleaseProfile.CreditGroup.Person(
+                name: name, role: role, tracks: tracks
+            )
+            guard seen.insert("\(kind.rawValue)|\(person.id)").inserted else { continue }
+            byKind[kind, default: []].append(person)
+        }
+        return byKind
+            .map { DigReleaseProfile.CreditGroup(kind: $0.key, people: $0.value) }
+            .sorted { $0.kind.rank < $1.kind.rank }
+    }
+
     /// Everything playable across an artist's catalogued releases, newest
     /// first and deduplicated — the same recording is often attached to a
     /// pressing and its reissue.
@@ -580,6 +633,7 @@ nonisolated struct DigEngine {
                 artist: index < record.trackArtists.count ? record.trackArtists[index].nonEmpty : nil
             )
         }
+        let credits = Self.creditGroups(from: record)
         var relatedByName: [String: RelatedArtist] = [:]
         for artist in record.artistNames {
             for peer in relatedArtists(to: artist) {
@@ -596,7 +650,7 @@ nonisolated struct DigEngine {
             labels: labels, genres: record.genres, styles: record.styles,
             imageURL: record.imageURL ?? artwork.full,
             thumbnailURL: record.thumbnailURL ?? artwork.thumbnail,
-            tracks: tracks, notes: record.notes,
+            tracks: tracks, credits: credits, notes: record.notes,
             sourceURL: record.profileURL,
             listen: Self.listenLines(from: [record]),
             related: relatedByName.values.sorted {

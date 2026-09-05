@@ -206,10 +206,17 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
             return recordingID.map { .digRecording(id: $0, title: title) }
         case .catalogNumber:
             return .digCatalog(number: title)
-        case .selector, .style, .scene, .station:
+        case .scene:
+            // A scene has had a page for a while; this was the one route to
+            // it that did not know. DEEP and the graph both hand back scene
+            // nodes, and every one of them was a row that would not open —
+            // which in a thing built on "no dead ends" is the worst kind of
+            // gap, because it looks like a link.
+            return .digScene(city: title)
+        case .selector, .style, .station:
             // A station is a section of the app rather than a page inside
-            // one, so it is reached through `route` instead. A style and a
-            // scene are lenses, and a selector is evidence.
+            // one, so it is reached through `route` instead. A style is a
+            // lens, and a selector has nowhere to go yet.
             return nil
         }
     }

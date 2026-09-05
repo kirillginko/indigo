@@ -36,6 +36,8 @@ nonisolated extension RelationshipKind {
         case .appearsOnRelease: "ON RELEASE"
         case .sameRelease: "SAME RELEASE"
         case .collaborator: "COLLABORATOR"
+        case .producer: "PRODUCER"
+        case .personnel: "PERSONNEL"
         case .playedInShow: "PLAYED IN"
         case .playedBySameSelector: "SAME SELECTOR"
         case .frequentlyPlayedNearby: "PLAYED NEARBY"
@@ -58,6 +60,12 @@ nonisolated extension RelationshipKind {
         case .sameRelease, .appearsOnRelease, .sameArtist: 0.9
         case .sharedLabel: 0.88
         case .collaborator: 0.86
+        // A sleeve credit is a fact somebody typed off the record itself, so
+        // it is evidence of the same order as a shared label. Production is
+        // ranked above the rest of the personnel only because it says more
+        // about how a record sounds.
+        case .producer: 0.87
+        case .personnel: 0.84
         case .manualRelation: 0.85
         case .sharedBroadcast, .playedInShow: 0.7
         case .frequentlyPlayedNearby: 0.68

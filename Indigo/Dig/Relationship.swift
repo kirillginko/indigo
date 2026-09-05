@@ -20,6 +20,12 @@ nonisolated enum RelationshipKind: String, Hashable, Sendable {
     case sameArtist
     case appearsOnRelease
     case collaborator
+    /// Shaped the record without necessarily playing on it — producer, mixer,
+    /// remixer. Kept apart from `personnel` because "who produces this" is one
+    /// of the strongest routes through underground music there is.
+    case producer
+    /// Played, sang, wrote, or engineered. The rest of the sleeve.
+    case personnel
     case playedInShow
     case inYourLibrary
     case inYourCrate

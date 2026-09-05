@@ -136,6 +136,16 @@ struct DigReleaseView: View {
 
                         listen(profile)
 
+                        if !profile.credits.isEmpty {
+                            // Under the tracklist rather than over it: the
+                            // record is the music first. But every name here
+                            // opens, which is the point — following an
+                            // engineer out of a sleeve is how a run of records
+                            // that sound alike turns out to have one person
+                            // behind them.
+                            credits(profile)
+                        }
+
                         if !profile.tracks.isEmpty {
                             DigSection(title: "Tracklist", trailing: "\(profile.tracks.count)") {
                                 VStack(spacing: 0) {
@@ -250,6 +260,37 @@ struct DigReleaseView: View {
 
     /// Hearing it.
     ///
+    /// Everybody else on the record, grouped by what they did.
+    ///
+    /// Every name opens their page. That is the whole of what this block is
+    /// for: a producer or an engineer is a route through a catalogue that no
+    /// resemblance-based recommendation can offer, because it is a fact
+    /// somebody typed off the back of the sleeve.
+    ///
+    /// Sleeve credits — design, photography, whoever pressed it — never reach
+    /// here; they are dropped when the record is written. See `CreditRole`.
+    @ViewBuilder
+    private func credits(_ profile: DigReleaseProfile) -> some View {
+        let total = profile.credits.reduce(0) { $0 + $1.people.count }
+        DigSection(title: "Credits", trailing: total > 1 ? "\(total)" : nil) {
+            VStack(alignment: .leading, spacing: 18) {
+                ForEach(profile.credits) { group in
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(group.title)
+                            .microLabel(1.4, size: 9)
+                            .foregroundStyle(Palette.inkFaint)
+                            .padding(.bottom, 4)
+                        ForEach(group.people) { person in
+                            DigLine(text: person.name, detail: person.detail) {
+                                appState.open(.digArtist(mbid: nil, name: person.name))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /// These are the recordings whoever catalogued this pressing linked to it,
     /// which is a far better match than asking a search engine for the track's
     /// name and hoping. They play in Indigo's own transport through YouTube's

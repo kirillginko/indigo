@@ -201,6 +201,7 @@ nonisolated struct DeepEngine {
         // The obvious answers: another name for the same person, someone they
         // recorded with, a record they are both on.
         if !kinds.isDisjoint(with: [.sameAlias, .aliasOrProject, .collaborator,
+                                    .producer, .personnel,
                                     .sameRelease, .appearsOnRelease, .sameArtist]) {
             return .surface
         }
