@@ -133,6 +133,53 @@ final class CrateService {
         return listeningMembership[url]
     }
 
+    // MARK: - Row cache
+
+    /// Where each row can be played from, and where its DIG button goes.
+    ///
+    /// Both read the store, so they are worked out when the crate changes
+    /// rather than while it is being drawn — and they live here rather than in
+    /// the view, because a view's state is discarded the moment somebody
+    /// navigates away. Held there, every return to the crate drew the whole
+    /// list unresolved and then resolved it a moment later, which is the
+    /// reshuffle you could see on the way in.
+    private(set) var resolvedSources: [UUID: AudioSource] = [:]
+    private(set) var digDestinations: [UUID: DetailPage] = [:]
+    /// False only before the first pass has ever run. A row is playable until
+    /// proven otherwise, so that a list drawn before the answers arrive does
+    /// not tell somebody their music cannot be played.
+    private(set) var hasResolvedRows = false
+    @ObservationIgnored private var resolvedRevision = -1
+    @ObservationIgnored private var resolvedDigRevision = -1
+
+    /// Recomputes the row cache when something it depends on has moved.
+    ///
+    /// `digDestination` is passed in rather than reached for: the crate has no
+    /// business knowing what DIG is, and this is the one thing on a row that
+    /// DIG decides.
+    func refreshRowCache(
+        digRevision: Int, digDestination: (Recording) -> DetailPage?
+    ) {
+        guard !hasResolvedRows
+                || resolvedRevision != revision
+                || resolvedDigRevision != digRevision
+        else { return }
+        var sources: [UUID: AudioSource] = [:]
+        var pages: [UUID: DetailPage] = [:]
+        let resolver = SourceResolver(context: context)
+        for item in items() {
+            if let found = resolver.best(item) { sources[item.id] = found }
+            if let recording = item.recording, let page = digDestination(recording) {
+                pages[item.id] = page
+            }
+        }
+        resolvedSources = sources
+        digDestinations = pages
+        resolvedRevision = revision
+        resolvedDigRevision = digRevision
+        hasResolvedRows = true
+    }
+
     // MARK: - Writing
 
     /// Crating the same thing twice is a no-op rather than a duplicate — the

@@ -739,21 +739,37 @@ final class DigStore {
     /// again. Which reads as a page loading twice, and is the thing that made
     /// it feel slow when nothing about it was.
     private(set) var exploreOffers = ExploreOffers()
-    @ObservationIgnored private var offersGeneration = -1
+    @ObservationIgnored private var offersCrateRevision = -1
+    @ObservationIgnored private var offersBuiltAt = Date.distantPast
     @ObservationIgnored private var offersTask: Task<Void, Never>?
 
-    /// Recomputes when the graph has moved since the last answer, and does
-    /// nothing at all when it has not.
-    func refreshExploreOffers() async {
-        let asked = revision
-        guard offersGeneration != asked else { return }
+    /// How long an answer stands before it is worth asking again.
+    ///
+    /// Not tied to `revision`, which is what this used to key on. Enrichment
+    /// bumps that several times a second while it works, so keying on it meant
+    /// the block was rebuilt on every visit and the cards moved under the
+    /// cursor a moment after the page opened. Almost none of those writes
+    /// changes what should be suggested.
+    @ObservationIgnored private static let offersLifetime: TimeInterval = 15 * 60
+
+    /// Recomputes when the crate has changed, when there is nothing yet, or
+    /// when the answer has simply been standing a while. Otherwise does
+    /// nothing at all — a set of recommendations that rearranges itself while
+    /// somebody is reading it is worse than one that is a quarter of an hour
+    /// out of date.
+    func refreshExploreOffers(crateRevision: Int) async {
+        let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
+        guard offersCrateRevision != crateRevision || exploreOffers.isEmpty || isStale
+        else { return }
         offersTask?.cancel()
+        let asked = revision
         let task = Task { [weak self] in
             guard let self else { return }
             self.settle()
             let found = await self.worker.exploreOffers(generation: asked)
             guard !Task.isCancelled else { return }
-            self.offersGeneration = asked
+            self.offersCrateRevision = crateRevision
+            self.offersBuiltAt = Date()
             self.exploreOffers = found
         }
         offersTask = task

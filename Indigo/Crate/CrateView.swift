@@ -85,7 +85,7 @@ struct CrateView: View {
                                     // to resolve the row's source again — three
                                     // times per row, each a fresh walk of the
                                     // ways it could be played, on every redraw.
-                                    let playable = resolved[item.id]
+                                    let playable = crate.resolvedSources[item.id]
                                     let current = isCurrent(playable)
                                     // Playable until proven otherwise. The map
                                     // is filled a moment after the list draws,
@@ -93,7 +93,7 @@ struct CrateView: View {
                                     // while we are still working it out is
                                     // worse than one that finds out on press —
                                     // which `play` does anyway.
-                                    let canPlay = playable != nil || !hasResolved
+                                    let canPlay = playable != nil || !crate.hasResolvedRows
                                     CrateRow(
                                         item: item,
                                         localArtworkKey: localTrack?.artworkKey,
@@ -101,7 +101,7 @@ struct CrateView: View {
                                         canPlay: canPlay,
                                         isCurrent: current,
                                         isPlaying: current && player.isPlaying,
-                                        digDestination: destinations[item.id],
+                                        digDestination: crate.digDestinations[item.id],
                                         open: { open(item) },
                                         play: { play(item) },
                                         dig: { page in appState.open(page) },
@@ -164,26 +164,9 @@ struct CrateView: View {
         SourceResolver(context: crate.context).best(item)
     }
 
-    /// Where each row can be played from, and where its DIG button goes.
-    ///
-    /// Both read the store, so they are worked out when the crate changes
-    /// rather than while it is being drawn.
-    @State private var resolved: [UUID: AudioSource] = [:]
-    @State private var destinations: [UUID: DetailPage] = [:]
-    @State private var hasResolved = false
 
     private func readRows() {
-        var sources: [UUID: AudioSource] = [:]
-        var pages: [UUID: DetailPage] = [:]
-        for item in crate.items() {
-            if let found = source(for: item) { sources[item.id] = found }
-            if let recording = item.recording, let page = dig.destination(for: recording) {
-                pages[item.id] = page
-            }
-        }
-        resolved = sources
-        destinations = pages
-        hasResolved = true
+        crate.refreshRowCache(digRevision: dig.revision) { dig.destination(for: $0) }
     }
 
     private func isCurrent(_ source: AudioSource?) -> Bool {

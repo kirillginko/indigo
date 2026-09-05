@@ -45,8 +45,11 @@ struct ExploreView: View {
         .background(MapColor.cobalt)
         .task { crate.backfillLocalGenres() }
         // Kept on the store, so coming back to this page shows what it showed
-        // last time rather than emptying itself and filling in again.
-        .task(id: dig.revision) { await dig.refreshExploreOffers() }
+        // last time rather than emptying itself and filling in again. Keyed on
+        // the crate rather than on the graph: enrichment moves the graph
+        // several times a second and almost none of it changes what should be
+        // suggested.
+        .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
     }
 
     private func header(_ kept: [CrateItem]) -> some View {
