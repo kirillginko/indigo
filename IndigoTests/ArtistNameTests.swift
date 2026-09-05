@@ -238,6 +238,64 @@ final class LabelNameTests: XCTestCase {
         )
     }
 
+    /// A collaboration put out by one of its members is still nobody's label.
+    /// All four of these were sitting in a real cache.
+    func testACollaborationReleasedByOneOfItsMembersIsSelfPublished() {
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Bardo Pond", artist: "Bardo Pond, Acid Mothers Temple, Guru Guru"
+        ))
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Space Afrika", artist: "Rainy Miller x Space Afrika"
+        ))
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Flora Purim", artist: "Airto Moreira, Flora Purim"
+        ))
+    }
+
+    /// A credit joined by a dash is not split, so this one is missed.
+    ///
+    /// Recorded rather than fixed. `creditedArtists` is what decides whose
+    /// page a record appears on across the whole app, and teaching it a new
+    /// separator to mend one label is a change with a much longer reach than
+    /// the thing it would mend.
+    func testACreditJoinedByADashIsNotYetRecognised() {
+        XCTAssertFalse(LabelName.isSelfPublished(
+            publisher: "Anthony Braxton", artist: "ANDREW CYRILLE - ANTHONY BRAXTON"
+        ))
+    }
+
+    /// The credit is the publisher and then a formation.
+    func testAnArtistsOwnEnsembleIsNotTheirLabel() {
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Christof Thewes", artist: "Christof Thewes Quartet"
+        ))
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Misha Panfilov", artist: "Misha Panfilov Septet"
+        ))
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Soft Machine", artist: "Soft Machine Legacy"
+        ))
+        XCTAssertTrue(LabelName.isSelfPublished(
+            publisher: "Lida Husik", artist: "Lida Husik and the Incarnations"
+        ))
+    }
+
+    /// Matched at a word boundary, so a label does not swallow an artist whose
+    /// name merely starts the same way.
+    func testALabelDoesNotSwallowAnArtistItMerelyPrefixes() {
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "Warp", artist: "Warpaint"))
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "Mute", artist: "Mutek"))
+    }
+
+    /// The line this stops at. An artist's own imprint named after them is a
+    /// real thing, and telling it from a side project needs to know who is
+    /// who — so these keep their label rather than risk deleting a real one.
+    func testAnArtistRunImprintIsLeftAlone() {
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "Grouper", artist: "Jefre Cantu-Ledesma"))
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "John Lurie", artist: "The Lounge Lizards"))
+        XCTAssertFalse(LabelName.isSelfPublished(publisher: "SBTRKT", artist: "KAYTRANADA"))
+    }
+
     func testARealLabelPublishingAnArtistIsStillALabel() {
         XCTAssertFalse(LabelName.isSelfPublished(publisher: "Hyperdub", artist: "Burial"))
         XCTAssertFalse(LabelName.isSelfPublished(publisher: nil, artist: "Burial"))

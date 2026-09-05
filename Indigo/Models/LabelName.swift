@@ -90,11 +90,31 @@ nonisolated enum LabelName {
     /// in a way that looks like an imprint, and treated as one it makes every
     /// self-releasing artist a labelmate of themselves and puts their own name
     /// in the list of who put their records out.
+    /// Three ways of being the same person, all of them readable off the two
+    /// strings. What is deliberately *not* here is an artist-run imprint named
+    /// after its founder — Grouper publishing Jefre Cantu-Ledesma, John Lurie
+    /// publishing The Lounge Lizards. Telling those from a side project needs
+    /// to know who is who, and guessing wrong deletes a real label, which is
+    /// the worse mistake of the two.
     static func isSelfPublished(publisher: String?, artist: String?) -> Bool {
         guard let publisher, let artist else { return false }
         let label = RecordingKey.normalizeArtist(publisher)
         let credited = RecordingKey.normalizeArtist(artist)
         guard !label.isEmpty, !credited.isEmpty else { return false }
-        return label == credited
+
+        // The plain case: they are the same name.
+        if label == credited { return true }
+
+        // The publisher is one of the people credited — "Bardo Pond" putting
+        // out "Bardo Pond, Acid Mothers Temple, Guru Guru". A collaboration
+        // released by one of its members is still nobody's label.
+        let publishing = Set(RecordingKey.creditedArtists(publisher))
+        let performing = Set(RecordingKey.creditedArtists(artist))
+        if !publishing.isEmpty, !publishing.isDisjoint(with: performing) { return true }
+
+        // The credit is the publisher and then a formation: "Christof Thewes
+        // Quartet", "Misha Panfilov Septet", "Soft Machine Legacy". Matched at
+        // a word boundary, so a label called Warp does not swallow Warpaint.
+        return credited.hasPrefix(label + " ")
     }
 }

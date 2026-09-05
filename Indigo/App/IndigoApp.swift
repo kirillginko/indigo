@@ -88,6 +88,15 @@ struct IndigoApp: App {
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
                     witness.watch(player)
+                    // One-shot repair of rows that stored an artist as their
+                    // own label. Off the main actor and off the critical path:
+                    // nothing below waits for it, and it finds nothing to do
+                    // on every launch after the first.
+                    Task.detached {
+                        await BandcampEnricher.repairSelfPublishedLabels(
+                            in: Persistence.container
+                        )
+                    }
                     library.restore()
                     nts.startPolling()
                     kiosk.startPolling()

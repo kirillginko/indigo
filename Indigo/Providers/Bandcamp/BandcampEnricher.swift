@@ -33,6 +33,54 @@ nonisolated struct BandcampEnricher {
         self.client = client
     }
 
+    // MARK: Repair
+
+    /// Clears the publisher out of rows that were storing an artist as their
+    /// own label.
+    ///
+    /// Reading through `BandcampRelease.imprint` already hides these, so this
+    /// changes nothing anyone can see. It is here because the wrong value is
+    /// still in the store and a cached release is never refetched — this
+    /// enricher skips any URL it already has rather than renewing it — so
+    /// without a repair those rows keep a claim about somebody for as long as
+    /// the app is installed, and every future reader has to remember to go the
+    /// long way round.
+    ///
+    /// Runs on its own context off the main thread, for the reason `DigWorker`
+    /// exists: this reads a whole table, and the main actor is where the app
+    /// draws. Returns how many rows it mended, which is what the test asserts
+    /// on and what a second run proves by answering zero.
+    ///
+    /// Needs no "already done" marker. It asks only for rows that still name a
+    /// publisher, so once they are cleared the query narrows to the handful of
+    /// releases that really are on a label, and afterwards it finds nothing to
+    /// do in a single small read.
+    @discardableResult
+    nonisolated static func repairSelfPublishedLabels(in container: ModelContainer) async -> Int {
+        let context = ModelContext(container)
+        // A plain optional-string attribute, which is a comparison SQLite can
+        // translate. The array attributes on this model are not — see
+        // `cachedReleases(forArtist:)`.
+        let descriptor = FetchDescriptor<BandcampRelease>(
+            predicate: #Predicate { $0.labelName != nil }
+        )
+        guard let published = try? context.fetch(descriptor), !published.isEmpty else { return 0 }
+
+        var mended = 0
+        for release in published
+        where LabelName.isSelfPublished(publisher: release.labelName, artist: release.artistName) {
+            release.labelName = nil
+            mended += 1
+        }
+        guard mended > 0 else { return 0 }
+        // A count of what was mended is worth nothing if the mending did not
+        // land, so a failed save reports none rather than the number it
+        // would have been. Nothing is lost by that: the rows are still there
+        // to find, and the next launch will try again.
+        do { try context.save() } catch { return 0 }
+        return mended
+    }
+
     // MARK: Reading the cache
 
     func cachedReleases(forArtist name: String) -> [BandcampRelease] {
