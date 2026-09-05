@@ -477,13 +477,31 @@ nonisolated struct DigEngine {
     /// Everything playable across an artist's catalogued releases, newest
     /// first and deduplicated — the same recording is often attached to a
     /// pressing and its reissue.
+    ///
+    /// Twice over, because a recording repeats itself two ways. The same
+    /// video arrives under two shapes of its address, so identity is the
+    /// video's id rather than the link; and the same recording is uploaded
+    /// twice, once as "[Official Audio]" and once plain, which is one
+    /// recording as far as somebody reading the list is concerned. Titles are
+    /// compared after cleaning, which is what makes those two meet.
     private static func listenLines(from releases: [DiscogsReleaseRecord]) -> [DigReleaseProfile.ListenLine] {
-        var seen = Set<String>()
+        var seenRecordings = Set<String>()
+        var seenTitles = Set<String>()
         return releases
             .sorted { ($0.year ?? 0) > ($1.year ?? 0) }
             .flatMap(\.videos)
-            .filter { seen.insert($0.url.absoluteString).inserted }
-            .map { DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds) }
+            .compactMap { video in
+                let identity = YouTubeLink.videoID(from: video.url) ?? video.url.absoluteString
+                guard seenRecordings.insert(identity).inserted else { return nil }
+                let title = YouTubeTitle.clean(video.title)
+                // "Untitled" is not a name — it is the absence of one, and
+                // white labels are full of them. It never stands in the way
+                // of the next recording.
+                let key = RecordingKey.normalize(title)
+                guard key.isEmpty || key == "untitled" || seenTitles.insert(key).inserted
+                else { return nil }
+                return DigReleaseProfile.ListenLine(url: video.url, title: title, seconds: video.seconds)
+            }
     }
 
     /// Tags from two sources, without repeating what either already said.
@@ -530,9 +548,7 @@ nonisolated struct DigEngine {
             thumbnailURL: record.thumbnailURL ?? artwork.thumbnail,
             tracks: tracks, notes: record.notes,
             sourceURL: record.profileURL,
-            listen: record.videos.map {
-                DigReleaseProfile.ListenLine(url: $0.url, title: $0.title, seconds: $0.seconds)
-            },
+            listen: Self.listenLines(from: [record]),
             related: relatedByName.values.sorted {
                 $0.weight == $1.weight ? $0.name < $1.name : $0.weight > $1.weight
             }

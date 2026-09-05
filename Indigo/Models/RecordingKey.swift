@@ -19,8 +19,16 @@ nonisolated enum RecordingKey {
     ]
 
     /// Case-, diacritic- and punctuation-insensitive form used for comparison.
+    ///
+    /// Called for nearly every comparison the app makes — every credit in a
+    /// graph walk, every title in a Listen list — so the common case is worth
+    /// spelling out. `folding` reaches into ICU and `CharacterSet.contains`
+    /// crosses into Foundation once per scalar; for a plain ASCII string
+    /// neither can do anything a byte loop cannot, and the loop is around
+    /// twenty times quicker. Anything else takes the general path below.
     static func normalize(_ value: String?) -> String {
         guard let value else { return "" }
+        if let ascii = normalizeASCII(value) { return ascii }
         let folded = value.folding(
             options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive],
             locale: nil
@@ -31,6 +39,33 @@ nonisolated enum RecordingKey {
         return String(stripped)
             .split(separator: " ", omittingEmptySubsequences: true)
             .joined(separator: " ")
+    }
+
+    /// The same answer as `normalize`, for the strings it can be sure about.
+    ///
+    /// Only ASCII: above it, case folding stops being "add 32", the width- and
+    /// diacritic-insensitive passes have work to do, and `alphanumerics`
+    /// stops meaning `[0-9A-Za-z]`. Returns nil rather than guessing, and the
+    /// caller falls back.
+    private static func normalizeASCII(_ value: String) -> String? {
+        var bytes = [UInt8]()
+        bytes.reserveCapacity(value.utf8.count)
+        var pendingSpace = false
+        for byte in value.utf8 {
+            guard byte < 0x80 else { return nil }
+            let isDigit = byte >= 0x30 && byte <= 0x39
+            let isUpper = byte >= 0x41 && byte <= 0x5A
+            let isLower = byte >= 0x61 && byte <= 0x7A
+            guard isDigit || isUpper || isLower else {
+                // Runs of punctuation collapse to one separator, and a
+                // trailing one is never written at all.
+                pendingSpace = !bytes.isEmpty
+                continue
+            }
+            if pendingSpace { bytes.append(0x20); pendingSpace = false }
+            bytes.append(isUpper ? byte + 0x20 : byte)
+        }
+        return String(decoding: bytes, as: UTF8.self)
     }
 
     /// Normalised title with the bracketed cruft catalogues disagree about

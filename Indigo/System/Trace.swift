@@ -75,6 +75,32 @@ nonisolated enum Trace {
         return try body()
     }
 
+    /// The same, for something called on every render.
+    ///
+    /// A step in a `body` writes a line per redraw, and a trace flooded with
+    /// "0ms" is a trace nobody can read — worse, the file flushes every forty
+    /// lines, so measuring the render adds to it. This one keeps quiet until
+    /// it has something to report.
+    @discardableResult
+    static func slowStep<T>(
+        _ name: StaticString,
+        _ detail: String = "",
+        over threshold: Duration = .milliseconds(50),
+        _ body: () throws -> T
+    ) rethrows -> T {
+        let started = ContinuousClock.now
+        defer {
+            let elapsed = ContinuousClock.now - started
+            if elapsed > threshold {
+                let where_ = Thread.isMainThread ? "MAIN" : "bg"
+                let line = "\(name) [\(where_)] \(detail) \(Self.milliseconds(elapsed))ms"
+                log.info("\(line, privacy: .public)")
+                Self.write(line)
+            }
+        }
+        return try body()
+    }
+
     /// Under test, the same lines go to a file.
     ///
     /// A test host's `Logger` output reaches neither xcodebuild nor the

@@ -20,6 +20,10 @@ struct MiniPlayerView: View {
     @Environment(AlharaProvider.self) private var alhara
     @Environment(CashmereProvider.self) private var cashmere
     @Environment(LYLProvider.self) private var lyl
+    @Environment(IdaProvider.self) private var ida
+    @Environment(Radio80000Provider.self) private var radio80000
+    @Environment(PanikProvider.self) private var panik
+    @Environment(RovrProvider.self) private var rovr
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(\.openWindow) private var openWindow
@@ -189,6 +193,15 @@ struct MiniPlayerView: View {
         if item.sourceID == AlharaProvider.providerID { return alhara.now(for: item.id) }
         if item.sourceID == CashmereProvider.providerID { return cashmere.now }
         if item.sourceID == LYLProvider.providerID { return lyl.now }
-        return nts.state(for: item.id)?.now
+        // See `PlayerBarView.liveShow`: these four publish what is on and
+        // were never asked.
+        if item.sourceID == IdaProvider.providerID {
+            return ida.channel(for: item.id).flatMap { ida.now(for: $0) }
+        }
+        if item.sourceID == Radio80000Provider.providerID { return radio80000.now }
+        if item.sourceID == PanikProvider.providerID { return panik.now }
+        if item.sourceID == RovrProvider.providerID { return rovr.now }
+        if item.sourceID == NTSProvider.providerID { return nts.state(for: item.id)?.now }
+        return nil
     }
 }

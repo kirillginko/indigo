@@ -93,6 +93,74 @@ actor DigWorker {
         return scenes ?? SceneEngine(context: modelContext)
     }
 
+    /// Every picture the background fill has found, by normalised name.
+    ///
+    /// Read here rather than on the store's own context. It is the whole
+    /// `ArtistPortrait` table, it grows for as long as the app is open, and
+    /// the store read it in one statement on the main actor four seconds
+    /// after launch — which is the hitch a listener sees once the window has
+    /// settled. A dictionary of strings and URLs crosses back, which is the
+    /// same bargain every other method here makes.
+    func portraitIndex() -> [String: URL] {
+        Trace.step("portraits.index") {
+            Dictionary(
+                ((try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
+                    .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
+                uniquingKeysWith: { first, _ in first }
+            )
+        }
+    }
+
+    /// Names still wanting a picture: somebody named as a connection, who has
+    /// neither been dug into nor already been looked up.
+    ///
+    /// Here for the same reason as `portraitIndex()`. It reads the artist
+    /// table and the portrait table whole and normalises every credit on
+    /// every artist, and the store rebuilt it on the main actor each time the
+    /// revision moved — which, during enrichment, is often.
+    func pendingPortraits() -> [String] {
+        Trace.step("portraits.pending") {
+            let artists = (try? modelContext.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
+            let dug = Set(artists.filter { $0.imageURLString?.isEmpty == false }.map(\.nameKey))
+            let looked = Dictionary(
+                ((try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
+                    .map { ($0.nameKey, $0.isWorthRetrying) },
+                uniquingKeysWith: { first, _ in first }
+            )
+
+            var pending: [String] = []
+            var seen = Set<String>()
+            for artist in artists {
+                let named = artist.labelNeighbourNames + artist.styleNeighbourNames
+                    + artist.collaboratorNames + artist.aliasNames
+                    + artist.memberNames + artist.groupNames
+                for name in named {
+                    let key = RecordingKey.normalizeArtist(name)
+                    guard !key.isEmpty, !dug.contains(key), seen.insert(key).inserted else { continue }
+                    if let worthRetrying = looked[key], !worthRetrying { continue }
+                    pending.append(name)
+                }
+            }
+            return pending
+        }
+    }
+
+    /// Which cached releases list this recording.
+    ///
+    /// `videoURLStrings` is a plain `[String]` attribute, which the store
+    /// keeps as one opaque value — there is nothing inside it for a query to
+    /// look at, and a `#Predicate` naming it takes the process down. So this
+    /// is a walk of the release table, and a walk belongs here: it used to
+    /// happen on the main actor at the exact moment a recording refused to
+    /// play, which is the moment a listener is waiting on the transport.
+    func releasesListing(_ address: String) -> [Int] {
+        Trace.step("releases.listing") {
+            ((try? modelContext.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [])
+                .filter { $0.videoURLStrings.contains(address) }
+                .map(\.discogsID)
+        }
+    }
+
     func artistProfile(name: String, mbid: String?, generation: Int) -> ArtistProfile {
         engine(generation).artistProfile(name: name, mbid: mbid)
     }

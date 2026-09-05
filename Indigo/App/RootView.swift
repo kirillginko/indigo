@@ -160,7 +160,7 @@ struct RootView: View {
                         // Wired here because both are in scope and neither
                         // should know how to find the other.
                         player.onUnplayableRecording = { [weak dig] url in
-                            dig?.markUnplayable(url)
+                            Task { await dig?.markUnplayable(url) }
                         }
                     }
             } else {

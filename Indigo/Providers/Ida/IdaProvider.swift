@@ -27,8 +27,17 @@ final class IdaProvider: RadioProvider {
         case failed(String)
     }
 
-    /// The station's own mark, for when there is no picture of what is on.
-    static let logoURL = URL(string: "https://idaidaida.net/favicon.ico")
+    /// The station's own mark, for when there is no picture of what is on —
+    /// which for IDA is most of the time: its live endpoint publishes
+    /// `featuredImage: null` for a channel that is on air.
+    ///
+    /// `/favicon.ico` is a 404 here, and IDA's 404 is an HTML page rather than
+    /// a status the image pipeline can refuse — so the bar loaded a document,
+    /// failed to make a picture of it, and left the last station's artwork up.
+    /// The site's own icons are `/favicons/dark.ico` and `light.ico`, both
+    /// solid colour blocks with no legible mark, so this is the card IDA
+    /// publishes for itself. It is 1200x630 and will crop.
+    static let logoURL = URL(string: "https://idaidaida.net/og-image.png")
 
     private(set) var channels: [IdaChannel: IdaChannelState] = [:]
     private(set) var schedule: [IdaScheduleEntry] = []
@@ -109,6 +118,11 @@ final class IdaProvider: RadioProvider {
             title: station.name,
             subtitle: state.episode?.title ?? "Live",
             detail: channel.city,
+            // What is on, the way NTS carries it. Without this the item says
+            // nothing about how it looks, and a bar that has just been
+            // showing another station has nothing to replace that picture
+            // with — so the previous station's artwork stays up.
+            remoteArtworkURL: state.episode?.imageURL,
             playbackURL: station.streamURL
         )
     }

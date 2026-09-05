@@ -179,17 +179,28 @@ nonisolated struct GraphStore {
         )) ?? []
         // A picture found after the edge was written must not be hidden by it.
         //
-        // This used to fetch the whole portrait table here, on the grounds
-        // that it is small. It is not: the background fill adds a row every
-        // second and a half for as long as the app is open, and a session's
-        // worth of them was being read on every stored-edge lookup — 178ms a
-        // walk, measured, and rising all session. The fold has already read
-        // that table; this reads the fold.
-        let caches = self.caches
+        // Asked for by name. This used to fetch the whole portrait table on
+        // the grounds that it is small — it is not, the background fill adds
+        // a row every second and a half — and then to read the fold instead,
+        // which is free only where somebody has already paid for the fold.
+        //
+        // On the main actor nobody has. `DigHistory.suggestions()` builds a
+        // GraphStore of its own, and the first stored lookup through it
+        // assembled six tables to colour in a handful of rows: 560ms of
+        // stopped main thread in the trace, once per revision, which is the
+        // hitch that paused the shader. A stored answer is meant to be a
+        // couple of indexed queries, and now is one.
+        // Built once. Asking each row for its edge to collect the names, and
+        // again to assemble the answer, doubles the only real work in here —
+        // which `testCostOfTheWalkThePageActuallyAsksFor` notices.
+        let built = rows.map { $0.edge(from: node) }
+        let portraits = portraitURLs(
+            forKeys: built.compactMap { $0.to.artworkURL == nil ? $0.to.key : nil }
+        )
         var edges = EdgeSet()
-        for row in rows {
-            var edge = row.edge(from: node)
-            if edge.to.artworkURL == nil, let portrait = caches.portrait(edge.to.key) {
+        for original in built {
+            var edge = original
+            if edge.to.artworkURL == nil, let portrait = portraits[edge.to.key] {
                 var destination = edge.to
                 destination.artworkURL = portrait
                 edge = MusicEdge(
@@ -200,6 +211,31 @@ nonisolated struct GraphStore {
             edges.insert(edge)
         }
         return edges
+    }
+
+    /// Pictures for exactly these names.
+    ///
+    /// Reads the fold where one has already been assembled — the profile
+    /// builder asks it a dozen questions and always has — and otherwise asks
+    /// the store, which is one query against `nameKey` rather than a reason
+    /// to read six tables whole.
+    private func portraitURLs(forKeys keys: [String]) -> [String: URL] {
+        guard !keys.isEmpty else { return [:] }
+        if let caches = assembledCaches {
+            return Dictionary(
+                keys.compactMap { key in caches.portrait(key).map { (key, $0) } },
+                uniquingKeysWith: { first, _ in first }
+            )
+        }
+        let wanted = Array(Set(keys))
+        let descriptor = FetchDescriptor<ArtistPortrait>(
+            predicate: #Predicate { wanted.contains($0.nameKey) }
+        )
+        return Dictionary(
+            ((try? context.fetch(descriptor)) ?? [])
+                .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
+            uniquingKeysWith: { first, _ in first }
+        )
     }
 
     private func persist(_ edges: EdgeSet, for node: MusicNode) {
@@ -820,6 +856,9 @@ private nonisolated struct Caches {
     private let shapeIndicesByLabelKey: [String: [Int]]
     private let shapeIndicesByStyleKey: [String: [Int]]
     private let portraitsByKey: [String: URL]
+    /// When that dictionary was last brought up to date, so the next build can
+    /// ask only for what has arrived since.
+    private let portraitsReadAt: Date
     private let recordingsByArtistKey: [String: [Recording]]
     /// Which albums an artist appears on, and what is on each album.
     private let albumKeysByArtistKey: [String: Set<String>]
@@ -993,13 +1032,45 @@ private nonisolated struct Caches {
         shapeIndicesByLabelKey = byLabel
         shapeIndicesByStyleKey = byStyle
 
-        portraitsByKey = kept(4, \.portraitsByKey) ?? Trace.step("t.portraits") {
-            Dictionary(
-                ((try? store.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
-                    .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
-                uniquingKeysWith: { first, _ in first }
-            )
+        // Only the pictures that have arrived since the last look.
+        //
+        // Reading this table whole was 243ms of a 614ms fold rebuild, and it
+        // was paid on nearly every one: the background fill inserts a row
+        // every second and a half for as long as the app is open, so its
+        // count is almost never the same twice and `kept` almost never held.
+        // That is the biggest single thing a cold page waits for.
+        //
+        // A row here is written once and never edited, and the one place that
+        // replaces an attempt deletes and re-inserts — so the replacement
+        // carries a newer `fetchedAt` too. Everything that can have changed
+        // is therefore newer than the last read, which also makes this more
+        // correct than the count was: a delete paired with an insert leaves
+        // the count alone, and used to be inherited straight past.
+        let portraitsCutoff = Date()
+        if let previous {
+            let since = previous.portraitsReadAt
+            portraitsByKey = Trace.step("t.portraits.since") {
+                var merged = previous.portraitsByKey
+                for record in (try? store.fetch(FetchDescriptor<ArtistPortrait>(
+                    predicate: #Predicate { $0.fetchedAt > since }
+                ))) ?? [] {
+                    guard let url = record.imageURL else { continue }
+                    merged[record.nameKey] = url
+                }
+                return merged
+            }
+        } else {
+            portraitsByKey = Trace.step("t.portraits") {
+                Dictionary(
+                    ((try? store.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
+                        .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
+                    uniquingKeysWith: { first, _ in first }
+                )
+            }
         }
+        // Captured before the read rather than after, so a row written while
+        // it ran is picked up next time instead of missed by both.
+        portraitsReadAt = portraitsCutoff
 
         albumKeysByArtistKey = library.albums
         tracksByAlbumKey = library.entries

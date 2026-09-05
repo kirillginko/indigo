@@ -258,13 +258,28 @@ final class CrateService {
     /// Genre persistence was added after the crate shipped. Recover tags for
     /// existing local entries from their indexed files instead of requiring
     /// listeners to remove and re-crate their library.
+    ///
+    /// One query for the whole backfill, because the For You page runs this
+    /// from a `.task` — which is the main actor, a moment after the page
+    /// appears. It used to ask for every `Track` in the library once per
+    /// crated entry and filter the answer in memory: with twelve thousand
+    /// tracks and a hundred and twenty entries that measured two minutes of
+    /// stopped main thread, and on any real library it is the hitch that
+    /// pauses the shader a few seconds in.
     func backfillLocalGenres() {
+        let pending = items().compactMap { item -> (item: CrateItem, paths: [String])? in
+            guard item.genreTags.isEmpty, let recording = item.recording else { return nil }
+            let paths = localPaths(of: recording)
+            return paths.isEmpty ? nil : (item, paths)
+        }
+        guard !pending.isEmpty else { return }
+
+        let genreByPath = genres(atPaths: Array(Set(pending.flatMap(\.paths))))
         var changed = false
-        for item in items() where item.genreTags.isEmpty {
-            guard let recording = item.recording else { continue }
-            let genres = localGenres(for: recording)
+        for entry in pending {
+            let genres = GenreTags.available(in: entry.paths.compactMap { genreByPath[$0] })
             guard !genres.isEmpty else { continue }
-            item.setGenres(genres)
+            entry.item.setGenres(genres)
             changed = true
         }
         if changed { save() }
@@ -321,11 +336,28 @@ final class CrateService {
     }
 
     private func localGenres(for recording: Recording) -> [String] {
-        let paths = Set(recording.sources.filter { $0.kind == .localFile }.map(\.identifier))
+        let paths = localPaths(of: recording)
         guard !paths.isEmpty else { return [] }
-        return GenreTags.available(in: ((try? context.fetch(FetchDescriptor<Track>())) ?? [])
-            .filter { paths.contains($0.path) }
-            .map(\.genre))
+        let genreByPath = genres(atPaths: paths)
+        return GenreTags.available(in: paths.compactMap { genreByPath[$0] })
+    }
+
+    /// Where this recording sits in the indexed library, if it does.
+    private func localPaths(of recording: Recording) -> [String] {
+        recording.sources.filter { $0.kind == .localFile }.map(\.identifier)
+    }
+
+    /// What the library calls these files, asked for by path.
+    ///
+    /// `path` is the unique attribute on `Track`, so the store answers this
+    /// from its index and materialises only the rows asked about — where
+    /// fetching the library and filtering it in memory materialises all of
+    /// it, on whichever actor the caller happens to be.
+    private func genres(atPaths paths: [String]) -> [String: String] {
+        guard !paths.isEmpty else { return [:] }
+        let descriptor = FetchDescriptor<Track>(predicate: #Predicate { paths.contains($0.path) })
+        let found = (try? context.fetch(descriptor)) ?? []
+        return Dictionary(found.map { ($0.path, $0.genre) }, uniquingKeysWith: { first, _ in first })
     }
 
     // MARK: - Persistence

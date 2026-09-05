@@ -26,14 +26,18 @@ struct ExploreView: View {
     ]
 
     var body: some View {
-        let kept = crateItems
+        // The page the shader lives on. Every stall left in the trace happens
+        // with nothing measured on the main actor, and a `body` is the last
+        // main-thread surface nothing measures — so this one says so. Silent
+        // under 50ms, which is nearly always.
+        let kept = Trace.slowStep("explore.crate") { crateItems }
         ScrollView {
             VStack(spacing: 0) {
-                header(kept)
+                Trace.slowStep("explore.header") { header(kept) }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
                         ExploreShaderField(seed: kept.prefix(8).reduce(193) { $0 &* 31 &+ stableSeed($1.displayTitle) })
-                        objects(kept, in: proxy.size)
+                        Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }
                     }
                     .overlayPreferenceValue(ExploreGraphKey.self) { nodes in
                         GeometryReader { geometry in
@@ -43,7 +47,7 @@ struct ExploreView: View {
                         .accessibilityHidden(true)
                     }
                 }
-                .frame(height: recommendationHeight(kept))
+                .frame(height: Trace.slowStep("explore.height") { recommendationHeight(kept) })
             }
         }
         .foregroundStyle(Color.black)

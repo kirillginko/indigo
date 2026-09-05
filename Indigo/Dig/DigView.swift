@@ -161,7 +161,7 @@ struct DigView: View {
         // confirming nothing had changed.
         let crateChanged = cached?.crateRevision != crate.revision
         if crateChanged {
-            entries = startingPoints()
+            entries = Trace.slowStep("dig.startingPoints") { startingPoints() }
         }
 
         // Always re-read: they have just been somewhere, and where they have

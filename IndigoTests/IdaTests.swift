@@ -221,6 +221,45 @@ final class IdaTests: XCTestCase {
         )
     }
 
+    /// The bar asks "what is on this station?" by source, and answers for
+    /// IDA by finding the channel behind the playing id and reading its
+    /// state. That lookup is what `PlayerBarView.liveShow` and
+    /// `MiniPlayerView.liveShow` were missing: IDA fell through to asking NTS
+    /// about an IDA channel id, got nothing, and so had no picture in the
+    /// bar, no show title, and no way to open the panel — which is gated on
+    /// there being a show at all.
+    ///
+    /// This pins the lookup. The two `liveShow` switches themselves are not
+    /// reachable from a test here.
+    func testAPlayingChannelCanBeTracedBackToWhatIsOnIt() throws {
+        let parsed = try decode(IdaLiveDTO.self, live).asLive()
+
+        for channel in [IdaChannel.tallinn, IdaChannel.helsinki] {
+            // The id the player carries for a live IDA stream.
+            let stationID = channel.stationID
+            let found = try XCTUnwrap(
+                IdaChannel.allCases.first { $0.stationID == stationID },
+                "The station id has to lead back to its channel"
+            )
+            XCTAssertEqual(found, channel)
+
+            let state = try XCTUnwrap(parsed.channels[found])
+            let show = try XCTUnwrap(
+                state.asRadioShow(city: found.city),
+                "A channel that is on air is showing something"
+            )
+            XCTAssertFalse(show.title.isEmpty, "Which the bar shows instead of the channel name")
+        }
+
+        // And why the station's own mark has to be a real image: IDA
+        // publishes `featuredImage: null` for a channel that is on air, so
+        // there is often nothing else for the bar to show.
+        for channel in [IdaChannel.tallinn, IdaChannel.helsinki] {
+            let state = try XCTUnwrap(parsed.channels[channel])
+            XCTAssertNil(state.episode?.imageURL, "Nothing published for what is on")
+        }
+    }
+
     /// A channel that is off air must still be listenable, so the station
     /// falls back to the published address rather than losing the stream.
     func testAChannelOffAirStillHasAStream() throws {

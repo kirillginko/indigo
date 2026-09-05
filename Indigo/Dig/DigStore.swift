@@ -52,9 +52,46 @@ final class DigStore {
     /// just inserted and not yet saved would otherwise get an answer computed
     /// without their change in it — a subtle, occasional wrongness that would
     /// be miserable to track down. Saving nothing costs nothing.
+    /// How long a burst of writes counts as one change.
+    @ObservationIgnored private static let changeWindow = Duration.milliseconds(400)
+    @ObservationIgnored private var pendingChange: Task<Void, Never>?
+    @ObservationIgnored private var lastChangeAt: ContinuousClock.Instant?
+
+    /// Tells the pages something changed — once for a burst of writes.
+    ///
+    /// Every announcement costs a full graph walk and a rebuild on each open
+    /// DIG surface, because that is what `.task(id: dig.revision)` is for.
+    /// Enriching one cold artist writes three times in as many seconds, and a
+    /// real session's trace showed four walks of the same artist inside a
+    /// single 3341ms enrichment that made exactly one network request. The
+    /// page was rebuilding itself out of a row still being written, and the
+    /// enrichment was queueing behind its own announcements on the main actor.
+    ///
+    /// The first write is announced at once, so a page that has been waiting
+    /// still fills in immediately. Anything arriving in the moment after it is
+    /// collapsed into a single announcement at the end of the burst.
+    private func announceChange() {
+        let now = ContinuousClock.now
+        guard let last = lastChangeAt, now - last < Self.changeWindow else {
+            pendingChange?.cancel()
+            pendingChange = nil
+            lastChangeAt = now
+            revision &+= 1
+            return
+        }
+        pendingChange?.cancel()
+        pendingChange = Task { [weak self] in
+            try? await Task.sleep(for: Self.changeWindow)
+            guard !Task.isCancelled, let self else { return }
+            self.pendingChange = nil
+            self.lastChangeAt = .now
+            self.revision &+= 1
+        }
+    }
+
     private func settle() {
         guard context.hasChanges else { return }
-        try? context.save()
+        saveContext()
     }
     @ObservationIgnored private let client: MusicBrainzClient
     @ObservationIgnored private let discogsClient: DiscogsClient
@@ -287,15 +324,15 @@ final class DigStore {
         // per release rebuilt the whole graph two dozen times — and bumping
         // only at the very end meant the grid sat blank until every last
         // request had landed.
-        try? context.save()
-        revision &+= 1
+        saveContext()
+        announceChange()
     }
 
     /// Throws away what was worked out about a node, because the catalogue it
     /// was worked out from has just changed.
     func forgetGraph(for node: MusicNode) {
         GraphStore.forget(node, in: context)
-        try? context.save()
+        saveContext()
     }
 
     /// Puts a newly found portrait onto the edges that already point at that
@@ -391,11 +428,15 @@ final class DigStore {
 
         // Let the page the listener is actually looking at finish first.
         try? await Task.sleep(for: .seconds(4))
-        portraits = Dictionary(
-            ((try? context.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
-                .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
-            uniquingKeysWith: { first, _ in first }
-        )
+        // On the worker, not here.
+        //
+        // This is the whole portrait table, and this store is main-actor
+        // isolated, so reading it inline was a full table materialised on the
+        // thread that draws — four seconds after launch, every launch, once
+        // the window had settled and the listener had started scrolling. The
+        // same read is measured at over two hundred milliseconds inside the
+        // fold, and nothing here measured it at all.
+        portraits = await worker.portraitIndex()
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -419,7 +460,7 @@ final class DigStore {
                 if Task.isCancelled { return }
             }
 
-            guard let next = nextPortraitNeeded() else {
+            guard let next = await nextPortraitNeeded() else {
                 if quiet > 0 { artworkRevision &+= 1 }
                 return
             }
@@ -460,7 +501,7 @@ final class DigStore {
             // Replaces any earlier attempt for the same name.
             if let existing = portrait(for: next) { context.delete(existing) }
             context.insert(record)
-            try? context.save()
+            saveContext()
 
             // Telling the page costs it a full rebuild of its graph, so this
             // is deliberately not done per picture. A name the listener is
@@ -502,7 +543,7 @@ final class DigStore {
     @ObservationIgnored private var portraitQueue: [String] = []
     @ObservationIgnored private var portraitQueueBuiltAt = 0
 
-    private func nextPortraitNeeded() -> String? {
+    private func nextPortraitNeeded() async -> String? {
         // The on-screen list is consumed rather than re-searched: each name
         // is checked once and then gone, instead of every name being looked
         // up again on every tick.
@@ -515,7 +556,7 @@ final class DigStore {
         }
         lastWasOnScreen = false
         if portraitQueue.isEmpty || portraitQueueBuiltAt != revision {
-            portraitQueue = pendingPortraits()
+            portraitQueue = await worker.pendingPortraits()
             portraitQueueBuiltAt = revision
         }
         while let next = portraitQueue.first {
@@ -523,30 +564,6 @@ final class DigStore {
             if portrait(for: next) == nil { return next }
         }
         return nil
-    }
-
-    private func pendingPortraits() -> [String] {
-        let artists = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
-        let dug = Set(artists.filter { $0.imageURLString?.isEmpty == false }.map(\.nameKey))
-        let looked = Dictionary(
-            ((try? context.fetch(FetchDescriptor<ArtistPortrait>())) ?? []).map { ($0.nameKey, $0) },
-            uniquingKeysWith: { first, _ in first }
-        )
-
-        var pending: [String] = []
-        var seen = Set<String>()
-        for artist in artists {
-            let named = artist.labelNeighbourNames + artist.styleNeighbourNames
-                + artist.collaboratorNames + artist.aliasNames
-                + artist.memberNames + artist.groupNames
-            for name in named {
-                let key = RecordingKey.normalizeArtist(name)
-                guard !key.isEmpty, !dug.contains(key), seen.insert(key).inserted else { continue }
-                if let attempt = looked[key], !attempt.isWorthRetrying { continue }
-                pending.append(name)
-            }
-        }
-        return pending
     }
 
     /// Reads an artist's Bandcamp, when their catalogue entry gives an
@@ -565,9 +582,9 @@ final class DigStore {
         guard let found = try? await enricher.enrich(artist: name, page: page, limit: limit),
               !found.isEmpty
         else { return }
-        try? context.save()
+        saveContext()
         forgetGraph(for: .artist(name))
-        revision &+= 1
+        announceChange()
     }
 
     /// Asks whether each recording can actually be played, and remembers the
@@ -606,26 +623,34 @@ final class DigStore {
                 guard let verdict = verdicts[offset] ?? nil else { continue }
                 mark(entry.record, index: entry.index, playable: verdict)
             }
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         }
     }
 
     /// Remembers that a recording refused to play, wherever it appears. Called
     /// when the player finds out the hard way, which is the layer certain to
     /// catch an uploader's embedding setting.
-    func markUnplayable(_ url: URL) {
+    func markUnplayable(_ url: URL) async {
         let address = url.absoluteString
+        // Which releases list it is worked out on the worker; only the rows
+        // that actually name it are touched here, by id. This used to walk
+        // the whole release table on the main actor, and it runs at the one
+        // moment a listener is waiting on the transport to do something.
+        let listing = await worker.releasesListing(address)
+        guard !listing.isEmpty else { return }
+        let enricher = discogsEnricher
         var changed = false
-        for record in (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [] {
+        for identifier in listing {
+            guard let record = enricher.cachedRelease(id: identifier) else { continue }
             for (index, stored) in record.videoURLStrings.enumerated() where stored == address {
                 mark(record, index: index, playable: false)
                 changed = true
             }
         }
         guard changed else { return }
-        try? context.save()
-        revision &+= 1
+        saveContext()
+        announceChange()
     }
 
     private func mark(_ record: DiscogsReleaseRecord, index: Int, playable: Bool) {
@@ -636,6 +661,17 @@ final class DigStore {
         guard verdicts.indices.contains(index) else { return }
         verdicts[index] = playable ? 1 : 2
         record.videoPlayable = verdicts
+    }
+
+    /// Every write to the app's own context, in one place that can be timed.
+    ///
+    /// This context is the main one — it has to be, so a crated recording is
+    /// the same object the views already hold — which means every save here
+    /// happens on the thread that draws. Whether that is where the time goes
+    /// was not something the trace could answer, because none of these were
+    /// measured.
+    private func saveContext() {
+        Trace.slowStep("store.save") { try? context.save() }
     }
 
     /// The graph node a detail page stands for, so a visit can be remembered
@@ -670,7 +706,7 @@ final class DigStore {
     func remember(_ page: DetailPage, from origin: DetailPage?) {
         guard let node = node(for: page) else { return }
         DigHistory(context: context).record(node, from: origin.flatMap { self.node(for: $0) })
-        revision &+= 1
+        announceChange()
     }
 
     /// One descent, cached against the revision.
@@ -777,8 +813,8 @@ final class DigStore {
                     }
                     backfillLocalGenres(artistName: name, genres: artist.genreTags)
                 }
-                try? context.save()
-                revision &+= 1
+                saveContext()
+                announceChange()
             } catch is CancellationError {
                 return
             } catch {
@@ -793,8 +829,8 @@ final class DigStore {
             do {
                 try await enricher.enrich(recording)
                 backfillLocalTrack(from: recording)
-                try? context.save()
-                revision &+= 1
+                saveContext()
+                announceChange()
             } catch is CancellationError {
                 return
             } catch {
@@ -817,7 +853,7 @@ final class DigStore {
         // station that only ever publishes one string — arrive with the whole
         // line as the title. Repair that first: without it there is no artist
         // to look up and no artist to dig into.
-        if recording.recreditFromTitle() { try? context.save() }
+        if recording.recreditFromTitle() { saveContext() }
 
         guard let initialArtist = recording.artistName, !initialArtist.isEmpty,
               let initialTitle = recording.title, !initialTitle.isEmpty else { return nil }
@@ -888,8 +924,8 @@ final class DigStore {
             metadata.artworkURLString = cover.absoluteString
         }
 
-        try? context.save()
-        revision &+= 1
+        saveContext()
+        announceChange()
         return metadata
     }
 
@@ -1007,8 +1043,8 @@ final class DigStore {
             if !genres.isEmpty { item.setGenres(Array(genres.prefix(8))) }
         }
 
-        try? context.save()
-        revision &+= 1
+        saveContext()
+        announceChange()
     }
 
     /// Fills in the tracks of a broadcast that is actually on screen.
@@ -1047,8 +1083,13 @@ final class DigStore {
         guard let metadata = engine.metadata(for: recording.id) else { return (nil, nil) }
         // Falls through to the shared ladder, so a track whose album Indigo
         // pictures elsewhere is not blank here.
-        let artwork = metadata.artworkURL ?? metadata.releaseTitle.flatMap {
-            DigArtwork(context: context).release(title: $0, artist: recording.artistName).full
+        //
+        // Measured because a tracklist asks this once a row, on the main
+        // actor, and a row that misses walks the release table.
+        let artwork = metadata.artworkURL ?? metadata.releaseTitle.flatMap { title in
+            Trace.slowStep("row.artwork", title) {
+                DigArtwork(context: context).release(title: title, artist: recording.artistName).full
+            }
         }
         return (metadata.releaseLine, artwork)
     }
@@ -1068,8 +1109,8 @@ final class DigStore {
             repaired += 1
         }
         if repaired > 0 {
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         }
         return repaired
     }
@@ -1106,8 +1147,16 @@ final class DigStore {
         guard let genre = genres.first, !genre.isEmpty else { return }
         let key = RecordingKey.normalizeArtist(artistName)
         guard !key.isEmpty else { return }
-        let tracks = (try? context.fetch(FetchDescriptor<Track>())) ?? []
-        for track in tracks where track.genre.isEmpty && DigEngine.artistKeys(for: track).contains(key) {
+        // Only the tracks this can actually change. Asking for the library
+        // and skipping most of it in the loop meant every cold artist read
+        // every file the listener owns, on the main actor, and normalised a
+        // credit for each one — which is the part of opening somebody new
+        // that had nothing to do with the network.
+        // `$0.genre.isEmpty` compiles and works in memory, and answers with
+        // nothing at all against SQLite. See `StorePredicateTests`.
+        let descriptor = FetchDescriptor<Track>(predicate: #Predicate { $0.genre == "" })
+        for track in (try? context.fetch(descriptor)) ?? []
+        where DigEngine.artistKeys(for: track).contains(key) {
             track.genre = genre
         }
     }
@@ -1121,11 +1170,14 @@ final class DigStore {
     /// listener's file tags. The local library remains the authority for its
     /// own spelling and organisation.
     private func backfillLocalTrack(from recording: Recording) {
-        let paths = Set(recording.sources.filter { $0.kind == .localFile }.map(\.identifier))
+        let paths = recording.sources.filter { $0.kind == .localFile }.map(\.identifier)
         guard !paths.isEmpty else { return }
         let metadata = engine.metadata(for: recording.id)
-        let tracks = (try? context.fetch(FetchDescriptor<Track>())) ?? []
-        for track in tracks where paths.contains(track.path) {
+        // By path, which is the unique attribute: the handful of rows this
+        // recording actually sits on, rather than the whole library filtered
+        // down to them afterwards.
+        let descriptor = FetchDescriptor<Track>(predicate: #Predicate { paths.contains($0.path) })
+        for track in (try? context.fetch(descriptor)) ?? [] {
             if track.title.isEmpty || track.title == "Unknown" {
                 track.title = recording.title ?? track.title
             }
@@ -1156,7 +1208,17 @@ final class DigStore {
     /// couple of recordings, is a label looked up, because a label is what
     /// RELATED is built from and nothing else on the page needs one.
     func enrichArtist(name: String, mbid: String?) async {
-        await inForeground { await digArtist(name: name, mbid: mbid) }
+        // A number for the whole of it, to hold the parts against.
+        //
+        // This target is built with `SWIFT_APPROACHABLE_CONCURRENCY`, so a
+        // `nonisolated` async function runs on its caller's actor — and this
+        // store is the main one. Everything below therefore happens on the
+        // thread that draws, apart from the awaits themselves, and only the
+        // pieces that were named are measured. If this total is far larger
+        // than the pieces inside it, the difference is where to look next.
+        await Trace.stage("dig.enrich", name) {
+            await inForeground { await digArtist(name: name, mbid: mbid) }
+        }
     }
 
     private func digArtist(name: String, mbid: String?) async {
@@ -1184,17 +1246,17 @@ final class DigStore {
                 let head = try await discogsClient.artistHead(named: name)
                 if let head {
                     discogsEnricher.artistIdentity(named: name, head: head)
-                    try? context.save()
-                    revision &+= 1
+                    saveContext()
+                    announceChange()
                 }
 
                 if let head, let artist = try await discogsEnricher.artist(named: name, head: head) {
-                    try? context.save()
+                    saveContext()
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
                     forgetGraph(for: .artist(name))
                     backfillLocalGenres(artistName: name, genres: artist.styles + artist.genres)
-                    revision &+= 1
+                    announceChange()
                     isEnriching = false
                     let previews = artist.releaseThumbnailURLStrings.compactMap(URL.init(string:))
                     Task.detached(priority: .utility) {
@@ -1204,8 +1266,8 @@ final class DigStore {
                     // page and sleeves are already usable while this fills in.
                     do {
                         try await discogsEnricher.recommendations(for: artist)
-                        try? context.save()
-                        revision &+= 1
+                        saveContext()
+                        announceChange()
                     } catch {
                         // Discovery enrichment is optional and never replaces
                         // a populated page with provider diagnostics.
@@ -1241,8 +1303,8 @@ final class DigStore {
             }
             // Saved here, not at the end: a throttle in stage two must not
             // discard what stage one already learned.
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         } catch is CancellationError {
             isEnriching = false
             return
@@ -1281,8 +1343,8 @@ final class DigStore {
             for label in labels.prefix(1) {
                 try await enricher.label(mbid: label)
             }
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         } catch is CancellationError {
         } catch {
             // Stage two is an enrichment, not the page. Losing it costs the
@@ -1306,8 +1368,8 @@ final class DigStore {
 
         do {
             try await enricher.label(mbid: mbid)
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         } catch is CancellationError {
         } catch {
             attempted.remove(key)
@@ -1324,8 +1386,8 @@ final class DigStore {
         defer { isEnriching = false }
         do {
             try await discogsEnricher.release(id: id)
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         } catch is CancellationError {
         } catch {
             attempted.remove(key)
@@ -1342,8 +1404,8 @@ final class DigStore {
         do {
             guard let id = try await discogsClient.releaseID(title: title, artist: artist) else { return nil }
             try await discogsEnricher.release(id: id)
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
             return id
         } catch {
             return nil
@@ -1411,8 +1473,8 @@ final class DigStore {
         defer { isEnriching = false }
         do {
             try await enricher.enrich(recording)
-            try? context.save()
-            revision &+= 1
+            saveContext()
+            announceChange()
         } catch is CancellationError {
         } catch {
             attempted.remove(key)
