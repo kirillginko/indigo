@@ -289,6 +289,42 @@ final class ExploreSuggestionTests: XCTestCase {
         XCTAssertEqual(suggestions().filter { $0.node.title == "239EF" }.count, 1)
     }
 
+    // MARK: Sorted into the places the page puts them
+
+    func testTheSameArtistIsNotOfferedTwiceOnOnePage() {
+        let origin = artist("Dean Blunt", id: 1, labels: ["World Music"])
+        origin.collaboratorNames = (0..<20).map { "Collaborator \($0)" }
+        for index in 0..<20 { artist("Collaborator \(index)", id: 100 + index) }
+        crate(artist: "Dean Blunt")
+        try? context.save()
+
+        let offers = ExploreSuggestionEngine(context: context).offers()
+        let next = Set(offers.next.map(\.id))
+        let alsoInArtists = offers.artists.filter { next.contains($0.id) }
+        // The same face in two blocks is a page that has run out of things to
+        // say and is repeating itself.
+        XCTAssertTrue(alsoInArtists.isEmpty, alsoInArtists.map(\.node.title).description)
+    }
+
+    func testShowsGoToTheirOwnBlockAndNotIntoTheGeneralOne() {
+        let store = RecordingStore(context: context)
+        let recording = try? store.upsert(title: "Black Metal", artistName: "Dean Blunt")
+        let appearance = MediaAppearance(
+            providerID: "nts", showTitle: "Some Show",
+            showID: "some-show/an-episode", isLive: false, method: .providerTracklist
+        )
+        context.insert(appearance)
+        appearance.recording = recording
+        artist("Dean Blunt", id: 1)
+        crate(artist: "Dean Blunt")
+        try? context.save()
+
+        let offers = ExploreSuggestionEngine(context: context).offers()
+        XCTAssertTrue(offers.shows.allSatisfy { $0.node.kind == .broadcast })
+        XCTAssertFalse(offers.next.contains { $0.node.kind == .broadcast })
+        XCTAssertFalse(offers.shows.isEmpty)
+    }
+
     // MARK: Explaining itself
 
     func testEverySuggestionSaysWhatItRestsOn() {

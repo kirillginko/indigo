@@ -731,11 +731,33 @@ final class DigStore {
         descents.any("\(origin.id)|\(level.rawValue)")
     }
 
-    /// See `DigWorker.exploreSuggestions(generation:limit:)`.
-    func exploreSuggestions(limit: Int = 12) async -> [ExploreSuggestion] {
-        let _ = revision
-        settle()
-        return await worker.exploreSuggestions(generation: revision, limit: limit)
+    /// What EXPLORE has to offer, kept between visits.
+    ///
+    /// Held on the store rather than in the view's own state, because a view's
+    /// state is gone the moment somebody navigates away — so returning to the
+    /// page emptied the block, waited a second on the worker, and filled it in
+    /// again. Which reads as a page loading twice, and is the thing that made
+    /// it feel slow when nothing about it was.
+    private(set) var exploreOffers = ExploreOffers()
+    @ObservationIgnored private var offersGeneration = -1
+    @ObservationIgnored private var offersTask: Task<Void, Never>?
+
+    /// Recomputes when the graph has moved since the last answer, and does
+    /// nothing at all when it has not.
+    func refreshExploreOffers() async {
+        let asked = revision
+        guard offersGeneration != asked else { return }
+        offersTask?.cancel()
+        let task = Task { [weak self] in
+            guard let self else { return }
+            self.settle()
+            let found = await self.worker.exploreOffers(generation: asked)
+            guard !Task.isCancelled else { return }
+            self.offersGeneration = asked
+            self.exploreOffers = found
+        }
+        offersTask = task
+        await task.value
     }
 
     /// Everything next to something, of any kind — the step DIG takes.

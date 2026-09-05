@@ -53,6 +53,24 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable {
     }
 }
 
+/// Everything EXPLORE has to offer, sorted into the places it goes.
+///
+/// One walk produces all of it. The page shows shows, artists and the rest in
+/// different blocks, and computing them separately would mean walking the
+/// graph three times to answer one question.
+nonisolated struct ExploreOffers: Sendable {
+    /// Mixed, minus shows — they have a block of their own.
+    var next: [ExploreSuggestion] = []
+    /// Radio worth an hour.
+    var shows: [ExploreSuggestion] = []
+    /// Further artists, for the crate's own artists block. Deliberately the
+    /// ones `next` did not take: the same face twice on one page is a page
+    /// that has run out of things to say.
+    var artists: [ExploreSuggestion] = []
+
+    var isEmpty: Bool { next.isEmpty && shows.isEmpty && artists.isEmpty }
+}
+
 nonisolated struct ExploreSuggestionEngine {
     let context: ModelContext
 
@@ -63,6 +81,20 @@ nonisolated struct ExploreSuggestionEngine {
     /// How many places the walk starts from. Every origin is a full graph
     /// walk, so this is the knob that decides what the whole thing costs.
     static let origins = 12
+
+    /// Everything the page needs, in one walk.
+    func offers(next: Int = 12, shows: Int = 6, artists: Int = 6) -> ExploreOffers {
+        let all = suggestions(limit: next + artists + shows)
+        var offers = ExploreOffers()
+        offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
+        let rest = all.filter { $0.node.kind != .broadcast }
+        offers.next = Array(rest.prefix(next))
+        let taken = Set(offers.next.map(\.id))
+        offers.artists = Array(
+            rest.filter { $0.node.kind == .artist && !taken.contains($0.id) }.prefix(artists)
+        )
+        return offers
+    }
 
     /// Everywhere worth going, best first.
     func suggestions(limit: Int = 12) -> [ExploreSuggestion] {

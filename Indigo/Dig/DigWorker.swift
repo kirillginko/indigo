@@ -102,10 +102,10 @@ actor DigWorker {
     /// way in.
     ///
     /// Plain values cross back, as with everything here.
-    func exploreSuggestions(generation: Int, limit: Int) -> [ExploreSuggestion] {
+    func exploreOffers(generation: Int) -> ExploreOffers {
         refresh(generation)
         return Trace.step("explore.suggest") {
-            ExploreSuggestionEngine(context: modelContext).suggestions(limit: limit)
+            ExploreSuggestionEngine(context: modelContext).offers()
         }
     }
 
