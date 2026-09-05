@@ -93,6 +93,22 @@ actor DigWorker {
         return scenes ?? SceneEngine(context: modelContext)
     }
 
+    /// What EXPLORE should offer that is not already in the crate.
+    ///
+    /// Here rather than on the store's own context for the ordinary reason: it
+    /// reads the crate, the listening log and the dig history, then walks the
+    /// graph out of a dozen nodes. Measured cold on a real library that is a
+    /// couple of seconds, which on the main actor is a page that hangs on the
+    /// way in.
+    ///
+    /// Plain values cross back, as with everything here.
+    func exploreSuggestions(generation: Int, limit: Int) -> [ExploreSuggestion] {
+        refresh(generation)
+        return Trace.step("explore.suggest") {
+            ExploreSuggestionEngine(context: modelContext).suggestions(limit: limit)
+        }
+    }
+
     /// Every picture the background fill has found, by normalised name.
     ///
     /// Read here rather than on the store's own context. It is the whole

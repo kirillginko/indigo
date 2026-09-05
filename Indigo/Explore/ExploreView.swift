@@ -4,6 +4,7 @@ import SwiftUI
 struct ExploreView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
+    @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(KioskProvider.self) private var kiosk
     @Environment(NoodsProvider.self) private var noods
@@ -14,6 +15,9 @@ struct ExploreView: View {
     @Environment(RovrProvider.self) private var rovr
     @Query(sort: [SortDescriptor(\Track.addedAt, order: .reverse)]) private var tracks: [Track]
     @State private var filter = ExploreFilter.all
+    /// Where to go next, walked out of the graph off the main thread. Held
+    /// here so a redraw never re-walks it.
+    @State private var suggestions: [ExploreSuggestion] = []
 
     private let stations = [
         ExploreStation("Kiosk Radio", "Brussels", .kioskStation, ["ambient", "jazz"]),
@@ -53,6 +57,9 @@ struct ExploreView: View {
         .foregroundStyle(Color.black)
         .background(MapColor.cobalt)
         .task { crate.backfillLocalGenres() }
+        // Rebuilt when the graph moves, which is what `revision` is for. The
+        // walk happens on the worker.
+        .task(id: dig.revision) { suggestions = await dig.exploreSuggestions() }
     }
 
     private func header(_ kept: [CrateItem]) -> some View {
@@ -96,13 +103,15 @@ struct ExploreView: View {
         // used to count from zero, so the first crated record, the first
         // station and the first local track were all placed as item nought and
         // landed on top of one another.
+        let showNext = (filter == .all || filter == .next) && !suggestions.isEmpty
         let showCrate = filter == .all || filter == .crate
         let showStations = filter == .all || filter == .stations
         let showLibrary = filter == .all || filter == .library
         let local = Array(tracks.prefix(8))
         let recommendations = stationRecommendations(from: kept)
         let crateSections = recommendationSections(from: kept)
-        let crateTop: CGFloat = 112
+        let nextTop: CGFloat = 112
+        let crateTop = nextTop + (showNext ? sectionHeight(for: suggestions.count, in: size) : 0)
         let stationsTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.items.count, in: size) } : 0)
         let libraryTop = stationsTop + (showStations ? sectionHeight(for: recommendations.count, in: size) : 0)
 
@@ -113,6 +122,30 @@ struct ExploreView: View {
         if kept.isEmpty && tracks.isEmpty {
             Button("Find something to start with") { appState.select(.dig) }
                 .buttonStyle(MapHeaderButtonStyle()).position(x: size.width * 0.58, y: 170)
+        }
+        // First, because it is the only block here that is not already yours.
+        // Everything below is the crate, the stations and the library — things
+        // this listener has already decided about — and a page that opens on
+        // those is an inventory rather than a way of finding anything.
+        if showNext {
+            ExploreSectionLabel(
+                title: "Where to go next",
+                description: "Reached from what you keep, and not yet heard"
+            )
+                .graphNode("section.next", section: "next", connects: false)
+                .position(x: size.width * 0.5, y: nextTop + 24)
+            ForEach(Array(suggestions.enumerated()), id: \.element.id) { i, suggestion in
+                Button {
+                    if let page = suggestion.node.destination { appState.open(page) }
+                } label: {
+                    MapLabel(suggestion.node.title, suggestion.node.kind.label,
+                             MapColor.lavender, artwork(for: suggestion),
+                             stableSeed(suggestion.node.id), cardWidth(in: size),
+                             connection: suggestion.connection)
+                }.buttonStyle(ExploreCardButtonStyle())
+                    .graphNode("next.\(suggestion.id)", section: "next", legend: true)
+                    .position(place(i, below: nextTop, in: size)).zIndex(5)
+            }
         }
         if showCrate {
             ForEach(Array(crateSections.enumerated()), id: \.element.id) { sectionIndex, section in
@@ -169,6 +202,17 @@ struct ExploreView: View {
                     .position(place(i, below: libraryTop, in: size)).zIndex(2)
             }
         }
+    }
+
+    /// A face for a suggestion, where one has already been found.
+    ///
+    /// Only from what is in memory: the background portrait fill keeps an
+    /// index, and DIG's own artwork ladder needs a store read per card. A row
+    /// of names is a list and a row of faces is a shelf, but not at the price
+    /// of a dozen fetches on the thread that draws.
+    private func artwork(for suggestion: ExploreSuggestion) -> URL? {
+        suggestion.node.artworkURL
+            ?? (suggestion.node.kind == .artist ? dig.portraitURL(for: suggestion.node.title) : nil)
     }
 
     private func columnCount(in size: CGSize) -> Int { max(2, min(4, Int(size.width / 430))) }
@@ -303,8 +347,11 @@ struct ExploreView: View {
         let rows: Int
         switch filter {
         case .all:
-            rows = recommendationSections(from: kept).reduce(0) { $0 + ($1.items.count + 1) / 2 }
+            rows = (suggestions.count + 1) / 2
+                + recommendationSections(from: kept).reduce(0) { $0 + ($1.items.count + 1) / 2 }
                 + (stations.count + 1) / 2 + (min(8, tracks.count) + 1) / 2
+        case .next:
+            rows = (suggestions.count + 1) / 2
         case .crate:
             rows = recommendationSections(from: kept).reduce(0) { $0 + ($1.items.count + 1) / 2 }
         case .stations:
@@ -316,9 +363,9 @@ struct ExploreView: View {
     }
     private func visibleSectionCount(_ kept: [CrateItem]) -> Int {
         switch filter {
-        case .all: recommendationSections(from: kept).count + 2
+        case .all: recommendationSections(from: kept).count + 3
         case .crate: recommendationSections(from: kept).count
-        case .stations, .library: 1
+        case .next, .stations, .library: 1
         }
     }
     private func play(_ index: Int) {
@@ -390,10 +437,26 @@ struct ExploreView: View {
 }
 
 private enum ExploreFilter: String, CaseIterable, Identifiable {
-    case all, crate, stations, library
+    case all, next, crate, stations, library
     var id: String { rawValue }
-    var label: String { self == .all ? "All recommendations" : self == .crate ? "From your crate" : self == .stations ? "Stations to try" : "Your library" }
-    var color: Color { self == .all ? .black : self == .crate ? MapColor.green : self == .stations ? MapColor.paleGreen : MapColor.blue }
+    var label: String {
+        switch self {
+        case .all: "All recommendations"
+        case .next: "Where to go next"
+        case .crate: "From your crate"
+        case .stations: "Stations to try"
+        case .library: "Your library"
+        }
+    }
+    var color: Color {
+        switch self {
+        case .all: .black
+        case .next: MapColor.lavender
+        case .crate: MapColor.green
+        case .stations: MapColor.paleGreen
+        case .library: MapColor.blue
+        }
+    }
 }
 
 private enum MapColor {

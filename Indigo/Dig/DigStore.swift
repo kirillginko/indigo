@@ -731,6 +731,13 @@ final class DigStore {
         descents.any("\(origin.id)|\(level.rawValue)")
     }
 
+    /// See `DigWorker.exploreSuggestions(generation:limit:)`.
+    func exploreSuggestions(limit: Int = 12) async -> [ExploreSuggestion] {
+        let _ = revision
+        settle()
+        return await worker.exploreSuggestions(generation: revision, limit: limit)
+    }
+
     /// Everything next to something, of any kind — the step DIG takes.
     func connections(from node: MusicNode) async -> [MusicGraph.Connection] {
         let _ = revision
