@@ -17,7 +17,7 @@
 
 import Foundation
 
-nonisolated enum MusicNodeKind: String, Hashable, Sendable, CaseIterable {
+nonisolated enum MusicNodeKind: String, Hashable, Sendable, Codable, CaseIterable {
     case artist
     case release
     case label
@@ -59,7 +59,7 @@ nonisolated enum MusicNodeKind: String, Hashable, Sendable, CaseIterable {
     }
 }
 
-nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
+nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     let kind: MusicNodeKind
     /// Normalised identity within the kind. Two nodes with the same kind and
     /// key are the same thing, however differently they were spelled.

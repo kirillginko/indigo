@@ -88,6 +88,10 @@ struct IndigoApp: App {
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
                     witness.watch(player)
+                    // What EXPLORE showed last time, before anything is
+                    // recomputed. A page that opens empty and grows its
+                    // headline a second later has loaded twice.
+                    dig.restoreExploreOffers()
                     // One-shot repair of rows that stored an artist as their
                     // own label. Off the main actor and off the critical path:
                     // nothing below waits for it, and it finds nothing to do

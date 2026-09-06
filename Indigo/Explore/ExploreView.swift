@@ -95,15 +95,29 @@ struct ExploreView: View {
         // landed on top of one another.
         let offers = dig.exploreOffers
         let suggestions = offers.next
-        let showNext = (filter == .all || filter == .next) && !suggestions.isEmpty
+        // Waiting is not the same as having nothing, and drawn the same way it
+        // is the page jumping. An empty block collapses, everything under it
+        // slides up, and the moment the real answer lands the whole page moves
+        // — which reads as the recommendations arriving late and shoving the
+        // rest down. So the block holds its place while it is being worked
+        // out, and fills in without anything else moving.
+        let awaitingNext = !dig.hasExploreOffers && !kept.isEmpty
+        let showNext = (filter == .all || filter == .next)
+            && (!suggestions.isEmpty || awaitingNext)
+        let nextCount = suggestions.isEmpty && awaitingNext
+            ? ExploreView.expectedSuggestions : suggestions.count
         let showCrate = filter == .all || filter == .crate
         let showShows = (filter == .all || filter == .shows) && !offers.shows.isEmpty
         let showLibrary = filter == .all || filter == .library
         let local = localPicks
         let crateSections = recommendationSections(from: kept, adding: offers.artists)
-        let hasScene = showNext && offers.movingToward != nil
+        // The direction is one card and arrives later still, so it keeps its
+        // row from the start for the same reason.
+        let awaitingScene = !dig.hasExploreDirection && !kept.isEmpty
+        let hasScene = (filter == .all || filter == .next)
+            && (offers.movingToward != nil || awaitingScene)
         let nextTop: CGFloat = 112
-        let crateTop = nextTop + (showNext ? sectionHeight(for: suggestions.count, in: size) : 0)
+        let crateTop = nextTop + (showNext ? sectionHeight(for: nextCount, in: size) : 0)
         let sceneTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.count, in: size) } : 0)
         let showsTop = sceneTop + (hasScene ? sectionHeight(for: 1, in: size) : 0)
         let libraryTop = showsTop + (showShows ? sectionHeight(for: offers.shows.count, in: size) : 0)
@@ -131,6 +145,10 @@ struct ExploreView: View {
             )
                 .graphNode("section.next", section: "next", connects: false)
                 .position(x: size.width * 0.5, y: nextTop + 24)
+            ForEach(0..<(suggestions.isEmpty ? nextCount : 0), id: \.self) { i in
+                ExplorePlaceholderCard(width: cardWidth(in: size))
+                    .position(place(i, below: nextTop, in: size)).zIndex(5)
+            }
             ForEach(Array(suggestions.enumerated()), id: \.element.id) { i, suggestion in
                 Button {
                     if let page = suggestion.node.destination { appState.open(page) }
@@ -184,7 +202,7 @@ struct ExploreView: View {
         // somebody is going rather than what to press next — and putting it
         // first pushed the recommendations off the top of the page, which is
         // where the page's actual work is.
-        if showNext, let scene = offers.movingToward {
+        if hasScene, let scene = offers.movingToward {
             ExploreSectionLabel(
                 title: "You seem to be moving toward",
                 description: scene.size
@@ -197,6 +215,17 @@ struct ExploreView: View {
                          connection: scene.size)
             }.buttonStyle(ExploreCardButtonStyle())
                 .graphNode("scene.\(scene.city)", section: "scene", legend: true)
+                .position(place(0, below: sceneTop, in: size)).zIndex(6)
+        }
+
+        if hasScene, offers.movingToward == nil {
+            ExploreSectionLabel(
+                title: "You seem to be moving toward",
+                description: "Reading where your collection is going"
+            )
+                .graphNode("section.scene", section: "scene", connects: false)
+                .position(x: size.width * 0.5, y: sceneTop + 24)
+            ExplorePlaceholderCard(width: cardWidth(in: size))
                 .position(place(0, below: sceneTop, in: size)).zIndex(6)
         }
 
@@ -237,6 +266,11 @@ struct ExploreView: View {
             }
         }
     }
+
+    /// How many rows the recommendations block holds while it is being worked
+    /// out. The same number the engine is asked for, so a full answer lands in
+    /// exactly the space kept for it.
+    static let expectedSuggestions = 12
 
     /// How many of the library to show at once.
     private static let localPickCount = 8
@@ -382,11 +416,13 @@ struct ExploreView: View {
         let rows: Int
         switch filter {
         case .all:
-            rows = (offers.next.count + 1) / 2 + (offers.movingToward == nil ? 0 : 1)
+            rows = (max(offers.next.count, dig.hasExploreOffers ? 0 : ExploreView.expectedSuggestions) + 1) / 2
+                + (offers.movingToward == nil && dig.hasExploreDirection ? 0 : 1)
                 + sections.reduce(0) { $0 + ($1.count + 1) / 2 }
                 + (offers.shows.count + 1) / 2 + (localPicks.count + 1) / 2
         case .next:
-            rows = (offers.next.count + 1) / 2
+            rows = (max(offers.next.count,
+                        dig.hasExploreOffers ? 0 : ExploreView.expectedSuggestions) + 1) / 2
         case .crate:
             rows = sections.reduce(0) { $0 + ($1.count + 1) / 2 }
         case .shows:
@@ -487,6 +523,26 @@ private enum MapColor {
     static let paleGreen = Color(red: 0.45, green: 0.96, blue: 0.68)
     static let paper = Color(red: 0.94, green: 0.96, blue: 0.94)
     static let lavender = Color(red: 0.73, green: 0.83, blue: 0.98)
+}
+
+/// A card's worth of nothing, held while the real one is being worked out.
+///
+/// Faint and unlabelled on purpose: it is not pretending to be a suggestion,
+/// it is keeping a row from collapsing. The alternative is an empty page that
+/// grows a block at the top a second later and pushes everything down.
+private struct ExplorePlaceholderCard: View {
+    let width: CGFloat
+
+    var body: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.06))
+            .frame(width: width, height: 54)
+            .overlay(
+                Rectangle().strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+            )
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
 }
 
 private struct CrateRecommendationSection: Identifiable {

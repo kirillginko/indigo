@@ -24,7 +24,7 @@ import SwiftData
 
 /// Something worth digging into, and the thing in this listener's own
 /// collection that argues for it.
-nonisolated struct ExploreSuggestion: Identifiable, Sendable {
+nonisolated struct ExploreSuggestion: Identifiable, Sendable, Codable {
     let node: MusicNode
     /// The evidence, as the edge itself stated it — "Releases on Orange Milk
     /// Records", "Mastered By on Pool". Never a phrase this file invented.
@@ -58,7 +58,7 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable {
 /// One walk produces all of it. The page shows shows, artists and the rest in
 /// different blocks, and computing them separately would mean walking the
 /// graph three times to answer one question.
-nonisolated struct ExploreOffers: Sendable {
+nonisolated struct ExploreOffers: Sendable, Codable {
     /// Mixed, minus shows — they have a block of their own.
     var next: [ExploreSuggestion] = []
     /// Radio worth an hour.
@@ -76,7 +76,7 @@ nonisolated struct ExploreOffers: Sendable {
     /// A scene, flattened to what the page draws. `MusicScene` is not
     /// `Sendable` all the way down and does not need to cross the actor
     /// boundary — a name, a sound and a size do.
-    nonisolated struct SceneOffer: Sendable {
+    nonisolated struct SceneOffer: Sendable, Codable {
         let city: String
         let title: String
         let sound: String

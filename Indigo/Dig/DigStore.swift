@@ -739,6 +739,27 @@ final class DigStore {
     /// again. Which reads as a page loading twice, and is the thing that made
     /// it feel slow when nothing about it was.
     private(set) var exploreOffers = ExploreOffers()
+    /// Whether the answer on `exploreOffers` is one, rather than the empty
+    /// value it starts as.
+    ///
+    /// The page needs to tell "nothing to suggest" from "not worked out yet",
+    /// because the two look identical and should not: an empty block collapses
+    /// and everything under it slides up, so the moment the real answer lands
+    /// the whole page jumps.
+    private(set) var hasExploreOffers = false
+    private(set) var hasExploreDirection = false
+    @ObservationIgnored private lazy var offersStore = ExploreOffersStore(context: context)
+
+    /// Reads back what was shown last time, so a launch opens on the page it
+    /// closed on rather than on an empty one. Called once, from the app.
+    func restoreExploreOffers() {
+        guard !hasExploreOffers, let kept = offersStore.load() else { return }
+        exploreOffers = kept.offers
+        hasExploreOffers = true
+        hasExploreDirection = kept.offers.movingToward != nil
+        offersCrateRevision = kept.crateRevision
+        offersBuiltAt = kept.builtAt
+    }
     @ObservationIgnored private var offersCrateRevision = -1
     @ObservationIgnored private var offersBuiltAt = Date.distantPast
     @ObservationIgnored private var offersTask: Task<Void, Never>?
@@ -774,6 +795,7 @@ final class DigStore {
             self.offersCrateRevision = crateRevision
             self.offersBuiltAt = Date()
             self.exploreOffers = found
+            self.hasExploreOffers = true
 
             // Then the slower half, folded into what is already on screen.
             let direction = await self.worker.exploreDirection(generation: asked)
@@ -781,6 +803,10 @@ final class DigStore {
             var withScene = self.exploreOffers
             withScene.movingToward = direction
             self.exploreOffers = withScene
+            self.hasExploreDirection = true
+            // Written down only once both halves are in, so a launch never
+            // restores an answer that is missing its direction.
+            self.offersStore.save(withScene, crateRevision: crateRevision)
         }
         offersTask = task
         await task.value
