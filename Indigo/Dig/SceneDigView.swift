@@ -27,6 +27,11 @@ struct SceneDigView: View {
     /// render pass reads most of the store.
     @State private var scene: MusicScene?
     @State private var hasGathered = false
+    /// The rest of the scene, from the shared catalogue. The local engine can
+    /// only know the artists this listener's own collection has already met —
+    /// see `SceneRepository`.
+    @State private var wider: [SceneRepository.Member] = []
+    @State private var roster: SceneRepository.Roster?
 
     var body: some View {
         let _ = dig.revision
@@ -129,9 +134,58 @@ struct SceneDigView: View {
         .task(id: city) {
             self.scene = await dig.scene(city: city, sound: sound)
             hasGathered = true
+            await loadWiderScene()
         }
         .task(id: dig.revision) {
             self.scene = await dig.scene(city: city, sound: sound)
         }
+    }
+
+    /// Everybody else in the scene.
+    ///
+    /// The names the listener already has are shown in their own block above;
+    /// this is the rest of it, and the two are kept apart on purpose. "You
+    /// have eight of these and here are ninety more" is a scene. One list of
+    /// ninety-eight with nothing to mark it is a directory.
+    @ViewBuilder
+    private func widerScene(mine: Set<String>) -> some View {
+        let others = wider.filter { !mine.contains($0.normalizedName) }
+        if !others.isEmpty {
+            DigSection(
+                title: "The wider scene",
+                // A crawl still walking is worth showing — half a scene is
+                // more than none — and worth saying so.
+                trailing: roster.map { $0.isComplete ? "\(others.count)" : "\(others.count)…" }
+            ) {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(others) { member in
+                        DigLine(
+                            text: member.name,
+                            detail: [member.disambiguation, member.yearsLabel]
+                                .compactMap { $0 }.first
+                        ) {
+                            appState.open(.digArtist(mbid: member.mbid, name: member.name))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Asks the backend for the scene, and reads whatever it already has.
+    ///
+    /// Safe on every visit: the request will not queue a scene twice, and will
+    /// not re-walk one filled recently. A page opened before the crawl has
+    /// finished simply shows less of it and fills in next time — which is the
+    /// bargain that keeps one polite crawler in place of a few hundred
+    /// impolite ones.
+    private func loadWiderScene() async {
+        guard SupabaseService.isConfigured, let scene else { return }
+        let found = try? await SceneRepository.shared.request(
+            place: scene.city, sound: scene.sound
+        )
+        roster = found
+        guard let found else { return }
+        wider = (try? await SceneRepository.shared.members(rosterID: found.id)) ?? []
     }
 }

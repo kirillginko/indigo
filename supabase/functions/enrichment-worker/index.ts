@@ -14,6 +14,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
+import { fillSceneRoster } from "../_shared/musicbrainz.ts";
 
 interface Job {
   id: string;
@@ -114,6 +115,29 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
         p_episode_id: null,
       });
       if (error) throw new Error(error.message);
+      return;
+    }
+
+    case "fetch_scene_roster": {
+      const rosterId = String(job.payload?.roster_id ?? "");
+      const place = String(job.payload?.place ?? "");
+      if (!rosterId || !place) throw new Error("missing roster/place");
+      const soundValue = job.payload?.sound;
+      const sound = typeof soundValue === "string" && soundValue ? soundValue : null;
+
+      // Where the last page stopped, read from the roster rather than carried
+      // in the payload: a job retried after a failure must not start again
+      // from an offset that was already recorded.
+      const { data: roster, error: readError } = await supabase
+        .from("scene_rosters")
+        .select("next_offset")
+        .eq("id", rosterId)
+        .maybeSingle();
+      if (readError) throw new Error(readError.message);
+
+      await fillSceneRoster(
+        supabase, rosterId, place, sound, Number(roster?.next_offset ?? 0),
+      );
       return;
     }
 
