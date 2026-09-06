@@ -53,6 +53,15 @@ final class PlaybackCoordinator {
     /// player has no business knowing where the listening log lives.
     var onListeningEnded: ((MediaItem, TimeInterval, Double) -> Void)?
 
+    /// Told when something is about to start playing.
+    ///
+    /// So that background work can stand aside while a stream opens. AVPlayer
+    /// gets sixty seconds to connect and then the station is unavailable —
+    /// there is no quiet retry — and the app has forty requests a minute of
+    /// picture-fetching running behind it. Set by the app; nothing here knows
+    /// what that background work is.
+    var onPlaybackStarting: (() -> Void)?
+
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
@@ -82,6 +91,13 @@ final class PlaybackCoordinator {
         nowPlaying.onSeek = { [weak self] position in self?.seek(to: position) }
         nowPlaying.activate()
     }
+
+    /// Present so that releasing one under XCTest does not abort the host.
+    /// An app-module main-actor class with no explicit deinit is torn down
+    /// through `swift_task_deinitOnExecutorImpl`, which crashes only under
+    /// test injection — see `DigStore`, which carries the same line for the
+    /// same reason.
+    nonisolated deinit {}
 
     // MARK: - Derived state
 
@@ -317,6 +333,7 @@ final class PlaybackCoordinator {
 
     private func startCurrent(autoplay: Bool) {
         guard let item = queue.current else { return }
+        onPlaybackStarting?()
         // Before `current` moves on, while the outgoing item is still the one
         // the stint has been measuring.
         endStint()

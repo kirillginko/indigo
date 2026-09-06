@@ -387,6 +387,35 @@ final class DigStore {
     @ObservationIgnored private var foregroundDigs = 0
     @ObservationIgnored private var foregroundEndedAt: ContinuousClock.Instant?
 
+    /// Until when the background fill must keep out of the way.
+    ///
+    /// A stream opening is the one request in the app that cannot be retried
+    /// quietly: AVPlayer gets sixty seconds and then the station is simply
+    /// unavailable. The fill is forty requests a minute of work nobody is
+    /// waiting on, and it already stands aside for a page somebody is reading
+    /// — a station somebody has just pressed deserves at least as much.
+    @ObservationIgnored private var holdUntil: ContinuousClock.Instant?
+
+    /// How long to stand aside. Long enough to cover a stream connecting and
+    /// its first buffers, short enough that a listener who leaves music on
+    /// still gets their pictures.
+    @ObservationIgnored private static let playbackHold = Duration.seconds(12)
+
+    /// Called when audio starts. The app wires this to the player; nothing
+    /// here knows what a player is.
+    func holdBackgroundWork() {
+        holdUntil = ContinuousClock.now + Self.playbackHold
+    }
+
+    /// Whether the fill is currently standing aside. Read by the loop below,
+    /// and by the test that pins this behaviour.
+    var isHoldingBackgroundWork: Bool { isHoldingForPlayback }
+
+    private var isHoldingForPlayback: Bool {
+        guard let holdUntil else { return false }
+        return ContinuousClock.now < holdUntil
+    }
+
     /// Whether a page is currently fetching something the listener asked for.
     ///
     /// Stays true for a moment after the last one finishes: a page load is a
@@ -456,6 +485,13 @@ final class DigStore {
             // and Bandcamp page has landed is how a connection row came to
             // fill in long after the page it is on.
             while isDiggingInForeground, !hasPortraitsOnScreen {
+                try? await Task.sleep(for: .milliseconds(250))
+                if Task.isCancelled { return }
+            }
+            // And out of the way of a stream that is opening — this one even
+            // for the faces on screen, because a picture arriving a moment
+            // later costs nothing and a station that times out is gone.
+            while isHoldingForPlayback {
                 try? await Task.sleep(for: .milliseconds(250))
                 if Task.isCancelled { return }
             }

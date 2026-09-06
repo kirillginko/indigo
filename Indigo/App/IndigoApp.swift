@@ -88,6 +88,9 @@ struct IndigoApp: App {
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
                     witness.watch(player)
+                    // Keep the picture backlog out of the way while a stream
+                    // opens. See `DigStore.holdBackgroundWork`.
+                    player.onPlaybackStarting = { [dig] in dig.holdBackgroundWork() }
                     // What EXPLORE showed last time, before anything is
                     // recomputed. A page that opens empty and grows its
                     // headline a second later has loaded twice.

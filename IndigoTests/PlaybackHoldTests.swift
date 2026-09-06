@@ -1,0 +1,54 @@
+//
+//  PlaybackHoldTests.swift
+//  IndigoTests
+//
+//  A stream opening is the one request in the app that cannot be retried
+//  quietly: AVPlayer gets sixty seconds to connect and then the station is
+//  simply unavailable. Behind it the picture backlog runs at forty requests a
+//  minute of work nobody is waiting on.
+//
+//  It already stands aside for a page somebody is reading. A station somebody
+//  has just pressed deserves at least as much.
+//
+
+import XCTest
+import SwiftData
+@testable import Indigo
+
+@MainActor
+final class PlaybackHoldTests: XCTestCase {
+
+    func testStartingSomethingTellsTheBackgroundWorkToStandAside() {
+        let player = PlaybackCoordinator(defaults: UserDefaults(suiteName: "hold-test")!)
+        var held = 0
+        player.onPlaybackStarting = { held += 1 }
+
+        player.playRadio(MediaItem(
+            id: "kiosk.live", sourceID: "kiosk", kind: .radioStation, title: "Kiosk",
+            playbackURL: URL(string: "https://example.test/stream")!
+        ))
+        XCTAssertEqual(held, 1)
+
+        // Every start, not only the first: moving between stations opens a new
+        // connection each time, and each one has the same sixty seconds.
+        player.playRadio(MediaItem(
+            id: "nts.live", sourceID: "nts", kind: .radioStation, title: "NTS",
+            playbackURL: URL(string: "https://example.test/stream2")!
+        ))
+        XCTAssertEqual(held, 2)
+        player.stopAll()
+    }
+
+    func testAStoreAskedToStandAsideDoesSoAndThenStops() throws {
+        let configuration = ModelConfiguration(
+            schema: Persistence.schema, isStoredInMemoryOnly: true
+        )
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let dig = DigStore(context: ModelContext(container))
+
+        // Nothing playing: the fill has no reason to wait.
+        XCTAssertFalse(dig.isHoldingBackgroundWork)
+        dig.holdBackgroundWork()
+        XCTAssertTrue(dig.isHoldingBackgroundWork)
+    }
+}
