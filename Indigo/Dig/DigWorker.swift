@@ -102,10 +102,28 @@ actor DigWorker {
     /// way in.
     ///
     /// Plain values cross back, as with everything here.
-    func exploreOffers(generation: Int) -> ExploreOffers {
+    /// The blocks somebody can act on. Answered first, and separately from
+    /// the direction below, so the page's headline does not wait a second on
+    /// a slower claim about where its reader is going.
+    func exploreRecommendations(generation: Int) -> ExploreOffers {
         refresh(generation)
         return Trace.step("explore.suggest") {
-            ExploreSuggestionEngine(context: modelContext).offers()
+            ExploreSuggestionEngine(context: modelContext).recommendations()
+        }
+    }
+
+    /// And where they are heading, which means assembling every place in the
+    /// catalogue. Uses the engine this actor already holds rather than
+    /// building a second set of the same caches.
+    func exploreDirection(generation: Int) -> ExploreOffers.SceneOffer? {
+        let scenes = sceneEngine(generation)
+        return Trace.step("explore.direction") {
+            let taste = TasteProfile.collected(context: modelContext)
+            guard let scene = scenes.movingToward(taste: taste) else { return nil }
+            return ExploreOffers.SceneOffer(
+                city: scene.city, title: scene.title,
+                sound: scene.soundLabel, size: scene.sizeLine
+            )
         }
     }
 

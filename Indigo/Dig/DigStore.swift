@@ -766,11 +766,21 @@ final class DigStore {
         let task = Task { [weak self] in
             guard let self else { return }
             self.settle()
-            let found = await self.worker.exploreOffers(generation: asked)
+            // The blocks somebody can act on, published as soon as they are
+            // known. Working out a direction reads every place in the
+            // catalogue, and the page was making its headline wait behind it.
+            let found = await self.worker.exploreRecommendations(generation: asked)
             guard !Task.isCancelled else { return }
             self.offersCrateRevision = crateRevision
             self.offersBuiltAt = Date()
             self.exploreOffers = found
+
+            // Then the slower half, folded into what is already on screen.
+            let direction = await self.worker.exploreDirection(generation: asked)
+            guard !Task.isCancelled else { return }
+            var withScene = self.exploreOffers
+            withScene.movingToward = direction
+            self.exploreOffers = withScene
         }
         offersTask = task
         await task.value

@@ -233,13 +233,26 @@ nonisolated struct SceneEngine {
     func movingToward(taste: TasteProfile) -> MusicScene? {
         guard !taste.isEmpty else { return nil }
         let caches = self.caches
-        return scenes()
+
+        // Only the places this listener has a foot in, decided before any
+        // scene is built. A direction requires a foothold, so assembling the
+        // forty-odd cities where there is none — each one a signature, a
+        // membership and a merge — is work whose answer is known in advance.
+        let candidates = caches.cities.keys.filter { cityKey in
+            guard !caches.countries.contains(cityKey) else { return false }
+            let members = caches.artistsForCity[cityKey] ?? []
+            guard members.count >= 4 else { return false }
+            return members.contains {
+                (caches.crateForArtist[$0] ?? 0) + (caches.libraryForArtist[$0] ?? 0) > 0
+            }
+        }
+        guard !candidates.isEmpty else { return nil }
+
+        let found: [MusicScene] = candidates
+            .flatMap { scenes(cityKey: $0, caches: caches) }
+            .filter(\.isSubstantial)
+        return found
             .compactMap { scene -> (scene: MusicScene, score: Double)? in
-                // A country is not a direction. Somewhere specific is the
-                // whole idea — "Berlin dub techno" is a scene and "the United
-                // States" is a bag of people who share a passport.
-                guard !caches.countries.contains(RecordingKey.normalize(scene.city))
-                else { return nil }
                 let foothold = scene.crateCount + scene.libraryTrackCount
                 // No foot in it at all is not a direction, it is a stranger.
                 guard foothold > 0, scene.artists.count >= 4 else { return nil }
