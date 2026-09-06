@@ -195,6 +195,74 @@ begin
     end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- Scenes the stations named
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    show_id uuid;
+    added int;
+begin
+    insert into public.radio_shows (provider, external_id, station, title)
+    values ('nts', 'smoke-show', 'NTS', 'A Show')
+    returning id into show_id;
+
+    -- Three broadcasts filed under the same sound from the same city, which is
+    -- the threshold: twice is a coincidence and a scene is a strand of
+    -- programming.
+    insert into public.radio_episodes
+        (radio_show_id, provider, external_id, title, genres, moods, location)
+    values
+        (show_id, 'nts', 'smoke-1', 'One',
+         array['Dub Techno','Ambient'], array['Hypnotic'], 'Manchester'),
+        (show_id, 'nts', 'smoke-2', 'Two',
+         array['Dub Techno'], array['Hypnotic'], 'Manchester'),
+        (show_id, 'nts', 'smoke-3', 'Three',
+         array['Dub Techno'], array['Hypnotic'], 'Manchester'),
+        -- And one that is not repeated, which should name nothing.
+        (show_id, 'nts', 'smoke-4', 'Four',
+         array['Yodelling'], '{}', 'Manchester');
+
+    added := public.seed_scenes_from_radio();
+    if added < 1 then
+        raise exception 'the stations named nothing';
+    end if;
+
+    -- The sound on its own.
+    if not exists (
+        select 1 from public.scene_rosters
+        where sound_key = 'dub techno' and coalesce(place_key, '') = ''
+    ) then
+        raise exception 'a repeated genre did not become a scene';
+    end if;
+
+    -- And the sound in the city it came from, which is the stronger claim and
+    -- the reason the location is kept at all.
+    if not exists (
+        select 1 from public.scene_rosters
+        where sound_key = 'dub techno' and place_key = 'manchester'
+    ) then
+        raise exception 'a repeated genre from one city did not become a scene';
+    end if;
+
+    -- A mood counts as a sound. NTS files half of what makes a show itself
+    -- under moods rather than genres.
+    if not exists (select 1 from public.scene_rosters where sound_key = 'hypnotic') then
+        raise exception 'a repeated mood did not become a scene';
+    end if;
+
+    -- One broadcast is a description, not a scene.
+    if exists (select 1 from public.scene_rosters where sound_key = 'yodelling') then
+        raise exception 'a one-off genre became a scene';
+    end if;
+
+    -- Reading them again adds nothing, which is what lets this run nightly.
+    if public.seed_scenes_from_radio() <> 0 then
+        raise exception 'reading the stations twice seeded twice';
+    end if;
+end $$;
+
 -- Neither half is optional to the point of being nothing.
 do $$
 begin
