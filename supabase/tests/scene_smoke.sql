@@ -263,6 +263,59 @@ begin
     end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- Going back for what the old ingest dropped
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    show_id uuid;
+    queued int;
+begin
+    select id into show_id from public.radio_shows where external_id = 'smoke-show';
+
+    -- An episode from before 0014: ingested by a worker that read past the
+    -- station's own tags.
+    insert into public.radio_episodes
+        (radio_show_id, provider, external_id, title, genres, moods, location)
+    values (show_id, 'nts', 'old-show/old-episode', 'Untagged', '{}', '{}', null);
+
+    queued := public.retag_nts_episodes(20);
+    if queued < 1 then
+        raise exception 'an untagged episode was not queued for another look';
+    end if;
+
+    -- Asked for as the work that already exists, under the key that work uses,
+    -- so nothing can queue it twice.
+    if (select count(*) from public.enrichment_jobs
+        where job_type = 'fetch_nts_episode'
+          and dedupe_key = 'old-show/old-episode'
+          and status = 'pending') <> 1 then
+        raise exception 'the retag did not queue a fetch under the episode key';
+    end if;
+
+    -- Below the live crawl: yesterday's tags must not delay this morning's
+    -- broadcasts.
+    if (select priority from public.enrichment_jobs
+        where dedupe_key = 'old-show/old-episode') >= 0 then
+        raise exception 'a retag outranked the live crawl';
+    end if;
+
+    -- Running again does not queue it twice.
+    if public.retag_nts_episodes(20) <> 0 then
+        raise exception 'a second pass queued the same episode again';
+    end if;
+
+    -- And an episode the station did tag is left alone, which is what makes
+    -- this stop on its own.
+    if exists (
+        select 1 from public.enrichment_jobs
+        where job_type = 'fetch_nts_episode' and dedupe_key = 'smoke-1'
+    ) then
+        raise exception 'a tagged episode was queued for retagging';
+    end if;
+end $$;
+
 -- Neither half is optional to the point of being nothing.
 do $$
 begin
