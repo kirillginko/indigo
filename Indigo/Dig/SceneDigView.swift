@@ -33,7 +33,9 @@ struct SceneDigView: View {
                 title: scene?.title ?? city.uppercased(),
                 breadcrumb: appState.breadcrumbTitle,
                 onBack: { appState.popDetail() },
-                subtitle: scene?.eraLabel ?? "Scene"
+                // What it sounds like, then when. A page headed by a date says
+                // less about a scene than the two words that make it one.
+                subtitle: scene.map { "\($0.soundLabel) · \($0.eraLabel)" } ?? "Scene"
             )
             Rule(color: Palette.outline)
 

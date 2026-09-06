@@ -101,7 +101,9 @@ struct ExploreView: View {
         let showLibrary = filter == .all || filter == .library
         let local = localPicks
         let crateSections = recommendationSections(from: kept, adding: offers.artists)
-        let nextTop: CGFloat = 112
+        let hasScene = showNext && offers.movingToward != nil
+        let sceneTop: CGFloat = 112
+        let nextTop = sceneTop + (hasScene ? sectionHeight(for: 1, in: size) : 0)
         let crateTop = nextTop + (showNext ? sectionHeight(for: suggestions.count, in: size) : 0)
         let showsTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.count, in: size) } : 0)
         let libraryTop = showsTop + (showShows ? sectionHeight(for: offers.shows.count, in: size) : 0)
@@ -118,6 +120,26 @@ struct ExploreView: View {
             Button("Find something to start with") { appState.select(.dig) }
                 .buttonStyle(MapHeaderButtonStyle()).position(x: size.width * 0.58, y: 170)
         }
+        // Above everything, and only one card wide. A direction is a different
+        // sort of claim from a list of things to try — it is about where this
+        // listener is going rather than what to press next — and it earns the
+        // top of the page by being the only thing here that is about them.
+        if showNext, let scene = offers.movingToward {
+            ExploreSectionLabel(
+                title: "You seem to be moving toward",
+                description: scene.size
+            )
+                .graphNode("section.scene", section: "scene", connects: false)
+                .position(x: size.width * 0.5, y: sceneTop + 24)
+            Button { appState.open(.digScene(city: scene.city)) } label: {
+                MapLabel(scene.title, scene.sound, MapColor.lavender, nil,
+                         stableSeed(scene.city), cardWidth(in: size),
+                         connection: scene.size)
+            }.buttonStyle(ExploreCardButtonStyle())
+                .graphNode("scene.\(scene.city)", section: "scene", legend: true)
+                .position(place(0, below: sceneTop, in: size)).zIndex(6)
+        }
+
         // First, because it is the only block here that is not already yours.
         // Everything below is the crate, the stations and the library — things
         // this listener has already decided about — and a page that opens on
@@ -359,7 +381,7 @@ struct ExploreView: View {
         let rows: Int
         switch filter {
         case .all:
-            rows = (offers.next.count + 1) / 2
+            rows = (offers.next.count + 1) / 2 + (offers.movingToward == nil ? 0 : 1)
                 + sections.reduce(0) { $0 + ($1.count + 1) / 2 }
                 + (offers.shows.count + 1) / 2 + (localPicks.count + 1) / 2
         case .next:
@@ -375,7 +397,7 @@ struct ExploreView: View {
     }
     private func visibleSectionCount(_ kept: [CrateItem]) -> Int {
         switch filter {
-        case .all: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count + 3
+        case .all: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count + 4
         case .crate: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count
         case .next, .shows, .library: 1
         }

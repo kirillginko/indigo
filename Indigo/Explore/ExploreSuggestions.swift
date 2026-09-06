@@ -63,12 +63,25 @@ nonisolated struct ExploreOffers: Sendable {
     var next: [ExploreSuggestion] = []
     /// Radio worth an hour.
     var shows: [ExploreSuggestion] = []
+    /// The scene this listener is heading into, when they are heading
+    /// anywhere. See `SceneEngine.movingToward(taste:)`.
+    var movingToward: SceneOffer?
     /// Further artists, for the crate's own artists block. Deliberately the
     /// ones `next` did not take: the same face twice on one page is a page
     /// that has run out of things to say.
     var artists: [ExploreSuggestion] = []
 
-    var isEmpty: Bool { next.isEmpty && shows.isEmpty && artists.isEmpty }
+    var isEmpty: Bool { next.isEmpty && shows.isEmpty && artists.isEmpty && movingToward == nil }
+
+    /// A scene, flattened to what the page draws. `MusicScene` is not
+    /// `Sendable` all the way down and does not need to cross the actor
+    /// boundary — a name, a sound and a size do.
+    nonisolated struct SceneOffer: Sendable {
+        let city: String
+        let title: String
+        let sound: String
+        let size: String
+    }
 }
 
 nonisolated struct ExploreSuggestionEngine {
@@ -89,6 +102,13 @@ nonisolated struct ExploreSuggestionEngine {
         offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
         let rest = all.filter { $0.node.kind != .broadcast }
         offers.next = Array(rest.prefix(next))
+        if let scene = SceneEngine(context: context)
+            .movingToward(taste: TasteProfile.collected(context: context)) {
+            offers.movingToward = ExploreOffers.SceneOffer(
+                city: scene.city, title: scene.title,
+                sound: scene.soundLabel, size: scene.sizeLine
+            )
+        }
         let taken = Set(offers.next.map(\.id))
         offers.artists = Array(
             rest.filter { $0.node.kind == .artist && !taken.contains($0.id) }.prefix(artists)

@@ -109,14 +109,30 @@ nonisolated struct MusicScene: Identifiable, Sendable {
     let artists: [String]
     let labels: [String]
     let tags: [String]
+    /// The sound this place has that the others do not.
+    ///
+    /// Not the same list as `tags`, and the difference is the whole point. The
+    /// commonest tags in a catalogue of this kind are Experimental, Electronic
+    /// and Ambient, and they are the commonest in *every* scene — so naming a
+    /// place by its top tag produced New York / Experimental, London /
+    /// Electronic and Berlin / Experimental, which is fifty scenes with three
+    /// names between them. See `SceneCaches.signature(for:)`.
+    let signature: [String]
     let radioAppearances: Int
     let libraryTrackCount: Int
     let crateCount: Int
 
     var id: String { "\(RecordingKey.normalize(city))|\(era?.lowerBound ?? 0)" }
 
-    /// "BERLIN / 2010–2016"
+    /// "BERLIN"
     var title: String { city.uppercased() }
+
+    /// What this scene sounds like, or when it happened when nothing marks it
+    /// out. "DUB TECHNO, MINIMAL" — or "2010–2016".
+    var soundLabel: String {
+        guard !signature.isEmpty else { return eraLabel }
+        return signature.prefix(2).map { $0.uppercased() }.joined(separator: ", ")
+    }
 
     var eraLabel: String {
         guard let era else { return "UNDATED" }
@@ -130,13 +146,22 @@ nonisolated struct MusicScene: Identifiable, Sendable {
             kind: .scene,
             key: id,
             title: city.uppercased(),
-            subtitle: eraLabel
+            subtitle: soundLabel
         )
     }
 
     /// A place with one artist and nothing else is not a scene. Saying so is
     /// better than a page of headings with one name under each.
     var isSubstantial: Bool { artists.count >= 2 || (!labels.isEmpty && !artists.isEmpty) }
+
+    /// "14 artists · 6 labels · 9 radio plays" — the size of what is waiting,
+    /// which is the part that makes a scene worth walking into.
+    var sizeLine: String {
+        var parts = ["\(artists.count) artists"]
+        if !labels.isEmpty { parts.append("\(labels.count) labels") }
+        if radioAppearances > 0 { parts.append("\(radioAppearances) radio plays") }
+        return parts.joined(separator: " · ")
+    }
 }
 
 nonisolated struct SceneEngine {
@@ -171,6 +196,44 @@ nonisolated struct SceneEngine {
                     ? $0.city < $1.city
                     : $0.artists.count > $1.artists.count
             }
+    }
+
+    /// The scene this listener is heading into.
+    ///
+    /// Not the one they know best — that is where they already are, and being
+    /// told about it is being told what they did. What "moving toward" means
+    /// is a place they have a foot in and most of which they have not heard:
+    /// a few of its artists in the crate, a sound that matches what they play,
+    /// and a dozen names still in front of them.
+    ///
+    /// Nil is a real answer. Somebody whose collection sits squarely in one
+    /// place is not moving anywhere, and inventing a direction for them would
+    /// be the app talking rather than reading.
+    func movingToward(taste: TasteProfile) -> MusicScene? {
+        guard !taste.isEmpty else { return nil }
+        let caches = self.caches
+        return scenes()
+            .compactMap { scene -> (scene: MusicScene, score: Double)? in
+                // A country is not a direction. Somewhere specific is the
+                // whole idea — "Berlin dub techno" is a scene and "the United
+                // States" is a bag of people who share a passport.
+                guard !caches.countries.contains(RecordingKey.normalize(scene.city))
+                else { return nil }
+                let foothold = scene.crateCount + scene.libraryTrackCount
+                // No foot in it at all is not a direction, it is a stranger.
+                guard foothold > 0, scene.artists.count >= 4 else { return nil }
+                let affinity = taste.affinity(for: scene.signature + scene.tags)
+                guard affinity > 0.15 else { return nil }
+                // Enough of a start to mean something, and enough left to be
+                // worth going. A scene they have already worked through is
+                // somewhere they have been.
+                let started = min(1, Double(foothold) / 3)
+                let room = 1 - min(1, Double(foothold) / Double(scene.artists.count))
+                let score = affinity * started * room
+                return score > 0 ? (scene, score) : nil
+            }
+            .max { $0.score == $1.score ? $0.scene.city > $1.scene.city : $0.score < $1.score }?
+            .scene
     }
 
     func scene(city: String) -> MusicScene? {
@@ -218,6 +281,8 @@ nonisolated struct SceneEngine {
                 .prefix(12).map(\.key),
             tags: tags.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
                 .prefix(10).map(\.key),
+            signature: caches.signature(for: cityKey),
+
             radioAppearances: radio,
             libraryTrackCount: library,
             crateCount: crate
@@ -240,6 +305,97 @@ nonisolated struct SceneEngine {
     }
 }
 
+extension SceneCaches {
+    /// The sound this place has that the others do not.
+    ///
+    /// Frequency alone is useless here. In a catalogue of this kind the
+    /// commonest tags are Experimental, Electronic and Ambient, and they are
+    /// the commonest in every single scene — so a name taken from the top tag
+    /// gives New York / Experimental, London / Electronic and Berlin /
+    /// Experimental, which is fifty places wearing three names. What
+    /// distinguishes a scene is a sound that is ordinary *here* and unusual
+    /// everywhere else: Detroit's minimal, Los Angeles' glitch, Manchester's
+    /// hard techno.
+    ///
+    /// So a tag is weighed by how much of this place carries it against how
+    /// many other places do — the same shape as the term weighting a search
+    /// index uses, for the same reason. A tag in half the scenes says almost
+    /// nothing; a tag in two says a great deal.
+    func signature(for cityKey: String, limit: Int = 3) -> [String] {
+        let artistKeys = artistsForCity[cityKey] ?? []
+        guard artistKeys.count > 1 else { return [] }
+
+        // Folded, or "Ambient" and "ambient" are counted as two sounds and
+        // each gets half the evidence of the one sound they are.
+        var here: [String: Int] = [:]
+        var spelling: [String: String] = [:]
+        for key in artistKeys {
+            // Counted once per artist, not once per tag. A record tagged both
+            // "Sonae" and "sonae" folds to one sound twice, which let a word
+            // on a single artist clear the two-artist bar — and named a whole
+            // city after her.
+            var seenForArtist = Set<String>()
+            for tag in tagsForArtist[key] ?? [] {
+                for folded in ListeningLog.foldTags([tag]) {
+                    spelling[folded] = spelling[folded] ?? tag
+                    guard seenForArtist.insert(folded).inserted else { continue }
+                    here[folded, default: 0] += 1
+                }
+            }
+        }
+        guard !here.isEmpty else { return [] }
+
+        let cityWords = Set(ListeningLog.foldTags([cities[cityKey] ?? ""]))
+        let placeCount = Double(max(1, cities.count))
+        let members = Double(artistKeys.count)
+
+        var scored: [(tag: String, weight: Double)] = []
+        for (tag, count) in here {
+            guard isSound(tag, avoiding: cityWords) else { continue }
+            // Two artists at the least, and enough of the place to be the
+            // place's rather than one member's. Without the share, a keyword
+            // on two of nineteen names the whole scene after them.
+            guard count > 1 else { continue }
+            let share = Double(count) / members
+            guard share >= 0.2 else { continue }
+            let elsewhere = Double(max(1, placesPerTag[tag] ?? 1))
+            let rarity = log(placeCount / elsewhere)
+            guard rarity > 0 else { continue }
+            scored.append((tag, share * rarity))
+        }
+        return scored
+            .sorted { $0.weight == $1.weight ? $0.tag < $1.tag : $0.weight > $1.weight }
+            .prefix(limit)
+            .map { spelling[$0.tag] ?? $0.tag }
+    }
+
+    /// Whether a tag describes a sound rather than a person or a place.
+    ///
+    /// Both are maximally distinctive — a name appears in exactly one place by
+    /// definition — which is precisely why they rise to the top of a rarity
+    /// measure and have to be refused by hand. Left in, they produced BERLIN /
+    /// SONAE, DETROIT / ROBERT HOOD and NEW ZEALAND / SPIRITUAL JAZZ,
+    /// AUCKLAND.
+    private func isSound(_ tag: String, avoiding cityWords: Set<String>) -> Bool {
+        guard !artistWords.contains(tag) else { return false }
+        guard !cityWords.contains(tag) else { return false }
+        guard placeIndex?.isPlace(tag) != true else { return false }
+        return true
+    }
+}
+
+extension SceneCaches {
+    /// Everything after the first part of an origin — which is where the
+    /// catalogue puts the country.
+    static func countryParts(of origin: String?) -> [String] {
+        guard let origin else { return [] }
+        return origin.split(separator: "/")
+            .dropFirst()
+            .map { RecordingKey.normalize(String($0)) }
+            .filter { !$0.isEmpty }
+    }
+}
+
 // MARK: - Caches
 
 /// One pass over the caches, arranged by artist so a scene can be assembled
@@ -256,6 +412,31 @@ nonisolated struct SceneCaches {
     var radioForArtist: [String: Int] = [:]
     var libraryForArtist: [String: Int] = [:]
     var crateForArtist: [String: Int] = [:]
+    /// How many places each folded tag turns up in. The denominator of a
+    /// scene's signature — see `signature(for:)`.
+    var placesPerTag: [String: Int] = [:]
+    /// Every artist's name the app knows, folded — not only the ones placed in
+    /// a scene. Bandcamp keywords carry artists' names, and a name appears in
+    /// exactly one place, which makes it the most distinctive word there is
+    /// and the least useful: it produced BERLIN / SONAE and DETROIT / ROBERT
+    /// HOOD.
+    ///
+    /// A genre word that is also somebody's name is lost with them. That is
+    /// the right way round to be wrong — a scene named after a person reads
+    /// as a mistake, and one missing a sound reads as a scene.
+    var artistWords: Set<String> = []
+    /// Places that are countries.
+    ///
+    /// MusicBrainz writes an origin as "Munich / Germany", so anything
+    /// appearing after the first slash somewhere is a country by the
+    /// catalogue's own reckoning — no list to maintain. Artists whose entry
+    /// names only their country land in one of these, and the result is a bag
+    /// of unrelated people: UNITED STATES / HORROR, EXPERIMENTAL POP, offered
+    /// as somewhere a listener was heading.
+    var countries: Set<String> = []
+    /// The place index, kept so a signature can refuse a city. A tag that is
+    /// somewhere is not a sound: NEW ZEALAND / SPIRITUAL JAZZ, AUCKLAND.
+    var placeIndex: PlaceIndex?
 
     init(context: ModelContext) {
         let places = PlaceIndex(context: context)
@@ -316,6 +497,39 @@ nonisolated struct SceneCaches {
             let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, !name.isEmpty else { continue }
             crateForArtist[RecordingKey.normalizeArtist(name), default: 0] += 1
+        }
+
+        // Every artist the app knows of, not only the ones with a place. Sonae
+        // has no origin on file and so was never in `artistNames`, but her
+        // name is a keyword on a Berlin collective's record — which is how the
+        // scene came to be called BERLIN / SONAE.
+        var names = Array(artistNames.values)
+        names += ((try? context.fetch(FetchDescriptor<Artist>())) ?? []).map(\.name)
+        names += ((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []).map(\.name)
+        names += ((try? context.fetch(FetchDescriptor<Recording>())) ?? []).compactMap(\.artistName)
+        artistWords = Set(names.flatMap { ListeningLog.foldTags([$0]) })
+
+        for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
+            countries.formUnion(Self.countryParts(of: artist.origin))
+        }
+        for label in (try? context.fetch(FetchDescriptor<MusicLabel>())) ?? [] {
+            countries.formUnion(Self.countryParts(of: label.origin))
+        }
+        placeIndex = placeIndex ?? PlaceIndex(context: context)
+
+        // Last, because it reads what everything above built: how widespread
+        // each sound is across all the places at once. A scene's signature is
+        // measured against this — see `signature(for:)`.
+        for (cityKey, artistKeys) in artistsForCity {
+            guard !cityKey.isEmpty else { continue }
+            var seenHere = Set<String>()
+            for key in artistKeys {
+                for tag in tagsForArtist[key] ?? [] {
+                    for folded in ListeningLog.foldTags([tag]) where seenHere.insert(folded).inserted {
+                        placesPerTag[folded, default: 0] += 1
+                    }
+                }
+            }
         }
     }
 }
