@@ -157,6 +157,56 @@ begin
     end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- The shelf it starts with
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    shelved int;
+    again int;
+begin
+    -- Idempotent, which is what lets it run on a timer — and why this counts
+    -- the shelf rather than what one call added. Turning the schedule on
+    -- already put it up, so a second call is expected to add nothing.
+    perform public.seed_scene_rosters();
+    select count(*) into shelved from public.scene_rosters;
+    if shelved < 10 then
+        raise exception 'the shelf holds only % scenes', shelved;
+    end if;
+
+    -- A sound with no place is a scene. Fourth World is not from anywhere.
+    if not exists (
+        select 1 from public.scene_rosters
+        where sound_key = 'fourth world' and coalesce(place_key, '') = ''
+    ) then
+        raise exception 'a placeless scene was not seeded';
+    end if;
+
+    again := public.seed_scene_rosters();
+    if again <> 0 then
+        raise exception 'seeding twice added % more', again;
+    end if;
+
+    -- And a seeded scene is something the resume pass will pick up, so the
+    -- crawl runs with nobody using the app at all.
+    if public.resume_scene_rosters(4) < 1 then
+        raise exception 'seeded scenes were not resumed';
+    end if;
+end $$;
+
+-- Neither half is optional to the point of being nothing.
+do $$
+begin
+    begin
+        insert into public.scene_rosters (place, place_key, sound, sound_key)
+        values (null, '', null, '');
+        raise exception 'a scene with no place and no sound was accepted';
+    exception
+        when check_violation then null;
+    end;
+end $$;
+
 rollback;
 
 \echo 'scene smoke: all checks passed'

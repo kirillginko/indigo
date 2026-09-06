@@ -120,10 +120,13 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
 
     case "fetch_scene_roster": {
       const rosterId = String(job.payload?.roster_id ?? "");
-      const place = String(job.payload?.place ?? "");
-      if (!rosterId || !place) throw new Error("missing roster/place");
+      const placeValue = job.payload?.place;
       const soundValue = job.payload?.sound;
+      const place = typeof placeValue === "string" && placeValue ? placeValue : null;
       const sound = typeof soundValue === "string" && soundValue ? soundValue : null;
+      // A scene is a place, a sound, or both. Neither is a job with no
+      // question in it.
+      if (!rosterId || (!place && !sound)) throw new Error("missing roster/place/sound");
 
       // Where the last page stopped, read from the roster rather than carried
       // in the payload: a job retried after a failure must not start again

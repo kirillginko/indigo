@@ -60,16 +60,21 @@ export interface SceneMember {
 /// Both halves are quoted and their own quotes stripped, so a place or a tag
 /// cannot close the string and add clauses of its own. These values arrive
 /// from `request_scene_roster`, which anybody may call.
-export function sceneQuery(place: string, sound: string | null): string {
+export function sceneQuery(place: string | null, sound: string | null): string {
   const clean = (value: string) => value.replace(/["\\]/g, " ").trim();
-  const area = `area:"${clean(place)}"`;
-  const tag = sound && clean(sound) ? ` AND tag:"${clean(sound)}"` : "";
-  return `${area}${tag}`;
+  const parts: string[] = [];
+  if (place && clean(place)) parts.push(`area:"${clean(place)}"`);
+  if (sound && clean(sound)) parts.push(`tag:"${clean(sound)}"`);
+  // A scene is a place, a sound, or both — Fourth World is not from anywhere,
+  // and neither is spiritual jazz. Neither half is required; both being empty
+  // is refused, because that query is "every artist".
+  if (parts.length === 0) throw new Error("scene has neither a place nor a sound");
+  return parts.join(" AND ");
 }
 
 /// One page of the artists MusicBrainz has in a place, making a sound.
 export async function fetchScenePage(
-  place: string,
+  place: string | null,
   sound: string | null,
   offset: number,
 ): Promise<{ members: SceneMember[]; total: number; nextOffset: number }> {
@@ -126,7 +131,7 @@ function year(value: string | undefined): string | null {
 export async function fillSceneRoster(
   supabase: SupabaseClient,
   rosterId: string,
-  place: string,
+  place: string | null,
   sound: string | null,
   offset: number,
 ): Promise<{ recorded: number; finished: boolean }> {
@@ -150,7 +155,7 @@ export async function fillSceneRoster(
     await supabase.rpc("enqueue_enrichment_job", {
       p_provider: "musicbrainz",
       p_job_type: "fetch_scene_roster",
-      p_dedupe_key: `${normalizeName(place)}|${sound ? normalizeName(sound) : ""}`,
+      p_dedupe_key: `${place ? normalizeName(place) : ""}|${sound ? normalizeName(sound) : ""}`,
       p_payload: { roster_id: rosterId, place, sound },
       p_priority: 0,
       p_entity_type: null,
