@@ -33,6 +33,18 @@ final class StreamAudioEngine {
     @ObservationIgnored private var stallObserver: NSObjectProtocol?
     @ObservationIgnored private var failureObserver: NSObjectProtocol?
     @ObservationIgnored private var reconnectTask: Task<Void, Never>?
+    @ObservationIgnored private var connectDeadline: Task<Void, Never>?
+
+    /// How long a station gets to make a sound before it is called
+    /// unavailable.
+    ///
+    /// AVPlayer's own patience is a minute, and it spends it silently: a host
+    /// that accepts a connection and then sends nothing leaves the bar reading
+    /// "Buffering" for the whole of it and only then reports a timeout. A
+    /// listener has decided the app is broken long before that. Fifteen
+    /// seconds is longer than any of these stations takes on a working
+    /// connection and short enough to be an answer.
+    @ObservationIgnored private static let connectTimeout = Duration.seconds(15)
     @ObservationIgnored private var reconnectAttempts = 0
     @ObservationIgnored private var volume: Double = 1
     @ObservationIgnored private var isUserPaused = false
@@ -63,6 +75,7 @@ final class StreamAudioEngine {
     }
 
     func pause() {
+        connectDeadline?.cancel()
         isUserPaused = true
         reconnectTask?.cancel()
         player.pause()
@@ -72,6 +85,7 @@ final class StreamAudioEngine {
     func stop() {
         levelMonitor.reset()
         reconnectTask?.cancel()
+        connectDeadline?.cancel()
         reconnectAttempts = 0
         isUserPaused = false
         removeNotificationObservers()
@@ -130,6 +144,21 @@ final class StreamAudioEngine {
         player.replaceCurrentItem(with: item)
         observe(item)
         player.play()
+        watchForSilence()
+    }
+
+    /// Calls a station that never starts what it is.
+    ///
+    /// Cancelled the moment anything plays — see the `timeControlStatus`
+    /// observer, which is the only place that can say a sound was made.
+    private func watchForSilence() {
+        connectDeadline?.cancel()
+        connectDeadline = Task { [weak self] in
+            try? await Task.sleep(for: Self.connectTimeout)
+            guard !Task.isCancelled, let self, !self.isUserPaused else { return }
+            guard case .buffering = self.state else { return }
+            self.handleInterruption("The station did not respond.")
+        }
     }
 
     private func observe(_ item: AVPlayerItem) {
@@ -146,6 +175,7 @@ final class StreamAudioEngine {
                 switch status {
                 case .playing:
                     self.reconnectAttempts = 0
+                    self.connectDeadline?.cancel()
                     self.setState(.playing)
                 case .waitingToPlayAtSpecifiedRate:
                     if case .failed = self.state {} else { self.setState(.buffering) }
