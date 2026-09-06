@@ -107,9 +107,19 @@ nonisolated final class StoredEdge {
 nonisolated final class GraphSnapshot {
     @Attribute(.unique) var nodeID: String
     var builtAt: Date
+    /// Which version of the walk wrote this.
+    ///
+    /// A stored answer is only as good as the rules that produced it, and
+    /// there was no way to say those had changed — so every edge computed
+    /// under an older understanding survived every fix. An artist's page went
+    /// on offering "Both release on World Music (8)" long after the code that
+    /// could produce that string was gone, because the sentence had been
+    /// written down. Bumping `GraphStore.builderVersion` retires the lot.
+    var builderVersion: Int = 0
 
-    init(nodeID: String) {
+    init(nodeID: String, builderVersion: Int) {
         self.nodeID = nodeID
-        builtAt = Date()
+        self.builtAt = Date()
+        self.builderVersion = builderVersion
     }
 }

@@ -111,8 +111,9 @@ nonisolated enum RecordingKey {
     static func creditedArtists(_ value: String?) -> [String] {
         guard let value, !value.isEmpty else { return [] }
         var parts = [value]
-        for separator in [" x ", " X ", " & ", " and ", " with ", " vs. ", " vs ", ", ",
-                          " feat. ", " feat ", " ft. ", " ft ", " featuring "] {
+        // One list, shared with `ArtistName.split`, which answers the same
+        // question in the spellings people actually wrote.
+        for separator in ArtistName.creditSeparators {
             parts = parts.flatMap { $0.components(separatedBy: separator) }
         }
         var seen = Set<String>()

@@ -303,10 +303,16 @@ nonisolated struct DigEngine {
         // up. See `LabelName.names(inDiscogsField:)`.
         var labelNames: [String: String?] = [:]
         var spelling: [String: String] = [:]
+        let artistCredit = name
         func note(_ raw: String, mbid: String?) {
             for name in LabelName.names(inDiscogsField: raw) {
                 let key = RecordingKey.normalize(name)
                 guard !key.isEmpty else { continue }
+                // An artist is not one of their own imprints. Both catalogues
+                // file a self-released record under whoever made it, which put
+                // somebody's own name in the list of who puts their records
+                // out.
+                guard !LabelName.isOwnName(name, artist: artistCredit) else { continue }
                 spelling[key] = spelling[key] ?? name
                 // An MBID is worth more than the absence of one, so a label
                 // met first from Discogs and later from MusicBrainz keeps the

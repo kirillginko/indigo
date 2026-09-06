@@ -42,4 +42,37 @@ nonisolated enum ArtistName {
         }
         return !isPlaceholder(name)
     }
+
+    /// The words that join two names into one credit.
+    ///
+    /// Kept here so `RecordingKey.creditedArtists` and anything that needs the
+    /// original spellings work from one list. The dashes and the slash are
+    /// spaced on purpose: an unspaced hyphen belongs to the name carrying it,
+    /// and splitting on it would make two people out of Jean-Michel Jarre.
+    static let creditSeparators = [
+        " x ", " X ", " & ", " and ", " with ", " vs. ", " vs ", ", ",
+        " feat. ", " feat ", " ft. ", " ft ", " featuring ",
+        " - ", " – ", " — ", " / "
+    ]
+
+    /// The people named in a credit, spelled as the credit spelled them.
+    ///
+    /// `RecordingKey.creditedArtists` answers the same question in normalised
+    /// form, which is what comparisons want. This is for the places that have
+    /// to *show* the answer — a scene's membership, a page's heading — where
+    /// "anthony braxton" is not a name anybody wrote.
+    static func split(_ credit: String?) -> [String] {
+        guard let credit, !credit.isEmpty else { return [] }
+        var parts = [credit]
+        for separator in creditSeparators {
+            parts = parts.flatMap { $0.components(separatedBy: separator) }
+        }
+        var seen = Set<String>()
+        return parts
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter {
+                guard isRealArtist($0) else { return false }
+                return seen.insert(RecordingKey.normalizeArtist($0)).inserted
+            }
+    }
 }

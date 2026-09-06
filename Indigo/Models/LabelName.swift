@@ -21,7 +21,10 @@ import Foundation
 nonisolated enum LabelName {
     private static let exact: Set<String> = [
         "unknown label", "no label", "none", "unknown", "self released",
-        "self release", "white label"
+        "self release", "self releases", "selfrelease", "selfreleased",
+        "self published", "self issued", "self titled", "selftitled",
+        "independent", "independently released", "diy", "white label",
+        "no label records", "own label", "private press", "bootleg"
     ]
 
     /// Whether this stands for the absence of a label.
@@ -34,6 +37,24 @@ nonisolated enum LabelName {
         let key = RecordingKey.normalize(name)
         guard !key.isEmpty else { return true }
         return key.hasPrefix("not on label") || exact.contains(key)
+    }
+
+    /// Whether a label is really just the artist's own name.
+    ///
+    /// An artist is not an imprint. Discogs and Bandcamp both file a
+    /// self-released record under whoever made it, so an artist's page ended
+    /// up listing them among the labels they release on — and, worse, two
+    /// strangers were told they were connected because each of them is the
+    /// label on their own record.
+    ///
+    /// Matched against every name in the credit, so a duo's record filed under
+    /// one member is caught too.
+    static func isOwnName(_ label: String?, artist: String?) -> Bool {
+        guard let label, let artist else { return false }
+        let labelKey = RecordingKey.normalizeArtist(label)
+        guard !labelKey.isEmpty else { return false }
+        if labelKey == RecordingKey.normalizeArtist(artist) { return true }
+        return RecordingKey.creditedArtists(artist).contains(labelKey)
     }
 
     static func isRealLabel(_ name: String?) -> Bool {

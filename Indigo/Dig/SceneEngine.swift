@@ -427,6 +427,44 @@ extension SceneCaches {
 }
 
 extension SceneCaches {
+    /// Gives each half of a collaboration what the collaboration knows.
+    ///
+    /// A duo filed as "Andrew Cyrille - Anthony Braxton" is placed as two
+    /// people, and everything the catalogue said about it — its tags, its
+    /// years, its labels — is filed under the pair. Left there, the two
+    /// members are placed in a city carrying nothing, so the sound that made
+    /// the scene belongs to a name that is not in it, and both of them fall
+    /// out of the very scene they define. New York went from Braxton, Cyrille
+    /// and George Lewis to Elephants Memory and Phase Tomorrow in one step,
+    /// which is how this was found.
+    ///
+    /// The pair keeps its own entry too. It is a real credit and other things
+    /// look it up; what it stops being is a member of anywhere.
+    mutating func distributeCredits() {
+        for (key, name) in artistNames {
+            let members = ArtistName.split(name)
+            guard members.count > 1 else { continue }
+            for member in members {
+                let memberKey = RecordingKey.normalizeArtist(member)
+                guard !memberKey.isEmpty, memberKey != key else { continue }
+                artistNames[memberKey] = artistNames[memberKey] ?? member
+                if let tags = tagsForArtist[key] {
+                    tagsForArtist[memberKey, default: []].formUnion(tags)
+                }
+                if let labels = labelsForArtist[key] {
+                    labelsForArtist[memberKey, default: []].formUnion(labels)
+                }
+                if let years = yearsForArtist[key] {
+                    yearsForArtist[memberKey, default: []] += years
+                }
+                // A record by both of them is a record for both of them.
+                radioForArtist[memberKey, default: 0] += radioForArtist[key] ?? 0
+                libraryForArtist[memberKey, default: 0] += libraryForArtist[key] ?? 0
+                crateForArtist[memberKey, default: 0] += crateForArtist[key] ?? 0
+            }
+        }
+    }
+
     /// Everything after the first part of an origin — which is where the
     /// catalogue puts the country.
     static func countryParts(of origin: String?) -> [String] {
@@ -492,13 +530,30 @@ nonisolated struct SceneCaches {
             artistNames[key] = artistNames[key] ?? name
         }
 
+        /// Places each person named in a credit, rather than the credit.
+        ///
+        /// A duo filed as "Andrew Cyrille - Anthony Braxton" is two people, and
+        /// filing it whole put a third name in the scene that is nobody —
+        /// New York listed Braxton three times, as himself and as two spellings
+        /// of the same pair.
+        func placeCredit(_ city: String, credit: String) {
+            let names = ArtistName.split(credit)
+            guard names.count > 1 else {
+                place(city, artist: RecordingKey.normalizeArtist(credit), named: credit)
+                return
+            }
+            for name in names {
+                place(city, artist: RecordingKey.normalizeArtist(name), named: name)
+            }
+        }
+
         // Where MusicBrainz says they began.
         for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
             let key = RecordingKey.normalizeArtist(artist.name)
             guard !key.isEmpty else { continue }
             artistNames[key] = artist.name
             if let city = PlaceIndex.city(from: artist.origin) {
-                place(city, artist: key, named: artist.name)
+                placeCredit(city, credit: artist.name)
             }
             yearsForArtist[key, default: []] += artist.releaseDates.compactMap { Int($0.prefix(4)) }
         }
@@ -510,7 +565,7 @@ nonisolated struct SceneCaches {
             guard !key.isEmpty else { continue }
             artistNames[key] = artistNames[key] ?? release.artistName
             let split = places.split(keywords: release.keywords)
-            for city in split.places { place(city, artist: key, named: release.artistName) }
+            for city in split.places { placeCredit(city, credit: release.artistName) }
             for tag in split.tags { tagsForArtist[key, default: []].insert(tag) }
             if let label = release.imprint, !label.isEmpty {
                 labelsForArtist[key, default: []].insert(label)
@@ -549,6 +604,8 @@ nonisolated struct SceneCaches {
         names += ((try? context.fetch(FetchDescriptor<Artist>())) ?? []).map(\.name)
         names += ((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []).map(\.name)
         names += ((try? context.fetch(FetchDescriptor<Recording>())) ?? []).compactMap(\.artistName)
+        distributeCredits()
+
         artistWords = Set(names.flatMap { ListeningLog.foldTags([$0]) })
 
         for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
