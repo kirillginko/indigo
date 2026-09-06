@@ -102,10 +102,10 @@ struct ExploreView: View {
         let local = localPicks
         let crateSections = recommendationSections(from: kept, adding: offers.artists)
         let hasScene = showNext && offers.movingToward != nil
-        let sceneTop: CGFloat = 112
-        let nextTop = sceneTop + (hasScene ? sectionHeight(for: 1, in: size) : 0)
+        let nextTop: CGFloat = 112
         let crateTop = nextTop + (showNext ? sectionHeight(for: suggestions.count, in: size) : 0)
-        let showsTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.count, in: size) } : 0)
+        let sceneTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.count, in: size) } : 0)
+        let showsTop = sceneTop + (hasScene ? sectionHeight(for: 1, in: size) : 0)
         let libraryTop = showsTop + (showShows ? sectionHeight(for: offers.shows.count, in: size) : 0)
 
         // Directly over the trunk, which `ExploreGraphLines` roots at half the
@@ -120,26 +120,6 @@ struct ExploreView: View {
             Button("Find something to start with") { appState.select(.dig) }
                 .buttonStyle(MapHeaderButtonStyle()).position(x: size.width * 0.58, y: 170)
         }
-        // Above everything, and only one card wide. A direction is a different
-        // sort of claim from a list of things to try — it is about where this
-        // listener is going rather than what to press next — and it earns the
-        // top of the page by being the only thing here that is about them.
-        if showNext, let scene = offers.movingToward {
-            ExploreSectionLabel(
-                title: "You seem to be moving toward",
-                description: scene.size
-            )
-                .graphNode("section.scene", section: "scene", connects: false)
-                .position(x: size.width * 0.5, y: sceneTop + 24)
-            Button { appState.open(.digScene(city: scene.city, sound: scene.sound)) } label: {
-                MapLabel(scene.title, scene.sound, MapColor.lavender, nil,
-                         stableSeed(scene.city), cardWidth(in: size),
-                         connection: scene.size)
-            }.buttonStyle(ExploreCardButtonStyle())
-                .graphNode("scene.\(scene.city)", section: "scene", legend: true)
-                .position(place(0, below: sceneTop, in: size)).zIndex(6)
-        }
-
         // First, because it is the only block here that is not already yours.
         // Everything below is the crate, the stations and the library — things
         // this listener has already decided about — and a page that opens on
@@ -199,6 +179,27 @@ struct ExploreView: View {
         // same seven for everybody, ranked against a bag of genre words —
         // where a show is an hour somebody chose, and Indigo can say what is
         // on it. See `ShowSuggestionEngine`.
+        // Below what they can act on now, and only one card wide. A direction
+        // is a slower claim than a list of things to try — it is about where
+        // somebody is going rather than what to press next — and putting it
+        // first pushed the recommendations off the top of the page, which is
+        // where the page's actual work is.
+        if showNext, let scene = offers.movingToward {
+            ExploreSectionLabel(
+                title: "You seem to be moving toward",
+                description: scene.size
+            )
+                .graphNode("section.scene", section: "scene", connects: false)
+                .position(x: size.width * 0.5, y: sceneTop + 24)
+            Button { appState.open(.digScene(city: scene.city, sound: scene.sound)) } label: {
+                MapLabel(scene.title, scene.sound, MapColor.lavender, nil,
+                         stableSeed(scene.city), cardWidth(in: size),
+                         connection: scene.size)
+            }.buttonStyle(ExploreCardButtonStyle())
+                .graphNode("scene.\(scene.city)", section: "scene", legend: true)
+                .position(place(0, below: sceneTop, in: size)).zIndex(6)
+        }
+
         if showShows {
             ExploreSectionLabel(
                 title: "Radio shows to check out",
