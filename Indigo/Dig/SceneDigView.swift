@@ -135,6 +135,7 @@ struct SceneDigView: View {
             self.scene = await dig.scene(city: city, sound: sound)
             hasGathered = true
             await loadWiderScene()
+            await rereadWiderScene()
         }
         .task(id: dig.revision) {
             self.scene = await dig.scene(city: city, sound: sound)
@@ -187,5 +188,33 @@ struct SceneDigView: View {
         roster = found
         guard let found else { return }
         wider = (try? await SceneRepository.shared.members(rosterID: found.id)) ?? []
+
+        // Nothing schedules the queue on its own from here, so browsing is
+        // what turns it over — the same bargain a residency makes when its
+        // episodes are ingested. Without this a scene asked for on a project
+        // with no cron never arrives at all, and one with cron waits for the
+        // next drain to come round.
+        guard !found.isComplete else { return }
+        Task.detached(priority: .background) {
+            try? await RadioRepository.shared.drainEnrichmentQueue()
+        }
+    }
+
+    /// Reads the roster again after a drain has had a chance to run.
+    ///
+    /// A page opened on a scene nobody has asked for before finds it empty,
+    /// starts it, and would otherwise show nothing until the next visit. One
+    /// look back is the difference between a scene appearing now and appearing
+    /// tomorrow.
+    private func rereadWiderScene() async {
+        guard SupabaseService.isConfigured, let roster, !roster.isComplete else { return }
+        try? await Task.sleep(for: .seconds(4))
+        guard !Task.isCancelled else { return }
+        let refreshed = try? await SceneRepository.shared.roster(
+            place: scene?.city ?? city, sound: scene?.sound
+        )
+        guard let refreshed, refreshed.memberCount > (self.roster?.memberCount ?? 0) else { return }
+        self.roster = refreshed
+        wider = (try? await SceneRepository.shared.members(rosterID: refreshed.id)) ?? []
     }
 }
