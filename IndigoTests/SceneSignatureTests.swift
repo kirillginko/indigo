@@ -236,6 +236,7 @@ final class SceneSignatureTests: XCTestCase {
         XCTAssertEqual(scene?.soundLabel, "FREE JAZZ")
         XCTAssertEqual(scene?.artists.count, 3)
         XCTAssertFalse(scene?.artists.contains("A Noise Band") ?? true)
+        XCTAssertNil(scene?.artists.first { $0 == "A Noise Band" })
     }
 
     func testASceneWithNoSoundOfItsOwnStillHoldsEverybody() {
@@ -251,6 +252,69 @@ final class SceneSignatureTests: XCTestCase {
         let scene = SceneEngine(context: context).scene(city: "Berlin")
         XCTAssertTrue(scene?.signature.isEmpty ?? false)
         XCTAssertEqual(scene?.artists.count, 2)
+    }
+
+    func testACityHoldsMoreThanOneScene() {
+        // Manchester read "HARD TECHNO, HIP HOP" — not a scene but two of
+        // them wearing one name, with a membership that was the union of
+        // people who have nothing to do with each other.
+        for name in ["Techno A", "Techno B", "Techno C"] {
+            artist(name, from: "Manchester", tags: ["Hard Techno"])
+        }
+        for name in ["Rap A", "Rap B", "Rap C"] {
+            artist(name, from: "Manchester", tags: ["Hip Hop"])
+        }
+        artist("Elsewhere", from: "London", tags: ["Ambient"])
+        artist("Elsewhere Two", from: "London", tags: ["Ambient"])
+        try? context.save()
+
+        let found = SceneEngine(context: context).scenes()
+            .filter { $0.city == "Manchester" }
+        XCTAssertEqual(found.count, 2)
+        let techno = found.first { $0.soundLabel == "HARD TECHNO" }
+        let hipHop = found.first { $0.soundLabel == "HIP HOP" }
+        XCTAssertEqual(techno?.artists.count, 3)
+        XCTAssertEqual(hipHop?.artists.count, 3)
+        // And neither contains the other's people.
+        XCTAssertFalse(techno?.artists.contains("Rap A") ?? true)
+        XCTAssertFalse(hipHop?.artists.contains("Techno A") ?? true)
+    }
+
+    func testTwoScenesInOnePlaceAreTwoAddresses() {
+        for name in ["Techno A", "Techno B"] {
+            artist(name, from: "Manchester", tags: ["Hard Techno"])
+        }
+        for name in ["Rap A", "Rap B"] {
+            artist(name, from: "Manchester", tags: ["Hip Hop"])
+        }
+        artist("Elsewhere", from: "London", tags: ["Ambient"])
+        artist("Elsewhere Two", from: "London", tags: ["Ambient"])
+        try? context.save()
+
+        let engine = SceneEngine(context: context)
+        let techno = engine.scene(city: "Manchester", sound: "Hard Techno")
+        let hipHop = engine.scene(city: "Manchester", sound: "Hip Hop")
+        XCTAssertNotEqual(techno?.id, hipHop?.id)
+        // And each opens onto itself rather than onto its city.
+        XCTAssertEqual(techno?.node.destination,
+                       .digScene(city: "Manchester", sound: "Hard Techno"))
+    }
+
+    func testAnArtistIsOnlyInTheScenesTheyAreActuallyIn() {
+        for name in ["Techno A", "Techno B"] {
+            artist(name, from: "Manchester", tags: ["Hard Techno"])
+        }
+        for name in ["Rap A", "Rap B"] {
+            artist(name, from: "Manchester", tags: ["Hip Hop"])
+        }
+        artist("Elsewhere", from: "London", tags: ["Ambient"])
+        artist("Elsewhere Two", from: "London", tags: ["Ambient"])
+        try? context.save()
+
+        // Living in Manchester does not put somebody in its hip hop scene.
+        let found = SceneEngine(context: context).scenes(forArtist: "Techno A")
+        XCTAssertEqual(found.count, 1)
+        XCTAssertEqual(found.first?.soundLabel, "HARD TECHNO")
     }
 
     func testMembershipIsDecidedByTheSoundsOnTheLabelAndNoOthers() {
@@ -270,13 +334,18 @@ final class SceneSignatureTests: XCTestCase {
         artist("G", from: "London", tags: ["Ambient"])
         try? context.save()
 
+        // The strongest scene in the place is one sound, and holds only the
+        // people who make it.
         let scene = SceneEngine(context: context).scene(city: "Cologne")
-        XCTAssertEqual(scene?.namedSounds.count, 2)
-        XCTAssertEqual(scene?.signature.count, 3, "the third sound is found, just not printed")
+        XCTAssertEqual(scene?.artists.count, 3)
         for name in ["D", "E"] {
             XCTAssertFalse(scene?.artists.contains(name) ?? true,
-                           "\(name) was admitted on a sound the page does not show")
+                           "\(name) was admitted on a sound this scene is not")
         }
+        // They are not lost — they are their own scene.
+        let other = SceneEngine(context: context)
+            .scene(city: "Cologne", sound: "Neue Deutsche Welle")
+        XCTAssertEqual(other?.artists.count, 2)
     }
 
     // MARK: What it reads as

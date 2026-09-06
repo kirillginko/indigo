@@ -131,7 +131,7 @@ struct ExploreView: View {
             )
                 .graphNode("section.scene", section: "scene", connects: false)
                 .position(x: size.width * 0.5, y: sceneTop + 24)
-            Button { appState.open(.digScene(city: scene.city)) } label: {
+            Button { appState.open(.digScene(city: scene.city, sound: scene.sound)) } label: {
                 MapLabel(scene.title, scene.sound, MapColor.lavender, nil,
                          stableSeed(scene.city), cardWidth(in: size),
                          connection: scene.size)

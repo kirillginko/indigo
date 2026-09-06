@@ -42,7 +42,21 @@ final class CreditAndLabelTests: XCTestCase {
     }
 
     func testTheSamePersonNamedTwiceInACreditIsNamedOnce() {
-        XCTAssertEqual(ArtistName.split("Anthony Braxton & anthony braxton"), ["Anthony Braxton"])
+        XCTAssertEqual(
+            ArtistName.split("Anthony Braxton, anthony braxton"), ["Anthony Braxton"]
+        )
+    }
+
+    /// An ampersand joins two acts as often as it sits inside the name of one,
+    /// so the split that gets *shown* leaves it alone. Holden & Zimpel is a
+    /// duo, and splitting it put two people on a scene page who do not exist.
+    func testAnAmpersandInsideAnActsNameIsNotSplitForDisplay() {
+        XCTAssertEqual(ArtistName.split("Holden & Zimpel"), ["Holden & Zimpel"])
+        XCTAssertEqual(ArtistName.split("Coco Steel & Lovebomb"), ["Coco Steel & Lovebomb"])
+        // The comparison side keeps it: there the cost is reversed, and
+        // listing a duo's record under both halves is generous where
+        // inventing a name is not.
+        XCTAssertEqual(RecordingKey.creditedArtists("Holden & Zimpel"), ["holden", "zimpel"])
     }
 
     func testAPlaceholderInACreditIsNotAPerson() {

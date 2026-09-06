@@ -103,6 +103,15 @@ nonisolated struct PlaceIndex: Sendable {
 /// every `var body: some Scene` in the app ambiguous.
 nonisolated struct MusicScene: Identifiable, Sendable {
     let city: String
+    /// The one sound this scene is. Nil where the place has nothing to
+    /// distinguish it and is a scene only in the older sense — a city and a
+    /// stretch of years.
+    ///
+    /// One sound, not two. A city holds more than one scene and saying so is
+    /// the point: Manchester read "HARD TECHNO, HIP HOP", which is not a scene
+    /// but two of them wearing one name, with a membership that was the union
+    /// of people who have nothing to do with each other.
+    let sound: String?
     /// When the music clustered here was actually made. Nil when nothing in
     /// the cache is dated, which is a real answer rather than a guess.
     let era: ClosedRange<Int>?
@@ -122,27 +131,17 @@ nonisolated struct MusicScene: Identifiable, Sendable {
     let libraryTrackCount: Int
     let crateCount: Int
 
-    var id: String { "\(RecordingKey.normalize(city))|\(era?.lowerBound ?? 0)" }
+    var id: String { "\(RecordingKey.normalize(city))|\(soundKey)" }
+
+    /// How the sound is written in an address. Empty for a place with none.
+    var soundKey: String { RecordingKey.normalize(sound) }
 
     /// "BERLIN"
     var title: String { city.uppercased() }
 
-    /// How many of the signature the scene actually goes by. The rest is kept
-    /// for weighing against a listener's taste, but a name with four sounds in
-    /// it is not a name.
-    static let namedSoundCount = 2
-
-    /// The sounds this scene is named after — and, exactly, the ones its
-    /// members are the members for. The page said two and admitted people on
-    /// the strength of a third nobody could see.
-    var namedSounds: [String] { Array(signature.prefix(Self.namedSoundCount)) }
-
     /// What this scene sounds like, or when it happened when nothing marks it
-    /// out. "DUB TECHNO, MINIMAL" — or "2010–2016".
-    var soundLabel: String {
-        guard !namedSounds.isEmpty else { return eraLabel }
-        return namedSounds.map { $0.uppercased() }.joined(separator: ", ")
-    }
+    /// out. "DUB TECHNO" — or "2010–2016".
+    var soundLabel: String { sound?.uppercased() ?? eraLabel }
 
     var eraLabel: String {
         guard let era else { return "UNDATED" }
@@ -156,7 +155,11 @@ nonisolated struct MusicScene: Identifiable, Sendable {
             kind: .scene,
             key: id,
             title: city.uppercased(),
-            subtitle: soundLabel
+            subtitle: soundLabel,
+            // Carried so the node can be reopened: a scene's address is its
+            // place and its sound, and a city alone no longer names one.
+            providerID: city,
+            handle: sound
         )
     }
 
@@ -195,11 +198,19 @@ nonisolated struct SceneEngine {
         self.context = context
     }
 
+    /// How many scenes one place can hold.
+    ///
+    /// A city is not a scene, it is where several of them happen. Manchester
+    /// has a hard techno one and a hip hop one, and folding them together
+    /// produced a name that was two names and a membership that was the union
+    /// of people with nothing to do with each other.
+    static let scenesPerPlace = 3
+
     /// Every scene the cache can evidence, busiest first.
     func scenes() -> [MusicScene] {
         let caches = self.caches
         return caches.cities.keys
-            .compactMap { scene(cityKey: $0, caches: caches) }
+            .flatMap { scenes(cityKey: $0, caches: caches) }
             .filter(\.isSubstantial)
             .sorted {
                 $0.artists.count == $1.artists.count
@@ -246,37 +257,83 @@ nonisolated struct SceneEngine {
             .scene
     }
 
-    func scene(city: String) -> MusicScene? {
-        scene(cityKey: RecordingKey.normalize(city), caches: caches)
+    /// One named scene: a place and a sound. Without a sound, the place's
+    /// strongest — so an older link that only knows a city still lands
+    /// somewhere real.
+    func scene(city: String, sound: String? = nil) -> MusicScene? {
+        let found = scenes(cityKey: RecordingKey.normalize(city), caches: caches)
+        guard let sound, !sound.isEmpty else { return found.first }
+        let wanted = RecordingKey.normalize(sound)
+        return found.first { $0.soundKey == wanted } ?? found.first
     }
 
     /// Which scenes an artist belongs to. An artist can be in more than one —
     /// people move, and a Berlin record made by somebody from Manchester
     /// belongs to both stories.
+    /// Which scenes an artist belongs to. Only the ones they are actually in:
+    /// living in Manchester does not put somebody in its hip hop scene.
     func scenes(forArtist name: String) -> [MusicScene] {
         let caches = self.caches
         let key = RecordingKey.normalizeArtist(name)
         return caches.citiesForArtist[key, default: []]
-            .compactMap { scene(cityKey: $0, caches: caches) }
-            .sorted { $0.city < $1.city }
+            .flatMap { scenes(cityKey: $0, caches: caches) }
+            .filter { scene in
+                guard let sound = scene.sound else { return true }
+                let tags = Set((caches.tagsForArtist[key] ?? []).flatMap { ListeningLog.foldTags([$0]) })
+                return !tags.isDisjoint(with: Set(ListeningLog.foldTags([sound])))
+            }
+            .sorted { $0.city == $1.city ? $0.soundKey < $1.soundKey : $0.city < $1.city }
     }
 
-    private func scene(cityKey: String, caches: SceneCaches) -> MusicScene? {
-        guard let city = caches.cities[cityKey] else { return nil }
-        let everyone = caches.artistsForCity[cityKey] ?? []
-        guard !everyone.isEmpty else { return nil }
-
-        // The sound first, then who is actually in it.
-        //
-        // A scene is a place *and* a sound, and until now only the name knew
-        // that: New York was called jazz and contained every New Yorker in the
-        // catalogue, most of whom play nothing of the kind. A page that says
-        // jazz and lists a noise band is worse than one that says New York,
-        // because it makes a claim and then contradicts it.
-        let signature = caches.signature(for: cityKey)
-        let artistKeys = caches.members(
-            of: cityKey, sounding: Array(signature.prefix(MusicScene.namedSoundCount))
+    /// Every scene one place holds, strongest sound first.
+    private func scenes(cityKey: String, caches: SceneCaches) -> [MusicScene] {
+        let signature = caches.signature(for: cityKey, limit: Self.scenesPerPlace)
+        guard !signature.isEmpty else {
+            // Nowhere in particular. Then it is a place and a stretch of
+            // years, which is what a scene was before it had a sound, and
+            // everybody who lives there is in it.
+            return [scene(cityKey: cityKey, sound: nil, caches: caches)].compactMap { $0 }
+        }
+        return Self.merged(
+            signature.compactMap { scene(cityKey: cityKey, sound: $0, caches: caches) }
         )
+    }
+
+    /// Folds scenes that are the same people under different words.
+    ///
+    /// A place's distinctive sounds are often several names for one thing: New
+    /// York came out as jazz, avantgarde and free jazz, each with the same
+    /// five musicians in it, and London as balearic, jazz and trance with an
+    /// identical membership. Three entries for one scene is not three scenes,
+    /// it is the same page printed three times.
+    ///
+    /// The first survives, because the signature is already ordered by how
+    /// much the sound belongs to the place.
+    static func merged(_ scenes: [MusicScene]) -> [MusicScene] {
+        var kept: [MusicScene] = []
+        for scene in scenes {
+            let members = Set(scene.artists)
+            let isDuplicate = kept.contains { existing in
+                let theirs = Set(existing.artists)
+                guard !members.isEmpty, !theirs.isEmpty else { return false }
+                let shared = members.intersection(theirs).count
+                // Most of one inside the other. Two scenes that share a few
+                // people are two scenes; two that share nearly everybody are
+                // one under two names.
+                return Double(shared) / Double(min(members.count, theirs.count)) >= 0.8
+            }
+            if !isDuplicate { kept.append(scene) }
+        }
+        return kept
+    }
+
+    private func scene(cityKey: String, sound: String?, caches: SceneCaches) -> MusicScene? {
+        guard let city = caches.cities[cityKey] else { return nil }
+        // A scene is a place *and* a sound, and its members are the people who
+        // make that sound there — not everybody who happens to live in the
+        // city. A page that says jazz and lists a noise band is worse than one
+        // that says New York, because it makes a claim and contradicts it.
+        let artistKeys = caches.members(of: cityKey, sounding: sound.map { [$0] } ?? [])
         guard !artistKeys.isEmpty else { return nil }
 
         var labels: [String: Int] = [:]
@@ -297,6 +354,7 @@ nonisolated struct SceneEngine {
 
         return MusicScene(
             city: city,
+            sound: sound,
             era: Self.era(from: years),
             artists: artistKeys.compactMap { caches.artistNames[$0] }
                 .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending },
@@ -304,7 +362,7 @@ nonisolated struct SceneEngine {
                 .prefix(12).map(\.key),
             tags: tags.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
                 .prefix(10).map(\.key),
-            signature: signature,
+            signature: caches.signature(for: cityKey),
 
             radioAppearances: radio,
             libraryTrackCount: library,

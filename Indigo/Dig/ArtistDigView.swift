@@ -672,7 +672,7 @@ struct ArtistDigView: View {
                                 scene.tags.prefix(3).joined(separator: " · ").nilIfEmpty
                             ].compactMap { $0 }.joined(separator: "  ")
                         ) {
-                            appState.open(.digScene(city: scene.city))
+                            appState.open(.digScene(city: scene.city, sound: scene.sound))
                         }
                         Rule()
                     }

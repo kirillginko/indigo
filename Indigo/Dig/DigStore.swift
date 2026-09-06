@@ -689,8 +689,8 @@ final class DigStore {
             return .release(title, discogsID: id)
         case .digCatalog(let number):
             return .catalogNumber(number)
-        case .digScene(let city):
-            return SceneEngine(context: context).scene(city: city)?.node
+        case .digScene(let city, let sound):
+            return SceneEngine(context: context).scene(city: city, sound: sound)?.node
         case .digRecording(let id, _):
             // Resolved through the recording itself so an identified track and
             // its unknown past are one node rather than two.
@@ -789,10 +789,10 @@ final class DigStore {
         return await worker.scenes(forArtist: name, generation: revision)
     }
 
-    func scene(city: String) async -> MusicScene? {
+    func scene(city: String, sound: String?) async -> MusicScene? {
         let _ = revision
         settle()
-        return await worker.scene(city: city, generation: revision)
+        return await worker.scene(city: city, sound: sound, generation: revision)
     }
 
     func undergroundCuts(for node: MusicNode) async -> [DeepResult] {

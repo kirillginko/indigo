@@ -2,10 +2,11 @@
 //  SceneDigView.swift
 //  Indigo
 //
-//  A place and a stretch of time.
+//  A place and a sound.
 //
-//  The spec's SCENE: Berlin 2010–2016, and the labels, artists and tags that
-//  clustered there. Everything on this page is assembled from evidence the
+//  The spec's SCENE: Berlin dub techno, and the labels, artists and tags that
+//  cluster there. A city is not itself a scene — it is where several of them
+//  happen — so the page is about one of them. Everything on this page is assembled from evidence the
 //  app already holds — where a catalogue says an artist began, what they
 //  tagged their own records with, when those records came out — rather than
 //  from anybody's opinion about what a scene was.
@@ -15,6 +16,9 @@ import SwiftUI
 
 struct SceneDigView: View {
     let city: String
+    /// Which of the place's scenes. Nil means whichever is strongest, which is
+    /// what a link naming only a city can mean now that a city holds several.
+    var sound: String?
 
     @Environment(AppState.self) private var appState
     @Environment(DigStore.self) private var dig
@@ -123,11 +127,11 @@ struct SceneDigView: View {
             }
         }
         .task(id: city) {
-            self.scene = await dig.scene(city: city)
+            self.scene = await dig.scene(city: city, sound: sound)
             hasGathered = true
         }
         .task(id: dig.revision) {
-            self.scene = await dig.scene(city: city)
+            self.scene = await dig.scene(city: city, sound: sound)
         }
     }
 }

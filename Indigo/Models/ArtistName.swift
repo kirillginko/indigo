@@ -55,6 +55,22 @@ nonisolated enum ArtistName {
         " - ", " – ", " — ", " / "
     ]
 
+    /// The separators that are safe when the answer will be *shown*.
+    ///
+    /// "&" and "and" join two acts as often as they sit inside the name of
+    /// one. Holden & Zimpel is a duo, Coco Steel & Lovebomb is a group, and
+    /// splitting those put four people on a scene page who do not exist —
+    /// Holden, Zimpel, Coco Steel, Lovebomb.
+    ///
+    /// `creditedArtists` keeps them, because there the cost is reversed: it
+    /// decides whose page a record turns up on, and listing a duo's record
+    /// under both halves is generous where inventing a name is not.
+    static let unambiguousSeparators = [
+        " x ", " X ", " with ", " vs. ", " vs ", ", ",
+        " feat. ", " feat ", " ft. ", " ft ", " featuring ",
+        " - ", " – ", " — ", " / "
+    ]
+
     /// The people named in a credit, spelled as the credit spelled them.
     ///
     /// `RecordingKey.creditedArtists` answers the same question in normalised
@@ -64,7 +80,7 @@ nonisolated enum ArtistName {
     static func split(_ credit: String?) -> [String] {
         guard let credit, !credit.isEmpty else { return [] }
         var parts = [credit]
-        for separator in creditSeparators {
+        for separator in unambiguousSeparators {
             parts = parts.flatMap { $0.components(separatedBy: separator) }
         }
         var seen = Set<String>()

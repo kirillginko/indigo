@@ -205,7 +205,7 @@ actor DigWorker {
         sceneEngine(generation).scenes(forArtist: name)
     }
 
-    func scene(city: String, generation: Int) -> MusicScene? {
-        sceneEngine(generation).scene(city: city)
+    func scene(city: String, sound: String?, generation: Int) -> MusicScene? {
+        sceneEngine(generation).scene(city: city, sound: sound)
     }
 }

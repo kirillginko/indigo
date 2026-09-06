@@ -835,9 +835,13 @@ nonisolated struct GraphStore {
     /// can walk, so a scene is somewhere you can dig out of rather than a
     /// page you have to reverse out of.
     private func addSceneNeighbors(_ node: MusicNode, caches: Caches, into edges: inout EdgeSet) {
-        let city = node.key.split(separator: "|").first.map(String.init) ?? node.key
-        guard let scene = SceneEngine(context: context).scene(city: city) else { return }
-        let where_ = "\(scene.city) \(scene.eraLabel)"
+        // A scene's key is its place and its sound — see `MusicScene.id`.
+        let parts = node.key.split(separator: "|", maxSplits: 1).map(String.init)
+        let city = node.providerID ?? parts.first ?? node.key
+        let sound = node.handle ?? (parts.count > 1 ? parts[1] : nil)
+        guard let scene = SceneEngine(context: context).scene(city: city, sound: sound)
+        else { return }
+        let where_ = "\(scene.city) \(scene.soundLabel)"
 
         for artist in scene.artists {
             edges.insert(MusicEdge(
