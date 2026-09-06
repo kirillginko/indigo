@@ -127,11 +127,21 @@ nonisolated struct MusicScene: Identifiable, Sendable {
     /// "BERLIN"
     var title: String { city.uppercased() }
 
+    /// How many of the signature the scene actually goes by. The rest is kept
+    /// for weighing against a listener's taste, but a name with four sounds in
+    /// it is not a name.
+    static let namedSoundCount = 2
+
+    /// The sounds this scene is named after — and, exactly, the ones its
+    /// members are the members for. The page said two and admitted people on
+    /// the strength of a third nobody could see.
+    var namedSounds: [String] { Array(signature.prefix(Self.namedSoundCount)) }
+
     /// What this scene sounds like, or when it happened when nothing marks it
     /// out. "DUB TECHNO, MINIMAL" — or "2010–2016".
     var soundLabel: String {
-        guard !signature.isEmpty else { return eraLabel }
-        return signature.prefix(2).map { $0.uppercased() }.joined(separator: ", ")
+        guard !namedSounds.isEmpty else { return eraLabel }
+        return namedSounds.map { $0.uppercased() }.joined(separator: ", ")
     }
 
     var eraLabel: String {
@@ -253,7 +263,20 @@ nonisolated struct SceneEngine {
 
     private func scene(cityKey: String, caches: SceneCaches) -> MusicScene? {
         guard let city = caches.cities[cityKey] else { return nil }
-        let artistKeys = caches.artistsForCity[cityKey] ?? []
+        let everyone = caches.artistsForCity[cityKey] ?? []
+        guard !everyone.isEmpty else { return nil }
+
+        // The sound first, then who is actually in it.
+        //
+        // A scene is a place *and* a sound, and until now only the name knew
+        // that: New York was called jazz and contained every New Yorker in the
+        // catalogue, most of whom play nothing of the kind. A page that says
+        // jazz and lists a noise band is worse than one that says New York,
+        // because it makes a claim and then contradicts it.
+        let signature = caches.signature(for: cityKey)
+        let artistKeys = caches.members(
+            of: cityKey, sounding: Array(signature.prefix(MusicScene.namedSoundCount))
+        )
         guard !artistKeys.isEmpty else { return nil }
 
         var labels: [String: Int] = [:]
@@ -281,7 +304,7 @@ nonisolated struct SceneEngine {
                 .prefix(12).map(\.key),
             tags: tags.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
                 .prefix(10).map(\.key),
-            signature: caches.signature(for: cityKey),
+            signature: signature,
 
             radioAppearances: radio,
             libraryTrackCount: library,
@@ -367,6 +390,25 @@ extension SceneCaches {
             .sorted { $0.weight == $1.weight ? $0.tag < $1.tag : $0.weight > $1.weight }
             .prefix(limit)
             .map { spelling[$0.tag] ?? $0.tag }
+    }
+
+    /// Who in this place actually belongs to its scene.
+    ///
+    /// Everybody, when the place has no sound of its own — then it is a scene
+    /// in the older sense, a city and a stretch of years, and there is nothing
+    /// to be a member of. Otherwise only the artists who carry the sound the
+    /// scene is named after. A signature needs two artists and a fifth of the
+    /// place to exist at all, so this never empties a scene it named.
+    func members(of cityKey: String, sounding signature: [String]) -> Set<String> {
+        let everyone = artistsForCity[cityKey] ?? []
+        guard !signature.isEmpty else { return everyone }
+        let wanted = Set(signature.flatMap { ListeningLog.foldTags([$0]) })
+        guard !wanted.isEmpty else { return everyone }
+        let found = everyone.filter { key in
+            let tags = Set((tagsForArtist[key] ?? []).flatMap { ListeningLog.foldTags([$0]) })
+            return !tags.isDisjoint(with: wanted)
+        }
+        return found.isEmpty ? everyone : found
     }
 
     /// Whether a tag describes a sound rather than a person or a place.

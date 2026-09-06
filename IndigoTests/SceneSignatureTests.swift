@@ -217,6 +217,68 @@ final class SceneSignatureTests: XCTestCase {
         XCTAssertEqual(line?.contains("2 artists"), true)
     }
 
+    // MARK: Who is in it
+
+    /// The bug as it was reported: a scene called jazz, containing bands that
+    /// are not jazz. Only the name knew about sound; membership was still
+    /// everybody who happened to live there.
+    func testASceneContainsOnlyTheArtistsItIsNamedAfter() {
+        artist("Braxton", from: "New York", tags: ["Free Jazz", "Experimental"])
+        artist("Cyrille", from: "New York", tags: ["Free Jazz", "Experimental"])
+        artist("Lurie", from: "New York", tags: ["Free Jazz", "Experimental"])
+        // From the same city, and nothing to do with the scene.
+        artist("A Noise Band", from: "New York", tags: ["Noise Rock", "Experimental"])
+        artist("Elsewhere", from: "London", tags: ["Experimental"])
+        artist("Elsewhere Two", from: "London", tags: ["Experimental"])
+        try? context.save()
+
+        let scene = SceneEngine(context: context).scene(city: "New York")
+        XCTAssertEqual(scene?.soundLabel, "FREE JAZZ")
+        XCTAssertEqual(scene?.artists.count, 3)
+        XCTAssertFalse(scene?.artists.contains("A Noise Band") ?? true)
+    }
+
+    func testASceneWithNoSoundOfItsOwnStillHoldsEverybody() {
+        // Nothing distinguishes this place, so it is a scene in the older
+        // sense — a city and a stretch of years — and there is nothing to be
+        // a member of.
+        artist("A", from: "Berlin", tags: ["Experimental"])
+        artist("B", from: "Berlin", tags: ["Experimental"])
+        artist("C", from: "London", tags: ["Experimental"])
+        artist("D", from: "London", tags: ["Experimental"])
+        try? context.save()
+
+        let scene = SceneEngine(context: context).scene(city: "Berlin")
+        XCTAssertTrue(scene?.signature.isEmpty ?? false)
+        XCTAssertEqual(scene?.artists.count, 2)
+    }
+
+    func testMembershipIsDecidedByTheSoundsOnTheLabelAndNoOthers() {
+        // Three sounds are found; two are shown. Admitting people on the
+        // strength of the third means a page that lists somebody it cannot
+        // explain.
+        // Half the city is kosmische and krautrock; a third of it is something
+        // else, which is real enough to be found and not one of the two the
+        // page prints.
+        for name in ["A", "B", "C"] {
+            artist(name, from: "Cologne", tags: ["Kosmische", "Krautrock"])
+        }
+        for name in ["D", "E"] {
+            artist(name, from: "Cologne", tags: ["Neue Deutsche Welle"])
+        }
+        artist("F", from: "London", tags: ["Ambient"])
+        artist("G", from: "London", tags: ["Ambient"])
+        try? context.save()
+
+        let scene = SceneEngine(context: context).scene(city: "Cologne")
+        XCTAssertEqual(scene?.namedSounds.count, 2)
+        XCTAssertEqual(scene?.signature.count, 3, "the third sound is found, just not printed")
+        for name in ["D", "E"] {
+            XCTAssertFalse(scene?.artists.contains(name) ?? true,
+                           "\(name) was admitted on a sound the page does not show")
+        }
+    }
+
     // MARK: What it reads as
 
     func testAScenePresentsItsSoundAndFallsBackToItsYears() {
