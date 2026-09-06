@@ -160,11 +160,7 @@ struct SceneDigView: View {
             ) {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(others) { member in
-                        DigLine(
-                            text: member.name,
-                            detail: [member.disambiguation, member.yearsLabel]
-                                .compactMap { $0 }.first
-                        ) {
+                        DigLine(text: member.name, detail: member.evidence) {
                             appState.open(.digArtist(mbid: member.mbid, name: member.name))
                         }
                     }

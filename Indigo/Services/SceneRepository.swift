@@ -34,8 +34,24 @@ nonisolated struct SceneRepository: Sendable {
         let endedYear: Int?
         let disambiguation: String?
         let score: Int
+        /// Where this name came from. "radio" means the stations played them
+        /// in this scene, which is a stronger thing to be able to say than a
+        /// catalogue tag — somebody chose to put them there.
+        let source: String
+        /// How many separate broadcasts, for a name radio supplied.
+        let plays: Int
 
         var id: String { normalizedName }
+
+        /// What can be said about them, in the terms whoever supplied the name
+        /// can support. A play count is evidence; a catalogue's years are a
+        /// fact about the artist and not about the scene.
+        var evidence: String? {
+            if source == "radio", plays > 0 {
+                return plays == 1 ? "Played once" : "Played on \(plays) broadcasts"
+            }
+            return [disambiguation, yearsLabel].compactMap { $0 }.first
+        }
 
         /// "1968–1994", "since 2011", or nothing when the catalogue is silent.
         var yearsLabel: String? {
@@ -56,6 +72,8 @@ nonisolated struct SceneRepository: Sendable {
             case endedYear = "ended_year"
             case disambiguation
             case score
+            case source
+            case plays
         }
     }
 
@@ -96,7 +114,9 @@ nonisolated struct SceneRepository: Sendable {
         let client = try SupabaseService.requireClient()
         return try await client
             .from("scene_members")
-            .select("name,normalized_name,mbid,area,began_year,ended_year,disambiguation,score")
+            .select(
+                "name,normalized_name,mbid,area,began_year,ended_year,disambiguation,score,source,plays"
+            )
             .eq("roster_id", value: rosterID.uuidString)
             .order("score", ascending: false)
             .limit(limit)

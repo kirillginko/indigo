@@ -316,6 +316,88 @@ begin
     end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- Who the stations played in a scene
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    roster uuid;
+    ep1 uuid;
+    ep2 uuid;
+    ep3 uuid;
+    filled int;
+begin
+    select id into ep1 from public.radio_episodes where external_id = 'smoke-1';
+    select id into ep2 from public.radio_episodes where external_id = 'smoke-2';
+    select id into ep3 from public.radio_episodes where external_id = 'smoke-3';
+
+    -- One artist across two of the dub techno broadcasts, one across all
+    -- three, and one heard only once.
+    insert into public.radio_appearances
+        (radio_episode_id, track_index, raw_artist_name, normalized_artist_name)
+    values
+        (ep1, 1, 'Rhythm & Sound', 'rhythm sound'),
+        (ep2, 1, 'Rhythm & Sound', 'rhythm sound'),
+        (ep1, 2, 'Basic Channel', 'basic channel'),
+        (ep2, 2, 'Basic Channel', 'basic channel'),
+        (ep3, 1, 'Basic Channel', 'basic channel'),
+        (ep3, 2, 'Heard Once', 'heard once');
+
+    select id into roster from public.scene_rosters
+    where sound_key = 'dub techno' and coalesce(place_key, '') = '';
+
+    filled := public.fill_scene_from_radio(roster);
+    if filled < 2 then
+        raise exception 'radio filled only % of the scene', filled;
+    end if;
+
+    -- Twice is a pattern; once is a selector reaching for something.
+    if not exists (
+        select 1 from public.scene_members
+        where roster_id = roster and normalized_name = 'basic channel' and plays = 3
+    ) then
+        raise exception 'the most played artist was not recorded with their plays';
+    end if;
+    if exists (
+        select 1 from public.scene_members
+        where roster_id = roster and normalized_name = 'heard once'
+    ) then
+        raise exception 'an artist played once became a member';
+    end if;
+
+    -- Marked as radio, so a page can tell evidence from a catalogue's opinion.
+    if (select source from public.scene_members
+        where roster_id = roster and normalized_name = 'basic channel') <> 'radio' then
+        raise exception 'a radio-derived member is not marked as one';
+    end if;
+
+    -- The roster knows how many it holds.
+    if (select member_count from public.scene_rosters where id = roster) < 2 then
+        raise exception 'the roster did not count what radio added';
+    end if;
+
+    -- Running it again does not double anybody.
+    perform public.fill_scene_from_radio(roster);
+    if (select count(*) from public.scene_members
+        where roster_id = roster and normalized_name = 'basic channel') <> 1 then
+        raise exception 'a second fill duplicated a member';
+    end if;
+
+    -- A place-and-sound roster reads as the shows that went out from there.
+    -- These broadcasts are all from Manchester, so its dub techno roster
+    -- holds them too.
+    perform public.fill_scenes_from_radio(60);
+    if not exists (
+        select m.id from public.scene_members m
+        join public.scene_rosters r on r.id = m.roster_id
+        where r.place_key = 'manchester' and r.sound_key = 'dub techno'
+          and m.normalized_name = 'basic channel'
+    ) then
+        raise exception 'a placed roster was not filled from its own city''s shows';
+    end if;
+end $$;
+
 -- Neither half is optional to the point of being nothing.
 do $$
 begin

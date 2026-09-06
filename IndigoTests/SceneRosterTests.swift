@@ -51,7 +51,7 @@ final class SceneRosterTests: XCTestCase {
         {"name":"Anthony Braxton","normalized_name":"anthony braxton","mbid":null,
          "area":"New York","began_year":\(began.map(String.init) ?? "null"),
          "ended_year":\(ended.map(String.init) ?? "null"),
-         "disambiguation":null,"score":100}
+         "disambiguation":null,"score":100,"source":"musicbrainz","plays":0}
         """
         return try! JSONDecoder().decode(SceneRepository.Member.self, from: Data(json.utf8))
     }
@@ -72,6 +72,25 @@ final class SceneRosterTests: XCTestCase {
             member(began: nil, ended: nil).normalizedName,
             RecordingKey.normalize("Anthony Braxton")
         )
+    }
+
+    /// A name radio supplied says what the radio can support — how many
+    /// broadcasts played them — rather than borrowing a catalogue's years,
+    /// which are a fact about the artist and not about the scene.
+    func testARadioMemberSaysHowOftenTheStationsPlayedThem() {
+        let json = """
+        {"name":"Basic Channel","normalized_name":"basic channel","mbid":null,
+         "area":null,"began_year":null,"ended_year":null,"disambiguation":null,
+         "score":3,"source":"radio","plays":3}
+        """
+        let member = try! JSONDecoder().decode(
+            SceneRepository.Member.self, from: Data(json.utf8)
+        )
+        XCTAssertEqual(member.evidence, "Played on 3 broadcasts")
+    }
+
+    func testACatalogueMemberSaysWhatACatalogueKnows() {
+        XCTAssertEqual(member(began: 1968, ended: 1994).evidence, "1968–1994")
     }
 
     func testARosterStillFillingIsUsableAndSaysSo() {
