@@ -198,6 +198,19 @@ nonisolated struct SceneEngine {
         self.context = context
     }
 
+    /// How many artists a place needs before it can be somewhere to head into.
+    ///
+    /// Four, back when a scene was a whole city and held nineteen people.
+    /// Splitting them by sound made every scene smaller — most hold two or
+    /// three — and the threshold went on measuring the old shape. On a real
+    /// collection exactly one place could clear it, so the page named
+    /// Manchester's hip hop every time it was opened, for weeks.
+    ///
+    /// Two, which is what `isSubstantial` already asks of a scene at all. A
+    /// scene somebody has a foot in and two names they have not heard is a
+    /// direction; refusing it and repeating yesterday's answer is not.
+    static let directionMinimum = 2
+
     /// How many scenes one place can hold.
     ///
     /// A city is not a scene, it is where several of them happen. Manchester
@@ -231,9 +244,20 @@ nonisolated struct SceneEngine {
     /// place is not moving anywhere, and inventing a direction for them would
     /// be the app talking rather than reading.
     func movingToward(taste: TasteProfile) -> MusicScene? {
-        guard !taste.isEmpty else { return nil }
-        let caches = self.caches
+        directions(taste: taste).first
+    }
 
+    /// Every scene this listener could be said to be heading into, best first.
+    ///
+    /// Plural because the singular was always the same answer. Scoring already
+    /// ranks every candidate and then threw all but one away, so a collection
+    /// that changes slowly named one place for weeks — the page made a claim
+    /// about somebody's direction and then repeated it until they stopped
+    /// reading it. Several are worked out for the price of the one, and which
+    /// gets shown moves on.
+    func directions(taste: TasteProfile, limit: Int = 6) -> [MusicScene] {
+        guard !taste.isEmpty else { return [] }
+        let caches = self.caches
         // Only the places this listener has a foot in, decided before any
         // scene is built. A direction requires a foothold, so assembling the
         // forty-odd cities where there is none — each one a signature, a
@@ -241,12 +265,12 @@ nonisolated struct SceneEngine {
         let candidates = caches.cities.keys.filter { cityKey in
             guard !caches.countries.contains(cityKey) else { return false }
             let members = caches.artistsForCity[cityKey] ?? []
-            guard members.count >= 4 else { return false }
+            guard members.count >= Self.directionMinimum else { return false }
             return members.contains {
                 (caches.crateForArtist[$0] ?? 0) + (caches.libraryForArtist[$0] ?? 0) > 0
             }
         }
-        guard !candidates.isEmpty else { return nil }
+        guard !candidates.isEmpty else { return [] }
 
         let found: [MusicScene] = candidates
             .flatMap { scenes(cityKey: $0, caches: caches) }
@@ -255,7 +279,7 @@ nonisolated struct SceneEngine {
             .compactMap { scene -> (scene: MusicScene, score: Double)? in
                 let foothold = scene.crateCount + scene.libraryTrackCount
                 // No foot in it at all is not a direction, it is a stranger.
-                guard foothold > 0, scene.artists.count >= 4 else { return nil }
+                guard foothold > 0, scene.artists.count >= Self.directionMinimum else { return nil }
                 let affinity = taste.affinity(for: scene.signature + scene.tags)
                 guard affinity > 0.15 else { return nil }
                 // Enough of a start to mean something, and enough left to be
@@ -266,8 +290,11 @@ nonisolated struct SceneEngine {
                 let score = affinity * started * room
                 return score > 0 ? (scene, score) : nil
             }
-            .max { $0.score == $1.score ? $0.scene.city > $1.scene.city : $0.score < $1.score }?
-            .scene
+            .sorted {
+                $0.score == $1.score ? $0.scene.id < $1.scene.id : $0.score > $1.score
+            }
+            .prefix(limit)
+            .map(\.scene)
     }
 
     /// One named scene: a place and a sound. Without a sound, the place's
@@ -665,6 +692,15 @@ nonisolated struct SceneCaches {
             let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, !name.isEmpty else { continue }
             crateForArtist[RecordingKey.normalizeArtist(name), default: 0] += 1
+        }
+
+        // Having listened to somebody is a foot in their scene as much as
+        // having kept them is. Counted here so a direction can be read from
+        // what a person plays and not only from what they filed — which on a
+        // collection whose crate is small is most of what there is to go on.
+        for event in ListeningLog(context: context).all()
+        where event.kind == .artist && event.weight > 0 {
+            crateForArtist[event.nodeKey, default: 0] += 1
         }
 
         // Every artist the app knows of, not only the ones with a place. Sonae

@@ -115,11 +115,16 @@ actor DigWorker {
     /// And where they are heading, which means assembling every place in the
     /// catalogue. Uses the engine this actor already holds rather than
     /// building a second set of the same caches.
-    func exploreDirection(generation: Int) -> ExploreOffers.SceneOffer? {
+    /// `turn` moves along the list of places somebody could be said to be
+    /// heading into, so a collection that changes slowly is not told the same
+    /// thing forever. Costs nothing: they are all worked out either way.
+    func exploreDirection(generation: Int, turn: Int) -> ExploreOffers.SceneOffer? {
         let scenes = sceneEngine(generation)
         return Trace.step("explore.direction") {
             let taste = TasteProfile.collected(context: modelContext)
-            guard let scene = scenes.movingToward(taste: taste) else { return nil }
+            let found = scenes.directions(taste: taste)
+            guard !found.isEmpty else { return nil }
+            let scene = found[((turn % found.count) + found.count) % found.count]
             return ExploreOffers.SceneOffer(
                 city: scene.city, title: scene.title,
                 sound: scene.soundLabel, size: scene.sizeLine

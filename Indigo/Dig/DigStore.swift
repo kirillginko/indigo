@@ -750,6 +750,22 @@ final class DigStore {
     private(set) var hasExploreDirection = false
     @ObservationIgnored private lazy var offersStore = ExploreOffersStore(context: context)
 
+    /// Which of the places somebody could be heading into to show next.
+    ///
+    /// Kept in defaults rather than in the store: it is a note about what was
+    /// last put on screen, not a fact about their music, and it should not be
+    /// worth a schema migration. Advanced once per recomputation — which is
+    /// about once a launch — so the page says something different each time
+    /// without any of it being worked out twice.
+    @ObservationIgnored static let directionTurnKey = "explore.direction.turn"
+
+    private static func nextDirectionTurn() -> Int {
+        let defaults = UserDefaults.standard
+        let turn = defaults.integer(forKey: directionTurnKey)
+        defaults.set(turn &+ 1, forKey: directionTurnKey)
+        return turn
+    }
+
     /// Reads back what was shown last time, so a launch opens on the page it
     /// closed on rather than on an empty one. Called once, from the app.
     func restoreExploreOffers() {
@@ -798,7 +814,9 @@ final class DigStore {
             self.hasExploreOffers = true
 
             // Then the slower half, folded into what is already on screen.
-            let direction = await self.worker.exploreDirection(generation: asked)
+            let direction = await self.worker.exploreDirection(
+                generation: asked, turn: Self.nextDirectionTurn()
+            )
             guard !Task.isCancelled else { return }
             var withScene = self.exploreOffers
             withScene.movingToward = direction

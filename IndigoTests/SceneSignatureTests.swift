@@ -199,6 +199,47 @@ final class SceneSignatureTests: XCTestCase {
         XCTAssertNotEqual(toward?.city, "United States")
     }
 
+    /// The bug as reported: the same scene, every time the page opened.
+    ///
+    /// Scoring already ranked every candidate and then threw all but one away,
+    /// so a collection that changes slowly named one place for weeks.
+    func testMoreThanOneDirectionIsWorkedOutWhenThereIsMoreThanOne() {
+        for index in 0..<4 {
+            artist("Köln \(index)", from: "Cologne", tags: ["Kosmische", "Ambient"])
+        }
+        for index in 0..<4 {
+            artist("Roma \(index)", from: "Rome", tags: ["Library Music", "Ambient"])
+        }
+        for index in 0..<4 {
+            artist("Londoner \(index)", from: "London", tags: ["Grime", "Ambient"])
+        }
+        crate(artist: "Köln 0")
+        crate(artist: "Roma 0")
+        try? context.save()
+
+        let found = SceneEngine(context: context)
+            .directions(taste: TasteProfile.collected(context: context))
+        XCTAssertGreaterThan(found.count, 1)
+        // Two different places, so rotating through them says something new.
+        XCTAssertEqual(Set(found.map(\.id)).count, found.count)
+    }
+
+    /// The threshold that caused it. Four artists was set when a scene was a
+    /// whole city and held nineteen people; splitting them by sound made every
+    /// scene smaller, and the threshold went on measuring the old shape.
+    func testASceneOfTwoCanBeADirection() {
+        artist("A", from: "Cologne", tags: ["Kosmische"])
+        artist("B", from: "Cologne", tags: ["Kosmische"])
+        artist("C", from: "London", tags: ["Grime"])
+        artist("D", from: "London", tags: ["Grime"])
+        crate(artist: "A")
+        try? context.save()
+
+        let found = SceneEngine(context: context)
+            .directions(taste: TasteProfile.collected(context: context))
+        XCTAssertTrue(found.contains { $0.city == "Cologne" })
+    }
+
     func testSomebodyWithNoTasteYetIsNotSentAnywhere() {
         for index in 0..<8 {
             artist("Köln \(index)", from: "Cologne", tags: ["Kosmische"])
