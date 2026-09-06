@@ -14,7 +14,8 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
-import { fillSceneRoster } from "../_shared/musicbrainz.ts";
+import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
+import { normalizeName } from "../_shared/normalize.ts";
 
 interface Job {
   id: string;
@@ -141,6 +142,26 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
       await fillSceneRoster(
         supabase, rosterId, place, sound, Number(roster?.next_offset ?? 0),
       );
+      return;
+    }
+
+    case "fetch_artist_origin": {
+      const artistId = String(job.payload?.artist_id ?? "");
+      const name = String(job.payload?.name ?? "");
+      if (!artistId || !name) throw new Error("missing artist");
+
+      const found = await fetchArtistOrigin(name);
+      // Recorded either way. An artist MusicBrainz cannot place is a finding,
+      // and writing it down is what stops the queue asking again next week.
+      const { error } = await supabase.rpc("record_artist_origin", {
+        p_artist_id: artistId,
+        p_area: found?.area ?? null,
+        p_area_key: found?.area ? normalizeName(found.area) : null,
+        p_country: found?.country ?? null,
+        p_began: found?.began ?? null,
+        p_mbid: found?.mbid ?? null,
+      });
+      if (error) throw new Error(error.message);
       return;
     }
 

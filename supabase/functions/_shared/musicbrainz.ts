@@ -164,3 +164,62 @@ export async function fillSceneRoster(
   }
   return { recorded: page.members.length, finished };
 }
+
+// MARK: - Where one artist is from
+
+interface MBArtistLookup {
+  id?: string;
+  name?: string;
+  score?: number;
+  country?: string;
+  area?: { name?: string };
+  "begin-area"?: { name?: string };
+  "life-span"?: { begin?: string };
+}
+
+/// Where MusicBrainz says an artist began.
+///
+/// A lookup about a name already held, not a search for names — which is the
+/// difference between an answer that is either right or absent and one nobody
+/// can check. The name is matched exactly after folding, because a search for
+/// "Anika" that returns somebody else's Anika would put an artist in the wrong
+/// city and there would be nothing on the page to say so.
+export async function fetchArtistOrigin(name: string): Promise<{
+  area: string | null;
+  country: string | null;
+  began: number | null;
+  mbid: string | null;
+} | null> {
+  const clean = name.replace(/["\\]/g, " ").trim();
+  if (!clean) return null;
+
+  const url = new URL("artist", MUSICBRAINZ_API);
+  url.searchParams.set("query", `artist:"${clean}"`);
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set("limit", "5");
+
+  const response = await fetch(url, {
+    headers: { Accept: "application/json", "User-Agent": MB_USER_AGENT },
+  });
+  if (response.status === 503) throw new Error("musicbrainz_busy");
+  if (!response.ok) throw new Error(`musicbrainz_${response.status}`);
+
+  const payload = await response.json() as { artists?: MBArtistLookup[] };
+  const wanted = normalizeName(clean);
+  const match = (payload.artists ?? []).find(
+    (artist) => normalizeName(artist.name ?? "") === wanted,
+  );
+  // No exact name, no answer. A near miss here is a wrong city on a page.
+  if (!match) return null;
+
+  // The area an artist *began* in is the scene they belong to; the area they
+  // are filed under can be where they live now.
+  const area = match["begin-area"]?.name ?? match.area?.name ?? null;
+  const begin = match["life-span"]?.begin?.slice(0, 4);
+  return {
+    area,
+    country: match.country ?? null,
+    began: begin && /^\d{4}$/.test(begin) ? Number(begin) : null,
+    mbid: match.id ?? null,
+  };
+}

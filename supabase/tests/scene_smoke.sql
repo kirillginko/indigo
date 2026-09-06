@@ -398,6 +398,78 @@ begin
     end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- Scenes named from where the artists are from
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    ep1 uuid;
+    ep2 uuid;
+    a1 uuid;
+    a2 uuid;
+    r1 uuid;
+    r2 uuid;
+    queued int;
+begin
+    select id into ep1 from public.radio_episodes where external_id = 'smoke-1';
+    select id into ep2 from public.radio_episodes where external_id = 'smoke-2';
+
+    insert into public.artists (name, normalized_name)
+    values ('Moritz Von Oswald', 'moritz von oswald') returning id into a1;
+    insert into public.artists (name, normalized_name)
+    values ('Mark Ernestus', 'mark ernestus') returning id into a2;
+
+    -- Both played across the dub techno broadcasts.
+    insert into public.recordings (title, artist_id) values ('A', a1) returning id into r1;
+    insert into public.recordings (title, artist_id) values ('B', a2) returning id into r2;
+    insert into public.radio_appearances
+        (radio_episode_id, recording_id, track_index, raw_artist_name, normalized_artist_name)
+    values
+        (ep1, r1, 10, 'Moritz Von Oswald', 'moritz von oswald'),
+        (ep2, r2, 10, 'Mark Ernestus', 'mark ernestus');
+
+    -- Nobody has been placed yet, so there is nothing to name a scene after.
+    if public.seed_scenes_from_artist_areas() <> 0 then
+        raise exception 'a scene was named from artists with no origin';
+    end if;
+
+    -- Worth asking about, because radio played them.
+    queued := public.enqueue_artist_origins(20);
+    if queued < 2 then
+        raise exception 'played artists were not queued for an origin: %', queued;
+    end if;
+
+    -- The worker answers.
+    perform public.record_artist_origin(a1, 'Berlin', 'berlin', 'DE', 1962, 'mb-a1');
+    perform public.record_artist_origin(a2, 'Berlin', 'berlin', 'DE', 1960, 'mb-a2');
+
+    -- And now the place is the artists' own, not the studio's.
+    if public.seed_scenes_from_artist_areas() < 1 then
+        raise exception 'two placed artists sharing a sound did not name a scene';
+    end if;
+    if not exists (
+        select 1 from public.scene_rosters
+        where place_key = 'berlin' and sound_key = 'dub techno'
+    ) then
+        raise exception 'the scene was not named after where the artists are from';
+    end if;
+
+    -- Asked and answered is not asked again.
+    if public.enqueue_artist_origins(20) <> 0 then
+        raise exception 'a placed artist was queued again';
+    end if;
+
+    -- And an artist nobody could place is not asked again either, which is
+    -- what stops a slow upstream being paid for the same miss every quarter
+    -- hour.
+    perform public.record_artist_origin(a1, null, null, null, null, null);
+    update public.artists set area_key = null where id = a1;
+    if public.enqueue_artist_origins(20) <> 0 then
+        raise exception 'an artist already looked up was queued again';
+    end if;
+end $$;
+
 -- Neither half is optional to the point of being nothing.
 do $$
 begin
