@@ -17,7 +17,7 @@
 
 import Foundation
 
-nonisolated enum MusicNodeKind: String, Hashable, Sendable, CaseIterable {
+nonisolated enum MusicNodeKind: String, Hashable, Sendable, Codable, CaseIterable {
     case artist
     case release
     case label
@@ -59,7 +59,7 @@ nonisolated enum MusicNodeKind: String, Hashable, Sendable, CaseIterable {
     }
 }
 
-nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
+nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     let kind: MusicNodeKind
     /// Normalised identity within the kind. Two nodes with the same kind and
     /// key are the same thing, however differently they were spelled.
@@ -157,9 +157,21 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
                   title: number.uppercased())
     }
 
-    static func scene(city: String, era: ClosedRange<Int>) -> MusicNode {
-        MusicNode(kind: .scene, key: "\(RecordingKey.normalize(city))|\(era.lowerBound)",
-                  title: city.uppercased(), subtitle: "\(era.lowerBound)–\(era.upperBound)")
+    /// A place and a sound — the two halves of a scene's address. See
+    /// `MusicScene.id`, which mints the same key.
+    ///
+    /// A sound is optional because a place can be a scene without one, and
+    /// because an older link that names only a city still has to land
+    /// somewhere: it opens the strongest scene there.
+    static func scene(city: String, sound: String? = nil) -> MusicNode {
+        MusicNode(
+            kind: .scene,
+            key: "\(RecordingKey.normalize(city))|\(RecordingKey.normalize(sound))",
+            title: city.uppercased(),
+            subtitle: sound?.uppercased(),
+            providerID: city,
+            handle: sound
+        )
     }
 
     /// A recording node, which is an unknown node when nobody could name it.
@@ -219,7 +231,7 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable {
             // nodes, and every one of them was a row that would not open —
             // which in a thing built on "no dead ends" is the worst kind of
             // gap, because it looks like a link.
-            return .digScene(city: title)
+            return .digScene(city: providerID ?? title, sound: handle)
         case .selector, .style, .station:
             // A station is a section of the app rather than a page inside
             // one, so it is reached through `route` instead. A style is a

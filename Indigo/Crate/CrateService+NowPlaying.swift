@@ -50,28 +50,65 @@ extension CrateService {
             remove(existing)
             return
         }
-        let isArchivedNTS = item.isLive && broadcastID.hasPrefix("nts.episode.")
+        // Naming what was on means the row is no longer about the station,
+        // and the station's stream is never the archive source: the crate
+        // page resolves the broadcast's own published URL. Keeping the live
+        // stream here would hand the player a different show under a kept
+        // name — see `CrateItem.isLiveShowSnapshot`, which catches the rows
+        // written before any of this and the stations that still cannot say
+        // what is on.
+        let keptOffAir = item.isLive && broadcastID != item.id
         add(
             broadcast: broadcastID,
             providerID: item.sourceID,
             title: liveShow?.title ?? item.title,
             subtitle: subtitle(for: item, liveShow: liveShow),
             artworkURL: liveShow?.artworkURL ?? item.remoteArtworkURL,
-            // A station stream is never the archive source. The crate page
-            // resolves the exact episode's published SoundCloud/Mixcloud URL.
-            playbackURL: isArchivedNTS ? nil : item.playbackURL,
-            embedProvider: isArchivedNTS ? nil : item.embedProvider,
-            isLiveStream: isArchivedNTS ? false : item.isLive,
+            playbackURL: keptOffAir ? nil : item.playbackURL,
+            embedProvider: keptOffAir ? nil : item.embedProvider,
+            isLiveStream: keptOffAir ? false : item.isLive,
             genres: (liveShow?.genres ?? []) + (liveShow?.moods ?? item.genres)
         )
     }
 
+    /// What was kept: the show that was on, when the station can name it.
+    ///
+    /// `item.id` is the station, because the station is what the player was
+    /// playing. Keeping that is how crating a show came to mean "whatever
+    /// this station is broadcasting now" — the one thing nobody meant to
+    /// keep. Where a live feed names what is on, that name is kept instead.
+    ///
+    /// The identifiers are the providers' own, so a show crated off the air
+    /// and the same broadcast crated later out of the archive are one row
+    /// rather than two: IDA, LYL and ROVR all publish, on air, the very slug
+    /// their episode pages are filed under.
+    ///
+    /// Panik and Cashmere name the *show* rather than the episode, so those
+    /// go to a namespace of their own — a show is not one of its broadcasts,
+    /// and filing it as one would claim an episode nobody identified.
     private func broadcastID(for item: MediaItem, liveShow: RadioShow?) -> String {
-        if item.isLive, item.sourceID == NTSProvider.providerID,
-           let detailID = liveShow?.detailID, NTSEpisodeRef.decode(detailID) != nil {
-            return "nts.episode.\(detailID)"
+        guard item.isLive, let detailID = liveShow?.detailID, !detailID.isEmpty else {
+            return item.id
         }
-        return item.id
+        switch item.sourceID {
+        case NTSProvider.providerID:
+            // NTS packs a show and an episode alias into one string, and a
+            // detailID that will not decode names neither.
+            guard NTSEpisodeRef.decode(detailID) != nil else { return item.id }
+            return "nts.episode.\(detailID)"
+        case IdaProvider.providerID:
+            return "ida.episode.\(detailID)"
+        case LYLProvider.providerID:
+            return "lyl.episode.\(detailID)"
+        case RovrProvider.providerID:
+            return "rovr.broadcast.\(detailID)"
+        case PanikProvider.providerID:
+            return "panik.show.\(detailID)"
+        case CashmereProvider.providerID:
+            return "cashmere.show.\(detailID)"
+        default:
+            return item.id
+        }
     }
 
     /// A live station's headline is the show that's on air, so the crated

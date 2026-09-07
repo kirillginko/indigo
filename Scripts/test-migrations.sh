@@ -77,3 +77,4 @@ run -tAc "select public.schedule_indigo_enrichment(
 
 echo "· checks"
 run -f "$ROOT/supabase/tests/radio_smoke.sql" | sed 's/^/    /'
+run -f "$ROOT/supabase/tests/scene_smoke.sql" | sed 's/^/    /'

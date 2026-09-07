@@ -53,6 +53,64 @@ final class SchemaMigrationTests: XCTestCase {
         XCTAssertEqual(try newContext.fetchCount(FetchDescriptor<Recording>()), 1)
     }
 
+    /// The remembered EXPLORE answer adds an entity to a schema that is on
+    /// people's machines with their crate in it — the same hazard as the
+    /// listening log below, and worth the same check.
+    func testAStoreWithoutTheRememberedOffersOpensWithThemAndKeepsTheCrate() throws {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("indigo-offers-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storeURL = directory.appendingPathComponent("default.store")
+
+        // Everything the shipping schema has, minus the new record.
+        let previous = Schema([
+            Track.self, Recording.self, MediaAppearance.self, RecordingSource.self,
+            CrateItem.self, Artist.self, MusicLabel.self, RecordingMetadata.self,
+            DiscogsArtist.self, DiscogsReleaseRecord.self, BandcampRelease.self,
+            BandcampArtistIndex.self, DigVisit.self, DigStep.self, ListeningEvent.self,
+            ArtistPortrait.self, StoredEdge.self, GraphSnapshot.self
+        ])
+        try autoreleasepool {
+            let container = try ModelContainer(
+                for: previous,
+                configurations: ModelConfiguration(schema: previous, url: storeURL)
+            )
+            let context = ModelContext(container)
+            let recording = try RecordingStore(context: context)
+                .upsert(title: "Vernal Equinox", artistName: "Jon Hassell")
+            context.insert(CrateItem(recording: recording))
+            try context.save()
+        }
+
+        let container = try ModelContainer(
+            for: Persistence.schema,
+            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL)
+        )
+        let context = ModelContext(container)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<CrateItem>()), 1,
+                       "The crate must survive the remembered answer being added")
+
+        // And the round trip works in the migrated store.
+        let store = ExploreOffersStore(context: context)
+        XCTAssertNil(store.load())
+        var offers = ExploreOffers()
+        offers.next = [ExploreSuggestion(
+            node: .artist("Tirzah"), reason: "Credited together", via: "Dean Blunt",
+            kind: .collaborator, corroboration: 2, score: 1.1
+        )]
+        offers.movingToward = ExploreOffers.SceneOffer(
+            city: "New York", title: "NEW YORK", sound: "JAZZ", size: "19 artists"
+        )
+        store.save(offers, crateRevision: 7)
+
+        let read = try XCTUnwrap(store.load())
+        XCTAssertEqual(read.crateRevision, 7)
+        XCTAssertEqual(read.offers.next.first?.node.title, "Tirzah")
+        XCTAssertEqual(read.offers.next.first?.corroboration, 2)
+        XCTAssertEqual(read.offers.movingToward?.sound, "JAZZ")
+    }
+
     /// The listening log added an entity to a schema that is already on
     /// people's machines with their crate in it. If adding one is not
     /// lightweight, `Persistence` falls through to `destroyStore()` and the

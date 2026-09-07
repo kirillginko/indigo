@@ -10,7 +10,7 @@
 
 import Foundation
 
-nonisolated enum RelationshipKind: String, Hashable, Sendable {
+nonisolated enum RelationshipKind: String, Hashable, Sendable, Codable {
     case sharedLabel
     case sharedStyle
     case aliasOrProject

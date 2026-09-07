@@ -24,7 +24,7 @@ import SwiftData
 
 /// Something worth digging into, and the thing in this listener's own
 /// collection that argues for it.
-nonisolated struct ExploreSuggestion: Identifiable, Sendable {
+nonisolated struct ExploreSuggestion: Identifiable, Sendable, Codable {
     let node: MusicNode
     /// The evidence, as the edge itself stated it — "Releases on Orange Milk
     /// Records", "Mastered By on Pool". Never a phrase this file invented.
@@ -58,17 +58,30 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable {
 /// One walk produces all of it. The page shows shows, artists and the rest in
 /// different blocks, and computing them separately would mean walking the
 /// graph three times to answer one question.
-nonisolated struct ExploreOffers: Sendable {
+nonisolated struct ExploreOffers: Sendable, Codable {
     /// Mixed, minus shows — they have a block of their own.
     var next: [ExploreSuggestion] = []
     /// Radio worth an hour.
     var shows: [ExploreSuggestion] = []
+    /// The scene this listener is heading into, when they are heading
+    /// anywhere. See `SceneEngine.movingToward(taste:)`.
+    var movingToward: SceneOffer?
     /// Further artists, for the crate's own artists block. Deliberately the
     /// ones `next` did not take: the same face twice on one page is a page
     /// that has run out of things to say.
     var artists: [ExploreSuggestion] = []
 
-    var isEmpty: Bool { next.isEmpty && shows.isEmpty && artists.isEmpty }
+    var isEmpty: Bool { next.isEmpty && shows.isEmpty && artists.isEmpty && movingToward == nil }
+
+    /// A scene, flattened to what the page draws. `MusicScene` is not
+    /// `Sendable` all the way down and does not need to cross the actor
+    /// boundary — a name, a sound and a size do.
+    nonisolated struct SceneOffer: Sendable, Codable {
+        let city: String
+        let title: String
+        let sound: String
+        let size: String
+    }
 }
 
 nonisolated struct ExploreSuggestionEngine {
@@ -84,7 +97,24 @@ nonisolated struct ExploreSuggestionEngine {
 
     /// Everything the page needs, in one walk.
     func offers(next: Int = 12, shows: Int = 6, artists: Int = 6) -> ExploreOffers {
-        let all = suggestions(limit: next + artists + shows)
+        let taste = TasteProfile.collected(context: context)
+        var offers = recommendations(next: next, shows: shows, artists: artists, taste: taste)
+        offers.movingToward = direction(taste: taste)
+        return offers
+    }
+
+    /// The blocks somebody can act on: where to go next, shows, more artists.
+    ///
+    /// Split from the direction on purpose, and the split is the reason this
+    /// method exists at all. Working out where somebody is heading means
+    /// assembling every place in the catalogue — around a second on a real
+    /// collection — and the page was making its own headline wait behind it.
+    /// What a reader came for arrives first now; the slower claim follows.
+    func recommendations(
+        next: Int = 12, shows: Int = 6, artists: Int = 6, taste: TasteProfile? = nil
+    ) -> ExploreOffers {
+        let taste = taste ?? TasteProfile.collected(context: context)
+        let all = suggestions(limit: next + artists + shows, taste: taste)
         var offers = ExploreOffers()
         offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
         let rest = all.filter { $0.node.kind != .broadcast }
@@ -96,8 +126,24 @@ nonisolated struct ExploreSuggestionEngine {
         return offers
     }
 
+    /// Where this listener is heading, which is the slow half.
+    func direction(taste: TasteProfile? = nil) -> ExploreOffers.SceneOffer? {
+        let taste = taste ?? TasteProfile.collected(context: context)
+        guard let scene = SceneEngine(context: context).movingToward(taste: taste)
+        else { return nil }
+        return ExploreOffers.SceneOffer(
+            city: scene.city, title: scene.title,
+            sound: scene.soundLabel, size: scene.sizeLine
+        )
+    }
+
     /// Everywhere worth going, best first.
-    func suggestions(limit: Int = 12) -> [ExploreSuggestion] {
+    ///
+    /// `taste` is passed in rather than built here because the caller needs it
+    /// too, and collecting it reads the crate, the log and the whole artist
+    /// cache — twice over is a fifth of a second spent proving the same thing.
+    func suggestions(limit: Int = 12, taste: TasteProfile? = nil) -> [ExploreSuggestion] {
+        let taste = taste ?? TasteProfile.collected(context: context)
         let known = knownGround()
         guard !known.isEmpty else { return [] }
 
@@ -159,7 +205,7 @@ nonisolated struct ExploreSuggestionEngine {
         // whole crate, while the appearance log held eighteen complete
         // tracklists nobody was reading. See `ShowSuggestionEngine`.
         let fromTracklists = ShowSuggestionEngine(context: context).suggestions(
-            taste: TasteProfile.collected(context: context),
+            taste: taste,
             known: seen,
             keptArtistKeys: Set(known.compactMap {
                 $0.node.kind == .artist ? $0.node.key : nil

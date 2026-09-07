@@ -367,4 +367,309 @@ final class CrateTests: XCTestCase {
         XCTAssertEqual(days.first?.items.first?.id, newItem.id)
         XCTAssertEqual(days.last?.items.first?.id, oldItem.id)
     }
+
+    // MARK: - Kept off the air
+
+    /// A show kept while a station was live must not replay as the station.
+    ///
+    /// The crate stores the station's id, because the station is what was
+    /// playing, and the show's title, because the show is what was kept.
+    /// Handing that back to the player starts whatever is on air now under
+    /// the name of something else — which is how crating "Neue Rituale" on
+    /// Radio 80000 came to open Radio 80000 live.
+    func testAShowKeptOffTheAirDoesNotReplayAsTheStation() throws {
+        let kept = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: "Radio 80000",
+            artworkURL: nil,
+            playbackURL: URL(string: "https://radio80k.out.airtime.pro/radio80k_a"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertTrue(kept.isLiveShowSnapshot, "The title is a show and the id is a station")
+        XCTAssertNil(
+            kept.broadcastMediaItem(),
+            "So there is nothing here the player can honestly start again"
+        )
+    }
+
+    /// A station kept as a station still plays. The rule above must not eat
+    /// the ordinary case: somebody who crates a station with nothing on air
+    /// has kept the station, and pressing play should open it.
+    func testAStationKeptAsAStationStillPlays() throws {
+        let kept = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Radio 80000",
+            subtitle: nil,
+            artworkURL: nil,
+            playbackURL: URL(string: "https://radio80k.out.airtime.pro/radio80k_a"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertFalse(kept.isLiveShowSnapshot)
+        XCTAssertEqual(kept.broadcastMediaItem()?.kind, .radioStation)
+    }
+
+    // MARK: - Crating what is on air
+
+    private func liveStation(_ providerID: String, id: String, name: String) -> MediaItem {
+        MediaItem(
+            id: id,
+            sourceID: providerID,
+            kind: .radioStation,
+            title: name,
+            subtitle: "Live",
+            playbackURL: URL(string: "https://stream.test/\(providerID)")!
+        )
+    }
+
+    private func onAir(_ title: String, detailID: String?) -> RadioShow {
+        RadioShow(
+            title: title, host: nil, summary: nil, location: nil,
+            genres: [], moods: [], artworkURL: nil,
+            startsAt: nil, endsAt: nil, detailID: detailID
+        )
+    }
+
+    /// A station that can say what is on has the show kept, not itself.
+    ///
+    /// IDA publishes, on air, the very slug its episode pages are filed
+    /// under — so the row a listener keeps mid-broadcast is the same row
+    /// they would get from the archive later, and the live stream is not
+    /// stored as though it were the recording.
+    func testAStationThatNamesWhatIsOnHasTheShowKept() throws {
+        let station = liveStation(IdaProvider.providerID, id: "ida.live.tallinn", name: "IDA Tallinn")
+        crate.toggle(nowPlaying: station, liveShow: onAir("AGSS Radio", detailID: "agss-radio-15-10-2024"))
+
+        let rows = crate.items()
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.showID, "ida.episode.agss-radio-15-10-2024")
+        XCTAssertEqual(rows.first?.showTitle, "AGSS Radio")
+        XCTAssertFalse(rows.first?.isLiveStream ?? true, "The broadcast is not the station's stream")
+        XCTAssertNil(rows.first?.playbackURLString, "And the stream is not its archive source")
+    }
+
+    /// Panik and Cashmere name the show rather than the broadcast, so those
+    /// are filed as shows. Calling one an episode would claim a broadcast
+    /// nobody identified.
+    func testAStationThatNamesOnlyTheShowFilesItAsAShow() throws {
+        let station = liveStation(PanikProvider.providerID, id: "panik.live", name: "Radio Panik")
+        crate.toggle(nowPlaying: station, liveShow: onAir("Digging Deeper", detailID: "digging-deeper"))
+
+        XCTAssertEqual(crate.items().first?.showID, "panik.show.digging-deeper")
+    }
+
+    /// The same broadcast kept twice — once off the air, once out of the
+    /// archive — is one row. That is the whole reason the providers' own
+    /// identifiers are used rather than something minted here.
+    func testKeepingABroadcastLiveAndFromTheArchiveIsOneRow() throws {
+        let station = liveStation(RovrProvider.providerID, id: "rovr.live", name: "ROVR")
+        crate.toggle(nowPlaying: station, liveShow: onAir("Nocturne", detailID: "doc-42"))
+
+        let archived = MediaItem(
+            id: "rovr.broadcast.doc-42",
+            sourceID: RovrProvider.providerID,
+            kind: .episode,
+            title: "Nocturne",
+            playbackURL: URL(string: "https://archive.test/nocturne.mp3")!
+        )
+        crate.toggle(nowPlaying: archived)
+
+        XCTAssertTrue(crate.items().isEmpty, "The second press took the one row back off")
+    }
+
+    /// A station with nothing to say still crates as the station, and still
+    /// plays. Naming what is on is an improvement where it is possible, not
+    /// a requirement for keeping anything.
+    func testAStationThatCannotSayWhatIsOnIsStillKept() throws {
+        let station = liveStation(AlharaProvider.providerID, id: "alhara.live", name: "Radio al Hara")
+        crate.toggle(nowPlaying: station, liveShow: onAir("Untitled", detailID: nil))
+
+        let row = try XCTUnwrap(crate.items().first)
+        XCTAssertEqual(row.showID, "alhara.live")
+        XCTAssertTrue(row.isLiveStream)
+    }
+
+    /// Every station the crate can hold has somewhere for a kept show to
+    /// land.
+    ///
+    /// The exact broadcast is the good answer and is not always available:
+    /// rows kept before a station's live feed was read, and stations whose
+    /// feeds still name nothing, have only a title. The shows page is the
+    /// honest fallback — the show may not have been posted yet — and a
+    /// station missing from this list would give a dead press instead.
+    func testEveryStationHasSomewhereAKeptShowCanLand() throws {
+        let stations = [
+            NTSProvider.providerID, KioskProvider.providerID, NoodsProvider.providerID,
+            LotProvider.providerID, DublabProvider.providerID, AlharaProvider.providerID,
+            CashmereProvider.providerID, LYLProvider.providerID, IdaProvider.providerID,
+            Radio80000Provider.providerID, PanikProvider.providerID, RovrProvider.providerID
+        ]
+        for station in stations {
+            XCTAssertNotNil(
+                BroadcastSource.showsRoute(for: station),
+                "\(BroadcastSource.label(for: station)) has nowhere to send a kept show"
+            )
+        }
+        XCTAssertNil(BroadcastSource.showsRoute(for: "somewhere.else"))
+    }
+
+    // MARK: - Where a kept id points
+
+    /// A station's own id must never be read as a broadcast id.
+    ///
+    /// `destination` falls back to the whole showID when it carries no
+    /// prefix, because a bare slug is what a tracklist files. A row kept
+    /// while a station was on air carries `radio80000.live`, and reading
+    /// that as a broadcast built a page for an episode nobody ever named —
+    /// which could only say the broadcast was unavailable. EXPLORE reached
+    /// it that way from the For You page.
+    func testAStationIdIsNotReadAsABroadcast() throws {
+        XCTAssertNil(BroadcastSource.destination(
+            showID: "radio80000.live", providerID: Radio80000Provider.providerID
+        ))
+        XCTAssertNil(BroadcastSource.destination(
+            showID: "panik.live", providerID: PanikProvider.providerID
+        ))
+    }
+
+    /// A show named on air opens the show, not an episode of it.
+    func testAShowIdOpensTheShow() throws {
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "panik.show.digging-deeper", providerID: PanikProvider.providerID
+            ),
+            .panikShow(slug: "digging-deeper")
+        )
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "cashmere.show.tundra", providerID: CashmereProvider.providerID
+            ),
+            .cashmereShow(slug: "tundra")
+        )
+    }
+
+    /// And the bare slug a tracklist files still reaches the broadcast, which
+    /// is the case the fallback exists for.
+    func testABareSlugStillReachesTheBroadcast() throws {
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "agss-radio-15-10-2024", providerID: IdaProvider.providerID
+            ),
+            .idaEpisode(slug: "agss-radio-15-10-2024")
+        )
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "ida.episode.agss-radio-15-10-2024", providerID: IdaProvider.providerID
+            ),
+            .idaEpisode(slug: "agss-radio-15-10-2024")
+        )
+    }
+
+    // MARK: - The ladder a kept show climbs
+
+    /// A row that named its broadcast opens the broadcast, and never gets as
+    /// far as a fallback.
+    func testAKeptBroadcastOpensTheBroadcast() async throws {
+        let station = liveStation(IdaProvider.providerID, id: "ida.live.tallinn", name: "IDA Tallinn")
+        crate.toggle(nowPlaying: station, liveShow: onAir("AGSS Radio", detailID: "agss-radio-15-10-2024"))
+        let row = try XCTUnwrap(crate.items().first)
+
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        XCTAssertEqual(found, .page(.idaEpisode(slug: "agss-radio-15-10-2024")))
+    }
+
+    /// A row that named only its station lands on that station's shows —
+    /// where the broadcast will appear once it is posted.
+    func testAKeptShowWithNoIdLandsOnTheStationsShows() async throws {
+        let row = crate.add(
+            broadcast: "panik.live",
+            providerID: PanikProvider.providerID,
+            title: "Digging Deeper",
+            subtitle: "Radio Panik",
+            artworkURL: nil,
+            playbackURL: URL(string: "https://stream.test/panik"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        XCTAssertEqual(found, .section(.panikShows))
+    }
+
+    /// A station kept as a station is not a kept show — it is the station,
+    /// and opens it. Before this the row did nothing at all when pressed,
+    /// which reads as a broken row rather than as a station.
+    func testAStationKeptAsAStationOpensTheStation() async throws {
+        let row = crate.add(
+            broadcast: "panik.live",
+            providerID: PanikProvider.providerID,
+            title: "Radio Panik",
+            subtitle: nil,
+            artworkURL: nil,
+            playbackURL: URL(string: "https://stream.test/panik"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        XCTAssertEqual(found, .section(.panikStation), "A station kept as itself opens the station")
+    }
+
+    /// Once a show's id has been worked out, the row keeps it.
+    ///
+    /// Finding a Radio 80000 show means searching its catalogue by name,
+    /// which is two requests before the page can open. Keeping the answer is
+    /// the difference between a row that is slow once and a row that is slow
+    /// forever.
+    func testAResolvedShowIdIsKeptOnTheRow() throws {
+        let row = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: "Radio 80000",
+            artworkURL: nil,
+            playbackURL: nil,
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertTrue(crate.remember(showID: "radio80000.show.neue-rituale", for: row))
+        XCTAssertEqual(row.showID, "radio80000.show.neue-rituale")
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: row.showID ?? "", providerID: Radio80000Provider.providerID
+            ),
+            .radio80000Show(slug: "neue-rituale"),
+            "And the next press goes straight there"
+        )
+    }
+
+    /// It will not write an id another row already holds: that would be the
+    /// same broadcast kept twice, and one silently becoming a duplicate of
+    /// the other is worse than looking it up again.
+    func testARememberedIdNeverCollidesWithAnotherRow() throws {
+        _ = crate.add(
+            broadcast: "radio80000.show.neue-rituale",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: nil, artworkURL: nil, playbackURL: nil, embedProvider: nil
+        )
+        let live = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: "Radio 80000",
+            artworkURL: nil, playbackURL: nil, embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertFalse(crate.remember(showID: "radio80000.show.neue-rituale", for: live))
+        XCTAssertEqual(live.showID, "radio80000.live")
+    }
 }

@@ -1,0 +1,487 @@
+-- Smoke test for the scene roster schema.
+--
+-- Written for the same reason `radio_smoke.sql` was: everything here is
+-- reached from the app through one function and drained by a worker, and none
+-- of that is exercised by applying the migrations. What is checked is the
+-- whole path — asking for a scene, the crawler recording a page of it, the
+-- resume pass picking up what stalled — because each of those is a place a
+-- mistake would only show as a scene page that stays empty for a month.
+--
+-- Run against a throwaway Postgres 17 with the migrations applied:
+--
+--     psql -f supabase/tests/scene_smoke.sql
+--
+-- Every check raises on failure, so a clean run means a clean run.
+
+\set ON_ERROR_STOP on
+begin;
+
+-- ---------------------------------------------------------------------------
+-- Asking for one
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    answer jsonb;
+    roster_id uuid;
+    queued int;
+begin
+    answer := public.request_scene_roster('Manchester', 'manchester', 'Hip Hop', 'hip hop');
+    roster_id := (answer ->> 'roster_id')::uuid;
+
+    if roster_id is null then
+        raise exception 'request_scene_roster returned no roster: %', answer;
+    end if;
+    if (answer ->> 'status') <> 'pending' then
+        raise exception 'a new roster should be pending, got %', answer ->> 'status';
+    end if;
+
+    -- And it asked for the work. This is the join the app cannot make itself:
+    -- `enqueue_enrichment_job` is revoked from anon, so a caller naming a
+    -- scene has to reach the queue through here or not at all.
+    select count(*) into queued
+    from public.enrichment_jobs
+    where provider = 'musicbrainz'
+      and job_type = 'fetch_scene_roster'
+      and dedupe_key = 'manchester|hip hop'
+      and status = 'pending';
+    if queued <> 1 then
+        raise exception 'expected one queued scene job, found %', queued;
+    end if;
+
+    -- Asked for twice is asked for once. A page opened repeatedly must not
+    -- become repeated upstream requests.
+    perform public.request_scene_roster('Manchester', 'manchester', 'Hip Hop', 'hip hop');
+    select count(*) into queued
+    from public.enrichment_jobs
+    where dedupe_key = 'manchester|hip hop' and status in ('pending', 'running');
+    if queued <> 1 then
+        raise exception 'a second ask queued more work: %', queued;
+    end if;
+
+    -- A place and a different sound is a different scene, not the same one.
+    perform public.request_scene_roster('Manchester', 'manchester', 'Hard Techno', 'hard techno');
+    if (select count(*) from public.scene_rosters where place_key = 'manchester') <> 2 then
+        raise exception 'two sounds in one place should be two rosters';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Recording a page of it
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    v_roster uuid;
+    members int;
+    state text;
+begin
+    select id into v_roster from public.scene_rosters
+    where place_key = 'manchester' and sound_key = 'hip hop';
+
+    -- A page that does not finish the crawl leaves it filling.
+    perform public.record_scene_members(
+        v_roster,
+        '[{"name":"Iceboy Violet","normalized_name":"iceboy violet","mbid":"mb-1",
+           "area":"Manchester","began":"2018","score":100},
+          {"name":"Space Afrika","normalized_name":"space afrika","mbid":"mb-2",
+           "area":"Manchester","began":"2014","score":98}]'::jsonb,
+        2, 40, false);
+
+    select member_count, status into members, state
+    from public.scene_rosters where id = v_roster;
+    if members <> 2 then raise exception 'expected 2 members, got %', members; end if;
+    if state <> 'filling' then raise exception 'expected filling, got %', state; end if;
+
+    -- The same name again is the same person. A crawl that overlaps its own
+    -- pages must not double the scene.
+    perform public.record_scene_members(
+        v_roster,
+        '[{"name":"Space Afrika","normalized_name":"space afrika","score":50},
+          {"name":"Blackhaine","normalized_name":"blackhaine","score":90}]'::jsonb,
+        4, 40, true);
+
+    select member_count, status into members, state
+    from public.scene_rosters where id = v_roster;
+    if members <> 3 then raise exception 'expected 3 members, got %', members; end if;
+    if state <> 'ready' then raise exception 'expected ready, got %', state; end if;
+
+    -- The better score survives, so a roster reads best-first however the
+    -- pages arrived.
+    if (select score from public.scene_members
+        where scene_members.roster_id = v_roster
+          and normalized_name = 'space afrika') <> 98 then
+        raise exception 'a repeated member should keep its best score';
+    end if;
+
+    -- A row with no usable name is not a member.
+    perform public.record_scene_members(
+        v_roster, '[{"name":"","normalized_name":""}]'::jsonb, 4, 40, true);
+    if (select member_count from public.scene_rosters where id = v_roster) <> 3 then
+        raise exception 'an unnamed row became a member';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Picking up what stalled
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    resumed int;
+begin
+    -- Nothing is owed: one roster is ready and fresh, the other is pending but
+    -- already has a job waiting, so the dedupe index holds.
+    update public.scene_rosters set filled_at = now() where status = 'ready';
+
+    -- A roster that finished long ago is walked again.
+    update public.scene_rosters
+    set filled_at = now() - interval '90 days'
+    where sound_key = 'hip hop';
+    delete from public.enrichment_jobs where dedupe_key = 'manchester|hip hop';
+
+    resumed := public.resume_scene_rosters(4);
+    if resumed < 1 then
+        raise exception 'a stale roster was not resumed';
+    end if;
+    if (select count(*) from public.enrichment_jobs
+        where dedupe_key = 'manchester|hip hop' and status = 'pending') <> 1 then
+        raise exception 'resume did not queue the stale roster';
+    end if;
+
+    -- And running it again does not queue it twice.
+    perform public.resume_scene_rosters(4);
+    if (select count(*) from public.enrichment_jobs
+        where dedupe_key = 'manchester|hip hop' and status in ('pending','running')) <> 1 then
+        raise exception 'resume queued the same roster twice';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- The shelf it starts with
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    shelved int;
+    again int;
+begin
+    -- Idempotent, which is what lets it run on a timer — and why this counts
+    -- the shelf rather than what one call added. Turning the schedule on
+    -- already put it up, so a second call is expected to add nothing.
+    perform public.seed_scene_rosters();
+    select count(*) into shelved from public.scene_rosters;
+    if shelved < 10 then
+        raise exception 'the shelf holds only % scenes', shelved;
+    end if;
+
+    -- A sound with no place is a scene. Fourth World is not from anywhere.
+    if not exists (
+        select 1 from public.scene_rosters
+        where sound_key = 'fourth world' and coalesce(place_key, '') = ''
+    ) then
+        raise exception 'a placeless scene was not seeded';
+    end if;
+
+    again := public.seed_scene_rosters();
+    if again <> 0 then
+        raise exception 'seeding twice added % more', again;
+    end if;
+
+    -- And a seeded scene is something the resume pass will pick up, so the
+    -- crawl runs with nobody using the app at all.
+    if public.resume_scene_rosters(4) < 1 then
+        raise exception 'seeded scenes were not resumed';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Scenes the stations named
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    show_id uuid;
+    added int;
+begin
+    insert into public.radio_shows (provider, external_id, station, title)
+    values ('nts', 'smoke-show', 'NTS', 'A Show')
+    returning id into show_id;
+
+    -- Three broadcasts filed under the same sound from the same city, which is
+    -- the threshold: twice is a coincidence and a scene is a strand of
+    -- programming.
+    insert into public.radio_episodes
+        (radio_show_id, provider, external_id, title, genres, moods, location)
+    values
+        (show_id, 'nts', 'smoke-1', 'One',
+         array['Dub Techno','Ambient'], array['Hypnotic'], 'Manchester'),
+        (show_id, 'nts', 'smoke-2', 'Two',
+         array['Dub Techno'], array['Hypnotic'], 'Manchester'),
+        (show_id, 'nts', 'smoke-3', 'Three',
+         array['Dub Techno'], array['Hypnotic'], 'Manchester'),
+        -- And one that is not repeated, which should name nothing.
+        (show_id, 'nts', 'smoke-4', 'Four',
+         array['Yodelling'], '{}', 'Manchester');
+
+    added := public.seed_scenes_from_radio();
+    if added < 1 then
+        raise exception 'the stations named nothing';
+    end if;
+
+    -- The sound on its own.
+    if not exists (
+        select 1 from public.scene_rosters
+        where sound_key = 'dub techno' and coalesce(place_key, '') = ''
+    ) then
+        raise exception 'a repeated genre did not become a scene';
+    end if;
+
+    -- And the sound in the city it came from, which is the stronger claim and
+    -- the reason the location is kept at all.
+    if not exists (
+        select 1 from public.scene_rosters
+        where sound_key = 'dub techno' and place_key = 'manchester'
+    ) then
+        raise exception 'a repeated genre from one city did not become a scene';
+    end if;
+
+    -- A mood counts as a sound. NTS files half of what makes a show itself
+    -- under moods rather than genres.
+    if not exists (select 1 from public.scene_rosters where sound_key = 'hypnotic') then
+        raise exception 'a repeated mood did not become a scene';
+    end if;
+
+    -- One broadcast is a description, not a scene.
+    if exists (select 1 from public.scene_rosters where sound_key = 'yodelling') then
+        raise exception 'a one-off genre became a scene';
+    end if;
+
+    -- Reading them again adds nothing, which is what lets this run nightly.
+    if public.seed_scenes_from_radio() <> 0 then
+        raise exception 'reading the stations twice seeded twice';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Going back for what the old ingest dropped
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    show_id uuid;
+    queued int;
+begin
+    select id into show_id from public.radio_shows where external_id = 'smoke-show';
+
+    -- An episode from before 0014: ingested by a worker that read past the
+    -- station's own tags.
+    insert into public.radio_episodes
+        (radio_show_id, provider, external_id, title, genres, moods, location)
+    values (show_id, 'nts', 'old-show/old-episode', 'Untagged', '{}', '{}', null);
+
+    queued := public.retag_nts_episodes(20);
+    if queued < 1 then
+        raise exception 'an untagged episode was not queued for another look';
+    end if;
+
+    -- Asked for as the work that already exists, under the key that work uses,
+    -- so nothing can queue it twice.
+    if (select count(*) from public.enrichment_jobs
+        where job_type = 'fetch_nts_episode'
+          and dedupe_key = 'old-show/old-episode'
+          and status = 'pending') <> 1 then
+        raise exception 'the retag did not queue a fetch under the episode key';
+    end if;
+
+    -- Below the live crawl: yesterday's tags must not delay this morning's
+    -- broadcasts.
+    if (select priority from public.enrichment_jobs
+        where dedupe_key = 'old-show/old-episode') >= 0 then
+        raise exception 'a retag outranked the live crawl';
+    end if;
+
+    -- Running again does not queue it twice.
+    if public.retag_nts_episodes(20) <> 0 then
+        raise exception 'a second pass queued the same episode again';
+    end if;
+
+    -- And an episode the station did tag is left alone, which is what makes
+    -- this stop on its own.
+    if exists (
+        select 1 from public.enrichment_jobs
+        where job_type = 'fetch_nts_episode' and dedupe_key = 'smoke-1'
+    ) then
+        raise exception 'a tagged episode was queued for retagging';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Who the stations played in a scene
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    roster uuid;
+    ep1 uuid;
+    ep2 uuid;
+    ep3 uuid;
+    filled int;
+begin
+    select id into ep1 from public.radio_episodes where external_id = 'smoke-1';
+    select id into ep2 from public.radio_episodes where external_id = 'smoke-2';
+    select id into ep3 from public.radio_episodes where external_id = 'smoke-3';
+
+    -- One artist across two of the dub techno broadcasts, one across all
+    -- three, and one heard only once.
+    insert into public.radio_appearances
+        (radio_episode_id, track_index, raw_artist_name, normalized_artist_name)
+    values
+        (ep1, 1, 'Rhythm & Sound', 'rhythm sound'),
+        (ep2, 1, 'Rhythm & Sound', 'rhythm sound'),
+        (ep1, 2, 'Basic Channel', 'basic channel'),
+        (ep2, 2, 'Basic Channel', 'basic channel'),
+        (ep3, 1, 'Basic Channel', 'basic channel'),
+        (ep3, 2, 'Heard Once', 'heard once');
+
+    select id into roster from public.scene_rosters
+    where sound_key = 'dub techno' and coalesce(place_key, '') = '';
+
+    filled := public.fill_scene_from_radio(roster);
+    if filled < 2 then
+        raise exception 'radio filled only % of the scene', filled;
+    end if;
+
+    -- Twice is a pattern; once is a selector reaching for something.
+    if not exists (
+        select 1 from public.scene_members
+        where roster_id = roster and normalized_name = 'basic channel' and plays = 3
+    ) then
+        raise exception 'the most played artist was not recorded with their plays';
+    end if;
+    if exists (
+        select 1 from public.scene_members
+        where roster_id = roster and normalized_name = 'heard once'
+    ) then
+        raise exception 'an artist played once became a member';
+    end if;
+
+    -- Marked as radio, so a page can tell evidence from a catalogue's opinion.
+    if (select source from public.scene_members
+        where roster_id = roster and normalized_name = 'basic channel') <> 'radio' then
+        raise exception 'a radio-derived member is not marked as one';
+    end if;
+
+    -- The roster knows how many it holds.
+    if (select member_count from public.scene_rosters where id = roster) < 2 then
+        raise exception 'the roster did not count what radio added';
+    end if;
+
+    -- Running it again does not double anybody.
+    perform public.fill_scene_from_radio(roster);
+    if (select count(*) from public.scene_members
+        where roster_id = roster and normalized_name = 'basic channel') <> 1 then
+        raise exception 'a second fill duplicated a member';
+    end if;
+
+    -- A place-and-sound roster reads as the shows that went out from there.
+    -- These broadcasts are all from Manchester, so its dub techno roster
+    -- holds them too.
+    perform public.fill_scenes_from_radio(60);
+    if not exists (
+        select m.id from public.scene_members m
+        join public.scene_rosters r on r.id = m.roster_id
+        where r.place_key = 'manchester' and r.sound_key = 'dub techno'
+          and m.normalized_name = 'basic channel'
+    ) then
+        raise exception 'a placed roster was not filled from its own city''s shows';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Scenes named from where the artists are from
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    ep1 uuid;
+    ep2 uuid;
+    a1 uuid;
+    a2 uuid;
+    r1 uuid;
+    r2 uuid;
+    queued int;
+begin
+    select id into ep1 from public.radio_episodes where external_id = 'smoke-1';
+    select id into ep2 from public.radio_episodes where external_id = 'smoke-2';
+
+    insert into public.artists (name, normalized_name)
+    values ('Moritz Von Oswald', 'moritz von oswald') returning id into a1;
+    insert into public.artists (name, normalized_name)
+    values ('Mark Ernestus', 'mark ernestus') returning id into a2;
+
+    -- Both played across the dub techno broadcasts.
+    insert into public.recordings (title, artist_id) values ('A', a1) returning id into r1;
+    insert into public.recordings (title, artist_id) values ('B', a2) returning id into r2;
+    insert into public.radio_appearances
+        (radio_episode_id, recording_id, track_index, raw_artist_name, normalized_artist_name)
+    values
+        (ep1, r1, 10, 'Moritz Von Oswald', 'moritz von oswald'),
+        (ep2, r2, 10, 'Mark Ernestus', 'mark ernestus');
+
+    -- Nobody has been placed yet, so there is nothing to name a scene after.
+    if public.seed_scenes_from_artist_areas() <> 0 then
+        raise exception 'a scene was named from artists with no origin';
+    end if;
+
+    -- Worth asking about, because radio played them.
+    queued := public.enqueue_artist_origins(20);
+    if queued < 2 then
+        raise exception 'played artists were not queued for an origin: %', queued;
+    end if;
+
+    -- The worker answers.
+    perform public.record_artist_origin(a1, 'Berlin', 'berlin', 'DE', 1962, 'mb-a1');
+    perform public.record_artist_origin(a2, 'Berlin', 'berlin', 'DE', 1960, 'mb-a2');
+
+    -- And now the place is the artists' own, not the studio's.
+    if public.seed_scenes_from_artist_areas() < 1 then
+        raise exception 'two placed artists sharing a sound did not name a scene';
+    end if;
+    if not exists (
+        select 1 from public.scene_rosters
+        where place_key = 'berlin' and sound_key = 'dub techno'
+    ) then
+        raise exception 'the scene was not named after where the artists are from';
+    end if;
+
+    -- Asked and answered is not asked again.
+    if public.enqueue_artist_origins(20) <> 0 then
+        raise exception 'a placed artist was queued again';
+    end if;
+
+    -- And an artist nobody could place is not asked again either, which is
+    -- what stops a slow upstream being paid for the same miss every quarter
+    -- hour.
+    perform public.record_artist_origin(a1, null, null, null, null, null);
+    update public.artists set area_key = null where id = a1;
+    if public.enqueue_artist_origins(20) <> 0 then
+        raise exception 'an artist already looked up was queued again';
+    end if;
+end $$;
+
+-- Neither half is optional to the point of being nothing.
+do $$
+begin
+    begin
+        insert into public.scene_rosters (place, place_key, sound, sound_key)
+        values (null, '', null, '');
+        raise exception 'a scene with no place and no sound was accepted';
+    exception
+        when check_violation then null;
+    end;
+end $$;
+
+rollback;
+
+\echo 'scene smoke: all checks passed'

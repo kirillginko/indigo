@@ -14,6 +14,8 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
+import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
+import { normalizeName } from "../_shared/normalize.ts";
 
 interface Job {
   id: string;
@@ -112,6 +114,52 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
       // matches in June, and this is what goes back for it.
       const { error } = await supabase.rpc("resolve_radio_appearances", {
         p_episode_id: null,
+      });
+      if (error) throw new Error(error.message);
+      return;
+    }
+
+    case "fetch_scene_roster": {
+      const rosterId = String(job.payload?.roster_id ?? "");
+      const placeValue = job.payload?.place;
+      const soundValue = job.payload?.sound;
+      const place = typeof placeValue === "string" && placeValue ? placeValue : null;
+      const sound = typeof soundValue === "string" && soundValue ? soundValue : null;
+      // A scene is a place, a sound, or both. Neither is a job with no
+      // question in it.
+      if (!rosterId || (!place && !sound)) throw new Error("missing roster/place/sound");
+
+      // Where the last page stopped, read from the roster rather than carried
+      // in the payload: a job retried after a failure must not start again
+      // from an offset that was already recorded.
+      const { data: roster, error: readError } = await supabase
+        .from("scene_rosters")
+        .select("next_offset")
+        .eq("id", rosterId)
+        .maybeSingle();
+      if (readError) throw new Error(readError.message);
+
+      await fillSceneRoster(
+        supabase, rosterId, place, sound, Number(roster?.next_offset ?? 0),
+      );
+      return;
+    }
+
+    case "fetch_artist_origin": {
+      const artistId = String(job.payload?.artist_id ?? "");
+      const name = String(job.payload?.name ?? "");
+      if (!artistId || !name) throw new Error("missing artist");
+
+      const found = await fetchArtistOrigin(name);
+      // Recorded either way. An artist MusicBrainz cannot place is a finding,
+      // and writing it down is what stops the queue asking again next week.
+      const { error } = await supabase.rpc("record_artist_origin", {
+        p_artist_id: artistId,
+        p_area: found?.area ?? null,
+        p_area_key: found?.area ? normalizeName(found.area) : null,
+        p_country: found?.country ?? null,
+        p_began: found?.began ?? null,
+        p_mbid: found?.mbid ?? null,
       });
       if (error) throw new Error(error.message);
       return;

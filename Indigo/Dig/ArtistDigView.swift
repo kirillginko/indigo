@@ -666,13 +666,13 @@ struct ArtistDigView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(found) { scene in
                         DigLine(
-                            text: "\(scene.title) / \(scene.eraLabel)",
+                            text: "\(scene.title) / \(scene.soundLabel)",
                             detail: [
                                 scene.artists.count > 1 ? "\(scene.artists.count) artists" : nil,
                                 scene.tags.prefix(3).joined(separator: " · ").nilIfEmpty
                             ].compactMap { $0 }.joined(separator: "  ")
                         ) {
-                            appState.open(.digScene(city: scene.city))
+                            appState.open(.digScene(city: scene.city, sound: scene.sound))
                         }
                         Rule()
                     }

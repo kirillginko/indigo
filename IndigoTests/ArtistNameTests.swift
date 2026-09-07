@@ -252,14 +252,10 @@ final class LabelNameTests: XCTestCase {
         ))
     }
 
-    /// A credit joined by a dash is not split, so this one is missed.
-    ///
-    /// Recorded rather than fixed. `creditedArtists` is what decides whose
-    /// page a record appears on across the whole app, and teaching it a new
-    /// separator to mend one label is a change with a much longer reach than
-    /// the thing it would mend.
-    func testACreditJoinedByADashIsNotYetRecognised() {
-        XCTAssertFalse(LabelName.isSelfPublished(
+    /// Was recorded here as a known limit, and is now fixed: `creditedArtists`
+    /// splits on a spaced dash. See `CreditAndLabelTests`.
+    func testACreditJoinedByADashIsRecognised() {
+        XCTAssertTrue(LabelName.isSelfPublished(
             publisher: "Anthony Braxton", artist: "ANDREW CYRILLE - ANTHONY BRAXTON"
         ))
     }

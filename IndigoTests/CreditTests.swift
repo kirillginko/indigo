@@ -187,7 +187,7 @@ final class CreditTests: XCTestCase {
         // It has had a page for a while. This was the one route to it that
         // did not know, so every scene the graph handed back was a row that
         // looked like a link and would not open.
-        let scene = MusicNode.scene(city: "Berlin", era: 2010...2016)
-        XCTAssertEqual(scene.destination, .digScene(city: "BERLIN"))
+        let scene = MusicNode.scene(city: "Berlin", sound: "Dub Techno")
+        XCTAssertEqual(scene.destination, .digScene(city: "Berlin", sound: "Dub Techno"))
     }
 }

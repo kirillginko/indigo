@@ -27,6 +27,7 @@ enum Persistence {
         DigVisit.self,
         DigStep.self,
         ListeningEvent.self,
+        ExploreOffersRecord.self,
         ArtistPortrait.self,
         StoredEdge.self,
         GraphSnapshot.self

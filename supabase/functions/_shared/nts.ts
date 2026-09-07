@@ -15,6 +15,24 @@ import { normalizeName } from "./normalize.ts";
 
 export const PROVIDER = "nts";
 
+/// NTS writes its genres and moods as `[{ id, value }]`. Empty and duplicate
+/// values are dropped here rather than in SQL, so a seed pass counts uses
+/// rather than spellings.
+function tagValues(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const found: string[] = [];
+  for (const entry of raw) {
+    const value = typeof entry?.value === "string" ? entry.value.trim() : "";
+    if (!value) continue;
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    found.push(value);
+  }
+  return found;
+}
+
 export const USER_AGENT = "Indigo/1.0 (+https://github.com/kirillginko/indigo)";
 export const NTS_API = "https://www.nts.live/api/v2/";
 
@@ -256,6 +274,15 @@ export async function ingestNTSEpisode(
       archive_url: archive,
       image_url: picture(payload.media),
       tracklist_status: tracklist.length > 0 ? "available" : "unavailable",
+      // What the station files this under, and where it went out from.
+      //
+      // Read past until now, and it is the only listing scenes ever had: the
+      // backend has no genre column anywhere else and an `artists.country`
+      // nothing fills, so without this it cannot know that Manchester has a
+      // hip hop scene. See `seed_scenes_from_radio`.
+      genres: tagValues(payload.genres),
+      moods: tagValues(payload.moods),
+      location: text(payload.location_long) ?? text(payload.location_short),
     }, { onConflict: "provider,external_id" })
     .select("id")
     .single();

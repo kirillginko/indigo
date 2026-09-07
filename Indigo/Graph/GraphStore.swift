@@ -171,11 +171,21 @@ nonisolated struct GraphStore {
 
     // MARK: - Keeping it
 
+    /// Bumped whenever the walk's rules change in a way that would have given
+    /// a different answer. Everything stored under an older number is thrown
+    /// away and worked out again.
+    ///
+    /// 1: labels cleaned of Discogs' disambiguators and joined names, artists
+    ///    no longer their own imprints, collaborations split into the people
+    ///    in them.
+    static let builderVersion = 1
+
     private func stored(for node: MusicNode) -> EdgeSet? {
         let identity = node.id
         var marker = FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == identity })
         marker.fetchLimit = 1
-        guard ((try? context.fetch(marker))?.first) != nil else { return nil }
+        guard let snapshot = (try? context.fetch(marker))?.first else { return nil }
+        guard snapshot.builderVersion == Self.builderVersion else { return nil }
 
         let rows = (try? context.fetch(
             FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity })
@@ -254,8 +264,9 @@ nonisolated struct GraphStore {
         marker.fetchLimit = 1
         if let existing = (try? context.fetch(marker))?.first {
             existing.builtAt = Date()
+            existing.builderVersion = Self.builderVersion
         } else {
-            context.insert(GraphSnapshot(nodeID: identity))
+            context.insert(GraphSnapshot(nodeID: identity, builderVersion: Self.builderVersion))
         }
         try? context.save()
     }
@@ -346,7 +357,8 @@ nonisolated struct GraphStore {
                 ))
             }
         }
-        for name in discogs?.labelNames ?? [] where labels[name] == nil {
+        for name in (discogs?.labelNames ?? []).flatMap({ LabelName.names(inDiscogsField: $0) })
+        where labels[name] == nil {
             // Assigning nil into a dictionary whose values are themselves
             // optional removes the key. `updateValue` is what actually
             // stores "known label, unknown MBID" — the ordinary case for
@@ -354,7 +366,11 @@ nonisolated struct GraphStore {
             labels.updateValue(nil, forKey: name)
         }
 
-        for (name, mbid) in labels where LabelName.isRealLabel(name) {
+        // An artist is not one of their own imprints, and a label node named
+        // after the artist whose page it sits on is a route back to where you
+        // already are.
+        for (name, mbid) in labels
+        where LabelName.isRealLabel(name) && !LabelName.isOwnName(name, artist: node.title) {
             edges.insert(MusicEdge(
                 from: node, to: .label(name, mbid: mbid), kind: .sharedLabel,
                 source: mbid == nil ? .discogs : .musicBrainz,
@@ -819,9 +835,13 @@ nonisolated struct GraphStore {
     /// can walk, so a scene is somewhere you can dig out of rather than a
     /// page you have to reverse out of.
     private func addSceneNeighbors(_ node: MusicNode, caches: Caches, into edges: inout EdgeSet) {
-        let city = node.key.split(separator: "|").first.map(String.init) ?? node.key
-        guard let scene = SceneEngine(context: context).scene(city: city) else { return }
-        let where_ = "\(scene.city) \(scene.eraLabel)"
+        // A scene's key is its place and its sound — see `MusicScene.id`.
+        let parts = node.key.split(separator: "|", maxSplits: 1).map(String.init)
+        let city = node.providerID ?? parts.first ?? node.key
+        let sound = node.handle ?? (parts.count > 1 ? parts[1] : nil)
+        guard let scene = SceneEngine(context: context).scene(city: city, sound: sound)
+        else { return }
+        let where_ = "\(scene.city) \(scene.soundLabel)"
 
         for artist in scene.artists {
             edges.insert(MusicEdge(
@@ -1200,7 +1220,16 @@ private nonisolated struct Caches {
             key = artist.nameKey
             name = artist.name
             var foundLabels: [String: String] = [:]
-            for label in artist.labelNames where LabelName.isRealLabel(label) {
+            // A self-released record is filed under whoever made it, so an
+            // artist's own name turns up in their label list — and two
+            // strangers were then told they were labelmates because each is
+            // the label on their own record.
+            // Cleaned on the way out, not only on the way in. A cached row
+            // holds whatever Discogs said when it was written — "World Music
+            // (8)", "AMF Records (3), Virgin EMI Records" — and those rows are
+            // not rewritten until the artist is enriched again.
+            for label in artist.labelNames.flatMap({ LabelName.names(inDiscogsField: $0) })
+            where !LabelName.isOwnName(label, artist: artist.name) {
                 foundLabels[RecordingKey.normalize(label)] = label
             }
             labels = foundLabels
@@ -1321,7 +1350,9 @@ private nonisolated struct Caches {
             guard let entry = metadata[recording.id], let name = entry.labelName else { continue }
             found[name] = entry.labelMBID
         }
-        for name in discogsArtist(key)?.labelNames ?? [] where found[name] == nil {
+        for name in (discogsArtist(key)?.labelNames ?? [])
+            .flatMap({ LabelName.names(inDiscogsField: $0) })
+        where found[name] == nil {
             found.updateValue(nil, forKey: name)
         }
         return found.sorted { $0.key < $1.key }.map { ArtistProfile.LabelRef(name: $0.key, mbid: $0.value) }

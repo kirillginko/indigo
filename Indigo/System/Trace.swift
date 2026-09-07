@@ -131,13 +131,33 @@ nonisolated enum Trace {
     /// memory and written once, by `flush()`.
     private static let buffer = Buffer()
 
+    /// Lines are stamped when they happen and formatted when they are
+    /// written.
+    ///
+    /// Without a clock the file cannot be read: a hundred requests at a
+    /// second and a half apart and a hundred back to back are the same
+    /// hundred lines, and a session was misread that way. The stamp is taken
+    /// as a bare `Date` rather than a formatted string because appending
+    /// happens inside whatever is being measured, and formatting a date there
+    /// is cost charged to the measurement — the same reason the file itself
+    /// is not opened until `flush`.
     private final class Buffer: @unchecked Sendable {
         private let lock = NSLock()
-        private var lines: [String] = []
-        func append(_ line: String) { lock.withLock { lines.append(line) } }
-        func drain() -> [String] { lock.withLock { defer { lines = [] }; return lines } }
+        private var lines: [(at: Date, text: String)] = []
+        func append(_ line: String) { lock.withLock { lines.append((Date(), line)) } }
+        func drain() -> [(at: Date, text: String)] {
+            lock.withLock { defer { lines = [] }; return lines }
+        }
         var count: Int { lock.withLock { lines.count } }
     }
+
+    /// Wall clock, to the millisecond, in the reader's own time zone — so a
+    /// line can be lined up against something they remember doing.
+    private static let clock: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss.SSS"
+        return formatter
+    }()
 
     private static func write(_ line: String) {
         guard fileSink != nil else { return }
@@ -158,7 +178,9 @@ nonisolated enum Trace {
         guard let fileSink else { return }
         let lines = buffer.drain()
         guard !lines.isEmpty else { return }
-        let body = lines.joined(separator: "\n") + "\n"
+        let body = lines
+            .map { "\(clock.string(from: $0.at))  \($0.text)" }
+            .joined(separator: "\n") + "\n"
         if let handle = FileHandle(forWritingAtPath: fileSink) {
             handle.seekToEndOfFile()
             handle.write(Data(body.utf8))

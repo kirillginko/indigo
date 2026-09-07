@@ -176,7 +176,11 @@ final class PortraitFillLifecycleTests: XCTestCase {
         let index = await worker.portraitIndex()
         let pending = await worker.pendingPortraits()
 
-        XCTAssertEqual(index.count, 400, "Every stored picture, by name")
+        XCTAssertEqual(index.found.count, 400, "Every stored picture, by name")
+        XCTAssertEqual(
+            index.settled.count, 400,
+            "And every one of them counts as answered, so it is not asked after again"
+        )
         XCTAssertFalse(pending.isEmpty, "Neighbours nobody has a picture for")
         XCTAssertFalse(
             pending.contains { RecordingKey.normalizeArtist($0) == RecordingKey.normalizeArtist("Artist 3") },
@@ -184,6 +188,33 @@ final class PortraitFillLifecycleTests: XCTestCase {
         )
         let ranOffMain = await worker.runsOffTheMainThread()
         XCTAssertTrue(ranOffMain, "And the context they were read on is not the main one")
+    }
+
+    /// A name nobody could ask about is still owed, not written off.
+    ///
+    /// The loop leans on this: `refused` and `unreachable` leave nothing in
+    /// the store and nothing in the store's settled set, so the name comes
+    /// round again on the next rebuild. Only `found` and `missing` are
+    /// answers. Getting this backwards would bar a name for a month over a
+    /// dropped connection — or, here, over there being no token at all.
+    func testAnUnaskableNameIsLeftOwedRatherThanWrittenOff() async throws {
+        let worker = DigWorker(modelContainer: container)
+        let outcome = await worker.fillPortrait(named: "Stenny")
+
+        switch outcome {
+        case .unreachable, .refused:
+            break
+        default:
+            XCTFail("No token is not an answer about this artist, but got \(outcome)")
+        }
+
+        let stored = (try? context.fetch(FetchDescriptor<ArtistPortrait>())) ?? []
+        XCTAssertTrue(stored.isEmpty, "Nothing is written down about a name nobody could ask about")
+
+        // And the request that was not made would have been made from here,
+        // which is not the thread that draws. See `runsOffTheMainThread`.
+        let ranOffMain = await worker.runsOffTheMainThread()
+        XCTAssertTrue(ranOffMain)
     }
 
     /// A page says whose pictures it needs, and those go first — one for

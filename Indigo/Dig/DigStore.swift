@@ -387,6 +387,35 @@ final class DigStore {
     @ObservationIgnored private var foregroundDigs = 0
     @ObservationIgnored private var foregroundEndedAt: ContinuousClock.Instant?
 
+    /// Until when the background fill must keep out of the way.
+    ///
+    /// A stream opening is the one request in the app that cannot be retried
+    /// quietly: AVPlayer gets sixty seconds and then the station is simply
+    /// unavailable. The fill is forty requests a minute of work nobody is
+    /// waiting on, and it already stands aside for a page somebody is reading
+    /// — a station somebody has just pressed deserves at least as much.
+    @ObservationIgnored private var holdUntil: ContinuousClock.Instant?
+
+    /// How long to stand aside. Long enough to cover a stream connecting and
+    /// its first buffers, short enough that a listener who leaves music on
+    /// still gets their pictures.
+    @ObservationIgnored private static let playbackHold = Duration.seconds(12)
+
+    /// Called when audio starts. The app wires this to the player; nothing
+    /// here knows what a player is.
+    func holdBackgroundWork() {
+        holdUntil = ContinuousClock.now + Self.playbackHold
+    }
+
+    /// Whether the fill is currently standing aside. Read by the loop below,
+    /// and by the test that pins this behaviour.
+    var isHoldingBackgroundWork: Bool { isHoldingForPlayback }
+
+    private var isHoldingForPlayback: Bool {
+        guard let holdUntil else { return false }
+        return ContinuousClock.now < holdUntil
+    }
+
     /// Whether a page is currently fetching something the listener asked for.
     ///
     /// Stays true for a moment after the last one finishes: a page load is a
@@ -436,7 +465,9 @@ final class DigStore {
         // the window had settled and the listener had started scrolling. The
         // same read is measured at over two hundred milliseconds inside the
         // fold, and nothing here measured it at all.
-        portraits = await worker.portraitIndex()
+        let index = await worker.portraitIndex()
+        portraits = index.found
+        portraitsSettled = index.settled
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -459,6 +490,13 @@ final class DigStore {
                 try? await Task.sleep(for: .milliseconds(250))
                 if Task.isCancelled { return }
             }
+            // And out of the way of a stream that is opening — this one even
+            // for the faces on screen, because a picture arriving a moment
+            // later costs nothing and a station that times out is gone.
+            while isHoldingForPlayback {
+                try? await Task.sleep(for: .milliseconds(250))
+                if Task.isCancelled { return }
+            }
 
             guard let next = await nextPortraitNeeded() else {
                 if quiet > 0 { artworkRevision &+= 1 }
@@ -466,41 +504,44 @@ final class DigStore {
             }
             // Consumed above, so the flag is set there instead.
             let wasOnScreen = lastWasOnScreen
-            let found: String?
-            do {
-                found = try await discogsClient.artistThumbnail(named: next)
-            } catch is CancellationError {
+            // The request and the row it becomes both happen on the worker.
+            // What comes back is a value, and what is done about it is this
+            // loop's business — see `DigWorker.PortraitOutcome`.
+            let outcome = await worker.fillPortrait(named: next)
+            guard !Task.isCancelled else { return }
+
+            let address: URL
+            switch outcome {
+            case .cancelled:
                 return
-            } catch DiscogsError.rateLimited {
+            case .refused:
                 // Being told to slow down is the one answer this loop must
                 // actually obey. Retrying at the usual pace keeps the app over
                 // the limit, and it is the page's requests — not these — that
-                // are refused alongside them.
+                // are refused alongside them. Nothing was written down, so
+                // the name comes round again on the next rebuild.
                 try? await Task.sleep(for: .seconds(30))
                 continue
-            } catch {
-                // A dropped connection is not an answer about this artist.
-                // Marking it failed would bar the name for a month over a
-                // blink of the network, so the loop just waits and retries.
+            case .unreachable:
+                // A dropped connection is not an answer about this artist, so
+                // nothing was written and the name is still owed.
                 try? await Task.sleep(for: spacing)
                 continue
+            case .missing:
+                // Nothing to show, but a real answer, and one the worker has
+                // written down so the name is not asked after again.
+                portraitsSettled.insert(RecordingKey.normalizeArtist(next))
+                quiet += 1
+                try? await Task.sleep(for: spacing)
+                continue
+            case .found(let found):
+                address = found
             }
-            guard !Task.isCancelled else { return }
 
-            let record = ArtistPortrait(
-                nameKey: RecordingKey.normalizeArtist(next), name: next
-            )
-            // Nothing found is a real answer, and worth remembering so the
-            // same name is not asked after on every launch.
-            if let found {
-                record.imageURLString = found
-                paint(next, with: found)
-            } else {
-                record.lookupFailed = true
-            }
-            // Replaces any earlier attempt for the same name.
-            if let existing = portrait(for: next) { context.delete(existing) }
-            context.insert(record)
+            // Stays here: these are rows the main context may already hold
+            // and be drawing from, and rewriting one column on them is the
+            // whole point — see `paint`.
+            paint(next, with: address.absoluteString)
             saveContext()
 
             // Telling the page costs it a full rebuild of its graph, so this
@@ -510,7 +551,9 @@ final class DigStore {
             // times less work.
             // Only the picture counter. Rows watching it redraw and pick the
             // new address out of `portraits`; nothing is rebuilt.
-            if let found { portraits[record.nameKey] = URL(string: found) }
+            let key = RecordingKey.normalizeArtist(next)
+            portraits[key] = address
+            portraitsSettled.insert(key)
             quiet += 1
             if wasOnScreen || quiet >= 5 {
                 quiet = 0
@@ -540,6 +583,12 @@ final class DigStore {
     /// Whether the name just handed out came from the on-screen list, which
     /// decides whether the page is told about it at once.
     @ObservationIgnored private var lastWasOnScreen = false
+    /// Names already answered for, so one is not asked after twice.
+    ///
+    /// Seeded from the worker at the start of a run and added to as answers
+    /// come back. A refusal or a dropped connection is not an answer and does
+    /// not land here — those names come round again.
+    @ObservationIgnored private var portraitsSettled: Set<String> = []
     @ObservationIgnored private var portraitQueue: [String] = []
     @ObservationIgnored private var portraitQueueBuiltAt = 0
 
@@ -549,7 +598,7 @@ final class DigStore {
         // up again on every tick.
         while let next = portraitPriority.first {
             portraitPriority.removeFirst()
-            if portrait(for: next) == nil {
+            if isPortraitWanted(next) {
                 lastWasOnScreen = true
                 return next
             }
@@ -561,9 +610,21 @@ final class DigStore {
         }
         while let next = portraitQueue.first {
             portraitQueue.removeFirst()
-            if portrait(for: next) == nil { return next }
+            if isPortraitWanted(next) { return next }
         }
         return nil
+    }
+
+    /// Whether this name still owes a picture.
+    ///
+    /// Read from what the store already holds rather than from the store's
+    /// own context, and not only to save a fetch a second: the rows are
+    /// written on the worker's context now, so this context would not see
+    /// them and every name would look unasked-for.
+    private func isPortraitWanted(_ name: String) -> Bool {
+        let key = RecordingKey.normalizeArtist(name)
+        guard !key.isEmpty else { return false }
+        return portraits[key] == nil && !portraitsSettled.contains(key)
     }
 
     /// Reads an artist's Bandcamp, when their catalogue entry gives an
@@ -689,8 +750,8 @@ final class DigStore {
             return .release(title, discogsID: id)
         case .digCatalog(let number):
             return .catalogNumber(number)
-        case .digScene(let city):
-            return SceneEngine(context: context).scene(city: city)?.node
+        case .digScene(let city, let sound):
+            return SceneEngine(context: context).scene(city: city, sound: sound)?.node
         case .digRecording(let id, _):
             // Resolved through the recording itself so an identified track and
             // its unknown past are one node rather than two.
@@ -739,6 +800,43 @@ final class DigStore {
     /// again. Which reads as a page loading twice, and is the thing that made
     /// it feel slow when nothing about it was.
     private(set) var exploreOffers = ExploreOffers()
+    /// Whether the answer on `exploreOffers` is one, rather than the empty
+    /// value it starts as.
+    ///
+    /// The page needs to tell "nothing to suggest" from "not worked out yet",
+    /// because the two look identical and should not: an empty block collapses
+    /// and everything under it slides up, so the moment the real answer lands
+    /// the whole page jumps.
+    private(set) var hasExploreOffers = false
+    private(set) var hasExploreDirection = false
+    @ObservationIgnored private lazy var offersStore = ExploreOffersStore(context: context)
+
+    /// Which of the places somebody could be heading into to show next.
+    ///
+    /// Kept in defaults rather than in the store: it is a note about what was
+    /// last put on screen, not a fact about their music, and it should not be
+    /// worth a schema migration. Advanced once per recomputation — which is
+    /// about once a launch — so the page says something different each time
+    /// without any of it being worked out twice.
+    @ObservationIgnored static let directionTurnKey = "explore.direction.turn"
+
+    private static func nextDirectionTurn() -> Int {
+        let defaults = UserDefaults.standard
+        let turn = defaults.integer(forKey: directionTurnKey)
+        defaults.set(turn &+ 1, forKey: directionTurnKey)
+        return turn
+    }
+
+    /// Reads back what was shown last time, so a launch opens on the page it
+    /// closed on rather than on an empty one. Called once, from the app.
+    func restoreExploreOffers() {
+        guard !hasExploreOffers, let kept = offersStore.load() else { return }
+        exploreOffers = kept.offers
+        hasExploreOffers = true
+        hasExploreDirection = kept.offers.movingToward != nil
+        offersCrateRevision = kept.crateRevision
+        offersBuiltAt = kept.builtAt
+    }
     @ObservationIgnored private var offersCrateRevision = -1
     @ObservationIgnored private var offersBuiltAt = Date.distantPast
     @ObservationIgnored private var offersTask: Task<Void, Never>?
@@ -766,11 +864,28 @@ final class DigStore {
         let task = Task { [weak self] in
             guard let self else { return }
             self.settle()
-            let found = await self.worker.exploreOffers(generation: asked)
+            // The blocks somebody can act on, published as soon as they are
+            // known. Working out a direction reads every place in the
+            // catalogue, and the page was making its headline wait behind it.
+            let found = await self.worker.exploreRecommendations(generation: asked)
             guard !Task.isCancelled else { return }
             self.offersCrateRevision = crateRevision
             self.offersBuiltAt = Date()
             self.exploreOffers = found
+            self.hasExploreOffers = true
+
+            // Then the slower half, folded into what is already on screen.
+            let direction = await self.worker.exploreDirection(
+                generation: asked, turn: Self.nextDirectionTurn()
+            )
+            guard !Task.isCancelled else { return }
+            var withScene = self.exploreOffers
+            withScene.movingToward = direction
+            self.exploreOffers = withScene
+            self.hasExploreDirection = true
+            // Written down only once both halves are in, so a launch never
+            // restores an answer that is missing its direction.
+            self.offersStore.save(withScene, crateRevision: crateRevision)
         }
         offersTask = task
         await task.value
@@ -789,10 +904,10 @@ final class DigStore {
         return await worker.scenes(forArtist: name, generation: revision)
     }
 
-    func scene(city: String) async -> MusicScene? {
+    func scene(city: String, sound: String?) async -> MusicScene? {
         let _ = revision
         settle()
-        return await worker.scene(city: city, generation: revision)
+        return await worker.scene(city: city, sound: sound, generation: revision)
     }
 
     func undergroundCuts(for node: MusicNode) async -> [DeepResult] {

@@ -100,8 +100,8 @@ struct RootView: View {
                     RecordingDigView(recordingID: id, fallbackTitle: title)
                 case .digCatalog(let number):
                     CatalogDigView(number: number)
-                case .digScene(let city):
-                    SceneDigView(city: city)
+                case .digScene(let city, let sound):
+                    SceneDigView(city: city, sound: sound)
                 case .noodsShow(let path):
                     NoodsShowDetailView(showPath: path)
                 case .noodsResident(let path):

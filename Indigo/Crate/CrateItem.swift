@@ -238,12 +238,35 @@ nonisolated final class CrateItem {
     /// Day bucket used for the TODAY / date headers in the crate.
     var addedDay: Date { Calendar.current.startOfDay(for: addedAt) }
 
+    /// Whether this row was kept while a station was on air, and so is about
+    /// the show rather than the station.
+    ///
+    /// Crating from the player bar stores the station's own id, because the
+    /// station is what was playing — but the title it stores is the show's.
+    /// The subtitle is what tells them apart: `CrateService.subtitle(for:)`
+    /// puts the station there when a show was known, and leaves it to the
+    /// item's own lines when it was not.
+    ///
+    /// It matters because the two do not mean the same thing later. "Neue
+    /// Rituale", replayed, is whatever Radio 80000 is broadcasting now — the
+    /// one thing the listener did not keep.
+    var isLiveShowSnapshot: Bool {
+        guard kind == .broadcast, isLiveStream else { return false }
+        guard let showSubtitle, !showSubtitle.isEmpty else { return false }
+        return showSubtitle != showTitle
+    }
+
     /// The item the player needs to hear this again, when the crate itself
     /// knows one. Recordings go through SourceResolver instead.
     func broadcastMediaItem() -> MediaItem? {
+        // A show kept off the air is not a stream anybody can start again.
+        // Playing the station would be playing a different show under the
+        // name of the one that was kept, so fail closed and let the crate
+        // page find the show itself.
+        if isLiveShowSnapshot { return nil }
         // Legacy builds stored the NTS station stream while presenting the
-        // on-air show as the crated item. Replaying that entry later starts a
-        // different live show, so fail closed instead of playing the wrong set.
+        // on-air show as the crated item. Named as well as caught by the rule
+        // above, because those rows predate the subtitle carrying the station.
         if providerID == "nts", isLiveStream,
            showID == "nts.1" || showID == "nts.2" {
             return nil

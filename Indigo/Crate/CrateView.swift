@@ -176,6 +176,11 @@ struct CrateView: View {
 
     private func play(_ item: CrateItem) {
         guard let source = source(for: item) else {
+            // A show kept while a station was on air has no stream of its
+            // own — its recordings are on its page, and that is what the
+            // press meant. Only say there is nothing when there is also
+            // nowhere.
+            if item.kind == .broadcast, open(item) { return }
             crate.notice = "\(item.displayTitle) has no playable source yet."
             return
         }
@@ -196,14 +201,15 @@ struct CrateView: View {
         }
     }
 
-    private func open(_ item: CrateItem) {
+    @discardableResult
+    private func open(_ item: CrateItem) -> Bool {
         if let destination = digDestination(for: item) {
             appState.open(destination)
-            return
+            return true
         }
         if let track = localTrack(for: item) {
             appState.open(.album(track.albumKey))
-            return
+            return true
         }
         if let showID = item.showID {
             switch item.providerID {
@@ -212,60 +218,87 @@ struct CrateView: View {
                 // Search the NTS archive instead of reopening today's stream.
                 appState.select(.ntsSearch)
                 appState.searchText = item.displayTitle
-                return
+                return true
             case NoodsProvider.providerID where showID.hasPrefix("noods.show."):
                 appState.open(.noodsShow(path: "shows/\(showID.dropFirst("noods.show.".count))"))
-                return
+                return true
             case KioskProvider.providerID where showID.hasPrefix("kiosk.episode."):
                 appState.open(.kioskEpisode(slug: String(showID.dropFirst("kiosk.episode.".count))))
-                return
+                return true
             case LYLProvider.providerID where showID.hasPrefix("lyl.episode."):
                 appState.open(.lylEpisode(slug: String(showID.dropFirst("lyl.episode.".count))))
-                return
+                return true
             case CashmereProvider.providerID where showID.hasPrefix("cashmere.episode."):
                 appState.open(.cashmereEpisode(slug: String(showID.dropFirst("cashmere.episode.".count))))
-                return
+                return true
+            // Cashmere and Panik name the show that is on air rather than the
+            // broadcast, so a row kept off the air opens the show.
+            case CashmereProvider.providerID where showID.hasPrefix("cashmere.show."):
+                appState.open(.cashmereShow(slug: String(showID.dropFirst("cashmere.show.".count))))
+                return true
             case IdaProvider.providerID where showID.hasPrefix("ida.episode."):
                 appState.open(.idaEpisode(slug: String(showID.dropFirst("ida.episode.".count))))
-                return
+                return true
             case Radio80000Provider.providerID where showID.hasPrefix("radio80000.episode."):
                 appState.open(.radio80000Episode(
                     id: String(showID.dropFirst("radio80000.episode.".count))
                 ))
-                return
+                return true
             case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
                 appState.open(.panikEpisode(id: String(showID.dropFirst("panik.episode.".count))))
-                return
+                return true
+            case PanikProvider.providerID where showID.hasPrefix("panik.show."):
+                appState.open(.panikShow(slug: String(showID.dropFirst("panik.show.".count))))
+                return true
             case RovrProvider.providerID where showID.hasPrefix("rovr.broadcast."):
                 appState.open(.rovrBroadcast(
                     id: String(showID.dropFirst("rovr.broadcast.".count))
                 ))
-                return
+                return true
             case AlharaProvider.providerID where showID.hasPrefix("alhara.show."):
                 appState.open(.alharaShow(slug: String(showID.dropFirst("alhara.show.".count))))
-                return
+                return true
             case DublabProvider.providerID where showID.hasPrefix("dublab.broadcast."):
                 appState.open(.dublabBroadcast(slug: String(showID.dropFirst("dublab.broadcast.".count))))
-                return
+                return true
             case LotProvider.providerID where showID.hasPrefix("lot.episode."):
                 let identity = String(showID.dropFirst("lot.episode.".count))
                 if let ref = LotEpisodeRef.decode(identity) {
                     appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
-                    return
+                    return true
                 }
             case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
                 let identity = String(showID.dropFirst("nts.episode.".count))
                 if let ref = NTSEpisodeRef.decode(identity) {
                     appState.open(.ntsEpisode(show: ref.show, episode: ref.episode))
-                    return
+                    return true
                 }
             default: break
             }
+        }
+        // A broadcast row nothing above could place: a show kept off the air,
+        // a station kept as itself, or an id from a build that filed them
+        // differently. The ladder is shared, because three places climb it —
+        // see `KeptShow`.
+        if item.kind == .broadcast {
+            Task { await followKeptShow(item) }
+            return true
         }
         // The row opens the track's own page — where it was heard, and what
         // was heard beside it. The DIG button still means the artist.
         if let recording = item.recording, let page = dig.recordingDestination(for: recording) {
             appState.open(page)
+            return true
+        }
+        return false
+    }
+
+
+    private func followKeptShow(_ item: CrateItem) async {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, crate: crate) {
+        case .page(let page): appState.open(page)
+        case .section(let route): appState.select(route)
+        case nil: break
         }
     }
 

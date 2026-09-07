@@ -40,6 +40,10 @@ actor DigWorker {
     let modelContainer: ModelContainer
     let modelContext: ModelContext
 
+    /// Nothing configured here: `DiscogsClient()` reads the same credential
+    /// the store's does, and it is a value type with no state of its own.
+    private let discogs = DiscogsClient()
+
     init(modelContainer: ModelContainer) {
         self.modelContainer = modelContainer
         self.modelContext = ModelContext(modelContainer)
@@ -102,10 +106,33 @@ actor DigWorker {
     /// way in.
     ///
     /// Plain values cross back, as with everything here.
-    func exploreOffers(generation: Int) -> ExploreOffers {
+    /// The blocks somebody can act on. Answered first, and separately from
+    /// the direction below, so the page's headline does not wait a second on
+    /// a slower claim about where its reader is going.
+    func exploreRecommendations(generation: Int) -> ExploreOffers {
         refresh(generation)
         return Trace.step("explore.suggest") {
-            ExploreSuggestionEngine(context: modelContext).offers()
+            ExploreSuggestionEngine(context: modelContext).recommendations()
+        }
+    }
+
+    /// And where they are heading, which means assembling every place in the
+    /// catalogue. Uses the engine this actor already holds rather than
+    /// building a second set of the same caches.
+    /// `turn` moves along the list of places somebody could be said to be
+    /// heading into, so a collection that changes slowly is not told the same
+    /// thing forever. Costs nothing: they are all worked out either way.
+    func exploreDirection(generation: Int, turn: Int) -> ExploreOffers.SceneOffer? {
+        let scenes = sceneEngine(generation)
+        return Trace.step("explore.direction") {
+            let taste = TasteProfile.collected(context: modelContext)
+            let found = scenes.directions(taste: taste)
+            guard !found.isEmpty else { return nil }
+            let scene = found[((turn % found.count) + found.count) % found.count]
+            return ExploreOffers.SceneOffer(
+                city: scene.city, title: scene.title,
+                sound: scene.soundLabel, size: scene.sizeLine
+            )
         }
     }
 
@@ -117,12 +144,89 @@ actor DigWorker {
     /// after launch — which is the hitch a listener sees once the window has
     /// settled. A dictionary of strings and URLs crosses back, which is the
     /// same bargain every other method here makes.
-    func portraitIndex() -> [String: URL] {
+    /// What a portrait lookup came back with.
+    ///
+    /// The store decides what to do about each of these, because pacing is
+    /// its business: it knows what is on screen, whether a page is being read
+    /// and whether a stream is opening. This actor only knows the answer.
+    nonisolated enum PortraitOutcome: Sendable {
+        case found(URL)
+        /// Looked, and there is no picture. Written down, so the same name is
+        /// not asked after on every launch.
+        case missing
+        /// Rate limited. Nothing was written and the name is still owed.
+        case refused
+        /// A blink of the network, which is not an answer about this artist —
+        /// so nothing is written, or a name would be barred for a month over
+        /// a dropped connection.
+        case unreachable
+        case cancelled
+    }
+
+    /// One picture: the request, and the row it becomes.
+    ///
+    /// Here rather than on the store for the reason the rest of this actor is
+    /// here. The store is main-actor isolated, so awaiting a Discogs search
+    /// from it resumed the decode, the fetch, the insert and the save on the
+    /// thread that draws — a hundred and fifty times a session, which is what
+    /// the trace file showed as `discogs.request [MAIN]` filling whole
+    /// screens. The request itself was never the problem; everything either
+    /// side of it was.
+    ///
+    /// Returns the address for the store to put in its own picture map. That
+    /// map is what the rows read, and it stays where the rows are.
+    func fillPortrait(named name: String) async -> PortraitOutcome {
+        let found: String?
+        do {
+            found = try await discogs.artistThumbnail(named: name)
+        } catch is CancellationError {
+            return .cancelled
+        } catch DiscogsError.rateLimited {
+            return .refused
+        } catch {
+            return .unreachable
+        }
+        guard !Task.isCancelled else { return .cancelled }
+
+        let key = RecordingKey.normalizeArtist(name)
+        let record = ArtistPortrait(nameKey: key, name: name)
+        if let found { record.imageURLString = found } else { record.lookupFailed = true }
+        // Replaces any earlier attempt for the same name.
+        var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
+        descriptor.fetchLimit = 1
+        if let existing = (try? modelContext.fetch(descriptor))?.first {
+            modelContext.delete(existing)
+        }
+        modelContext.insert(record)
+        try? modelContext.save()
+
+        guard let found, let address = URL(string: found) else { return .missing }
+        return .found(address)
+    }
+
+    /// Everything already known about artist pictures.
+    ///
+    /// Both halves come out of one read of the table. `settled` is the part
+    /// the store cannot work out for itself any more: the rows are written on
+    /// this actor's context now, so the store's own context never sees them,
+    /// and without this it would ask after a name it had already been told
+    /// there is no picture for — once per launch, forever.
+    nonisolated struct PortraitIndex: Sendable {
+        var found: [String: URL] = [:]
+        /// Names with an answer worth keeping — a picture, or a miss recent
+        /// enough that asking again is asking twice.
+        var settled: Set<String> = []
+    }
+
+    func portraitIndex() -> PortraitIndex {
         Trace.step("portraits.index") {
-            Dictionary(
-                ((try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
-                    .compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
-                uniquingKeysWith: { first, _ in first }
+            let records = (try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? []
+            return PortraitIndex(
+                found: Dictionary(
+                    records.compactMap { record in record.imageURL.map { (record.nameKey, $0) } },
+                    uniquingKeysWith: { first, _ in first }
+                ),
+                settled: Set(records.filter { !$0.isWorthRetrying }.map(\.nameKey))
             )
         }
     }
@@ -205,7 +309,7 @@ actor DigWorker {
         sceneEngine(generation).scenes(forArtist: name)
     }
 
-    func scene(city: String, generation: Int) -> MusicScene? {
-        sceneEngine(generation).scene(city: city)
+    func scene(city: String, sound: String?, generation: Int) -> MusicScene? {
+        sceneEngine(generation).scene(city: city, sound: sound)
     }
 }

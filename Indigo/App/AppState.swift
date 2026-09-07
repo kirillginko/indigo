@@ -129,7 +129,11 @@ nonisolated enum DetailPage: Hashable {
     /// A catalogue number, treated as somewhere you can go.
     case digCatalog(number: String)
     /// A place and a stretch of time.
-    case digScene(city: String)
+    /// A place and a sound. A city alone no longer names a scene — Manchester
+    /// holds a hard techno one and a hip hop one — so the sound is part of the
+    /// address. Nil lands on the place's strongest, which is what an older
+    /// link means by naming only a city.
+    case digScene(city: String, sound: String?)
     case noodsShow(path: String)
     case noodsResident(path: String)
     case noodsCollection(path: String)
