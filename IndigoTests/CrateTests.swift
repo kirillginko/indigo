@@ -414,4 +414,84 @@ final class CrateTests: XCTestCase {
         XCTAssertFalse(kept.isLiveShowSnapshot)
         XCTAssertEqual(kept.broadcastMediaItem()?.kind, .radioStation)
     }
+
+    // MARK: - Crating what is on air
+
+    private func liveStation(_ providerID: String, id: String, name: String) -> MediaItem {
+        MediaItem(
+            id: id,
+            sourceID: providerID,
+            kind: .radioStation,
+            title: name,
+            subtitle: "Live",
+            playbackURL: URL(string: "https://stream.test/\(providerID)")!
+        )
+    }
+
+    private func onAir(_ title: String, detailID: String?) -> RadioShow {
+        RadioShow(
+            title: title, host: nil, summary: nil, location: nil,
+            genres: [], moods: [], artworkURL: nil,
+            startsAt: nil, endsAt: nil, detailID: detailID
+        )
+    }
+
+    /// A station that can say what is on has the show kept, not itself.
+    ///
+    /// IDA publishes, on air, the very slug its episode pages are filed
+    /// under — so the row a listener keeps mid-broadcast is the same row
+    /// they would get from the archive later, and the live stream is not
+    /// stored as though it were the recording.
+    func testAStationThatNamesWhatIsOnHasTheShowKept() throws {
+        let station = liveStation(IdaProvider.providerID, id: "ida.live.tallinn", name: "IDA Tallinn")
+        crate.toggle(nowPlaying: station, liveShow: onAir("AGSS Radio", detailID: "agss-radio-15-10-2024"))
+
+        let rows = crate.items()
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.showID, "ida.episode.agss-radio-15-10-2024")
+        XCTAssertEqual(rows.first?.showTitle, "AGSS Radio")
+        XCTAssertFalse(rows.first?.isLiveStream ?? true, "The broadcast is not the station's stream")
+        XCTAssertNil(rows.first?.playbackURLString, "And the stream is not its archive source")
+    }
+
+    /// Panik and Cashmere name the show rather than the broadcast, so those
+    /// are filed as shows. Calling one an episode would claim a broadcast
+    /// nobody identified.
+    func testAStationThatNamesOnlyTheShowFilesItAsAShow() throws {
+        let station = liveStation(PanikProvider.providerID, id: "panik.live", name: "Radio Panik")
+        crate.toggle(nowPlaying: station, liveShow: onAir("Digging Deeper", detailID: "digging-deeper"))
+
+        XCTAssertEqual(crate.items().first?.showID, "panik.show.digging-deeper")
+    }
+
+    /// The same broadcast kept twice — once off the air, once out of the
+    /// archive — is one row. That is the whole reason the providers' own
+    /// identifiers are used rather than something minted here.
+    func testKeepingABroadcastLiveAndFromTheArchiveIsOneRow() throws {
+        let station = liveStation(RovrProvider.providerID, id: "rovr.live", name: "ROVR")
+        crate.toggle(nowPlaying: station, liveShow: onAir("Nocturne", detailID: "doc-42"))
+
+        let archived = MediaItem(
+            id: "rovr.broadcast.doc-42",
+            sourceID: RovrProvider.providerID,
+            kind: .episode,
+            title: "Nocturne",
+            playbackURL: URL(string: "https://archive.test/nocturne.mp3")!
+        )
+        crate.toggle(nowPlaying: archived)
+
+        XCTAssertTrue(crate.items().isEmpty, "The second press took the one row back off")
+    }
+
+    /// A station with nothing to say still crates as the station, and still
+    /// plays. Naming what is on is an improvement where it is possible, not
+    /// a requirement for keeping anything.
+    func testAStationThatCannotSayWhatIsOnIsStillKept() throws {
+        let station = liveStation(AlharaProvider.providerID, id: "alhara.live", name: "Radio al Hara")
+        crate.toggle(nowPlaying: station, liveShow: onAir("Untitled", detailID: nil))
+
+        let row = try XCTUnwrap(crate.items().first)
+        XCTAssertEqual(row.showID, "alhara.live")
+        XCTAssertTrue(row.isLiveStream)
+    }
 }
