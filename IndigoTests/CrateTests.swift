@@ -367,4 +367,51 @@ final class CrateTests: XCTestCase {
         XCTAssertEqual(days.first?.items.first?.id, newItem.id)
         XCTAssertEqual(days.last?.items.first?.id, oldItem.id)
     }
+
+    // MARK: - Kept off the air
+
+    /// A show kept while a station was live must not replay as the station.
+    ///
+    /// The crate stores the station's id, because the station is what was
+    /// playing, and the show's title, because the show is what was kept.
+    /// Handing that back to the player starts whatever is on air now under
+    /// the name of something else — which is how crating "Neue Rituale" on
+    /// Radio 80000 came to open Radio 80000 live.
+    func testAShowKeptOffTheAirDoesNotReplayAsTheStation() throws {
+        let kept = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: "Radio 80000",
+            artworkURL: nil,
+            playbackURL: URL(string: "https://radio80k.out.airtime.pro/radio80k_a"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertTrue(kept.isLiveShowSnapshot, "The title is a show and the id is a station")
+        XCTAssertNil(
+            kept.broadcastMediaItem(),
+            "So there is nothing here the player can honestly start again"
+        )
+    }
+
+    /// A station kept as a station still plays. The rule above must not eat
+    /// the ordinary case: somebody who crates a station with nothing on air
+    /// has kept the station, and pressing play should open it.
+    func testAStationKeptAsAStationStillPlays() throws {
+        let kept = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Radio 80000",
+            subtitle: nil,
+            artworkURL: nil,
+            playbackURL: URL(string: "https://radio80k.out.airtime.pro/radio80k_a"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertFalse(kept.isLiveShowSnapshot)
+        XCTAssertEqual(kept.broadcastMediaItem()?.kind, .radioStation)
+    }
 }

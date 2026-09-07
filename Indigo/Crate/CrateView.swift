@@ -233,6 +233,13 @@ struct CrateView: View {
                     id: String(showID.dropFirst("radio80000.episode.".count))
                 ))
                 return
+            case Radio80000Provider.providerID where item.isLiveShowSnapshot:
+                // Kept while the station was on air, so the row knows the
+                // show's name and the station's id. Opening the id is how
+                // "Neue Rituale" came to mean "whatever is on Radio 80000
+                // now". The name is enough to find the show itself.
+                openRadio80000Show(named: item.displayTitle)
+                return
             case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
                 appState.open(.panikEpisode(id: String(showID.dropFirst("panik.episode.".count))))
                 return
@@ -266,6 +273,28 @@ struct CrateView: View {
         // was heard beside it. The DIG button still means the artist.
         if let recording = item.recording, let page = dig.recordingDestination(for: recording) {
             appState.open(page)
+        }
+    }
+
+    /// Finds a Radio 80000 show by the name a live row kept, and opens it.
+    ///
+    /// The catalogue is loaded on demand: somebody may never have opened the
+    /// station's Shows page, and a crate row should not depend on their
+    /// having done so. A name that matches nothing lands on the list, which
+    /// is still the right neighbourhood — the show may have ended its run.
+    private func openRadio80000Show(named title: String) {
+        Task {
+            await radio80000Browse.loadShowsIfNeeded()
+            let wanted = RecordingKey.normalize(title)
+            guard !wanted.isEmpty,
+                  let match = radio80000Browse.shows.first(
+                      where: { RecordingKey.normalize($0.title) == wanted }
+                  )
+            else {
+                appState.select(.radio80000Shows)
+                return
+            }
+            appState.open(.radio80000Show(slug: match.slug))
         }
     }
 
