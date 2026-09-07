@@ -494,4 +494,28 @@ final class CrateTests: XCTestCase {
         XCTAssertEqual(row.showID, "alhara.live")
         XCTAssertTrue(row.isLiveStream)
     }
+
+    /// Every station the crate can hold has somewhere for a kept show to
+    /// land.
+    ///
+    /// The exact broadcast is the good answer and is not always available:
+    /// rows kept before a station's live feed was read, and stations whose
+    /// feeds still name nothing, have only a title. The shows page is the
+    /// honest fallback — the show may not have been posted yet — and a
+    /// station missing from this list would give a dead press instead.
+    func testEveryStationHasSomewhereAKeptShowCanLand() throws {
+        let stations = [
+            NTSProvider.providerID, KioskProvider.providerID, NoodsProvider.providerID,
+            LotProvider.providerID, DublabProvider.providerID, AlharaProvider.providerID,
+            CashmereProvider.providerID, LYLProvider.providerID, IdaProvider.providerID,
+            Radio80000Provider.providerID, PanikProvider.providerID, RovrProvider.providerID
+        ]
+        for station in stations {
+            XCTAssertNotNil(
+                CrateView.showsPage(for: station),
+                "\(BroadcastSource.label(for: station)) has nowhere to send a kept show"
+            )
+        }
+        XCTAssertNil(CrateView.showsPage(for: "somewhere.else"))
+    }
 }

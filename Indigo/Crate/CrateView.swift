@@ -283,6 +283,18 @@ struct CrateView: View {
             default: break
             }
         }
+        // A show kept off the air that nothing above could place: the row
+        // knows a name and the station it was on, which is enough to reach
+        // the station's shows. Not the broadcast, but the right
+        // neighbourhood — and where a show has not been posted yet, the
+        // shows page is the honest answer rather than a dead press.
+        //
+        // Rows kept before a station's live feed was read for what is on
+        // land here, and so do the stations whose feeds still cannot say.
+        if item.isLiveShowSnapshot, let page = Self.showsPage(for: item.providerID) {
+            appState.select(page)
+            return true
+        }
         // The row opens the track's own page — where it was heard, and what
         // was heard beside it. The DIG button still means the artist.
         if let recording = item.recording, let page = dig.recordingDestination(for: recording) {
@@ -290,6 +302,25 @@ struct CrateView: View {
             return true
         }
         return false
+    }
+
+    /// Where a station keeps what it has broadcast.
+    static func showsPage(for providerID: String?) -> Route? {
+        switch providerID {
+        case NTSProvider.providerID: .ntsShows
+        case KioskProvider.providerID: .kioskShows
+        case NoodsProvider.providerID: .noodsShows
+        case LotProvider.providerID: .lotShows
+        case DublabProvider.providerID: .dublabArchive
+        case AlharaProvider.providerID: .alharaArchive
+        case CashmereProvider.providerID: .cashmereShows
+        case LYLProvider.providerID: .lylShows
+        case IdaProvider.providerID: .idaShows
+        case Radio80000Provider.providerID: .radio80000Shows
+        case PanikProvider.providerID: .panikShows
+        case RovrProvider.providerID: .rovrShows
+        default: nil
+        }
     }
 
     /// Finds a Radio 80000 show by the name a live row kept, and opens it.
