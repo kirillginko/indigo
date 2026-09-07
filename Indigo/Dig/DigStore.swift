@@ -465,7 +465,9 @@ final class DigStore {
         // the window had settled and the listener had started scrolling. The
         // same read is measured at over two hundred milliseconds inside the
         // fold, and nothing here measured it at all.
-        portraits = await worker.portraitIndex()
+        let index = await worker.portraitIndex()
+        portraits = index.found
+        portraitsSettled = index.settled
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -502,41 +504,44 @@ final class DigStore {
             }
             // Consumed above, so the flag is set there instead.
             let wasOnScreen = lastWasOnScreen
-            let found: String?
-            do {
-                found = try await discogsClient.artistThumbnail(named: next)
-            } catch is CancellationError {
+            // The request and the row it becomes both happen on the worker.
+            // What comes back is a value, and what is done about it is this
+            // loop's business — see `DigWorker.PortraitOutcome`.
+            let outcome = await worker.fillPortrait(named: next)
+            guard !Task.isCancelled else { return }
+
+            let address: URL
+            switch outcome {
+            case .cancelled:
                 return
-            } catch DiscogsError.rateLimited {
+            case .refused:
                 // Being told to slow down is the one answer this loop must
                 // actually obey. Retrying at the usual pace keeps the app over
                 // the limit, and it is the page's requests — not these — that
-                // are refused alongside them.
+                // are refused alongside them. Nothing was written down, so
+                // the name comes round again on the next rebuild.
                 try? await Task.sleep(for: .seconds(30))
                 continue
-            } catch {
-                // A dropped connection is not an answer about this artist.
-                // Marking it failed would bar the name for a month over a
-                // blink of the network, so the loop just waits and retries.
+            case .unreachable:
+                // A dropped connection is not an answer about this artist, so
+                // nothing was written and the name is still owed.
                 try? await Task.sleep(for: spacing)
                 continue
+            case .missing:
+                // Nothing to show, but a real answer, and one the worker has
+                // written down so the name is not asked after again.
+                portraitsSettled.insert(RecordingKey.normalizeArtist(next))
+                quiet += 1
+                try? await Task.sleep(for: spacing)
+                continue
+            case .found(let found):
+                address = found
             }
-            guard !Task.isCancelled else { return }
 
-            let record = ArtistPortrait(
-                nameKey: RecordingKey.normalizeArtist(next), name: next
-            )
-            // Nothing found is a real answer, and worth remembering so the
-            // same name is not asked after on every launch.
-            if let found {
-                record.imageURLString = found
-                paint(next, with: found)
-            } else {
-                record.lookupFailed = true
-            }
-            // Replaces any earlier attempt for the same name.
-            if let existing = portrait(for: next) { context.delete(existing) }
-            context.insert(record)
+            // Stays here: these are rows the main context may already hold
+            // and be drawing from, and rewriting one column on them is the
+            // whole point — see `paint`.
+            paint(next, with: address.absoluteString)
             saveContext()
 
             // Telling the page costs it a full rebuild of its graph, so this
@@ -546,7 +551,9 @@ final class DigStore {
             // times less work.
             // Only the picture counter. Rows watching it redraw and pick the
             // new address out of `portraits`; nothing is rebuilt.
-            if let found { portraits[record.nameKey] = URL(string: found) }
+            let key = RecordingKey.normalizeArtist(next)
+            portraits[key] = address
+            portraitsSettled.insert(key)
             quiet += 1
             if wasOnScreen || quiet >= 5 {
                 quiet = 0
@@ -576,6 +583,12 @@ final class DigStore {
     /// Whether the name just handed out came from the on-screen list, which
     /// decides whether the page is told about it at once.
     @ObservationIgnored private var lastWasOnScreen = false
+    /// Names already answered for, so one is not asked after twice.
+    ///
+    /// Seeded from the worker at the start of a run and added to as answers
+    /// come back. A refusal or a dropped connection is not an answer and does
+    /// not land here — those names come round again.
+    @ObservationIgnored private var portraitsSettled: Set<String> = []
     @ObservationIgnored private var portraitQueue: [String] = []
     @ObservationIgnored private var portraitQueueBuiltAt = 0
 
@@ -585,7 +598,7 @@ final class DigStore {
         // up again on every tick.
         while let next = portraitPriority.first {
             portraitPriority.removeFirst()
-            if portrait(for: next) == nil {
+            if isPortraitWanted(next) {
                 lastWasOnScreen = true
                 return next
             }
@@ -597,9 +610,21 @@ final class DigStore {
         }
         while let next = portraitQueue.first {
             portraitQueue.removeFirst()
-            if portrait(for: next) == nil { return next }
+            if isPortraitWanted(next) { return next }
         }
         return nil
+    }
+
+    /// Whether this name still owes a picture.
+    ///
+    /// Read from what the store already holds rather than from the store's
+    /// own context, and not only to save a fetch a second: the rows are
+    /// written on the worker's context now, so this context would not see
+    /// them and every name would look unasked-for.
+    private func isPortraitWanted(_ name: String) -> Bool {
+        let key = RecordingKey.normalizeArtist(name)
+        guard !key.isEmpty else { return false }
+        return portraits[key] == nil && !portraitsSettled.contains(key)
     }
 
     /// Reads an artist's Bandcamp, when their catalogue entry gives an
