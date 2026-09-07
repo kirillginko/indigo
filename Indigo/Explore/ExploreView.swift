@@ -3,6 +3,9 @@ import SwiftUI
 
 struct ExploreView: View {
     @Environment(AppState.self) private var appState
+    /// Only for the one station whose live feed names a show and no id — see
+    /// `KeptShow`.
+    @Environment(Radio80000BrowseStore.self) private var radio80000Browse
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
@@ -238,7 +241,7 @@ struct ExploreView: View {
                 .position(x: size.width * 0.5, y: showsTop + 24)
             ForEach(Array(offers.shows.enumerated()), id: \.element.id) { i, show in
                 Button {
-                    if let page = show.node.destination { appState.open(page) }
+                    Task { await follow(show.node) }
                 } label: {
                     MapLabel(show.node.title, show.node.subtitle, MapColor.paleGreen,
                              show.node.artworkURL, stableSeed(show.id), cardWidth(in: size),
@@ -466,15 +469,31 @@ struct ExploreView: View {
         }
     }
 
+    private func follow(_ item: CrateItem) async {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse) {
+        case .page(let page): appState.open(page)
+        case .section(let route): appState.select(route)
+        case nil: appState.select(.crate)
+        }
+    }
+
+    private func follow(_ node: MusicNode) async {
+        switch await KeptShow.destination(for: node, radio80000: radio80000Browse) {
+        case .page(let page): appState.open(page)
+        case .section(let route): appState.select(route)
+        case nil: break
+        }
+    }
+
     private func open(_ item: CrateItem) {
         if let recording = item.recording { appState.open(.digRecording(id: recording.id, title: item.displayTitle)); return }
         if let id = item.showID, let provider = item.providerID,
            let page = BroadcastSource.destination(showID: id, providerID: provider) { appState.open(page); return }
         // A show kept while a station was on air names no broadcast, so there
-        // is no broadcast page to open. Its station's shows are where it will
-        // appear — the same ladder the crate itself climbs.
-        if item.isLiveShowSnapshot, let route = BroadcastSource.showsRoute(for: item.providerID) {
-            appState.select(route)
+        // is no broadcast page to open. The ladder it climbs instead is the
+        // crate's own — see `KeptShow`.
+        if item.isLiveShowSnapshot {
+            Task { await follow(item) }
             return
         }
         guard let id = item.showID else { appState.select(.crate); return }

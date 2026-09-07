@@ -244,13 +244,6 @@ struct CrateView: View {
                     id: String(showID.dropFirst("radio80000.episode.".count))
                 ))
                 return true
-            case Radio80000Provider.providerID where item.isLiveShowSnapshot:
-                // Kept while the station was on air, so the row knows the
-                // show's name and the station's id. Opening the id is how
-                // "Neue Rituale" came to mean "whatever is on Radio 80000
-                // now". The name is enough to find the show itself.
-                openRadio80000Show(named: item.displayTitle)
-                return true
             case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
                 appState.open(.panikEpisode(id: String(showID.dropFirst("panik.episode.".count))))
                 return true
@@ -283,16 +276,10 @@ struct CrateView: View {
             default: break
             }
         }
-        // A show kept off the air that nothing above could place: the row
-        // knows a name and the station it was on, which is enough to reach
-        // the station's shows. Not the broadcast, but the right
-        // neighbourhood — and where a show has not been posted yet, the
-        // shows page is the honest answer rather than a dead press.
-        //
-        // Rows kept before a station's live feed was read for what is on
-        // land here, and so do the stations whose feeds still cannot say.
-        if item.isLiveShowSnapshot, let page = BroadcastSource.showsRoute(for: item.providerID) {
-            appState.select(page)
+        // A show kept off the air that nothing above could place. The ladder
+        // is shared, because three places climb it — see `KeptShow`.
+        if item.isLiveShowSnapshot {
+            Task { await followKeptShow(item) }
             return true
         }
         // The row opens the track's own page — where it was heard, and what
@@ -305,25 +292,11 @@ struct CrateView: View {
     }
 
 
-    /// Finds a Radio 80000 show by the name a live row kept, and opens it.
-    ///
-    /// The catalogue is loaded on demand: somebody may never have opened the
-    /// station's Shows page, and a crate row should not depend on their
-    /// having done so. A name that matches nothing lands on the list, which
-    /// is still the right neighbourhood — the show may have ended its run.
-    private func openRadio80000Show(named title: String) {
-        Task {
-            await radio80000Browse.loadShowsIfNeeded()
-            let wanted = RecordingKey.normalize(title)
-            guard !wanted.isEmpty,
-                  let match = radio80000Browse.shows.first(
-                      where: { RecordingKey.normalize($0.title) == wanted }
-                  )
-            else {
-                appState.select(.radio80000Shows)
-                return
-            }
-            appState.open(.radio80000Show(slug: match.slug))
+    private func followKeptShow(_ item: CrateItem) async {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse) {
+        case .page(let page): appState.open(page)
+        case .section(let route): appState.select(route)
+        case nil: break
         }
     }
 

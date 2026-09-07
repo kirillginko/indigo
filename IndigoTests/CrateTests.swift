@@ -570,4 +570,52 @@ final class CrateTests: XCTestCase {
             .idaEpisode(slug: "agss-radio-15-10-2024")
         )
     }
+
+    // MARK: - The ladder a kept show climbs
+
+    /// A row that named its broadcast opens the broadcast, and never gets as
+    /// far as a fallback.
+    func testAKeptBroadcastOpensTheBroadcast() async throws {
+        let station = liveStation(IdaProvider.providerID, id: "ida.live.tallinn", name: "IDA Tallinn")
+        crate.toggle(nowPlaying: station, liveShow: onAir("AGSS Radio", detailID: "agss-radio-15-10-2024"))
+        let row = try XCTUnwrap(crate.items().first)
+
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore())
+        XCTAssertEqual(found, .page(.idaEpisode(slug: "agss-radio-15-10-2024")))
+    }
+
+    /// A row that named only its station lands on that station's shows —
+    /// where the broadcast will appear once it is posted.
+    func testAKeptShowWithNoIdLandsOnTheStationsShows() async throws {
+        let row = crate.add(
+            broadcast: "panik.live",
+            providerID: PanikProvider.providerID,
+            title: "Digging Deeper",
+            subtitle: "Radio Panik",
+            artworkURL: nil,
+            playbackURL: URL(string: "https://stream.test/panik"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore())
+        XCTAssertEqual(found, .section(.panikShows))
+    }
+
+    /// A station kept as a station is not a kept show, and climbs nothing.
+    func testAStationKeptAsAStationClimbsNothing() async throws {
+        let row = crate.add(
+            broadcast: "panik.live",
+            providerID: PanikProvider.providerID,
+            title: "Radio Panik",
+            subtitle: nil,
+            artworkURL: nil,
+            playbackURL: URL(string: "https://stream.test/panik"),
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore())
+        XCTAssertNil(found, "There is nothing kept here but the station itself")
+    }
 }

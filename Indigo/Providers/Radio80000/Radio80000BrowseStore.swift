@@ -111,6 +111,25 @@ final class Radio80000BrowseStore {
 
     // MARK: - Shows
 
+    /// The show a name belongs to, for a row that kept only the name.
+    ///
+    /// Airtime says what is on air and gives no identifier, so a show crated
+    /// mid-broadcast knows what it was called and nothing else. The catalogue
+    /// is loaded on demand: somebody may never have opened the Shows page,
+    /// and a crate row should not depend on their having done so.
+    ///
+    /// Nil for a name that matches nothing — the show may have ended its run,
+    /// and the caller falls back to the directory rather than inventing a
+    /// slug.
+    func showDestination(named title: String) async -> DetailPage? {
+        let wanted = RecordingKey.normalize(title)
+        guard !wanted.isEmpty else { return nil }
+        await loadShowsIfNeeded()
+        guard let match = shows.first(where: { RecordingKey.normalize($0.title) == wanted })
+        else { return nil }
+        return .radio80000Show(slug: match.slug)
+    }
+
     func loadShowsIfNeeded() async {
         guard shows.isEmpty, showsPhase != .loading else { return }
         await loadShows()
