@@ -276,9 +276,11 @@ struct CrateView: View {
             default: break
             }
         }
-        // A show kept off the air that nothing above could place. The ladder
-        // is shared, because three places climb it — see `KeptShow`.
-        if item.isLiveShowSnapshot {
+        // A broadcast row nothing above could place: a show kept off the air,
+        // a station kept as itself, or an id from a build that filed them
+        // differently. The ladder is shared, because three places climb it —
+        // see `KeptShow`.
+        if item.kind == .broadcast {
             Task { await followKeptShow(item) }
             return true
         }
@@ -293,7 +295,7 @@ struct CrateView: View {
 
 
     private func followKeptShow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, radio80000: radio80000Browse) {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, crate: crate) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: break

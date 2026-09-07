@@ -580,7 +580,7 @@ final class CrateTests: XCTestCase {
         crate.toggle(nowPlaying: station, liveShow: onAir("AGSS Radio", detailID: "agss-radio-15-10-2024"))
         let row = try XCTUnwrap(crate.items().first)
 
-        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore())
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
         XCTAssertEqual(found, .page(.idaEpisode(slug: "agss-radio-15-10-2024")))
     }
 
@@ -598,12 +598,14 @@ final class CrateTests: XCTestCase {
             isLiveStream: true
         )
 
-        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore())
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
         XCTAssertEqual(found, .section(.panikShows))
     }
 
-    /// A station kept as a station is not a kept show, and climbs nothing.
-    func testAStationKeptAsAStationClimbsNothing() async throws {
+    /// A station kept as a station is not a kept show — it is the station,
+    /// and opens it. Before this the row did nothing at all when pressed,
+    /// which reads as a broken row rather than as a station.
+    func testAStationKeptAsAStationOpensTheStation() async throws {
         let row = crate.add(
             broadcast: "panik.live",
             providerID: PanikProvider.providerID,
@@ -615,7 +617,59 @@ final class CrateTests: XCTestCase {
             isLiveStream: true
         )
 
-        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore())
-        XCTAssertNil(found, "There is nothing kept here but the station itself")
+        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        XCTAssertEqual(found, .section(.panikStation), "A station kept as itself opens the station")
+    }
+
+    /// Once a show's id has been worked out, the row keeps it.
+    ///
+    /// Finding a Radio 80000 show means searching its catalogue by name,
+    /// which is two requests before the page can open. Keeping the answer is
+    /// the difference between a row that is slow once and a row that is slow
+    /// forever.
+    func testAResolvedShowIdIsKeptOnTheRow() throws {
+        let row = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: "Radio 80000",
+            artworkURL: nil,
+            playbackURL: nil,
+            embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertTrue(crate.remember(showID: "radio80000.show.neue-rituale", for: row))
+        XCTAssertEqual(row.showID, "radio80000.show.neue-rituale")
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: row.showID ?? "", providerID: Radio80000Provider.providerID
+            ),
+            .radio80000Show(slug: "neue-rituale"),
+            "And the next press goes straight there"
+        )
+    }
+
+    /// It will not write an id another row already holds: that would be the
+    /// same broadcast kept twice, and one silently becoming a duplicate of
+    /// the other is worse than looking it up again.
+    func testARememberedIdNeverCollidesWithAnotherRow() throws {
+        _ = crate.add(
+            broadcast: "radio80000.show.neue-rituale",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: nil, artworkURL: nil, playbackURL: nil, embedProvider: nil
+        )
+        let live = crate.add(
+            broadcast: "radio80000.live",
+            providerID: Radio80000Provider.providerID,
+            title: "Neue Rituale",
+            subtitle: "Radio 80000",
+            artworkURL: nil, playbackURL: nil, embedProvider: nil,
+            isLiveStream: true
+        )
+
+        XCTAssertFalse(crate.remember(showID: "radio80000.show.neue-rituale", for: live))
+        XCTAssertEqual(live.showID, "radio80000.live")
     }
 }

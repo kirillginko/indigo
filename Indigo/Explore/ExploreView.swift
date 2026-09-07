@@ -470,7 +470,7 @@ struct ExploreView: View {
     }
 
     private func follow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, radio80000: radio80000Browse) {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, crate: crate) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: appState.select(.crate)
@@ -487,12 +487,11 @@ struct ExploreView: View {
 
     private func open(_ item: CrateItem) {
         if let recording = item.recording { appState.open(.digRecording(id: recording.id, title: item.displayTitle)); return }
-        if let id = item.showID, let provider = item.providerID,
-           let page = BroadcastSource.destination(showID: id, providerID: provider) { appState.open(page); return }
-        // A show kept while a station was on air names no broadcast, so there
-        // is no broadcast page to open. The ladder it climbs instead is the
-        // crate's own — see `KeptShow`.
-        if item.isLiveShowSnapshot {
+        // Every broadcast row goes up the one ladder — the broadcast, then
+        // the show, then the station or its shows. Asking `BroadcastSource`
+        // here as well is how this view came to disagree with the crate about
+        // where the same row opens. See `KeptShow`.
+        if item.kind == .broadcast {
             Task { await follow(item) }
             return
         }

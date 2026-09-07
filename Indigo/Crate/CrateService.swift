@@ -211,6 +211,26 @@ final class CrateService {
         )
     }
 
+    /// Writes down a broadcast's real id once something has worked it out.
+    ///
+    /// Radio 80000's live feed names what is on and gives no identifier, so a
+    /// show kept off the air can only be found again by searching the show
+    /// catalogue for its name — two requests before the page can open. Doing
+    /// that on every press is a slow row forever; doing it once and keeping
+    /// the answer is a slow row once.
+    ///
+    /// Refuses to write an id another row already holds. The two would be the
+    /// same broadcast kept twice, and quietly turning one into a duplicate of
+    /// the other is worse than leaving it to be looked up again.
+    @discardableResult
+    func remember(showID: String, for item: CrateItem) -> Bool {
+        guard let providerID = item.providerID, item.showID != showID else { return false }
+        guard self.item(forBroadcast: showID, providerID: providerID) == nil else { return false }
+        item.showID = showID
+        save()
+        return true
+    }
+
     @discardableResult
     func add(
         broadcast showID: String,

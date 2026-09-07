@@ -34,15 +34,27 @@ enum KeptShow {
     /// names the broadcast or names nothing.
     static func destination(
         for item: CrateItem,
-        radio80000: Radio80000BrowseStore
+        radio80000: Radio80000BrowseStore,
+        crate: CrateService
     ) async -> KeptShowDestination? {
         if let showID = item.showID, let providerID = item.providerID,
            let page = BroadcastSource.destination(showID: showID, providerID: providerID) {
             return .page(page)
         }
-        guard item.isLiveShowSnapshot else { return nil }
+        guard item.isLiveShowSnapshot else {
+            // Not a show at all: a station kept while nothing was on air is
+            // the station, and opens it. Without this the row simply did
+            // nothing when pressed.
+            guard item.isLiveStream, let providerID = item.providerID else { return nil }
+            return BroadcastSource.route(providerID: providerID, stationID: item.showID)
+                .map { .section($0) }
+        }
         if item.providerID == Radio80000Provider.providerID,
-           let page = await radio80000.showDestination(named: item.displayTitle) {
+           let page = await radio80000.showDestination(named: item.displayTitle),
+           case .radio80000Show(let slug) = page {
+            // Kept, so the catalogue is searched once for this row rather
+            // than on every press. See `CrateService.remember`.
+            crate.remember(showID: "\(Radio80000Provider.providerID).show.\(slug)", for: item)
             return .page(page)
         }
         return BroadcastSource.showsRoute(for: item.providerID).map { .section($0) }
