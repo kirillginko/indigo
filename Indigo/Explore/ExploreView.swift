@@ -470,6 +470,13 @@ struct ExploreView: View {
         if let recording = item.recording { appState.open(.digRecording(id: recording.id, title: item.displayTitle)); return }
         if let id = item.showID, let provider = item.providerID,
            let page = BroadcastSource.destination(showID: id, providerID: provider) { appState.open(page); return }
+        // A show kept while a station was on air names no broadcast, so there
+        // is no broadcast page to open. Its station's shows are where it will
+        // appear — the same ladder the crate itself climbs.
+        if item.isLiveShowSnapshot, let route = BroadcastSource.showsRoute(for: item.providerID) {
+            appState.select(route)
+            return
+        }
         guard let id = item.showID else { appState.select(.crate); return }
         switch (item.kind, item.providerID) {
         case (.artist, "dig.artist.mbid"):

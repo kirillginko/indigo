@@ -512,10 +512,62 @@ final class CrateTests: XCTestCase {
         ]
         for station in stations {
             XCTAssertNotNil(
-                CrateView.showsPage(for: station),
+                BroadcastSource.showsRoute(for: station),
                 "\(BroadcastSource.label(for: station)) has nowhere to send a kept show"
             )
         }
-        XCTAssertNil(CrateView.showsPage(for: "somewhere.else"))
+        XCTAssertNil(BroadcastSource.showsRoute(for: "somewhere.else"))
+    }
+
+    // MARK: - Where a kept id points
+
+    /// A station's own id must never be read as a broadcast id.
+    ///
+    /// `destination` falls back to the whole showID when it carries no
+    /// prefix, because a bare slug is what a tracklist files. A row kept
+    /// while a station was on air carries `radio80000.live`, and reading
+    /// that as a broadcast built a page for an episode nobody ever named —
+    /// which could only say the broadcast was unavailable. EXPLORE reached
+    /// it that way from the For You page.
+    func testAStationIdIsNotReadAsABroadcast() throws {
+        XCTAssertNil(BroadcastSource.destination(
+            showID: "radio80000.live", providerID: Radio80000Provider.providerID
+        ))
+        XCTAssertNil(BroadcastSource.destination(
+            showID: "panik.live", providerID: PanikProvider.providerID
+        ))
+    }
+
+    /// A show named on air opens the show, not an episode of it.
+    func testAShowIdOpensTheShow() throws {
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "panik.show.digging-deeper", providerID: PanikProvider.providerID
+            ),
+            .panikShow(slug: "digging-deeper")
+        )
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "cashmere.show.tundra", providerID: CashmereProvider.providerID
+            ),
+            .cashmereShow(slug: "tundra")
+        )
+    }
+
+    /// And the bare slug a tracklist files still reaches the broadcast, which
+    /// is the case the fallback exists for.
+    func testABareSlugStillReachesTheBroadcast() throws {
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "agss-radio-15-10-2024", providerID: IdaProvider.providerID
+            ),
+            .idaEpisode(slug: "agss-radio-15-10-2024")
+        )
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "ida.episode.agss-radio-15-10-2024", providerID: IdaProvider.providerID
+            ),
+            .idaEpisode(slug: "agss-radio-15-10-2024")
+        )
     }
 }

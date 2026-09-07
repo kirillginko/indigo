@@ -291,7 +291,7 @@ struct CrateView: View {
         //
         // Rows kept before a station's live feed was read for what is on
         // land here, and so do the stations whose feeds still cannot say.
-        if item.isLiveShowSnapshot, let page = Self.showsPage(for: item.providerID) {
+        if item.isLiveShowSnapshot, let page = BroadcastSource.showsRoute(for: item.providerID) {
             appState.select(page)
             return true
         }
@@ -304,24 +304,6 @@ struct CrateView: View {
         return false
     }
 
-    /// Where a station keeps what it has broadcast.
-    static func showsPage(for providerID: String?) -> Route? {
-        switch providerID {
-        case NTSProvider.providerID: .ntsShows
-        case KioskProvider.providerID: .kioskShows
-        case NoodsProvider.providerID: .noodsShows
-        case LotProvider.providerID: .lotShows
-        case DublabProvider.providerID: .dublabArchive
-        case AlharaProvider.providerID: .alharaArchive
-        case CashmereProvider.providerID: .cashmereShows
-        case LYLProvider.providerID: .lylShows
-        case IdaProvider.providerID: .idaShows
-        case Radio80000Provider.providerID: .radio80000Shows
-        case PanikProvider.providerID: .panikShows
-        case RovrProvider.providerID: .rovrShows
-        default: nil
-        }
-    }
 
     /// Finds a Radio 80000 show by the name a live row kept, and opens it.
     ///
