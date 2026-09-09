@@ -80,7 +80,7 @@ struct LabelDigView: View {
                                        ? "\(profile.releases.count) of \(profile.catalogueSize)" : nil) {
                                 VStack(alignment: .leading, spacing: 0) {
                                     ForEach(profile.releases.prefix(20), id: \.self) { title in
-                                        DigLine(text: title)
+                                        DigLine(text: title, action: open(release: title))
                                     }
                                 }
                             }
@@ -88,7 +88,9 @@ struct LabelDigView: View {
                         }
 
                         catalogue
-                        deepCuts
+                        DeepSectionView(
+                            origin: node(profile), isReady: hasEnriched, showing: shown(profile)
+                        ) { appState.open($0) }
                     }
                 }
                 .padding(.horizontal, Metrics.gutter)
@@ -120,7 +122,20 @@ struct LabelDigView: View {
     }
 
     @State private var catalogueNumbers: [MusicGraph.Connection] = []
-    @State private var undergroundCuts: [DeepResult] = []
+    /// Where each release in the list actually goes, by folded title.
+    ///
+    /// The names in `Releases` come from MusicBrainz, which knows the record
+    /// exists and nothing else about it — no id, so no page. The graph knows
+    /// the same catalogue from Discogs, where the records do have ids. Meeting
+    /// the two on the title is what turns a column of strings into a column of
+    /// records; a name we cannot place stays a name, because sending somebody
+    /// to a page that will say "no catalogue has this" is a dead end with an
+    /// extra step in it.
+    @State private var releasePages: [String: DetailPage] = [:]
+    /// Everything the walk above this page already put on it — the roster, the
+    /// catalogue, the numbers — so DEEP is the part of a label nobody arrives
+    /// at by accident rather than a second printing of its front page.
+    @State private var catalogueNodes: Set<String> = []
 
     private func readCatalogue() async {
         let subject = node(profile ?? LabelProfile(
@@ -128,17 +143,44 @@ struct LabelDigView: View {
             releases: [], catalogueSize: 0, libraryTrackCount: 0, crateCount: 0,
             radioAppearances: 0
         ))
-        catalogueNumbers = await dig.connections(from: subject)
+        let connections = await dig.connections(from: subject)
+        catalogueNodes = Set(
+            connections.lazy
+                .filter { $0.to.kind == .release || $0.to.kind == .catalogNumber }
+                .map(\.to.id)
+        )
+        releasePages = connections.reduce(into: [:]) { found, connection in
+            guard connection.to.kind == .release,
+                  let page = connection.to.destination else { return }
+            found[ArtistProfile.ReleaseLine.key(connection.to.title)] = page
+        }
+        catalogueNumbers = connections
             .filter { $0.to.kind == .catalogNumber }
             .sorted { lhs, rhs in
                 let left = CatalogNumber.split(lhs.to.title)
                 let right = CatalogNumber.split(rhs.to.title)
-                guard let left, let right, left.prefix == right.prefix else {
+                guard let left, let right,
+                      left.prefix == right.prefix, left.suffix == right.suffix else {
                     return lhs.to.title < rhs.to.title
                 }
                 return left.number < right.number
             }
-        undergroundCuts = await dig.undergroundCuts(for: subject)
+    }
+
+    /// What this page has already shown, in the graph's terms: its roster,
+    /// its catalogue and its catalogue numbers.
+    private func shown(_ profile: LabelProfile) -> Set<String> {
+        var ids = catalogueNodes
+        for artist in profile.artists {
+            ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id)
+        }
+        return ids
+    }
+
+    /// The page a listed release opens, when the graph could place it.
+    private func open(release title: String) -> (() -> Void)? {
+        guard let page = releasePages[ArtistProfile.ReleaseLine.key(title)] else { return nil }
+        return { appState.open(page) }
     }
 
     /// The run itself. Catalogue numbers are the label's spine, and reading
@@ -163,32 +205,6 @@ struct LabelDigView: View {
                     }
                 }
                 .padding(.top, 4)
-            }
-        }
-    }
-
-    /// The spec's DEEP CUTS: the end of the catalogue nobody arrives at by
-    /// accident — small pressings, white labels, the records a label puts out
-    /// and never mentions again.
-    @ViewBuilder
-    private var deepCuts: some View {
-        let cuts = undergroundCuts
-        if !cuts.isEmpty {
-            DigSection(title: "Deep cuts", trailing: "\(cuts.count)") {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(cuts) { cut in
-                        DigLine(
-                            text: cut.node.title,
-                            detail: [
-                                cut.signals.releaseKind == .unknown
-                                    ? nil : cut.signals.releaseKind.label,
-                                cut.node.subtitle
-                            ].compactMap { $0 }.joined(separator: " · "),
-                            action: cut.node.destination.map { page in { appState.open(page) } }
-                        )
-                        Rule()
-                    }
-                }
             }
         }
     }

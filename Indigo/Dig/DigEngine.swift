@@ -641,7 +641,7 @@ nonisolated struct DigEngine {
         }
         let credits = Self.creditGroups(from: record)
         var relatedByName: [String: RelatedArtist] = [:]
-        for artist in record.artistNames {
+        for artist in record.credits {
             for peer in relatedArtists(to: artist) {
                 relatedByName[peer.name] = peer
             }
@@ -649,10 +649,10 @@ nonisolated struct DigEngine {
         // The same ladder every other surface uses, so a record does not have
         // a sleeve in the grid and a blank square on its own page.
         let artwork = DigArtwork(context: context).release(
-            title: record.title, artist: record.artistNames.first { ArtistName.isRealArtist($0) }
+            title: record.title, artist: record.credits.first { ArtistName.isRealArtist($0) }
         )
         return DigReleaseProfile(
-            id: id, title: record.title, year: record.year, artists: record.artistNames,
+            id: id, title: record.title, year: record.year, artists: record.credits,
             labels: labels, genres: record.genres, styles: record.styles,
             imageURL: record.imageURL ?? artwork.full,
             thumbnailURL: record.thumbnailURL ?? artwork.thumbnail,

@@ -139,34 +139,63 @@ final class DigStore {
     ///
     /// Only the answer comes back here; the reading and the walking happen on
     /// the worker's own context, so a page filling in does not stop a scroll.
-    /// Walks already running, by the answer each is working out.
+    /// Walks already running, by the artist each is working out.
     ///
-    /// Two callers can want the same profile at the same moment — the task
-    /// that follows navigation and the one that follows `revision` — and
-    /// both miss the cache, because neither has finished to fill it. Without
-    /// this they both walk, and the second answer is thrown away.
+    /// Two callers want the same profile at the same moment — the task that
+    /// follows navigation and the one that follows `revision`, 120ms behind
+    /// it — and both miss the cache, because neither has finished to fill it.
+    ///
+    /// The ticket used to carry the revision as well, on the grounds that an
+    /// answer from before a write is not the one somebody asking after it
+    /// wants. That is true and it cost twice the work: a write landing in the
+    /// 120ms between the two tasks gave them different tickets, so they both
+    /// walked, and the trace shows what that looks like — Skit 985ms and
+    /// 964ms, SNKLS 1065ms and 1097ms, Annika Henderson 967ms and 940ms, two
+    /// full walks of one artist inside a tenth of a second of each other.
+    ///
+    /// So a second caller joins whatever walk is already under way, even one
+    /// started a revision ago. Its answer can be one write behind, and that
+    /// is safe rather than sloppy: the write that moved `revision` also
+    /// re-fires `.task(id: dig.revision)` on every open page, so a fresher
+    /// answer is already on its way. What is gained is that there is never
+    /// more than one walk of an artist in flight at a time.
     @ObservationIgnored private var walking: [String: Task<ArtistProfile, Never>] = [:]
+
+    /// How many walks have actually been started. Only a test reads it, and
+    /// it exists because "one walk per artist" is a claim about work that is
+    /// invisible from the outside — the two callers return the same value
+    /// whether they shared a walk or each did their own, which is how this
+    /// went unnoticed while a trace showed it plainly.
+    @ObservationIgnored private(set) var walksStarted = 0
+
+    /// Moves `revision` the way a write would, for the test that needs one to
+    /// land between two callers.
+    func bumpRevisionForTesting() { revision &+= 1 }
 
     func artistProfile(name: String, mbid: String?) async -> ArtistProfile {
         let key = Self.artistKey(name: name, mbid: mbid)
         let asked = revision
         if let fresh = profiles.fresh(key, revision: asked) { return fresh }
 
-        // One walk per answer, however many callers want it. The ticket is
-        // the revision as well as the artist: an answer from before a write
-        // is not the one somebody asking after it wants.
-        let ticket = "\(asked)|\(key)"
-        if let running = walking[ticket] { return await running.value }
+        if let running = walking[key] {
+            Trace.step("graph.join", key) {}
+            return await running.value
+        }
 
         settle()
+        walksStarted += 1
+        // Traced by key rather than by name. Two walks of "Dean Blunt" a
+        // tenth of a second apart are either one bug or none, and the trace
+        // could not say which — the key is what the dedupe actually compares,
+        // so it is what the line has to show.
         let running = Task { [worker] in
-            await Trace.stage("graph.walk", name) {
+            await Trace.stage("graph.walk", key) {
                 await worker.artistProfile(name: name, mbid: mbid, generation: asked)
             }
         }
-        walking[ticket] = running
+        walking[key] = running
         let profile = await running.value
-        walking[ticket] = nil
+        walking[key] = nil
         profiles.store(profile, key: key, revision: asked)
         return profile
     }
@@ -343,13 +372,9 @@ final class DigStore {
     /// Rewriting one column on the rows that name them is a great deal cheaper
     /// than rebuilding anybody's graph.
     private func paint(_ name: String, with address: String) {
-        let key = RecordingKey.normalizeArtist(name)
-        let artist = MusicNodeKind.artist.rawValue
-        let rows = (try? context.fetch(FetchDescriptor<StoredEdge>(predicate: #Predicate {
-            $0.toKey == key && $0.toKindRaw == artist && $0.toArtworkURLString == nil
-        }))) ?? []
-        guard !rows.isEmpty else { return }
-        for row in rows { row.toArtworkURLString = address }
+        StoredEdge.repaint(
+            artistKey: RecordingKey.normalizeArtist(name), with: address, in: context
+        )
     }
 
     /// Fills in artist thumbnails slowly, in the background, forever.
@@ -399,12 +424,37 @@ final class DigStore {
     /// How long to stand aside. Long enough to cover a stream connecting and
     /// its first buffers, short enough that a listener who leaves music on
     /// still gets their pictures.
-    @ObservationIgnored private static let playbackHold = Duration.seconds(12)
+    /// A ceiling rather than a duration.
+    ///
+    /// This was twelve seconds from the moment play was pressed, on the
+    /// grounds that a stream gets its first buffers inside that. Most do. The
+    /// ones that do not are exactly the ones this protects: a trace of NTS
+    /// shows a connect that took twenty-nine seconds and two reconnects, and
+    /// the hold ran out fourteen seconds in — so the picture backlog came
+    /// back and started spending the request budget while the station was
+    /// still failing to open. The protection ended precisely when it was
+    /// needed.
+    ///
+    /// So the hold now lasts as long as the stream is actually opening, and
+    /// this is only the point at which a station is assumed never to be
+    /// coming. It has to outlast `StreamAudioEngine.connectTimeout` and the
+    /// reconnects behind it, or it reintroduces the same gap further along.
+    @ObservationIgnored private static let playbackHold = Duration.seconds(45)
 
     /// Called when audio starts. The app wires this to the player; nothing
     /// here knows what a player is.
     func holdBackgroundWork() {
         holdUntil = ContinuousClock.now + Self.playbackHold
+    }
+
+    /// Called once the stream is playing, or has given up.
+    ///
+    /// The other half of `holdBackgroundWork`. Without it the ceiling above
+    /// would be the whole story, and a listener who put a station on would
+    /// wait three quarters of a minute for the faces on the page they are
+    /// reading. A station that is playing is not competing for anything.
+    func releaseBackgroundHold() {
+        holdUntil = nil
     }
 
     /// Whether the fill is currently standing aside. Read by the loop below,
@@ -778,18 +828,42 @@ final class DigStore {
     /// what made scrolling stutter.
     @ObservationIgnored private var descents = DigCache<DeepEngine.Descent>()
 
-    func descent(from origin: MusicNode, at level: DeepLevel) async -> DeepEngine.Descent {
-        let key = "\(origin.id)|\(level.rawValue)"
+    func descent(
+        from origin: MusicNode, at level: DeepLevel, showing: Set<String> = []
+    ) async -> DeepEngine.Descent {
+        let key = Self.descentKey(origin: origin, level: level, showing: showing)
         let asked = revision
         if let fresh = descents.fresh(key, revision: asked) { return fresh }
         settle()
-        let found = await worker.descent(from: origin, at: level, generation: asked)
+        let found = await worker.descent(
+            from: origin, at: level, generation: asked, showing: showing
+        )
         descents.store(found, key: key, revision: asked)
         return found
     }
 
-    func cachedDescent(from origin: MusicNode, at level: DeepLevel) -> DeepEngine.Descent? {
-        descents.any("\(origin.id)|\(level.rawValue)")
+    func cachedDescent(
+        from origin: MusicNode, at level: DeepLevel, showing: Set<String> = []
+    ) -> DeepEngine.Descent? {
+        descents.any(Self.descentKey(origin: origin, level: level, showing: showing))
+    }
+
+    /// What the page is already showing is part of the question, so it has to
+    /// be part of the key. A descent answered before the release listed its
+    /// credits is not the answer to the same page once it has.
+    ///
+    /// Folded commutatively rather than sorted and joined: this is asked on
+    /// every redraw of a page whose exclusion list is every name on a sleeve,
+    /// and building that string to hash it would be the kind of per-frame
+    /// allocation the rest of this file exists to have removed.
+    private static func descentKey(
+        origin: MusicNode, level: DeepLevel, showing: Set<String>
+    ) -> String {
+        var digest: UInt64 = 0xcbf2_9ce4_8422_2325
+        for id in showing {
+            digest ^= UInt64(bitPattern: Int64(id.utf8.reduce(5381) { ($0 &* 33) ^ Int($1) }))
+        }
+        return "\(origin.id)|\(level.rawValue)|\(showing.count)|\(digest)"
     }
 
     /// What EXPLORE has to offer, kept between visits.
@@ -898,6 +972,13 @@ final class DigStore {
         return await worker.connections(from: node, generation: revision)
     }
 
+    /// Where this listener has not been, worked out off the main thread.
+    func digSuggestions(limit: Int = 6) async -> [DigHistory.Suggestion] {
+        let _ = revision
+        settle()
+        return await worker.digSuggestions(limit: limit, generation: revision)
+    }
+
     func scenes(forArtist name: String) async -> [MusicScene] {
         let _ = revision
         settle()
@@ -908,12 +989,6 @@ final class DigStore {
         let _ = revision
         settle()
         return await worker.scene(city: city, sound: sound, generation: revision)
-    }
-
-    func undergroundCuts(for node: MusicNode) async -> [DeepResult] {
-        let _ = revision
-        settle()
-        return await worker.undergroundCuts(for: node, generation: revision)
     }
 
     func genres(for recording: Recording) -> [String] {

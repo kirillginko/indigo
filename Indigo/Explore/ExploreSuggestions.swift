@@ -41,6 +41,26 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable, Codable {
 
     var id: String { node.id }
 
+    /// How far outside charted territory this sits, 0…1.
+    ///
+    /// EXPLORE draws a map, and on a map position is an argument. Until now
+    /// it was not one: a card's distance from the spine came out of a cosine
+    /// of its ordinal, which is to say the layout was decorated rather than
+    /// drawn, and two things sitting side by side meant only that they had
+    /// been counted next to each other.
+    ///
+    /// Corroboration is the honest axis for it. One route to somewhere is the
+    /// frontier however good that route is; four separate things this listener
+    /// keeps arriving at the same place is not a frontier at all — it is a gap
+    /// in the middle of ground they have already charted, and it should be
+    /// drawn where the rest of that ground is. Strength only breaks ties
+    /// within a reach, because a strong single edge is still a single edge.
+    var frontier: Double {
+        let reach = 1 - 1 / Double(max(1, corroboration))
+        let strength = min(1, max(0, score))
+        return min(1, max(0, 1 - (reach * 0.65 + strength * 0.35)))
+    }
+
     /// The line under the card: what this is, and what it came from.
     ///
     /// The origin is dropped when the reason already names it — a show offered
@@ -423,5 +443,29 @@ nonisolated struct ExploreSuggestionEngine {
         return found.values.sorted {
             $0.weight == $1.weight ? $0.node.id < $1.node.id : $0.weight > $1.weight
         }
+    }
+}
+
+nonisolated extension Array where Element == ExploreSuggestion {
+    /// The same offers, regrouped so everything reached from one place in the
+    /// collection sits together.
+    ///
+    /// Ranked by score alone, a cluster is invisible: four artists reached
+    /// out of the same crated label land in first, fourth, seventh and
+    /// eleventh place, separated by four unrelated people, and the one thing
+    /// the arrangement could have said — that these belong together — is the
+    /// thing it does not say. Adjacency is what makes a cluster a cluster.
+    ///
+    /// Origins keep the order their strongest offer gave them, and offers keep
+    /// theirs within an origin, so the best thing on the page is still the
+    /// first thing on it. This regroups; it does not re-rank.
+    func clusteredByOrigin() -> [ExploreSuggestion] {
+        var order: [String] = []
+        var clusters: [String: [ExploreSuggestion]] = [:]
+        for suggestion in self {
+            if clusters[suggestion.via] == nil { order.append(suggestion.via) }
+            clusters[suggestion.via, default: []].append(suggestion)
+        }
+        return order.flatMap { clusters[$0] ?? [] }
     }
 }

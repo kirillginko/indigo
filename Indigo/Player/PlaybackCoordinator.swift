@@ -61,6 +61,9 @@ final class PlaybackCoordinator {
     /// picture-fetching running behind it. Set by the app; nothing here knows
     /// what that background work is.
     var onPlaybackStarting: (() -> Void)?
+    /// The other end of `onPlaybackStarting`: the stream is playing, or it has
+    /// stopped trying. Whatever stood aside for it can stop standing aside.
+    var onPlaybackSettled: (() -> Void)?
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
@@ -434,6 +437,14 @@ final class PlaybackCoordinator {
     }
 
     private func handleStreamStateChange() {
+        switch stream.state {
+        case .playing, .failed, .idle, .paused:
+            // Buffering is the one state that is still asking the network for
+            // something, and it is the one the hold exists for.
+            onPlaybackSettled?()
+        default:
+            break
+        }
         if case .failed(let message) = stream.state {
             // Four stations stream through here now, so the notice names the
             // one that actually dropped.

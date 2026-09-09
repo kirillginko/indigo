@@ -116,9 +116,20 @@ nonisolated struct DeepEngine {
 
     /// Everything reachable from a node, each filed at the shallowest level
     /// that would have shown it.
-    func results(from origin: MusicNode, distance: Int = 1) -> [DeepResult] {
+    ///
+    /// `showing` is what the page has already drawn above, by node id, and
+    /// leaving it out is the difference between a descent and a second copy
+    /// of the page. A release walks out to its label, its catalogue number
+    /// and everyone on its sleeve — which is to say to the three blocks
+    /// printed directly above DEEP, so every row at the surface was a fact
+    /// the reader had just read, and getting past them meant pressing DEEPER
+    /// through their own page.
+    func results(
+        from origin: MusicNode, distance: Int = 1, showing: Set<String> = []
+    ) -> [DeepResult] {
         let caches = self.caches
-        return graph.neighbors(of: origin).byDestination.map { candidate in
+        return graph.neighbors(of: origin).byDestination.compactMap { candidate in
+            guard !showing.contains(candidate.node.id) else { return nil }
             let signals = caches.signals(for: candidate.node, distance: distance)
             return DeepResult(
                 node: candidate.node,
@@ -135,12 +146,24 @@ nonisolated struct DeepEngine {
     /// Both answers come from a single walk on purpose. Asking for them
     /// separately means walking the graph twice and rebuilding every cache
     /// with it, which is exactly how opening an artist page got slow.
-    func descent(from origin: MusicNode, at level: DeepLevel, distance: Int = 1) -> Descent {
-        let all = results(from: origin, distance: distance)
+    ///
+    /// A level with nothing in it is not a level anybody should have to press
+    /// through, so the descent settles on the first one at or below the level
+    /// asked for that actually has something — and says which that was.
+    /// Without this, taking the page's own contents out of the walk simply
+    /// moved the problem: the surface came back empty and DEEPER became a
+    /// button you pressed twice to reach the first real row.
+    func descent(
+        from origin: MusicNode, at level: DeepLevel, distance: Int = 1, showing: Set<String> = []
+    ) -> Descent {
+        let all = results(from: origin, distance: distance, showing: showing)
+        let settled = all.contains { $0.level == level }
+            ? level
+            : Self.nextLevel(after: level, in: all) ?? level
         return Descent(
-            level: level,
-            results: Self.ordered(all.filter { $0.level == level }),
-            next: Self.nextLevel(after: level, in: all)
+            level: settled,
+            results: Self.ordered(all.filter { $0.level == settled }),
+            next: Self.nextLevel(after: settled, in: all)
         )
     }
 
@@ -164,14 +187,33 @@ nonisolated struct DeepEngine {
         Self.nextLevel(after: level, in: results(from: origin, distance: distance))
     }
 
+    /// One row per record, however many pressings of it the catalogue holds.
+    ///
+    /// The graph keys a release on its Discogs id, which is right — two
+    /// pressings of Change are two objects and must not collapse into one
+    /// node. In a list of things to go and find they are one find, and DEEP
+    /// was printing the album, its repress and its CD issue as three
+    /// consecutive rows with the same name on them. The strongest survives;
+    /// the rest are the same record again.
+    ///
+    /// Releases only. Two artists who fold to one title are two people.
+    private static func deduplicated(_ results: [DeepResult]) -> [DeepResult] {
+        var seen = Set<String>()
+        return results.filter { result in
+            guard result.node.kind == .release else { return true }
+            let key = ArtistProfile.ReleaseLine.key(result.node.title)
+            return key.isEmpty || seen.insert(key).inserted
+        }
+    }
+
     private static func ordered(_ results: [DeepResult]) -> [DeepResult] {
-        results.sorted {
+        deduplicated(results.sorted {
             // Confidence breaks ties, because a deep connection nobody can
             // justify is a guess wearing a good disguise.
             $0.signals.score == $1.signals.score
                 ? $0.confidence > $1.confidence
                 : $0.signals.score > $1.signals.score
-        }
+        })
     }
 
     private static func nextLevel(after level: DeepLevel, in results: [DeepResult]) -> DeepLevel? {
@@ -182,6 +224,7 @@ nonisolated struct DeepEngine {
         }
         return nil
     }
+
 
     // MARK: Level assignment
 

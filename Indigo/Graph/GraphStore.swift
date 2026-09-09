@@ -178,7 +178,13 @@ nonisolated struct GraphStore {
     /// 1: labels cleaned of Discogs' disambiguators and joined names, artists
     ///    no longer their own imprints, collaborations split into the people
     ///    in them.
-    static let builderVersion = 1
+    /// 2: release credits carried Discogs' disambiguating numbers, so a
+    /// record credited to "Hype Williams (2)" wrote an artist node of that
+    /// name — a second page under a spelling nothing is catalogued against,
+    /// with no picture and no way back to the artist it is a spelling of.
+    /// The names are stripped at the boundary now, and every edge written
+    /// before that has one of those nodes on the end of it.
+    static let builderVersion = 2
 
     private func stored(for node: MusicNode) -> EdgeSet? {
         let identity = node.id
@@ -700,7 +706,7 @@ nonisolated struct GraphStore {
 
     private func addReleaseNeighbors(_ node: MusicNode, caches: Caches, into edges: inout EdgeSet) {
         guard let identifier = node.discogsID, let record = caches.discogsRelease(identifier) else { return }
-        for artist in record.artistNames where ArtistName.isRealArtist(artist) {
+        for artist in record.credits where ArtistName.isRealArtist(artist) {
             edges.insert(MusicEdge(
                 from: node, to: .artist(artist), kind: .sameRelease, source: .discogs,
                 reason: "Appears on \(record.title)", confidence: RelationshipKind.sameRelease.baseConfidence
@@ -735,7 +741,7 @@ nonisolated struct GraphStore {
     private func addCredits(
         of record: DiscogsReleaseRecord, on node: MusicNode, into edges: inout EdgeSet
     ) {
-        let headline = Set(record.artistNames.map(RecordingKey.normalizeArtist))
+        let headline = Set(record.credits.map(RecordingKey.normalizeArtist))
         for (index, name) in record.creditNames.enumerated() {
             guard ArtistName.isRealArtist(name) else { continue }
             // The headline artist producing their own record is not a second
@@ -868,7 +874,8 @@ nonisolated struct GraphStore {
         guard let parts = CatalogNumber.split(node.title) else { return }
         for release in caches.discogsReleases {
             for catalog in release.catalogNumbers {
-                guard let other = CatalogNumber.split(catalog), other.prefix == parts.prefix else { continue }
+                guard let other = CatalogNumber.split(catalog),
+                      other.prefix == parts.prefix, other.suffix == parts.suffix else { continue }
                 let distance = abs(other.number - parts.number)
                 guard distance > 0, distance <= 3 else {
                     if distance == 0 {
@@ -1046,7 +1053,7 @@ private nonisolated struct Caches {
             }
             var folded: [String: String] = [:]
             for release in fetchedReleases {
-                for raw in release.artistNames where !raw.isEmpty {
+                for raw in release.credits where !raw.isEmpty {
                     let key: String
                     if let known = folded[raw] { key = known } else {
                         key = RecordingKey.normalizeArtist(raw)

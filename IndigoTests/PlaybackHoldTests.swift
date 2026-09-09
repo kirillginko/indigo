@@ -50,5 +50,41 @@ final class PlaybackHoldTests: XCTestCase {
         XCTAssertFalse(dig.isHoldingBackgroundWork)
         dig.holdBackgroundWork()
         XCTAssertTrue(dig.isHoldingBackgroundWork)
+
+        // And it stops standing aside the moment the stream settles, rather
+        // than sitting out a fixed stretch of time. A station that opened in
+        // a second must not cost the page its pictures for the rest of a
+        // minute.
+        dig.releaseBackgroundHold()
+        XCTAssertFalse(dig.isHoldingBackgroundWork)
+    }
+
+    /// The failure this replaces: the hold ran for a fixed twelve seconds
+    /// from the moment play was pressed, so a station taking twenty-nine —
+    /// which the trace of an NTS connect shows, with two reconnects — lost
+    /// the protection two thirds of the way through, and the picture backlog
+    /// came back and spent the request budget while the stream was still
+    /// failing to open.
+    @MainActor
+    func testTheHoldLastsWhileTheStreamIsStillOpening() throws {
+        let configuration = ModelConfiguration(
+            schema: Persistence.schema, isStoredInMemoryOnly: true
+        )
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let dig = DigStore(context: ModelContext(container))
+        let player = PlaybackCoordinator()
+        player.onPlaybackStarting = { dig.holdBackgroundWork() }
+        player.onPlaybackSettled = { dig.releaseBackgroundHold() }
+
+        player.playRadio(MediaItem(
+            id: "nts.live", sourceID: "nts", kind: .radioStation, title: "NTS",
+            playbackURL: URL(string: "https://example.test/stream")!
+        ))
+
+        XCTAssertTrue(
+            dig.isHoldingBackgroundWork,
+            "Still opening, so the backlog is still out of the way"
+        )
+        player.stopAll()
     }
 }

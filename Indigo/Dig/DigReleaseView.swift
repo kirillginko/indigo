@@ -210,6 +210,20 @@ struct DigReleaseView: View {
                             }
                         }
 
+                        // A record was where a dig stopped. "Continue
+                        // digging" above offers the artists on the sleeve and
+                        // nothing else, so a compilation of people you already
+                        // know ended the descent — which on the one page that
+                        // names a label, a catalogue number and every engineer
+                        // on the pressing is the worst place for it to end.
+                        if let identifier {
+                            DeepSectionView(
+                                origin: .release(profile.title, discogsID: identifier),
+                                isReady: hasLookedUp,
+                                showing: Self.shown(profile)
+                            ) { appState.open($0) }
+                        }
+
                         if let sourceURL = profile.sourceURL {
                             Link("Data provided by Discogs", destination: sourceURL)
                                 .font(Typeface.mono(9))
@@ -256,6 +270,31 @@ struct DigReleaseView: View {
             // ever appears in it.
             await dig.verifyListenable(releaseIDs: [identifier])
         }
+    }
+
+    /// Everything this page has already printed, in the graph's terms.
+    ///
+    /// A release's neighbours *are* its blocks: the artists in its header, the
+    /// labels and catalogue numbers in its pressing, and every name in its
+    /// credits. Handing that list to DEEP is what stops the descent opening on
+    /// the same label the reader is looking at — see
+    /// `DeepEngine.results(from:distance:showing:)`.
+    private static func shown(_ profile: DigReleaseProfile) -> Set<String> {
+        var ids: Set<String> = []
+        for artist in profile.artists { ids.insert(MusicNode.artist(artist).id) }
+        for label in profile.labels {
+            ids.insert(MusicNode.label(label.name).id)
+            if let number = label.catalogNumber, !number.isEmpty {
+                ids.insert(MusicNode.catalogNumber(number).id)
+            }
+        }
+        for group in profile.credits {
+            for person in group.people { ids.insert(MusicNode.artist(person.name).id) }
+        }
+        // "Continue digging" is on this page too, and it is the surface by
+        // another name.
+        for artist in profile.related { ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id) }
+        return ids
     }
 
     /// Hearing it.

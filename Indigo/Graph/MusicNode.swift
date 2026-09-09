@@ -266,16 +266,27 @@ nonisolated enum CatalogNumber {
             .reduce(into: "") { $0.append($1) }
     }
 
-    /// "ITLP09" → ("ITLP", 9). The prefix is a label's mark and the number is
-    /// its position in the run, which is what makes neighbouring catalogue
-    /// numbers worth offering.
-    static func split(_ value: String) -> (prefix: String, number: Int)? {
+    /// "ITLP09" → ("ITLP", 9, ""), "SBR276CD" → ("SBR", 276, "CD").
+    ///
+    /// The prefix is a label's mark and the number is its position in the run,
+    /// which is what makes neighbouring catalogue numbers worth offering. The
+    /// suffix is the format the pressing was issued in, and it has to be
+    /// carried rather than refused: this used to require that everything after
+    /// the prefix be digits, so any number written with its format on the end
+    /// split to nil — and a catalogue node that cannot be split has no
+    /// neighbours, which is a page offered from every release that opens on
+    /// nothing at all.
+    ///
+    /// It stays part of the shelf's identity. SBR276CD and SBR277CD are a run;
+    /// SBR276CD and SBR277LP are the same records in two formats, and reading
+    /// along a shelf that alternates between them is not reading along a shelf.
+    static func split(_ value: String) -> (prefix: String, number: Int, suffix: String)? {
         let normalized = normalize(value)
         guard !normalized.isEmpty else { return nil }
-        let digits = normalized.drop { !$0.isNumber }
-        guard !digits.isEmpty, digits.allSatisfy(\.isNumber), let number = Int(digits) else { return nil }
-        let prefix = String(normalized.prefix(normalized.count - digits.count))
-        guard !prefix.isEmpty else { return nil }
-        return (prefix.uppercased(), number)
+        let prefix = normalized.prefix { !$0.isNumber }
+        let rest = normalized.dropFirst(prefix.count)
+        let digits = rest.prefix { $0.isNumber }
+        guard !prefix.isEmpty, !digits.isEmpty, let number = Int(digits) else { return nil }
+        return (prefix.uppercased(), number, String(rest.dropFirst(digits.count)).uppercased())
     }
 }

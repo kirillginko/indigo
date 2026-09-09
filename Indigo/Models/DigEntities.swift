@@ -354,6 +354,18 @@ nonisolated final class DiscogsReleaseRecord {
         return URL(string: "https://www.discogs.com\(profileURLString)")
     }
     var isFresh: Bool { Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 }
+    /// Who the record is credited to, as a name the app can act on.
+    ///
+    /// Read rather than stored, because rows written before the disambiguator
+    /// was stripped at the boundary are still in the store and refetch only
+    /// when they go stale. Discogs credits a record to "Hype Williams (2)" —
+    /// its way of filing the second person with a name — and carried through
+    /// that becomes an artist of its own: a duplicate page under a spelling
+    /// nothing is catalogued against, with no picture and no way back.
+    var credits: [String] {
+        artistNames.map(DiscogsClient.withoutDisambiguator)
+    }
+
 }
 
 

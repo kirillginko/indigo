@@ -122,4 +122,27 @@ nonisolated final class GraphSnapshot {
         self.builtAt = Date()
         self.builderVersion = builderVersion
     }
+
+}
+
+nonisolated extension StoredEdge {
+    /// Puts one artist's picture on every stored edge that points at them.
+    ///
+    /// The graph copies a portrait onto each edge as it writes it, so a face
+    /// ends up stamped into every row that leads to an artist — dozens of
+    /// them — and EXPLORE, DEEP and the related lists draw from those rather
+    /// than from the portrait table. Correcting the table alone therefore
+    /// changed nothing anybody could see.
+    ///
+    /// Deliberately rewrites a picture that is merely *different*, not only a
+    /// missing one. Filling the blanks is the ordinary case; replacing a face
+    /// that turned out to belong to somebody else is why this is a function.
+    static func repaint(artistKey key: String, with address: String, in context: ModelContext) {
+        guard !key.isEmpty else { return }
+        let artist = MusicNodeKind.artist.rawValue
+        let rows = (try? context.fetch(FetchDescriptor<StoredEdge>(predicate: #Predicate {
+            $0.toKey == key && $0.toKindRaw == artist && $0.toArtworkURLString != address
+        }))) ?? []
+        for row in rows { row.toArtworkURLString = address }
+    }
 }

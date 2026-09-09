@@ -12,7 +12,9 @@ nonisolated struct DiscogsLabelProfile: Sendable {
         var seenArtists = Set<String>()
         artists = results.compactMap { result in
             guard let divider = result.title.range(of: " - ") else { return nil }
-            let value = String(result.title[..<divider.lowerBound])
+            // "Anika (2) - Change" names an artist, and the number is
+            // Discogs' filing rather than part of it.
+            let value = DiscogsClient.withoutDisambiguator(String(result.title[..<divider.lowerBound]))
             let key = RecordingKey.normalizeArtist(value)
             return !key.isEmpty && seenArtists.insert(key).inserted ? value : nil
         }
@@ -108,6 +110,16 @@ struct DiscogsLabelDigView: View {
                                 }
                             }
                         }
+
+                        // The same descent the MusicBrainz label page has.
+                        // A label reached by name rather than by MBID is the
+                        // same label, and it is usually the smaller one —
+                        // which is to say the one whose catalogue is worth
+                        // reading to the end.
+                        DeepSectionView(
+                            origin: .label(profile.name), isReady: true,
+                            showing: Self.shown(profile)
+                        ) { appState.open($0) }
                     }
                 }
                 .padding(.horizontal, Metrics.gutter).padding(.vertical, 22)
@@ -115,5 +127,18 @@ struct DiscogsLabelDigView: View {
                 .loadingVeil(profile == nil)
             }
         }.task(id: labelName) { await dig.enrichDiscogsLabel(named: labelName) }
+    }
+
+    /// The catalogue, the roster and the neighbouring imprints — everything
+    /// already printed above DEEP. See
+    /// `DeepEngine.results(from:distance:showing:)`.
+    private static func shown(_ profile: DiscogsLabelProfile) -> Set<String> {
+        var ids: Set<String> = []
+        for artist in profile.artists { ids.insert(MusicNode.artist(artist).id) }
+        for label in profile.relatedLabels { ids.insert(MusicNode.label(label).id) }
+        for release in profile.releases {
+            ids.insert(MusicNode.release(release.title, discogsID: release.discogsID).id)
+        }
+        return ids
     }
 }

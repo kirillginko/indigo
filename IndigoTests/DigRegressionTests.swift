@@ -501,3 +501,51 @@ final class DigRegressionTests: XCTestCase {
         )
     }
 }
+
+// MARK: - One walk per artist
+
+/// The trace kept showing two full walks of one artist a tenth of a second
+/// apart — Skit 985/964ms, Dean Blunt 1090/1151ms. Two tasks on the page want
+/// the same profile 120ms apart, and neither has finished to fill the cache.
+final class ProfileWalkTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    @MainActor
+    func testTwoCallersShareOneWalk() async {
+        let store = DigStore(context: context)
+
+        async let first = store.artistProfile(name: "Dean Blunt", mbid: nil)
+        async let second = store.artistProfile(name: "Dean Blunt", mbid: nil)
+        let both = await [first, second]
+
+        XCTAssertEqual(both[0].name, both[1].name)
+        XCTAssertEqual(store.walksStarted, 1, "One walk, however many callers wanted it")
+    }
+
+    /// The case the old revision-keyed ticket could not catch: a write lands
+    /// between the two, so they ask at different revisions.
+    @MainActor
+    func testAWriteBetweenTheTwoCallersDoesNotBuyASecondWalk() async {
+        let store = DigStore(context: context)
+
+        async let first = store.artistProfile(name: "Dean Blunt", mbid: nil)
+        await Task.yield()
+        store.bumpRevisionForTesting()
+        async let second = store.artistProfile(name: "Dean Blunt", mbid: nil)
+        _ = await [first, second]
+
+        XCTAssertEqual(store.walksStarted, 1, "A write in between is not a second walk")
+    }
+}

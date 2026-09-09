@@ -87,9 +87,17 @@ nonisolated final class DigStep {
 
 nonisolated struct DigHistory {
     let context: ModelContext
+    /// A graph somebody else has already paid for, when there is one.
+    ///
+    /// `suggestions()` walks out of four nodes, and building a `GraphStore`'s
+    /// caches reads six whole tables. On the worker that cost is already
+    /// borne once per generation — see `DigWorker.refresh(_:)` — so sharing it
+    /// is the difference between a walk and a rebuild.
+    private let shared: GraphStore?
 
-    init(context: ModelContext) {
+    init(context: ModelContext, graph: GraphStore? = nil) {
         self.context = context
+        self.shared = graph
     }
 
     // MARK: Writing
@@ -193,7 +201,7 @@ nonisolated struct DigHistory {
         let origins = haunts(kinds: [.artist, .label, .broadcast, .scene], limit: 4)
         guard !origins.isEmpty else { return [] }
 
-        let graph = GraphStore(context: context)
+        let graph = shared ?? GraphStore(context: context)
         var best: [String: Suggestion] = [:]
         for origin in origins {
             let originNode = origin.node
