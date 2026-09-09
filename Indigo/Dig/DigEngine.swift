@@ -364,9 +364,19 @@ nonisolated struct DigEngine {
                 // first record that says, because a later one saying the same
                 // adds nothing and a later one disagreeing is two labels the
                 // page has no way to tell apart anyway.
+                //
+                // Folded on the way in, exactly as `note` folds. Records
+                // written before the disambiguator was dropped hold the
+                // filing form — "World Music (8)" — so keying on the raw
+                // string here would file the identity under a name no other
+                // part of this list uses, and the label it identifies would
+                // go on opening whichever one a search found first.
                 guard let discogsID, discogsID > 0 else { continue }
-                let key = RecordingKey.normalize(label)
-                if labelIdentities[key] == nil { labelIdentities[key] = discogsID }
+                for name in LabelName.names(inDiscogsField: label) {
+                    let key = RecordingKey.normalize(name)
+                    guard !key.isEmpty, labelIdentities[key] == nil else { continue }
+                    labelIdentities[key] = discogsID
+                }
             }
         }
 

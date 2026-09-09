@@ -309,7 +309,7 @@ final class DigStore {
         // arrives any other way. A small picture is not a reason to stop
         // asking who put the record out.
         let missing = await artistProfile(name: name, mbid: mbid).releases
-            .filter { $0.imageURL == nil }
+            .filter { needsReading($0) }
         guard !missing.isEmpty else { return }
 
         // Fetched together, written one at a time.
@@ -327,6 +327,26 @@ final class DigStore {
             guard !Task.isCancelled else { return }
             await fetchAndStore(batch, artist: name, client: client)
         }
+    }
+
+    /// Whether a record still has to be read in its own right.
+    ///
+    /// Two reasons, and the second is the one that was missing. A release with
+    /// no full-size cover has plainly never been read — the artist endpoint
+    /// carries only a thumbnail. But a release read *before* labels had
+    /// identities has a cover and a label name and no way to say which label
+    /// that name meant, and nothing would ever ask about it again: the fill
+    /// skipped it for having a picture, and it is the only thing that asks.
+    ///
+    /// So a record naming labels it cannot identify is unread as far as this
+    /// is concerned. `release(id:)` refuses to refetch anything still fresh,
+    /// so this cannot turn into a loop over records that were only just read.
+    private func needsReading(_ release: ArtistProfile.ReleaseLine) -> Bool {
+        if release.imageURL == nil { return true }
+        guard let identifier = release.discogsID,
+              let stored = discogsEnricher.cachedRelease(id: identifier)
+        else { return true }
+        return !stored.labelNames.isEmpty && stored.labelDiscogsIDs.isEmpty
     }
 
     private func fetchAndStore(

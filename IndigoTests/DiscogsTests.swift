@@ -797,3 +797,40 @@ final class LabelIdentityTests: XCTestCase {
         )
     }
 }
+
+// MARK: - Identities on records already written
+
+/// Records read before labels had identities hold the filing form Discogs
+/// printed — "World Music (8)" — and are never asked about again, because the
+/// one thing that asks skipped them for having a picture.
+final class LabelIdentityBackfillTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The filing form and the folded form have to reach the same key, or the
+    /// identity is filed under a name nothing else in the list uses.
+    func testAFilingFormIdentifiesTheFoldedName() {
+        let record = DiscogsReleaseRecord(discogsID: 1, title: "Smile Please")
+        record.artistNames = ["Dean Blunt"]
+        record.labelNames = ["World Music (8)"]
+        record.labelDiscogsIDs = [12_345]
+        context.insert(record)
+
+        let labels = DigEngine(context: context)
+            .artistProfile(name: "Dean Blunt", mbid: nil).labels
+
+        XCTAssertEqual(labels.first?.name, "World Music", "Shown without Discogs' filing number")
+        XCTAssertEqual(labels.first?.discogsID, 12_345, "And still knowing which one it is")
+    }
+}
