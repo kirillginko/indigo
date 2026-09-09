@@ -520,17 +520,16 @@ final class ReleaseSleeveTests: XCTestCase {
     /// label — so reading only that field sampled their labels through the
     /// one-off releases at the edge of the catalogue.
     func testAMastersLabelComesFromTheSearchWhenItsOwnRowHasNone() {
-        let sleeves = [10: searchHit("Hype Williams - One Nation", id: 10,
-                                     label: ["Hyperdub"], cover: nil)]
+        let catalogued: (Int) -> [String] = { $0 == 10 ? ["Hyperdub"] : [] }
 
         XCTAssertEqual(
-            DiscogsEnricher.label(of: master("One Nation", id: 10), sleeves: sleeves),
+            DiscogsEnricher.label(of: master("One Nation", id: 10), catalogued: catalogued),
             "Hyperdub"
         )
         // Its own row wins where it has one.
         XCTAssertEqual(
             DiscogsEnricher.label(of: master("Rise Up", id: 10, label: "Second Layer Records"),
-                                  sleeves: sleeves),
+                                  catalogued: catalogued),
             "Second Layer Records"
         )
     }
@@ -538,10 +537,8 @@ final class ReleaseSleeveTests: XCTestCase {
     /// With the masters counted, the imprint carrying the catalogue outranks
     /// a magazine that hosted one mix.
     func testTheMagazineStopsOutrankingTheLabel() {
-        let sleeves = [
-            10: searchHit("Hype Williams - One Nation", id: 10, label: ["Big Dada Recordings"], cover: nil),
-            11: searchHit("Hype Williams - Black Is Beautiful", id: 11, label: ["Big Dada Recordings"], cover: nil)
-        ]
+        let catalogued: (Int) -> [String] = { [10: ["Big Dada Recordings"],
+                                              11: ["Big Dada Recordings"]][$0] ?? [] }
         let found = DiscogsEnricher.imprints(releasedBy: [
             DiscogsArtistRelease(
                 id: 99, title: "FACT Mix 216", year: nil, role: "Main", type: "release",
@@ -550,7 +547,7 @@ final class ReleaseSleeveTests: XCTestCase {
             ),
             master("One Nation", id: 10),
             master("Black Is Beautiful", id: 11)
-        ], artist: "Hype Williams", sleeves: sleeves)
+        ], artist: "Hype Williams", catalogued: catalogued)
 
         XCTAssertEqual(found.first, "Big Dada Recordings")
     }
@@ -609,5 +606,55 @@ final class CreditSpellingTests: XCTestCase {
         )
 
         XCTAssertEqual(line.artistName, "Hype Williams")
+    }
+}
+
+// MARK: - A pressing plant is not a label
+
+/// The search's `label` array holds every company credited on a record, not
+/// its imprint — so filling a master's missing label from it put Key
+/// Production, Sony DADC and Southwater on a page for Babyfather: a
+/// manufacturing broker, a disc plant, and the town the plant is in.
+final class ImprintSourceTests: XCTestCase {
+    private func master(_ title: String, id: Int, label: String? = nil) -> DiscogsArtistRelease {
+        DiscogsArtistRelease(
+            id: id, title: title, year: nil, role: "Main", type: "master",
+            label: label, artist: "Babyfather", mainRelease: id,
+            format: "Vinyl, LP", thumbnail: nil
+        )
+    }
+
+    /// Nothing is invented for a record this app has not read in full. An
+    /// empty answer is the correct one; the search's answer was not.
+    func testAnUnreadMasterNamesNoLabelAtAll() {
+        XCTAssertEqual(
+            DiscogsEnricher.labels(of: master("Cypher", id: 10162016), catalogued: { _ in [] }),
+            []
+        )
+    }
+
+    /// A record read in full names its own imprint, from the release's
+    /// `labels` field rather than its `companies`.
+    func testARecordReadInFullNamesItsImprint() {
+        let catalogued: (Int) -> [String] = { $0 == 8_330_306 ? ["Hyperdub"] : [] }
+
+        XCTAssertEqual(
+            DiscogsEnricher.labels(
+                of: master("BBF Hosted By DJ Escrow", id: 8_330_306), catalogued: catalogued
+            ),
+            ["Hyperdub"]
+        )
+    }
+
+    /// And the imprint an artist actually keeps releasing on still leads.
+    func testTheImprintOnMostOfTheRecordsLeads() {
+        let found = DiscogsEnricher.imprints(releasedBy: [
+            master("Teddy Boi Freestyle", id: 1, label: "World Music"),
+            master("Bluey Vuitton", id: 2, label: "World Music"),
+            master("1471", id: 3, label: "World Music"),
+            master("BBF Hosted By DJ Escrow", id: 4, label: "Hyperdub")
+        ], artist: "Babyfather")
+
+        XCTAssertEqual(found, ["World Music", "Hyperdub"])
     }
 }

@@ -52,7 +52,7 @@ nonisolated struct DiscogsEnricher {
         // and a title like that resolves to no record at all. A row cached
         // before any of those looks current while being wrong, so it is
         // refetched once.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 11,
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 12,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
         return write(bundle, name: name)
@@ -61,7 +61,7 @@ nonisolated struct DiscogsEnricher {
     /// The same, for a caller that has already done the search.
     @discardableResult
     func artist(named name: String, head: DiscogsSearchResult, force: Bool = false) async throws -> DiscogsArtist? {
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 11,
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 12,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name, head: head) else { return nil }
         return write(bundle, name: name)
@@ -129,6 +129,9 @@ nonisolated struct DiscogsEnricher {
             bundle.catalogue.compactMap { result in result.id.map { ($0, result) } },
             uniquingKeysWith: { first, _ in first }
         )
+        // Only labels a record itself names, or that this app has read off the
+        // record in full. See `imprints(releasedBy:artist:catalogued:)`.
+        let catalogued: (Int) -> [String] = { [self] in cachedRelease(id: $0)?.labelNames ?? [] }
         let discography = Array(
             Self.discography(uniqueReleases, artist: detail.name).prefix(30)
         )
@@ -146,8 +149,12 @@ nonisolated struct DiscogsEnricher {
                 ?? DiscogsClient.usableImage($0.release.catalogueID.flatMap { sleeves[$0]?.thumbnail })
                 ?? ""
         }
-        record.releaseLabels = discography.map { Self.label(of: $0.release, sleeves: sleeves) ?? "" }
-        record.labelNames = Self.imprints(releasedBy: releases, artist: detail.name, sleeves: sleeves)
+        record.releaseLabels = discography.map {
+            Self.label(of: $0.release, catalogued: catalogued) ?? ""
+        }
+        record.labelNames = Self.imprints(
+            releasedBy: releases, artist: detail.name, catalogued: catalogued
+        )
         // Only the label each release names for itself.
         //
         // The search catalogue also carries a `label` array, but it holds
@@ -165,7 +172,7 @@ nonisolated struct DiscogsEnricher {
         )
         Self.repaintPortrait(of: record, in: context)
         record.fetchedAt = Date()
-        record.cacheVersion = 11
+        record.cacheVersion = 12
         return record
     }
 
@@ -326,13 +333,13 @@ nonisolated struct DiscogsEnricher {
     static func imprints(
         releasedBy releases: [DiscogsArtistRelease],
         artist: String,
-        sleeves: [Int: DiscogsSearchResult] = [:]
+        catalogued: (Int) -> [String] = { _ in [] }
     ) -> [String] {
         var order: [String] = []
         var counts: [String: Int] = [:]
         var spelling: [String: String] = [:]
         for release in releases where ArtistName.isRealArtist(release.artist ?? artist) {
-            for name in Self.labels(of: release, sleeves: sleeves)
+            for name in Self.labels(of: release, catalogued: catalogued)
             where !LabelName.isOwnName(name, artist: artist) {
                 let key = RecordingKey.normalize(name)
                 guard !key.isEmpty else { continue }
@@ -405,24 +412,33 @@ nonisolated struct DiscogsEnricher {
     /// rows; the master rows — which is what an artist's actual albums are
     /// filed as — have none. So reading only that field sampled an artist's
     /// labels through the one-off releases at the edge of their catalogue and
-    /// missed the imprints they are actually on: a page for Hype Williams
-    /// named FACT Magazine, off a magazine's mix, while Big Dada and Honest
-    /// Jon's were carried by masters and went uncounted. The search knows the
-    /// masters' labels, so it fills the gaps by id.
+    /// missed imprints carried by masters.
+    ///
+    /// The gap is filled from records this app has already read in full,
+    /// whose labels come from a release's own `labels` field. Deliberately
+    /// **not** from the search, which was tried and is the trap the comment
+    /// above `genres` describes: its `label` array holds every company
+    /// credited on a record, so a page for Babyfather listed Key Production,
+    /// Sony DADC and Southwater — a manufacturing broker, a disc plant and
+    /// the town the plant is in — beside Hyperdub. A release's `labels` and
+    /// its `companies` are different fields for a reason; the search flattens
+    /// them together and cannot be un-flattened afterwards.
+    ///
+    /// Sparser than the search, and correct instead of full.
     static func labels(
-        of release: DiscogsArtistRelease, sleeves: [Int: DiscogsSearchResult]
+        of release: DiscogsArtistRelease, catalogued: (Int) -> [String]
     ) -> [String] {
         let named = LabelName.names(inDiscogsField: release.label)
         guard named.isEmpty else { return named }
-        guard let identifier = release.catalogueID, let found = sleeves[identifier] else { return [] }
-        return (found.label ?? []).flatMap { LabelName.names(inDiscogsField: $0) }
+        guard let identifier = release.catalogueID else { return [] }
+        return catalogued(identifier)
     }
 
     /// The one label to credit a record to, when a single line is shown.
     static func label(
-        of release: DiscogsArtistRelease, sleeves: [Int: DiscogsSearchResult]
+        of release: DiscogsArtistRelease, catalogued: (Int) -> [String]
     ) -> String? {
-        labels(of: release, sleeves: sleeves).first
+        labels(of: release, catalogued: catalogued).first
     }
 
     private static func unique(_ values: [String]) -> [String] {
