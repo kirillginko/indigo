@@ -337,6 +337,25 @@ nonisolated struct DigEngine {
         for label in discogs?.releaseLabels ?? [] {
             note(label, mbid: nil)
         }
+        // And the label written on the record itself, for every one this app
+        // has read in full.
+        //
+        // `artists/{id}/releases` names a label only on its plain release
+        // rows, so an artist's albums — filed as masters — arrive from it
+        // with none, and the list was as short as that endpoint's blind spot.
+        // A release read in its own right does say, in a `labels` field kept
+        // apart from the `companies` that pressed and distributed it. Those
+        // records are already here: the artwork fill reads a dozen of them
+        // per page, and every release anybody opens adds one. Nothing was
+        // reading them back.
+        //
+        // Which is also why this is not a fifth source of guesses. It is the
+        // same fold the discography is built from, and it grows as the
+        // listener digs rather than by asking anything extra.
+        let credited = graph.releases(creditedTo: RecordingKey.normalizeArtist(name))
+        for record in credited {
+            for label in record.labelNames { note(label, mbid: nil) }
+        }
 
         // How much of this artist's music each one actually put out.
         //
@@ -345,11 +364,27 @@ nonisolated struct DigEngine {
         // imprints and is the opposite of what the list is for. Ranked by
         // releases, the home imprint goes first and the one-offs fall to the
         // bottom where they belong.
+        //
+        // Counted per record rather than per mention, because the two sources
+        // above overlap: a release whose row named its label and which has
+        // also been read in full would otherwise count twice and outrank an
+        // imprint carrying more of the catalogue.
         var releaseCounts: [String: Int] = [:]
-        for raw in discogs?.releaseLabels ?? [] {
+        var counted: Set<String> = []
+        func count(_ raw: String, on release: String) {
             for name in LabelName.names(inDiscogsField: raw) {
-                releaseCounts[RecordingKey.normalize(name), default: 0] += 1
+                let key = RecordingKey.normalize(name)
+                guard !key.isEmpty, counted.insert("\(release)|\(key)").inserted else { continue }
+                releaseCounts[key, default: 0] += 1
             }
+        }
+        let countedIDs = discogs?.releaseDiscogsIDs ?? []
+        for (index, raw) in (discogs?.releaseLabels ?? []).enumerated() {
+            let identity = index < countedIDs.count ? String(countedIDs[index]) : "row \(index)"
+            count(raw, on: identity)
+        }
+        for record in credited {
+            for label in record.labelNames { count(label, on: String(record.discogsID)) }
         }
         let labels = labelNames
             .compactMap { key, mbid -> ArtistProfile.LabelRef? in

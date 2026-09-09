@@ -658,3 +658,81 @@ final class ImprintSourceTests: XCTestCase {
         XCTAssertEqual(found, ["World Music", "Hyperdub"])
     }
 }
+
+// MARK: - Labels off the records themselves
+
+/// The artist releases endpoint names a label only on its plain release rows,
+/// so an artist's albums arrive from it with none and the list was as short as
+/// that blind spot. A release read in its own right does say — in a `labels`
+/// field kept apart from the companies that pressed and distributed it — and
+/// those records are already in the store.
+final class ArtistLabelSourceTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    @discardableResult
+    private func release(
+        _ title: String, id: Int, labels: [String], by artist: String = "Babyfather"
+    ) -> DiscogsReleaseRecord {
+        let record = DiscogsReleaseRecord(discogsID: id, title: title)
+        record.artistNames = [artist]
+        record.labelNames = labels
+        context.insert(record)
+        return record
+    }
+
+    private func artist(_ name: String, labelNames: [String], releaseLabels: [String], ids: [Int]) {
+        let record = DiscogsArtist(
+            nameKey: RecordingKey.normalizeArtist(name), discogsID: 1, name: name
+        )
+        record.labelNames = labelNames
+        record.releaseLabels = releaseLabels
+        record.releaseDiscogsIDs = ids
+        record.releaseTitles = ids.map { "Release \($0)" }
+        context.insert(record)
+    }
+
+    /// An album the endpoint said nothing about still names its imprint.
+    func testAnImprintOnlyTheRecordKnowsReachesThePage() {
+        artist("Babyfather", labelNames: [], releaseLabels: [""], ids: [8_330_306])
+        release("BBF Hosted By DJ Escrow", id: 8_330_306, labels: ["Hyperdub"])
+
+        let found = DigEngine(context: context)
+            .artistProfile(name: "Babyfather", mbid: nil).labels
+
+        XCTAssertEqual(found.map(\.name), ["Hyperdub"])
+    }
+
+    /// The two sources overlap, and a record counted twice would outrank an
+    /// imprint carrying more of the catalogue.
+    func testARecordCountsOnceHoweverManySourcesNameIt() {
+        artist(
+            "Babyfather",
+            labelNames: [],
+            releaseLabels: ["Hyperdub", "World Music", "World Music"],
+            ids: [1, 2, 3]
+        )
+        // The first is also read in full, naming the same label again.
+        release("Meditation", id: 1, labels: ["Hyperdub"])
+
+        let found = DigEngine(context: context)
+            .artistProfile(name: "Babyfather", mbid: nil).labels
+
+        XCTAssertEqual(
+            found.map { "\($0.name) \($0.releaseCount)" },
+            ["World Music 2", "Hyperdub 1"],
+            "Two records beats one record named twice"
+        )
+    }
+}
