@@ -7,6 +7,36 @@ nonisolated struct DiscogsLabelProfile: Sendable {
     let relatedLabels: [String]
     let styles: [String]
 
+    /// A label's own catalogue, from `labels/{id}/releases`.
+    ///
+    /// The artist is a field here rather than glued to the front of the
+    /// title, so nothing has to be unpicked and nothing can be unpicked
+    /// wrongly. Related labels are not offered: a search hit names every
+    /// company on a record and this endpoint names none, and inventing
+    /// neighbours out of the wrong one is what put a pressing plant on an
+    /// artist's page.
+    init(name: String, catalogue: [DiscogsLabelRelease]) {
+        self.name = name
+        var seenArtists = Set<String>()
+        artists = catalogue.compactMap { entry in
+            guard let value = entry.artist.map(DiscogsClient.withoutDisambiguator) else { return nil }
+            let key = RecordingKey.normalizeArtist(value)
+            return !key.isEmpty && ArtistName.isRealArtist(value)
+                && seenArtists.insert(key).inserted ? value : nil
+        }
+        releases = catalogue.compactMap { entry in
+            guard let id = entry.id, let title = entry.title else { return nil }
+            return ArtistProfile.ReleaseLine(
+                title: title, year: entry.year.map(String.init), discogsID: id,
+                imageURL: nil,
+                thumbnailURL: DiscogsClient.usableImage(entry.thumbnail).flatMap(URL.init(string:)),
+                label: name
+            )
+        }
+        relatedLabels = []
+        styles = []
+    }
+
     init(name: String, results: [DiscogsSearchResult]) {
         self.name = name
         var seenArtists = Set<String>()
@@ -42,13 +72,16 @@ nonisolated struct DiscogsLabelProfile: Sendable {
 
 struct DiscogsLabelDigView: View {
     let labelName: String
+    /// Which label, where a record said so. Without it this page can only
+    /// search on the name, and two labels sharing one are indistinguishable.
+    var labelDiscogsID: Int?
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
 
     var body: some View {
         let _ = crate.revision
-        let profile = dig.discogsLabelProfile(named: labelName)
+        let profile = dig.discogsLabelProfile(named: labelName, discogsID: labelDiscogsID)
         let crateID = RecordingKey.normalizeArtist(labelName)
         let isCrated = crate.contains(dig: .label, identifier: crateID, providerID: "dig.label.discogs")
         VStack(spacing: 0) {
@@ -106,7 +139,9 @@ struct DiscogsLabelDigView: View {
                             }
                             DigSection(title: "Related labels", trailing: "\(profile.relatedLabels.count)") {
                                 ForEach(profile.relatedLabels, id: \.self) { label in
-                                    DigLine(text: label) { appState.open(.digDiscogsLabel(name: label)) }
+                                    DigLine(text: label) {
+                                        appState.open(.digDiscogsLabel(name: label))
+                                    }
                                 }
                             }
                         }
@@ -126,7 +161,9 @@ struct DiscogsLabelDigView: View {
                 // One treatment for the whole page. See `LoadingVeil`.
                 .loadingVeil(profile == nil)
             }
-        }.task(id: labelName) { await dig.enrichDiscogsLabel(named: labelName) }
+        }.task(id: "\(labelName)|\(labelDiscogsID ?? 0)") {
+            await dig.enrichDiscogsLabel(named: labelName, discogsID: labelDiscogsID)
+        }
     }
 
     /// The catalogue, the roster and the neighbouring imprints — everything

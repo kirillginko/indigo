@@ -715,7 +715,7 @@ struct ArtistDigView: View {
         if let mbid = label.mbid {
             appState.open(.digLabel(mbid: mbid, name: label.name))
         } else {
-            appState.open(.digDiscogsLabel(name: label.name))
+            appState.open(.digDiscogsLabel(name: label.name, discogsID: label.discogsID))
         }
     }
 

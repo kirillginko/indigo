@@ -242,7 +242,12 @@ final class DigStore {
 
     func cachedReleaseProfile(id: Int) -> DigReleaseProfile? { releases.any(String(id)) }
 
-    func discogsLabelProfile(named name: String) -> DiscogsLabelProfile? {
+    func discogsLabelProfile(named name: String, discogsID: Int? = nil) -> DiscogsLabelProfile? {
+        if let discogsID, let found = discogsLabelProfiles["discogs \(discogsID)"] { return found }
+        return discogsLabelProfile(named: name)
+    }
+
+    private func discogsLabelProfile(named name: String) -> DiscogsLabelProfile? {
         discogsLabelProfiles[RecordingKey.normalizeArtist(name)]
     }
 
@@ -293,8 +298,18 @@ final class DigStore {
     }
 
     private func digReleaseArtwork(forArtist name: String, mbid: String?, limit: Int) async {
+        // Records this app has not read in full.
+        //
+        // This used to ask for the ones with no picture at all, and that
+        // stopped meaning anything the moment sleeves started coming from
+        // `artists/{id}/releases`, which hands back a thumbnail for nearly
+        // everything — so the fill found nothing to do and quietly stopped
+        // fetching. What it fetches is a release's own record, which carries
+        // the full-size cover *and* the labels that pressed it, and neither
+        // arrives any other way. A small picture is not a reason to stop
+        // asking who put the record out.
         let missing = await artistProfile(name: name, mbid: mbid).releases
-            .filter { $0.imageURL == nil && $0.thumbnailURL == nil }
+            .filter { $0.imageURL == nil }
         guard !missing.isEmpty else { return }
 
         // Fetched together, written one at a time.
@@ -794,7 +809,7 @@ final class DigStore {
             return .artist(name, mbid: mbid)
         case .digLabel(let mbid, let name):
             return .label(name, mbid: mbid)
-        case .digDiscogsLabel(let name):
+        case .digDiscogsLabel(let name, _):
             return .label(name)
         case .digRelease(let id, let title):
             return .release(title, discogsID: id)
@@ -1647,7 +1662,30 @@ final class DigStore {
         }
     }
 
-    func enrichDiscogsLabel(named name: String) async {
+    func enrichDiscogsLabel(named name: String, discogsID: Int? = nil) async {
+        // Asked for by identity where a record named one. Two labels can
+        // share a name, and a search on the name opens whichever Discogs
+        // ranks first — which is how a page for Dean Blunt's World Music
+        // showed a 1995 catalogue of country-dance compilations.
+        if let discogsID {
+            let key = "discogs \(discogsID)"
+            guard discogsLabelProfiles[key] == nil else { return }
+            isEnriching = true
+            defer { isEnriching = false }
+            if let catalogue = try? await discogsClient.labelCatalogue(id: discogsID),
+               !catalogue.isEmpty {
+                discogsLabelProfiles[key] = DiscogsLabelProfile(name: name, catalogue: catalogue)
+                let previews = catalogue.compactMap {
+                    DiscogsClient.usableImage($0.thumbnail).flatMap(URL.init(string:))
+                }
+                Task.detached(priority: .utility) {
+                    await RemoteArtworkStore.shared.prefetch(Array(previews.prefix(16)))
+                }
+                return
+            }
+            // Falling back to the name is worse than asking by id and better
+            // than an empty page, so it says nothing and lets the search try.
+        }
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty, discogsLabelProfiles[key] == nil else { return }
         isEnriching = true

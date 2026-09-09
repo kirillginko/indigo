@@ -140,6 +140,32 @@ nonisolated struct DiscogsArtistReleases: Decodable, Sendable {
     let releases: [DiscogsArtistRelease]?
 }
 
+/// One record in a label's own catalogue.
+///
+/// From `labels/{id}/releases`, which answers about a label by identity
+/// rather than by name — the distinction the whole of `labelDiscogsIDs`
+/// exists for. Shaped like an artist's releases and not like a search hit:
+/// the artist is a field of its own here rather than glued to the front of
+/// the title, and the catalogue number is given.
+nonisolated struct DiscogsLabelRelease: Decodable, Sendable {
+    let id: Int?
+    let title: String?
+    let artist: String?
+    let year: Int?
+    let catno: String?
+    let format: String?
+    let thumbnail: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case id, title, artist, year, catno, format
+        case thumbnail = "thumb"
+    }
+}
+
+nonisolated struct DiscogsLabelReleases: Decodable, Sendable {
+    let releases: [DiscogsLabelRelease]?
+}
+
 nonisolated struct DiscogsArtistBundle: Sendable {
     let detail: DiscogsArtistDetail
     let releases: DiscogsArtistReleases

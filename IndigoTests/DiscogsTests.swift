@@ -736,3 +736,64 @@ final class ArtistLabelSourceTests: XCTestCase {
         )
     }
 }
+
+// MARK: - Which label, not just what it is called
+
+/// Discogs numbers labels sharing a name exactly as it numbers artists, and
+/// the name alone cannot separate them: a page for Dean Blunt's World Music
+/// opened a 1995 catalogue of country-dance compilations, because the label
+/// page searched on the string.
+final class LabelIdentityTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The two arrays are paired defensively: a row written before ids were
+    /// stored has names and none.
+    func testARecordWrittenBeforeIdsStillNamesItsLabels() {
+        let record = DiscogsReleaseRecord(discogsID: 1, title: "1471")
+        record.labelNames = ["World Music"]
+
+        XCTAssertEqual(record.labels.map(\.name), ["World Music"])
+        XCTAssertNil(record.labels.first?.discogsID)
+    }
+
+    func testALabelKnownByIdCarriesItToThePage() {
+        let record = DiscogsReleaseRecord(discogsID: 1, title: "1471")
+        record.labelNames = ["World Music"]
+        record.labelDiscogsIDs = [4_242]
+        record.artistNames = ["Babyfather"]
+        context.insert(record)
+
+        let labels = DigEngine(context: context)
+            .artistProfile(name: "Babyfather", mbid: nil).labels
+
+        XCTAssertEqual(labels.first?.name, "World Music")
+        XCTAssertEqual(labels.first?.discogsID, 4_242, "The page can now open the right one")
+        XCTAssertEqual(
+            MusicNode.label("World Music", discogsID: 4_242).destination,
+            .digDiscogsLabel(name: "World Music", discogsID: 4_242)
+        )
+    }
+
+    /// Identity stays the name on purpose. Keying a node on the id would
+    /// split one label into two the moment a record named it and another did
+    /// not, and the graph, the crate and the stored edges would disagree
+    /// about a label nobody renamed.
+    func testTwoRecordsNamingOneLabelAreStillOneNode() {
+        XCTAssertEqual(
+            MusicNode.label("World Music", discogsID: 4_242).id,
+            MusicNode.label("World Music").id
+        )
+    }
+}

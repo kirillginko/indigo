@@ -265,6 +265,20 @@ nonisolated final class DiscogsReleaseRecord {
     var year: Int?
     var artistNames: [String]
     var labelNames: [String]
+    /// Which label, not just what it is called.
+    ///
+    /// Positional against `labelNames`. Discogs numbers labels that share a
+    /// name exactly as it numbers artists, and the name alone cannot tell
+    /// them apart: Dean Blunt's World Music and the World Music that issued
+    /// *Boot Scootin' Two Steppin' Country Dances* in 1995 are one label to
+    /// anything holding only the string. A release names the id, and it is
+    /// the only place that does — the artist releases endpoint hands back a
+    /// bare label string with nothing behind it.
+    ///
+    /// Empty for a record written before this was stored, and for one whose
+    /// labels arrived without ids. Nothing may assume the two arrays are the
+    /// same length; see `labels`.
+    var labelDiscogsIDs: [Int] = []
     var catalogNumbers: [String]
     var genres: [String]
     var styles: [String]
@@ -354,6 +368,17 @@ nonisolated final class DiscogsReleaseRecord {
         return URL(string: "https://www.discogs.com\(profileURLString)")
     }
     var isFresh: Bool { Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 }
+    /// Who put this record out, with the identity where it is known.
+    ///
+    /// Paired defensively rather than by index arithmetic: a row written
+    /// before ids were stored has names and no ids, and a row whose labels
+    /// arrived unevenly has fewer of one than the other.
+    var labels: [(name: String, discogsID: Int?)] {
+        labelNames.enumerated().map { index, name in
+            (name, index < labelDiscogsIDs.count ? labelDiscogsIDs[index] : nil)
+        }
+    }
+
     /// Who the record is credited to, as a name the app can act on.
     ///
     /// Read rather than stored, because rows written before the disambiguator

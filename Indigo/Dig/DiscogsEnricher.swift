@@ -252,9 +252,29 @@ nonisolated struct DiscogsEnricher {
         // Named one per entry here rather than joined, but they carry the
         // same disambiguating numbers, and a label filed under "Aeon (5)" is
         // a label the pages cannot look up.
-        record.labelNames = Self.unique(
-            (detail.labels ?? []).flatMap { LabelName.names(inDiscogsField: $0.name) }
-        )
+        // Names and identities together, and positionally paired.
+        //
+        // `LabelName.names(inDiscogsField:)` splits a field naming several
+        // companies and drops the disambiguating number, which is right for
+        // display and destroys the only thing telling two labels of one name
+        // apart. The id survives that, and this is the one endpoint that
+        // carries it.
+        var labelNames: [String] = []
+        var labelIDs: [Int] = []
+        var seenLabels = Set<String>()
+        for reference in detail.labels ?? [] {
+            let named = LabelName.names(inDiscogsField: reference.name)
+            // Only a field naming exactly one company can be paired with the
+            // one id beside it. A split field has names this cannot place, so
+            // they are kept without one rather than given the wrong one.
+            for name in named {
+                guard seenLabels.insert(RecordingKey.normalize(name)).inserted else { continue }
+                labelNames.append(name)
+                labelIDs.append(named.count == 1 ? (reference.id ?? 0) : 0)
+            }
+        }
+        record.labelNames = labelNames
+        record.labelDiscogsIDs = labelIDs
         record.catalogNumbers = detail.labels?.compactMap(\.catno) ?? []
 
         // Everybody else on the record, minus the sleeve.

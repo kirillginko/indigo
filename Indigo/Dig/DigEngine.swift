@@ -110,6 +110,9 @@ nonisolated struct ArtistProfile: Sendable {
         /// the label is known only as a name attached to the artist, with no
         /// record naming it — which is most of what MusicBrainz contributes.
         var releaseCount: Int = 0
+        /// Which label, where one of this artist's records said so. See
+        /// `DiscogsReleaseRecord.labelDiscogsIDs`.
+        var discogsID: Int?
         var id: String { mbid ?? name }
     }
 
@@ -353,8 +356,18 @@ nonisolated struct DigEngine {
         // same fold the discography is built from, and it grows as the
         // listener digs rather than by asking anything extra.
         let credited = graph.releases(creditedTo: RecordingKey.normalizeArtist(name))
+        var labelIdentities: [String: Int] = [:]
         for record in credited {
-            for label in record.labelNames { note(label, mbid: nil) }
+            for (label, discogsID) in record.labels {
+                note(label, mbid: nil)
+                // Which of the labels sharing this name it is. Kept from the
+                // first record that says, because a later one saying the same
+                // adds nothing and a later one disagreeing is two labels the
+                // page has no way to tell apart anyway.
+                guard let discogsID, discogsID > 0 else { continue }
+                let key = RecordingKey.normalize(label)
+                if labelIdentities[key] == nil { labelIdentities[key] = discogsID }
+            }
         }
 
         // How much of this artist's music each one actually put out.
@@ -390,7 +403,8 @@ nonisolated struct DigEngine {
             .compactMap { key, mbid -> ArtistProfile.LabelRef? in
                 guard let name = spelling[key] else { return nil }
                 return ArtistProfile.LabelRef(
-                    name: name, mbid: mbid, releaseCount: releaseCounts[key] ?? 0
+                    name: name, mbid: mbid, releaseCount: releaseCounts[key] ?? 0,
+                    discogsID: labelIdentities[key]
                 )
             }
             .sorted {

@@ -248,6 +248,21 @@ nonisolated struct DiscogsClient: Sendable {
         return earliest?.id ?? results.first?.id
     }
 
+    /// A label's catalogue, asked for by identity.
+    ///
+    /// `labelCatalogue(named:)` below searches on the label's *name*, and
+    /// Discogs numbers labels that share one exactly as it numbers artists.
+    /// Dean Blunt's World Music and the World Music that issued *Boot
+    /// Scootin' Two Steppin' Country Dances* in 1995 are the same string, so
+    /// a page for the first opened the catalogue of the second. Where a
+    /// record has told us which label it was, that is asked instead.
+    func labelCatalogue(id: Int) async throws -> [DiscogsLabelRelease] {
+        let response: DiscogsLabelReleases = try await get("labels/\(id)/releases", query: [
+            URLQueryItem(name: "per_page", value: "50")
+        ])
+        return response.releases ?? []
+    }
+
     func labelCatalogue(named name: String) async throws -> [DiscogsSearchResult] {
         let response: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "label", value: name),

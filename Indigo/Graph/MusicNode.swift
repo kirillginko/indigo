@@ -100,8 +100,18 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
         MusicNode(kind: .artist, key: key, title: name, mbid: mbid)
     }
 
-    static func label(_ name: String, mbid: String? = nil) -> MusicNode {
-        MusicNode(kind: .label, key: RecordingKey.normalize(name), title: name, mbid: mbid)
+    /// A label, keyed on its name.
+    ///
+    /// Deliberately still the name, even though `discogsID` can now say which
+    /// of two labels sharing one this is. Identity here is what decides
+    /// whether two rows are the same row, and keying on an id would split one
+    /// label into two the moment a record named it and another did not —
+    /// stored edges, crate entries and the graph all disagreeing about a
+    /// label nobody renamed. The id is carried for the reason every other
+    /// identifier on a node is: so the row opens the right page.
+    static func label(_ name: String, mbid: String? = nil, discogsID: Int? = nil) -> MusicNode {
+        MusicNode(kind: .label, key: RecordingKey.normalize(name), title: name,
+                  mbid: mbid, discogsID: discogsID)
     }
 
     static func release(_ title: String, discogsID: Int? = nil, mbid: String? = nil, year: String? = nil) -> MusicNode {
@@ -213,7 +223,7 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
             return .digArtist(mbid: mbid, name: title)
         case .label:
             if let mbid, !mbid.isEmpty { return .digLabel(mbid: mbid, name: title) }
-            return .digDiscogsLabel(name: title)
+            return .digDiscogsLabel(name: title, discogsID: discogsID)
         case .release:
             return discogsID.map { .digRelease(id: $0, title: title) }
         case .broadcast:
