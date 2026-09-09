@@ -355,7 +355,17 @@ nonisolated struct DigEngine {
         // Which is also why this is not a fifth source of guesses. It is the
         // same fold the discography is built from, and it grows as the
         // listener digs rather than by asking anything extra.
+        // Records, not films — the same rule `writeArtist` applies to the
+        // catalogue, applied here too.
+        //
+        // It was applied on one path and not the other, and this is the path
+        // that grew: making the fill read more releases in full is what
+        // brought *The Videos Vol. 1 Sales EPK* into the store, and its label
+        // is Palm Pictures. A page for a lo-fi duo listed a film distributor
+        // because the only thing that knew to exclude videos was reading a
+        // different endpoint. See `ReleaseFormat`.
         let credited = graph.releases(creditedTo: RecordingKey.normalizeArtist(name))
+            .filter { !$0.isVideo }
         var labelIdentities: [String: Int] = [:]
         for record in credited {
             for (label, discogsID) in record.labels {

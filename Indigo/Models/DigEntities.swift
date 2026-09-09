@@ -279,6 +279,18 @@ nonisolated final class DiscogsReleaseRecord {
     /// labels arrived without ids. Nothing may assume the two arrays are the
     /// same length; see `labels`.
     var labelDiscogsIDs: [Int] = []
+    /// How it was issued: "Vinyl, LP, Album", "DVD, NTSC".
+    ///
+    /// Kept so a stored release can answer the one question `ReleaseFormat`
+    /// exists for. Without it, a page derived labels from every record
+    /// credited to an artist and could not tell that one of them was a video
+    /// — which is how Palm Pictures, who released *The Work of Director Hype
+    /// Williams*, came to sit in the label list of a lo-fi duo.
+    ///
+    /// Empty for a row written before this was stored, which reads as "not a
+    /// film" rather than as unknown: that is the answer for almost every
+    /// record, and the ones it is wrong about are re-read anyway.
+    var formats: [String] = []
     var catalogNumbers: [String]
     var genres: [String]
     var styles: [String]
@@ -368,6 +380,9 @@ nonisolated final class DiscogsReleaseRecord {
         return URL(string: "https://www.discogs.com\(profileURLString)")
     }
     var isFresh: Bool { Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 }
+    /// Whether this is a film rather than a record. See `ReleaseFormat`.
+    var isVideo: Bool { ReleaseFormat.isVideo(anyOf: formats) }
+
     /// Who put this record out, with the identity where it is known.
     ///
     /// Paired defensively rather than by index arithmetic: a row written

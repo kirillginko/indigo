@@ -894,3 +894,70 @@ final class NeighbourFreshnessTests: XCTestCase {
         XCTAssertTrue(needsRefetch(record))
     }
 }
+
+// MARK: - The same rule on both paths
+
+/// A page for Hype Williams the lo-fi duo listed Palm Pictures, who released
+/// *The Work of Director Hype Williams*. Videos were excluded when the
+/// catalogue was written and not when labels were read back off the records
+/// themselves, and the second path is the one that grew.
+final class VideoLabelExclusionTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    @discardableResult
+    private func record(
+        _ title: String, id: Int, label: String, formats: [String]
+    ) -> DiscogsReleaseRecord {
+        let row = DiscogsReleaseRecord(discogsID: id, title: title)
+        row.artistNames = ["Hype Williams"]
+        row.labelNames = [label]
+        row.formats = formats
+        context.insert(row)
+        return row
+    }
+
+    func testAFilmsDistributorIsNotOneOfTheArtistsLabels() {
+        record("The Videos Vol. 1 Sales EPK", id: 1, label: "Palm Pictures", formats: ["DVD, NTSC"])
+        record("One Nation", id: 2, label: "Hippos In Tanks", formats: ["Vinyl, LP, Album"])
+
+        let labels = DigEngine(context: context)
+            .artistProfile(name: "Hype Williams", mbid: nil).labels
+
+        XCTAssertEqual(labels.map(\.name), ["Hippos In Tanks"])
+    }
+
+    /// A row written before formats were stored says nothing, and nothing is
+    /// the answer for almost every record.
+    func testARecordThatNeverSaidIsTreatedAsARecord() {
+        record("One Nation", id: 2, label: "Hippos In Tanks", formats: [])
+
+        let labels = DigEngine(context: context)
+            .artistProfile(name: "Hype Williams", mbid: nil).labels
+
+        XCTAssertEqual(labels.map(\.name), ["Hippos In Tanks"])
+    }
+
+    /// One statement of the rule, whichever route asks it.
+    func testBothRoutesAgreeOnWhatAFilmIs() {
+        XCTAssertTrue(ReleaseFormat.isVideo("DVD, NTSC"))
+        XCTAssertTrue(ReleaseFormat.isVideo(anyOf: ["Vinyl", "VHS, PAL"]))
+        XCTAssertFalse(ReleaseFormat.isVideo("Vinyl, 12\", 33 ⅓ RPM"))
+        XCTAssertFalse(ReleaseFormat.isVideo(anyOf: []))
+        XCTAssertEqual(
+            DiscogsFormat(name: "DVD", descriptions: ["NTSC", "Promo"]).written,
+            "DVD, NTSC, Promo"
+        )
+    }
+}

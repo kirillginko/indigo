@@ -291,6 +291,7 @@ nonisolated struct DiscogsEnricher {
         }
         record.labelNames = labelNames
         record.labelDiscogsIDs = labelIDs
+        record.formats = (detail.formats ?? []).map(\.written)
         record.catalogNumbers = detail.labels?.compactMap(\.catno) ?? []
 
         // Everybody else on the record, minus the sleeve.
