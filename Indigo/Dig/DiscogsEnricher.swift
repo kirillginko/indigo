@@ -176,9 +176,25 @@ nonisolated struct DiscogsEnricher {
         return record
     }
 
+    /// Who else is nearby, worked out from this artist's labels and styles.
+    ///
+    /// Stale a day after it was asked, and stale the moment the artist it was
+    /// asked about is rewritten — which is the part that was missing. These
+    /// neighbours are derived entirely from the row's labels, so when the row
+    /// turns out to have described a different person they describe that
+    /// person's world and go on doing it for a day. A page for Hype Williams
+    /// resolved to the video director cached 1 Giant Leap, Sidestepper and
+    /// Mocean Worker off Palm Pictures; correcting the artist to Dean Blunt
+    /// and Inga Copeland's duo left every one of them sitting there, under a
+    /// reason naming a label they have nothing to do with.
+    ///
+    /// Comparing the two stamps says it without needing to know why the row
+    /// changed: anything worked out before the row was last written was
+    /// worked out about something else.
     func recommendations(for artist: DiscogsArtist, force: Bool = false) async throws {
         if !force, let fetchedAt = artist.recommendationsFetchedAt,
-           Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 { return }
+           Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60,
+           fetchedAt >= artist.fetchedAt { return }
         // The years the artist was actually working, so the era question is
         // about their contemporaries rather than about a decade.
         let years = artist.releaseYears.compactMap { Int($0.prefix(4)) }.filter { $0 > 1900 }

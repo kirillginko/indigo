@@ -834,3 +834,63 @@ final class LabelIdentityBackfillTests: XCTestCase {
         XCTAssertEqual(labels.first?.discogsID, 12_345, "And still knowing which one it is")
     }
 }
+
+// MARK: - Neighbours outliving the artist they were about
+
+/// Label and style neighbours are derived entirely from an artist row's own
+/// labels, so when that row turns out to have described a different person
+/// they go on describing that person's world. A page for Hype Williams
+/// resolved to the video director cached Palm Pictures' roster; correcting it
+/// to the duo left every one of them in place for a day.
+final class NeighbourFreshnessTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    private func artist(written: Date, neighboursAt: Date?) -> DiscogsArtist {
+        let record = DiscogsArtist(nameKey: "hype williams", discogsID: 1, name: "Hype Williams")
+        record.fetchedAt = written
+        record.recommendationsFetchedAt = neighboursAt
+        context.insert(record)
+        return record
+    }
+
+    private func needsRefetch(_ record: DiscogsArtist) -> Bool {
+        guard let fetchedAt = record.recommendationsFetchedAt else { return true }
+        return !(Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 && fetchedAt >= record.fetchedAt)
+    }
+
+    /// The case that was wrong: neighbours worked out two hours before the
+    /// row was rewritten are about whoever the row used to describe.
+    func testNeighboursOlderThanTheArtistRowAreStale() {
+        let now = Date()
+        let record = artist(written: now, neighboursAt: now.addingTimeInterval(-7_200))
+
+        XCTAssertTrue(needsRefetch(record))
+    }
+
+    func testNeighboursWorkedOutAfterTheRowStand() {
+        let now = Date()
+        let record = artist(written: now.addingTimeInterval(-7_200), neighboursAt: now)
+
+        XCTAssertFalse(needsRefetch(record), "Nothing has changed under them")
+    }
+
+    /// And the day-old rule still applies to a row nobody has rewritten.
+    func testADayOldAnswerIsStillStale() {
+        let old = Date().addingTimeInterval(-90_000)
+        let record = artist(written: old, neighboursAt: old)
+
+        XCTAssertTrue(needsRefetch(record))
+    }
+}
