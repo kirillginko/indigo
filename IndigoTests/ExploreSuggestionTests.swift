@@ -388,3 +388,77 @@ final class ExploreSuggestionTests: XCTestCase {
         )
     }
 }
+
+// MARK: - Where a card belongs on the map
+
+/// EXPLORE draws a map, and on a map a position is an argument. These pin the
+/// two things an arrangement is now allowed to say: how far outside charted
+/// territory something sits, and which offers belong together.
+extension ExploreSuggestionTests {
+    private func offer(
+        _ name: String, via: String, corroboration: Int, score: Double
+    ) -> ExploreSuggestion {
+        ExploreSuggestion(
+            node: .artist(name), reason: "Releases on \(via)", via: via,
+            kind: .sharedLabel, corroboration: corroboration, score: score
+        )
+    }
+
+    /// The core of the metaphor: what the collection surrounds is drawn inside
+    /// it, and what one thin edge reached is drawn at the edge.
+    func testSomewhereTwoThingsYouKeepReachIsNotTheFrontier() {
+        let corroborated = offer("Tirzah", via: "Dean Blunt", corroboration: 3, score: 0.5)
+        let lone = offer("Somebody Else", via: "Cokiyu", corroboration: 1, score: 0.5)
+
+        XCTAssertLessThan(corroborated.frontier, lone.frontier)
+        XCTAssertLessThanOrEqual(corroborated.frontier, 1)
+        XCTAssertGreaterThanOrEqual(corroborated.frontier, 0)
+    }
+
+    /// A strong single edge is still a single edge. Strength may separate two
+    /// offers of the same reach; it may not promote one out of the frontier.
+    func testAStrongLoneRouteIsStillTheFrontier() {
+        let strong = offer("Tirzah", via: "Dean Blunt", corroboration: 1, score: 1)
+        let weak = offer("Cokiyu", via: "Dean Blunt", corroboration: 1, score: 0.1)
+        let corroborated = offer("Kate NV", via: "Dean Blunt", corroboration: 2, score: 0.1)
+
+        XCTAssertLessThan(strong.frontier, weak.frontier, "Strength separates equals")
+        XCTAssertLessThan(corroborated.frontier, strong.frontier,
+                          "But a second route outranks any amount of one")
+    }
+
+    /// Adjacency is what makes a cluster a cluster. Ranked by score alone the
+    /// four artists reached out of one crated label land first, fourth,
+    /// seventh and eleventh, and the arrangement says nothing.
+    func testOffersReachedFromOnePlaceAreDrawnTogether() {
+        let mixed = [
+            offer("A", via: "Ilian Tape", corroboration: 1, score: 0.9),
+            offer("B", via: "Music From Memory", corroboration: 1, score: 0.8),
+            offer("C", via: "Ilian Tape", corroboration: 1, score: 0.7),
+            offer("D", via: "Music From Memory", corroboration: 1, score: 0.6),
+            offer("E", via: "Ilian Tape", corroboration: 1, score: 0.5)
+        ]
+
+        let names = mixed.clusteredByOrigin().map(\.node.title)
+
+        XCTAssertEqual(names, ["A", "C", "E", "B", "D"])
+    }
+
+    /// It regroups; it does not re-rank. The best thing on the page has to
+    /// stay the first thing on it, or a layout change has quietly become a
+    /// recommendation change.
+    func testClusteringKeepsTheBestOfferInFront() {
+        let mixed = [
+            offer("A", via: "Ilian Tape", corroboration: 1, score: 0.9),
+            offer("B", via: "Music From Memory", corroboration: 1, score: 0.8),
+            offer("C", via: "Ilian Tape", corroboration: 1, score: 0.7)
+        ]
+
+        let clustered = mixed.clusteredByOrigin()
+
+        XCTAssertEqual(clustered.first?.node.title, "A")
+        XCTAssertEqual(Set(clustered.map(\.id)), Set(mixed.map(\.id)),
+                       "Nothing gained and nothing lost")
+        XCTAssertEqual(clustered.count, mixed.count)
+    }
+}

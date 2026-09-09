@@ -94,7 +94,45 @@ nonisolated struct DiscogsClient: Sendable {
             URLQueryItem(name: "type", value: "artist"),
             URLQueryItem(name: "per_page", value: "5")
         ])
-        return Self.bestArtistMatch(name: name, results: search.results ?? [])
+        let candidates = Self.artistMatches(name: name, results: search.results ?? [])
+        guard candidates.count > 1 else { return candidates.first }
+        return try await Self.whicheverMakesRecords(candidates, using: self) ?? candidates.first
+    }
+
+    /// Which of several people with one name is the one who makes the records.
+    ///
+    /// Discogs files everybody who shares a name under the same one with a
+    /// number after it, and `withoutDisambiguator` — which exists so that
+    /// "Nirvana (2)" can be found at all — folds them back together. So a tie
+    /// was settled by whichever Discogs happened to rank first, and for Hype
+    /// Williams that is the video director rather than Dean Blunt and Inga
+    /// Copeland's duo: a page for the group listed his videography.
+    ///
+    /// The difference is what the two of them actually put out. Asking which
+    /// of them has releases of their own is not enough and was not: a
+    /// director is the main credit on his own videos, so both candidates
+    /// answered yes. What separates them is the format — his releases are
+    /// films and theirs are records — so the question is which candidate is
+    /// the main credit on something that is not a video.
+    ///
+    /// Bounded to three, and every probe is allowed to fail: this runs in
+    /// front of somebody opening a page, against a service that rate-limits,
+    /// and a wrong-but-present answer beats a spinner. Falling back to the
+    /// first candidate is exactly the behaviour this replaces.
+    private static func whicheverMakesRecords(
+        _ candidates: [DiscogsSearchResult], using client: DiscogsClient
+    ) async throws -> DiscogsSearchResult? {
+        for candidate in candidates.prefix(3) {
+            guard let id = candidate.id else { continue }
+            let releases: DiscogsArtistReleases? = try? await client.get(
+                "artists/\(id)/releases", query: [URLQueryItem(name: "per_page", value: "25")]
+            )
+            guard let found = releases?.releases else { continue }
+            if found.contains(where: { ($0.role == nil || $0.role == "Main") && !$0.isVideo }) {
+                return candidate
+            }
+        }
+        return nil
     }
 
     func artist(named name: String) async throws -> DiscogsArtistBundle? {
@@ -140,7 +178,7 @@ nonisolated struct DiscogsClient: Sendable {
         ])
         guard let match = Self.bestArtistMatch(name: name, results: response.results ?? [])
         else { return nil }
-        return match.thumbnail ?? match.coverImage
+        return Self.usableImage(match.thumbnail) ?? Self.usableImage(match.coverImage)
     }
 
     func release(id: Int) async throws -> DiscogsReleaseDetail {
@@ -208,6 +246,21 @@ nonisolated struct DiscogsClient: Sendable {
             .filter { ($0.year.flatMap(Int.init) ?? 0) > 0 }
             .min { ($0.year.flatMap(Int.init) ?? 0) < ($1.year.flatMap(Int.init) ?? 0) }
         return earliest?.id ?? results.first?.id
+    }
+
+    /// A label's catalogue, asked for by identity.
+    ///
+    /// `labelCatalogue(named:)` below searches on the label's *name*, and
+    /// Discogs numbers labels that share one exactly as it numbers artists.
+    /// Dean Blunt's World Music and the World Music that issued *Boot
+    /// Scootin' Two Steppin' Country Dances* in 1995 are the same string, so
+    /// a page for the first opened the catalogue of the second. Where a
+    /// record has told us which label it was, that is asked instead.
+    func labelCatalogue(id: Int) async throws -> [DiscogsLabelRelease] {
+        let response: DiscogsLabelReleases = try await get("labels/\(id)/releases", query: [
+            URLQueryItem(name: "per_page", value: "50")
+        ])
+        return response.releases ?? []
     }
 
     func labelCatalogue(named name: String) async throws -> [DiscogsSearchResult] {
@@ -368,9 +421,19 @@ nonisolated struct DiscogsClient: Sendable {
     /// `normalizeArtist` does not do this itself — it folds punctuation to
     /// spaces, which turns that row into "bandulu 3" and would match nobody.
     static func bestArtistMatch(name: String, results: [DiscogsSearchResult]) -> DiscogsSearchResult? {
+        artistMatches(name: name, results: results).first
+    }
+
+    /// Everybody Discogs files under this name, in the order it ranked them.
+    ///
+    /// More than one is the ordinary case rather than an oddity — Discogs
+    /// numbers namesakes precisely because they are common — and which of
+    /// them is meant cannot be read off a search result. See
+    /// `whicheverMakesRecords(_:using:)`.
+    static func artistMatches(name: String, results: [DiscogsSearchResult]) -> [DiscogsSearchResult] {
         let wanted = RecordingKey.normalizeArtist(name)
-        guard !wanted.isEmpty else { return nil }
-        return results.first {
+        guard !wanted.isEmpty else { return [] }
+        return results.filter {
             RecordingKey.normalizeArtist(Self.withoutDisambiguator($0.title)) == wanted
         }
     }
@@ -394,6 +457,18 @@ nonisolated struct DiscogsClient: Sendable {
         return value
             .replacingOccurrences(of: #"\s{2,}"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespaces)
+    }
+
+    /// A Discogs image address, or nil where Discogs is saying there is none.
+    ///
+    /// Search results carry `st.discogs.com/.../images/spacer.gif` for a
+    /// record with no sleeve in the index — a real URL that loads a
+    /// transparent one-pixel image. Stored and drawn, that is a tile showing
+    /// nothing where the placeholder artwork should be, on a record whose own
+    /// page fetches a perfectly good cover a moment later.
+    static func usableImage(_ address: String?) -> String? {
+        guard let address, !address.isEmpty else { return nil }
+        return address.contains("/images/spacer") ? nil : address
     }
 
     private static func normalized(_ value: String) -> String {

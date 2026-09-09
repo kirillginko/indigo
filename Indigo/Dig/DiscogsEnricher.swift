@@ -52,7 +52,7 @@ nonisolated struct DiscogsEnricher {
         // and a title like that resolves to no record at all. A row cached
         // before any of those looks current while being wrong, so it is
         // refetched once.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 7,
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 12,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
         return write(bundle, name: name)
@@ -61,7 +61,7 @@ nonisolated struct DiscogsEnricher {
     /// The same, for a caller that has already done the search.
     @discardableResult
     func artist(named name: String, head: DiscogsSearchResult, force: Bool = false) async throws -> DiscogsArtist? {
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 7,
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 12,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name, head: head) else { return nil }
         return write(bundle, name: name)
@@ -77,8 +77,11 @@ nonisolated struct DiscogsEnricher {
     private func writeArtist(_ bundle: DiscogsArtistBundle, name: String) -> DiscogsArtist? {
 
         let detail = bundle.detail
+        // Records, not films. A videography is not a discography, and whoever
+        // released the DVD is not one of this artist's labels — see
+        // `DiscogsArtistRelease.isVideo`.
         let releases = (bundle.releases.releases ?? []).filter {
-            $0.role == nil || $0.role == "Main"
+            ($0.role == nil || $0.role == "Main") && !$0.isVideo
         }
         let uniqueReleases = releases.reduce(into: [DiscogsArtistRelease]()) { result, release in
             guard let title = release.title, !result.contains(where: { $0.title == title }) else { return }
@@ -107,25 +110,51 @@ nonisolated struct DiscogsEnricher {
         record.externalURLStrings = detail.urls ?? []
         record.memberNames = (detail.members?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
         record.groupNames = (detail.groups?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
-        let catalogue = bundle.catalogue.filter { $0.id != nil }
-        if !catalogue.isEmpty {
-            record.releaseTitles = catalogue.map { Self.releaseTitle($0.title, artist: detail.name) }
-            record.releaseYears = catalogue.map { $0.year ?? "" }
-            record.releaseDiscogsIDs = catalogue.compactMap(\.id)
-            record.releaseImageURLStrings = catalogue.map { $0.coverImage ?? "" }
-            record.releaseThumbnailURLStrings = catalogue.map { $0.thumbnail ?? "" }
-            record.releaseLabels = catalogue.map {
-                ($0.label ?? []).lazy.compactMap { LabelName.primary(inDiscogsField: $0) }.first ?? ""
-            }
-        } else {
-            let fallback = Array(uniqueReleases.prefix(30))
-            record.releaseTitles = fallback.compactMap(\.title)
-            record.releaseYears = fallback.map { $0.year.map(String.init) ?? "" }
-            record.releaseDiscogsIDs = fallback.compactMap(\.id)
-            record.releaseImageURLStrings = Array(repeating: "", count: fallback.count)
-            record.releaseThumbnailURLStrings = Array(repeating: "", count: fallback.count)
-            record.releaseLabels = fallback.map { LabelName.primary(inDiscogsField: $0.label) ?? "" }
+        // The artist's own shelf, and only the artist's own shelf.
+        //
+        // This used to be `bundle.catalogue`, which is
+        // `database/search?artist=<name>` — a match on the *text* of a credit.
+        // For anyone filed alongside namesakes that returns their records too:
+        // the cached discography for Anika held Precious Love by Anika (2),
+        // Change by Anika (6) and an EP by Anika (20), none of which she made,
+        // and held Change, Anika EP and Spaceman twice each because two
+        // pressings are two hits. Both of those reached DEEP as rows, which is
+        // how a page for one musician came to offer four other people's
+        // records as things to discover.
+        //
+        // `artists/{id}/releases` cannot do that: it is the shelf Discogs
+        // files under this artist. The search is kept for what it is actually
+        // good for — it carries sleeves, and the releases endpoint does not.
+        let sleeves = Dictionary(
+            bundle.catalogue.compactMap { result in result.id.map { ($0, result) } },
+            uniquingKeysWith: { first, _ in first }
+        )
+        // Only labels a record itself names, or that this app has read off the
+        // record in full. See `imprints(releasedBy:artist:catalogued:)`.
+        let catalogued: (Int) -> [String] = { [self] in cachedRelease(id: $0)?.labelNames ?? [] }
+        let discography = Array(
+            Self.discography(uniqueReleases, artist: detail.name).prefix(30)
+        )
+        record.releaseTitles = discography.map(\.title)
+        record.releaseYears = discography.map { $0.release.year.map(String.init) ?? "" }
+        record.releaseDiscogsIDs = discography.map { $0.release.catalogueID ?? 0 }
+        record.releaseImageURLStrings = discography.map {
+            DiscogsClient.usableImage($0.release.catalogueID.flatMap { sleeves[$0]?.coverImage })
+                ?? ""
         }
+        // The record's own row first, the search second. See
+        // `DiscogsArtistRelease.thumbnail`.
+        record.releaseThumbnailURLStrings = discography.map {
+            DiscogsClient.usableImage($0.release.thumbnail)
+                ?? DiscogsClient.usableImage($0.release.catalogueID.flatMap { sleeves[$0]?.thumbnail })
+                ?? ""
+        }
+        record.releaseLabels = discography.map {
+            Self.label(of: $0.release, catalogued: catalogued) ?? ""
+        }
+        record.labelNames = Self.imprints(
+            releasedBy: releases, artist: detail.name, catalogued: catalogued
+        )
         // Only the label each release names for itself.
         //
         // The search catalogue also carries a `label` array, but it holds
@@ -133,7 +162,6 @@ nonisolated struct DiscogsEnricher {
         // mastering house, the distributor, the magazine that ran the mix. As
         // an artist's imprints that reads as nonsense: Space Afrika listed on
         // GZ Media and Bonati Mastering alongside Dais and sferic.
-        record.labelNames = Self.unique(releases.flatMap { LabelName.names(inDiscogsField: $0.label) })
         record.genres = Self.unique(bundle.catalogue.flatMap { $0.genre ?? [] })
         record.styles = Self.unique(bundle.catalogue.flatMap { $0.style ?? [] })
         record.collaboratorNames = Self.unique(
@@ -142,14 +170,31 @@ nonisolated struct DiscogsEnricher {
                 return release.artist.map(DiscogsClient.withoutDisambiguator)
             }.filter { RecordingKey.normalizeArtist($0) != key }
         )
+        Self.repaintPortrait(of: record, in: context)
         record.fetchedAt = Date()
-        record.cacheVersion = 7
+        record.cacheVersion = 12
         return record
     }
 
+    /// Who else is nearby, worked out from this artist's labels and styles.
+    ///
+    /// Stale a day after it was asked, and stale the moment the artist it was
+    /// asked about is rewritten — which is the part that was missing. These
+    /// neighbours are derived entirely from the row's labels, so when the row
+    /// turns out to have described a different person they describe that
+    /// person's world and go on doing it for a day. A page for Hype Williams
+    /// resolved to the video director cached 1 Giant Leap, Sidestepper and
+    /// Mocean Worker off Palm Pictures; correcting the artist to Dean Blunt
+    /// and Inga Copeland's duo left every one of them sitting there, under a
+    /// reason naming a label they have nothing to do with.
+    ///
+    /// Comparing the two stamps says it without needing to know why the row
+    /// changed: anything worked out before the row was last written was
+    /// worked out about something else.
     func recommendations(for artist: DiscogsArtist, force: Bool = false) async throws {
         if !force, let fetchedAt = artist.recommendationsFetchedAt,
-           Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60 { return }
+           Date().timeIntervalSince(fetchedAt) < 24 * 60 * 60,
+           fetchedAt >= artist.fetchedAt { return }
         // The years the artist was actually working, so the era question is
         // about their contemporaries rather than about a decade.
         let years = artist.releaseYears.compactMap { Int($0.prefix(4)) }.filter { $0 > 1900 }
@@ -212,13 +257,40 @@ nonisolated struct DiscogsEnricher {
         }()
         record.title = detail.title
         record.year = detail.year
-        record.artistNames = detail.artists?.compactMap(\.name) ?? []
+        // Stripped, like every other Discogs name that becomes something you
+        // can open. Discogs credits a record to "Hype Williams (2)" because
+        // that is how it files the second person with the name, and carried
+        // through it becomes an artist in its own right: a second page under
+        // a name nothing is catalogued against, with no picture, no
+        // discography and no way back to the artist it is a spelling of.
+        record.artistNames = (detail.artists?.compactMap(\.name) ?? [])
+            .map(DiscogsClient.withoutDisambiguator)
         // Named one per entry here rather than joined, but they carry the
         // same disambiguating numbers, and a label filed under "Aeon (5)" is
         // a label the pages cannot look up.
-        record.labelNames = Self.unique(
-            (detail.labels ?? []).flatMap { LabelName.names(inDiscogsField: $0.name) }
-        )
+        // Names and identities together, and positionally paired.
+        //
+        // `LabelName.names(inDiscogsField:)` splits a field naming several
+        // companies and drops the disambiguating number, which is right for
+        // display and destroys the only thing telling two labels of one name
+        // apart. The id survives that, and this is the one endpoint that
+        // carries it.
+        var labelNames: [String] = []
+        var labelIDs: [Int] = []
+        var seenLabels = Set<String>()
+        for reference in detail.labels ?? [] {
+            let named = LabelName.names(inDiscogsField: reference.name)
+            // Only a field naming exactly one company can be paired with the
+            // one id beside it. A split field has names this cannot place, so
+            // they are kept without one rather than given the wrong one.
+            for name in named {
+                guard seenLabels.insert(RecordingKey.normalize(name)).inserted else { continue }
+                labelNames.append(name)
+                labelIDs.append(named.count == 1 ? (reference.id ?? 0) : 0)
+            }
+        }
+        record.labelNames = labelNames
+        record.labelDiscogsIDs = labelIDs
         record.catalogNumbers = detail.labels?.compactMap(\.catno) ?? []
 
         // Everybody else on the record, minus the sleeve.
@@ -278,6 +350,133 @@ nonisolated struct DiscogsEnricher {
         return (try? context.fetch(descriptor))?.first
     }
 
+    /// The imprints this artist actually releases on, the ones they release
+    /// on most first.
+    ///
+    /// This was the first twelve distinct labels in whatever order Discogs
+    /// listed the records — which is newest first — so one appearance on a
+    /// magazine's compilation last year outranked the label that has put out
+    /// half their catalogue, and could push it off the end of the list
+    /// entirely. A page for Anika named FACT Magazine among her labels for
+    /// exactly that reason.
+    ///
+    /// Two changes make it an answer rather than an ordering accident.
+    /// Compilations are left out: a record credited to Various is somebody
+    /// else's release that this artist is on, and whoever put it out is not
+    /// their label. And what remains is counted, because how many of an
+    /// artist's records an imprint carries is the whole of what makes it
+    /// theirs.
+    static func imprints(
+        releasedBy releases: [DiscogsArtistRelease],
+        artist: String,
+        catalogued: (Int) -> [String] = { _ in [] }
+    ) -> [String] {
+        var order: [String] = []
+        var counts: [String: Int] = [:]
+        var spelling: [String: String] = [:]
+        for release in releases where ArtistName.isRealArtist(release.artist ?? artist) {
+            for name in Self.labels(of: release, catalogued: catalogued)
+            where !LabelName.isOwnName(name, artist: artist) {
+                let key = RecordingKey.normalize(name)
+                guard !key.isEmpty else { continue }
+                if counts[key] == nil { order.append(key); spelling[key] = name }
+                counts[key, default: 0] += 1
+            }
+        }
+        // Ties keep the order the catalogue gave them, which is newest first.
+        return order
+            .enumerated()
+            .sorted {
+                counts[$0.element, default: 0] == counts[$1.element, default: 0]
+                    ? $0.offset < $1.offset
+                    : counts[$0.element, default: 0] > counts[$1.element, default: 0]
+            }
+            .prefix(12)
+            .compactMap { spelling[$0.element] }
+    }
+
+    /// Files the resolved artist's own picture as this name's portrait.
+    ///
+    /// Portraits are filled in bulk by `artistThumbnail(named:)`, which is one
+    /// search and takes the first namesake it sees — cheap, and right until
+    /// two people share a name. EXPLORE draws from that cache, so a For You
+    /// page went on showing the video director's photograph beside a link
+    /// that opened the duo's page: the artist row had been corrected and the
+    /// portrait had not, and nothing ever asked it again because a portrait
+    /// has no version to be out of date.
+    ///
+    /// Writing it here settles that. Once a page has been opened, the picture
+    /// belongs to whoever the full lookup decided this artist is — which is
+    /// the answer the cheap search was guessing at.
+    private static func repaintPortrait(of record: DiscogsArtist, in context: ModelContext) {
+        guard let address = DiscogsClient.usableImage(
+            record.thumbnailURLString ?? record.imageURLString
+        ) else { return }
+        let key = record.nameKey
+        guard !key.isEmpty else { return }
+        var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
+        descriptor.fetchLimit = 1
+        let portrait = (try? context.fetch(descriptor))?.first ?? {
+            let fresh = ArtistPortrait(nameKey: key, name: record.name)
+            context.insert(fresh)
+            return fresh
+        }()
+        let wasShowing = portrait.imageURLString
+        portrait.name = record.name
+        portrait.imageURLString = address
+        portrait.lookupFailed = false
+        portrait.fetchedAt = Date()
+
+        // And everywhere it was already copied to. See `StoredEdge.repaint`.
+        guard wasShowing != address else { return }
+        StoredEdge.repaint(artistKey: key, with: address, in: context)
+
+        // EXPLORE writes its answer down, faces and all, so the copy on disk
+        // is now a page of somebody who has been corrected. Thrown away
+        // rather than patched: it costs a second to work out again, and it is
+        // the one cache here that nothing else can put right.
+        var offers = FetchDescriptor<ExploreOffersRecord>(
+            predicate: #Predicate { $0.id == "explore.offers" }
+        )
+        offers.fetchLimit = 1
+        for record in (try? context.fetch(offers)) ?? [] { context.delete(record) }
+    }
+
+    /// Who put a record out, from whichever source names them.
+    ///
+    /// `artists/{id}/releases` carries a `label` only on its plain release
+    /// rows; the master rows — which is what an artist's actual albums are
+    /// filed as — have none. So reading only that field sampled an artist's
+    /// labels through the one-off releases at the edge of their catalogue and
+    /// missed imprints carried by masters.
+    ///
+    /// The gap is filled from records this app has already read in full,
+    /// whose labels come from a release's own `labels` field. Deliberately
+    /// **not** from the search, which was tried and is the trap the comment
+    /// above `genres` describes: its `label` array holds every company
+    /// credited on a record, so a page for Babyfather listed Key Production,
+    /// Sony DADC and Southwater — a manufacturing broker, a disc plant and
+    /// the town the plant is in — beside Hyperdub. A release's `labels` and
+    /// its `companies` are different fields for a reason; the search flattens
+    /// them together and cannot be un-flattened afterwards.
+    ///
+    /// Sparser than the search, and correct instead of full.
+    static func labels(
+        of release: DiscogsArtistRelease, catalogued: (Int) -> [String]
+    ) -> [String] {
+        let named = LabelName.names(inDiscogsField: release.label)
+        guard named.isEmpty else { return named }
+        guard let identifier = release.catalogueID else { return [] }
+        return catalogued(identifier)
+    }
+
+    /// The one label to credit a record to, when a single line is shown.
+    static func label(
+        of release: DiscogsArtistRelease, catalogued: (Int) -> [String]
+    ) -> String? {
+        labels(of: release, catalogued: catalogued).first
+    }
+
     private static func unique(_ values: [String]) -> [String] {
         var seen = Set<String>()
         return values.filter { seen.insert($0.lowercased()).inserted }.prefix(12).map { $0 }
@@ -312,6 +511,39 @@ nonisolated struct DiscogsEnricher {
         // less than a record still called what the catalogue calls it.
         return remainder.trimmingCharacters(in: .whitespaces).isEmpty ? title : remainder
     }
+
+    /// One entry per record this artist actually released, in the order the
+    /// catalogue files them.
+    ///
+    /// Deduped on the folded title rather than the exact one, because Discogs
+    /// files an album, its repress and its CD issue as separate rows, and a
+    /// discography that lists Change three times reads as a bug — which is
+    /// what it was.
+    ///
+    /// The title handed back is the cleaned one, and cleaning before the fold
+    /// is what makes the fold work: some of these rows still carry the credit
+    /// on the front, so "Anika - Change" and "Change" are one record and only
+    /// collapse once both read as "Change". Stripping is safe here in a way it
+    /// never was over a name search, because everything in this list is
+    /// already known to be theirs.
+    ///
+    /// Everything kept has an id, because the arrays this feeds are parallel
+    /// and read by index (see `DiscogsArtist.releaseLines`): an entry that
+    /// could not be opened would shift every sleeve after it onto the wrong
+    /// record.
+    static func discography(
+        _ releases: [DiscogsArtistRelease], artist: String
+    ) -> [(release: DiscogsArtistRelease, title: String)] {
+        var seen = Set<String>()
+        return releases.compactMap { release in
+            guard let raw = release.title, release.catalogueID != nil else { return nil }
+            let title = releaseTitle(raw, artist: artist)
+            let key = ArtistProfile.ReleaseLine.key(title)
+            guard !key.isEmpty, seen.insert(key).inserted else { return nil }
+            return (release, title)
+        }
+    }
+
 
 
     static func cleanProfile(_ text: String) -> String {

@@ -91,6 +91,7 @@ struct IndigoApp: App {
                     // Keep the picture backlog out of the way while a stream
                     // opens. See `DigStore.holdBackgroundWork`.
                     player.onPlaybackStarting = { [dig] in dig.holdBackgroundWork() }
+                    player.onPlaybackSettled = { [dig] in dig.releaseBackgroundHold() }
                     // What EXPLORE showed last time, before anything is
                     // recomputed. A page that opens empty and grows its
                     // headline a second later has loaded twice.

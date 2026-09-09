@@ -364,7 +364,8 @@ struct ArtistDigView: View {
                     DeepSectionView(
                         origin: .artist(profile.name, mbid: profile.mbid),
                         isReady: hasEnriched,
-                        initial: nil
+                        initial: nil,
+                        showing: Self.shown(profile)
                     ) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
@@ -681,6 +682,24 @@ struct ArtistDigView: View {
         }
     }
 
+    /// Everything this page has already printed, in the graph's terms.
+    ///
+    /// "Continue digging" is the surface by another name — it is the same walk,
+    /// rendered as cards halfway up the page — so without this DEEP opened on
+    /// a second copy of it, and the descent began by asking somebody to press
+    /// past what they had just scrolled through. The labels, the discography
+    /// and the aliases are on the page for the same reason.
+    private static func shown(_ profile: ArtistProfile) -> Set<String> {
+        var ids: Set<String> = []
+        for artist in profile.related { ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id) }
+        for alias in profile.aliases { ids.insert(MusicNode.artist(alias).id) }
+        for label in profile.labels { ids.insert(MusicNode.label(label.name, mbid: label.mbid).id) }
+        for release in profile.releases {
+            ids.insert(MusicNode.release(release.title, discogsID: release.discogsID).id)
+        }
+        return ids
+    }
+
     @ViewBuilder
     private func genresSection(_ profile: ArtistProfile) -> some View {
         if !profile.styles.isEmpty || !profile.genres.isEmpty {
@@ -696,7 +715,7 @@ struct ArtistDigView: View {
         if let mbid = label.mbid {
             appState.open(.digLabel(mbid: mbid, name: label.name))
         } else {
-            appState.open(.digDiscogsLabel(name: label.name))
+            appState.open(.digDiscogsLabel(name: label.name, discogsID: label.discogsID))
         }
     }
 

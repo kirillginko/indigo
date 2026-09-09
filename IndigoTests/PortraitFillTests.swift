@@ -393,3 +393,81 @@ final class PortraitInvalidationTests: XCTestCase {
         XCTAssertNil(dig.portraitURL(for: "Various"), "Never a placeholder")
     }
 }
+
+// MARK: - A face that turned out to be the wrong man
+
+/// The picture is not read from one place. The graph copies it onto every
+/// edge that points at an artist, and EXPLORE, DEEP and the related lists all
+/// draw from those — so correcting the portrait table alone changed nothing
+/// anybody could see, and a video director's photograph stayed beside a link
+/// that opened somebody else's page.
+final class PortraitRepaintTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// Distinct origins on purpose: a stored edge's identity is
+    /// from-to-kind, so two rows built from one origin are one row, and a
+    /// test asserting about "both" of them would be asserting twice about the
+    /// same object.
+    private func edge(from origin: String, artwork: String?) -> StoredEdge {
+        let row = StoredEdge(
+            from: .artist(origin),
+            edge: MusicEdge(
+                from: .artist(origin), to: .artist("Hype Williams"),
+                kind: .collaborator, source: .discogs,
+                reason: "Recorded with", confidence: 0.9
+            )
+        )
+        row.toArtworkURLString = artwork
+        context.insert(row)
+        return row
+    }
+
+    func testEveryEdgePointingAtThemGetsTheNewFace() {
+        let wrong = "https://i.discogs.com/director.jpeg"
+        let right = "https://i.discogs.com/duo.jpeg"
+        let stale = edge(from: "Dean Blunt", artwork: wrong)
+        let blank = edge(from: "Inga Copeland", artwork: nil)
+        XCTAssertNotEqual(stale.id, blank.id, "Two rows, not one row twice")
+
+        StoredEdge.repaint(
+            artistKey: RecordingKey.normalizeArtist("Hype Williams"),
+            with: right, in: context
+        )
+
+        XCTAssertEqual(stale.toArtworkURLString, right, "A face that was somebody else's is replaced")
+        XCTAssertEqual(blank.toArtworkURLString, right, "And a row with none is still filled")
+    }
+
+    /// An artist nobody is repainting must not have their rows touched.
+    func testOtherArtistsAreLeftAlone() {
+        let other = StoredEdge(
+            from: .artist("Dean Blunt"),
+            edge: MusicEdge(
+                from: .artist("Dean Blunt"), to: .artist("Inga Copeland"),
+                kind: .collaborator, source: .discogs,
+                reason: "Recorded with", confidence: 0.9
+            )
+        )
+        other.toArtworkURLString = "https://i.discogs.com/inga.jpeg"
+        context.insert(other)
+
+        StoredEdge.repaint(
+            artistKey: RecordingKey.normalizeArtist("Hype Williams"),
+            with: "https://i.discogs.com/duo.jpeg", in: context
+        )
+
+        XCTAssertEqual(other.toArtworkURLString, "https://i.discogs.com/inga.jpeg")
+    }
+}

@@ -97,7 +97,10 @@ struct ExploreView: View {
         // station and the first local track were all placed as item nought and
         // landed on top of one another.
         let offers = dig.exploreOffers
-        let suggestions = offers.next
+        // Regrouped, not re-ranked. Things reached out of the same record or
+        // label sit together, so a cluster on the page is a cluster in the
+        // graph rather than four cards that happened to score alike.
+        let suggestions = offers.next.clusteredByOrigin()
         // Waiting is not the same as having nothing, and drawn the same way it
         // is the page jumping. An empty block collapses, everything under it
         // slides up, and the moment the real answer lands the whole page moves
@@ -150,7 +153,13 @@ struct ExploreView: View {
                 .position(x: size.width * 0.5, y: nextTop + 24)
             ForEach(0..<(suggestions.isEmpty ? nextCount : 0), id: \.self) { i in
                 ExplorePlaceholderCard(width: cardWidth(in: size))
-                    .position(place(i, below: nextTop, in: size)).zIndex(5)
+                    // Where most offers land, rather than on the trunk. The
+                    // block holds its place so nothing moves when the answer
+                    // arrives, and a placeholder drawn as charted ground would
+                    // hand that back: every card would step outward at once as
+                    // the real distances replaced it.
+                    .position(place(i, below: nextTop, in: size,
+                                    frontier: ExploreView.expectedFrontier)).zIndex(5)
             }
             ForEach(Array(suggestions.enumerated()), id: \.element.id) { i, suggestion in
                 Button {
@@ -162,7 +171,8 @@ struct ExploreView: View {
                              connection: suggestion.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
                     .graphNode("next.\(suggestion.id)", section: "next", legend: true)
-                    .position(place(i, below: nextTop, in: size)).zIndex(5)
+                    .position(place(i, below: nextTop, in: size,
+                                    frontier: suggestion.frontier)).zIndex(5)
             }
         }
         if showCrate {
@@ -192,7 +202,8 @@ struct ExploreView: View {
                                  connection: suggestion.connection)
                     }.buttonStyle(ExploreCardButtonStyle())
                         .graphNode("suggested.\(suggestion.id)", section: section.id, legend: true)
-                        .position(place(section.items.count + i, below: top, in: size)).zIndex(4)
+                        .position(place(section.items.count + i, below: top, in: size,
+                                        frontier: suggestion.frontier)).zIndex(4)
                 }
             }
         }
@@ -248,7 +259,8 @@ struct ExploreView: View {
                              connection: show.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
                     .graphNode("radio.\(show.id)", section: "radio", legend: true)
-                    .position(place(i, below: showsTop, in: size)).zIndex(3)
+                    .position(place(i, below: showsTop, in: size,
+                                    frontier: show.frontier)).zIndex(3)
             }
         }
         if showLibrary {
@@ -274,6 +286,12 @@ struct ExploreView: View {
     /// out. The same number the engine is asked for, so a full answer lands in
     /// exactly the space kept for it.
     static let expectedSuggestions = 12
+
+    /// Where a card is likely to land, for the placeholders standing in for
+    /// one. Most offers are reached by a single route — see
+    /// `ExploreSuggestion.frontier` — so the honest guess is well out towards
+    /// the margin rather than on the trunk.
+    static let expectedFrontier = 0.75
 
     /// How many of the library to show at once.
     private static let localPickCount = 8
@@ -327,7 +345,15 @@ struct ExploreView: View {
     /// than fixed: a constant pitch overran the pane as soon as there were
     /// more than a few rows, and the clamp that caught it stacked every
     /// overflowing card on the bottom edge.
-    private func place(_ ordinal: Int, below sectionTop: CGFloat, in size: CGSize) -> CGPoint {
+    ///
+    /// `frontier` is how far outside charted territory the card belongs, and
+    /// it is what its distance from the centre spine now says. Nought is
+    /// something the listener already has — the trunk is their own collection,
+    /// so those hug it — and one is the far edge of what Indigo can argue for.
+    /// See `ExploreSuggestion.frontier`.
+    private func place(
+        _ ordinal: Int, below sectionTop: CGFloat, in size: CGSize, frontier: Double = 0
+    ) -> CGPoint {
         let columns = columnCount(in: size)
         let column = ordinal % columns, row = ordinal / columns
 
@@ -342,12 +368,16 @@ struct ExploreView: View {
         let center = size.width * 0.5
         let centerClearance = halfCard + 44
         let isLeftSide = column < columns / 2
-        // Each recommendation drifts farther toward its outside edge by a
-        // different amount. The deterministic wave keeps the composition
-        // stable between redraws while avoiding a rigid two-column ladder.
+        // How far out a card sits is the frontier it belongs to, so the
+        // arrangement says something: what the collection surrounds is drawn
+        // near the trunk, and what one thin edge reached is drawn at the
+        // margin. The wave that used to decide this outright is kept as a
+        // sixth of the drift, because it is what stops a block of equally
+        // argued cards from setting into a rigid two-column ladder.
         let outwardRange = min(72, max(28, cell * 0.18))
+        let wave = abs(CGFloat(cos(Double(ordinal + 1) * 1.73)))
         let outwardDrift = outwardRange
-            * (0.35 + 0.65 * abs(CGFloat(cos(Double(ordinal + 1) * 1.73))))
+            * (0.15 + 0.7 * CGFloat(min(1, max(0, frontier))) + 0.15 * wave)
         let rawX = baseX + (isLeftSide ? -outwardDrift : outwardDrift)
         let separatedX = isLeftSide
             ? min(rawX, center - centerClearance)
@@ -401,7 +431,7 @@ struct ExploreView: View {
             // another search from — and the cards say which is which: a
             // suggestion carries the reason it is being offered, and a colour
             // of its own.
-            let suggested = id == "artists" ? artists : []
+            let suggested = id == "artists" ? artists.clusteredByOrigin() : []
             guard !matches.isEmpty || !suggested.isEmpty else { return nil }
             return CrateRecommendationSection(
                 id: id, title: title, description: description,

@@ -92,6 +92,14 @@ final class MusicGraphTests: XCTestCase {
         XCTAssertEqual(CatalogNumber.split("ITLP09")?.number, 9)
         XCTAssertNil(CatalogNumber.split("WHITELABEL"), "No number is not a catalogue position")
         XCTAssertNil(CatalogNumber.split("12345"), "No prefix is not a label's mark")
+
+        // A number written with its format on the end used to split to nil,
+        // and a catalogue node that cannot be split has no neighbours — so
+        // every release that offered one opened a page with nothing on it.
+        XCTAssertEqual(CatalogNumber.split("SBR276CD")?.prefix, "SBR")
+        XCTAssertEqual(CatalogNumber.split("SBR276CD")?.number, 276)
+        XCTAssertEqual(CatalogNumber.split("SBR276CD")?.suffix, "CD")
+        XCTAssertEqual(CatalogNumber.split("ITLP09")?.suffix, "", "Nothing after the number is no format")
     }
 
     /// The point of the whole model: music nobody could name is a node, not a

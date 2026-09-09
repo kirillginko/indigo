@@ -176,6 +176,18 @@ actor DigWorker {
     /// Returns the address for the store to put in its own picture map. That
     /// map is what the rows read, and it stays where the rows are.
     func fillPortrait(named name: String) async -> PortraitOutcome {
+        // Whoever the full lookup already decided this artist is.
+        //
+        // `artistThumbnail(named:)` is one search and takes the first result
+        // that matches the name, which is right until two people share one.
+        // Where a page has already been opened the answer is sitting in the
+        // store — the right Discogs id, and their picture — so asking a
+        // search engine to guess again is both a wasted request and the way
+        // the video director's photograph got filed under the duo's name.
+        if let resolved = Self.resolvedPortrait(named: name, in: modelContext) {
+            return write(resolved, named: name)
+        }
+
         let found: String?
         do {
             found = try await discogs.artistThumbnail(named: name)
@@ -187,7 +199,21 @@ actor DigWorker {
             return .unreachable
         }
         guard !Task.isCancelled else { return .cancelled }
+        return write(found, named: name)
+    }
 
+    /// The picture on the artist row, when a full lookup has written one.
+    private static func resolvedPortrait(named name: String, in context: ModelContext) -> String? {
+        let key = RecordingKey.normalizeArtist(name)
+        guard !key.isEmpty else { return nil }
+        var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.nameKey == key })
+        descriptor.fetchLimit = 1
+        guard let artist = (try? context.fetch(descriptor))?.first else { return nil }
+        return DiscogsClient.usableImage(artist.thumbnailURLString)
+            ?? DiscogsClient.usableImage(artist.imageURLString)
+    }
+
+    private func write(_ found: String?, named name: String) -> PortraitOutcome {
         let key = RecordingKey.normalizeArtist(name)
         let record = ArtistPortrait(nameKey: key, name: name)
         if let found { record.imageURLString = found } else { record.lookupFailed = true }
@@ -297,12 +323,23 @@ actor DigWorker {
         engine(generation).connections(from: node)
     }
 
-    func descent(from origin: MusicNode, at level: DeepLevel, generation: Int) -> DeepEngine.Descent {
-        deepEngine(generation).descent(from: origin, at: level)
+    func descent(
+        from origin: MusicNode, at level: DeepLevel, generation: Int, showing: Set<String>
+    ) -> DeepEngine.Descent {
+        deepEngine(generation).descent(from: origin, at: level, showing: showing)
     }
 
-    func undergroundCuts(for node: MusicNode, generation: Int) -> [DeepResult] {
-        deepEngine(generation).results(from: node, at: .underground)
+    /// "TRY" on the DIG landing page — where this listener has not been.
+    ///
+    /// Here rather than on the store's own context because it is a graph walk
+    /// out of four nodes, and the landing page was doing it on the thread that
+    /// draws. The trace names it plainly: four `g.stored [MAIN]` reads and
+    /// then `main.stall`, 448ms and 1683ms of stopped main thread, once per
+    /// revision. `Suggestion` is a plain value, so it crosses back like
+    /// everything else here.
+    func digSuggestions(limit: Int, generation: Int) -> [DigHistory.Suggestion] {
+        refresh(generation)
+        return DigHistory(context: modelContext, graph: graph).suggestions(limit: limit)
     }
 
     func scenes(forArtist name: String, generation: Int) -> [MusicScene] {

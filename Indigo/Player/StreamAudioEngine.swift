@@ -10,6 +10,73 @@ import AVFoundation
 import Foundation
 import Observation
 
+/// One failure is one failure, however many observers notice it.
+///
+/// Three things report the same dropped connection: the item's status turning
+/// `.failed`, a `playbackStalled` notification, and a `failedToPlayToEndTime`
+/// notification. Each used to count as a separate failure, so one of them
+/// could spend two of the five chances a station gets — and, worse, spend the
+/// free one. The first retry waits no time at all by design, because a stall
+/// already means the connection is in trouble and a second of deliberate
+/// silence on top of it buys nothing: measured against a two-second underrun
+/// on IDA's stream, reconnecting at once cost 1.12s of silence where a
+/// one-second backoff cost 2.17s. The second retry waits a second. So a
+/// duplicate report quietly turned the immediate retry into a delayed one,
+/// which is exactly the cost that backoff was tuned to remove.
+///
+/// A trace of a livepeer stream shows it: the same station, failing the same
+/// way, took 108ms and 133ms from restart to failure, and the first two
+/// reconnect lines are 46ms apart. Nothing restarted in between. It also
+/// matters more than the arithmetic suggests — several of these stations are
+/// Icecast mounts that refuse a second connection while the first is still
+/// open, so a retry the station was never going to accept is not a wasted
+/// chance but a harmful one. See `start(url:)`.
+nonisolated struct ReconnectPolicy {
+    enum Response: Equatable {
+        /// The failure already being dealt with, noticed again.
+        case ignore
+        case retry(after: Duration)
+        /// Out of chances. The station is unavailable and should say so.
+        case giveUp
+    }
+
+    /// How many chances a station gets before it is called unavailable.
+    let limit: Int
+    /// How many it has used. Shown in the trace, and nowhere else.
+    private(set) var attempts = 0
+    /// Whether a retry is scheduled and has not yet been acted on. This is
+    /// the whole of what tells a second observer from a second failure.
+    private var isAwaitingRetry = false
+
+    init(limit: Int) { self.limit = limit }
+
+    mutating func interrupted() -> Response {
+        guard !isAwaitingRetry else { return .ignore }
+        guard attempts < limit else { return .giveUp }
+        attempts += 1
+        isAwaitingRetry = true
+        return .retry(after: Self.delay(attempt: attempts))
+    }
+
+    /// The stream is being opened again, so whatever fails next is new.
+    mutating func opening() { isAwaitingRetry = false }
+
+    /// Something played, or the listener took over.
+    mutating func reset() {
+        attempts = 0
+        isAwaitingRetry = false
+    }
+
+    /// How long to wait before trying again.
+    ///
+    /// Waiting is right once a station is properly unreachable, so the
+    /// backoff is kept for every attempt after the first.
+    static func delay(attempt: Int) -> Duration {
+        guard attempt > 1 else { return .zero }
+        return .seconds(min(8, 1 << (attempt - 2)))
+    }
+}
+
 @Observable
 final class StreamAudioEngine {
     enum State: Equatable {
@@ -45,14 +112,12 @@ final class StreamAudioEngine {
     /// seconds is longer than any of these stations takes on a working
     /// connection and short enough to be an answer.
     @ObservationIgnored private static let connectTimeout = Duration.seconds(20)
-    @ObservationIgnored private var reconnectAttempts = 0
+    @ObservationIgnored private var reconnect = ReconnectPolicy(limit: 5)
     @ObservationIgnored private var volume: Double = 1
     @ObservationIgnored private var isUserPaused = false
 
-    private static let maxReconnectAttempts = 5
-
     deinit {
-        removeNotificationObservers()
+        removeObservers()
     }
 
     @ObservationIgnored private let levelMonitor = AudioLevelMonitor()
@@ -62,7 +127,7 @@ final class StreamAudioEngine {
 
     func play(url: URL) {
         reconnectTask?.cancel()
-        reconnectAttempts = 0
+        reconnect.reset()
         isUserPaused = false
         start(url: url)
     }
@@ -86,11 +151,9 @@ final class StreamAudioEngine {
         levelMonitor.reset()
         reconnectTask?.cancel()
         connectDeadline?.cancel()
-        reconnectAttempts = 0
+        reconnect.reset()
         isUserPaused = false
-        removeNotificationObservers()
-        statusObservation = nil
-        timeControlObservation = nil
+        removeObservers()
         player.pause()
         player.replaceCurrentItem(with: nil)
         currentURL = nil
@@ -126,7 +189,9 @@ final class StreamAudioEngine {
     // MARK: - Connection
 
     private func start(url: URL) {
-        removeNotificationObservers()
+        removeObservers()
+        // Whatever failed last is behind us; the next failure is a new one.
+        reconnect.opening()
         currentURL = url
         setState(.buffering)
 
@@ -234,7 +299,7 @@ final class StreamAudioEngine {
                 guard let self, !self.isUserPaused else { return }
                 switch status {
                 case .playing:
-                    self.reconnectAttempts = 0
+                    self.reconnect.reset()
                     self.connectDeadline?.cancel()
                     self.setState(.playing)
                 case .waitingToPlayAtSpecifiedRate:
@@ -271,41 +336,38 @@ final class StreamAudioEngine {
 
     private func handleInterruption(_ message: String) {
         guard !isUserPaused, let url = currentURL else { return }
-        guard reconnectAttempts < Self.maxReconnectAttempts else {
-            setState(.failed(message))
+        switch reconnect.interrupted() {
+        case .ignore:
             return
-        }
-        reconnectAttempts += 1
-        Trace.note("stream.reconnect \(reconnectAttempts)/\(Self.maxReconnectAttempts) \(message)")
-        setState(.buffering)
-
-        reconnectTask?.cancel()
-        reconnectTask = Task { [weak self, delay = Self.reconnectDelay(attempt: reconnectAttempts)] in
-            if delay > 0 { try? await Task.sleep(nanoseconds: delay) }
-            guard !Task.isCancelled else { return }
-            self?.start(url: url)
+        case .giveUp:
+            setState(.failed(message))
+        case .retry(let delay):
+            Trace.note("stream.reconnect \(reconnect.attempts)/\(reconnect.limit) \(message)")
+            setState(.buffering)
+            reconnectTask?.cancel()
+            reconnectTask = Task { [weak self] in
+                if delay > .zero { try? await Task.sleep(for: delay) }
+                guard !Task.isCancelled else { return }
+                self?.start(url: url)
+            }
         }
     }
 
-    /// How long to wait before trying again.
+    /// Every way the outgoing stream could still speak.
     ///
-    /// The first attempt does not wait at all. A stall already means the
-    /// connection is in trouble, and a second of deliberate silence on top of
-    /// it buys nothing — measured against a two-second underrun on IDA's
-    /// stream, the old one-second first backoff cost 2.17s of silence where
-    /// reconnecting at once cost 1.12s.
-    ///
-    /// Waiting is still right once a station is properly unreachable, so the
-    /// backoff is kept for every attempt after the first.
-    private static func reconnectDelay(attempt: Int) -> UInt64 {
-        guard attempt > 1 else { return 0 }
-        return UInt64(min(8, 1 << (attempt - 2))) * 1_000_000_000
-    }
-
-    private func removeNotificationObservers() {
+    /// The notifications used to be torn down here and the two observations
+    /// left alone until `observe(_:)` reassigned them — so between letting go
+    /// of one stream and taking hold of the next, an item that was being
+    /// discarded could still turn `.failed`, and a player that had just been
+    /// replaced could still report its status. Either one arrives as news
+    /// about the stream now opening, which it is not: a dying item's failure
+    /// would be counted against its replacement's five chances.
+    private func removeObservers() {
         if let stallObserver { NotificationCenter.default.removeObserver(stallObserver) }
         if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
         stallObserver = nil
         failureObserver = nil
+        statusObservation = nil
+        timeControlObservation = nil
     }
 }

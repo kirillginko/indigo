@@ -90,8 +90,8 @@ struct RootView: View {
                     ArtistDigView(artistName: name, artistMBID: mbid)
                 case .digLabel(let mbid, let name):
                     LabelDigView(labelMBID: mbid, labelName: name)
-                case .digDiscogsLabel(let name):
-                    DiscogsLabelDigView(labelName: name)
+                case .digDiscogsLabel(let name, let discogsID):
+                    DiscogsLabelDigView(labelName: name, labelDiscogsID: discogsID)
                 case .digRelease(let id, let title):
                     DigReleaseView(releaseID: id, fallbackTitle: title)
                 case .digReleaseNamed(let title, let artist):

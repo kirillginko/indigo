@@ -110,6 +110,9 @@ nonisolated struct ArtistProfile: Sendable {
         /// the label is known only as a name attached to the artist, with no
         /// record naming it — which is most of what MusicBrainz contributes.
         var releaseCount: Int = 0
+        /// Which label, where one of this artist's records said so. See
+        /// `DiscogsReleaseRecord.labelDiscogsIDs`.
+        var discogsID: Int?
         var id: String { mbid ?? name }
     }
 
@@ -337,6 +340,45 @@ nonisolated struct DigEngine {
         for label in discogs?.releaseLabels ?? [] {
             note(label, mbid: nil)
         }
+        // And the label written on the record itself, for every one this app
+        // has read in full.
+        //
+        // `artists/{id}/releases` names a label only on its plain release
+        // rows, so an artist's albums — filed as masters — arrive from it
+        // with none, and the list was as short as that endpoint's blind spot.
+        // A release read in its own right does say, in a `labels` field kept
+        // apart from the `companies` that pressed and distributed it. Those
+        // records are already here: the artwork fill reads a dozen of them
+        // per page, and every release anybody opens adds one. Nothing was
+        // reading them back.
+        //
+        // Which is also why this is not a fifth source of guesses. It is the
+        // same fold the discography is built from, and it grows as the
+        // listener digs rather than by asking anything extra.
+        let credited = graph.releases(creditedTo: RecordingKey.normalizeArtist(name))
+        var labelIdentities: [String: Int] = [:]
+        for record in credited {
+            for (label, discogsID) in record.labels {
+                note(label, mbid: nil)
+                // Which of the labels sharing this name it is. Kept from the
+                // first record that says, because a later one saying the same
+                // adds nothing and a later one disagreeing is two labels the
+                // page has no way to tell apart anyway.
+                //
+                // Folded on the way in, exactly as `note` folds. Records
+                // written before the disambiguator was dropped hold the
+                // filing form — "World Music (8)" — so keying on the raw
+                // string here would file the identity under a name no other
+                // part of this list uses, and the label it identifies would
+                // go on opening whichever one a search found first.
+                guard let discogsID, discogsID > 0 else { continue }
+                for name in LabelName.names(inDiscogsField: label) {
+                    let key = RecordingKey.normalize(name)
+                    guard !key.isEmpty, labelIdentities[key] == nil else { continue }
+                    labelIdentities[key] = discogsID
+                }
+            }
+        }
 
         // How much of this artist's music each one actually put out.
         //
@@ -345,17 +387,34 @@ nonisolated struct DigEngine {
         // imprints and is the opposite of what the list is for. Ranked by
         // releases, the home imprint goes first and the one-offs fall to the
         // bottom where they belong.
+        //
+        // Counted per record rather than per mention, because the two sources
+        // above overlap: a release whose row named its label and which has
+        // also been read in full would otherwise count twice and outrank an
+        // imprint carrying more of the catalogue.
         var releaseCounts: [String: Int] = [:]
-        for raw in discogs?.releaseLabels ?? [] {
+        var counted: Set<String> = []
+        func count(_ raw: String, on release: String) {
             for name in LabelName.names(inDiscogsField: raw) {
-                releaseCounts[RecordingKey.normalize(name), default: 0] += 1
+                let key = RecordingKey.normalize(name)
+                guard !key.isEmpty, counted.insert("\(release)|\(key)").inserted else { continue }
+                releaseCounts[key, default: 0] += 1
             }
+        }
+        let countedIDs = discogs?.releaseDiscogsIDs ?? []
+        for (index, raw) in (discogs?.releaseLabels ?? []).enumerated() {
+            let identity = index < countedIDs.count ? String(countedIDs[index]) : "row \(index)"
+            count(raw, on: identity)
+        }
+        for record in credited {
+            for label in record.labelNames { count(label, on: String(record.discogsID)) }
         }
         let labels = labelNames
             .compactMap { key, mbid -> ArtistProfile.LabelRef? in
                 guard let name = spelling[key] else { return nil }
                 return ArtistProfile.LabelRef(
-                    name: name, mbid: mbid, releaseCount: releaseCounts[key] ?? 0
+                    name: name, mbid: mbid, releaseCount: releaseCounts[key] ?? 0,
+                    discogsID: labelIdentities[key]
                 )
             }
             .sorted {
@@ -641,7 +700,7 @@ nonisolated struct DigEngine {
         }
         let credits = Self.creditGroups(from: record)
         var relatedByName: [String: RelatedArtist] = [:]
-        for artist in record.artistNames {
+        for artist in record.credits {
             for peer in relatedArtists(to: artist) {
                 relatedByName[peer.name] = peer
             }
@@ -649,10 +708,10 @@ nonisolated struct DigEngine {
         // The same ladder every other surface uses, so a record does not have
         // a sleeve in the grid and a blank square on its own page.
         let artwork = DigArtwork(context: context).release(
-            title: record.title, artist: record.artistNames.first { ArtistName.isRealArtist($0) }
+            title: record.title, artist: record.credits.first { ArtistName.isRealArtist($0) }
         )
         return DigReleaseProfile(
-            id: id, title: record.title, year: record.year, artists: record.artistNames,
+            id: id, title: record.title, year: record.year, artists: record.credits,
             labels: labels, genres: record.genres, styles: record.styles,
             imageURL: record.imageURL ?? artwork.full,
             thumbnailURL: record.thumbnailURL ?? artwork.thumbnail,

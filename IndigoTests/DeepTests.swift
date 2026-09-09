@@ -366,3 +366,83 @@ final class DeepReadinessTests: XCTestCase {
         XCTAssertTrue(descent.results.contains { $0.node.title == "Stenny" })
     }
 }
+
+// MARK: - Not a second copy of the page
+
+/// The engine's own promise, applied to the thing the page is standing on.
+/// DEEP is the graph with the obvious answers taken away, and the most obvious
+/// answer of all is the one already printed six inches higher up.
+extension DeepTests {
+    private func pressing(
+        _ title: String, id: Int, label: String, catalog: String
+    ) -> DiscogsReleaseRecord {
+        let record = DiscogsReleaseRecord(discogsID: id, title: title)
+        record.labelNames = [label]
+        record.catalogNumbers = [catalog]
+        record.artistNames = ["Skee Mask"]
+        context.insert(record)
+        return record
+    }
+
+    /// The complaint exactly: a release's descent opened on the label and the
+    /// catalogue number printed directly above it.
+    func testAReleaseDescentDoesNotRepeatTheReleasePage() {
+        pressing("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        let origin = MusicNode.release("Compro", discogsID: 12_345)
+        let engine = DeepEngine(context: context)
+
+        let everything = Set(engine.results(from: origin).map(\.node.id))
+        XCTAssertTrue(everything.contains(MusicNode.label("Ilian Tape").id),
+                      "The walk still knows the label")
+
+        // What the page has already drawn: its label, its number, its artist.
+        let shown: Set<String> = [
+            MusicNode.label("Ilian Tape").id,
+            MusicNode.catalogNumber("ITLP09").id,
+            MusicNode.artist("Skee Mask").id
+        ]
+        let left = Set(engine.results(from: origin, showing: shown).map(\.node.id))
+
+        XCTAssertTrue(left.isDisjoint(with: shown),
+                      "Nothing the reader has just read comes back as a discovery")
+    }
+
+    /// Taking the page's contents out must not leave DEEPER as a button you
+    /// press through empty levels to reach the first real row.
+    func testADescentSettlesOnALevelThatHasSomething() {
+        pressing("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        let origin = MusicNode.release("Compro", discogsID: 12_345)
+        let engine = DeepEngine(context: context)
+
+        // Empty the surface by declaring everything on it already shown.
+        let surface = Set(
+            engine.results(from: origin).filter { $0.level == .surface }.map(\.node.id)
+        )
+        XCTAssertFalse(surface.isEmpty, "The surface had something to empty")
+
+        let descent = engine.descent(from: origin, at: .surface, showing: surface)
+
+        XCTAssertNotEqual(descent.level, .surface, "It did not stop on the level it emptied")
+        XCTAssertFalse(descent.results.isEmpty, "And it landed somewhere with rows in it")
+    }
+
+    /// Levels accumulate, so the walk must never hand back a level that is
+    /// already on the page — a rebuild after a write would print its rows
+    /// twice.
+    func testASettledLevelIsTheOneItSaysItIs() {
+        pressing("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        let origin = MusicNode.release("Compro", discogsID: 12_345)
+        let engine = DeepEngine(context: context)
+
+        let surface = Set(
+            engine.results(from: origin).filter { $0.level == .surface }.map(\.node.id)
+        )
+        let descent = engine.descent(from: origin, at: .surface, showing: surface)
+
+        XCTAssertTrue(
+            descent.results.allSatisfy { $0.level == descent.level },
+            "Every row belongs to the level the descent claims to be at"
+        )
+        XCTAssertNotEqual(descent.next, descent.level, "DEEPER never re-offers where you are")
+    }
+}

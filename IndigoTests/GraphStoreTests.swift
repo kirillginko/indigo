@@ -151,6 +151,24 @@ final class GraphStoreTests: XCTestCase {
         XCTAssertTrue(reached.contains { $0.node.kind == .catalogNumber && $0.node.title == "ITLP09" })
     }
 
+    /// The label page lists its catalogue by name, out of MusicBrainz, which
+    /// holds no id for any of it. The rows open by meeting that list against
+    /// this walk on the title — so a record reached from its label has to
+    /// arrive carrying somewhere to go, not just something to read.
+    func testARecordReachedFromItsLabelIsSomewhereYouCanGo() {
+        release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+
+        let reached = GraphStore(context: context).neighbors(of: .label("Ilian Tape")).byDestination
+        let compro = reached.first { $0.node.kind == .release && $0.node.title == "Compro" }
+
+        XCTAssertNotNil(compro?.node.destination, "A pressing with an id is a page")
+        XCTAssertEqual(
+            ArtistProfile.ReleaseLine.key("compro"),
+            ArtistProfile.ReleaseLine.key(compro?.node.title ?? ""),
+            "One record, however the two catalogues capitalised it"
+        )
+    }
+
     /// A run of catalogue numbers is a label's spine. Reading along it is how
     /// a promo or a reissue gets stumbled upon rather than searched for.
     func testACatalogueNumberOffersItsNeighboursOnTheShelf() {

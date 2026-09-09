@@ -75,6 +75,22 @@ struct CatalogDigView: View {
                             releaseRows(nearby)
                         }
                     }
+
+                    // Off the shelf and outwards. Everything above is the run
+                    // this number sits in; the descent is how somebody leaves
+                    // it — through whoever pressed the record, whoever played
+                    // it, and the numbers nobody claimed. A catalogue number
+                    // is the deepest thing in the graph that still has a page,
+                    // and until now it was the one page with no way further
+                    // down.
+                    //
+                    // Every row above came out of this same walk, so the
+                    // descent is handed all of it: the shelf is the page, and
+                    // DEEP is what the shelf does not hold.
+                    DeepSectionView(
+                        origin: .catalogNumber(number), isReady: hasLooked,
+                        showing: Set(connections.map(\.to.id))
+                    ) { appState.open($0) }
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.vertical, 22)

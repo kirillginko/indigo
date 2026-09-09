@@ -237,7 +237,9 @@ struct DigView: View {
             },
             uniquingKeysWith: { first, _ in first }
         )
-        trySuggestions = history.suggestions()
+        // Off the main actor: this one walks the graph, and the other three
+        // are indexed fetches. See `DigStore.digSuggestions(limit:)`.
+        trySuggestions = await dig.digSuggestions()
     }
 
     /// What this listener has actually been doing. Their own history first,

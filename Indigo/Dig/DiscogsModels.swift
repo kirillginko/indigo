@@ -87,15 +87,83 @@ nonisolated struct DiscogsArtistRelease: Decodable, Sendable {
     let label: String?
     let artist: String?
     let mainRelease: Int?
+    /// How it was issued: "12\", 33 ⅓ RPM, EP", "DVD, Album", "Cassette".
+    let format: String?
+    /// The sleeve, which this endpoint carries and nothing was reading.
+    ///
+    /// Sleeves used to come from the name search instead, and that search
+    /// returns twenty-five hits for a name rather than an artist's catalogue —
+    /// so once the discography stopped coming from it, most records had no
+    /// picture at all. They are on the record's own row here.
+    let thumbnail: String?
 
     private enum CodingKeys: String, CodingKey {
-        case id, title, year, role, type, label, artist
+        case id, title, year, role, type, label, artist, format
         case mainRelease = "main_release"
+        case thumbnail = "thumb"
+    }
+
+    /// Whether this is a film rather than a record.
+    ///
+    /// The distinction earns its place twice over. It is what tells a video
+    /// director from a group when Discogs files both under one name — his
+    /// releases are videos and he is the main credit on them, so "has
+    /// releases of their own" could not separate them. And it is why a page
+    /// for Hype Williams listed Palm Pictures among his labels: a film
+    /// distributor is not an imprint an artist releases on, it is who put out
+    /// the DVD.
+    ///
+    /// A concert film by a musician is caught by this too, and that is the
+    /// intended trade: this is an application about records.
+    var isVideo: Bool {
+        guard let format else { return false }
+        let value = format.lowercased()
+        return Self.videoFormats.contains { value.contains($0) }
+    }
+
+    private static let videoFormats = [
+        "dvd", "vhs", "blu-ray", "bluray", "laserdisc", "video", "betamax", "vcd", "umd"
+    ]
+
+    /// The id that opens a page.
+    ///
+    /// A master's own id is not a release id, and asking `releases/{id}` for
+    /// one answers about the wrong thing or not at all. Discogs names the
+    /// pressing a master stands for in `main_release`, which is the one to
+    /// follow.
+    var catalogueID: Int? {
+        type == "master" ? (mainRelease ?? id) : id
     }
 }
 
 nonisolated struct DiscogsArtistReleases: Decodable, Sendable {
     let releases: [DiscogsArtistRelease]?
+}
+
+/// One record in a label's own catalogue.
+///
+/// From `labels/{id}/releases`, which answers about a label by identity
+/// rather than by name — the distinction the whole of `labelDiscogsIDs`
+/// exists for. Shaped like an artist's releases and not like a search hit:
+/// the artist is a field of its own here rather than glued to the front of
+/// the title, and the catalogue number is given.
+nonisolated struct DiscogsLabelRelease: Decodable, Sendable {
+    let id: Int?
+    let title: String?
+    let artist: String?
+    let year: Int?
+    let catno: String?
+    let format: String?
+    let thumbnail: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case id, title, artist, year, catno, format
+        case thumbnail = "thumb"
+    }
+}
+
+nonisolated struct DiscogsLabelReleases: Decodable, Sendable {
+    let releases: [DiscogsLabelRelease]?
 }
 
 nonisolated struct DiscogsArtistBundle: Sendable {
@@ -115,8 +183,17 @@ nonisolated struct DiscogsTrackLine: Decodable, Sendable {
     /// compilation and was being thrown away.
     let artists: [DiscogsArtistReference]?
 
+    /// Who is on this track, when the record itself is credited to nobody.
+    ///
+    /// Disambiguators removed for the same reason they are removed everywhere
+    /// else a Discogs name reaches the app: "Hype Williams (2)" is Discogs'
+    /// filing, and a track line naming it sends somebody to a page for a
+    /// person who does not exist.
     var artistName: String? {
-        let names = (artists ?? []).compactMap(\.name).filter { !$0.isEmpty }
+        let names = (artists ?? [])
+            .compactMap(\.name)
+            .map(DiscogsClient.withoutDisambiguator)
+            .filter { !$0.isEmpty }
         return names.isEmpty ? nil : names.joined(separator: " & ")
     }
 }

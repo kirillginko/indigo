@@ -119,7 +119,10 @@ nonisolated enum DetailPage: Hashable {
     case kioskEpisode(slug: String)
     case digArtist(mbid: String?, name: String)
     case digLabel(mbid: String, name: String)
-    case digDiscogsLabel(name: String)
+    /// A label Discogs knows by name, and — where a record told us — by
+    /// identity. The id is what separates two labels sharing a name; see
+    /// `DiscogsReleaseRecord.labelDiscogsIDs`.
+    case digDiscogsLabel(name: String, discogsID: Int? = nil)
     case digRelease(id: Int, title: String)
     /// A record named only in an artist's own listing, with no catalogue
     /// entry to open. It still has a page.
