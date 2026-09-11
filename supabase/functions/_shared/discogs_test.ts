@@ -10,8 +10,8 @@
 //
 // Or Scripts/test-functions.sh, which runs everything under supabase/functions.
 
-import { assertEquals } from "jsr:@std/assert@1";
-import { searchTarget } from "./discogs.ts";
+import { assert, assertEquals } from "jsr:@std/assert@1";
+import { DISCOGS_SPACING_MS, fetchArtistPortrait, searchTarget } from "./discogs.ts";
 
 Deno.test("an artist hit becomes a complete artist row", () => {
   const target = searchTarget({ id: 2477159, type: "artist", title: "Purelink", country: "US" });
@@ -86,4 +86,27 @@ Deno.test("a country is absent rather than empty", () => {
   // Written as "" it would read as a country nobody is from.
   assertEquals(searchTarget({ id: 10, type: "artist", title: "Purelink", country: "" })?.country, null);
   assertEquals(searchTarget({ id: 11, type: "artist", title: "Purelink" })?.country, null);
+});
+
+Deno.test("portrait searches leave a second between them", async () => {
+  // The portrait lane runs thirty back to back on a credential listeners share.
+  const sent: number[] = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = ((_input: unknown, _init?: unknown) => {
+    sent.push(Date.now());
+    return Promise.resolve(new Response(JSON.stringify({ results: [] }), { status: 200 }));
+  }) as typeof fetch;
+  try {
+    await fetchArtistPortrait("Purelink", undefined, "IndigoTest/1");
+    await fetchArtistPortrait("Skee Mask", undefined, "IndigoTest/1");
+    await fetchArtistPortrait("Bandulu", undefined, "IndigoTest/1");
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+
+  assert(sent.length === 3, `expected three requests, saw ${sent.length}`);
+  for (let i = 1; i < sent.length; i++) {
+    const gap = sent[i] - sent[i - 1];
+    assert(gap >= DISCOGS_SPACING_MS - 5, `requests ${i} and ${i + 1} were ${gap}ms apart`);
+  }
 });

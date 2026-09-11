@@ -52,14 +52,22 @@ Deno.serve(async (req: Request) => {
     ? Math.min(Math.max(Math.trunc(requested), 1), MAX_BATCH)
     : 5;
 
+  // One kind of job only, for a drain that has a lane of its own; see 0024.
+  // Left out of the call entirely when absent, so the main drain's request is
+  // the same one it has always made and works against either claim function.
+  const jobType = typeof body.job_type === "string" && /^[a-z_]{1,64}$/.test(body.job_type)
+    ? body.job_type
+    : null;
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  const { data: claimed, error } = await supabase.rpc("claim_enrichment_jobs", {
-    p_limit: limit,
-  });
+  const { data: claimed, error } = await supabase.rpc(
+    "claim_enrichment_jobs",
+    jobType ? { p_limit: limit, p_job_type: jobType } : { p_limit: limit },
+  );
   if (error) return json({ error: "claim_failed", detail: error.message }, 500);
 
   const jobs = (claimed ?? []) as Job[];

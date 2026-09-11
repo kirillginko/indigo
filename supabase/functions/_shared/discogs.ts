@@ -276,6 +276,23 @@ export async function isDiscogsSearchNormalized(
   return Boolean(data);
 }
 
+export const DISCOGS_SPACING_MS = 1000;
+let lastPortraitRequestAt = 0;
+
+/// Portrait searches, a second apart.
+///
+/// The portrait lane runs thirty of these back to back, and unspaced they go
+/// out in about ten seconds — half the credential's minute gone in a burst,
+/// with catalog-refresh answering listeners on the same token. Spaced, the
+/// lane never takes more than thirty in any minute. See migration 0024.
+/// Exported for its own test.
+export async function pacedPortraitFetch(input: URL, init: RequestInit): Promise<Response> {
+  const wait = lastPortraitRequestAt + DISCOGS_SPACING_MS - Date.now();
+  if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+  lastPortraitRequestAt = Date.now();
+  return await fetch(input, init);
+}
+
 /// A picture of an artist, or the finding that Discogs has none.
 ///
 /// Moved here from the app, where it ran as a background loop on every
@@ -307,7 +324,7 @@ export async function fetchArtistPortrait(
   };
   if (token) headers.Authorization = `Discogs token=${token}`;
 
-  const response = await fetch(url, { headers });
+  const response = await pacedPortraitFetch(url, { headers });
   // Thrown rather than swallowed: the queue's own retry is the right answer to
   // being told to slow down, and recording a miss here would write down "no
   // picture exists" on the strength of a refusal.

@@ -83,8 +83,25 @@ run -f "$ROOT/supabase/migrations/0022_drain_thirty_jobs.sql" >/dev/null
 run -c "do \$\$ begin if not exists (select 1 from cron.job where jobname = 'indigo-drain-queue' and command like '%''limit'', 30%') then raise exception 'the running drain job still asks for fewer than thirty'; end if; end \$\$;"
 echo "    a drain that was already running now asks for thirty"
 
+echo "· portrait lane"
+# As a project whose drain was running before 0024: no lane yet. Applying 0024
+# again has to add one that claims only portraits.
+run -c "delete from cron.job where jobname = 'indigo-drain-portraits';"
+run -f "$ROOT/supabase/migrations/0024_portrait_lane.sql" >/dev/null
+run -c "do \$\$ begin if not exists (select 1 from cron.job where jobname = 'indigo-drain-portraits' and command like '%''job_type'', ''fetch_artist_portrait''%') then raise exception 'a running drain did not get a portrait lane'; end if; end \$\$;"
+echo "    a drain that was already running now has a portrait lane"
+
+echo "· privileges"
+# As a project from before 0023: its internal functions granted to the app's
+# key by name. Applying 0023 again has to take that back.
+run -c "grant execute on function public.enqueue_enrichment_job(text, text, text, jsonb, int, text, uuid) to anon, authenticated;"
+run -f "$ROOT/supabase/migrations/0023_keep_the_queue_private.sql" >/dev/null
+run -c "do \$\$ begin if has_function_privilege('anon', 'public.enqueue_enrichment_job(text, text, text, jsonb, int, text, uuid)', 'execute') then raise exception 'the app key can still fill the queue'; end if; end \$\$;"
+echo "    a queue the app key could fill no longer can be"
+
 echo "· checks"
 run -f "$ROOT/supabase/tests/radio_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/scene_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/search_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/portrait_smoke.sql" | sed 's/^/    /'
+run -f "$ROOT/supabase/tests/queue_smoke.sql" | sed 's/^/    /'
