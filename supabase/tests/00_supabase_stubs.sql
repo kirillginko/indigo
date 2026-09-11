@@ -5,6 +5,14 @@
 create role anon nologin;
 create role authenticated nologin;
 create role service_role nologin;
+
+-- What a Supabase project grants on every new function, by role name. Without
+-- this a plain Postgres is stricter than the real thing: `revoke ... from
+-- public` really does close a function here, and every migration looked
+-- private in tests while being callable with the publishable key in
+-- production. See migration 0023.
+alter default privileges in schema public
+    grant execute on functions to anon, authenticated, service_role;
 create schema if not exists extensions;
 create schema if not exists storage;
 
