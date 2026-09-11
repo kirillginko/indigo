@@ -280,3 +280,11 @@ nonisolated struct DiscogsReleaseDetail: Decodable, Sendable {
     let notes: String?
     let uri: String?
 }
+
+/// The three things a dig can start from, as Discogs names them in a
+/// `database/search` `type` parameter.
+nonisolated enum DiscogsSearchKind: String, Sendable, CaseIterable {
+    case artist
+    case release
+    case label
+}

@@ -658,3 +658,69 @@ nonisolated extension Catalog {
         }
     }
 }
+
+// MARK: - Search
+
+nonisolated extension Catalog {
+    /// What the shared catalogue has for a typed query, in the three kinds a
+    /// dig can start from.
+    ///
+    /// Ranked by Postgres rather than here: `search_catalog` knows which rows
+    /// matched exactly, which matched a prefix, and how close the rest were,
+    /// and none of that survives the trip. See migration 0018.
+    struct SearchResults: Codable, Sendable, Hashable {
+        var artists: [ArtistHit]
+        var labels: [LabelHit]
+        var releases: [ReleaseHit]
+
+        static let none = SearchResults(artists: [], labels: [], releases: [])
+
+        var isEmpty: Bool { artists.isEmpty && labels.isEmpty && releases.isEmpty }
+
+        struct ArtistHit: Codable, Sendable, Hashable, Identifiable {
+            var id: UUID
+            var name: String
+            var country: String?
+            /// Discogs' own id where the catalogue has recorded one. Carried
+            /// so a result can open the page Indigo already builds from a
+            /// Discogs id rather than one guessed back from the name.
+            var discogsID: String?
+
+            enum CodingKeys: String, CodingKey {
+                case id, name, country
+                case discogsID = "discogs_id"
+            }
+        }
+
+        struct LabelHit: Codable, Sendable, Hashable, Identifiable {
+            var id: UUID
+            var name: String
+            var country: String?
+            var discogsID: String?
+
+            enum CodingKeys: String, CodingKey {
+                case id, name, country
+                case discogsID = "discogs_id"
+            }
+        }
+
+        struct ReleaseHit: Codable, Sendable, Hashable, Identifiable {
+            var id: UUID
+            var title: String
+            var artistName: String?
+            var labelName: String?
+            var releaseYear: Int?
+            var catalogNumber: String?
+            var discogsID: String?
+
+            enum CodingKeys: String, CodingKey {
+                case id, title
+                case artistName = "artist_name"
+                case labelName = "label_name"
+                case releaseYear = "release_year"
+                case catalogNumber = "catalog_number"
+                case discogsID = "discogs_id"
+            }
+        }
+    }
+}

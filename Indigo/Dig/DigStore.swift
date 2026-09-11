@@ -582,6 +582,18 @@ final class DigStore {
                 try? await Task.sleep(for: .milliseconds(250))
                 if Task.isCancelled { return }
             }
+            // And out of the way of the minute's last requests, which belong
+            // to whatever the listener does next rather than to the backlog.
+            //
+            // The yields above are about who is waiting; this one is about
+            // what is left. They are not the same question — the fill can be
+            // the only thing running, with nobody digging and nothing
+            // playing, and still be the reason a search two seconds from now
+            // is refused. See `DiscogsBudget.reserve`.
+            while await !discogsClient.hasRoom(for: .background) {
+                try? await Task.sleep(for: .seconds(2))
+                if Task.isCancelled { return }
+            }
 
             guard let next = await nextPortraitNeeded() else {
                 if quiet > 0 { artworkRevision &+= 1 }
@@ -1005,6 +1017,122 @@ final class DigStore {
         let _ = revision
         settle()
         return await worker.connections(from: node, generation: revision)
+    }
+
+    // MARK: - Search
+
+    /// Answers from the two networked catalogues, kept for the session.
+    ///
+    /// Keyed on the query rather than on a page, and deliberately not
+    /// invalidated by `revision`: enrichment writing a row somewhere does not
+    /// change what Discogs has under "ilian", and re-asking on every write
+    /// would spend a listener's rate limit confirming it.
+    @ObservationIgnored private var searches = DigCache<DigSearchResults>()
+
+    /// What this machine already holds, matched against a typed query.
+    ///
+    /// Off the main thread, and no network: this is the half of a search that
+    /// can be drawn immediately, and it is drawn before the other two are
+    /// asked. See `DigSearchIndex`.
+    func searchYours(_ query: String, limit: Int = 30) async -> [DigSearchResult] {
+        guard DigSearchIndex.isSearchable(query) else { return [] }
+        let _ = revision
+        settle()
+        return await worker.searchLocally(query, limit: limit, generation: revision)
+    }
+
+    /// Indigo's shared graph and Discogs, asked at the same time.
+    ///
+    /// Neither is allowed to sink the other: a backend that is not configured
+    /// and a search for something nobody has ever filed are each one empty
+    /// section on a page whose other sections still work. A refusal is not in
+    /// that class and is carried back rather than swallowed — see
+    /// `DigSearchResults.discogsRefused`.
+    ///
+    /// Marked as foreground work. Somebody is watching this, and the
+    /// background portrait fill stands aside for as long as it runs; without
+    /// that the fill spends the minute's requests on rows nobody has looked at
+    /// and the search is refused in a millisecond. That was not a theory — a
+    /// trace of a real session showed ninety-seven requests in one minute out
+    /// of a budget of sixty, and the searches at the end of it coming back in
+    /// three milliseconds each.
+    func searchElsewhere(_ query: String, limit: Int = 8) async -> DigSearchResults {
+        let key = RecordingKey.normalize(query)
+        guard key.count >= DigSearchIndex.shortestQuery else { return .none }
+        if let cached = searches.fresh(key, revision: 0) { return cached }
+
+        let found = await inForeground {
+            // Our own catalogue first, on its own.
+            //
+            // These four used to leave together, and asking in parallel saved
+            // nothing: the wall time was whichever leg was slowest, and
+            // Discogs was asked every time regardless of what we already had.
+            // Asked first, a query the catalogue can answer never pays for the
+            // other three at all — no request, and none of the half second the
+            // backend hop costs. That is the whole return on filing what a
+            // search finds; see `normalizeDiscogsSearch`.
+            //
+            // It also means Discogs traffic follows the number of *distinct
+            // unanswered queries* rather than the number of listeners, which
+            // is the only version of this that survives more people using it.
+            let catalogue = await catalogueSearch(query, limit: limit)
+            if DigSearchResult.answers(catalogue, query: query) {
+                return DigSearchResults(yours: [], catalogue: catalogue, discogs: [])
+            }
+
+            async let artists = discogsSearch(query, kind: .artist, limit: limit)
+            async let labels = discogsSearch(query, kind: .label, limit: limit)
+            async let releases = discogsSearch(query, kind: .release, limit: limit)
+
+            let byArtist = await artists
+            let byLabel = await labels
+            let byRelease = await releases
+
+            // Artists and labels ahead of releases: somebody typing a name is
+            // usually after a person or an imprint, and Discogs holds an order
+            // of magnitude more pressings than either.
+            return DigSearchResults(
+                yours: [],
+                catalogue: catalogue,
+                discogs: byArtist.rows + byLabel.rows + byRelease.rows,
+                discogsRefused: byArtist.refused || byLabel.refused || byRelease.refused
+            )
+        }
+
+        // A refusal is not an answer, and caching one makes it permanent: the
+        // same query would return the same nothing for the rest of the
+        // session, however quiet Discogs had since become.
+        if !found.discogsRefused { searches.store(found, key: key, revision: 0) }
+        return found
+    }
+
+    private func catalogueSearch(_ query: String, limit: Int) async -> [DigSearchResult] {
+        guard SupabaseService.isConfigured else { return [] }
+        guard let results = try? await SearchRepository.shared.search(query, limit: limit)
+        else { return [] }
+        return DigSearchResult.rows(from: results)
+    }
+
+    /// One kind, and whether Discogs would answer at all.
+    private func discogsSearch(
+        _ query: String, kind: DiscogsSearchKind, limit: Int
+    ) async -> (rows: [DigSearchResult], refused: Bool) {
+        guard discogsClient.isConfigured else { return ([], false) }
+        // Asked before spending anything. A request sent into an empty budget
+        // comes back refused in a millisecond, and the page then has to guess
+        // what that meant; knowing in advance is both quicker and clearer.
+        //
+        // `canSearch` rather than `hasRoom`: a search that goes to the backend
+        // spends none of this app's budget. See `DiscogsClient.canSearch`.
+        guard await discogsClient.canSearch() else { return ([], true) }
+        do {
+            let results = try await discogsClient.search(query, kind: kind, limit: limit)
+            return (DigSearchResult.rows(fromDiscogs: results, kind: kind), false)
+        } catch DiscogsError.rateLimited {
+            return ([], true)
+        } catch {
+            return ([], false)
+        }
     }
 
     /// Where this listener has not been, worked out off the main thread.
