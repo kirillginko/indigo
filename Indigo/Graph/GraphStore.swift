@@ -46,6 +46,9 @@ nonisolated struct GraphStore {
         var caches: Caches?
         /// The tables the last generation read, offered to this one.
         var inherited: Caches?
+        /// When this store began reading its tables. An answer worked out
+        /// from them is only as new as this.
+        var assembledAt: Date?
     }
 
     init(context: ModelContext, inheriting previous: GraphStore? = nil) {
@@ -74,9 +77,11 @@ nonisolated struct GraphStore {
 
     private var caches: Caches {
         if let existing = box.caches { return existing }
+        let started = Date()
         let fresh = Trace.step("graph.tables") {
             Caches(context: context, reusing: box.inherited)
         }
+        box.assembledAt = started
         box.caches = fresh
         box.inherited = nil
         return fresh
@@ -91,6 +96,24 @@ nonisolated struct GraphStore {
     func neighbors(of node: MusicNode) -> EdgeSet {
         if let kept = Trace.step("g.stored", node.key, { stored(for: node) }) { return kept }
         let computed = compute(node)
+        // Handed back, but not kept, when the stored answer was thrown away
+        // after these tables were read.
+        //
+        // A walk and a write do not wait for each other. Opening an artist
+        // starts a walk, and the discography lands while it is still going:
+        // the write forgets the stored answer, and then the walk — built from
+        // tables read before the write — finished and stored its own in the
+        // space the forget had just cleared. Stored answers outlive unrelated
+        // writes on purpose, so that one stayed, and the artist's
+        // neighbourhood was the one from before its discography arrived. The
+        // trace caught a walk in flight across the write in five of eight
+        // artist opens. The page still gets this answer for now; the write
+        // already moved the revision, and the walk that follows stores one
+        // worked out from what is there.
+        if let assembled = box.assembledAt, ForgottenNodes.shared.wasForgotten(node.id, since: assembled) {
+            Trace.step("g.stale", node.key) {}
+            return computed
+        }
         Trace.step("g.persist", node.key) { persist(computed, for: node) }
         return computed
     }
@@ -281,6 +304,7 @@ nonisolated struct GraphStore {
     /// worked out from has changed.
     static func forget(_ node: MusicNode, in context: ModelContext) {
         let identity = node.id
+        ForgottenNodes.shared.record(identity)
         for row in (try? context.fetch(
             FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity })
         )) ?? [] {
@@ -1559,5 +1583,29 @@ nonisolated final class LibraryAlbums: @unchecked Sendable {
             for artistKey in credited { albums[artistKey, default: []].insert(album) }
         }
         return Index(albums: albums, entries: entries, trackCounts: counts)
+    }
+}
+
+/// When each node's stored answer was last thrown away, for the whole process.
+///
+/// In memory rather than in the store, because what it has to reach is a walk
+/// on another context that is already under way and will not read the store
+/// again before it saves. Grows by one entry per node forgotten in a session,
+/// which is a few hundred at most.
+nonisolated final class ForgottenNodes: @unchecked Sendable {
+    static let shared = ForgottenNodes()
+
+    private let lock = NSLock()
+    private var forgottenAt: [String: Date] = [:]
+
+    func record(_ nodeID: String) {
+        lock.withLock { forgottenAt[nodeID] = Date() }
+    }
+
+    /// Whether the node was forgotten at or after `moment`. A tie counts:
+    /// storing nothing costs one walk, and storing something stale costs the
+    /// page its neighbourhood until the next write.
+    func wasForgotten(_ nodeID: String, since moment: Date) -> Bool {
+        lock.withLock { forgottenAt[nodeID].map { $0 >= moment } ?? false }
     }
 }

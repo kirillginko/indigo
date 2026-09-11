@@ -141,6 +141,39 @@ final class GraphStoreTests: XCTestCase {
         XCTAssertEqual(byKind[.release]?.first?.node.destination, .digRelease(id: 12_345, title: "Compro"))
     }
 
+    // MARK: Answers worked out before a write
+
+    /// A walk that read its tables before a write, and finishes after the
+    /// write threw the stored answer away, must not put its own answer back.
+    /// That answer describes the artist as they were before the write.
+    func testAnAnswerWorkedOutBeforeItWasForgottenIsNotKept() throws {
+        artist("Skee Mask", labels: ["Ilian Tape"], styles: ["Techno"], releases: [("Compro", 12_345)])
+        try context.save()
+
+        let walk = GraphStore(context: context)
+        walk.prepare()
+        GraphStore.forget(.artist("Skee Mask"), in: context)
+        try context.save()
+
+        let reached = walk.neighbors(of: .artist("Skee Mask"))
+        XCTAssertFalse(reached.byDestination.isEmpty, "The page still gets an answer")
+        let id = MusicNode.artist("Skee Mask").id
+        let kept = try context.fetch(FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == id }))
+        XCTAssertTrue(kept.isEmpty, "An answer from tables older than the write must not be stored")
+    }
+
+    /// And a walk that began after the forget stores its answer as always.
+    func testAnAnswerWorkedOutAfterItWasForgottenIsKept() throws {
+        artist("Skee Mask", labels: ["Ilian Tape"], styles: ["Techno"], releases: [("Compro", 12_345)])
+        try context.save()
+        GraphStore.forget(.artist("Skee Mask"), in: context)
+        try context.save()
+
+        _ = GraphStore(context: context).neighbors(of: .artist("Skee Mask"))
+        let id = MusicNode.artist("Skee Mask").id
+        let kept = try context.fetch(FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == id }))
+        XCTAssertFalse(kept.isEmpty)
+    }
 
     // MARK: Rebuilding after records arrive
 
