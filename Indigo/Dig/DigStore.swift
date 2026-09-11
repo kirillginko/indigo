@@ -469,6 +469,20 @@ final class DigStore {
 
     func wantPortraits(for names: [String]) {
         portraitPriority = names.filter { ArtistName.isRealArtist($0) }
+        // The backend first, for all of them at once.
+        //
+        // These went straight to the fill, which searches Discogs for one name
+        // every second and a half — so the eighteen faces on a page were the
+        // one set of pictures that never asked the backend, which had often
+        // already found them. Asked here, a page's rows fill in from a single
+        // request and the fill is left only what the backend had nothing for.
+        let wanted = portraitPriority.filter { isPortraitWanted($0) }
+        guard !wanted.isEmpty else { return }
+        let previous = onScreenAdoption
+        onScreenAdoption = Task { [weak self] in
+            await previous?.value
+            await self?.adoptCataloguePortraits(for: wanted, onScreen: true)
+        }
     }
 
     // MARK: - Who gets the request budget
@@ -745,6 +759,9 @@ final class DigStore {
         // The on-screen list is consumed rather than re-searched: each name
         // is checked once and then gone, instead of every name being looked
         // up again on every tick.
+        // Whatever the backend is about to answer for these, before searching
+        // Discogs for any of them. See `wantPortraits(for:)`.
+        await onScreenAdoption?.value
         while let next = portraitPriority.first {
             portraitPriority.removeFirst()
             if isPortraitWanted(next) {
@@ -788,24 +805,46 @@ final class DigStore {
     /// one. The rest are picked up on the next rebuild.
     private static let cataloguePortraitBatch = 200
 
-    private func adoptCataloguePortraits(for names: [String]) async {
-        guard SupabaseService.isConfigured, !names.isEmpty else { return }
+    /// Where the portraits the backend has already found come from. A property
+    /// so a test can stand in for the backend, which is off under XCTest.
+    @ObservationIgnored var cataloguePortraits: @Sendable ([String]) async -> [String: URL] = { keys in
+        guard SupabaseService.isConfigured else { return [:] }
+        return (try? await ArtworkRepository.shared.portraits(forArtistKeys: keys)) ?? [:]
+    }
 
+    /// Catalogue keys already asked about this session. A page reports its rows
+    /// on every redraw, and each report would otherwise be a request; and the
+    /// backlog asks for the next names it has not asked about, rather than the
+    /// same first two hundred every time it is rebuilt.
+    @ObservationIgnored private var askedCatalogueForPortraits: Set<String> = []
+
+    /// The on-screen request in flight, so the fill waits for its answer rather
+    /// than searching Discogs for a picture that is about to arrive.
+    @ObservationIgnored private var onScreenAdoption: Task<Void, Never>?
+
+    private func adoptCataloguePortraits(for names: [String], onScreen: Bool = false) async {
         // The catalogue files names under `RecordingKey.normalize`; this store
         // keys them under `normalizeArtist`. The two disagree about joint
         // credits, so the question goes out in the catalogue's spelling and
         // the answer comes back to the display name it was asked about.
         var byCatalogueKey: [String: String] = [:]
-        for name in names.prefix(Self.cataloguePortraitBatch) {
+        for name in names {
+            guard byCatalogueKey.count < Self.cataloguePortraitBatch else { break }
             let key = RecordingKey.normalize(name)
-            guard !key.isEmpty, byCatalogueKey[key] == nil else { continue }
+            guard !key.isEmpty, byCatalogueKey[key] == nil,
+                  !askedCatalogueForPortraits.contains(key) else { continue }
             byCatalogueKey[key] = name
         }
         guard !byCatalogueKey.isEmpty else { return }
+        askedCatalogueForPortraits.formUnion(byCatalogueKey.keys)
 
-        guard let found = try? await ArtworkRepository.shared.portraits(
-            forArtistKeys: Array(byCatalogueKey.keys)
-        ), !found.isEmpty else { return }
+        let found = await cataloguePortraits(Array(byCatalogueKey.keys))
+        // The one line that says whether the backend's pictures reach the app:
+        // how many were asked for, from where, and how many it had.
+        Trace.step(
+            "portraits.adopted",
+            "\(onScreen ? "screen" : "backlog") asked=\(byCatalogueKey.count) found=\(found.count)"
+        ) {}
 
         var adopted: [(name: String, address: String)] = []
         var resolved: [String: URL] = [:]
@@ -817,7 +856,18 @@ final class DigStore {
         guard !adopted.isEmpty else { return }
 
         await worker.adopt(adopted)
-        for (key, url) in resolved { portraits[key] = url }
+        for (key, url) in resolved {
+            portraits[key] = url
+            portraitsSettled.insert(key)
+        }
+        // Rows already drawn are repainted, as the fill repaints them, for the
+        // ones on screen. Not for the backlog: up to two hundred edge rewrites
+        // on the main thread for rows nobody is looking at, which read the
+        // portrait table when they are next drawn anyway.
+        if onScreen {
+            for (name, address) in adopted { paint(name, with: address) }
+            saveContext()
+        }
         // One announcement for the batch. See `artworkRevision`.
         artworkRevision &+= 1
     }

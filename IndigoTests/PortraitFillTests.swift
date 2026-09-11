@@ -471,3 +471,57 @@ final class PortraitRepaintTests: XCTestCase {
         XCTAssertEqual(other.toArtworkURLString, "https://i.discogs.com/inga.jpeg")
     }
 }
+
+/// Every name a stand-in backend was asked about, and how many times.
+private final class CatalogueAsks: @unchecked Sendable {
+    private let lock = NSLock()
+    private var asks: [[String]] = []
+    func record(_ keys: [String]) { lock.withLock { asks.append(keys) } }
+    var count: Int { lock.withLock { asks.count } }
+}
+
+/// The pictures the backend has already found, reaching the rows on screen.
+@MainActor
+final class CataloguePortraitTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    /// The faces on a page come from the backend in one request, are written
+    /// down so they outlast the session, and leave only what it had nothing for
+    /// to be searched for. A redraw reporting the same rows does not ask again.
+    func testTheRowsOnScreenTakeTheBackendsPicturesFirst() async throws {
+        let asks = CatalogueAsks()
+        let dig = DigStore(context: context)
+        dig.cataloguePortraits = { keys in
+            asks.record(keys)
+            return keys.contains("carl craig") ? ["carl craig": URL(string: "https://img.test/carl.jpg")!] : [:]
+        }
+
+        dig.wantPortraits(for: ["Carl Craig", "Somebody Buried"])
+        for _ in 0..<300 where dig.portraitURL(for: "Carl Craig") == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        XCTAssertEqual(dig.portraitURL(for: "Carl Craig")?.absoluteString, "https://img.test/carl.jpg")
+        XCTAssertNil(dig.portraitURL(for: "Somebody Buried"), "Nothing on the backend is not a picture")
+
+        let key = RecordingKey.normalizeArtist("Carl Craig")
+        let stored = try context.fetch(FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key }))
+        XCTAssertEqual(stored.first?.imageURLString, "https://img.test/carl.jpg", "Written down, not only held")
+
+        dig.wantPortraits(for: ["Carl Craig", "Somebody Buried"])
+        try await Task.sleep(for: .milliseconds(150))
+        XCTAssertEqual(asks.count, 1, "A page redrawing its rows is not another request")
+    }
+}
