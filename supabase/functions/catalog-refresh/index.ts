@@ -10,7 +10,11 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
-import { normalizeDiscogsRelease } from "../_shared/discogs.ts";
+import {
+  isDiscogsSearchNormalized,
+  normalizeDiscogsRelease,
+  normalizeDiscogsSearch,
+} from "../_shared/discogs.ts";
 import { ingestNTSEpisode, ingestNTSShow } from "../_shared/nts.ts";
 
 // An allow-list, not a URL parameter. The request names a provider and a
@@ -70,6 +74,10 @@ function isSafeID(provider: string, resourceType: string, id: string): boolean {
 // does not match one of these patterns is refused, and every query key must be
 // named here. Without both halves this would be an open proxy wearing Indigo's
 // credential.
+/// The one path that is a question rather than a lookup. Named because both
+/// the allow-list and the normalizer have to agree about it.
+const SEARCH_PATH = "database/search";
+
 const DISCOGS_PATHS: Array<{ pattern: RegExp; params: Set<string> }> = [
   {
     pattern: /^database\/search$/,
@@ -226,7 +234,7 @@ Deno.serve(async (req: Request) => {
     // run that failed partway, still has no rows behind it. Cheap to check —
     // one indexed lookup — and it means the normalized tables catch up without
     // anyone having to expire the cache by hand.
-    if (!(await isNormalized(supabase, provider, resourceType, resourceID))) {
+    if (!(await isNormalized(supabase, provider, resourceType, resourceID, cached.payload))) {
       await normalize(supabase, provider, resourceType, resourceID, cached.payload);
     }
     return json(cached.payload);
@@ -313,7 +321,15 @@ async function isNormalized(
   provider: string,
   resourceType: string,
   resourceID: string,
+  payload: unknown,
 ): Promise<boolean> {
+  // A search names many entities rather than one, so its marker cannot be the
+  // resource id. It is read out of the payload instead; see
+  // `isDiscogsSearchNormalized`.
+  if (provider === "discogs" && resourceType === SEARCH_PATH) {
+    return await isDiscogsSearchNormalized(supabase, payload as Record<string, unknown>);
+  }
+
   if (provider === "discogs" && resourceType === "release") {
     const { data } = await supabase
       .from("external_ids")
@@ -353,6 +369,9 @@ async function normalize(
   payload: unknown,
 ): Promise<void> {
   try {
+    if (provider === "discogs" && resourceType === SEARCH_PATH) {
+      await normalizeDiscogsSearch(supabase, payload as Record<string, unknown>);
+    }
     if (provider === "discogs" && resourceType === "release") {
       await normalizeDiscogsRelease(supabase, payload as Record<string, unknown>);
     }

@@ -149,3 +149,129 @@ export async function normalizeDiscogsRelease(
 
   return releaseUUID;
 }
+
+/// Discogs' own filing marks, which are not part of anybody's name.
+///
+/// "Nirvana (2)" is how Discogs separates two bands that share a name, and the
+/// trailing asterisk on "Flowdan*" says a record credited them under a variant
+/// spelling. Both belong to the catalogue's bookkeeping rather than to the
+/// artist, and filed here they become names nothing else in Indigo is stored
+/// under — a row that matches a search and then opens onto an empty page.
+///
+/// The app strips them at the same boundary; see
+/// `DiscogsClient.withoutDisambiguator`.
+function withoutDisambiguator(title: string): string {
+  return title
+    .replace(/\s*\(\d+\)/g, "")
+    .replace(/\*/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+/// The entities named in a `database/search` response, filed as rows.
+///
+/// Searches were being cached as a blob and normalized into nothing, so every
+/// search anyone had ever run taught the catalogue exactly nothing — and the
+/// catalogue is what `search_catalog` reads. This is the difference between a
+/// backend that gets cheaper the more it is used and one that gets more
+/// expensive.
+///
+/// **Artists and labels only, on purpose.** Those two tables hold a name, its
+/// normalized form and a country, and an artist or label hit carries all
+/// three: the row is finished rather than provisional.
+///
+/// A release hit is not. `releases` wants an artist and a label, and a search
+/// result names neither by id — it carries "Artist - Title" as one string and
+/// its labels as bare names. Worse, `resolveEntity` returns an existing entity
+/// without updating it, so a credit-less stub written now would still be
+/// credit-less after somebody opened the record and the full payload went
+/// past. Releases reach these tables through `normalizeDiscogsRelease`, which
+/// has the ids. A `master` hit is skipped for a second reason: its `id` is a
+/// master id, and filing that as a release external id would point a later
+/// lookup at the wrong thing entirely.
+export async function normalizeDiscogsSearch(
+  supabase: SupabaseClient,
+  payload: Payload,
+): Promise<number> {
+  const results = Array.isArray(payload?.results) ? payload.results : [];
+  let filed = 0;
+
+  for (const result of results) {
+    const target = searchTarget(result);
+    if (!target) continue;
+
+    const entityID = await resolveEntity(
+      supabase,
+      target.table,
+      target.entityType,
+      target.externalID,
+      {
+        name: target.name,
+        normalized_name: normalizeName(target.name),
+        country: target.country,
+      },
+    );
+    if (entityID) filed += 1;
+  }
+
+  return filed;
+}
+
+/// What a single search hit should become, or nothing.
+///
+/// Exported for its own tests: everything it decides — which hits are filed at
+/// all, and under what name — is invisible until somebody clicks a row that
+/// opens onto nothing.
+export function searchTarget(result: Payload): {
+  table: string;
+  entityType: string;
+  externalID: string;
+  name: string;
+  country: string | null;
+} | null {
+  if (!result || result.id === undefined || result.id === null) return null;
+
+  const type = String(result.type ?? "");
+  if (type !== "artist" && type !== "label") return null;
+
+  const name = withoutDisambiguator(String(result.title ?? ""));
+  if (name.length === 0) return null;
+  // The same filing conventions that must never enter the graph as artists.
+  // "Not On Label" arrives as a label hit and is exactly as much of a label as
+  // "Various" is an artist.
+  if (!isRealArtist(name)) return null;
+
+  const country = typeof result.country === "string" && result.country.length > 0
+    ? result.country
+    : null;
+
+  return type === "artist"
+    ? { table: "artists", entityType: "artist", externalID: String(result.id), name, country }
+    : { table: "labels", entityType: "label", externalID: String(result.id), name, country };
+}
+
+/// Whether a cached search has already been filed.
+///
+/// The first hit worth filing stands for the response: normalization runs the
+/// whole list in one pass, so if that one is present the rest went with it.
+/// One indexed lookup, on a path that runs for every cache hit.
+export async function isDiscogsSearchNormalized(
+  supabase: SupabaseClient,
+  payload: Payload,
+): Promise<boolean> {
+  const results = Array.isArray(payload?.results) ? payload.results : [];
+  const first = results.map(searchTarget).find((target) => target !== null);
+  // Nothing in this response belongs in the tables, which is a finished state
+  // rather than an outstanding one.
+  if (!first) return true;
+
+  const { data } = await supabase
+    .from("external_ids")
+    .select("id")
+    .eq("provider", PROVIDER)
+    .eq("entity_type", first.entityType)
+    .eq("external_id", first.externalID)
+    .maybeSingle();
+
+  return Boolean(data);
+}
