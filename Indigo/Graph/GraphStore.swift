@@ -46,6 +46,9 @@ nonisolated struct GraphStore {
         var caches: Caches?
         /// The tables the last generation read, offered to this one.
         var inherited: Caches?
+        /// When this store began reading its tables. An answer worked out
+        /// from them is only as new as this.
+        var assembledAt: Date?
     }
 
     init(context: ModelContext, inheriting previous: GraphStore? = nil) {
@@ -74,9 +77,11 @@ nonisolated struct GraphStore {
 
     private var caches: Caches {
         if let existing = box.caches { return existing }
+        let started = Date()
         let fresh = Trace.step("graph.tables") {
             Caches(context: context, reusing: box.inherited)
         }
+        box.assembledAt = started
         box.caches = fresh
         box.inherited = nil
         return fresh
@@ -91,6 +96,24 @@ nonisolated struct GraphStore {
     func neighbors(of node: MusicNode) -> EdgeSet {
         if let kept = Trace.step("g.stored", node.key, { stored(for: node) }) { return kept }
         let computed = compute(node)
+        // Handed back, but not kept, when the stored answer was thrown away
+        // after these tables were read.
+        //
+        // A walk and a write do not wait for each other. Opening an artist
+        // starts a walk, and the discography lands while it is still going:
+        // the write forgets the stored answer, and then the walk — built from
+        // tables read before the write — finished and stored its own in the
+        // space the forget had just cleared. Stored answers outlive unrelated
+        // writes on purpose, so that one stayed, and the artist's
+        // neighbourhood was the one from before its discography arrived. The
+        // trace caught a walk in flight across the write in five of eight
+        // artist opens. The page still gets this answer for now; the write
+        // already moved the revision, and the walk that follows stores one
+        // worked out from what is there.
+        if let assembled = box.assembledAt, ForgottenNodes.shared.wasForgotten(node.id, since: assembled) {
+            Trace.step("g.stale", node.key) {}
+            return computed
+        }
         Trace.step("g.persist", node.key) { persist(computed, for: node) }
         return computed
     }
@@ -281,6 +304,7 @@ nonisolated struct GraphStore {
     /// worked out from has changed.
     static func forget(_ node: MusicNode, in context: ModelContext) {
         let identity = node.id
+        ForgottenNodes.shared.record(identity)
         for row in (try? context.fetch(
             FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity })
         )) ?? [] {
@@ -941,6 +965,9 @@ private nonisolated struct Caches {
     /// When that dictionary was last brought up to date, so the next build can
     /// ask only for what has arrived since.
     private let portraitsReadAt: Date
+    /// When the release table was last actually read — not merely handed on —
+    /// so the next build can ask only for the records that arrived since.
+    private let releasesReadAt: Date
     private let recordingsByArtistKey: [String: [Recording]]
     /// Which albums an artist appears on, and what is on each album.
     private let albumKeysByArtistKey: [String: Set<String>]
@@ -994,6 +1021,47 @@ private nonisolated struct Caches {
         ]
     }
 
+    /// How far back each partial read reaches past the last one.
+    ///
+    /// Records are written on the main context and read here on the worker's,
+    /// so the two interleave: a record stamped a moment before the last read
+    /// began and saved a moment after it is older than that cutoff and absent
+    /// from that read. Reaching back a few seconds catches it for a handful of
+    /// rows read twice, and they merge by id without harm.
+    private static let releasesOverlap: TimeInterval = 5
+
+    /// The release table brought up to date by reading only what is new.
+    ///
+    /// Reading it whole was 218ms at the median in the running app, and every
+    /// batch of records an artist page reads grows it — so the rebuild behind
+    /// each batch paid for thousands of rows to learn about twelve. The
+    /// portraits below were fixed the same way, for the same reason.
+    ///
+    /// Nil whenever the answer cannot be shown to be exact, and the caller
+    /// reads the table whole as it always has. What shows it is the count:
+    /// the store has just said how many records there are, and a merge that
+    /// does not arrive at that number — a record older than the overlap, a
+    /// record deleted — is not an answer.
+    private static func releasesSince(
+        _ previous: Caches?,
+        expecting count: Int,
+        in store: ModelContext
+    ) -> [DiscogsReleaseRecord]? {
+        // Only for a table that grew. One that shrank lost records a read of
+        // what is new cannot see go.
+        guard let previous, count > previous.discogsReleases.count else { return nil }
+        let since = previous.releasesReadAt.addingTimeInterval(-releasesOverlap)
+        return Trace.step("t.releases.since") { () -> [DiscogsReleaseRecord]? in
+            var byID = previous.releasesByID
+            for release in (try? store.fetch(FetchDescriptor<DiscogsReleaseRecord>(
+                predicate: #Predicate { $0.fetchedAt > since }
+            ))) ?? [] {
+                byID[release.discogsID] = release
+            }
+            return byID.count == count ? Array(byID.values) : nil
+        }
+    }
+
     init(context: ModelContext, reusing previous: Caches? = nil) {
         self.context = context
         let store = context
@@ -1021,8 +1089,21 @@ private nonisolated struct Caches {
         let fetchedArtists = kept(1, \.discogsArtists)
             ?? Trace.step("t.artists") { (try? store.fetch(FetchDescriptor<DiscogsArtist>())) ?? [] }
         let inheritedReleases = kept(2, \.discogsReleases)
+        // Taken before reading, as the portraits' is below, so a record saved
+        // while this runs is caught by the next build rather than missed by
+        // both.
+        let releasesCutoff = Date()
+        let mergedReleases = inheritedReleases == nil
+            ? Self.releasesSince(previous, expecting: counts[2], in: store)
+            : nil
         let fetchedReleases = inheritedReleases
+            ?? mergedReleases
             ?? Trace.step("t.releases") { (try? store.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [] }
+        // Handed on untouched, the window stays open from the last real read,
+        // so a record rewritten in the meantime is still inside it next time.
+        releasesReadAt = inheritedReleases != nil
+            ? (previous?.releasesReadAt ?? releasesCutoff)
+            : releasesCutoff
         let entries = kept(3) { Array($0.metadata.values) }
             ?? Trace.step("t.metadata") { (try? store.fetch(FetchDescriptor<RecordingMetadata>())) ?? [] }
         recordings = fetchedRecordings
@@ -1502,5 +1583,29 @@ nonisolated final class LibraryAlbums: @unchecked Sendable {
             for artistKey in credited { albums[artistKey, default: []].insert(album) }
         }
         return Index(albums: albums, entries: entries, trackCounts: counts)
+    }
+}
+
+/// When each node's stored answer was last thrown away, for the whole process.
+///
+/// In memory rather than in the store, because what it has to reach is a walk
+/// on another context that is already under way and will not read the store
+/// again before it saves. Grows by one entry per node forgotten in a session,
+/// which is a few hundred at most.
+nonisolated final class ForgottenNodes: @unchecked Sendable {
+    static let shared = ForgottenNodes()
+
+    private let lock = NSLock()
+    private var forgottenAt: [String: Date] = [:]
+
+    func record(_ nodeID: String) {
+        lock.withLock { forgottenAt[nodeID] = Date() }
+    }
+
+    /// Whether the node was forgotten at or after `moment`. A tie counts:
+    /// storing nothing costs one walk, and storing something stale costs the
+    /// page its neighbourhood until the next write.
+    func wasForgotten(_ nodeID: String, since moment: Date) -> Bool {
+        lock.withLock { forgottenAt[nodeID].map { $0 >= moment } ?? false }
     }
 }

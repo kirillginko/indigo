@@ -61,10 +61,86 @@ nonisolated struct DiscogsEnricher {
     /// The same, for a caller that has already done the search.
     @discardableResult
     func artist(named name: String, head: DiscogsSearchResult, force: Bool = false) async throws -> DiscogsArtist? {
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 12,
-           cached.isFresh { return cached }
+        if !force, let cached = freshArtist(named: name) { return cached }
         guard let bundle = try await client.artist(named: name, head: head) else { return nil }
         return write(bundle, name: name)
+    }
+
+    /// A complete entry still young enough not to ask about again.
+    ///
+    /// Complete means stamped by `writeArtist`. Neither `artistIdentity` nor
+    /// `artistDetail` stamps anything, so a row either of them wrote — a name
+    /// and a picture, or a whole profile with no shelf behind it — is asked
+    /// about again rather than served as though it were the artist.
+    func freshArtist(named name: String) -> DiscogsArtist? {
+        guard let cached = cachedArtist(named: name), cached.cacheVersion >= 12, cached.isFresh
+        else { return nil }
+        return cached
+    }
+
+    /// Who they are, from their own entry, ahead of what they released.
+    ///
+    /// The profile, the real name, the full-size portrait, the aliases and
+    /// groups — everything `artists/{id}` says — written the moment it lands
+    /// rather than held for the shelf, the slowest request an artist page makes.
+    ///
+    /// Deliberately stamps nothing, for the reason `artistIdentity` does not:
+    /// this row has no discography, labels or styles yet, and
+    /// `freshArtist(named:)` must not take it for a finished one. If the shelf
+    /// never arrives the artist is simply asked about again next time.
+    @discardableResult
+    func artistDetail(
+        named name: String, head: DiscogsSearchResult, detail: DiscogsArtistDetail
+    ) -> DiscogsArtist {
+        Trace.step("enrich.artist.detail", name) {
+            let key = RecordingKey.normalizeArtist(name)
+            let record = cachedArtist(named: name) ?? {
+                let value = DiscogsArtist(nameKey: key, discogsID: detail.id, name: detail.name)
+                context.insert(value)
+                return value
+            }()
+            Self.applyDetail(
+                detail, to: record,
+                searchImageURL: head.coverImage, searchThumbnailURL: head.thumbnail
+            )
+            Self.repaintPortrait(of: record, in: context)
+            return record
+        }
+    }
+
+    /// The whole entry, once the shelf has landed, stamped complete.
+    func artist(named name: String, bundle: DiscogsArtistBundle) -> DiscogsArtist? {
+        write(bundle, name: name)
+    }
+
+    /// What `artists/{id}` says about someone, set on their row.
+    ///
+    /// Shared by the early write and the complete one so the two cannot
+    /// drift apart: a field only one of them set would be a field that
+    /// changes under somebody reading it when the shelf lands.
+    private static func applyDetail(
+        _ detail: DiscogsArtistDetail,
+        to record: DiscogsArtist,
+        searchImageURL: String?,
+        searchThumbnailURL: String?
+    ) {
+        record.discogsID = detail.id
+        // The title of the page. Discogs files a second Oliwa as "Oliwa (2)",
+        // and left alone that number becomes the artist's name at the top of
+        // their own page.
+        record.name = DiscogsClient.withoutDisambiguator(detail.name)
+        record.realName = detail.realname.map(DiscogsClient.withoutDisambiguator)
+        record.biography = detail.profile.map(Self.cleanProfile)
+        record.imageURLString = detail.images?.first(where: { $0.type == "primary" })?.uri
+            ?? detail.images?.first?.uri ?? searchImageURL
+        record.thumbnailURLString = detail.images?.first(where: { $0.type == "primary" })?.uri150
+            ?? detail.images?.first?.uri150 ?? searchThumbnailURL
+            ?? record.thumbnailURLString
+        record.profileURLString = detail.uri
+        record.aliasNames = (detail.aliases?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
+        record.externalURLStrings = detail.urls ?? []
+        record.memberNames = (detail.members?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
+        record.groupNames = (detail.groups?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
     }
 
     private func write(_ bundle: DiscogsArtistBundle, name: String) -> DiscogsArtist? {
@@ -93,23 +169,10 @@ nonisolated struct DiscogsEnricher {
             context.insert(value)
             return value
         }()
-        record.discogsID = detail.id
-        // The title of the page. Discogs files a second Oliwa as "Oliwa (2)",
-        // and left alone that number becomes the artist's name at the top of
-        // their own page.
-        record.name = DiscogsClient.withoutDisambiguator(detail.name)
-        record.realName = detail.realname.map(DiscogsClient.withoutDisambiguator)
-        record.biography = detail.profile.map(Self.cleanProfile)
-        record.imageURLString = detail.images?.first(where: { $0.type == "primary" })?.uri
-            ?? detail.images?.first?.uri ?? bundle.searchImageURL
-        record.thumbnailURLString = detail.images?.first(where: { $0.type == "primary" })?.uri150
-            ?? detail.images?.first?.uri150 ?? bundle.searchThumbnailURL
-            ?? record.thumbnailURLString
-        record.profileURLString = detail.uri
-        record.aliasNames = (detail.aliases?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
-        record.externalURLStrings = detail.urls ?? []
-        record.memberNames = (detail.members?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
-        record.groupNames = (detail.groups?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
+        Self.applyDetail(
+            detail, to: record,
+            searchImageURL: bundle.searchImageURL, searchThumbnailURL: bundle.searchThumbnailURL
+        )
         // The artist's own shelf, and only the artist's own shelf.
         //
         // This used to be `bundle.catalogue`, which is
@@ -291,6 +354,7 @@ nonisolated struct DiscogsEnricher {
         }
         record.labelNames = labelNames
         record.labelDiscogsIDs = labelIDs
+        record.formats = (detail.formats ?? []).map(\.written)
         record.catalogNumbers = detail.labels?.compactMap(\.catno) ?? []
 
         // Everybody else on the record, minus the sleeve.

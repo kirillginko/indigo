@@ -59,6 +59,9 @@ actor DigWorker {
     private var engine: DigEngine?
     private var deep: DeepEngine?
     private var scenes: SceneEngine?
+    /// Built on demand rather than with the engines: it reads six tables and
+    /// most sessions never type into the search field. See `DigSearchIndex`.
+    private var searchIndex: DigSearchIndex?
     private var generation = -1
 
     /// Whether this actor's work actually happens off the main thread.
@@ -79,7 +82,20 @@ actor DigWorker {
         engine = DigEngine(context: modelContext, graph: next)
         deep = DeepEngine(context: modelContext, graph: next)
         scenes = SceneEngine(context: modelContext)
+        searchIndex = nil
         generation = asked
+    }
+
+    /// Matches on this machine for a typed query.
+    ///
+    /// The index is the expensive half and it does not change between
+    /// keystrokes, so it is built once per generation and kept — the same
+    /// bargain the graph makes above.
+    func searchLocally(_ query: String, limit: Int, generation asked: Int) -> [DigSearchResult] {
+        refresh(asked)
+        let index = searchIndex ?? DigSearchIndex(context: modelContext)
+        searchIndex = index
+        return index.search(query, limit: limit)
     }
 
     private func engine(_ asked: Int) -> DigEngine {
@@ -200,6 +216,21 @@ actor DigWorker {
         }
         guard !Task.isCancelled else { return .cancelled }
         return write(found, named: name)
+    }
+
+    /// Portraits the shared catalogue had already found, written down here as
+    /// though this machine had found them.
+    ///
+    /// The queue is then shorter by exactly the names the backend has already
+    /// paid for, which is the whole point of filling them once for everybody
+    /// rather than once per listener. See migration 0019.
+    /// Through `write` rather than a bare insert: `nameKey` is unique, and an
+    /// artist the fill already recorded a miss for is exactly the case this is
+    /// most useful in.
+    func adopt(_ found: [(name: String, address: String)]) {
+        for entry in found {
+            _ = write(entry.address, named: entry.name)
+        }
     }
 
     /// The picture on the artist row, when a full lookup has written one.

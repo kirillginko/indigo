@@ -65,17 +65,61 @@ nonisolated struct DiscogsClient: Sendable {
     /// Indigo's backend, which holds the Discogs credential server-side. Nil
     /// for the test initialiser, which must stay on its injected transport.
     private let gateway: CatalogDiscogsGateway?
+    /// How much of this minute is left. Shared by every client in the app,
+    /// because the limit is shared: it is counted per credential, not per
+    /// caller. See `DiscogsBudget`.
+    private let budget: DiscogsBudget
 
     init() {
         transport = NetworkEnvironment.metadataSession
         suppliedToken = nil
         gateway = .shared
+        budget = .shared
     }
 
-    init(transport: DiscogsTransport, token: String) {
+    /// A client of its own, on its own budget. A refusal arranged by one test
+    /// must not convince the next one that Discogs is busy.
+    ///
+    /// No gateway unless a test asks for one: the injected transport is the
+    /// whole point of this initialiser, and a backend in front of it would be
+    /// a second route out of the fixtures.
+    init(
+        transport: DiscogsTransport,
+        token: String,
+        budget: DiscogsBudget = DiscogsBudget(),
+        gateway: CatalogDiscogsGateway? = nil
+    ) {
         self.transport = transport
         suppliedToken = token
-        gateway = nil
+        self.gateway = gateway
+        self.budget = budget
+    }
+
+    /// Whether Discogs will take another request of this kind right now.
+    ///
+    /// Asked before spending anything on work that can be postponed or
+    /// declined. A refusal costs a round trip and comes back shaped like an
+    /// answer, so the cheapest 429 is the one nobody sends.
+    func hasRoom(for work: DiscogsBudget.Work) async -> Bool {
+        await budget.hasRoom(for: work)
+    }
+
+    /// Whether a search can be attempted.
+    ///
+    /// Separate from `hasRoom` because a search does not necessarily spend
+    /// this app's budget. Through the backend it travels on the server's
+    /// credential and is usually answered from a cache, so the local reading
+    /// has no bearing on it — and refusing a free request because the portrait
+    /// fill drained a budget it was never going to touch is the same bug as
+    /// before, wearing the fix as a disguise.
+    func canSearch() async -> Bool {
+        let route = Self.route(
+            preferringBackend: true, hasToken: token != nil, hasBackend: gateway?.isEnabled == true)
+        switch route {
+        case .backend, .backendThenDirect: return true
+        case .direct: return await budget.hasRoom(for: .foreground)
+        case .unconfigured: return false
+        }
     }
 
     /// Configured when either route to Discogs is open: Indigo's backend, or a
@@ -141,10 +185,39 @@ nonisolated struct DiscogsClient: Sendable {
     }
 
     /// Everything else, once they have been found.
+    ///
+    /// Built from the two halves below, so a caller that wants them one at a
+    /// time can have them — see `DigStore.describeArtist(named:head:)` — and
+    /// a caller that does not gets the same three requests it always did.
     func artist(named name: String, head match: DiscogsSearchResult) async throws -> DiscogsArtistBundle? {
         guard let id = match.id else { return nil }
+        async let detail = artistDetail(id: id)
+        async let shelf = artistShelf(named: name, id: id)
+        let (described, found) = try await (detail, shelf)
+        return DiscogsArtistBundle(
+            detail: described,
+            releases: found.releases,
+            searchImageURL: match.coverImage,
+            searchThumbnailURL: match.thumbnail,
+            catalogue: found.catalogue
+        )
+    }
 
-        async let detail: DiscogsArtistDetail = get("artists/\(id)")
+    /// Who an artist is, from their own entry: the profile, the real name,
+    /// the portrait, the aliases.
+    ///
+    /// The quick half. 199ms at the median in the running app's trace, where
+    /// the shelf below is 442ms and over a second in the slowest twentieth —
+    /// so a page held for both was held for the shelf alone.
+    func artistDetail(id: Int) async throws -> DiscogsArtistDetail {
+        try await get("artists/\(id)")
+    }
+
+    /// What an artist has put out: the shelf Discogs files under them, and
+    /// the search that carries its sleeves.
+    func artistShelf(
+        named name: String, id: Int
+    ) async throws -> (releases: DiscogsArtistReleases, catalogue: [DiscogsSearchResult]) {
         async let releases: DiscogsArtistReleases = get("artists/\(id)/releases", query: [
             URLQueryItem(name: "sort", value: "year"),
             URLQueryItem(name: "sort_order", value: "desc"),
@@ -155,13 +228,8 @@ nonisolated struct DiscogsClient: Sendable {
             URLQueryItem(name: "type", value: "release"),
             URLQueryItem(name: "per_page", value: "25")
         ])
-        return try await DiscogsArtistBundle(
-            detail: detail,
-            releases: releases,
-            searchImageURL: match.coverImage,
-            searchThumbnailURL: match.thumbnail,
-            catalogue: catalogue.results ?? []
-        )
+        let (shelf, search) = try await (releases, catalogue)
+        return (shelf, search.results ?? [])
     }
 
     /// Just a picture of an artist, in one request.
@@ -179,6 +247,45 @@ nonisolated struct DiscogsClient: Sendable {
         guard let match = Self.bestArtistMatch(name: name, results: response.results ?? [])
         else { return nil }
         return Self.usableImage(match.thumbnail) ?? Self.usableImage(match.coverImage)
+    }
+
+    /// What Discogs has under a typed query, in one of the three kinds a dig
+    /// can start from.
+    ///
+    /// Asked one kind at a time rather than as a single untyped search.
+    /// Discogs ranks an untyped `q` across everything it holds, and since it
+    /// holds far more releases than artists or labels, a search for "ilian"
+    /// comes back as twenty-five records and no imprint. Three narrow
+    /// questions each return their own best answers, and the page decides how
+    /// many of each to show.
+    ///
+    /// Whatever the kind, `title` is what the catalogue calls the thing —
+    /// except for a release, where Discogs writes it as "Artist - Title".
+    func search(
+        _ query: String,
+        kind: DiscogsSearchKind,
+        limit: Int = 8
+    ) async throws -> [DiscogsSearchResult] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        let response: DiscogsSearchResponse = try await get(
+            "database/search",
+            query: [
+                URLQueryItem(name: "q", value: trimmed),
+                URLQueryItem(name: "type", value: kind.rawValue),
+                URLQueryItem(name: "per_page", value: String(max(1, min(limit, 50))))
+            ],
+            // A refusal here is not worth waiting out. The ladder below costs
+            // three seconds and two more requests against a budget that has
+            // just been proved empty, to answer a query the listener has very
+            // likely finished typing over. Saying "Discogs is busy" at once is
+            // both quicker and true; see `DigSearchResults.discogsRefused`.
+            retryWhenRefused: false,
+            // The one caller that would rather be cached than quick. See
+            // `route(preferringBackend:hasToken:hasBackend:)`.
+            preferringBackend: true
+        )
+        return response.results ?? []
     }
 
     func release(id: Int) async throws -> DiscogsReleaseDetail {
@@ -483,29 +590,90 @@ nonisolated struct DiscogsClient: Sendable {
         return trimmed.isEmpty ? nil : trimmed
     }
 
-    /// Direct when this build carries a credential, Indigo's backend when it
-    /// does not.
+    /// The backend where it is worth the hop, direct where it is not.
     ///
-    /// The backend is not the faster route for what comes through here. These
-    /// are overwhelmingly searches, and a search reads no quicker out of
-    /// Postgres than out of Discogs — about a fifth of a second either way —
-    /// so routing them through an Edge Function only adds a hop, and the first
-    /// search for anything nobody has asked for before adds half a second on
-    /// top. That was felt as the label page and the artist portrait crawling.
+    /// The listener's search field prefers the backend even where this build
+    /// carries a credential. A search there is answered from a cache anybody's
+    /// earlier search filled and costs Discogs nothing, and it is the only
+    /// route that files what it finds into `artists` and `labels` — so a query
+    /// that costs a request today is free for everybody tomorrow. That is
+    /// worth the extra half second, because results stream in and the local
+    /// ones are already on screen.
     ///
-    /// Release lookups are the opposite case and still go through the backend:
-    /// read far more often than written, they normalize into the graph, and
-    /// Postgres genuinely beats Discogs for them. See CatalogReleaseSource.
-    private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
-        if token != nil { return try await direct(path, query: query) }
+    /// **Everything else goes direct, and the difference is the caller rather
+    /// than the path.** This was keyed on `database/search` at first, which
+    /// swept up far more than the search field: `artistHead`,
+    /// `artistThumbnail`, `recommendations` and both `releaseID` lookups all
+    /// use that path too. Nine of them run when an artist page opens, and each
+    /// went from about two hundred milliseconds to about six hundred — a page
+    /// somebody is watching, made a second slower to cache work nobody was
+    /// waiting on. Whether a request wants the shared cached copy is a
+    /// property of what it is for, not of the URL it happens to use.
+    ///
+    /// Release lookups by id have always gone through the backend and still
+    /// do: read far more often than written, they normalize into the graph,
+    /// and Postgres genuinely beats Discogs for them. See CatalogReleaseSource.
+    /// Where a request goes, and what happens if that fails.
+    ///
+    /// Stated as a value rather than as a ladder of `if`s because it is the
+    /// whole of the decision and every branch of it matters — one of them is
+    /// the difference between a search costing Discogs a request and costing
+    /// it nothing. Pure, so it can be checked without a network.
+    enum Route: Sendable, Hashable {
+        /// The backend, and Discogs if the backend cannot answer.
+        case backendThenDirect
+        /// The backend, whose failure is the answer: there is no credential
+        /// here to fall back to.
+        case backend
+        case direct
+        case unconfigured
+    }
 
-        if let gateway, gateway.isEnabled {
+    /// - Parameter preferringBackend: whether this caller would rather be slow
+    ///   and cached than quick and direct. True for the listener's search
+    ///   field and nothing else.
+    static func route(preferringBackend: Bool, hasToken: Bool, hasBackend: Bool) -> Route {
+        if preferringBackend, hasBackend {
+            return hasToken ? .backendThenDirect : .backend
+        }
+        if hasToken { return .direct }
+        return hasBackend ? .backend : .unconfigured
+    }
+
+    private func get<T: Decodable>(
+        _ path: String,
+        query: [URLQueryItem] = [],
+        retryWhenRefused: Bool = true,
+        preferringBackend: Bool = false
+    ) async throws -> T {
+        func viaBackend() async throws -> T {
+            guard let gateway else { throw DiscogsError.notConfigured }
             return try await Trace.stage("discogs.backend", path) {
                 try await gateway.get(T.self, path: path, query: query)
             }
         }
 
-        throw DiscogsError.notConfigured
+        switch Self.route(
+            preferringBackend: preferringBackend,
+            hasToken: token != nil,
+            hasBackend: gateway?.isEnabled == true
+        ) {
+        case .backendThenDirect:
+            do {
+                return try await viaBackend()
+            } catch {
+                // For a search the backend is the better route, not the only
+                // one. A backend having a bad minute must not be why a
+                // listener is told there is no such artist.
+                return try await direct(path, query: query, retryWhenRefused: retryWhenRefused)
+            }
+        case .backend:
+            return try await viaBackend()
+        case .direct:
+            return try await direct(path, query: query, retryWhenRefused: retryWhenRefused)
+        case .unconfigured:
+            throw DiscogsError.notConfigured
+        }
     }
 
     /// How many times a refusal to serve is worth waiting out.
@@ -523,12 +691,17 @@ nonisolated struct DiscogsClient: Sendable {
     /// right one for work nobody is waiting on.
     private static let attemptsWhenRefused = 3
 
-    private func direct<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
-        for attempt in 0..<Self.attemptsWhenRefused {
+    private func direct<T: Decodable>(
+        _ path: String,
+        query: [URLQueryItem] = [],
+        retryWhenRefused: Bool = true
+    ) async throws -> T {
+        let attempts = retryWhenRefused ? Self.attemptsWhenRefused : 1
+        for attempt in 0..<attempts {
             do {
                 return try await send(path, query: query)
             } catch DiscogsError.rateLimited {
-                guard attempt < Self.attemptsWhenRefused - 1 else { break }
+                guard attempt < attempts - 1 else { break }
                 // A second, then two. Longer than that and the page has been
                 // blank so long that waiting is its own failure.
                 try await Task.sleep(for: .seconds(1 << attempt))
@@ -549,6 +722,7 @@ nonisolated struct DiscogsClient: Sendable {
 
         let data: Data
         let response: URLResponse
+        await budget.willIssue()
         do {
             (data, response) = try await Trace.stage("discogs.request", path) {
                 try await transport.data(for: request)
@@ -560,7 +734,11 @@ nonisolated struct DiscogsClient: Sendable {
             throw DiscogsError.transport(error.localizedDescription)
         }
         guard let http = response as? HTTPURLResponse else { throw DiscogsError.malformedResponse }
-        if http.statusCode == 429 { throw DiscogsError.rateLimited }
+        if http.statusCode == 429 {
+            await budget.recordRefusal()
+            throw DiscogsError.rateLimited
+        }
+        await budget.record(http)
         guard (200..<300).contains(http.statusCode) else { throw DiscogsError.badStatus(http.statusCode) }
         do {
             return try JSONDecoder().decode(T.self, from: data)

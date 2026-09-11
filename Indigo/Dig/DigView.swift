@@ -70,72 +70,100 @@ struct DigView: View {
         let shown = shown
         let entries = shown.entries
         let hasSomething = isReady || dig.landing != nil
+        // A search replaces the page rather than filtering it. What is
+        // underneath is a list of artists this listener already keeps, and
+        // narrowing that would answer a much smaller question than the one
+        // somebody typing a name is asking. See `DigSearchView`.
+        let isSearching = !appState.searchText.trimmingCharacters(in: .whitespaces).isEmpty
+
+        @Bindable var state = appState
 
         VStack(spacing: 0) {
             PageHeader(
                 title: "Dig",
-                subtitle: entries.isEmpty ? "Follow the music" : "\(entries.count) artists to follow"
-            )
+                subtitle: isSearching
+                    ? "Your shelves, Indigo and Discogs"
+                    : (entries.isEmpty ? "Follow the music" : "\(entries.count) artists to follow")
+            ) {
+                SearchField(
+                    text: $state.searchText,
+                    placeholder: "Artists, releases, labels",
+                    focusSignal: appState.searchFocusRequests
+                )
+            }
             Rule(color: Palette.outline)
 
-            // "Nothing to dig into" is only true once we have looked. Said
-            // while still looking it is a failure announced in advance, and
-            // this page opens on it every single time.
-            if hasSomething && entries.isEmpty {
-                EmptyStateView(
-                    headline: "Nothing to dig into yet",
-                    message: "Crate something, or index a music folder. Dig follows artists into their labels, and labels into everyone else on them."
-                ) {
-                    Button("Open Crate") { appState.select(.crate) }
-                        .buttonStyle(OutlineButtonStyle())
-                }
+            if isSearching {
+                DigSearchView(query: appState.searchText)
             } else {
-                ScrollView {
-                    // Only until the library has been read, which is the one
-                    // stretch where there is genuinely nothing to soften. The
-                    // veil needs something to breathe on or the page reads as
-                    // stopped rather than arriving.
-                    if entries.isEmpty {
-                        DigSkeleton(hasImage: false, sections: 3)
-                            .padding(.horizontal, Metrics.gutter)
-                            .padding(.top, 22)
-                    }
-
-                    memory(shown)
-
-                    if !entries.isEmpty {
-                        HStack {
-                            Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
-                            Spacer()
-                            Text("\(entries.count)").microLabel(1.2).foregroundStyle(Palette.inkFaint)
-                        }
-                        .padding(.horizontal, Metrics.gutter)
-                        .padding(.top, 8)
-                        .padding(.bottom, 9)
-                        Rule(color: Palette.outline)
-
-                        LazyVStack(spacing: 0) {
-                            ForEach(entries) { entry in
-                                DigStartRow(entry: entry) {
-                                    appState.open(.digArtist(mbid: entry.mbid, name: entry.name))
-                                }
-                                Rule()
-                            }
-                        }
-                        .padding(.bottom, 24)
-                    }
-                }
-                .scrollIndicators(.visible)
-                // One treatment for the whole page. See `LoadingVeil`.
-                //
-                // The list arrives before the blocks above it do, so it moves
-                // once while it is still soft — and the moment the veil lifts
-                // is the moment the page is finished. One reveal, and nothing
-                // rearranging itself in front of somebody reading it.
-                .loadingVeil(!hasSomething)
+                landing(shown, hasSomething: hasSomething)
             }
         }
         .task(id: revision) { await refresh() }
+    }
+
+    /// The page as it is when nobody has typed anything: what this listener
+    /// has been doing, and the artists worth following out of it.
+    @ViewBuilder
+    private func landing(_ shown: DigLanding, hasSomething: Bool) -> some View {
+        let entries = shown.entries
+
+        // "Nothing to dig into" is only true once we have looked. Said
+        // while still looking it is a failure announced in advance, and
+        // this page opens on it every single time.
+        if hasSomething && entries.isEmpty {
+            EmptyStateView(
+                headline: "Nothing to dig into yet",
+                message: "Crate something, or index a music folder. Dig follows artists into their labels, and labels into everyone else on them."
+            ) {
+                Button("Open Crate") { appState.select(.crate) }
+                    .buttonStyle(OutlineButtonStyle())
+            }
+        } else {
+            ScrollView {
+                // Only until the library has been read, which is the one
+                // stretch where there is genuinely nothing to soften. The
+                // veil needs something to breathe on or the page reads as
+                // stopped rather than arriving.
+                if entries.isEmpty {
+                    DigSkeleton(hasImage: false, sections: 3)
+                        .padding(.horizontal, Metrics.gutter)
+                        .padding(.top, 22)
+                }
+
+                memory(shown)
+
+                if !entries.isEmpty {
+                    HStack {
+                        Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
+                        Spacer()
+                        Text("\(entries.count)").microLabel(1.2).foregroundStyle(Palette.inkFaint)
+                    }
+                    .padding(.horizontal, Metrics.gutter)
+                    .padding(.top, 8)
+                    .padding(.bottom, 9)
+                    Rule(color: Palette.outline)
+
+                    LazyVStack(spacing: 0) {
+                        ForEach(entries) { entry in
+                            DigStartRow(entry: entry) {
+                                appState.open(.digArtist(mbid: entry.mbid, name: entry.name))
+                            }
+                            Rule()
+                        }
+                    }
+                    .padding(.bottom, 24)
+                }
+            }
+            .scrollIndicators(.visible)
+            // One treatment for the whole page. See `LoadingVeil`.
+            //
+            // The list arrives before the blocks above it do, so it moves
+            // once while it is still soft — and the moment the veil lifts
+            // is the moment the page is finished. One reveal, and nothing
+            // rearranging itself in front of somebody reading it.
+            .loadingVeil(!hasSomething)
+        }
     }
 
     /// Local history first, then a moment for radio — and then the page,

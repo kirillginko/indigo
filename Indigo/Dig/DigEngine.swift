@@ -147,6 +147,18 @@ nonisolated struct ArtistProfile: Sendable {
             && biography == nil && imageURL == nil
             && libraryTrackCount == 0 && crateCount == 0 && radioAppearances.isEmpty
     }
+
+    /// Nothing to dig through, whatever the catalogue said about who they are.
+    ///
+    /// `isBare` counts a profile and a portrait as something, and on its own
+    /// terms that is right. But an artist's entry now lands a round trip ahead
+    /// of their shelf, so a shelf that never comes — refused, or abandoned when
+    /// the listener moved on — leaves a biography over an empty page, and
+    /// `isBare` said nothing about exactly that page.
+    var hasNothingToDig: Bool {
+        releases.isEmpty && labels.isEmpty && related.isEmpty
+            && libraryTrackCount == 0 && crateCount == 0 && radioAppearances.isEmpty
+    }
 }
 
 nonisolated struct DigReleaseProfile: Sendable {
@@ -355,7 +367,17 @@ nonisolated struct DigEngine {
         // Which is also why this is not a fifth source of guesses. It is the
         // same fold the discography is built from, and it grows as the
         // listener digs rather than by asking anything extra.
+        // Records, not films — the same rule `writeArtist` applies to the
+        // catalogue, applied here too.
+        //
+        // It was applied on one path and not the other, and this is the path
+        // that grew: making the fill read more releases in full is what
+        // brought *The Videos Vol. 1 Sales EPK* into the store, and its label
+        // is Palm Pictures. A page for a lo-fi duo listed a film distributor
+        // because the only thing that knew to exclude videos was reading a
+        // different endpoint. See `ReleaseFormat`.
         let credited = graph.releases(creditedTo: RecordingKey.normalizeArtist(name))
+            .filter { !$0.isVideo }
         var labelIdentities: [String: Int] = [:]
         for record in credited {
             for (label, discogsID) in record.labels {

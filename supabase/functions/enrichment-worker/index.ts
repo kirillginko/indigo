@@ -15,6 +15,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
 import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
+import { fetchArtistPortrait } from "../_shared/discogs.ts";
 import { normalizeName } from "../_shared/normalize.ts";
 
 interface Job {
@@ -25,7 +26,9 @@ interface Job {
   payload: Record<string, unknown> | null;
 }
 
-const MAX_BATCH = 25;
+// Thirty, to match what the drain now asks for; see migration 0022. A request
+// for more than this is quietly given this, so the two have to move together.
+const MAX_BATCH = 30;
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -49,14 +52,22 @@ Deno.serve(async (req: Request) => {
     ? Math.min(Math.max(Math.trunc(requested), 1), MAX_BATCH)
     : 5;
 
+  // One kind of job only, for a drain that has a lane of its own; see 0024.
+  // Left out of the call entirely when absent, so the main drain's request is
+  // the same one it has always made and works against either claim function.
+  const jobType = typeof body.job_type === "string" && /^[a-z_]{1,64}$/.test(body.job_type)
+    ? body.job_type
+    : null;
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  const { data: claimed, error } = await supabase.rpc("claim_enrichment_jobs", {
-    p_limit: limit,
-  });
+  const { data: claimed, error } = await supabase.rpc(
+    "claim_enrichment_jobs",
+    jobType ? { p_limit: limit, p_job_type: jobType } : { p_limit: limit },
+  );
   if (error) return json({ error: "claim_failed", detail: error.message }, 500);
 
   const jobs = (claimed ?? []) as Job[];
@@ -160,6 +171,27 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
         p_country: found?.country ?? null,
         p_began: found?.began ?? null,
         p_mbid: found?.mbid ?? null,
+      });
+      if (error) throw new Error(error.message);
+      return;
+    }
+
+    case "fetch_artist_portrait": {
+      const artistId = String(job.payload?.artist_id ?? "");
+      const name = String(job.payload?.name ?? "");
+      if (!artistId || !name) throw new Error("missing artist");
+
+      const found = await fetchArtistPortrait(
+        name, Deno.env.get("DISCOGS_TOKEN"), USER_AGENT);
+
+      // Recorded either way. An artist Discogs has no picture of is a finding,
+      // and writing it down is what stops the queue asking again next week —
+      // the same bargain `fetch_artist_origin` makes above.
+      const { error } = await supabase.rpc("record_artist_portrait", {
+        p_artist_id: artistId,
+        p_url: found?.url ?? null,
+        p_width: found?.width ?? null,
+        p_height: found?.height ?? null,
       });
       if (error) throw new Error(error.message);
       return;

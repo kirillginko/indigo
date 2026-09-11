@@ -293,11 +293,19 @@ final class DigStore {
     /// the portraits are. Gating them made a connection row's face turn up
     /// long after everything else on the page, which is a worse trade than
     /// the one the gate was making in the first place.
-    func fillMissingReleaseArtwork(forArtist name: String, mbid: String?, limit: Int = 24) async {
-        await digReleaseArtwork(forArtist: name, mbid: mbid, limit: limit)
+    /// - Parameter whenThereIsRoom: wait for room in the minute before each
+    ///   batch, and stop rather than spend the last of it. For the batch a page
+    ///   asks for on its own; one the listener asked for by revealing more
+    ///   releases goes ahead regardless.
+    func fillMissingReleaseArtwork(
+        forArtist name: String, mbid: String?, limit: Int = 24, whenThereIsRoom: Bool = false
+    ) async {
+        await digReleaseArtwork(forArtist: name, mbid: mbid, limit: limit, whenThereIsRoom: whenThereIsRoom)
     }
 
-    private func digReleaseArtwork(forArtist name: String, mbid: String?, limit: Int) async {
+    private func digReleaseArtwork(
+        forArtist name: String, mbid: String?, limit: Int, whenThereIsRoom: Bool
+    ) async {
         // Records this app has not read in full.
         //
         // This used to ask for the ones with no picture at all, and that
@@ -319,12 +327,19 @@ final class DigStore {
         // for. The network half runs in parallel; the writes stay serial,
         // because they all land in one ModelContext.
         let client = discogsClient
-        // Six at a time. The grid shows two dozen and all of them deserve a
-        // sleeve, but firing four dozen requests in one breath is how a
+        // Twelve at a time. The grid shows two dozen and all of them deserve
+        // a sleeve, but firing four dozen requests in one breath is how a
         // service starts refusing them — and a batch that lands is a batch
         // the listener can see.
-        for batch in Array(missing.prefix(limit)).chunked(into: 6) {
+        //
+        // This was six. Discogs meters requests per minute rather than how
+        // many are in flight, so six-then-six spends exactly what twelve does;
+        // what the second batch added was a second save, a second
+        // announcement and a second walk of the graph behind the page. A
+        // typical artist needs a dozen records read, which is now one.
+        for batch in Array(missing.prefix(limit)).chunked(into: 12) {
             guard !Task.isCancelled else { return }
+            if whenThereIsRoom, !(await waitForRoom()) { return }
             await fetchAndStore(batch, artist: name, client: client)
         }
     }
@@ -354,6 +369,24 @@ final class DigStore {
         artist name: String,
         client: DiscogsClient
     ) async {
+        // Through the same source `DiscogsEnricher.release(id:)` uses, which
+        // this path had been going around.
+        //
+        // It went around it because the enricher holds a ModelContext, and
+        // every task in the group would have queued on the main actor to
+        // reach it — so it took the bare client, and lost what the source
+        // does besides the request. `CatalogReleaseSource` is a `Sendable`
+        // struct with no context, so it can be asked from inside the group.
+        //
+        // What that buys is the fill, not speed. A build that can reach
+        // Discogs itself is deliberately not sent to the shared cache first —
+        // see `canReachProviderDirectly` — so this answers nil at once and asks
+        // the backend to describe the record behind the page. These dozen
+        // reads are the most expensive thing an artist page does, and until
+        // now not one of them ever reached the catalogue for anybody else.
+        // A build without a credential does read the shared copy here.
+        let catalog = CatalogReleaseSource.shared
+
         let fetched = await withTaskGroup(of: (Int, DiscogsReleaseDetail)?.self) { group in
             for release in wanted {
                 let title = release.title
@@ -367,9 +400,16 @@ final class DigStore {
                     if identifier == nil {
                         identifier = try? await client.releaseID(title: title, artist: name)
                     }
-                    guard let identifier,
-                          let detail = try? await client.release(id: identifier)
-                    else { return nil }
+                    guard let identifier else { return nil }
+
+                    if let shared = await catalog.release(id: identifier) {
+                        return (identifier, shared)
+                    }
+                    // No second `populateInBackground` here: `release(id:)`
+                    // has already asked for the fill in exactly the case that
+                    // reaches this line, and asking again sent every record
+                    // to the Edge Function twice.
+                    guard let detail = try? await client.release(id: identifier) else { return nil }
                     return (identifier, detail)
                 }
             }
@@ -429,6 +469,20 @@ final class DigStore {
 
     func wantPortraits(for names: [String]) {
         portraitPriority = names.filter { ArtistName.isRealArtist($0) }
+        // The backend first, for all of them at once.
+        //
+        // These went straight to the fill, which searches Discogs for one name
+        // every second and a half — so the eighteen faces on a page were the
+        // one set of pictures that never asked the backend, which had often
+        // already found them. Asked here, a page's rows fill in from a single
+        // request and the fill is left only what the backend had nothing for.
+        let wanted = portraitPriority.filter { isPortraitWanted($0) }
+        guard !wanted.isEmpty else { return }
+        let previous = onScreenAdoption
+        onScreenAdoption = Task { [weak self] in
+            await previous?.value
+            await self?.adoptCataloguePortraits(for: wanted, onScreen: true)
+        }
     }
 
     // MARK: - Who gets the request budget
@@ -582,6 +636,18 @@ final class DigStore {
                 try? await Task.sleep(for: .milliseconds(250))
                 if Task.isCancelled { return }
             }
+            // And out of the way of the minute's last requests, which belong
+            // to whatever the listener does next rather than to the backlog.
+            //
+            // The yields above are about who is waiting; this one is about
+            // what is left. They are not the same question — the fill can be
+            // the only thing running, with nobody digging and nothing
+            // playing, and still be the reason a search two seconds from now
+            // is refused. See `DiscogsBudget.reserve`.
+            while await !discogsClient.hasRoom(for: .background) {
+                try? await Task.sleep(for: .seconds(2))
+                if Task.isCancelled { return }
+            }
 
             guard let next = await nextPortraitNeeded() else {
                 if quiet > 0 { artworkRevision &+= 1 }
@@ -676,11 +742,26 @@ final class DigStore {
     @ObservationIgnored private var portraitsSettled: Set<String> = []
     @ObservationIgnored private var portraitQueue: [String] = []
     @ObservationIgnored private var portraitQueueBuiltAt = 0
+    /// When the queue was last worked out, as opposed to which revision.
+    ///
+    /// Rebuilding it reads every artist and every portrait and walks every
+    /// neighbour name on every artist — 648ms at the median, over three
+    /// seconds at worst — and it happens on the same worker that answers the
+    /// page. Keyed on the revision alone, it ran after almost every write,
+    /// which during a dig is several times a minute: in the trace it was
+    /// running through eleven seconds of time that page walks spent waiting
+    /// their turn. The names it would add are not urgent — the ones on screen
+    /// jump the queue regardless — so a minute old is new enough.
+    @ObservationIgnored private var portraitQueueBuiltWhen: ContinuousClock.Instant?
+    private static let portraitQueueLifetime = Duration.seconds(60)
 
     private func nextPortraitNeeded() async -> String? {
         // The on-screen list is consumed rather than re-searched: each name
         // is checked once and then gone, instead of every name being looked
         // up again on every tick.
+        // Whatever the backend is about to answer for these, before searching
+        // Discogs for any of them. See `wantPortraits(for:)`.
+        await onScreenAdoption?.value
         while let next = portraitPriority.first {
             portraitPriority.removeFirst()
             if isPortraitWanted(next) {
@@ -689,15 +770,106 @@ final class DigStore {
             }
         }
         lastWasOnScreen = false
-        if portraitQueue.isEmpty || portraitQueueBuiltAt != revision {
+        let outOfDate = portraitQueueBuiltAt != revision
+            && portraitQueueBuiltWhen.map { ContinuousClock.now - $0 >= Self.portraitQueueLifetime } ?? true
+        if portraitQueue.isEmpty || outOfDate {
             portraitQueue = await worker.pendingPortraits()
             portraitQueueBuiltAt = revision
+            portraitQueueBuiltWhen = .now
+            // Whatever the backend has already found, taken in one request
+            // before a single Discogs search is spent on the rest.
+            await adoptCataloguePortraits(for: portraitQueue)
         }
         while let next = portraitQueue.first {
             portraitQueue.removeFirst()
             if isPortraitWanted(next) { return next }
         }
         return nil
+    }
+
+    /// Portraits the shared catalogue already has, in one request.
+    ///
+    /// This is the whole return on filling them server-side. The loop below
+    /// this used to ask Discogs about every name on its own — forty requests a
+    /// minute out of a budget of sixty that every listener draws on — and each
+    /// of those requests was made again, identically, on every other machine
+    /// running Indigo. Asked here, the work was done once by a cron job and
+    /// this costs one Postgres read for the entire queue.
+    ///
+    /// What the catalogue does not know is left in the queue and looked up the
+    /// old way, so a cold catalogue behaves exactly as before rather than
+    /// leaving pages blank.
+    ///
+    /// Bounded because the queue can be thousands of names long on a large
+    /// library, and the point is one small request rather than one enormous
+    /// one. The rest are picked up on the next rebuild.
+    private static let cataloguePortraitBatch = 200
+
+    /// Where the portraits the backend has already found come from. A property
+    /// so a test can stand in for the backend, which is off under XCTest.
+    @ObservationIgnored var cataloguePortraits: @Sendable ([String]) async -> [String: URL] = { keys in
+        guard SupabaseService.isConfigured else { return [:] }
+        return (try? await ArtworkRepository.shared.portraits(forArtistKeys: keys)) ?? [:]
+    }
+
+    /// Catalogue keys already asked about this session. A page reports its rows
+    /// on every redraw, and each report would otherwise be a request; and the
+    /// backlog asks for the next names it has not asked about, rather than the
+    /// same first two hundred every time it is rebuilt.
+    @ObservationIgnored private var askedCatalogueForPortraits: Set<String> = []
+
+    /// The on-screen request in flight, so the fill waits for its answer rather
+    /// than searching Discogs for a picture that is about to arrive.
+    @ObservationIgnored private var onScreenAdoption: Task<Void, Never>?
+
+    private func adoptCataloguePortraits(for names: [String], onScreen: Bool = false) async {
+        // The catalogue files names under `RecordingKey.normalize`; this store
+        // keys them under `normalizeArtist`. The two disagree about joint
+        // credits, so the question goes out in the catalogue's spelling and
+        // the answer comes back to the display name it was asked about.
+        var byCatalogueKey: [String: String] = [:]
+        for name in names {
+            guard byCatalogueKey.count < Self.cataloguePortraitBatch else { break }
+            let key = RecordingKey.normalize(name)
+            guard !key.isEmpty, byCatalogueKey[key] == nil,
+                  !askedCatalogueForPortraits.contains(key) else { continue }
+            byCatalogueKey[key] = name
+        }
+        guard !byCatalogueKey.isEmpty else { return }
+        askedCatalogueForPortraits.formUnion(byCatalogueKey.keys)
+
+        let found = await cataloguePortraits(Array(byCatalogueKey.keys))
+        // The one line that says whether the backend's pictures reach the app:
+        // how many were asked for, from where, and how many it had.
+        Trace.step(
+            "portraits.adopted",
+            "\(onScreen ? "screen" : "backlog") asked=\(byCatalogueKey.count) found=\(found.count)"
+        ) {}
+
+        var adopted: [(name: String, address: String)] = []
+        var resolved: [String: URL] = [:]
+        for (key, url) in found {
+            guard let name = byCatalogueKey[key] else { continue }
+            adopted.append((name, url.absoluteString))
+            resolved[RecordingKey.normalizeArtist(name)] = url
+        }
+        guard !adopted.isEmpty else { return }
+
+        await worker.adopt(adopted)
+        for (key, url) in resolved {
+            portraits[key] = url
+            portraitsSettled.insert(key)
+        }
+        // Rows already drawn are repainted, as the fill repaints them, for the
+        // ones on screen. Not for the backlog: up to two hundred edge rewrites
+        // on the main thread for rows nobody is looking at, which read the
+        // portrait table when they are next drawn anyway.
+        if onScreen {
+            for (name, address) in adopted { paint(name, with: address) }
+            saveContext()
+        }
+        // One announcement for the batch. See `artworkRevision`.
+        artworkRevision &+= 1
     }
 
     /// Whether this name still owes a picture.
@@ -1007,6 +1179,122 @@ final class DigStore {
         return await worker.connections(from: node, generation: revision)
     }
 
+    // MARK: - Search
+
+    /// Answers from the two networked catalogues, kept for the session.
+    ///
+    /// Keyed on the query rather than on a page, and deliberately not
+    /// invalidated by `revision`: enrichment writing a row somewhere does not
+    /// change what Discogs has under "ilian", and re-asking on every write
+    /// would spend a listener's rate limit confirming it.
+    @ObservationIgnored private var searches = DigCache<DigSearchResults>()
+
+    /// What this machine already holds, matched against a typed query.
+    ///
+    /// Off the main thread, and no network: this is the half of a search that
+    /// can be drawn immediately, and it is drawn before the other two are
+    /// asked. See `DigSearchIndex`.
+    func searchYours(_ query: String, limit: Int = 30) async -> [DigSearchResult] {
+        guard DigSearchIndex.isSearchable(query) else { return [] }
+        let _ = revision
+        settle()
+        return await worker.searchLocally(query, limit: limit, generation: revision)
+    }
+
+    /// Indigo's shared graph and Discogs, asked at the same time.
+    ///
+    /// Neither is allowed to sink the other: a backend that is not configured
+    /// and a search for something nobody has ever filed are each one empty
+    /// section on a page whose other sections still work. A refusal is not in
+    /// that class and is carried back rather than swallowed — see
+    /// `DigSearchResults.discogsRefused`.
+    ///
+    /// Marked as foreground work. Somebody is watching this, and the
+    /// background portrait fill stands aside for as long as it runs; without
+    /// that the fill spends the minute's requests on rows nobody has looked at
+    /// and the search is refused in a millisecond. That was not a theory — a
+    /// trace of a real session showed ninety-seven requests in one minute out
+    /// of a budget of sixty, and the searches at the end of it coming back in
+    /// three milliseconds each.
+    func searchElsewhere(_ query: String, limit: Int = 8) async -> DigSearchResults {
+        let key = RecordingKey.normalize(query)
+        guard key.count >= DigSearchIndex.shortestQuery else { return .none }
+        if let cached = searches.fresh(key, revision: 0) { return cached }
+
+        let found = await inForeground {
+            // Our own catalogue first, on its own.
+            //
+            // These four used to leave together, and asking in parallel saved
+            // nothing: the wall time was whichever leg was slowest, and
+            // Discogs was asked every time regardless of what we already had.
+            // Asked first, a query the catalogue can answer never pays for the
+            // other three at all — no request, and none of the half second the
+            // backend hop costs. That is the whole return on filing what a
+            // search finds; see `normalizeDiscogsSearch`.
+            //
+            // It also means Discogs traffic follows the number of *distinct
+            // unanswered queries* rather than the number of listeners, which
+            // is the only version of this that survives more people using it.
+            let catalogue = await catalogueSearch(query, limit: limit)
+            if DigSearchResult.answers(catalogue, query: query) {
+                return DigSearchResults(yours: [], catalogue: catalogue, discogs: [])
+            }
+
+            async let artists = discogsSearch(query, kind: .artist, limit: limit)
+            async let labels = discogsSearch(query, kind: .label, limit: limit)
+            async let releases = discogsSearch(query, kind: .release, limit: limit)
+
+            let byArtist = await artists
+            let byLabel = await labels
+            let byRelease = await releases
+
+            // Artists and labels ahead of releases: somebody typing a name is
+            // usually after a person or an imprint, and Discogs holds an order
+            // of magnitude more pressings than either.
+            return DigSearchResults(
+                yours: [],
+                catalogue: catalogue,
+                discogs: byArtist.rows + byLabel.rows + byRelease.rows,
+                discogsRefused: byArtist.refused || byLabel.refused || byRelease.refused
+            )
+        }
+
+        // A refusal is not an answer, and caching one makes it permanent: the
+        // same query would return the same nothing for the rest of the
+        // session, however quiet Discogs had since become.
+        if !found.discogsRefused { searches.store(found, key: key, revision: 0) }
+        return found
+    }
+
+    private func catalogueSearch(_ query: String, limit: Int) async -> [DigSearchResult] {
+        guard SupabaseService.isConfigured else { return [] }
+        guard let results = try? await SearchRepository.shared.search(query, limit: limit)
+        else { return [] }
+        return DigSearchResult.rows(from: results)
+    }
+
+    /// One kind, and whether Discogs would answer at all.
+    private func discogsSearch(
+        _ query: String, kind: DiscogsSearchKind, limit: Int
+    ) async -> (rows: [DigSearchResult], refused: Bool) {
+        guard discogsClient.isConfigured else { return ([], false) }
+        // Asked before spending anything. A request sent into an empty budget
+        // comes back refused in a millisecond, and the page then has to guess
+        // what that meant; knowing in advance is both quicker and clearer.
+        //
+        // `canSearch` rather than `hasRoom`: a search that goes to the backend
+        // spends none of this app's budget. See `DiscogsClient.canSearch`.
+        guard await discogsClient.canSearch() else { return ([], true) }
+        do {
+            let results = try await discogsClient.search(query, kind: kind, limit: limit)
+            return (DigSearchResult.rows(fromDiscogs: results, kind: kind), false)
+        } catch DiscogsError.rateLimited {
+            return ([], true)
+        } catch {
+            return ([], false)
+        }
+    }
+
     /// Where this listener has not been, worked out off the main thread.
     func digSuggestions(limit: Int = 6) async -> [DigHistory.Suggestion] {
         let _ = revision
@@ -1017,7 +1305,14 @@ final class DigStore {
     func scenes(forArtist name: String) async -> [MusicScene] {
         let _ = revision
         settle()
-        return await worker.scenes(forArtist: name, generation: revision)
+        // Traced because it was not, and an artist page was waiting on it for
+        // over half a second before asking Discogs anything — visible in the
+        // trace only as a gap with nothing in it.
+        let asked = revision
+        let worker = worker
+        return await Trace.stage("dig.scenes", name) {
+            await worker.scenes(forArtist: name, generation: asked)
+        }
     }
 
     func scene(city: String, sound: String?) async -> MusicScene? {
@@ -1491,6 +1786,73 @@ final class DigStore {
         }
     }
 
+    /// How long work a page can live without waits for room in the minute
+    /// before giving up. Settable for the test that has to watch it give up.
+    @ObservationIgnored var budgetPatience: Duration = .seconds(10)
+
+    /// Room in the minute's budget for work a page can live without, or false
+    /// once patience runs out or the page has gone.
+    ///
+    /// A new artist costs thirty or forty requests between the lookup, the
+    /// neighbourhood, a batch of records and the portraits on its rows, and the
+    /// minute holds sixty for every copy of the app. Opening a few in a row ran
+    /// the session to sixty-seven a minute, and the artist after that had its
+    /// own lookup refused three times over and came back with nothing at all.
+    /// The lookup is what the page cannot do without, so it never waits. What
+    /// follows it does, down to the same reserve the background fill keeps.
+    private func waitForRoom() async -> Bool {
+        let deadline = ContinuousClock.now + budgetPatience
+        while await !discogsClient.hasRoom(for: .background) {
+            guard !Task.isCancelled, ContinuousClock.now < deadline else { return false }
+            try? await Task.sleep(for: .milliseconds(250))
+        }
+        return !Task.isCancelled
+    }
+
+    /// An artist's Discogs entry in the two writes it arrives in, rather than
+    /// the one it used to be held for.
+    ///
+    /// `artists/{id}` and `artists/{id}/releases` leave together, and the page
+    /// waited for both — so it waited on the shelf: 442ms at the median in the
+    /// trace against 199ms for the entry, and over a second in the slowest
+    /// twentieth. The entry is written as soon as it lands, and the page lifts
+    /// its head once there is a profile to read.
+    ///
+    /// Both announcements go through the usual window, so a quick shelf folds
+    /// into one redraw and the reveal lands exactly when it did before.
+    ///
+    /// The shelf's was briefly announced at once, to cut the window out of the
+    /// reveal, and that was wrong. A read arriving while a walk of the same
+    /// artist is under way joins it rather than starting a second one — see
+    /// `ProfileWalkTests` — and the walk under way at that moment had read its
+    /// tables before the shelf was written. So the page revealed a profile of
+    /// the artist as they were a moment earlier: the trace showed Ellessar's
+    /// reveal joining a walk begun before the shelf landed.
+    ///
+    /// No save between the two. The page reads through `artistProfile`, which
+    /// settles the context before it asks the worker anything, so saving here
+    /// would be a second save on the main thread for the same rows.
+    private func describeArtist(named name: String, head: DiscogsSearchResult) async throws -> DiscogsArtist? {
+        if let fresh = discogsEnricher.freshArtist(named: name) { return fresh }
+        guard let id = head.id else { return nil }
+        let client = discogsClient
+        async let detail = client.artistDetail(id: id)
+        async let shelf = client.artistShelf(named: name, id: id)
+
+        let described = try await detail
+        discogsEnricher.artistDetail(named: name, head: head, detail: described)
+        announceChange()
+
+        let found = try await shelf
+        return discogsEnricher.artist(named: name, bundle: DiscogsArtistBundle(
+            detail: described,
+            releases: found.releases,
+            searchImageURL: head.coverImage,
+            searchThumbnailURL: head.thumbnail,
+            catalogue: found.catalogue
+        ))
+    }
+
     private func digArtist(name: String, mbid: String?) async {
         let key = "artist:\(mbid ?? name)"
         let discogsKey = "discogs:artist:\(RecordingKey.normalizeArtist(name))"
@@ -1520,7 +1882,7 @@ final class DigStore {
                     announceChange()
                 }
 
-                if let head, let artist = try await discogsEnricher.artist(named: name, head: head) {
+                if let head, let artist = try await describeArtist(named: name, head: head) {
                     saveContext()
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
@@ -1534,10 +1896,14 @@ final class DigStore {
                     }
                     // Recommendations arrive as a quiet second stage: the
                     // page and sleeves are already usable while this fills in.
+                    // Five searches, and only with room left in the minute —
+                    // see `waitForRoom()`.
                     do {
-                        try await discogsEnricher.recommendations(for: artist)
-                        saveContext()
-                        announceChange()
+                        if await waitForRoom() {
+                            try await discogsEnricher.recommendations(for: artist)
+                            saveContext()
+                            announceChange()
+                        }
                     } catch {
                         // Discovery enrichment is optional and never replaces
                         // a populated page with provider diagnostics.

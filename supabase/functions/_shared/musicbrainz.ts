@@ -21,6 +21,29 @@ export const MUSICBRAINZ_API = "https://musicbrainz.org/ws/2/";
 // An anonymous or generic agent is throttled harder and may be refused.
 export const MB_USER_AGENT = "Indigo/1.0 (+https://github.com/kirillginko/indigo)";
 
+/// The gap this crawler leaves between two requests to MusicBrainz.
+///
+/// MusicBrainz asks for one request a second, and the header above promises a
+/// crawler that paces itself — but nothing held it to that. The worker runs
+/// the jobs it claims one after another with nothing between them, and a
+/// drain claims fifteen, so a batch of scene pages or origin lookups went out
+/// several a second. A tenth over the second, because their limit is measured
+/// at their end and a request is never exactly as long as the one before it.
+export const MB_SPACING_MS = 1100;
+let lastRequestAt = 0;
+
+/// Every request to MusicBrainz, a second apart.
+///
+/// Held per worker invocation, which is where the bursts were: jobs inside one
+/// drain run back to back, and drains are five minutes apart. Exported for its
+/// own test.
+export async function pacedFetch(input: URL, init: RequestInit): Promise<Response> {
+  const wait = lastRequestAt + MB_SPACING_MS - Date.now();
+  if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+  lastRequestAt = Date.now();
+  return await fetch(input, init);
+}
+
 /// A hundred is MusicBrainz's own maximum, and one page is one request. A job
 /// takes exactly one and enqueues the next, so a scene of four hundred names
 /// is four polite requests spread over four drains rather than four at once.
@@ -84,7 +107,7 @@ export async function fetchScenePage(
   url.searchParams.set("limit", String(MB_PAGE));
   url.searchParams.set("offset", String(Math.max(0, offset)));
 
-  const response = await fetch(url, {
+  const response = await pacedFetch(url, {
     headers: { Accept: "application/json", "User-Agent": MB_USER_AGENT },
   });
   if (response.status === 503) {
@@ -198,7 +221,7 @@ export async function fetchArtistOrigin(name: string): Promise<{
   url.searchParams.set("fmt", "json");
   url.searchParams.set("limit", "5");
 
-  const response = await fetch(url, {
+  const response = await pacedFetch(url, {
     headers: { Accept: "application/json", "User-Agent": MB_USER_AGENT },
   });
   if (response.status === 503) throw new Error("musicbrainz_busy");

@@ -177,6 +177,25 @@ final class StorePredicateTests: XCTestCase {
         XCTAssertEqual(try context.fetch(descriptor).map(\.nameKey), ["late"])
     }
 
+    /// `GraphStore.Caches` reading only the records written since it last
+    /// looked — the same `Date` comparison as the portraits above, asked of a
+    /// different table rather than assumed to work because that one does.
+    func testFetchingReleasesWrittenSinceAMoment() throws {
+        let early = DiscogsReleaseRecord(discogsID: 1, title: "Early")
+        early.fetchedAt = Date(timeIntervalSince1970: 1000)
+        context.insert(early)
+        let late = DiscogsReleaseRecord(discogsID: 2, title: "Late")
+        late.fetchedAt = Date(timeIntervalSince1970: 3000)
+        context.insert(late)
+        try context.save()
+
+        let since = Date(timeIntervalSince1970: 2000)
+        let descriptor = FetchDescriptor<DiscogsReleaseRecord>(
+            predicate: #Predicate { $0.fetchedAt > since }
+        )
+        XCTAssertEqual(try context.fetch(descriptor).map(\.discogsID), [2])
+    }
+
     /// `GraphStore.portraitURLs(forKeys:)`, which the stored-edge lookup uses
     /// instead of assembling the fold.
     func testFetchingPortraitsByName() throws {

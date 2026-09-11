@@ -458,6 +458,38 @@ final class DigPerformanceTests: XCTestCase {
         )
     }
 
+    /// The rebuild that follows reading one record in full — the one an artist
+    /// page actually triggers, batch after batch.
+    ///
+    /// Opening an artist reads their records one by one to learn which labels
+    /// pressed them, and every batch written ends in a rebuild. The two tests
+    /// above cover a rebuild with nothing written and one after a new artist;
+    /// neither touches the release table, which is the one those batches grow.
+    /// In the running app that re-read was 218ms at the median and sat under
+    /// most of the slow page opens in the trace.
+    func testCostOfRebuildingAfterReadingOneRecord() throws {
+        let one = GraphStore(context: context)
+        _ = one.compute(.artist("Artist 0"))
+
+        let pressing = DiscogsReleaseRecord(discogsID: 999_999, title: "Fresh Pressing")
+        pressing.artistNames = ["Artist 0"]
+        pressing.labelNames = [labels[0]]
+        context.insert(pressing)
+        try context.save()
+
+        let two = GraphStore(context: context, inheriting: one)
+        let cost = milliseconds { _ = two.compute(.artist("Artist 0")) }
+        record("cacheBuild after one new release \(cost)ms")
+        // 917ms and 929ms reading the table whole; 177ms and 195ms reading
+        // only what arrived, against the four thousand records this store is
+        // seeded with. The bound sits where the old path fails and the new one
+        // has room to spare on a busy machine.
+        XCTAssertLessThan(
+            cost, 450,
+            "A rebuild after one record must read the record, not the whole release table"
+        )
+    }
+
     /// The whole answer a page waits for.
     func testCostOfAnArtistProfile() {
         let cost = milliseconds {

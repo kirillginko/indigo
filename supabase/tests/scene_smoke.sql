@@ -408,8 +408,6 @@ declare
     ep2 uuid;
     a1 uuid;
     a2 uuid;
-    r1 uuid;
-    r2 uuid;
     queued int;
 begin
     select id into ep1 from public.radio_episodes where external_id = 'smoke-1';
@@ -420,14 +418,15 @@ begin
     insert into public.artists (name, normalized_name)
     values ('Mark Ernestus', 'mark ernestus') returning id into a2;
 
-    -- Both played across the dub techno broadcasts.
-    insert into public.recordings (title, artist_id) values ('A', a1) returning id into r1;
-    insert into public.recordings (title, artist_id) values ('B', a2) returning id into r2;
+    -- Both played across the dub techno broadcasts, written the way production
+    -- writes them: resolved to an artist and never to a recording. This used to
+    -- give each appearance a recording instead, which is how 0017's join passed
+    -- here while finding nobody in the real tables. See migration 0021.
     insert into public.radio_appearances
-        (radio_episode_id, recording_id, track_index, raw_artist_name, normalized_artist_name)
+        (radio_episode_id, artist_id, track_index, raw_artist_name, normalized_artist_name)
     values
-        (ep1, r1, 10, 'Moritz Von Oswald', 'moritz von oswald'),
-        (ep2, r2, 10, 'Mark Ernestus', 'mark ernestus');
+        (ep1, a1, 10, 'Moritz Von Oswald', 'moritz von oswald'),
+        (ep2, a2, 10, 'Mark Ernestus', 'mark ernestus');
 
     -- Nobody has been placed yet, so there is nothing to name a scene after.
     if public.seed_scenes_from_artist_areas() <> 0 then

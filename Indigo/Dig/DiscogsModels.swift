@@ -5,6 +5,45 @@
 
 import Foundation
 
+/// How a record was issued, and the one question anything here asks of it.
+///
+/// Stated once because two kinds of row need the same answer and they arrive
+/// by different routes: an entry in an artist's releases carries a format
+/// string, and a release read in its own right carries a list of format
+/// objects. Both are asking whether this is a film rather than a record —
+/// which is what tells a video director from a group when Discogs files both
+/// under one name, and why a film distributor was appearing among an artist's
+/// labels.
+nonisolated enum ReleaseFormat {
+    private static let video = [
+        "dvd", "vhs", "blu-ray", "bluray", "laserdisc", "video", "betamax", "vcd", "umd"
+    ]
+
+    static func isVideo(_ text: String?) -> Bool {
+        guard let text else { return false }
+        let value = text.lowercased()
+        return video.contains { value.contains($0) }
+    }
+
+    static func isVideo(anyOf values: [String]) -> Bool {
+        values.contains { isVideo($0) }
+    }
+}
+
+/// One of a release's formats: "Vinyl", "DVD", "Cassette", with whatever
+/// Discogs adds about it — "NTSC", "Promo", "Album".
+nonisolated struct DiscogsFormat: Decodable, Sendable {
+    let name: String?
+    let descriptions: [String]?
+
+    /// The format as one string, for storing and for asking about.
+    var written: String {
+        ([name] + (descriptions ?? []).map { Optional($0) })
+            .compactMap { $0 }
+            .joined(separator: ", ")
+    }
+}
+
 nonisolated struct DiscogsSearchResponse: Decodable, Sendable {
     let results: [DiscogsSearchResult]?
 }
@@ -115,15 +154,7 @@ nonisolated struct DiscogsArtistRelease: Decodable, Sendable {
     ///
     /// A concert film by a musician is caught by this too, and that is the
     /// intended trade: this is an application about records.
-    var isVideo: Bool {
-        guard let format else { return false }
-        let value = format.lowercased()
-        return Self.videoFormats.contains { value.contains($0) }
-    }
-
-    private static let videoFormats = [
-        "dvd", "vhs", "blu-ray", "bluray", "laserdisc", "video", "betamax", "vcd", "umd"
-    ]
+    var isVideo: Bool { ReleaseFormat.isVideo(format) }
 
     /// The id that opens a page.
     ///
@@ -238,6 +269,9 @@ nonisolated struct DiscogsReleaseDetail: Decodable, Sendable {
     let artists: [DiscogsArtistReference]?
     let extraartists: [DiscogsCredit]?
     let labels: [DiscogsLabelReference]?
+    /// How it was issued. Nothing read this, so a release read in full could
+    /// not say whether it was a record or a film — see `ReleaseFormat`.
+    let formats: [DiscogsFormat]?
     let videos: [DiscogsVideo]?
     let genres: [String]?
     let styles: [String]?
@@ -245,4 +279,12 @@ nonisolated struct DiscogsReleaseDetail: Decodable, Sendable {
     let tracklist: [DiscogsTrackLine]?
     let notes: String?
     let uri: String?
+}
+
+/// The three things a dig can start from, as Discogs names them in a
+/// `database/search` `type` parameter.
+nonisolated enum DiscogsSearchKind: String, Sendable, CaseIterable {
+    case artist
+    case release
+    case label
 }

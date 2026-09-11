@@ -141,6 +141,111 @@ final class GraphStoreTests: XCTestCase {
         XCTAssertEqual(byKind[.release]?.first?.node.destination, .digRelease(id: 12_345, title: "Compro"))
     }
 
+    // MARK: Answers worked out before a write
+
+    /// A walk that read its tables before a write, and finishes after the
+    /// write threw the stored answer away, must not put its own answer back.
+    /// That answer describes the artist as they were before the write.
+    func testAnAnswerWorkedOutBeforeItWasForgottenIsNotKept() throws {
+        artist("Skee Mask", labels: ["Ilian Tape"], styles: ["Techno"], releases: [("Compro", 12_345)])
+        try context.save()
+
+        let walk = GraphStore(context: context)
+        walk.prepare()
+        GraphStore.forget(.artist("Skee Mask"), in: context)
+        try context.save()
+
+        let reached = walk.neighbors(of: .artist("Skee Mask"))
+        XCTAssertFalse(reached.byDestination.isEmpty, "The page still gets an answer")
+        let id = MusicNode.artist("Skee Mask").id
+        let kept = try context.fetch(FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == id }))
+        XCTAssertTrue(kept.isEmpty, "An answer from tables older than the write must not be stored")
+    }
+
+    /// And a walk that began after the forget stores its answer as always.
+    func testAnAnswerWorkedOutAfterItWasForgottenIsKept() throws {
+        artist("Skee Mask", labels: ["Ilian Tape"], styles: ["Techno"], releases: [("Compro", 12_345)])
+        try context.save()
+        GraphStore.forget(.artist("Skee Mask"), in: context)
+        try context.save()
+
+        _ = GraphStore(context: context).neighbors(of: .artist("Skee Mask"))
+        let id = MusicNode.artist("Skee Mask").id
+        let kept = try context.fetch(FetchDescriptor<GraphSnapshot>(predicate: #Predicate { $0.nodeID == id }))
+        XCTAssertFalse(kept.isEmpty)
+    }
+
+    // MARK: Rebuilding after records arrive
+
+    /// A record read after the last build has to be there in the next one.
+    ///
+    /// A rebuild used to read the whole release table again whenever it grew.
+    /// It now reads only the records that arrived since, and this is the case
+    /// that has to keep working: the one an artist page makes, batch after
+    /// batch.
+    func testARecordReadAfterTheLastBuildReachesTheNextOne() throws {
+        release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        try context.save()
+        let first = GraphStore(context: context)
+        _ = first.neighbors(of: .label("Ilian Tape"))
+
+        release("Pool", id: 67_890, label: "Ilian Tape", catalog: "ITLP10")
+        try context.save()
+        GraphStore.forget(.label("Ilian Tape"), in: context)
+
+        let reached = GraphStore(context: context, inheriting: first)
+            .neighbors(of: .label("Ilian Tape")).byDestination
+        XCTAssertTrue(reached.contains { $0.node.kind == .release && $0.node.title == "Pool" },
+                      "The record read since the last build")
+        XCTAssertTrue(reached.contains { $0.node.kind == .release && $0.node.title == "Compro" },
+                      "And the one that was already there")
+    }
+
+    /// Records are saved on the main context and read on the worker's, so one
+    /// can be stamped before a read began and saved after it — older than the
+    /// cutoff, and invisible to a read of what is new. The count has to catch
+    /// it, and the table be read whole instead.
+    func testARecordOlderThanTheLastReadIsNotMissed() throws {
+        release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        try context.save()
+        let first = GraphStore(context: context)
+        _ = first.neighbors(of: .label("Ilian Tape"))
+
+        release("Pool", id: 67_890, label: "Ilian Tape", catalog: "ITLP10")
+        let id = 67_890
+        let pool = try XCTUnwrap(context.fetch(FetchDescriptor<DiscogsReleaseRecord>(
+            predicate: #Predicate { $0.discogsID == id })).first)
+        pool.fetchedAt = Date(timeIntervalSinceNow: -3600)
+        try context.save()
+        GraphStore.forget(.label("Ilian Tape"), in: context)
+
+        let reached = GraphStore(context: context, inheriting: first)
+            .neighbors(of: .label("Ilian Tape")).byDestination
+        XCTAssertTrue(reached.contains { $0.node.kind == .release && $0.node.title == "Pool" })
+    }
+
+    /// A read of what is new cannot see what went, so a table that shrank has
+    /// to be read whole.
+    func testARecordThatIsGoneIsGoneFromTheNextBuild() throws {
+        release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        release("Pool", id: 67_890, label: "Ilian Tape", catalog: "ITLP10")
+        try context.save()
+        let first = GraphStore(context: context)
+        _ = first.neighbors(of: .label("Ilian Tape"))
+
+        let id = 67_890
+        let pool = try XCTUnwrap(context.fetch(FetchDescriptor<DiscogsReleaseRecord>(
+            predicate: #Predicate { $0.discogsID == id })).first)
+        context.delete(pool)
+        try context.save()
+        GraphStore.forget(.label("Ilian Tape"), in: context)
+
+        let reached = GraphStore(context: context, inheriting: first)
+            .neighbors(of: .label("Ilian Tape")).byDestination
+        XCTAssertFalse(reached.contains { $0.node.title == "Pool" })
+        XCTAssertTrue(reached.contains { $0.node.title == "Compro" })
+    }
+
     func testALabelWalksOutToItsRosterCatalogueAndPressings() {
         artist("Skee Mask", labels: ["Ilian Tape"])
         release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
