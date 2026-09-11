@@ -293,11 +293,19 @@ final class DigStore {
     /// the portraits are. Gating them made a connection row's face turn up
     /// long after everything else on the page, which is a worse trade than
     /// the one the gate was making in the first place.
-    func fillMissingReleaseArtwork(forArtist name: String, mbid: String?, limit: Int = 24) async {
-        await digReleaseArtwork(forArtist: name, mbid: mbid, limit: limit)
+    /// - Parameter whenThereIsRoom: wait for room in the minute before each
+    ///   batch, and stop rather than spend the last of it. For the batch a page
+    ///   asks for on its own; one the listener asked for by revealing more
+    ///   releases goes ahead regardless.
+    func fillMissingReleaseArtwork(
+        forArtist name: String, mbid: String?, limit: Int = 24, whenThereIsRoom: Bool = false
+    ) async {
+        await digReleaseArtwork(forArtist: name, mbid: mbid, limit: limit, whenThereIsRoom: whenThereIsRoom)
     }
 
-    private func digReleaseArtwork(forArtist name: String, mbid: String?, limit: Int) async {
+    private func digReleaseArtwork(
+        forArtist name: String, mbid: String?, limit: Int, whenThereIsRoom: Bool
+    ) async {
         // Records this app has not read in full.
         //
         // This used to ask for the ones with no picture at all, and that
@@ -331,6 +339,7 @@ final class DigStore {
         // typical artist needs a dozen records read, which is now one.
         for batch in Array(missing.prefix(limit)).chunked(into: 12) {
             guard !Task.isCancelled else { return }
+            if whenThereIsRoom, !(await waitForRoom()) { return }
             await fetchAndStore(batch, artist: name, client: client)
         }
     }
@@ -1246,7 +1255,14 @@ final class DigStore {
     func scenes(forArtist name: String) async -> [MusicScene] {
         let _ = revision
         settle()
-        return await worker.scenes(forArtist: name, generation: revision)
+        // Traced because it was not, and an artist page was waiting on it for
+        // over half a second before asking Discogs anything — visible in the
+        // trace only as a gap with nothing in it.
+        let asked = revision
+        let worker = worker
+        return await Trace.stage("dig.scenes", name) {
+            await worker.scenes(forArtist: name, generation: asked)
+        }
     }
 
     func scene(city: String, sound: String?) async -> MusicScene? {
@@ -1720,6 +1736,73 @@ final class DigStore {
         }
     }
 
+    /// How long work a page can live without waits for room in the minute
+    /// before giving up. Settable for the test that has to watch it give up.
+    @ObservationIgnored var budgetPatience: Duration = .seconds(10)
+
+    /// Room in the minute's budget for work a page can live without, or false
+    /// once patience runs out or the page has gone.
+    ///
+    /// A new artist costs thirty or forty requests between the lookup, the
+    /// neighbourhood, a batch of records and the portraits on its rows, and the
+    /// minute holds sixty for every copy of the app. Opening a few in a row ran
+    /// the session to sixty-seven a minute, and the artist after that had its
+    /// own lookup refused three times over and came back with nothing at all.
+    /// The lookup is what the page cannot do without, so it never waits. What
+    /// follows it does, down to the same reserve the background fill keeps.
+    private func waitForRoom() async -> Bool {
+        let deadline = ContinuousClock.now + budgetPatience
+        while await !discogsClient.hasRoom(for: .background) {
+            guard !Task.isCancelled, ContinuousClock.now < deadline else { return false }
+            try? await Task.sleep(for: .milliseconds(250))
+        }
+        return !Task.isCancelled
+    }
+
+    /// An artist's Discogs entry in the two writes it arrives in, rather than
+    /// the one it used to be held for.
+    ///
+    /// `artists/{id}` and `artists/{id}/releases` leave together, and the page
+    /// waited for both — so it waited on the shelf: 442ms at the median in the
+    /// trace against 199ms for the entry, and over a second in the slowest
+    /// twentieth. The entry is written as soon as it lands, and the page lifts
+    /// its head once there is a profile to read.
+    ///
+    /// Both announcements go through the usual window, so a quick shelf folds
+    /// into one redraw and the reveal lands exactly when it did before.
+    ///
+    /// The shelf's was briefly announced at once, to cut the window out of the
+    /// reveal, and that was wrong. A read arriving while a walk of the same
+    /// artist is under way joins it rather than starting a second one — see
+    /// `ProfileWalkTests` — and the walk under way at that moment had read its
+    /// tables before the shelf was written. So the page revealed a profile of
+    /// the artist as they were a moment earlier: the trace showed Ellessar's
+    /// reveal joining a walk begun before the shelf landed.
+    ///
+    /// No save between the two. The page reads through `artistProfile`, which
+    /// settles the context before it asks the worker anything, so saving here
+    /// would be a second save on the main thread for the same rows.
+    private func describeArtist(named name: String, head: DiscogsSearchResult) async throws -> DiscogsArtist? {
+        if let fresh = discogsEnricher.freshArtist(named: name) { return fresh }
+        guard let id = head.id else { return nil }
+        let client = discogsClient
+        async let detail = client.artistDetail(id: id)
+        async let shelf = client.artistShelf(named: name, id: id)
+
+        let described = try await detail
+        discogsEnricher.artistDetail(named: name, head: head, detail: described)
+        announceChange()
+
+        let found = try await shelf
+        return discogsEnricher.artist(named: name, bundle: DiscogsArtistBundle(
+            detail: described,
+            releases: found.releases,
+            searchImageURL: head.coverImage,
+            searchThumbnailURL: head.thumbnail,
+            catalogue: found.catalogue
+        ))
+    }
+
     private func digArtist(name: String, mbid: String?) async {
         let key = "artist:\(mbid ?? name)"
         let discogsKey = "discogs:artist:\(RecordingKey.normalizeArtist(name))"
@@ -1749,7 +1832,7 @@ final class DigStore {
                     announceChange()
                 }
 
-                if let head, let artist = try await discogsEnricher.artist(named: name, head: head) {
+                if let head, let artist = try await describeArtist(named: name, head: head) {
                     saveContext()
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
@@ -1763,10 +1846,14 @@ final class DigStore {
                     }
                     // Recommendations arrive as a quiet second stage: the
                     // page and sleeves are already usable while this fills in.
+                    // Five searches, and only with room left in the minute —
+                    // see `waitForRoom()`.
                     do {
-                        try await discogsEnricher.recommendations(for: artist)
-                        saveContext()
-                        announceChange()
+                        if await waitForRoom() {
+                            try await discogsEnricher.recommendations(for: artist)
+                            saveContext()
+                            announceChange()
+                        }
                     } catch {
                         // Discovery enrichment is optional and never replaces
                         // a populated page with provider diagnostics.

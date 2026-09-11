@@ -216,7 +216,7 @@ struct ArtistDigView: View {
                     // and a placeholder is bare by definition — announcing
                     // "nothing found" before looking would be a lie told
                     // quickly.
-                    if hasEnriched, profile.isBare {
+                    if hasEnriched, profile.hasNothingToDig {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Nothing to dig into yet.")
                                 .font(Typeface.body(12.5))
@@ -380,6 +380,12 @@ struct ArtistDigView: View {
                 // empty, which is precisely the "it failed" reading it exists
                 // to prevent. The discography is what the page is for, so
                 // that is what it waits for.
+                //
+                // It was split once into a veil per part, so the head could
+                // lift as soon as the profile arrived. The profile and the
+                // discography land within a tenth of a second of each other
+                // for nearly every artist, so that bought nothing — and the
+                // page lost the blur somebody watches to know it is working.
                 .loadingVeil(
                     !hasEnriched && profile.releases.isEmpty && profile.related.isEmpty
                 )
@@ -414,7 +420,16 @@ struct ArtistDigView: View {
         .task(id: artistMBID ?? artistName) {
             releaseOrder = []
             await readProfile()
-            artistScenes = await dig.scenes(forArtist: artistName)
+            // Scenes alongside the catalogue, not in front of it.
+            //
+            // This was awaited before the catalogue was asked anything, and the
+            // trace put every new artist's first request between 631 and 657ms
+            // after the page's first read — the scenes, untraced, filling the
+            // gap. Their section is inside the reveal, so for an artist the
+            // catalogue has not answered for they were work nobody could see,
+            // standing in front of the one request the page is waiting on.
+            let store = dig
+            async let earlyScenes = store.scenes(forArtist: artistName)
 
             // The catalogue first: everything after it needs the artist's own
             // links, which is where the Bandcamp address comes from.
@@ -427,6 +442,7 @@ struct ArtistDigView: View {
             // it after the top of the page was already on screen, which is
             // what the stutter was.
             await dig.enrichArtist(name: artistName, mbid: artistMBID)
+            artistScenes = await earlyScenes
             // The one exception, and it costs nothing: "nothing to dig into"
             // is held behind `hasEnriched`, so that flag must not be raised
             // over a profile from before the catalogue answered. Both this
@@ -443,8 +459,9 @@ struct ArtistDigView: View {
             // is up to four dozen requests before anything else on the page
             // gets a turn, for tiles most people never scroll to — and the
             // rest are fetched on demand when "More releases" reveals them.
+            // Only with room left in the minute. See `DigStore.waitForRoom()`.
             await dig.fillMissingReleaseArtwork(
-                forArtist: artistName, mbid: artistMBID, limit: 12
+                forArtist: artistName, mbid: artistMBID, limit: 12, whenThereIsRoom: true
             )
             artistScenes = await dig.scenes(forArtist: artistName)
             // The descent is not computed here any more.
@@ -511,6 +528,15 @@ struct ArtistDigView: View {
     private func readProfile() async {
         let found = await dig.artistProfile(name: artistName, mbid: artistMBID)
         profile = found
+        // What a listener can see after this read: whether the profile has
+        // arrived, and whether the veil has lifted. The first line with each
+        // is when that happened, and neither was in the trace.
+        let revealed = hasEnriched || !found.releases.isEmpty || !found.related.isEmpty
+        let hasProfile = !(found.biography ?? "").isEmpty
+        Trace.step(
+            "page.artist",
+            "\(artistName)|head=\(hasProfile ? 1 : 0)|reveal=\(revealed ? 1 : 0)"
+        ) {}
         if releaseOrder.isEmpty, !found.releases.isEmpty {
             releaseOrder = found.releases.map(\.id)
         }

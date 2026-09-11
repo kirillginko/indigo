@@ -185,10 +185,39 @@ nonisolated struct DiscogsClient: Sendable {
     }
 
     /// Everything else, once they have been found.
+    ///
+    /// Built from the two halves below, so a caller that wants them one at a
+    /// time can have them — see `DigStore.describeArtist(named:head:)` — and
+    /// a caller that does not gets the same three requests it always did.
     func artist(named name: String, head match: DiscogsSearchResult) async throws -> DiscogsArtistBundle? {
         guard let id = match.id else { return nil }
+        async let detail = artistDetail(id: id)
+        async let shelf = artistShelf(named: name, id: id)
+        let (described, found) = try await (detail, shelf)
+        return DiscogsArtistBundle(
+            detail: described,
+            releases: found.releases,
+            searchImageURL: match.coverImage,
+            searchThumbnailURL: match.thumbnail,
+            catalogue: found.catalogue
+        )
+    }
 
-        async let detail: DiscogsArtistDetail = get("artists/\(id)")
+    /// Who an artist is, from their own entry: the profile, the real name,
+    /// the portrait, the aliases.
+    ///
+    /// The quick half. 199ms at the median in the running app's trace, where
+    /// the shelf below is 442ms and over a second in the slowest twentieth —
+    /// so a page held for both was held for the shelf alone.
+    func artistDetail(id: Int) async throws -> DiscogsArtistDetail {
+        try await get("artists/\(id)")
+    }
+
+    /// What an artist has put out: the shelf Discogs files under them, and
+    /// the search that carries its sleeves.
+    func artistShelf(
+        named name: String, id: Int
+    ) async throws -> (releases: DiscogsArtistReleases, catalogue: [DiscogsSearchResult]) {
         async let releases: DiscogsArtistReleases = get("artists/\(id)/releases", query: [
             URLQueryItem(name: "sort", value: "year"),
             URLQueryItem(name: "sort_order", value: "desc"),
@@ -199,13 +228,8 @@ nonisolated struct DiscogsClient: Sendable {
             URLQueryItem(name: "type", value: "release"),
             URLQueryItem(name: "per_page", value: "25")
         ])
-        return try await DiscogsArtistBundle(
-            detail: detail,
-            releases: releases,
-            searchImageURL: match.coverImage,
-            searchThumbnailURL: match.thumbnail,
-            catalogue: catalogue.results ?? []
-        )
+        let (shelf, search) = try await (releases, catalogue)
+        return (shelf, search.results ?? [])
     }
 
     /// Just a picture of an artist, in one request.

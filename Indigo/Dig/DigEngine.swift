@@ -147,6 +147,18 @@ nonisolated struct ArtistProfile: Sendable {
             && biography == nil && imageURL == nil
             && libraryTrackCount == 0 && crateCount == 0 && radioAppearances.isEmpty
     }
+
+    /// Nothing to dig through, whatever the catalogue said about who they are.
+    ///
+    /// `isBare` counts a profile and a portrait as something, and on its own
+    /// terms that is right. But an artist's entry now lands a round trip ahead
+    /// of their shelf, so a shelf that never comes — refused, or abandoned when
+    /// the listener moved on — leaves a biography over an empty page, and
+    /// `isBare` said nothing about exactly that page.
+    var hasNothingToDig: Bool {
+        releases.isEmpty && labels.isEmpty && related.isEmpty
+            && libraryTrackCount == 0 && crateCount == 0 && radioAppearances.isEmpty
+    }
 }
 
 nonisolated struct DigReleaseProfile: Sendable {
