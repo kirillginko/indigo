@@ -941,6 +941,9 @@ private nonisolated struct Caches {
     /// When that dictionary was last brought up to date, so the next build can
     /// ask only for what has arrived since.
     private let portraitsReadAt: Date
+    /// When the release table was last actually read — not merely handed on —
+    /// so the next build can ask only for the records that arrived since.
+    private let releasesReadAt: Date
     private let recordingsByArtistKey: [String: [Recording]]
     /// Which albums an artist appears on, and what is on each album.
     private let albumKeysByArtistKey: [String: Set<String>]
@@ -994,6 +997,47 @@ private nonisolated struct Caches {
         ]
     }
 
+    /// How far back each partial read reaches past the last one.
+    ///
+    /// Records are written on the main context and read here on the worker's,
+    /// so the two interleave: a record stamped a moment before the last read
+    /// began and saved a moment after it is older than that cutoff and absent
+    /// from that read. Reaching back a few seconds catches it for a handful of
+    /// rows read twice, and they merge by id without harm.
+    private static let releasesOverlap: TimeInterval = 5
+
+    /// The release table brought up to date by reading only what is new.
+    ///
+    /// Reading it whole was 218ms at the median in the running app, and every
+    /// batch of records an artist page reads grows it — so the rebuild behind
+    /// each batch paid for thousands of rows to learn about twelve. The
+    /// portraits below were fixed the same way, for the same reason.
+    ///
+    /// Nil whenever the answer cannot be shown to be exact, and the caller
+    /// reads the table whole as it always has. What shows it is the count:
+    /// the store has just said how many records there are, and a merge that
+    /// does not arrive at that number — a record older than the overlap, a
+    /// record deleted — is not an answer.
+    private static func releasesSince(
+        _ previous: Caches?,
+        expecting count: Int,
+        in store: ModelContext
+    ) -> [DiscogsReleaseRecord]? {
+        // Only for a table that grew. One that shrank lost records a read of
+        // what is new cannot see go.
+        guard let previous, count > previous.discogsReleases.count else { return nil }
+        let since = previous.releasesReadAt.addingTimeInterval(-releasesOverlap)
+        return Trace.step("t.releases.since") { () -> [DiscogsReleaseRecord]? in
+            var byID = previous.releasesByID
+            for release in (try? store.fetch(FetchDescriptor<DiscogsReleaseRecord>(
+                predicate: #Predicate { $0.fetchedAt > since }
+            ))) ?? [] {
+                byID[release.discogsID] = release
+            }
+            return byID.count == count ? Array(byID.values) : nil
+        }
+    }
+
     init(context: ModelContext, reusing previous: Caches? = nil) {
         self.context = context
         let store = context
@@ -1021,8 +1065,21 @@ private nonisolated struct Caches {
         let fetchedArtists = kept(1, \.discogsArtists)
             ?? Trace.step("t.artists") { (try? store.fetch(FetchDescriptor<DiscogsArtist>())) ?? [] }
         let inheritedReleases = kept(2, \.discogsReleases)
+        // Taken before reading, as the portraits' is below, so a record saved
+        // while this runs is caught by the next build rather than missed by
+        // both.
+        let releasesCutoff = Date()
+        let mergedReleases = inheritedReleases == nil
+            ? Self.releasesSince(previous, expecting: counts[2], in: store)
+            : nil
         let fetchedReleases = inheritedReleases
+            ?? mergedReleases
             ?? Trace.step("t.releases") { (try? store.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [] }
+        // Handed on untouched, the window stays open from the last real read,
+        // so a record rewritten in the meantime is still inside it next time.
+        releasesReadAt = inheritedReleases != nil
+            ? (previous?.releasesReadAt ?? releasesCutoff)
+            : releasesCutoff
         let entries = kept(3) { Array($0.metadata.values) }
             ?? Trace.step("t.metadata") { (try? store.fetch(FetchDescriptor<RecordingMetadata>())) ?? [] }
         recordings = fetchedRecordings

@@ -319,11 +319,17 @@ final class DigStore {
         // for. The network half runs in parallel; the writes stay serial,
         // because they all land in one ModelContext.
         let client = discogsClient
-        // Six at a time. The grid shows two dozen and all of them deserve a
-        // sleeve, but firing four dozen requests in one breath is how a
+        // Twelve at a time. The grid shows two dozen and all of them deserve
+        // a sleeve, but firing four dozen requests in one breath is how a
         // service starts refusing them — and a batch that lands is a batch
         // the listener can see.
-        for batch in Array(missing.prefix(limit)).chunked(into: 6) {
+        //
+        // This was six. Discogs meters requests per minute rather than how
+        // many are in flight, so six-then-six spends exactly what twelve does;
+        // what the second batch added was a second save, a second
+        // announcement and a second walk of the graph behind the page. A
+        // typical artist needs a dozen records read, which is now one.
+        for batch in Array(missing.prefix(limit)).chunked(into: 12) {
             guard !Task.isCancelled else { return }
             await fetchAndStore(batch, artist: name, client: client)
         }
@@ -354,6 +360,24 @@ final class DigStore {
         artist name: String,
         client: DiscogsClient
     ) async {
+        // Through the same source `DiscogsEnricher.release(id:)` uses, which
+        // this path had been going around.
+        //
+        // It went around it because the enricher holds a ModelContext, and
+        // every task in the group would have queued on the main actor to
+        // reach it — so it took the bare client, and lost what the source
+        // does besides the request. `CatalogReleaseSource` is a `Sendable`
+        // struct with no context, so it can be asked from inside the group.
+        //
+        // What that buys is the fill, not speed. A build that can reach
+        // Discogs itself is deliberately not sent to the shared cache first —
+        // see `canReachProviderDirectly` — so this answers nil at once and asks
+        // the backend to describe the record behind the page. These dozen
+        // reads are the most expensive thing an artist page does, and until
+        // now not one of them ever reached the catalogue for anybody else.
+        // A build without a credential does read the shared copy here.
+        let catalog = CatalogReleaseSource.shared
+
         let fetched = await withTaskGroup(of: (Int, DiscogsReleaseDetail)?.self) { group in
             for release in wanted {
                 let title = release.title
@@ -367,9 +391,16 @@ final class DigStore {
                     if identifier == nil {
                         identifier = try? await client.releaseID(title: title, artist: name)
                     }
-                    guard let identifier,
-                          let detail = try? await client.release(id: identifier)
-                    else { return nil }
+                    guard let identifier else { return nil }
+
+                    if let shared = await catalog.release(id: identifier) {
+                        return (identifier, shared)
+                    }
+                    // No second `populateInBackground` here: `release(id:)`
+                    // has already asked for the fill in exactly the case that
+                    // reaches this line, and asking again sent every record
+                    // to the Edge Function twice.
+                    guard let detail = try? await client.release(id: identifier) else { return nil }
                     return (identifier, detail)
                 }
             }
