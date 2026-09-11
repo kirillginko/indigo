@@ -26,7 +26,9 @@ interface Job {
   payload: Record<string, unknown> | null;
 }
 
-const MAX_BATCH = 25;
+// Thirty, to match what the drain now asks for; see migration 0022. A request
+// for more than this is quietly given this, so the two have to move together.
+const MAX_BATCH = 30;
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

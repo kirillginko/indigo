@@ -75,6 +75,14 @@ run -tAc "select public.schedule_indigo_enrichment(
     'https://example.supabase.co/functions/v1/enrichment-worker', 'test-key');" \
     | sed 's/^/    /'
 
+echo "· drain batch"
+# As a project that scheduled the drain before 0022 existed: its job still asks
+# for fifteen. Applying 0022 again has to move it to thirty.
+run -c "update cron.job set command = replace(command, '''limit'', 30', '''limit'', 15') where jobname = 'indigo-drain-queue';"
+run -f "$ROOT/supabase/migrations/0022_drain_thirty_jobs.sql" >/dev/null
+run -c "do \$\$ begin if not exists (select 1 from cron.job where jobname = 'indigo-drain-queue' and command like '%''limit'', 30%') then raise exception 'the running drain job still asks for fewer than thirty'; end if; end \$\$;"
+echo "    a drain that was already running now asks for thirty"
+
 echo "· checks"
 run -f "$ROOT/supabase/tests/radio_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/scene_smoke.sql" | sed 's/^/    /'
