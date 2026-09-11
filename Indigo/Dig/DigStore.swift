@@ -688,6 +688,18 @@ final class DigStore {
     @ObservationIgnored private var portraitsSettled: Set<String> = []
     @ObservationIgnored private var portraitQueue: [String] = []
     @ObservationIgnored private var portraitQueueBuiltAt = 0
+    /// When the queue was last worked out, as opposed to which revision.
+    ///
+    /// Rebuilding it reads every artist and every portrait and walks every
+    /// neighbour name on every artist — 648ms at the median, over three
+    /// seconds at worst — and it happens on the same worker that answers the
+    /// page. Keyed on the revision alone, it ran after almost every write,
+    /// which during a dig is several times a minute: in the trace it was
+    /// running through eleven seconds of time that page walks spent waiting
+    /// their turn. The names it would add are not urgent — the ones on screen
+    /// jump the queue regardless — so a minute old is new enough.
+    @ObservationIgnored private var portraitQueueBuiltWhen: ContinuousClock.Instant?
+    private static let portraitQueueLifetime = Duration.seconds(60)
 
     private func nextPortraitNeeded() async -> String? {
         // The on-screen list is consumed rather than re-searched: each name
@@ -701,15 +713,73 @@ final class DigStore {
             }
         }
         lastWasOnScreen = false
-        if portraitQueue.isEmpty || portraitQueueBuiltAt != revision {
+        let outOfDate = portraitQueueBuiltAt != revision
+            && portraitQueueBuiltWhen.map { ContinuousClock.now - $0 >= Self.portraitQueueLifetime } ?? true
+        if portraitQueue.isEmpty || outOfDate {
             portraitQueue = await worker.pendingPortraits()
             portraitQueueBuiltAt = revision
+            portraitQueueBuiltWhen = .now
+            // Whatever the backend has already found, taken in one request
+            // before a single Discogs search is spent on the rest.
+            await adoptCataloguePortraits(for: portraitQueue)
         }
         while let next = portraitQueue.first {
             portraitQueue.removeFirst()
             if isPortraitWanted(next) { return next }
         }
         return nil
+    }
+
+    /// Portraits the shared catalogue already has, in one request.
+    ///
+    /// This is the whole return on filling them server-side. The loop below
+    /// this used to ask Discogs about every name on its own — forty requests a
+    /// minute out of a budget of sixty that every listener draws on — and each
+    /// of those requests was made again, identically, on every other machine
+    /// running Indigo. Asked here, the work was done once by a cron job and
+    /// this costs one Postgres read for the entire queue.
+    ///
+    /// What the catalogue does not know is left in the queue and looked up the
+    /// old way, so a cold catalogue behaves exactly as before rather than
+    /// leaving pages blank.
+    ///
+    /// Bounded because the queue can be thousands of names long on a large
+    /// library, and the point is one small request rather than one enormous
+    /// one. The rest are picked up on the next rebuild.
+    private static let cataloguePortraitBatch = 200
+
+    private func adoptCataloguePortraits(for names: [String]) async {
+        guard SupabaseService.isConfigured, !names.isEmpty else { return }
+
+        // The catalogue files names under `RecordingKey.normalize`; this store
+        // keys them under `normalizeArtist`. The two disagree about joint
+        // credits, so the question goes out in the catalogue's spelling and
+        // the answer comes back to the display name it was asked about.
+        var byCatalogueKey: [String: String] = [:]
+        for name in names.prefix(Self.cataloguePortraitBatch) {
+            let key = RecordingKey.normalize(name)
+            guard !key.isEmpty, byCatalogueKey[key] == nil else { continue }
+            byCatalogueKey[key] = name
+        }
+        guard !byCatalogueKey.isEmpty else { return }
+
+        guard let found = try? await ArtworkRepository.shared.portraits(
+            forArtistKeys: Array(byCatalogueKey.keys)
+        ), !found.isEmpty else { return }
+
+        var adopted: [(name: String, address: String)] = []
+        var resolved: [String: URL] = [:]
+        for (key, url) in found {
+            guard let name = byCatalogueKey[key] else { continue }
+            adopted.append((name, url.absoluteString))
+            resolved[RecordingKey.normalizeArtist(name)] = url
+        }
+        guard !adopted.isEmpty else { return }
+
+        await worker.adopt(adopted)
+        for (key, url) in resolved { portraits[key] = url }
+        // One announcement for the batch. See `artworkRevision`.
+        artworkRevision &+= 1
     }
 
     /// Whether this name still owes a picture.

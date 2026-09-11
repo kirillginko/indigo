@@ -44,6 +44,39 @@ nonisolated struct ArtworkRepository: Sendable {
 
     private static let bucket = "artwork"
 
+    private struct NamesParams: Encodable {
+        let pNames: [String]
+
+        enum CodingKeys: String, CodingKey { case pNames = "p_names" }
+    }
+
+    /// Portraits for a set of artists, by the normalized name the catalogue
+    /// files them under, in one request.
+    ///
+    /// The backend fills these on a schedule — see migration 0019 — so a name
+    /// answered here is a Discogs search this machine does not have to make,
+    /// and the search behind it was made once for every listener rather than
+    /// once by each of them.
+    ///
+    /// Keyed on `RecordingKey.normalize` rather than `normalizeArtist`,
+    /// because that is what the backend writes into `normalized_name`. The two
+    /// disagree about joint credits — one truncates at "&" and the other does
+    /// not — and asking with the wrong one matches nothing at all.
+    ///
+    /// Names the catalogue has no picture for are simply absent, which the
+    /// caller reads as "look it up yourself if you like".
+    func portraits(forArtistKeys keys: [String]) async throws -> [String: URL] {
+        let wanted = Array(Set(keys.filter { !$0.isEmpty }))
+        guard !wanted.isEmpty else { return [:] }
+
+        let client = try SupabaseService.requireClient()
+        let rows: [String: String] = try await client
+            .rpc("portraits_for_artists", params: NamesParams(pNames: wanted))
+            .execute()
+            .value
+        return rows.compactMapValues(URL.init(string:))
+    }
+
     func artwork(for entityType: Catalog.EntityType, id entityID: UUID) async throws -> Catalog.Artwork? {
         let client = try SupabaseService.requireClient()
         let rows: [Catalog.Artwork] = try await client

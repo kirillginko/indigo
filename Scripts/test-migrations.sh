@@ -79,3 +79,4 @@ echo "· checks"
 run -f "$ROOT/supabase/tests/radio_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/scene_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/search_smoke.sql" | sed 's/^/    /'
+run -f "$ROOT/supabase/tests/portrait_smoke.sql" | sed 's/^/    /'

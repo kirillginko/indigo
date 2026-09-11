@@ -15,6 +15,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
 import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
+import { fetchArtistPortrait } from "../_shared/discogs.ts";
 import { normalizeName } from "../_shared/normalize.ts";
 
 interface Job {
@@ -160,6 +161,27 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
         p_country: found?.country ?? null,
         p_began: found?.began ?? null,
         p_mbid: found?.mbid ?? null,
+      });
+      if (error) throw new Error(error.message);
+      return;
+    }
+
+    case "fetch_artist_portrait": {
+      const artistId = String(job.payload?.artist_id ?? "");
+      const name = String(job.payload?.name ?? "");
+      if (!artistId || !name) throw new Error("missing artist");
+
+      const found = await fetchArtistPortrait(
+        name, Deno.env.get("DISCOGS_TOKEN"), USER_AGENT);
+
+      // Recorded either way. An artist Discogs has no picture of is a finding,
+      // and writing it down is what stops the queue asking again next week —
+      // the same bargain `fetch_artist_origin` makes above.
+      const { error } = await supabase.rpc("record_artist_portrait", {
+        p_artist_id: artistId,
+        p_url: found?.url ?? null,
+        p_width: found?.width ?? null,
+        p_height: found?.height ?? null,
       });
       if (error) throw new Error(error.message);
       return;

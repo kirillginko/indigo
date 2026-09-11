@@ -275,3 +275,72 @@ export async function isDiscogsSearchNormalized(
 
   return Boolean(data);
 }
+
+/// A picture of an artist, or the finding that Discogs has none.
+///
+/// Moved here from the app, where it ran as a background loop on every
+/// listener's machine and was the largest single consumer of a Discogs budget
+/// that all of them share. See migration 0019.
+///
+/// The name must match. Discogs ranks loosely and will happily return a
+/// tribute band, a bootleg label or somebody else entirely for a name it does
+/// not have — and a wrong portrait is worse than none, because nothing about
+/// the page it lands on will say so. `withoutDisambiguator` is applied before
+/// comparing, so the artist really called Bandulu still matches the row
+/// Discogs files as "Bandulu (3)".
+export async function fetchArtistPortrait(
+  name: string,
+  token: string | undefined,
+  userAgent: string,
+): Promise<{ url: string; width: number | null; height: number | null } | null> {
+  const clean = name.trim();
+  if (!clean) return null;
+
+  const url = new URL("https://api.discogs.com/database/search");
+  url.searchParams.set("q", clean);
+  url.searchParams.set("type", "artist");
+  url.searchParams.set("per_page", "5");
+
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "User-Agent": userAgent,
+  };
+  if (token) headers.Authorization = `Discogs token=${token}`;
+
+  const response = await fetch(url, { headers });
+  // Thrown rather than swallowed: the queue's own retry is the right answer to
+  // being told to slow down, and recording a miss here would write down "no
+  // picture exists" on the strength of a refusal.
+  if (response.status === 429) throw new Error("discogs_rate_limited");
+  if (!response.ok) throw new Error(`discogs_${response.status}`);
+
+  const payload = await response.json() as { results?: Payload[] };
+  const wanted = normalizeName(clean);
+  const match = (payload.results ?? []).find(
+    (result) => normalizeName(withoutDisambiguator(String(result?.title ?? ""))) === wanted,
+  );
+  if (!match) return null;
+
+  // `thumb` first: this fills a row, not a hero image, and the small cut is
+  // the one the app actually draws.
+  const picture = usableImage(match.thumb) ?? usableImage(match.cover_image);
+  if (!picture) return null;
+
+  return {
+    url: picture,
+    width: Number.isFinite(Number(match.width)) ? Math.trunc(Number(match.width)) : null,
+    height: Number.isFinite(Number(match.height)) ? Math.trunc(Number(match.height)) : null,
+  };
+}
+
+/// A Discogs image address, or nothing where Discogs is saying there is none.
+///
+/// A record with no sleeve in the index comes back as a real, loadable URL for
+/// a transparent one-pixel gif. Stored, that is a portrait slot filled with
+/// nothing — which reads as a picture that failed to load rather than as an
+/// artist nobody has photographed, and stops the artist ever being asked about
+/// again.
+function usableImage(address: unknown): string | null {
+  if (typeof address !== "string" || address.length === 0) return null;
+  return address.includes("/images/spacer") ? null : address;
+}

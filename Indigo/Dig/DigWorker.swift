@@ -218,6 +218,21 @@ actor DigWorker {
         return write(found, named: name)
     }
 
+    /// Portraits the shared catalogue had already found, written down here as
+    /// though this machine had found them.
+    ///
+    /// The queue is then shorter by exactly the names the backend has already
+    /// paid for, which is the whole point of filling them once for everybody
+    /// rather than once per listener. See migration 0019.
+    /// Through `write` rather than a bare insert: `nameKey` is unique, and an
+    /// artist the fill already recorded a miss for is exactly the case this is
+    /// most useful in.
+    func adopt(_ found: [(name: String, address: String)]) {
+        for entry in found {
+            _ = write(entry.address, named: entry.name)
+        }
+    }
+
     /// The picture on the artist row, when a full lookup has written one.
     private static func resolvedPortrait(named name: String, in context: ModelContext) -> String? {
         let key = RecordingKey.normalizeArtist(name)
