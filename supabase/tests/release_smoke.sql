@@ -439,4 +439,67 @@ begin
     raise notice 'release smoke: the cache checks out';
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- 0032 — an artist named after themselves
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    v_episode uuid;
+    v_id uuid;
+begin
+    select id into v_episode from public.radio_episodes where external_id = 'merge-show/1';
+    if v_episode is null then
+        select id into v_episode from public.radio_episodes limit 1;
+    end if;
+
+    -- A line crediting two people, as the ingest writes it since 0029: the
+    -- appearance belongs to the primary, and both names are kept beside it.
+    insert into public.radio_appearances
+        (radio_episode_id, track_index, raw_artist_name, normalized_artist_name,
+         credited_artist_names, credited_artist_keys)
+    values (v_episode, 90, 'Rrawun Maymuru, Nick Wales', 'rrawun maymuru',
+            array['Rrawun Maymuru', 'Nick Wales'], array['rrawun maymuru', 'nick wales']);
+
+    -- Adoption files it under the right key, and must label it with the right
+    -- name rather than the whole line.
+    perform public.adopt_radio_artists(null);
+
+    select id into v_id from public.artists where normalized_name = 'rrawun maymuru';
+    if v_id is null then
+        raise exception 'the primary credit should have been adopted';
+    end if;
+    if (select name from public.artists where id = v_id) <> 'Rrawun Maymuru' then
+        raise exception 'an artist was named after the whole line: %',
+            (select name from public.artists where id = v_id);
+    end if;
+
+    -- And nobody was invented out of the rest of the line.
+    if exists (select 1 from public.artists where normalized_name = 'rrawun maymuru nick wales') then
+        raise exception 'the whole credit became an artist';
+    end if;
+
+    -- MARK: the ones already labelled wrongly
+
+    update public.artists set name = 'Rrawun Maymuru, Nick Wales' where id = v_id;
+    if public.relabel_credited_artists(500) <> 1 then
+        raise exception 'the wrongly labelled artist was not renamed';
+    end if;
+    if (select name from public.artists where id = v_id) <> 'Rrawun Maymuru' then
+        raise exception 'the rename did not take';
+    end if;
+
+    -- Idempotent, and it renames nothing that is already right.
+    if public.relabel_credited_artists(500) <> 0 then
+        raise exception 'a second pass renamed something that was already correct';
+    end if;
+
+    -- A line crediting one artist is never touched by any of this.
+    if (select count(*) from public.artists where normalized_name = 'skee mask') <> 1 then
+        raise exception 'a single credit was disturbed';
+    end if;
+
+    raise notice 'release smoke: an artist is named after themselves';
+end $$;
+
 rollback;
