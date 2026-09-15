@@ -324,6 +324,62 @@ final class BandcampTests: XCTestCase {
         XCTAssertEqual(row.imageURL?.absoluteString, "https://f4.bcbits.com/img/quiet.jpg")
         XCTAssertEqual(row.pageURL.absoluteString, "https://x.bandcamp.com/album/quiet-storm")
     }
+
+    // MARK: - The fold behind the sleeve ladder
+
+    /// `cachedReleases(forArtist:)` reads the whole table and filters it in
+    /// Swift, because `artistKeys` is an array attribute and a `#Predicate`
+    /// naming it takes the app down against SQLite. `DigArtwork.release` asks
+    /// it once per row of a tracklist, so on a real store — eight hundred
+    /// Bandcamp releases — twenty rows measured 1,398ms. Folded once it is
+    /// 91ms.
+    ///
+    /// Holding a fold is only safe while it notices the store changing, and
+    /// these are the two ways it does: a row added, and a row written over in
+    /// place by a re-read, which changes no count at all.
+    func testTheFoldNoticesAReleaseArriving() throws {
+        let enricher = BandcampEnricher(context: context)
+        XCTAssertTrue(enricher.cachedReleases(forArtist: "Purelink").isEmpty)
+
+        context.insert(BandcampRelease(
+            urlString: "https://purelink.test/a", title: "Faith", artistName: "Purelink"
+        ))
+        try context.save()
+
+        XCTAssertEqual(
+            enricher.cachedReleases(forArtist: "Purelink").map(\.title), ["Faith"],
+            "A release just written has to be found"
+        )
+    }
+
+    func testTheFoldNoticesAReleaseRewrittenInPlace() throws {
+        let release = BandcampRelease(
+            urlString: "https://split.test/a", title: "Untitled", artistName: "Nobody"
+        )
+        context.insert(release)
+        try context.save()
+
+        let enricher = BandcampEnricher(context: context)
+        XCTAssertEqual(enricher.cachedReleases(forArtist: "Nobody").count, 1)
+        XCTAssertTrue(enricher.cachedReleases(forArtist: "Loraine James").isEmpty)
+
+        // What a re-read does: the same row, re-credited. The row count does
+        // not move, so only the stamp can say the fold is stale.
+        release.artistName = "Loraine James"
+        release.artistKey = RecordingKey.normalizeArtist("Loraine James")
+        release.artistKeys = RecordingKey.creditedArtists("Loraine James")
+        release.fetchedAt = Date().addingTimeInterval(60)
+        try context.save()
+
+        XCTAssertEqual(
+            enricher.cachedReleases(forArtist: "Loraine James").count, 1,
+            "A re-credited release has to move to the artist it now names"
+        )
+        XCTAssertTrue(
+            enricher.cachedReleases(forArtist: "Nobody").isEmpty,
+            "and stop being found under the one it used to"
+        )
+    }
 }
 
 // MARK: - Image sizes

@@ -56,6 +56,21 @@ nonisolated struct MetadataRepository: Sendable {
         }
     }
 
+    /// `CacheRow` with the id it was keyed on, for the batched read below.
+    /// A type nested in a generic function is not allowed, and this one is
+    /// read by one.
+    private struct KeyedCacheRow: Decodable {
+        let resourceID: String
+        let payload: AnyJSON
+        let fetchedAt: Date
+
+        enum CodingKeys: String, CodingKey {
+            case resourceID = "resource_id"
+            case payload
+            case fetchedAt = "fetched_at"
+        }
+    }
+
     /// The cached payload for a provider resource, fresh or not, or nil on a
     /// true miss.
     func cached<Payload: Decodable & Sendable>(
@@ -83,6 +98,47 @@ nonisolated struct MetadataRepository: Sendable {
         return CachedPayload(value: value, fetchedAt: row.fetchedAt, expiresAt: row.expiresAt)
     }
 
+    /// The cached payloads for many resources of one type, in one round trip.
+    ///
+    /// An artist page reads a dozen releases at once, and asked one at a time
+    /// that is a dozen round trips to answer a question Postgres can answer in
+    /// one. The probe only pays for itself if it costs less than what it
+    /// replaces, and twelve probes against eight Discogs requests did not.
+    ///
+    /// Keyed by `resource_id`, and a resource nobody has cached is simply
+    /// absent — the caller reads that as "ask the provider yourself".
+    func cached<Payload: Decodable & Sendable>(
+        _ type: Payload.Type,
+        provider: String,
+        resourceType: String,
+        resourceIDs: [String],
+        fresherThan lifetime: TimeInterval
+    ) async throws -> [String: Payload] {
+        guard !resourceIDs.isEmpty else { return [:] }
+        let client = try SupabaseService.requireClient()
+
+        let rows: [KeyedCacheRow] = try await client
+            .from("metadata_cache")
+            .select("resource_id,payload,fetched_at")
+            .eq("provider", value: provider)
+            .eq("resource_type", value: resourceType)
+            .in("resource_id", values: resourceIDs)
+            .execute()
+            .value
+
+        let oldest = Date().addingTimeInterval(-lifetime)
+        var found: [String: Payload] = [:]
+        for row in rows where row.fetchedAt > oldest {
+            // One row that will not decode is one release read from Discogs
+            // instead, not a page that fails.
+            guard let data = try? AnyJSON.encoder.encode(row.payload),
+                  let value = try? AnyJSON.decoder.decode(Payload.self, from: data)
+            else { continue }
+            found[row.resourceID] = value
+        }
+        return found
+    }
+
     /// Asks the backend to fetch this resource upstream and store the result.
     ///
     /// Returns the freshly normalized payload so a cache miss is one round
@@ -108,6 +164,47 @@ nonisolated struct MetadataRepository: Sendable {
             "catalog-refresh",
             options: FunctionInvokeOptions(body: request)
         )
+    }
+
+    /// Names the releases a page wanted and could not find cached.
+    ///
+    /// The app cannot fill the queue — `enqueue_enrichment_job` is revoked from
+    /// the publishable key — so this is the narrow door it is allowed through:
+    /// Discogs release ids, and nothing that follows but a fetch of those.
+    ///
+    /// Failure is silence. A backend that is down or unconfigured means the
+    /// cache stays cold, which is exactly where it was a moment ago.
+    func requestReleaseCache(ids: [Int]) async {
+        guard let client = try? SupabaseService.requireClient(), !ids.isEmpty else { return }
+
+        struct Params: Encodable {
+            let pDiscogsIDs: [String]
+            enum CodingKeys: String, CodingKey { case pDiscogsIDs = "p_discogs_ids" }
+        }
+
+        // Fifty is what `request_release_cache` accepts in a call.
+        _ = try? await client
+            .rpc("request_release_cache", params: Params(
+                pDiscogsIDs: ids.prefix(50).map(String.init)
+            ))
+            .execute()
+    }
+
+    /// Names the shelf a page wanted and could not read.
+    ///
+    /// The narrow door again: a Discogs artist id, and nothing that follows
+    /// but a fetch of that artist's listing. See migration 0027.
+    func requestArtistShelf(discogsID id: Int) async {
+        guard let client = try? SupabaseService.requireClient() else { return }
+
+        struct Params: Encodable {
+            let pDiscogsID: String
+            enum CodingKeys: String, CodingKey { case pDiscogsID = "p_discogs_id" }
+        }
+
+        _ = try? await client
+            .rpc("request_artist_shelf", params: Params(pDiscogsID: String(id)))
+            .execute()
     }
 
     // MARK: - Provider paths

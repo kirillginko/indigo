@@ -51,6 +51,10 @@ final class DigPerformanceTests: XCTestCase {
 
     private let styles = ["Techno", "Ambient", "House", "Electro", "Dub", "Jungle"]
     private let labels = ["Ilian Tape", "Warp", "Hessle Audio", "Sferic", "Dais", "Bandulu"]
+    /// Few enough that each holds hundreds of artists, which is what makes
+    /// working out a place's sound expensive — and is how a real store looks.
+    private let cities = ["London", "Berlin", "Manchester", "Detroit"]
+    private let countries = ["UK", "Germany", "UK", "USA"]
 
     override func setUpWithError() throws {
         let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
@@ -82,6 +86,40 @@ final class DigPerformanceTests: XCTestCase {
             record.releaseThumbnailURLStrings = ["", ""]
             record.releaseLabels = [labels[index % labels.count], ""]
             context.insert(record)
+
+            // Somewhere to be from.
+            //
+            // Scenes are built from `Artist.origin`, and this seed had none —
+            // so `testCostOfTheScenesAnArtistPageAsksFor` measured an artist
+            // placed nowhere, found no scenes, and passed while proving
+            // nothing. A handful of cities, shared the way a real store shares
+            // them, is what gives a place a signature worth deriving.
+            // Bandcamp, which the seed had none of while the real store has
+            // eight hundred — and `SceneCaches` runs every one of their
+            // keywords through `PlaceIndex.split`, so a benchmark without them
+            // measured that phase at 0ms and said nothing about it.
+            if index % 6 == 0 {
+                context.insert(BandcampRelease(
+                    urlString: "https://example.test/\(index)",
+                    title: "Record \(index)",
+                    artistName: name,
+                    labelName: labels[index % labels.count],
+                    year: "2021",
+                    keywords: [
+                        styles[index % styles.count],
+                        cities[index % cities.count],
+                        "experimental", "cassette", "limited"
+                    ]
+                ))
+            }
+
+            context.insert(Artist(
+                mbid: "mbid-\(index)",
+                name: name,
+                origin: "\(cities[index % cities.count]) / \(countries[index % countries.count])",
+                releaseDates: ["2018", "2021"],
+                genreTags: [styles[index % styles.count]]
+            ))
         }
 
         // The table the profile builder scans in full, which the benchmark
@@ -383,6 +421,131 @@ final class DigPerformanceTests: XCTestCase {
     /// The lanes show twelve rows each across six lanes. Everything past that
     /// is built, sorted, written to the store and read back so it can be
     /// thrown away by a `prefix`.
+    /// What an artist page spends on scenes.
+    ///
+    /// The largest single piece of CPU an artist page was spending, and it was
+    /// untraced until it was not: 693ms per call in a real session's trace,
+    /// twice per page, because `ArtistDigView` asks once before the catalogue
+    /// answers and once after — enrichment changes the artist's tags, so the
+    /// second answer really can differ from the first.
+    ///
+    /// The cost is `signature(for:)`, which folds the tags of every artist in
+    /// a place to work out what that place sounds like. It does not depend on
+    /// which artist is being looked at, so the second call was re-deriving an
+    /// answer the first had already found.
+    func testCostOfTheScenesAnArtistPageAsksFor() {
+        let engine = SceneEngine(context: context)
+
+        var first = 0
+        var found = 0
+        first = milliseconds {
+            found = engine.scenes(forArtist: "Artist 0").count
+        }
+
+        // The same question the page asks a second time, at the same
+        // generation. Everything behind it has already been worked out.
+        var again = 0
+        let repeated = milliseconds {
+            for index in 0..<10 {
+                again += engine.scenes(forArtist: "Artist \(index)").count
+            }
+        }
+
+        record("scenes(first) \(first)ms \(found) scenes, x10 more \(repeated)ms total, "
+               + "\(Double(repeated) / 10.0)ms each")
+
+        XCTAssertGreaterThanOrEqual(again, 0)
+        // Ten further artists, all in the same places, must not each pay for
+        // the place's signature again. Without the memo this was ten full
+        // re-derivations; the bar is deliberately loose because the seed is
+        // smaller than a real store and the point is the shape, not the
+        // number.
+        XCTAssertLessThan(
+            repeated, max(first * 8, 50),
+            "Ten more artists cost \(repeated)ms against \(first)ms for the first — "
+            + "the place signature is being re-derived per artist"
+        )
+    }
+
+    /// What a write costs the scenes.
+    ///
+    /// `DigWorker.refresh` replaces the whole `SceneEngine` whenever the
+    /// generation moves, and every write moves it — so the next page to ask
+    /// for scenes rebuilds `SceneCaches` from nothing: six table scans and a
+    /// fold of every artist's tags. `GraphStore` already refuses to do this,
+    /// inheriting its tables when nothing has been inserted since
+    /// (`GraphStore(context:inheriting:)`). Nothing does the same for scenes.
+    ///
+    /// This is the number to watch, and the one to beat.
+    func testCostOfRebuildingTheSceneCaches() {
+        // Warm: one engine, asked twice.
+        let engine = SceneEngine(context: context)
+        let cold = milliseconds { _ = engine.scenes(forArtist: "Artist 0") }
+        let warm = milliseconds { _ = engine.scenes(forArtist: "Artist 1") }
+
+        // What a write does: a brand new engine, exactly as `refresh` makes —
+        // handed the old one, exactly as `refresh` now hands it over.
+        let afterWrite = milliseconds {
+            _ = SceneEngine(context: context, inheriting: engine).scenes(forArtist: "Artist 2")
+        }
+
+        // And the same with nothing to inherit, which is what every write used
+        // to cost.
+        let fromNothing = milliseconds {
+            _ = SceneEngine(context: context).scenes(forArtist: "Artist 3")
+        }
+
+        record("sceneCaches cold \(cold)ms, warm \(warm)ms, "
+               + "after a write \(afterWrite)ms, from nothing \(fromNothing)ms")
+
+        XCTAssertGreaterThan(cold, 0)
+        // The point of the whole change: a write that touched none of the
+        // seven tables scenes are built from must not rebuild them.
+        XCTAssertLessThan(
+            afterWrite, max(fromNothing / 4, 50),
+            "A write still costs a full scene rebuild: \(afterWrite)ms against "
+            + "\(fromNothing)ms from nothing, \(warm)ms warm"
+        )
+    }
+
+    /// What a write costs the search index.
+    ///
+    /// `DigWorker.refresh` sets `searchIndex = nil` whenever the generation
+    /// moves, and every write moves it — so the next keystroke rebuilds the
+    /// index from six whole tables. Searching an artist is exactly the moment
+    /// writes are landing: the catalogue lookup, the portrait, the shelf. The
+    /// listener types, the app writes, and every letter after the write pays
+    /// for a rebuild.
+    func testCostOfRebuildingTheSearchIndex() {
+        let built = milliseconds { _ = DigSearchIndex(context: context) }
+        let index = DigSearchIndex(context: context)
+        let searched = milliseconds {
+            for _ in 0..<20 { _ = index.search("artist 1", limit: 30) }
+        }
+        record("searchIndex build \(built)ms, search x20 \(searched)ms total, "
+               + "\(Double(searched) / 20.0)ms each")
+
+        // What a write used to cost: the index thrown away and read again.
+        // Now it is asked whether it still describes the store.
+        let checked = milliseconds {
+            for _ in 0..<20 { _ = index.stillDescribes(context) }
+        }
+        record("searchIndex stillDescribes x20 \(checked)ms total, "
+               + "\(Double(checked) / 20.0)ms each")
+
+        XCTAssertGreaterThan(built, 0)
+        // The index is the expensive half and a keystroke is the cheap one.
+        // That is only true while the index survives the keystroke.
+        XCTAssertLessThan(searched / 20, max(built / 4, 5),
+                          "A keystroke costs \(searched / 20)ms against \(built)ms to build")
+        // And the check that keeps it has to be cheaper than the rebuild it
+        // replaces by a wide margin, or it is just the same cost moved.
+        XCTAssertLessThan(
+            checked / 20, max(built / 50, 2),
+            "Checking the index costs \(checked / 20)ms against \(built)ms to rebuild it"
+        )
+    }
+
     func testTheWalkDoesNotBuildFarMoreThanThePageCanShow() {
         let graph = GraphStore(context: context)
         let peers = graph.relatedArtists(to: .artist("Artist 0"))
@@ -554,8 +717,18 @@ final class DigPerformanceTests: XCTestCase {
             }
         }
         record("DigArtwork.release x\(rows) \(cost)ms total, \(cost / rows)ms each")
+        // 150 rather than 100 because the seed now holds eight hundred
+        // Bandcamp releases, which it did not when this bar was set — so the
+        // ladder's third rung has candidates to compare instead of none.
+        // Measured alone it is 92-101ms; the headroom is for a machine running
+        // the rest of the suite alongside, which is where a 100ms bar failed
+        // on a 101ms reading.
+        //
+        // The number this exists to catch is not 100. It is 1,398ms: what
+        // twenty rows cost once those Bandcamp rows existed and every one of
+        // them re-read the whole table. See `BandcampByArtist`.
         XCTAssertLessThan(
-            cost, 100,
+            cost, 150,
             """
             A tracklist asks this once a row and the release page asked it \
             once a render. Walking every catalogued release apiece measured \
@@ -581,9 +754,32 @@ final class DigPerformanceTests: XCTestCase {
         // apiece — every recording filtered by a folded credit, every track in
         // the library folded twice, the crate walked per artist. Read from the
         // fold the graph had already built, 159ms.
+        //
+        // Then the seed gained an `Artist` row per artist, because scenes are
+        // built from `Artist.origin` and a store without any measured a scene
+        // page that could not exist. That took this from 145ms to 768ms — a
+        // cost the benchmark had been blind to while the running app paid it,
+        // and which the trace corroborates: `graph.walk` averages 497ms there.
+        //
+        // Half of it was a scan. `cachedArtistNamed` fetched the whole `Artist`
+        // table and normalized every name, per profile, and a profile without
+        // an MBID is most of them. Folded once per engine it is a dictionary
+        // lookup: 768ms to 462ms.
+        //
+        // The other half is not a scan and is not fixable here. Measured by
+        // swapping the 5,000 `Artist` rows for 5,000 `MusicLabel` rows, which
+        // nothing on this path reads at all: 435ms. That is what a
+        // `ModelContext` holding five thousand more registered objects costs
+        // every fetch made through it, and chasing it means changing how much
+        // of the store is resident, not removing a loop.
+        //
+        // So the bar sits above the measured 462ms and below the 768ms the
+        // scan cost. If this fails, either the fold has been lost or something
+        // new walks the table.
         XCTAssertLessThan(
-            cost / 5, 280,
-            "A page re-reads its profile on every write; that cannot cost half a second"
+            cost / 5, 600,
+            "A page re-reads its profile on every write; the Artist table is "
+            + "being walked again"
         )
     }
 }

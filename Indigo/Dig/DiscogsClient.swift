@@ -159,19 +159,46 @@ nonisolated struct DiscogsClient: Sendable {
     /// films and theirs are records — so the question is which candidate is
     /// the main credit on something that is not a video.
     ///
-    /// Bounded to three, and every probe is allowed to fail: this runs in
-    /// front of somebody opening a page, against a service that rate-limits,
-    /// and a wrong-but-present answer beats a spinner. Falling back to the
-    /// first candidate is exactly the behaviour this replaces.
+    /// Bounded to three: this runs in front of somebody opening a page,
+    /// against a service that rate-limits, and a wrong-but-present answer
+    /// beats a spinner.
+    ///
+    /// A probe that *fails* stops the walk rather than advancing it, and that
+    /// distinction is the whole of this function's correctness. It used to be
+    /// `try?` and `continue`, which cannot tell "this candidate makes no
+    /// records" from "Discogs would not say" — so a refused probe read as a
+    /// negative and promoted the next namesake.
+    ///
+    /// That is not a rare case, it is a biased one. The real artist is the one
+    /// with thousands of records, so theirs is the slowest, heaviest probe and
+    /// the first to time out or be throttled — while the impostor filed beside
+    /// them has two releases and answers instantly. Searching The Beatles on a
+    /// starved budget did exactly this: `artists/82730/releases` took eight
+    /// seconds and threw, the walk moved on to "the Beatles (4)", and the page
+    /// came back holding its single hoax cassette.
+    ///
+    /// So on a failure this answers nil, and `artistHead` falls back to
+    /// Discogs' own ranking — where the real artist is almost always first.
+    /// Guessing from rank is what this function exists to improve on; guessing
+    /// from a question nobody answered is worse than not guessing at all.
     private static func whicheverMakesRecords(
         _ candidates: [DiscogsSearchResult], using client: DiscogsClient
     ) async throws -> DiscogsSearchResult? {
         for candidate in candidates.prefix(3) {
             guard let id = candidate.id else { continue }
-            let releases: DiscogsArtistReleases? = try? await client.get(
-                "artists/\(id)/releases", query: [URLQueryItem(name: "per_page", value: "25")]
-            )
-            guard let found = releases?.releases else { continue }
+
+            let releases: DiscogsArtistReleases
+            do {
+                releases = try await client.get(
+                    "artists/\(id)/releases",
+                    query: [URLQueryItem(name: "per_page", value: "25")]
+                )
+            } catch {
+                return nil
+            }
+
+            // An empty shelf is an answer, and it is a negative one.
+            guard let found = releases.releases else { continue }
             if found.contains(where: { ($0.role == nil || $0.role == "Main") && !$0.isVideo }) {
                 return candidate
             }
@@ -218,18 +245,44 @@ nonisolated struct DiscogsClient: Sendable {
     func artistShelf(
         named name: String, id: Int
     ) async throws -> (releases: DiscogsArtistReleases, catalogue: [DiscogsSearchResult]) {
-        async let releases: DiscogsArtistReleases = get("artists/\(id)/releases", query: [
-            URLQueryItem(name: "sort", value: "year"),
-            URLQueryItem(name: "sort_order", value: "desc"),
-            URLQueryItem(name: "per_page", value: "50")
-        ])
-        async let catalogue: DiscogsSearchResponse = get("database/search", query: [
+        async let releases: DiscogsArtistReleases = artistReleases(id: id)
+        async let catalogue: [DiscogsSearchResult] = artistCatalogue(named: name)
+        return try await (releases, catalogue)
+    }
+
+    /// The exact query the shared cache is keyed on.
+    ///
+    /// Held in one place because three things have to agree on it: this
+    /// request, the row `cacheDiscogsShelf` writes, and the key
+    /// `CatalogShelfSource` reads. A different `per_page` on any of them is a
+    /// cached shelf nobody ever finds. See `MetadataRepository.cacheKey`.
+    static let shelfQuery = [
+        URLQueryItem(name: "per_page", value: "50"),
+        URLQueryItem(name: "sort", value: "year"),
+        URLQueryItem(name: "sort_order", value: "desc")
+    ]
+
+    static func shelfPath(id: Int) -> String { "artists/\(id)/releases" }
+
+    /// What Discogs files under an artist.
+    ///
+    /// Separated from the search beside it because this one is cacheable and
+    /// that one is not: a shelf is an artist's discography, keyed on their id,
+    /// while the search is a match on the text of a credit. It is also the
+    /// slowest request a cold page makes — 2,727ms for Ryuichi Sakamoto — which
+    /// is what makes serving it out of Postgres worth the split.
+    func artistReleases(id: Int) async throws -> DiscogsArtistReleases {
+        try await get(Self.shelfPath(id: id), query: Self.shelfQuery)
+    }
+
+    /// The sleeves the shelf does not carry.
+    func artistCatalogue(named name: String) async throws -> [DiscogsSearchResult] {
+        let response: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "artist", value: name),
             URLQueryItem(name: "type", value: "release"),
             URLQueryItem(name: "per_page", value: "25")
         ])
-        let (shelf, search) = try await (releases, catalogue)
-        return (shelf, search.results ?? [])
+        return response.results ?? []
     }
 
     /// Just a picture of an artist, in one request.
