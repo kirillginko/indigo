@@ -120,4 +120,98 @@ begin
     raise notice 'queue smoke: all checks passed';
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- A claim that expires (0030)
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    v_claimed text[];
+    v_id uuid;
+begin
+    delete from public.enrichment_jobs;
+
+    -- One job, claimed and never reported back — a worker cut short mid-batch.
+    perform public.enqueue_enrichment_job('nts', 'fetch_nts_episode', 'lost/1',
+                                          jsonb_build_object('show', 'lost'), 0, null, null);
+    select array_agg(job_type) into v_claimed from public.claim_enrichment_jobs(5);
+    if cardinality(v_claimed) <> 1 then
+        raise exception 'the job should have been claimed once, got %', v_claimed;
+    end if;
+
+    -- Still inside its lease, so nobody else may take it. This is what keeps
+    -- two drains off the same work.
+    select array_agg(job_type) into v_claimed from public.claim_enrichment_jobs(5);
+    if v_claimed is not null then
+        raise exception 'a claim inside its lease was taken a second time';
+    end if;
+
+    -- Past the lease, and nobody came back. Ninety jobs sat like this for four
+    -- days on the live project, holding their dedupe keys, while the passes
+    -- that would have re-queued them found the work already there.
+    --
+    -- The trigger has to come off to age a row: `touch_updated_at` rewrites
+    -- `updated_at` on every update, which is exactly what makes the column
+    -- mean something in production — a claimed job is not updated again, so it
+    -- ages on its own — and exactly what stops a fixture from pretending time
+    -- has passed.
+    alter table public.enrichment_jobs disable trigger enrichment_jobs_touch_updated_at;
+    update public.enrichment_jobs set updated_at = now() - interval '30 minutes';
+    alter table public.enrichment_jobs enable trigger enrichment_jobs_touch_updated_at;
+
+    -- The sweep puts it back; the drain then takes it as ordinary pending work.
+    if public.reclaim_expired_enrichment_jobs(200) <> 1 then
+        raise exception 'the expired claim was not put back';
+    end if;
+    select array_agg(job_type) into v_claimed from public.claim_enrichment_jobs(5);
+    if v_claimed is null or cardinality(v_claimed) <> 1 then
+        raise exception 'a reclaimed job should be claimable again, got %', v_claimed;
+    end if;
+
+    -- And the attempt it already spent still counts, so this cannot go round
+    -- for ever.
+    select id into v_id from public.enrichment_jobs limit 1;
+    if (select attempts from public.enrichment_jobs where id = v_id) <> 2 then
+        raise exception 'reclaiming did not count the attempt the lost run spent';
+    end if;
+
+    -- Burnt through its attempts: put back as failed rather than queued again,
+    -- so nothing retries for ever.
+    alter table public.enrichment_jobs disable trigger enrichment_jobs_touch_updated_at;
+    update public.enrichment_jobs
+    set status = 'running', attempts = max_attempts,
+        updated_at = now() - interval '30 minutes';
+    alter table public.enrichment_jobs enable trigger enrichment_jobs_touch_updated_at;
+    perform public.reclaim_expired_enrichment_jobs(200);
+    if (select status from public.enrichment_jobs limit 1) <> 'failed' then
+        raise exception 'a job past max_attempts should be failed, not queued again';
+    end if;
+
+    -- MARK: what the queue says about itself
+
+    delete from public.enrichment_jobs;
+    perform public.enqueue_enrichment_job('nts', 'fetch_nts_episode', 'health/1',
+                                          null, 0, null, null);
+    perform public.claim_enrichment_jobs(5);
+    alter table public.enrichment_jobs disable trigger enrichment_jobs_touch_updated_at;
+    update public.enrichment_jobs set updated_at = now() - interval '30 minutes';
+    alter table public.enrichment_jobs enable trigger enrichment_jobs_touch_updated_at;
+
+    if (public.enrichment_queue_health()->>'claims_expired')::int <> 1 then
+        raise exception 'queue health should count a claim nobody came back from';
+    end if;
+    -- And it has to be able to see the table at all. `enrichment_jobs` has RLS
+    -- on with no policy, so an invoker function reports a queue holding
+    -- nothing and calls it healthy. See 0031.
+    if (public.enrichment_queue_health()->>'running')::int < 1 then
+        raise exception 'queue health cannot see the queue';
+    end if;
+    if not (select prosecdef from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+            where n.nspname = 'public' and p.proname = 'enrichment_queue_health') then
+        raise exception 'queue health must run as the owner or it answers zeros';
+    end if;
+
+    raise notice 'queue smoke: the claim expires';
+end $$;
+
 rollback;
