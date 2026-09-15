@@ -30,7 +30,10 @@ struct ExploreView: View {
                 Trace.slowStep("explore.header") { header(kept) }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
-                        ExploreShaderField(seed: kept.prefix(8).reduce(193) { $0 &* 31 &+ stableSeed($1.displayTitle) })
+                        ExploreShaderField(
+                            seed: kept.prefix(8).reduce(193) { $0 &* 31 &+ stableSeed($1.displayTitle) },
+                            size: proxy.size
+                        )
                         Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }
                     }
                     .overlayPreferenceValue(ExploreGraphKey.self) { nodes in
@@ -864,26 +867,133 @@ private struct MapGlyph: View {
     }
 }
 
+/// Where each slice of the background field begins.
+///
+/// Its own type so the arithmetic can be tested. What it has to get right is
+/// not obvious from reading it: the slices have to cover the whole page with
+/// no gap, none may be taller than a Metal texture can be, and the last one
+/// has to stop exactly at the bottom rather than overrun it.
+enum ExploreFieldSlices {
+    static func tops(forHeight height: CGFloat, each sliceHeight: CGFloat) -> [CGFloat] {
+        guard height > 0, sliceHeight > 0 else { return [] }
+        return stride(from: 0, to: height, by: sliceHeight).map { $0 }
+    }
+
+    /// The height of the slice beginning at `top`.
+    static func height(at top: CGFloat, forHeight height: CGFloat, each sliceHeight: CGFloat)
+        -> CGFloat {
+        min(sliceHeight, height - top)
+    }
+}
+
 private struct ExploreShaderField: View {
     let seed: Int
+    /// The size to fill, from the page's own geometry.
+    ///
+    /// This had a `GeometryReader` of its own, nested inside the page's, and
+    /// that is a size this view cannot be sure of: a `GeometryReader` inside a
+    /// `ZStack` contributes nothing to what the stack wants to be, so what it
+    /// reports back depends on what the other children asked for. A field
+    /// measuring zero draws nothing, and nothing is exactly what the page
+    /// behind it looks like — flat `MapColor.cobalt`, which is the blue in the
+    /// bug report rather than the blue this shader starts from.
+    ///
+    /// The page already measures itself to lay the cards out. One measurement,
+    /// passed down, and there is no second one to disagree with it.
+    let size: CGSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// When this visit began.
+    ///
+    /// Reset on appear, which is the whole point. This used to be the value
+    /// `@State` gave it the first time the page was ever shown, and
+    /// `timeIntervalSince` it grew for as long as the app stayed open — so
+    /// coming back to this page after a few hours handed the shader a `time`
+    /// in the tens of thousands. Every term it drives is a `float`: at that
+    /// size the per-frame step is a handful of ULPs, the wave stops resolving
+    /// it, and the field settles on the flat blue it starts from
+    /// (`half3(0.157, 0.392, 0.941)` in `exploreOffsetField`) and stops.
+    ///
+    /// `PlayerShaderBackdrop` has always known this — "keeping the value small
+    /// preserves float precision in the Metal shader" — and wraps a shared
+    /// clock at 4096s. Wrapping suits it because its field is not translated
+    /// by time; this one is (`p.x += time * 0.072`), so a wrap would jump the
+    /// pattern sideways every hour. Starting each visit at zero bounds the
+    /// value just as well and never jumps while anybody is looking at it.
     @State private var startedAt = Date()
+
+    /// How tall one slice of the field may be.
+    ///
+    /// A `colorEffect` is backed by one Metal texture, and a texture has a
+    /// maximum edge — 16,384 on Apple silicon. A crate large enough to make
+    /// this page 16,604 points tall asked for a 1854x16604 BGRA8Unorm, got
+    /// `RBLayer: unable to create texture`, and drew nothing: flat
+    /// `MapColor.cobalt` where the field should be. It is not a limit worth
+    /// approaching either, since the texture at that size is about 120MB.
+    ///
+    /// Four thousand leaves a fourfold margin under the limit and puts the
+    /// ceiling on how tall the page may grow somewhere no crate will reach.
+    ///
+    /// Raised from two thousand because every slice is a layer to allocate and
+    /// draw the first frame of, and returning to this page does all of them at
+    /// once — which is a visible stutter. Halving the count halves that. It is
+    /// the dial to turn if the stutter is still there: fewer, larger slices
+    /// cost one allocation each and more memory apiece.
+    private static let sliceHeight: CGFloat = 4096
+
+    private var slices: [CGFloat] {
+        ExploreFieldSlices.tops(forHeight: size.height, each: Self.sliceHeight)
+    }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { timeline in
-            GeometryReader { proxy in
-                Rectangle()
-                    .fill(.white)
-                    .colorEffect(
-                        ShaderLibrary.exploreOffsetField(
-                            .float2(proxy.size),
-                            .float(reduceMotion
-                                   ? 0
-                                   : timeline.date.timeIntervalSince(startedAt)),
-                            .float(Float(seed & 1023))
+            let elapsed = reduceMotion ? 0 : timeline.date.timeIntervalSince(startedAt)
+            VStack(spacing: 0) {
+                ForEach(slices, id: \.self) { top in
+                    Rectangle()
+                        .fill(.white)
+                        .frame(height: ExploreFieldSlices.height(
+                            at: top, forHeight: size.height, each: Self.sliceHeight))
+                        .colorEffect(
+                            ShaderLibrary.exploreOffsetField(
+                                .float2(size),
+                                .float(elapsed),
+                                .float(Float(seed & 1023)),
+                                // Where this slice sits in the whole field, so
+                                // the pattern runs through the seams rather
+                                // than starting again at each one.
+                                .float2(0, top)
+                            )
                         )
-                    )
+                }
             }
+            // Whether the clock is moving, how large the field is, and how
+            // many textures it takes.
+            //
+            // A frozen shader and a shader nobody is drawing look identical
+            // from outside, and there was nothing on this path to tell them
+            // apart — nor anything that would have named a size no texture can
+            // be. One line a second while the page is open, none when it is
+            // not.
+            .onChange(of: Int(elapsed)) { _, whole in
+                Trace.note("explore.shaderClock \(whole)s "
+                           + "size=\(Int(size.width))x\(Int(size.height)) "
+                           + "slices=\(slices.count)")
+            }
+        }
+        .frame(width: size.width, height: size.height)
+        // No `.id` keyed on anything this view mutates on appear. Tried, and
+        // it is a remount loop: the id changes, SwiftUI rebuilds the view,
+        // `onAppear` fires again and changes it again, so the timeline is torn
+        // down every frame and never draws.
+        // Only when the clock has actually grown, not on every return.
+        //
+        // Assigning here unconditionally is a state change on the way back to
+        // this page, and a state change rebuilds every slice below — nine
+        // layers thrown away and allocated again for a value that was fine.
+        // Ten minutes is far inside the range where a `float` still resolves a
+        // 1/30s step, and far outside the length of a visit.
+        .onAppear {
+            if Date().timeIntervalSince(startedAt) > 600 { startedAt = Date() }
         }
         .accessibilityHidden(true)
     }
