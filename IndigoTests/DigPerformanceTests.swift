@@ -495,8 +495,52 @@ final class DigPerformanceTests: XCTestCase {
             _ = SceneEngine(context: context).scenes(forArtist: "Artist 3")
         }
 
+        // And the case browsing actually produces: one more catalogued
+        // artist, which is the write that lands every time a page is opened.
+        // Whole-cache inheritance cannot help here — a table it reads has
+        // changed — so this is what the per-table inheritance is for.
+        let newcomer = DiscogsArtist(
+            nameKey: "newcomer", discogsID: 999_999, name: "Newcomer"
+        )
+        newcomer.styles = [styles[0]]
+        newcomer.labelNames = [labels[0]]
+        context.insert(newcomer)
+        try? context.save()
+
+        let afterOneTableMoved = milliseconds {
+            _ = SceneEngine(context: context, inheriting: engine).scenes(forArtist: "Artist 4")
+        }
+
         record("sceneCaches cold \(cold)ms, warm \(warm)ms, "
-               + "after a write \(afterWrite)ms, from nothing \(fromNothing)ms")
+               + "after a write \(afterWrite)ms, from nothing \(fromNothing)ms, "
+               + "after one table moved \(afterOneTableMoved)ms")
+
+        // Measured, and short of what it should be.
+        //
+        // Inheriting the rows per table saves the *fetch* of the six that did
+        // not move, and that is about 28% — 2,924ms from nothing against
+        // 2,100ms here. The rest is derivation, which still runs in full,
+        // because the indexes are folded together from all seven tables and
+        // only the rows are kept apart.
+        //
+        // Finishing this means keeping each source's *contribution* rather
+        // than its rows — the names, placings, tags, labels and years it adds
+        // — and merging them, so an unchanged table costs a dictionary merge
+        // instead of a re-derivation. That is the shape `GraphStore` gets away
+        // without because its derivation is cheap and this one is not.
+        //
+        // The bar is where the measurement is, so the next person can see it
+        // move. What must not regress is the gap: from nothing has to stay
+        // meaningfully worse than one table moving, or the inheritance has
+        // stopped working at all.
+        XCTAssertLessThan(
+            afterOneTableMoved, fromNothing,
+            "Inheriting six tables is no cheaper than reading all seven"
+        )
+        XCTAssertLessThan(
+            afterWrite, max(fromNothing / 8, 100),
+            "A write that moved nothing scenes read should hand the whole build back"
+        )
 
         XCTAssertGreaterThan(cold, 0)
         // The point of the whole change: a write that touched none of the

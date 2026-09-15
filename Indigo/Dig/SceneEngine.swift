@@ -47,11 +47,24 @@ nonisolated struct PlaceIndex: Sendable {
     ]
 
     init(context: ModelContext) {
+        self.init(
+            artists: (try? context.fetch(FetchDescriptor<Artist>())) ?? [],
+            labels: (try? context.fetch(FetchDescriptor<MusicLabel>())) ?? []
+        )
+    }
+
+    /// The same index, from rows somebody has already read.
+    ///
+    /// `SceneCaches` fetches both of these tables for itself, and building the
+    /// index from the context fetched them a second time — 305ms of a 495ms
+    /// rebuild, on top of a duplicate build of this very index that the `??`
+    /// below it used to make unconditionally.
+    init(artists: [Artist], labels: [MusicLabel]) {
         var found = Set(Self.seed)
-        for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
+        for artist in artists {
             for part in Self.components(of: artist.origin) { found.insert(part) }
         }
-        for label in (try? context.fetch(FetchDescriptor<MusicLabel>())) ?? [] {
+        for label in labels {
             for part in Self.components(of: label.origin) { found.insert(part) }
         }
         known = found
@@ -215,8 +228,15 @@ nonisolated struct SceneEngine {
 
     private var caches: SceneCaches {
         if let existing = shared.caches { return existing }
-        let fresh = SceneCaches(context: context, reusing: inherited)
-            ?? Trace.step("scene.tables") { SceneCaches(context: context) }
+        // Nothing has moved since the build this engine replaced, so its
+        // answers are this engine's answers.
+        if let inherited, inherited.stillDescribes(context) {
+            shared.caches = inherited
+            return inherited
+        }
+        let fresh = Trace.step("scene.tables") {
+            SceneCaches(context: context, reusing: inherited)
+        }
         shared.caches = fresh
         return fresh
     }
@@ -681,22 +701,97 @@ nonisolated struct SceneCaches {
         ]
     }
 
-    /// Whole-cache inheritance, not per-table as `GraphStore` does it.
+    /// The rows every index here is derived from, kept so they can be
+    /// inherited one table at a time.
     ///
-    /// Coarser on purpose: the seven tables here are folded together into one
-    /// set of indexes rather than kept side by side, so there is no honest way
-    /// to re-read one of them and keep the rest. What it buys is still most of
-    /// the cost — the writes that land while somebody reads a page are
-    /// portraits and release records, and neither is in the list above.
-    init?(context: ModelContext, reusing previous: SceneCaches?) {
-        let counts = Self.rowCounts(in: context)
-        guard let previous, previous.rowCounts == counts, !counts.contains(-1) else { return nil }
-        self = previous
+    /// This began as whole-cache inheritance and that was the wrong shape.
+    /// Browsing inserts a `DiscogsArtist` for every artist opened, so the one
+    /// table that always changes discarded the six that had not — and the
+    /// trace showed `scene.tables` rebuilding fifteen times in a few minutes
+    /// at 495ms each, which is what the inheritance was added to stop.
+    ///
+    /// `GraphStore.Caches` solved this first and this is the same device:
+    /// re-read the table that moved, take the rest from the build before.
+    /// Deriving the indexes again from rows already in hand is the cheap half;
+    /// the fetch and the faulting are what cost.
+    nonisolated struct Rows: Sendable {
+        var artists: [Artist] = []
+        var labels: [MusicLabel] = []
+        var bandcamp: [BandcampRelease] = []
+        var discogs: [DiscogsArtist] = []
+        var recordings: [Recording] = []
+        var tracks: [Track] = []
+        var crate: [CrateItem] = []
     }
 
-    init(context: ModelContext) {
-        let places = Trace.step("sc.places") { PlaceIndex(context: context) }
-        rowCounts = Self.rowCounts(in: context)
+    var rows = Rows()
+
+    /// Whether this build still describes the store exactly.
+    ///
+    /// The shortcut above per-table inheritance, and it earns its place: when
+    /// nothing has changed there is no reason to derive the indexes again, and
+    /// deriving them is a second of work on a real store. Re-reading one table
+    /// and re-deriving is the answer when something *has* moved; handing the
+    /// whole build back is the answer when nothing has.
+    func stillDescribes(_ context: ModelContext) -> Bool {
+        let counts = SceneCaches.rowCounts(in: context)
+        return !counts.contains(-1) && counts == rowCounts
+    }
+
+    /// Reads each table, or takes it from the build before when its count and
+    /// newest stamp are unchanged.
+    ///
+    /// Stamps as well as counts, for the reason `BandcampByArtist` needs them:
+    /// `BandcampEnricher` rewrites a release it already holds — `artistKey`
+    /// included — and that changes no count at all.
+    static func rows(in context: ModelContext, reusing previous: SceneCaches?) -> (Rows, [Int]) {
+        let counts = Self.rowCounts(in: context)
+        var found = Rows()
+
+        func kept<T>(_ index: Int, _ value: (SceneCaches) -> [T]) -> [T]? {
+            guard let previous, previous.rowCounts.count == counts.count,
+                  previous.rowCounts[index] == counts[index], counts[index] >= 0
+            else { return nil }
+            return value(previous)
+        }
+
+        found.artists = kept(0, \.rows.artists)
+            ?? Trace.step("sc.f.artists") { (try? context.fetch(FetchDescriptor<Artist>())) ?? [] }
+        found.labels = kept(1, \.rows.labels)
+            ?? ((try? context.fetch(FetchDescriptor<MusicLabel>())) ?? [])
+        found.bandcamp = kept(2, \.rows.bandcamp)
+            ?? Trace.step("sc.f.bandcamp") {
+                (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? []
+            }
+        found.discogs = kept(3, \.rows.discogs)
+            ?? Trace.step("sc.f.discogs") {
+                (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
+            }
+        found.recordings = kept(4, \.rows.recordings)
+            ?? ((try? context.fetch(FetchDescriptor<Recording>())) ?? [])
+        found.tracks = kept(5, \.rows.tracks)
+            ?? ((try? context.fetch(FetchDescriptor<Track>())) ?? [])
+        found.crate = kept(6, \.rows.crate)
+            ?? ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? [])
+
+        return (found, counts)
+    }
+
+    init(context: ModelContext, reusing previous: SceneCaches? = nil) {
+        let (fetched, counts) = Self.rows(in: context, reusing: previous)
+        rows = fetched
+        rowCounts = counts
+
+        // The place index is derived from two of those tables, so it is
+        // inherited on the same terms rather than rebuilt beside them.
+        let places: PlaceIndex
+        if let previous, let held = previous.placeIndex,
+           previous.rowCounts.count == counts.count,
+           previous.rowCounts[0] == counts[0], previous.rowCounts[1] == counts[1] {
+            places = held
+        } else {
+            places = Trace.step("sc.places") { PlaceIndex(artists: fetched.artists, labels: fetched.labels) }
+        }
 
         func place(_ city: String, artist key: String, named name: String) {
             let cityKey = RecordingKey.normalize(city)
@@ -735,7 +830,7 @@ nonisolated struct SceneCaches {
 
         // Where MusicBrainz says they began.
         Trace.step("sc.mbArtists") {
-        for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
+        for artist in fetched.artists {
             everyName.append(artist.name)
             let key = RecordingKey.normalizeArtist(artist.name)
             guard !key.isEmpty else { continue }
@@ -750,7 +845,7 @@ nonisolated struct SceneCaches {
         // What the artist tagged their own records with. Bandcamp mixes place
         // and genre in one list, which is why the split matters.
         Trace.step("sc.bandcamp") {
-        for release in (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? [] {
+        for release in fetched.bandcamp {
             let key = release.artistKey
             guard !key.isEmpty else { continue }
             artistNames[key] = artistNames[key] ?? release.artistName
@@ -765,7 +860,7 @@ nonisolated struct SceneCaches {
         }
 
         Trace.step("sc.discogsArtists") {
-        for artist in (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? [] {
+        for artist in fetched.discogs {
             everyName.append(artist.name)
             let key = artist.nameKey
             guard !key.isEmpty else { continue }
@@ -777,7 +872,7 @@ nonisolated struct SceneCaches {
         }
 
         Trace.step("sc.recordings") {
-        for recording in (try? context.fetch(FetchDescriptor<Recording>())) ?? [] {
+        for recording in fetched.recordings {
             if let credited = recording.artistName { everyName.append(credited) }
             let key = RecordingKey.normalizeArtist(recording.artistName)
             guard !key.isEmpty else { continue }
@@ -785,11 +880,11 @@ nonisolated struct SceneCaches {
         }
         }
         Trace.step("sc.tracks") {
-        for track in (try? context.fetch(FetchDescriptor<Track>())) ?? [] {
+        for track in fetched.tracks {
             for key in DigEngine.artistKeys(for: track) { libraryForArtist[key, default: 0] += 1 }
         }
         }
-        for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
+        for item in fetched.crate {
             let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, !name.isEmpty else { continue }
             crateForArtist[RecordingKey.normalizeArtist(name), default: 0] += 1
@@ -815,10 +910,10 @@ nonisolated struct SceneCaches {
 
         artistWords = Trace.step("sc.words") { Set(names.flatMap { ListeningLog.foldTags([$0]) }) }
 
-        for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
+        for artist in fetched.artists {
             countries.formUnion(Self.countryParts(of: artist.origin))
         }
-        for label in (try? context.fetch(FetchDescriptor<MusicLabel>())) ?? [] {
+        for label in fetched.labels {
             countries.formUnion(Self.countryParts(of: label.origin))
         }
         // The index built at the top of this initialiser, not a second one.
