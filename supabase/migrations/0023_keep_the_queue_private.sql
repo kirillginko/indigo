@@ -28,12 +28,24 @@
 --
 -- Safe to re-run.
 
+-- This block is re-applied by `Scripts/test-migrations.sh` on purpose, long
+-- after later migrations have run, so the list below decides what is callable
+-- for the life of the project rather than only on the day this was written.
+-- That made it the wrong place to keep the list: 0027 granted
+-- `request_release_cache` to `anon` and this sweep took it straight back, and
+-- the privilege test agreed, because it only ever asked whether too much was
+-- exposed.
+--
+-- So the list lives in `public.app_callable_functions()` from 0027 onwards, and
+-- this reads it when it is there. The literal stays as the fallback for a fresh
+-- database, where this migration runs four migrations before that function
+-- exists.
 do $$
 declare
     -- Everything Indigo calls with the publishable key. `request_scene_roster`
     -- is the one definer among them, and it is meant to be: it is how a
     -- listener opening a scene asks the backend to go and read it.
-    app_callable constant text[] := array[
+    app_callable text[] := array[
         'artist_radio_appearances',
         'artist_radio_relations',
         'artist_radio_summary',
@@ -46,6 +58,10 @@ declare
     ];
     fn regprocedure;
 begin
+    if public.has_function('public', 'app_callable_functions') then
+        app_callable := public.app_callable_functions();
+    end if;
+
     for fn in
         select p.oid::regprocedure
         from pg_proc p

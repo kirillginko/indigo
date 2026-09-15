@@ -15,7 +15,12 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
 import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
-import { fetchArtistPortrait } from "../_shared/discogs.ts";
+import {
+  cacheDiscogsRelease,
+  cacheDiscogsShelf,
+  fetchArtistPortrait,
+} from "../_shared/discogs.ts";
+import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
 
 interface Job {
@@ -194,6 +199,52 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
         p_height: found?.height ?? null,
       });
       if (error) throw new Error(error.message);
+      return;
+    }
+
+    case "fetch_track_release": {
+      const trackID = String(job.payload?.deezer_track_id ?? "");
+      if (!trackID) throw new Error("missing deezer track");
+
+      const found = await fetchTrackRelease(trackID);
+
+      // Recorded either way, exactly as origins and portraits are. A track
+      // Deezer cannot place is a finding, and writing it down is what stops
+      // the queue coming back for it in a fortnight.
+      const { error } = await supabase.rpc("record_track_release", {
+        p_deezer_track_id: trackID,
+        p_track_title: found?.trackTitle ?? null,
+        p_title_key: found?.trackTitle ? normalizeName(found.trackTitle) : null,
+        p_album_title: found?.albumTitle ?? null,
+        p_deezer_album_id: found?.albumID ?? null,
+        p_label: found?.label ?? null,
+        p_label_key: found?.label ? normalizeName(found.label) : null,
+        p_release_year: found?.releaseYear ?? null,
+        p_isrc: found?.isrc ?? null,
+      });
+      if (error) throw new Error(error.message);
+      return;
+    }
+
+    case "cache_discogs_release": {
+      const releaseID = String(job.payload?.release_id ?? "");
+      if (!releaseID) throw new Error("missing release");
+
+      // False is "Discogs has no such release", which is a finished job. A
+      // throttle or an outage throws instead, and the queue's backoff brings
+      // it round again.
+      await cacheDiscogsRelease(supabase, releaseID, Deno.env.get("DISCOGS_TOKEN"));
+      return;
+    }
+
+    case "cache_discogs_shelf": {
+      // The artist row is the crawl's; a shelf a page asked for has only the
+      // Discogs id. See `request_artist_shelf`.
+      const artistID = String(job.payload?.artist_id ?? "") || null;
+      const discogsID = String(job.payload?.discogs_id ?? "");
+      if (!discogsID) throw new Error("missing artist");
+
+      await cacheDiscogsShelf(supabase, artistID, discogsID, Deno.env.get("DISCOGS_TOKEN"));
       return;
     }
 

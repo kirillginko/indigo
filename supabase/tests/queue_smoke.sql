@@ -26,11 +26,32 @@ begin
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
       and p.prosecdef
-      and p.proname <> 'request_scene_roster'
+      -- The one list, defined in 0027 and swept against there. A literal
+      -- here would be a second copy free to disagree with the grant, which is
+      -- exactly how `request_release_cache` was swept while this test agreed
+      -- it should have been.
+      and p.proname <> all (public.app_callable_functions())
       and (has_function_privilege('anon', p.oid, 'execute')
            or has_function_privilege('authenticated', p.oid, 'execute'));
     if exposed is not null then
         raise exception 'callable with the publishable key: %', exposed;
+    end if;
+
+    -- And the other direction, which is the half that was missing.
+    --
+    -- `request_release_cache` was granted to `anon` in 0027 and swept straight
+    -- back out by 0023 re-running, and the check above *passed* -- it only ever
+    -- asked whether anything was exposed that should not be, so a function that
+    -- lost the grant it needs looked exactly like success. An app-callable
+    -- function nobody can call is the same outage as a missing one.
+    select string_agg(p.oid::regprocedure::text, ', ') into exposed
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and p.proname = any (public.app_callable_functions())
+      and not has_function_privilege('anon', p.oid, 'execute');
+    if exposed is not null then
+        raise exception 'the app is meant to call these and cannot: %', exposed;
     end if;
 
     -- Looked up by name, so a signature changing later does not make these

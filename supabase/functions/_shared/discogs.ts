@@ -14,12 +14,77 @@ const PROVIDER = "discogs";
 
 type Payload = Record<string, any>;
 
+/// The row Indigo already has for this name, when it is plainly the same
+/// entity and not merely a namesake.
+///
+/// Only ever adopts a row whose *entire* identity is a name — one that
+/// `adopt_radio_artists` created because NTS gave it nothing else. Such a row
+/// asserts "somebody called this"; attaching the Discogs id answers who.
+///
+/// Refuses on any hint of ambiguity, and those refusals are the point:
+///
+///   * two rows share the name — one of them may be the right one and there is
+///     nothing here that can say which;
+///   * the row already carries an id from some provider — then Discogs has
+///     numbered these as different artists, and Disorder (2) is not Disorder
+///     (3). On the live project 49 names are exactly this, against 85 that are
+///     one artist split in half.
+///
+/// Refusing means inserting a second row, which is what this did for every name
+/// before. No worse than it was, and only ever where the answer is genuinely
+/// unknown.
+async function adoptNameKeyedRow(
+  supabase: SupabaseClient,
+  table: string,
+  entityType: string,
+  externalID: string,
+  row: Record<string, unknown>,
+): Promise<string | null> {
+  const key = typeof row.normalized_name === "string" ? row.normalized_name : "";
+  if (!key) return null;
+
+  // Two is already too many to choose between, so ask for two and refuse.
+  const named = await supabase.from(table).select("id").eq("normalized_name", key).limit(2);
+  if (named.error || !named.data || named.data.length !== 1) return null;
+
+  const candidate = named.data[0].id as string;
+
+  const identities = await supabase
+    .from("external_ids")
+    .select("id")
+    .eq("entity_type", entityType)
+    .eq("entity_id", candidate)
+    .neq("provider", "nts")
+    .limit(1);
+  if (identities.error || (identities.data?.length ?? 0) > 0) return null;
+
+  const link = await supabase.from("external_ids").insert({
+    entity_type: entityType,
+    entity_id: candidate,
+    provider: PROVIDER,
+    external_id: externalID,
+    source_url: `https://www.discogs.com/${entityType}/${externalID}`,
+  });
+
+  // Lost a race to another invocation claiming this same id. Whoever won holds
+  // the canonical row, and the caller's own lookup will find it.
+  if (link.error) return null;
+  return candidate;
+}
+
 /// Finds the Indigo entity behind an upstream id, creating it the first time.
 ///
 /// `external_ids` is the identity, not the name: two artists can share a name,
 /// and the same artist can be spelled three ways across a catalogue. The unique
 /// constraint on (provider, entity_type, external_id) makes the insert safe to
 /// race — a loser re-reads the winner's row rather than creating a duplicate.
+///
+/// The one exception is below, and it exists because Indigo files artists two
+/// ways. `adopt_radio_artists` has no id to file under — NTS publishes a name
+/// and nothing else — so it keys on the name. Looking up only by Discogs id
+/// therefore missed those rows every time, and inserted beside them: opening
+/// The Beatles wrote a second Beatles, leaving 23 radio appearances on one row
+/// and the Discogs id on the other. See migration 0028.
 async function resolveEntity(
   supabase: SupabaseClient,
   table: string,
@@ -36,6 +101,9 @@ async function resolveEntity(
     .maybeSingle();
 
   if (existing.data?.entity_id) return existing.data.entity_id as string;
+
+  const adopted = await adoptNameKeyedRow(supabase, table, entityType, externalID, row);
+  if (adopted) return adopted;
 
   const inserted = await supabase.from(table).insert(row).select("id").single();
   if (inserted.error || !inserted.data) {
@@ -360,4 +428,191 @@ export async function fetchArtistPortrait(
 function usableImage(address: unknown): string | null {
   if (typeof address !== "string" || address.length === 0) return null;
   return address.includes("/images/spacer") ? null : address;
+}
+
+// ---------------------------------------------------------------------------
+// Filling the release cache
+// ---------------------------------------------------------------------------
+
+export const DISCOGS_API = "https://api.discogs.com/";
+
+let lastCacheRequestAt = 0;
+
+/// Cache-filling requests, a second apart.
+///
+/// Held separately from `pacedPortraitFetch` on purpose: they are different
+/// lanes claiming different job types, and a shared cursor would make each wait
+/// on the other's clock without either being able to see why. A second apart
+/// each, two lanes running, is twenty requests a minute out of sixty — and the
+/// portrait lane's own comment already spends thirty of the other forty.
+/// Exported for its own test.
+export async function pacedCacheFetch(url: string, token: string | undefined): Promise<Response> {
+  const wait = lastCacheRequestAt + DISCOGS_SPACING_MS - Date.now();
+  if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+  lastCacheRequestAt = Date.now();
+
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "User-Agent": "Indigo/1.0 (+https://github.com/kirillginko/indigo)",
+  };
+  if (token) headers.Authorization = `Discogs token=${token}`;
+  return await fetch(url, { headers });
+}
+
+/// How long a cached release is worth reading. Matches
+/// `release_cache_lifetime()` in migration 0027 and
+/// `MetadataRepository.Lifetime.release` in the app; all three decide the same
+/// thing and have to agree about it.
+export const RELEASE_CACHE_TTL_SECONDS = 60 * 24 * 60 * 60;
+
+/// How long a shelf is worth reading. Shorter than a release's sixty days: a
+/// record never changes, but an artist's discography gains one whenever they
+/// put something out. Matches `MetadataRepository.Lifetime.artist`.
+export const SHELF_CACHE_TTL_SECONDS = 30 * 24 * 60 * 60;
+
+/// One release, fetched and written to the shared cache.
+///
+/// The point of the whole path: this record is described once here instead of
+/// once per listener per page open. Returns false when Discogs would not answer,
+/// so the queue can back off rather than record a record that does not exist.
+export async function cacheDiscogsRelease(
+  supabase: SupabaseClient,
+  releaseID: string,
+  token: string | undefined,
+): Promise<boolean> {
+  if (!/^[0-9]{1,12}$/.test(releaseID)) {
+    throw new Error(`refusing a release id that is not digits: ${releaseID}`);
+  }
+
+  const response = await pacedCacheFetch(`${DISCOGS_API}releases/${releaseID}`, token);
+
+  // A release that does not exist is an answer, and it is the queue's job to
+  // stop asking. Everything else — a throttle, an outage — has to come back.
+  if (response.status === 404) return false;
+  if (!response.ok) throw new Error(`discogs ${response.status} for releases/${releaseID}`);
+
+  const payload = await response.json();
+
+  const written = await supabase
+    .from("metadata_cache")
+    .upsert({
+      provider: PROVIDER,
+      resource_type: "release",
+      resource_id: releaseID,
+      payload,
+      fetched_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + RELEASE_CACHE_TTL_SECONDS * 1000).toISOString(),
+    }, { onConflict: "provider,resource_type,resource_id" });
+
+  if (written.error) throw new Error(written.error.message);
+
+  // The normalized tables too, not just the blob. `search_catalog` reads
+  // `releases` and `labels`, and a cache that only fed the app's release page
+  // would leave search exactly as empty as it is now.
+  await normalizeDiscogsRelease(supabase, payload);
+  return true;
+}
+
+/// An artist's shelf, turned into one job per release on it.
+///
+/// Fans out rather than fetching here. A shelf is fifty records and this
+/// function has one invocation's worth of time; queued individually they spread
+/// across the lane's own pace, and a shelf half-walked when the function times
+/// out is still a shelf half-cached rather than nothing.
+/// The shelf query the app sends, and the key it will look under.
+///
+/// Both halves have to match `DiscogsClient.artistShelf` exactly: the app
+/// reads this row straight out of Postgres without going through
+/// catalog-refresh, so a different `per_page` here is a row nobody ever finds.
+/// The key format is `resolvePath`'s — path, then the params sorted and joined
+/// raw — and `CatalogPathKeyTests` pins the two sides together.
+export const SHELF_QUERY = "per_page=50&sort=year&sort_order=desc";
+
+export function shelfPath(discogsID: string): string {
+  return `artists/${discogsID}/releases`;
+}
+
+export async function cacheDiscogsShelf(
+  supabase: SupabaseClient,
+  artistID: string | null,
+  discogsID: string,
+  token: string | undefined,
+): Promise<number> {
+  if (!/^[0-9]{1,12}$/.test(discogsID)) {
+    throw new Error(`refusing an artist id that is not digits: ${discogsID}`);
+  }
+
+  const path = shelfPath(discogsID);
+  const response = await pacedCacheFetch(
+    `${DISCOGS_API}${path}?sort=year&sort_order=desc&per_page=50`,
+    token,
+  );
+  // An artist Discogs files nothing under is a finding; the caller stamps it
+  // either way, which is what stops the crawl returning to them.
+  if (response.status === 404) return 0;
+  if (!response.ok) {
+    throw new Error(`discogs ${response.status} for ${path}`);
+  }
+
+  const page = await response.json() as Payload;
+
+  // The listing itself, kept rather than thrown away once it has been read
+  // for ids.
+  //
+  // This is the request a cold artist page waits on and the slowest one it
+  // makes — measured at 2,727ms for Ryuichi Sakamoto and 1,916ms for Haruomi
+  // Hosono against a Discogs that was not refusing anything. The crawl was
+  // already fetching exactly this listing, for exactly these artists, and
+  // discarding it after enqueuing the releases named in it.
+  const stored = await supabase
+    .from("metadata_cache")
+    .upsert({
+      provider: PROVIDER,
+      resource_type: path,
+      resource_id: `${path}?${SHELF_QUERY}`,
+      payload: page,
+      fetched_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + SHELF_CACHE_TTL_SECONDS * 1000).toISOString(),
+    }, { onConflict: "provider,resource_type,resource_id" });
+  if (stored.error) console.error("shelf: cache write failed", stored.error.message);
+
+  const listed: Payload[] = Array.isArray(page.releases) ? page.releases : [];
+
+  let queued = 0;
+  for (const entry of listed) {
+    // `main_release` is the id of the actual pressing behind a master; the
+    // master's own id is not a release and `releases/{id}` does not answer for
+    // it. Where there is no master, `id` is already the release.
+    const id = entry.type === "master"
+      ? (entry.main_release ?? null)
+      : (entry.id ?? null);
+    if (id === null || id === undefined) continue;
+    const releaseID = String(id);
+    if (!/^[0-9]{1,12}$/.test(releaseID)) continue;
+
+    const { error } = await supabase.rpc("enqueue_enrichment_job", {
+      p_provider: PROVIDER,
+      p_job_type: "cache_discogs_release",
+      p_dedupe_key: releaseID,
+      p_payload: { release_id: releaseID },
+      // Below a page's own request at 1. Nobody is reading this shelf yet.
+      p_priority: 0,
+      p_entity_type: null,
+      p_entity_id: null,
+    });
+    if (error) {
+      console.error("shelf: enqueue failed", releaseID, error.message);
+      continue;
+    }
+    queued += 1;
+  }
+
+  // A shelf asked for by a page has no Indigo artist row to stamp — the app
+  // knows the Discogs id and nothing else. The crawl's own jobs always carry
+  // one, and that is what stops it returning to the same artist.
+  if (artistID) {
+    const stamped = await supabase.rpc("record_shelf_cached", { p_artist_id: artistID });
+    if (stamped.error) throw new Error(stamped.error.message);
+  }
+  return queued;
 }

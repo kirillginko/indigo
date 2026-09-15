@@ -98,6 +98,54 @@ function matchableName(value: string | null): string | null {
   return key;
 }
 
+/// The people a programme is presented by, read off the title NTS publishes.
+///
+/// NTS has no host field. What it has is a naming convention its schedule is
+/// almost entirely written in -- "Pacing The Platform w/ upsammy", "Peking
+/// Spring w/ Jon K", "Ben Sims Presents: Run It Red" -- and 46 of a sample of
+/// 120 programmes are the first form alone.
+///
+/// This matters because a selector is not usually in their own tracklist.
+/// `adopt_radio_artists` builds the artist table out of what shows *play*, so
+/// the people doing the playing were the one group of names the catalogue could
+/// not answer for: Ben UFO and Jane Fitz were the two misses in a twenty-name
+/// search test where everything else was found instantly. They are also exactly
+/// the names somebody types.
+///
+/// Conservative on purpose. Only the two forms above, never a bare title --
+/// "In Focus" and "The Early Bird Show" are programmes, not people, and there
+/// is nothing in the string to say so.
+export function hostNames(title: string | null): string[] {
+  if (!title) return [];
+
+  let credited: string | null = null;
+
+  // Last rather than first: a programme called "Wigs w/ Imogen w/ guests"
+  // credits Imogen, and splitting on the first would credit the rest.
+  const withMarker = title.lastIndexOf(" w/ ");
+  if (withMarker >= 0) {
+    credited = title.slice(withMarker + 4);
+  } else {
+    const presents = title.match(/^(.+?)\s+[Pp]resents\b/);
+    if (presents) credited = presents[1];
+  }
+  if (!credited) return [];
+
+  const found: string[] = [];
+  const seen = new Set<string>();
+  for (const part of credited.split(/\s+&\s+|\s+and\s+|,\s*/)) {
+    const name = part.trim();
+    // One character is an initial or a stray separator, never a name worth a
+    // row of its own.
+    if (name.length < 2) continue;
+    const key = matchableName(name);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    found.push(name);
+  }
+  return found;
+}
+
 /// The programme an episode belongs to, created the first time one of its
 /// broadcasts is seen.
 ///
@@ -153,18 +201,36 @@ export async function ingestNTSShow(
   const show = await ensureShow(supabase, alias);
   if (!show) return null;
 
+  const title = text(payload.name) ?? alias;
+  const hosts = hostNames(title);
+
   const update = await supabase
     .from("radio_shows")
     .update({
-      title: text(payload.name) ?? alias,
+      title,
       description: text(payload.description),
       station: "NTS",
+      // Written as published rather than as parsed, so the column says what
+      // the schedule says. The split-out names go to `artists`, below.
+      host_name: hosts.length > 0 ? hosts.join(" & ") : null,
       image_url: picture(payload.media),
       provider_url: `https://www.nts.live/shows/${alias}`,
     })
     .eq("id", show.id);
 
   if (update.error) console.error("nts: show update failed", update.error.message);
+
+  // Each presenter becomes an artist, sharing the identity a tracklist name
+  // would have got. A selector who also turns up in somebody else's tracklist
+  // is one artist with both, not two rows that never meet.
+  for (const host of hosts) {
+    const { error } = await supabase.rpc("adopt_named_artist", {
+      p_name: host,
+      p_key: normalizeName(host),
+      p_source_url: `https://www.nts.live/shows/${alias}`,
+    });
+    if (error) console.error("nts: host adopt failed", host, error.message);
+  }
 
   await enqueueBackCatalogue(supabase, alias);
   return show.id;
@@ -308,6 +374,16 @@ export async function ingestNTSEpisode(
       normalized_artist_name: matchableName(artist),
       normalized_title: title ? normalizeName(title) : null,
       offset_seconds: integer(track.offset ?? track.offset_estimate),
+      // What NTS identified the record as, which is the part no amount of
+      // name matching can recover later. Around two lines in five carry an
+      // ISRC and one in three a Deezer id; a version of this function without
+      // these three fields dropped every one of them, and the only way back
+      // to them is to read the episode again. See migration 0025.
+      isrc: text(track.isrc_id),
+      deezer_track_id: track.deezer_track_id != null
+        ? String(track.deezer_track_id)
+        : null,
+      musicbrainz_recording_id: text(track.musicbrainz_track_id),
       identification_source: null,
     };
   }).filter((row) => row.raw_artist_name !== null || row.raw_track_title !== null);
