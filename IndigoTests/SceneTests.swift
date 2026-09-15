@@ -165,4 +165,103 @@ final class SceneTests: XCTestCase {
         )
         XCTAssertEqual(reached.first?.why?.headline, "Part of Manchester 2021")
     }
+
+    // MARK: - Inheriting must not change the answer
+
+    /// Every scene, for every artist, as one comparable value.
+    private func membership(_ engine: SceneEngine, over names: [String]) -> [String: [String]] {
+        var found: [String: [String]] = [:]
+        for name in names {
+            found[name] = engine.scenes(forArtist: name).map {
+                // City, sound and who is in it — the three things a listener
+                // would notice changing.
+                "\($0.city)|\($0.sound ?? "-")|\($0.artists.sorted().joined(separator: ","))"
+            }.sorted()
+        }
+        return found
+    }
+
+    /// The invariant the whole cache-inheritance scheme rests on.
+    ///
+    /// `DigWorker.refresh` hands a new `SceneEngine` the old one's caches so a
+    /// write does not cost a rebuild of seven tables — measured at 4,943ms
+    /// against 32ms. That is only sound while an inherited build answers
+    /// exactly what a fresh one would. Inheriting *more* is the optimisation;
+    /// inheriting something stale is a scene whose membership quietly stops
+    /// matching the store, with nothing on screen to say so.
+    ///
+    /// Written before the per-source inheritance it guards, so the refactor has
+    /// something to be checked against rather than judged by eye.
+    func testAnInheritedBuildAnswersWhatAFreshOneWould() throws {
+        let names = ["Alpha", "Beta", "Gamma", "Delta"]
+        for (index, name) in names.enumerated() {
+            let artist = Artist(
+                mbid: "mb-\(index)", name: name,
+                origin: index < 2 ? "Berlin / Germany" : "Detroit / USA",
+                releaseDates: ["2019"], genreTags: [index % 2 == 0 ? "Techno" : "Ambient"]
+            )
+            context.insert(artist)
+            let discogs = DiscogsArtist(
+                nameKey: RecordingKey.normalizeArtist(name), discogsID: 100 + index, name: name
+            )
+            discogs.styles = [index % 2 == 0 ? "Techno" : "Ambient"]
+            discogs.labelNames = ["Ostgut Ton"]
+            context.insert(discogs)
+        }
+        try context.save()
+
+        let first = SceneEngine(context: context)
+        let before = membership(first, over: names)
+        XCTAssertFalse(before.values.allSatisfy(\.isEmpty), "The fixture has to produce scenes")
+
+        // What browsing does: one more catalogued artist. They are given an
+        // origin as well as a catalogue entry, because an artist with no place
+        // joins no scene — and a fixture whose newcomer changes no membership
+        // cannot tell a stale cache from a fresh one. This one joins Berlin,
+        // so a cache that missed them answers differently.
+        let newcomer = DiscogsArtist(
+            nameKey: RecordingKey.normalizeArtist("Epsilon"), discogsID: 999, name: "Epsilon"
+        )
+        newcomer.styles = ["Techno"]
+        newcomer.labelNames = ["Ostgut Ton"]
+        context.insert(newcomer)
+        context.insert(Artist(
+            mbid: "mb-new", name: "Epsilon", origin: "Berlin / Germany",
+            releaseDates: ["2019"], genreTags: ["Techno"]
+        ))
+        try context.save()
+
+        let inherited = SceneEngine(context: context, inheriting: first)
+        let fromNothing = SceneEngine(context: context)
+
+        XCTAssertEqual(
+            membership(inherited, over: names + ["Epsilon"]),
+            membership(fromNothing, over: names + ["Epsilon"]),
+            "An inherited build answered something a fresh build would not"
+        )
+    }
+
+    /// And the other direction: a write that changes nothing scenes read must
+    /// not be a reason to rebuild, or the inheritance buys nothing at all.
+    func testAWriteScenesDoNotReadIsInherited() throws {
+        let artist = Artist(mbid: "mb-1", name: "Alpha", origin: "Berlin / Germany")
+        context.insert(artist)
+        let discogs = DiscogsArtist(nameKey: "alpha", discogsID: 1, name: "Alpha")
+        discogs.styles = ["Techno"]
+        context.insert(discogs)
+        try context.save()
+
+        let first = SceneEngine(context: context)
+        _ = first.scenes(forArtist: "Alpha")
+
+        // A portrait is the commonest write there is and scenes read none.
+        context.insert(ArtistPortrait(nameKey: "somebody", name: "Somebody"))
+        try context.save()
+
+        let inherited = SceneEngine(context: context, inheriting: first)
+        XCTAssertEqual(
+            membership(inherited, over: ["Alpha"]),
+            membership(first, over: ["Alpha"])
+        )
+    }
 }
