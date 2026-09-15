@@ -357,11 +357,23 @@ final class DigStore {
     /// is concerned. `release(id:)` refuses to refetch anything still fresh,
     /// so this cannot turn into a loop over records that were only just read.
     private func needsReading(_ release: ArtistProfile.ReleaseLine) -> Bool {
-        if release.imageURL == nil { return true }
-        guard let identifier = release.discogsID,
-              let stored = discogsEnricher.cachedRelease(id: identifier)
-        else { return true }
-        return !stored.labelNames.isEmpty && stored.labelDiscogsIDs.isEmpty
+        // No id, so it has to be found before it can be read — which is what
+        // `fetchAndStore` does first.
+        guard let identifier = release.discogsID else { return true }
+        guard let stored = discogsEnricher.cachedRelease(id: identifier) else { return true }
+        if !stored.labelNames.isEmpty, stored.labelDiscogsIDs.isEmpty { return true }
+        // The stored record is the evidence of having been read, not the
+        // cover.
+        //
+        // This asked `release.imageURL == nil` first, and for a record Discogs
+        // genuinely has no sleeve for that is never satisfied: the fill read
+        // it, stored it, found no image, and asked again on the next page
+        // open, for ever. `fetchAndStore` goes straight to the client rather
+        // than through `release(id:)`, so the freshness guard that would have
+        // caught it was never on this path. In one session's trace that was
+        // 222 of 1,217 release reads — 18% of the most expensive thing an
+        // artist page does — with one release fetched eighteen times.
+        return !stored.isFresh
     }
 
     private func fetchAndStore(
@@ -387,33 +399,53 @@ final class DigStore {
         // A build without a credential does read the shared copy here.
         let catalog = CatalogReleaseSource.shared
 
-        let fetched = await withTaskGroup(of: (Int, DiscogsReleaseDetail)?.self) { group in
+        // The ids first, because the cache can only be asked about records that
+        // have one. A release with no Discogs ID has to be found before it can
+        // be read — which is exactly what opening the tile did, and why the
+        // blank ones were the ones this used to skip. Same work, done before
+        // somebody clicks for it.
+        let identified = await withTaskGroup(of: (Int, ArtistProfile.ReleaseLine)?.self) { group in
             for release in wanted {
                 let title = release.title
                 let known = release.discogsID
-                group.addTask { () async -> (Int, DiscogsReleaseDetail)? in
-                    // A release with no Discogs ID has to be found before it
-                    // can be read — which is exactly what opening the tile
-                    // did, and why the blank ones were the ones this used to
-                    // skip. Same work, done before somebody clicks for it.
-                    var identifier = known
-                    if identifier == nil {
-                        identifier = try? await client.releaseID(title: title, artist: name)
-                    }
-                    guard let identifier else { return nil }
+                group.addTask { () async -> (Int, ArtistProfile.ReleaseLine)? in
+                    if let known { return (known, release) }
+                    guard let found = try? await client.releaseID(title: title, artist: name)
+                    else { return nil }
+                    return (found, release)
+                }
+            }
+            var results: [(Int, ArtistProfile.ReleaseLine)] = []
+            for await result in group {
+                if let result { results.append(result) }
+            }
+            return results
+        }
+        guard !Task.isCancelled, !identified.isEmpty else { return }
 
-                    if let shared = await catalog.release(id: identifier) {
-                        return (identifier, shared)
-                    }
-                    // No second `populateInBackground` here: `release(id:)`
-                    // has already asked for the fill in exactly the case that
-                    // reaches this line, and asking again sent every record
-                    // to the Edge Function twice.
+        // One question for the whole batch.
+        //
+        // This is the flip `CatalogReleaseSource` was waiting for. The probe
+        // used to be per release and was therefore skipped on any build with a
+        // credential — a dozen round trips to learn what a dozen Discogs
+        // requests would tell us anyway. Asked once for all of them it costs a
+        // single PostgREST read whether it hits or misses, and a hit is eight
+        // requests a page never has to spend.
+        let shared = await catalog.releases(ids: identified.map(\.0))
+
+        let outstanding = identified.filter { shared[$0.0] == nil }
+        // What the cache did not have, so it has it next time. Not waited on:
+        // the page is about to ask Discogs for these itself.
+        catalog.requestCache(ids: outstanding.map(\.0))
+
+        let fetched = await withTaskGroup(of: (Int, DiscogsReleaseDetail)?.self) { group in
+            for (identifier, _) in outstanding {
+                group.addTask { () async -> (Int, DiscogsReleaseDetail)? in
                     guard let detail = try? await client.release(id: identifier) else { return nil }
                     return (identifier, detail)
                 }
             }
-            var results: [(Int, DiscogsReleaseDetail)] = []
+            var results: [(Int, DiscogsReleaseDetail)] = shared.map { ($0.key, $0.value) }
             for await result in group {
                 if let result { results.append(result) }
             }
@@ -1786,6 +1818,10 @@ final class DigStore {
         }
     }
 
+    /// Indigo's own cache of artist shelves. Settable so a test can drive both
+    /// a hit and a miss without a backend.
+    @ObservationIgnored var catalogShelves = CatalogShelfSource.shared
+
     /// How long work a page can live without waits for room in the minute
     /// before giving up. Settable for the test that has to watch it give up.
     @ObservationIgnored var budgetPatience: Duration = .seconds(10)
@@ -1801,12 +1837,48 @@ final class DigStore {
     /// The lookup is what the page cannot do without, so it never waits. What
     /// follows it does, down to the same reserve the background fill keeps.
     private func waitForRoom() async -> Bool {
-        let deadline = ContinuousClock.now + budgetPatience
-        while await !discogsClient.hasRoom(for: .background) {
-            guard !Task.isCancelled, ContinuousClock.now < deadline else { return false }
-            try? await Task.sleep(for: .milliseconds(250))
+        // Traced, because it was the one thing on this path that was not.
+        //
+        // A page that reveals in a second and a half and then sits for
+        // another ten shows up in the trace as `dig.enrich` taking twelve
+        // seconds with a silent gap in the middle of it — which reads as the
+        // app doing something slow rather than as the app waiting on a
+        // credential. It is the same mistake `dig.scenes` was made to stop
+        // making.
+        await Trace.stage("dig.waitForRoom") {
+            // Waiting is not digging.
+            //
+            // This ran inside `inForeground`, so ten seconds of polling a
+            // budget that never opened counted as a dig in progress — and the
+            // portrait fill stands aside for exactly that, which is how the
+            // faces on a page stopped arriving while nothing was being
+            // fetched at all. The gate is for the nine requests a cold artist
+            // cannot do without; holding it to wait for optional work inverts
+            // what it is for.
+            await pausingForeground {
+                let deadline = ContinuousClock.now + budgetPatience
+                while await !discogsClient.hasRoom(for: .background) {
+                    guard !Task.isCancelled, ContinuousClock.now < deadline else { return false }
+                    try? await Task.sleep(for: .milliseconds(250))
+                }
+                return !Task.isCancelled
+            }
         }
-        return !Task.isCancelled
+    }
+
+    /// Steps out of the foreground for the duration of `body`.
+    ///
+    /// The mirror of `inForeground`, for the part of a dig that is not work
+    /// but waiting. Balanced the same way, so a cancellation in the middle of
+    /// it cannot leave the count short.
+    private func pausingForeground<T>(_ body: () async -> T) async -> T {
+        let wasDigging = foregroundDigs > 0
+        if wasDigging {
+            foregroundDigs -= 1
+            if foregroundDigs == 0 { foregroundEndedAt = .now }
+        }
+        defer { if wasDigging { foregroundDigs += 1 } }
+        return await body()
     }
 
     /// An artist's Discogs entry in the two writes it arrives in, rather than
@@ -1836,20 +1908,43 @@ final class DigStore {
         if let fresh = discogsEnricher.freshArtist(named: name) { return fresh }
         guard let id = head.id else { return nil }
         let client = discogsClient
+
+        // The shelf, out of Indigo's cache where somebody has already paid for
+        // it.
+        //
+        // This is the request the page waits on: 2,727ms for Ryuichi Sakamoto,
+        // 1,916ms for Haruomi Hosono, neither of them refused — just Discogs
+        // being slow about a large discography. A shelf does not change from
+        // one listener to the next, and the enrichment crawl is already
+        // fetching exactly this listing for the artists radio ranks highest.
+        //
+        // Asked alongside the detail rather than in front of it, so a miss
+        // costs the page nothing it was not already spending.
+        let shelves = catalogShelves
         async let detail = client.artistDetail(id: id)
-        async let shelf = client.artistShelf(named: name, id: id)
+        async let cached = shelves.shelf(discogsID: id)
+        async let catalogue = client.artistCatalogue(named: name)
 
         let described = try await detail
         discogsEnricher.artistDetail(named: name, head: head, detail: described)
         announceChange()
 
-        let found = try await shelf
+        let releases: DiscogsArtistReleases
+        if let held = await cached {
+            releases = held
+        } else {
+            releases = try await client.artistReleases(id: id)
+            // So the next listener does not wait on it, and neither does this
+            // one tomorrow.
+            shelves.requestCache(discogsID: id)
+        }
+
         return discogsEnricher.artist(named: name, bundle: DiscogsArtistBundle(
             detail: described,
-            releases: found.releases,
+            releases: releases,
             searchImageURL: head.coverImage,
             searchThumbnailURL: head.thumbnail,
-            catalogue: found.catalogue
+            catalogue: try await catalogue
         ))
     }
 

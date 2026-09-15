@@ -422,4 +422,54 @@ final class DigSearchTests: XCTestCase {
             .digReleaseNamed(title: "Compro", artist: "Skee Mask")
         )
     }
+
+    // MARK: - Surviving a write
+
+    /// The index is the expensive half of a search and a keystroke is the
+    /// cheap one — which was only true until somebody typed while the app was
+    /// writing. `DigWorker.refresh` threw the index away on every generation
+    /// bump, and searching an artist *is* the moment writes land: the
+    /// catalogue lookup, the portrait, the shelf. Rebuilding reads six tables,
+    /// measured at 3,591ms on the performance seed, per letter.
+    func testAnIndexSurvivesAWriteThatChangesNothingItReads() throws {
+        let artist = DiscogsArtist(
+            nameKey: RecordingKey.normalizeArtist("Skee Mask"), discogsID: 1, name: "Skee Mask"
+        )
+        context.insert(artist)
+        try context.save()
+
+        let index = DigSearchIndex(context: context)
+        XCTAssertFalse(index.search("skee", limit: 10).isEmpty)
+        XCTAssertTrue(index.stillDescribes(context), "Nothing has changed yet")
+
+        // A portrait is the commonest write there is — the background fill
+        // makes them all session — and the index reads no portraits.
+        context.insert(ArtistPortrait(nameKey: "somebody else", name: "Somebody Else"))
+        try context.save()
+
+        XCTAssertTrue(
+            index.stillDescribes(context),
+            "A write to a table the index does not read must not rebuild it"
+        )
+    }
+
+    /// And the other half, which is what makes keeping it safe: a write the
+    /// index *does* read has to be noticed, or search would answer out of a
+    /// stale index for the rest of the session.
+    func testAnIndexIsRebuiltWhenSomethingItReadsChanges() throws {
+        let index = DigSearchIndex(context: context)
+        XCTAssertTrue(index.search("purelink", limit: 10).isEmpty)
+        XCTAssertTrue(index.stillDescribes(context))
+
+        context.insert(DiscogsArtist(
+            nameKey: RecordingKey.normalizeArtist("Purelink"), discogsID: 2, name: "Purelink"
+        ))
+        try context.save()
+
+        XCTAssertFalse(
+            index.stillDescribes(context),
+            "An artist the listener just dug into has to turn up in the next search"
+        )
+        XCTAssertFalse(DigSearchIndex(context: context).search("purelink", limit: 10).isEmpty)
+    }
 }

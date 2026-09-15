@@ -52,7 +52,16 @@ nonisolated struct DiscogsEnricher {
         // and a title like that resolves to no record at all. A row cached
         // before any of those looks current while being wrong, so it is
         // refetched once.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 12,
+        //
+        // 13 is not a change of shape but a change of trust. Until
+        // `whicheverMakesRecords` learned to tell a refused probe from an
+        // empty shelf, a namesake lookup could resolve to the wrong Discogs
+        // artist entirely — The Beatles came back as "the Beatles (4)", an
+        // entry holding one hoax cassette. Those rows are the right shape,
+        // are stamped complete, and stay fresh for a day. Nothing about them
+        // says which artist they describe, so the only way not to serve them
+        // is to stop trusting the whole generation that could contain one.
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 13,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
         return write(bundle, name: name)
@@ -73,7 +82,7 @@ nonisolated struct DiscogsEnricher {
     /// and a picture, or a whole profile with no shelf behind it — is asked
     /// about again rather than served as though it were the artist.
     func freshArtist(named name: String) -> DiscogsArtist? {
-        guard let cached = cachedArtist(named: name), cached.cacheVersion >= 12, cached.isFresh
+        guard let cached = cachedArtist(named: name), cached.cacheVersion >= 13, cached.isFresh
         else { return nil }
         return cached
     }
@@ -235,7 +244,7 @@ nonisolated struct DiscogsEnricher {
         )
         Self.repaintPortrait(of: record, in: context)
         record.fetchedAt = Date()
-        record.cacheVersion = 12
+        record.cacheVersion = 13
         return record
     }
 

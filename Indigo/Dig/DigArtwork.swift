@@ -101,10 +101,14 @@ nonisolated struct DigArtwork {
 
         // A different spelling of the same record — punctuation, an edition
         // in brackets — is only findable by comparing the normalised form of
-        // every one of them. Rare, and worth the walk when it happens; never
-        // call this from a render pass.
-        let match = ((try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [])
-            .first(where: isTheRecord)
+        // every one of them.
+        //
+        // That comparison used to walk the table here, and the comment above
+        // it said never to call this from a render pass. A tracklist row whose
+        // release is not cached does exactly that, once per row: five misses
+        // measured 4,075ms. The walk now happens once, in `ReleasesByTitle`,
+        // and every ask after it is a lookup.
+        let match = ReleasesByTitle.shared.index(in: context)[wanted]?.first(where: isTheRecord)
         return Pair(full: match?.imageURL, thumbnail: match?.thumbnailURL)
     }
 
@@ -121,5 +125,67 @@ nonisolated struct DigArtwork {
             full: BandcampImage.sized(match.imageURL, BandcampImage.cover),
             thumbnail: BandcampImage.sized(match.imageURL, BandcampImage.thumbnail)
         )
+    }
+}
+
+/// Catalogued releases folded by the normalised form of their title.
+///
+/// The last rung of the sleeve ladder compares the normalised title of every
+/// catalogued release, because a record filed as "Untitled (Edition 2)" and
+/// asked for as "Untitled" is the same record and no index can say so. Its own
+/// comment says never to call it from a render pass — and a tracklist row whose
+/// release is not cached calls it, once per row, which is a render pass.
+///
+/// Measured on the benchmark's store: five rows that match nothing cost
+/// 4,075ms, 815ms each. Folded once, the walk happens one time and every miss
+/// after it is a dictionary lookup.
+///
+/// Held the way `LibraryAlbums` and `BandcampByArtist` are held, and stale for
+/// the same two reasons — a row added, or a row written over in place by
+/// `DiscogsEnricher.release(id:)`, which changes no count and does stamp
+/// `fetchedAt`.
+nonisolated final class ReleasesByTitle: @unchecked Sendable {
+    static let shared = ReleasesByTitle()
+
+    private let lock = NSLock()
+    private var signature: [Double]?
+    private var source: ObjectIdentifier?
+    private var held: [String: [DiscogsReleaseRecord]] = [:]
+
+    private static func signature(in context: ModelContext) -> [Double] {
+        let count = (try? context.fetchCount(FetchDescriptor<DiscogsReleaseRecord>())) ?? -1
+        var newest = FetchDescriptor<DiscogsReleaseRecord>(
+            sortBy: [SortDescriptor(\DiscogsReleaseRecord.fetchedAt, order: .reverse)]
+        )
+        newest.fetchLimit = 1
+        let touched = (try? context.fetch(newest))?.first?.fetchedAt.timeIntervalSince1970 ?? -1
+        return [Double(count), touched]
+    }
+
+    func index(in context: ModelContext) -> [String: [DiscogsReleaseRecord]] {
+        let current = Self.signature(in: context)
+        let store = ObjectIdentifier(context.container)
+
+        lock.lock()
+        if let signature, signature == current, source == store {
+            let answer = held
+            lock.unlock()
+            return answer
+        }
+        lock.unlock()
+
+        var built: [String: [DiscogsReleaseRecord]] = [:]
+        for record in (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [] {
+            let key = RecordingKey.normalizeTitle(record.title)
+            guard !key.isEmpty else { continue }
+            built[key, default: []].append(record)
+        }
+
+        lock.lock()
+        signature = current
+        source = store
+        held = built
+        lock.unlock()
+        return built
     }
 }

@@ -263,6 +263,98 @@ final class CoverResolutionTests: XCTestCase {
         XCTAssertEqual(release.label, "Warp Records")
     }
 
+    /// The record Discogs has no sleeve for, read once instead of for ever.
+    ///
+    /// `needsReading` asked whether the tile had a cover, and for a release
+    /// Discogs genuinely has no picture of the answer is always no — so the
+    /// fill read it, stored it, found no image, and read it again on the next
+    /// page open, and the one after that. `fetchAndStore` goes straight to the
+    /// client rather than through `release(id:)`, so the freshness guard that
+    /// would have caught it was never on this path.
+    ///
+    /// Measured in one session's `indigo-trace.txt`: 222 of 1,217 release
+    /// reads were an id already fetched, one of them eighteen times — against
+    /// a Discogs budget of sixty a minute shared by every copy of the app.
+    func testARecordWithNoSleeveIsReadOnceRatherThanOnEveryOpen() async throws {
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Seefeel"),
+                                   discogsID: 1, name: "Seefeel")
+        artist.releaseTitles = ["White Label"]
+        artist.releaseDiscogsIDs = [700]
+        artist.releaseImageURLStrings = [""]
+        artist.releaseYears = ["2024"]
+        artist.cacheVersion = 3
+        context.insert(artist)
+
+        let recorder = RecordingTransport.Recorder()
+        // Discogs answers, and has no images at all — a white label, which is
+        // most of what this app is for.
+        let dig = makeStore(routes: [
+            "releases/700": """
+            {"id":700,"title":"White Label","year":2024,"uri":"/release/700",
+             "artists":[{"id":1,"name":"Seefeel"}],
+             "labels":[{"id":9,"name":"Warp Records","catno":"WARP700"}],
+             "genres":[],"styles":[],"images":[],"tracklist":[]}
+            """
+        ], recorder: recorder)
+
+        await dig.fillMissingReleaseArtwork(forArtist: "Seefeel", mbid: nil)
+        let first = recorder.urls.filter { $0.contains("releases/700") }.count
+        XCTAssertEqual(first, 1, "Read once on the first open")
+
+        // The tile is still blank, because there is nothing to put on it. That
+        // is not a reason to ask again.
+        let profile = await dig.artistProfile(name: "Seefeel", mbid: nil)
+        XCTAssertNil(profile.releases.first?.imageURL, "Discogs has no sleeve for it")
+
+        await dig.fillMissingReleaseArtwork(forArtist: "Seefeel", mbid: nil)
+        await dig.fillMissingReleaseArtwork(forArtist: "Seefeel", mbid: nil)
+
+        let total = recorder.urls.filter { $0.contains("releases/700") }.count
+        XCTAssertEqual(total, 1, "Three opens, one read — it was read the first time")
+    }
+
+    /// A record read before labels had identities is still re-read.
+    ///
+    /// The guard above must not be so broad that it swallows the reason
+    /// `needsReading` looks at labels at all: a release stored with a label
+    /// name and no id cannot say *which* label that name meant, and this is
+    /// the only thing that goes back for it.
+    func testARecordWhoseLabelHasNoIdentityIsStillReadAgain() async throws {
+        let artist = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Seefeel"),
+                                   discogsID: 1, name: "Seefeel")
+        artist.releaseTitles = ["Quique"]
+        artist.releaseDiscogsIDs = [800]
+        artist.releaseImageURLStrings = ["https://img.test/quique.jpg"]
+        artist.releaseYears = ["1993"]
+        artist.cacheVersion = 3
+        context.insert(artist)
+
+        // As written before label ids were stored: a name, and no way to say
+        // which label it was.
+        let stale = DiscogsReleaseRecord(discogsID: 800, title: "Quique")
+        stale.labelNames = ["Too Pure"]
+        stale.labelDiscogsIDs = []
+        stale.imageURLString = "https://img.test/quique.jpg"
+        context.insert(stale)
+
+        let recorder = RecordingTransport.Recorder()
+        let dig = makeStore(routes: [
+            "releases/800": """
+            {"id":800,"title":"Quique","year":1993,"uri":"/release/800",
+             "artists":[{"id":1,"name":"Seefeel"}],
+             "labels":[{"id":11,"name":"Too Pure","catno":"PURE22"}],
+             "genres":[],"styles":[],
+             "images":[{"type":"primary","uri":"https://img.test/quique.jpg"}],
+             "tracklist":[]}
+            """
+        ], recorder: recorder)
+
+        await dig.fillMissingReleaseArtwork(forArtist: "Seefeel", mbid: nil)
+
+        XCTAssertTrue(recorder.urls.contains { $0.contains("releases/800") },
+                      "A label with no identity is a reason to read the record again")
+    }
+
     /// The page reads the profile on every redraw — including every hover —
     /// and each miss walks the whole graph. Nothing but a write should cost
     /// that.

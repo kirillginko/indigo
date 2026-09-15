@@ -183,19 +183,47 @@ nonisolated struct SceneEngine {
     /// Built once for the life of this engine — see `DigEngine` for why.
     private let shared = CacheBox()
 
+    /// What the engine this one replaced had already worked out.
+    ///
+    /// `DigWorker.refresh` makes a new engine every time a write moves the
+    /// generation, and a new engine used to mean rebuilding every index here
+    /// from seven whole tables. `GraphStore` has taken its tables from its
+    /// predecessor since the same problem was found there; this is that,
+    /// for scenes.
+    private let inherited: SceneCaches?
+
     private final class CacheBox {
         var caches: SceneCaches?
+        /// A place's distinctive sounds, worked out once per generation.
+        ///
+        /// `signature(for:)` folds the tags of every artist in a place, and an
+        /// artist page asks for it once per city the artist is placed in,
+        /// twice over — once before the catalogue answers and once after,
+        /// because enrichment changes the tags.
+        ///
+        /// Worth keeping rather than worth much: measured on the benchmark's
+        /// seed it saves about 6% of ten repeated lookups, because that seed
+        /// gives each artist a single style to fold. It is not where an artist
+        /// page's CPU goes — that is the whole of `SceneCaches(context:)`,
+        /// rebuilt from nothing every time a write moves the generation. See
+        /// `testCostOfRebuildingTheSceneCaches`.
+        ///
+        /// Safe to hold because the caches beside it are: both are thrown away
+        /// together when a write moves the generation. See `DigEngine`.
+        var signatures: [String: [String]] = [:]
     }
 
     private var caches: SceneCaches {
         if let existing = shared.caches { return existing }
-        let fresh = SceneCaches(context: context)
+        let fresh = SceneCaches(context: context, reusing: inherited)
+            ?? Trace.step("scene.tables") { SceneCaches(context: context) }
         shared.caches = fresh
         return fresh
     }
 
-    init(context: ModelContext) {
+    init(context: ModelContext, inheriting previous: SceneEngine? = nil) {
         self.context = context
+        self.inherited = previous?.shared.caches
     }
 
     /// How many artists a place needs before it can be somewhere to head into.
@@ -315,19 +343,31 @@ nonisolated struct SceneEngine {
     func scenes(forArtist name: String) -> [MusicScene] {
         let caches = self.caches
         let key = RecordingKey.normalizeArtist(name)
+        // Folded once, not once per scene. This artist's tags do not change
+        // between the scenes being filtered, and re-folding them inside the
+        // closure did the same work for every place-and-sound the artist is
+        // in.
+        let tags = Set((caches.tagsForArtist[key] ?? []).flatMap { ListeningLog.foldTags([$0]) })
         return caches.citiesForArtist[key, default: []]
             .flatMap { scenes(cityKey: $0, caches: caches) }
             .filter { scene in
                 guard let sound = scene.sound else { return true }
-                let tags = Set((caches.tagsForArtist[key] ?? []).flatMap { ListeningLog.foldTags([$0]) })
                 return !tags.isDisjoint(with: Set(ListeningLog.foldTags([sound])))
             }
             .sorted { $0.city == $1.city ? $0.soundKey < $1.soundKey : $0.city < $1.city }
     }
 
+    /// `SceneCaches.signature(for:)`, remembered for this generation.
+    private func signature(for cityKey: String, caches: SceneCaches) -> [String] {
+        if let known = shared.signatures[cityKey] { return known }
+        let worked = caches.signature(for: cityKey, limit: Self.scenesPerPlace)
+        shared.signatures[cityKey] = worked
+        return worked
+    }
+
     /// Every scene one place holds, strongest sound first.
     private func scenes(cityKey: String, caches: SceneCaches) -> [MusicScene] {
-        let signature = caches.signature(for: cityKey, limit: Self.scenesPerPlace)
+        let signature = self.signature(for: cityKey, caches: caches)
         guard !signature.isEmpty else {
             // Nowhere in particular. Then it is a place and a stretch of
             // years, which is what a scene was before it had a sound, and
@@ -616,8 +656,47 @@ nonisolated struct SceneCaches {
     /// somewhere is not a sound: NEW ZEALAND / SPIRITUAL JAZZ, AUCKLAND.
     var placeIndex: PlaceIndex?
 
+    /// The tables this cache is derived from, counted.
+    ///
+    /// Same device as `GraphStore.Caches.rowCounts`, and for the same reason:
+    /// a cache is only stale if something it reads has changed. Counting is
+    /// six index reads against a rebuild that fetches all seven tables whole
+    /// and folds every artist's tags — measured at 5,009ms cold against 32ms
+    /// warm on the benchmark's store. See `testCostOfRebuildingTheSceneCaches`.
+    ///
+    /// A count is a complete answer here because nothing this reads is edited
+    /// in place without a row being added: origins arrive with the artist,
+    /// keywords with the Bandcamp release.
+    var rowCounts: [Int] = []
+
+    static func rowCounts(in context: ModelContext) -> [Int] {
+        [
+            (try? context.fetchCount(FetchDescriptor<Artist>())) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<MusicLabel>())) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<BandcampRelease>())) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<DiscogsArtist>())) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<Recording>())) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<Track>())) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<CrateItem>())) ?? -1
+        ]
+    }
+
+    /// Whole-cache inheritance, not per-table as `GraphStore` does it.
+    ///
+    /// Coarser on purpose: the seven tables here are folded together into one
+    /// set of indexes rather than kept side by side, so there is no honest way
+    /// to re-read one of them and keep the rest. What it buys is still most of
+    /// the cost — the writes that land while somebody reads a page are
+    /// portraits and release records, and neither is in the list above.
+    init?(context: ModelContext, reusing previous: SceneCaches?) {
+        let counts = Self.rowCounts(in: context)
+        guard let previous, previous.rowCounts == counts, !counts.contains(-1) else { return nil }
+        self = previous
+    }
+
     init(context: ModelContext) {
-        let places = PlaceIndex(context: context)
+        let places = Trace.step("sc.places") { PlaceIndex(context: context) }
+        rowCounts = Self.rowCounts(in: context)
 
         func place(_ city: String, artist key: String, named name: String) {
             let cityKey = RecordingKey.normalize(city)
@@ -645,8 +724,19 @@ nonisolated struct SceneCaches {
             }
         }
 
+        // Every name the app knows, collected as the tables go past.
+        //
+        // `artistWords` needs the name of everybody, placed or not — and it
+        // used to get them by fetching `Artist`, `DiscogsArtist` and
+        // `Recording` a second time, after the loops below had already read
+        // all three. That re-read measured 1,476ms of a 4,429ms rebuild, the
+        // largest single piece of it, for rows sitting in hand.
+        var everyName: [String] = []
+
         // Where MusicBrainz says they began.
+        Trace.step("sc.mbArtists") {
         for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
+            everyName.append(artist.name)
             let key = RecordingKey.normalizeArtist(artist.name)
             guard !key.isEmpty else { continue }
             artistNames[key] = artist.name
@@ -655,9 +745,11 @@ nonisolated struct SceneCaches {
             }
             yearsForArtist[key, default: []] += artist.releaseDates.compactMap { Int($0.prefix(4)) }
         }
+        }
 
         // What the artist tagged their own records with. Bandcamp mixes place
         // and genre in one list, which is why the split matters.
+        Trace.step("sc.bandcamp") {
         for release in (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? [] {
             let key = release.artistKey
             guard !key.isEmpty else { continue }
@@ -670,8 +762,11 @@ nonisolated struct SceneCaches {
             }
             if let year = release.year.flatMap(Int.init) { yearsForArtist[key, default: []].append(year) }
         }
+        }
 
+        Trace.step("sc.discogsArtists") {
         for artist in (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? [] {
+            everyName.append(artist.name)
             let key = artist.nameKey
             guard !key.isEmpty else { continue }
             artistNames[key] = artistNames[key] ?? artist.name
@@ -679,14 +774,20 @@ nonisolated struct SceneCaches {
             for style in artist.styles { tagsForArtist[key, default: []].insert(style) }
             yearsForArtist[key, default: []] += artist.releaseYears.compactMap { Int($0.prefix(4)) }
         }
+        }
 
+        Trace.step("sc.recordings") {
         for recording in (try? context.fetch(FetchDescriptor<Recording>())) ?? [] {
+            if let credited = recording.artistName { everyName.append(credited) }
             let key = RecordingKey.normalizeArtist(recording.artistName)
             guard !key.isEmpty else { continue }
             radioForArtist[key, default: 0] += recording.appearances.count
         }
+        }
+        Trace.step("sc.tracks") {
         for track in (try? context.fetch(FetchDescriptor<Track>())) ?? [] {
             for key in DigEngine.artistKeys(for: track) { libraryForArtist[key, default: 0] += 1 }
+        }
         }
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
             let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
@@ -698,22 +799,21 @@ nonisolated struct SceneCaches {
         // having kept them is. Counted here so a direction can be read from
         // what a person plays and not only from what they filed — which on a
         // collection whose crate is small is most of what there is to go on.
+        Trace.step("sc.listening") {
         for event in ListeningLog(context: context).all()
         where event.kind == .artist && event.weight > 0 {
             crateForArtist[event.nodeKey, default: 0] += 1
+        }
         }
 
         // Every artist the app knows of, not only the ones with a place. Sonae
         // has no origin on file and so was never in `artistNames`, but her
         // name is a keyword on a Berlin collective's record — which is how the
         // scene came to be called BERLIN / SONAE.
-        var names = Array(artistNames.values)
-        names += ((try? context.fetch(FetchDescriptor<Artist>())) ?? []).map(\.name)
-        names += ((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []).map(\.name)
-        names += ((try? context.fetch(FetchDescriptor<Recording>())) ?? []).compactMap(\.artistName)
-        distributeCredits()
+        let names = Trace.step("sc.nameList") { Array(artistNames.values) + everyName }
+        Trace.step("sc.credits") { distributeCredits() }
 
-        artistWords = Set(names.flatMap { ListeningLog.foldTags([$0]) })
+        artistWords = Trace.step("sc.words") { Set(names.flatMap { ListeningLog.foldTags([$0]) }) }
 
         for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
             countries.formUnion(Self.countryParts(of: artist.origin))
@@ -721,11 +821,18 @@ nonisolated struct SceneCaches {
         for label in (try? context.fetch(FetchDescriptor<MusicLabel>())) ?? [] {
             countries.formUnion(Self.countryParts(of: label.origin))
         }
-        placeIndex = placeIndex ?? PlaceIndex(context: context)
+        // The index built at the top of this initialiser, not a second one.
+        //
+        // `placeIndex` is never assigned before here, so the `??` always took
+        // its right-hand side and every scene rebuild constructed the same
+        // index twice — 305ms of the two and a half seconds, spent deriving an
+        // answer already sitting in `places`.
+        placeIndex = places
 
         // Last, because it reads what everything above built: how widespread
         // each sound is across all the places at once. A scene's signature is
         // measured against this — see `signature(for:)`.
+        Trace.step("sc.placesPerTag") {
         for (cityKey, artistKeys) in artistsForCity {
             guard !cityKey.isEmpty else { continue }
             var seenHere = Set<String>()
@@ -736,6 +843,7 @@ nonisolated struct SceneCaches {
                     }
                 }
             }
+        }
         }
     }
 }

@@ -439,6 +439,93 @@ final class ArtistNamesakeTests: XCTestCase {
     }
 }
 
+// MARK: - The real one, when the probe will not answer
+
+/// Discogs files "the Beatles (4)" beside The Beatles — an entry whose own
+/// profile says it is claimed to be them and is not — and it holds one hoax
+/// album. Searching The Beatles returned exactly that record.
+///
+/// The deciding probe asks each namesake what they have put out, and it used
+/// to read a failed probe as an empty shelf. That bias always runs the same
+/// way: the real artist has thousands of records, so theirs is the heaviest
+/// probe and the first to time out or be throttled, while the impostor's two
+/// releases come back instantly.
+final class NamesakeProbeFailureTests: XCTestCase {
+    /// Answers the search, then refuses the first namesake's shelf and hands
+    /// back the second's. Exactly the shape of the trace: eight seconds on
+    /// `artists/82730/releases`, then straight on to `artists/5495389`.
+    private struct BeatlesTransport: DiscogsTransport {
+        let realShelfStatus: Int
+        let counter = Counter()
+
+        final class Counter: @unchecked Sendable {
+            var paths: [String] = []
+        }
+
+        func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+            let url = request.url?.absoluteString ?? ""
+            counter.paths.append(url)
+
+            func answer(_ body: String, _ status: Int = 200) -> (Data, URLResponse) {
+                (Data(body.utf8), HTTPURLResponse(
+                    url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil
+                )!)
+            }
+
+            if url.contains("database/search") {
+                // Discogs' own ranking, which has the real one first.
+                return answer("""
+                {"results":[
+                  {"id":82730,"title":"The Beatles"},
+                  {"id":1385829,"title":"The Beatles Revival Band"},
+                  {"id":5495389,"title":"the Beatles (4)"}
+                ]}
+                """)
+            }
+            if url.contains("artists/82730/releases") {
+                return answer("""
+                {"releases":[{"id":1,"title":"Please Please Me","role":"Main",
+                              "type":"release","format":"Vinyl, LP"}]}
+                """, realShelfStatus)
+            }
+            if url.contains("artists/5495389/releases") {
+                return answer("""
+                {"releases":[{"id":2,"title":"Everyday Chemistry","role":"Main",
+                              "type":"master","format":"Cassette"}]}
+                """)
+            }
+            return answer("{}", 404)
+        }
+    }
+
+    /// The bug, as it happened. A refused probe is not a finding about the
+    /// artist, so it must not hand the page to the next namesake.
+    func testARefusedProbeDoesNotPromoteTheImpostor() async throws {
+        let transport = BeatlesTransport(realShelfStatus: 429)
+        let client = DiscogsClient(transport: transport, token: "t")
+
+        let head = try await client.artistHead(named: "The Beatles")
+
+        XCTAssertEqual(head?.id, 82730,
+                       "Unanswerable is not a reason to open the hoax entry")
+        XCTAssertFalse(
+            transport.counter.paths.contains { $0.contains("artists/5495389") },
+            "A candidate is only ruled out by an answer, never by a refusal"
+        )
+    }
+
+    /// And when the probe does answer, it still decides — the real one has
+    /// records, so it wins on evidence rather than on rank.
+    func testAnAnsweringProbeStillPicksTheOneWithRecords() async throws {
+        let transport = BeatlesTransport(realShelfStatus: 200)
+        let client = DiscogsClient(transport: transport, token: "t")
+
+        let head = try await client.artistHead(named: "The Beatles")
+
+        XCTAssertEqual(head?.id, 82730)
+    }
+}
+
 // MARK: - Records, not films
 
 /// Discogs files the video director Hype Williams and Dean Blunt and Inga

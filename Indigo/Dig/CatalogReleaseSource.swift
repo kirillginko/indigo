@@ -101,6 +101,55 @@ nonisolated struct CatalogReleaseSource: Sendable {
         return refreshed ?? hit?.value
     }
 
+    /// Many releases at once, out of the shared cache.
+    ///
+    /// The probe `release(id:)` skips on a build with a credential, made worth
+    /// making. One PostgREST read for the whole batch an artist page wants,
+    /// against one Discogs request per release — so even a cache that misses
+    /// most of the time costs a single round trip to find that out, and a
+    /// cache that hits saves eight.
+    ///
+    /// Returns only what it has and only while fresh. Everything absent is the
+    /// caller's to fetch, and telling the backend about those is
+    /// `requestCache(ids:)` below.
+    func releases(ids: [Int]) async -> [Int: DiscogsReleaseDetail] {
+        guard isEnabled, !ids.isEmpty else { return [:] }
+
+        let found = try? await repository.cached(
+            DiscogsReleaseDetail.self,
+            provider: Self.provider,
+            resourceType: Self.resourceType,
+            resourceIDs: ids.map(String.init),
+            fresherThan: MetadataRepository.Lifetime.release
+        )
+
+        var byID: [Int: DiscogsReleaseDetail] = [:]
+        for (key, value) in found ?? [:] {
+            guard let identifier = Int(key) else { continue }
+            byID[identifier] = value
+        }
+        return byID
+    }
+
+    /// Tells the backend which releases a page wanted and could not get.
+    ///
+    /// The other half of the probe. A miss today is a hit for everybody
+    /// tomorrow, but only if somebody writes down that it was wanted — and the
+    /// app is the only thing that knows. One call for the whole batch, not
+    /// waited on: the page has already gone to Discogs for these.
+    ///
+    /// `request_release_cache` is the narrowest thing the publishable key can
+    /// reach. It takes Discogs release ids, refuses anything that is not
+    /// digits, and the only work it can cause is a fetch of exactly those
+    /// releases. See migration 0027.
+    func requestCache(ids: [Int]) {
+        guard isEnabled, !ids.isEmpty else { return }
+        let repository = repository
+        Task.detached(priority: .background) {
+            await repository.requestReleaseCache(ids: ids)
+        }
+    }
+
     /// Asks the backend to fetch and normalize this release, without waiting.
     ///
     /// Costs one more upstream request than strictly necessary — the app has
@@ -117,6 +166,98 @@ nonisolated struct CatalogReleaseSource: Sendable {
                 resourceID: String(id),
                 lifetime: MetadataRepository.Lifetime.release
             )
+        }
+    }
+}
+
+/// An artist's shelf, out of Indigo's cache rather than Discogs'.
+///
+/// `artists/{id}/releases` is the slowest request a cold artist page makes and
+/// the one it cannot draw without: measured at 2,727ms for Ryuichi Sakamoto and
+/// 1,916ms for Haruomi Hosono, on a Discogs that was refusing nothing. Unlike
+/// the release reads beside it, one shelf is one request, so there is no batch
+/// to amortise the probe across — but there is also nothing else on the page
+/// that is slower, so a probe that misses costs a fifth of a second against a
+/// wait of two or three seconds.
+///
+/// The enrichment crawl already fetches this exact listing for the artists
+/// radio says are worth having ready, and since migration 0027 it keeps it. A
+/// miss asks the backend to keep this one too.
+nonisolated struct CatalogShelfSource: Sendable {
+    static let shared = CatalogShelfSource()
+
+    private let repository: MetadataRepository
+    private let isEnabled: Bool
+
+    init(
+        repository: MetadataRepository = .shared,
+        isEnabled: Bool = CatalogReleaseSource.isEnabledByDefault
+    ) {
+        self.repository = repository
+        self.isEnabled = isEnabled
+        self.held = nil
+        self.asked = nil
+    }
+
+    /// Which shelves a test says are already cached, and which ones it saw
+    /// handed back.
+    ///
+    /// Injected rather than reached through a backend, for the reason
+    /// `CatalogReleaseSource.canReachProviderDirectly` is injected: the
+    /// publishable key is deliberately absent under XCTest, so the real path
+    /// answers nil for both a hit and a miss and the difference — which is the
+    /// whole behaviour — cannot be seen.
+    nonisolated final class Asked: @unchecked Sendable {
+        private let lock = NSLock()
+        private var seen: [Int] = []
+        func record(_ id: Int) { lock.withLock { seen.append(id) } }
+        var ids: [Int] { lock.withLock { seen } }
+    }
+
+    private let held: [String: DiscogsArtistReleases]?
+    private let asked: Asked?
+
+    init(holding shelves: [String: DiscogsArtistReleases], asked: Asked? = nil) {
+        self.repository = .shared
+        self.isEnabled = true
+        self.held = shelves
+        self.asked = asked
+    }
+
+    func shelf(discogsID id: Int) async -> DiscogsArtistReleases? {
+        guard isEnabled else { return nil }
+        if let held { return held[DiscogsClient.shelfPath(id: id)] }
+
+        let found = try? await repository.cached(
+            DiscogsArtistReleases.self,
+            provider: "discogs",
+            path: DiscogsClient.shelfPath(id: id),
+            query: DiscogsClient.shelfQuery
+        )
+        guard let found, found.fetchedAt > Date().addingTimeInterval(-Self.lifetime) else {
+            return nil
+        }
+        return found.value
+    }
+
+    /// Matches `shelf_cache_lifetime()` in 0027 and `SHELF_CACHE_TTL_SECONDS`
+    /// in `discogs.ts`. A record never changes; a discography gains one
+    /// whenever the artist puts something out.
+    static let lifetime: TimeInterval = 30 * 86_400
+
+    /// Tells the backend which shelf a page had to fetch for itself.
+    ///
+    /// Not waited on: the page has already gone to Discogs for this. What it
+    /// buys is the next listener, and this listener tomorrow.
+    func requestCache(discogsID id: Int) {
+        guard isEnabled else { return }
+        if let asked {
+            asked.record(id)
+            return
+        }
+        let repository = repository
+        Task.detached(priority: .background) {
+            await repository.requestArtistShelf(discogsID: id)
         }
     }
 }

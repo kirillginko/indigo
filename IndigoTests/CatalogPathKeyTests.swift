@@ -54,4 +54,37 @@ final class CatalogPathKeyTests: XCTestCase {
     func testAnEmptyValueStillProducesItsPair() {
         XCTAssertEqual(key("database/search", [("q", "")]), "database/search?q=")
     }
+
+    /// The shelf key, which three things have to agree on: the request the app
+    /// sends, the row `cacheDiscogsShelf` writes, and the read
+    /// `CatalogShelfSource` makes. A disagreement is not an error — it is a
+    /// cached shelf nobody ever finds, and a page that goes on waiting the
+    /// 2,727ms this exists to remove.
+    ///
+    /// The literal below is what `discogs.ts` builds:
+    /// `${path}?${SHELF_QUERY}`, with SHELF_QUERY sorted the way `resolvePath`
+    /// sorts it.
+    func testTheShelfKeyMatchesTheOneTheWorkerWrites() {
+        XCTAssertEqual(
+            MetadataRepository.cacheKey(
+                path: DiscogsClient.shelfPath(id: 5087),
+                query: DiscogsClient.shelfQuery
+            ),
+            "artists/5087/releases?per_page=50&sort=year&sort_order=desc"
+        )
+    }
+
+    /// And the request the app actually sends carries those same three
+    /// parameters — a shelf fetched with a different `per_page` is a different
+    /// listing, cached under a key the reader will not build.
+    func testTheShelfRequestCarriesExactlyWhatTheKeyNames() {
+        XCTAssertEqual(
+            Set(DiscogsClient.shelfQuery.map(\.name)),
+            ["per_page", "sort", "sort_order"]
+        )
+        XCTAssertEqual(
+            DiscogsClient.shelfQuery.first { $0.name == "per_page" }?.value, "50",
+            "Fifty is what the worker fetches and what the key says"
+        )
+    }
 }

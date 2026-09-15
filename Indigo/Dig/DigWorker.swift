@@ -81,8 +81,14 @@ actor DigWorker {
         graph = next
         engine = DigEngine(context: modelContext, graph: next)
         deep = DeepEngine(context: modelContext, graph: next)
-        scenes = SceneEngine(context: modelContext)
-        searchIndex = nil
+        scenes = SceneEngine(context: modelContext, inheriting: scenes)
+        // The index is deliberately *not* discarded here any more.
+        //
+        // It used to be, and every write moves the generation — so a listener
+        // typing while the catalogue answered paid 3,591ms to rebuild six
+        // tables before the next letter could be matched, over and over, which
+        // is precisely when somebody is watching. `searchLocally` now asks the
+        // index whether it still describes the store, which is six counts.
         generation = asked
     }
 
@@ -93,7 +99,10 @@ actor DigWorker {
     /// bargain the graph makes above.
     func searchLocally(_ query: String, limit: Int, generation asked: Int) -> [DigSearchResult] {
         refresh(asked)
-        let index = searchIndex ?? DigSearchIndex(context: modelContext)
+        if let kept = searchIndex, kept.stillDescribes(modelContext) {
+            return kept.search(query, limit: limit)
+        }
+        let index = Trace.step("search.index") { DigSearchIndex(context: modelContext) }
         searchIndex = index
         return index.search(query, limit: limit)
     }

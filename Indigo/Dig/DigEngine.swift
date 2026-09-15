@@ -259,6 +259,49 @@ nonisolated struct DigEngine {
 
     private final class GraphBox {
         var store: GraphStore?
+        /// MusicBrainz artists by normalized name, folded once for this engine.
+        ///
+        /// `cachedArtistNamed` fetches the whole `Artist` table and scans it,
+        /// normalizing every name, and a profile built without an MBID calls it
+        /// — which is most of them, because a search result opens by name. The
+        /// profile is rebuilt on every write, so that scan ran per write per
+        /// artist opened.
+        ///
+        /// Measured: seeding the benchmark with one `Artist` row per artist
+        /// took `artistProfile` from 159ms to 757ms, and the running app's
+        /// trace agreed at ~500ms. Folded once per engine — and an engine
+        /// lasts a generation, exactly as the graph above does — it is a
+        /// dictionary lookup.
+        var artistsByName: [String: Artist]?
+    }
+
+    /// The `Artist` table keyed the way callers ask for it.
+    private var artistsByName: [String: Artist] {
+        if let existing = shared.artistsByName { return existing }
+        let fresh = Trace.step("t.mbArtists") {
+            var found: [String: Artist] = [:]
+            for artist in (try? context.fetch(FetchDescriptor<Artist>())) ?? [] {
+                let key = RecordingKey.normalize(artist.name)
+                guard !key.isEmpty else { continue }
+                // First wins, which is what `first(where:)` did.
+                if found[key] == nil { found[key] = artist }
+            }
+            return found
+        }
+        shared.artistsByName = fresh
+        return fresh
+    }
+
+    /// The cached MusicBrainz artist for a name, without reading the table.
+    ///
+    /// Same answer as `MusicBrainzEnricher.cachedArtistNamed`, which stays as
+    /// it is: it is called from paths that build an enricher for one question
+    /// and never come back, where folding the whole table would be the more
+    /// expensive of the two.
+    private func cachedArtist(named name: String) -> Artist? {
+        let key = RecordingKey.normalize(name)
+        guard !key.isEmpty else { return nil }
+        return artistsByName[key]
     }
 
     private var graph: GraphStore {
@@ -290,7 +333,7 @@ nonisolated struct DigEngine {
         // reached from the library alone never has one, and that is exactly
         // the case the page must still fill in.
         let enricher = MusicBrainzEnricher(context: context)
-        let cached = mbid.flatMap { enricher.cachedArtist($0) } ?? enricher.cachedArtistNamed(name)
+        let cached = mbid.flatMap { enricher.cachedArtist($0) } ?? cachedArtist(named: name)
         let cachedDiscogs = DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: name)
         let discogs = cachedDiscogs?.isFresh == true ? cachedDiscogs : nil
         let byArtist = recordings(byArtist: name)

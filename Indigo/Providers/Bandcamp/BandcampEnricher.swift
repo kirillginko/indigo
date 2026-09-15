@@ -94,10 +94,12 @@ nonisolated struct BandcampEnricher {
         // in-memory container these tests use, because that runs the
         // predicate as Swift; against the app's SQLite store it takes the
         // process down. See `StorePredicateTests`.
-        let all = (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? []
+        // Read from the fold rather than from the table.
+        //
         // Matched against everyone in the credit, so a collaboration appears
-        // on both artists' pages rather than only the first name's.
-        return all.filter { $0.artistKey == key || $0.artistKeys.contains(key) }
+        // on both artists' pages rather than only the first name's — which is
+        // what `BandcampByArtist` files it under.
+        return BandcampByArtist.shared.index(in: context)[key] ?? []
     }
 
     /// The record a track is on, if Bandcamp has already been read for this
@@ -266,5 +268,82 @@ nonisolated struct BandcampEnricher {
         )
         context.insert(record)
         return record
+    }
+}
+
+/// Bandcamp's cache, folded by artist once for the process.
+///
+/// `cachedReleases(forArtist:)` reads the whole `BandcampRelease` table and
+/// filters it in Swift, and it has to: `artistKeys` is an array attribute, so
+/// there is nothing inside it for a query to look at and a `#Predicate` naming
+/// it takes the app down against SQLite. See `StorePredicateTests`.
+///
+/// That is fine once and ruinous per row. `DigArtwork.release` asks for a
+/// record's sleeve once per row of a tracklist and once per tile of a
+/// discography, and each ask read the table again: on the benchmark's store,
+/// twenty rows measured 1,398ms once eight hundred Bandcamp releases were in
+/// it, against 4ms with none. A real store holds eight hundred.
+///
+/// So the fold is held, and rebuilt only when the table's size changes — the
+/// same bargain `LibraryAlbums` makes with the library, for the same reason.
+nonisolated final class BandcampByArtist: @unchecked Sendable {
+    static let shared = BandcampByArtist()
+
+    private let lock = NSLock()
+    private var signature: [Double]?
+    /// Which store the held fold came from. Two containers can hold the same
+    /// number of rows and hand each other the wrong answer — tests do this
+    /// routinely. `LibraryAlbums` learned the same lesson.
+    private var source: ObjectIdentifier?
+    private var held: [String: [BandcampRelease]] = [:]
+
+    /// Two reads rather than a table scan: how many rows, and when the most
+    /// recently touched one was touched.
+    ///
+    /// A count alone is not enough. `BandcampEnricher` re-reads a release it
+    /// already holds and writes over it in place — `artistKey` and
+    /// `artistKeys` included, which is exactly what this is keyed on — and
+    /// that changes no count at all. Every one of those edits stamps
+    /// `fetchedAt`, so the newest stamp is what says the fold is out of date.
+    private static func signature(in context: ModelContext) -> [Double] {
+        let count = (try? context.fetchCount(FetchDescriptor<BandcampRelease>())) ?? -1
+        var newest = FetchDescriptor<BandcampRelease>(
+            sortBy: [SortDescriptor(\BandcampRelease.fetchedAt, order: .reverse)]
+        )
+        newest.fetchLimit = 1
+        let touched = (try? context.fetch(newest))?.first?.fetchedAt.timeIntervalSince1970 ?? -1
+        return [Double(count), touched]
+    }
+
+    func index(in context: ModelContext) -> [String: [BandcampRelease]] {
+        let current = Self.signature(in: context)
+        let store = ObjectIdentifier(context.container)
+
+        lock.lock()
+        if let signature, signature == current, source == store {
+            let answer = held
+            lock.unlock()
+            return answer
+        }
+        lock.unlock()
+
+        var built: [String: [BandcampRelease]] = [:]
+        for release in (try? context.fetch(FetchDescriptor<BandcampRelease>())) ?? [] {
+            // Filed under everyone in the credit, so a collaboration is found
+            // from either artist's page — which is what the scan it replaces
+            // did with `artistKey || artistKeys.contains`.
+            var keys = Set(release.artistKeys)
+            if !release.artistKey.isEmpty { keys.insert(release.artistKey) }
+            for key in keys where !key.isEmpty {
+                built[key, default: []].append(release)
+            }
+        }
+
+        lock.lock()
+        signature = current
+        source = store
+        held = built
+        lock.unlock()
+        return built
     }
 }

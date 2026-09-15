@@ -148,7 +148,7 @@ final class ArtistStagingTests: XCTestCase {
         XCTAssertEqual(early.aliasNames, ["SCNTST"])
         XCTAssertEqual(early.imageURL?.absoluteString, "https://img.test/artist.jpg")
         XCTAssertTrue(early.releaseTitles.isEmpty, "The shelf has not arrived")
-        XCTAssertLessThan(early.cacheVersion, 12)
+        XCTAssertLessThan(early.cacheVersion, 13)
         XCTAssertNil(enricher.freshArtist(named: "Skee Mask"),
                      "A profile with no shelf behind it must not satisfy the cache")
 
@@ -160,7 +160,7 @@ final class ArtistStagingTests: XCTestCase {
             catalogue: found.catalogue
         )))
         XCTAssertFalse(complete.releaseTitles.isEmpty)
-        XCTAssertEqual(complete.cacheVersion, 12)
+        XCTAssertEqual(complete.cacheVersion, 13)
         XCTAssertEqual(complete.realName, "Bryan Müller", "The complete write agrees with the early one")
         XCTAssertNotNil(enricher.freshArtist(named: "Skee Mask"))
     }
@@ -207,13 +207,13 @@ final class ArtistStagingTests: XCTestCase {
         let partial = try XCTUnwrap(storedArtist(), "The entry should not wait for the shelf")
         XCTAssertEqual(partial.realName, "Bryan Müller")
         XCTAssertTrue(partial.releaseTitles.isEmpty)
-        XCTAssertLessThan(partial.cacheVersion, 12)
+        XCTAssertLessThan(partial.cacheVersion, 13)
 
         gate.open()
         await enrichment.value
 
         let complete = try XCTUnwrap(storedArtist())
-        XCTAssertEqual(complete.cacheVersion, 12)
+        XCTAssertEqual(complete.cacheVersion, 13)
         XCTAssertFalse(complete.releaseTitles.isEmpty)
     }
 
@@ -267,6 +267,125 @@ final class ArtistStagingTests: XCTestCase {
     /// full — and the neighbourhood searches and record reads that follow wait
     /// for room rather than spend the last of it.
     @MainActor
+    /// A shelf Indigo already holds is not asked of Discogs again.
+    ///
+    /// `artists/{id}/releases` is the slowest request a cold artist makes and
+    /// the one the page cannot draw without — 2,727ms for Ryuichi Sakamoto,
+    /// 1,916ms for Haruomi Hosono, neither refused. A discography does not
+    /// change from one listener to the next, and the enrichment crawl already
+    /// fetches this exact listing; since 0027 it keeps it.
+    func testAShelfAlreadyCachedIsNotFetchedFromDiscogsAgain() async throws {
+        let gate = ShelfGate()
+        gate.open()
+        let recorder = URLRecorder()
+        let store = DigStore(
+            context: context,
+            client: MusicBrainzClient(transport: NobodyOnMusicBrainz()),
+            discogsClient: DiscogsClient(
+                transport: ShelfTransport(gate: gate, recorder: recorder), token: "secret"
+            )
+        )
+        store.catalogShelves = CatalogShelfSource(holding: [
+            DiscogsClient.shelfPath(id: 1): DiscogsArtistReleases(releases: [
+                DiscogsArtistRelease(
+                    id: 900, title: "Compro", year: 2018, role: "Main", type: "release",
+                    label: "Ilian Tape", artist: "Skee Mask", mainRelease: nil,
+                    format: "Vinyl, LP", thumbnail: nil
+                )
+            ])
+        ])
+
+        await store.enrichArtist(name: "Skee Mask", mbid: nil)
+
+        XCTAssertTrue(
+            recorder.all.filter { $0.path.contains("/releases") }.isEmpty,
+            "The shelf was read from Postgres; Discogs should not have been asked for it"
+        )
+        // And the page still got its discography out of it.
+        let stored = try XCTUnwrap(storedArtist())
+        XCTAssertEqual(stored.releaseTitles, ["Compro"])
+    }
+
+    /// A shelf nobody has cached is fetched, and the backend is told to keep
+    /// it — which is what makes the next listener's page fast.
+    func testAShelfNobodyHasCachedIsFetchedAndHandedBack() async throws {
+        let gate = ShelfGate()
+        gate.open()
+        let recorder = URLRecorder()
+        let store = DigStore(
+            context: context,
+            client: MusicBrainzClient(transport: NobodyOnMusicBrainz()),
+            discogsClient: DiscogsClient(
+                transport: ShelfTransport(gate: gate, recorder: recorder), token: "secret"
+            )
+        )
+        let asked = CatalogShelfSource.Asked()
+        store.catalogShelves = CatalogShelfSource(holding: [:], asked: asked)
+
+        await store.enrichArtist(name: "Skee Mask", mbid: nil)
+
+        XCTAssertFalse(
+            recorder.all.filter { $0.path.contains("/releases") }.isEmpty,
+            "A shelf nobody holds still has to come from Discogs"
+        )
+        XCTAssertEqual(asked.ids, [1], "and the backend has to be asked to keep it")
+    }
+
+    /// Waiting for the budget is not digging.
+    ///
+    /// The optional second stage of a cold artist asks `waitForRoom()`, which
+    /// polls for up to ten seconds and then gives up. That poll ran inside the
+    /// foreground gate, so ten seconds of doing nothing counted as a dig in
+    /// progress — and the portrait fill stands aside for exactly that flag.
+    /// In a real session's trace the page revealed in 1.5s and `dig.enrich`
+    /// went on for 12.4s, nine and a half of them silent, with the faces on
+    /// the page blocked throughout for work that never happened.
+    func testWaitingForTheBudgetDoesNotCountAsDigging() async throws {
+        let gate = ShelfGate()
+        gate.open()
+        let budget = DiscogsBudget()
+        // Below the reserve, so `waitForRoom` waits out its whole patience
+        // and answers false.
+        await budget.record(HTTPURLResponse(
+            url: URL(string: "https://api.discogs.com/database/search")!,
+            statusCode: 200, httpVersion: nil,
+            headerFields: ["X-Discogs-Ratelimit-Remaining": "1", "X-Discogs-Ratelimit": "60"]
+        )!)
+        let store = DigStore(
+            context: context,
+            client: MusicBrainzClient(transport: NobodyOnMusicBrainz()),
+            discogsClient: DiscogsClient(
+                transport: ShelfTransport(gate: gate, recorder: URLRecorder()),
+                token: "secret", budget: budget
+            )
+        )
+        store.budgetPatience = .seconds(3)
+
+        // Watched while the dig runs, because the whole question is what the
+        // flag says *during* the wait rather than after it.
+        let enriching = Task { await store.enrichArtist(name: "Skee Mask", mbid: nil) }
+        var theGateOpenedWhileWaiting = false
+        for _ in 0..<40 {
+            try? await Task.sleep(for: .milliseconds(50))
+            guard !enriching.isCancelled else { break }
+            // Once the page has its catalogue entry, everything left is the
+            // optional stage — which is the wait. `isDiggingInForeground`
+            // stays true for 750ms after the last real request on purpose, so
+            // what is asserted is that it goes false *before* the dig returns,
+            // not that it was never true.
+            if storedArtist()?.cacheVersion == 13, !store.isDiggingInForeground {
+                theGateOpenedWhileWaiting = true
+                break
+            }
+        }
+        await enriching.value
+
+        XCTAssertTrue(
+            theGateOpenedWhileWaiting,
+            "The portrait fill stood aside for the whole wait, while nothing was being fetched"
+        )
+    }
+
     func testWorkThePageCanDoWithoutWaitsForRoomRatherThanSpendingTheLastOfTheMinute() async throws {
         let gate = ShelfGate()
         gate.open()
@@ -287,7 +406,7 @@ final class ArtistStagingTests: XCTestCase {
         store.budgetPatience = .milliseconds(150)
 
         await store.enrichArtist(name: "Skee Mask", mbid: nil)
-        XCTAssertEqual(storedArtist()?.cacheVersion, 12, "The artist on screen is still looked up in full")
+        XCTAssertEqual(storedArtist()?.cacheVersion, 13, "The artist on screen is still looked up in full")
 
         await store.fillMissingReleaseArtwork(forArtist: "Skee Mask", mbid: nil, limit: 12, whenThereIsRoom: true)
 
