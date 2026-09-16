@@ -256,6 +256,29 @@ nonisolated final class CrateItem {
         return showSubtitle != showTitle
     }
 
+    /// Whether this row is a live snapshot still waiting to be pointed at the
+    /// recording it kept.
+    ///
+    /// A show kept while it was on air stores the station rather than the
+    /// broadcast, because at that moment the broadcast has no handle. Once the
+    /// station publishes one the row can be repaired — see
+    /// `CrateService.migrateLotLiveBroadcast` — and this is what the crate page
+    /// looks for when deciding which rows to go and ask about.
+    ///
+    /// Its own property because the repair used to ride along with genre
+    /// hydration, which only visits rows with no genres. A row that was kept
+    /// with genres was therefore never repaired at all, and the one thing that
+    /// is actually wrong with it — where it points — is unrelated to whether
+    /// anybody filled its genres in.
+    var needsLiveSnapshotRepair: Bool {
+        guard kind == .broadcast, isLiveStream, let showID, let providerID else { return false }
+        switch providerID {
+        case LotProvider.providerID: return !showID.hasPrefix("lot.episode.")
+        case NTSProvider.providerID: return !showID.hasPrefix("nts.episode.")
+        default: return false
+        }
+    }
+
     /// The item the player needs to hear this again, when the crate itself
     /// knows one. Recordings go through SourceResolver instead.
     func broadcastMediaItem() -> MediaItem? {

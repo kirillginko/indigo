@@ -267,6 +267,18 @@ struct CrateView: View {
                     appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
                     return true
                 }
+            case LotProvider.providerID where item.isLiveStream:
+                // Kept on air and not yet matched to a recording — either The
+                // Lot has not published it or it aired too long ago to find.
+                // The residency is the nearest true thing to open: it is where
+                // the broadcast will appear, rather than the whole directory.
+                let residency = LotScheduleEntry.residency(in: item.displayTitle)
+                if let show = lotBrowse.shows.first(where: {
+                    LibraryKey.normalize($0.name) == LibraryKey.normalize(residency)
+                }) {
+                    appState.open(.lotShow(slug: show.slug))
+                    return true
+                }
             case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
                 let identity = String(showID.dropFirst("nts.episode.".count))
                 if let ref = NTSEpisodeRef.decode(identity) {
@@ -339,7 +351,11 @@ struct CrateView: View {
     }
 
     private func hydrateMissingRadioGenres() async {
-        for item in crate.items() where item.genreTags.isEmpty {
+        // Rows with nothing to show, and rows pointing at the wrong thing.
+        // The second is not a subset of the first: see
+        // `CrateItem.needsLiveSnapshotRepair`.
+        for item in crate.items()
+        where item.genreTags.isEmpty || item.needsLiveSnapshotRepair {
             guard let provider = item.providerID, let showID = item.showID else { continue }
             let genres: [String]
             switch provider {
@@ -351,6 +367,17 @@ struct CrateView: View {
                 let detail = ntsBrowse.detail(show: ref.show, episode: ref.episode)
                 crate.migrateLegacyNTSBroadcast(item, ref: ref, media: detail?.mediaItem())
                 genres = detail.map { $0.summary.genres + $0.summary.moods } ?? []
+            case LotProvider.providerID where item.isLiveStream
+                && !showID.hasPrefix("lot.episode."):
+                // Kept while it was on air, so the row holds the station. Now
+                // that The Lot has published the broadcast, point at it.
+                guard let ref = await lotBrowse.archivedEpisode(
+                    matching: item.displayTitle, near: item.addedAt
+                ) else { continue }
+                await lotBrowse.loadEpisodeIfNeeded(ref: ref)
+                let episode = lotBrowse.episode(ref: ref)
+                crate.migrateLotLiveBroadcast(item, ref: ref, media: episode?.mediaItem())
+                genres = episode?.genreNames ?? []
             case KioskProvider.providerID where showID.hasPrefix("kiosk.episode."):
                 let slug = String(showID.dropFirst("kiosk.episode.".count))
                 await kioskBrowse.loadEpisodeDetailIfNeeded(slug: slug)

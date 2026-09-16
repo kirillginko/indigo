@@ -238,6 +238,81 @@ final class LotBrowseStore {
         }
     }
 
+    /// The archived broadcast of a show somebody kept while it was on air.
+    ///
+    /// Crating the live stream stores the station — `lot.live` — with the
+    /// on-air show's title, because at that moment the archived episode does
+    /// not exist and has no handle to point at. Once The Lot publishes the
+    /// recording there is one, and this is how the kept row finds it. The same
+    /// job `NTSBrowseStore.archivedEpisode(matching:near:)` does, and Lot has
+    /// no search endpoint to do it with, so it reads the archive instead.
+    ///
+    /// Two passes, cheapest first. The index is the recent archive, which is
+    /// where a broadcast kept in the last few days will be. Failing that, the
+    /// title is billed as "Residency with Guest" — see
+    /// `LotScheduleEntry.showName` — so the residency is looked up in the
+    /// shows directory and its own episodes are read.
+    ///
+    /// Nil rather than a guess. A wrong episode under the right name is worse
+    /// than a row that still says "The Lot Radio": the listener would have no
+    /// way to tell it was wrong.
+    func archivedEpisode(matching title: String, near savedAt: Date) async -> LotEpisodeRef? {
+        let wanted = LibraryKey.normalize(title)
+        guard !wanted.isEmpty else { return nil }
+
+        await loadIndexIfNeeded()
+        if let found = Self.best(of: episodes, matching: wanted, near: savedAt) { return found }
+
+        // The residency, which is the part of a billing the directory is keyed
+        // by: "Love From The Sun with Jada Lorraine" is filed under "Love From
+        // The Sun".
+        let residency = LibraryKey.normalize(LotScheduleEntry.residency(in: title))
+        guard !residency.isEmpty else { return nil }
+        await loadShowsIfNeeded()
+        guard let show = shows.first(where: { LibraryKey.normalize($0.name) == residency })
+        else { return nil }
+
+        await loadShowIfNeeded(slug: show.slug)
+        let aired = showDetails[show.slug]?.episodes ?? []
+        // Matched on the full billing first, and only then on the day. A
+        // residency broadcasts repeatedly, so the date is the only thing that
+        // tells two of its episodes apart.
+        if let found = Self.best(of: aired, matching: wanted, near: savedAt) { return found }
+        return Self.nearest(of: aired, to: savedAt)
+    }
+
+    /// The episode whose title matches and whose airing is closest to when the
+    /// row was kept.
+    /// Internal rather than private so a test can drive the matching without
+    /// a network: which episode this picks, and which it refuses, is the part
+    /// that could quietly point a kept row at the wrong broadcast.
+    static func best(
+        of candidates: [LotEpisode], matching wanted: String, near savedAt: Date
+    ) -> LotEpisodeRef? {
+        nearest(
+            of: candidates.filter { LibraryKey.normalize($0.title) == wanted },
+            to: savedAt
+        )
+    }
+
+    /// Within a day of when it was kept, and no further.
+    ///
+    /// A listener keeps a show while it is playing, so the broadcast and the
+    /// row are hours apart at most. Without a bound this would hand back the
+    /// closest episode a residency has ever aired, which for a monthly show
+    /// could be weeks from the one they actually heard.
+    static func nearest(of candidates: [LotEpisode], to savedAt: Date) -> LotEpisodeRef? {
+        candidates
+            .compactMap { episode -> (ref: LotEpisodeRef, gap: TimeInterval)? in
+                guard let ref = episode.ref,
+                      let aired = episode.airedAt ?? episode.startedAt else { return nil }
+                return (ref, abs(aired.timeIntervalSince(savedAt)))
+            }
+            .filter { $0.gap <= 60 * 60 * 24 }
+            .min { $0.gap < $1.gap }?
+            .ref
+    }
+
     func episode(ref: LotEpisodeRef) -> LotEpisode? {
         episodeDetails[ref.encoded]?.episode ?? known[ref.encoded]
     }

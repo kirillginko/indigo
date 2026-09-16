@@ -404,6 +404,42 @@ final class CrateService {
         if changed { save() }
     }
 
+    /// Points a kept live broadcast at the recording, once The Lot has one.
+    ///
+    /// Keeping a show while it is on air stores the station: `lot.live`, with
+    /// the on-air title, and the live HLS address as its playback. None of
+    /// that survives the show ending. The title names something no longer
+    /// broadcasting, the address plays whatever is on now, and the row opens
+    /// the shows directory because `lot.live` is not an episode handle.
+    ///
+    /// The same repair `migrateLegacyNTSBroadcast` does, on the same terms —
+    /// including dropping the live address even when there is no archive audio
+    /// yet. Playing nothing is better than playing a different show under the
+    /// name of the one that was kept.
+    func migrateLotLiveBroadcast(_ item: CrateItem, ref: LotEpisodeRef, media: MediaItem?) {
+        guard item.kind == .broadcast, item.providerID == LotProvider.providerID else { return }
+        item.showID = "lot.episode.\(ref.encoded)"
+        item.isLiveStream = false
+        item.playbackURLString = nil
+        item.embedProviderRaw = nil
+        if let media {
+            item.playbackURLString = media.playbackURL.absoluteString
+            item.embedProviderRaw = media.embedProvider?.rawValue
+            if let artwork = media.remoteArtworkURL?.absoluteString {
+                item.artworkURLString = artwork
+            }
+            if !media.genres.isEmpty { item.setGenres(media.genres) }
+            // The billing the listener kept is what they will recognise, so
+            // the title is left as it is. Only the subtitle moves: it was
+            // holding the station's name to mark this as a live snapshot, and
+            // now that the row points at a broadcast it can say when.
+            if let subtitle = media.subtitle, !subtitle.isEmpty {
+                item.showSubtitle = subtitle
+            }
+        }
+        save()
+    }
+
     func migrateLegacyNTSBroadcast(_ item: CrateItem, ref: NTSEpisodeRef, media: MediaItem?) {
         guard item.kind == .broadcast, item.providerID == NTSProvider.providerID else { return }
         item.showID = "nts.episode.\(ref.show)/\(ref.episode)"

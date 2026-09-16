@@ -444,7 +444,14 @@ nonisolated struct LotScheduleEntry: Identifiable, Hashable, Sendable {
 
     /// The Lot bills guest slots as "Residency with Guest"; the residency
     /// alone is what the shows directory is keyed by.
-    var showName: String {
+    var showName: String { Self.residency(in: title) }
+
+    /// The residency in a billing, without whoever is guesting on it.
+    ///
+    /// A static so a kept crate row can ask the same question of a title it
+    /// stored months ago, with no schedule entry to hand. See
+    /// `LotBrowseStore.archivedEpisode(matching:near:)`.
+    static func residency(in title: String) -> String {
         for separator in [" with ", " w/ ", " invites ", " presents "] {
             if let range = title.range(of: separator, options: .caseInsensitive) {
                 return String(title[title.startIndex..<range.lowerBound])
