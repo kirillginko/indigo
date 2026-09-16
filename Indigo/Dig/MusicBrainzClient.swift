@@ -210,8 +210,11 @@ nonisolated struct MusicBrainzClient: Sendable {
                 // One short retry keeps a transient throttle from turning a
                 // foreground page into a minute-long wait.
                 let backoff = UInt64(1 << attempt) * 1_000_000_000
-                await Trace.stage("mb.backoff", path) {
-                    try? await Task.sleep(nanoseconds: backoff)
+                // `try`, not `try?`. Swallowing the error would swallow
+                // cancellation with it, and a page closed mid-enrichment would
+                // go on retrying MusicBrainz behind it, seconds at a time.
+                try await Trace.stage("mb.backoff", path) {
+                    try await Task.sleep(nanoseconds: backoff)
                 }
             }
         }
