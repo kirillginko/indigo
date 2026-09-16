@@ -17,6 +17,23 @@ nonisolated struct RadioNeighborhoodEngine {
         self.context = context
     }
 
+    /// Fills the show's picture into its appearances, where they have none.
+    ///
+    /// Read whole and filtered here rather than asked of the store: an
+    /// equality `#Predicate` on `showID` would translate, but the table is
+    /// small, this runs once per episode read, and `StorePredicateTests` is a
+    /// standing reminder of what a predicate on the wrong attribute costs.
+    ///
+    /// Never overwrites one already there, so a station that changes its
+    /// artwork does not rewrite what the listener saw.
+    private func adoptArtwork(from detail: NTSEpisodeDetail, showID: String) {
+        guard let artwork = detail.summary.artworkURL?.absoluteString else { return }
+        for row in (try? context.fetch(FetchDescriptor<MediaAppearance>())) ?? []
+        where row.showID == showID && row.artworkURLString == nil {
+            row.artworkURLString = artwork
+        }
+    }
+
     /// Promotes a published NTS tracklist into canonical recordings and
     /// appearances. Loading the same episode again is idempotent: RecordingStore
     /// reuses recordings and collapses the matching appearance.
@@ -25,6 +42,18 @@ nonisolated struct RadioNeighborhoodEngine {
         let showID = detail.summary.id
         let broadcastAt = detail.summary.broadcastAt ?? Date()
         let matchCounts = Dictionary(grouping: detail.tracklist, by: matchKey).mapValues(\.count)
+
+        // The picture first, and for rows that are already here.
+        //
+        // The loop below skips every entry it has ingested before — which,
+        // the second time an episode is read, is the whole tracklist. So an
+        // appearance written before appearances kept a picture is never
+        // reached by it, and could never gain one: reading the episode again
+        // did nothing at all. That is not the loop's fault, it is idempotent
+        // on purpose; the picture simply does not belong to an entry. It
+        // belongs to the show, so it is written here, once, for every row of
+        // it that has none.
+        adoptArtwork(from: detail, showID: showID)
 
         for entry in detail.tracklist {
             if recording(for: entry, in: detail) != nil { continue }
@@ -52,6 +81,7 @@ nonisolated struct RadioNeighborhoodEngine {
                     stationName: "NTS",
                     showTitle: detail.summary.name,
                     showID: showID,
+                    artworkURL: detail.summary.artworkURL,
                     heardAt: broadcastAt.addingTimeInterval(offset ?? 0),
                     offsetSeconds: offset,
                     isLive: false,

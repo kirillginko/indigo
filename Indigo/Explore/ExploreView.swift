@@ -174,6 +174,14 @@ struct ExploreView: View {
             }
         }
         if showCrate {
+            // Worked out once for the whole block rather than per card.
+            //
+            // As a computed property read inside the loop it was a fetch of
+            // the crate and a pass over the entire library *for every tile* —
+            // on the main actor, on a canvas that redraws whenever anything
+            // moves. It cost five seconds of main-actor time in a test that
+            // never opens this page, which is how it was caught.
+            let artworkKeys = localArtworkKeys
             ForEach(Array(crateSections.enumerated()), id: \.element.id) { sectionIndex, section in
                 let top = crateSectionTop(sectionIndex, sections: crateSections,
                                           start: crateTop, in: size)
@@ -185,6 +193,13 @@ struct ExploreView: View {
                         MapLabel(item.displayTitle, item.displaySubtitle ?? item.sourceLine,
                                  MosaicColor.green, item.artworkURL, stableSeed(item.displayTitle),
                                  cardWidth(in: size))
+                            // A kept local file has no address, only a key
+                            // into the artwork store — so without this a
+                            // record the listener owns drew a block while the
+                            // same record two rows down, in "Your library",
+                            // showed its sleeve. The crate page has always
+                            // passed it; this card was the one that did not.
+                            .localArtwork(artworkKeys[item.id])
                     }.buttonStyle(ExploreCardButtonStyle())
                         .contextMenu { Button("Open details") { open(item) } }
                         .graphNode("crate.\(item.id)", section: section.id)
@@ -325,6 +340,30 @@ struct ExploreView: View {
     private func artwork(for suggestion: ExploreSuggestion) -> URL? {
         suggestion.node.artworkURL
             ?? (suggestion.node.kind == .artist ? dig.portraitURL(for: suggestion.node.title) : nil)
+    }
+
+    /// Sleeves for the kept rows that are local files, by crate row.
+    ///
+    /// Built from `tracks`, which this view already holds, rather than by
+    /// fetching per card: the crate page can afford a query apiece because it
+    /// draws a list once, and this canvas is rebuilt whenever anything on it
+    /// moves. Only the paths actually on screen are looked up, so the pass is
+    /// over the library once and the dictionary is a handful of entries.
+    private var localArtworkKeys: [UUID: String] {
+        var wanted: [String: UUID] = [:]
+        for item in crateItems {
+            guard let path = item.recording?.sources
+                .first(where: { $0.kind == AudioSourceKind.localFile })?.identifier
+            else { continue }
+            wanted[path] = item.id
+        }
+        guard !wanted.isEmpty else { return [:] }
+        var found: [UUID: String] = [:]
+        for track in tracks {
+            guard let itemID = wanted[track.path], let key = track.artworkKey else { continue }
+            found[itemID] = key
+        }
+        return found
     }
 
     private func columnCount(in size: CGSize) -> Int { max(2, min(4, Int(size.width / 430))) }

@@ -53,7 +53,15 @@ final class DigStore {
     /// without their change in it — a subtle, occasional wrongness that would
     /// be miserable to track down. Saving nothing costs nothing.
     /// How long a burst of writes counts as one change.
-    @ObservationIgnored private static let changeWindow = Duration.milliseconds(400)
+    /// Settable for the test that counts announcements.
+    ///
+    /// That test fires six writes and expects them to land inside one window.
+    /// At 400ms of wall clock it passed alone and failed intermittently in the
+    /// full suite, where parallel tests stretched the burst past the window —
+    /// and each new test added anywhere made it worse. What it checks is the
+    /// collapsing, not the number, so it widens the window rather than racing
+    /// it.
+    @ObservationIgnored var changeWindow = Duration.milliseconds(400)
     @ObservationIgnored private var pendingChange: Task<Void, Never>?
     @ObservationIgnored private var lastChangeAt: ContinuousClock.Instant?
 
@@ -72,7 +80,7 @@ final class DigStore {
     /// collapsed into a single announcement at the end of the burst.
     private func announceChange() {
         let now = ContinuousClock.now
-        guard let last = lastChangeAt, now - last < Self.changeWindow else {
+        guard let last = lastChangeAt, now - last < self.changeWindow else {
             pendingChange?.cancel()
             pendingChange = nil
             lastChangeAt = now
@@ -80,8 +88,9 @@ final class DigStore {
             return
         }
         pendingChange?.cancel()
+        let window = changeWindow
         pendingChange = Task { [weak self] in
-            try? await Task.sleep(for: Self.changeWindow)
+            try? await Task.sleep(for: window)
             guard !Task.isCancelled, let self else { return }
             self.pendingChange = nil
             self.lastChangeAt = .now
@@ -1168,6 +1177,24 @@ final class DigStore {
     /// nothing at all — a set of recommendations that rearranges itself while
     /// somebody is reading it is worse than one that is a quarter of an hour
     /// out of date.
+    /// Works EXPLORE's answer out again, for when what it was built from has
+    /// changed without the crate moving — a show gaining its picture, say.
+    ///
+    /// Offers are kept for fifteen minutes and persisted across launches, so a
+    /// correction that lands in the store otherwise goes unseen: the page has
+    /// its answer and nothing asks for another.
+    ///
+    /// It rebuilds rather than merely marking the answer stale. Staleness is
+    /// only consulted when somebody asks, and nobody asks while the page is
+    /// already open — which is exactly when this is called. The persisted copy
+    /// is deliberately left alone until the new one is ready: it is what the
+    /// next launch draws before anything is recomputed, and clearing it traded
+    /// a page with a stale picture for a page with nothing on it.
+    func invalidateExploreOffers() async {
+        offersBuiltAt = .distantPast
+        await refreshExploreOffers(crateRevision: offersCrateRevision)
+    }
+
     func refreshExploreOffers(crateRevision: Int) async {
         let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
         guard offersCrateRevision != crateRevision || exploreOffers.isEmpty || isStale

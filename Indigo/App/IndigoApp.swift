@@ -113,6 +113,21 @@ struct IndigoApp: App {
                             await BandcampEnricher.repairSelfPublishedLabels(
                                 in: Persistence.container
                             )
+                            // Pictures for the shows EXPLORE offers, which
+                            // the appearance rows never kept. Its own task
+                            // because it is paced across half a minute of
+                            // requests and nothing below should wait on it.
+                            Task {
+                                let gained = await ShowArtworkBackfill.run(
+                                    using: browse, context: Persistence.container.mainContext
+                                )
+                                // The cards are drawn from an answer kept for
+                                // fifteen minutes and persisted across
+                                // launches, so a picture that arrives after it
+                                // was worked out would not be seen until it
+                                // expired. See `invalidateExploreOffers`.
+                                if gained > 0 { await dig.invalidateExploreOffers() }
+                            }
                             // And the Discogs "no picture" pictures, for the
                             // same reasons and on the same terms. See
                             // `SpacerSweep`.

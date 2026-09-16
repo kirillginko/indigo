@@ -51,9 +51,10 @@ nonisolated struct ShowSuggestionEngine {
 
         var found: [ExploreSuggestion] = []
         for show in shows.values {
-            let node = MusicNode.broadcast(
+            var node = MusicNode.broadcast(
                 providerID: show.providerID, showID: show.showID, title: show.title
             )
+            node.artworkURL = show.artworkURL
             guard node.destination != nil else { continue }
             guard !known.contains(node.id), !log.hasEncountered(node) else { continue }
 
@@ -118,6 +119,9 @@ nonisolated struct ShowSuggestionEngine {
         let showID: String
         var title: String
         var artists: Set<String> = []
+        /// The first picture any of these appearances carried. A show has one
+        /// cover however many tracks were logged off it.
+        var artworkURL: URL?
     }
 
     /// Every broadcast Indigo has a tracklist for, and who was on it.
@@ -134,6 +138,7 @@ nonisolated struct ShowSuggestionEngine {
                 entry.artists.insert(name)
             }
             if entry.title.isEmpty, let title = appearance.showTitle { entry.title = title }
+            if entry.artworkURL == nil { entry.artworkURL = appearance.artworkURL }
             byShow[key] = entry
         }
         // A show nobody could name a single track from says nothing about

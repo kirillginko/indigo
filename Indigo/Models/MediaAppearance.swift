@@ -50,6 +50,18 @@ nonisolated final class MediaAppearance {
     /// Provider-defined handle for that broadcast, so DIG can navigate back
     /// to it — an NTS "show/episode" pair, a Kiosk episode slug.
     var showID: String?
+    /// The picture the station published for this broadcast.
+    ///
+    /// Kept on the appearance because it is the only local record of the show.
+    /// EXPLORE offers shows worked out from these tracklists — see
+    /// `ShowSuggestionEngine` — and without it every one of them drew a
+    /// placeholder, on a page whose whole argument is "here is something worth
+    /// putting on".
+    ///
+    /// Nil for rows written before it existed. Those fill in the next time the
+    /// station's tracklist is read: see the merge in
+    /// `RecordingStore.note(appearance:on:)`.
+    var artworkURLString: String?
 
     /// Wall-clock moment it was heard.
     var heardAt: Date
@@ -77,6 +89,7 @@ nonisolated final class MediaAppearance {
         stationName: String? = nil,
         showTitle: String? = nil,
         showID: String? = nil,
+        artworkURL: URL? = nil,
         heardAt: Date = Date(),
         offsetSeconds: Double? = nil,
         endedAt: Date? = nil,
@@ -91,6 +104,7 @@ nonisolated final class MediaAppearance {
         self.stationName = stationName
         self.showTitle = showTitle
         self.showID = showID
+        self.artworkURLString = artworkURL?.absoluteString
         self.heardAt = heardAt
         self.offsetSeconds = offsetSeconds
         self.endedAt = endedAt
@@ -108,6 +122,8 @@ nonisolated final class MediaAppearance {
     // MARK: Display
 
     /// "NTS / Moxie", "Kiosk Radio / Slagwerk", "Local Library".
+    var artworkURL: URL? { artworkURLString.flatMap(URL.init(string:)) }
+
     var sourceLine: String {
         let left = stationName ?? providerDisplayName
         guard let showTitle, !showTitle.isEmpty else { return left }

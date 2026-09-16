@@ -8,6 +8,7 @@
 // these tables.
 
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
+import { storeReleasePayload } from "./release_cache.ts";
 import { normalizeName } from "./normalize.ts";
 
 const PROVIDER = "discogs";
@@ -493,13 +494,19 @@ export async function cacheDiscogsRelease(
 
   const payload = await response.json();
 
+  // The document to Storage, and a row that says where (0036). Uploaded first
+  // and awaited, so a failure throws before any row can point at nothing, and
+  // the queue's backoff brings the job round again.
+  const payloadPath = await storeReleasePayload(supabase, releaseID, payload);
+
   const written = await supabase
     .from("metadata_cache")
     .upsert({
       provider: PROVIDER,
       resource_type: "release",
       resource_id: releaseID,
-      payload,
+      payload: null,
+      payload_path: payloadPath,
       fetched_at: new Date().toISOString(),
       expires_at: new Date(Date.now() + RELEASE_CACHE_TTL_SECONDS * 1000).toISOString(),
     }, { onConflict: "provider,resource_type,resource_id" });
