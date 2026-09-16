@@ -35,6 +35,17 @@ enum Persistence {
 
     static let container: ModelContainer = makeContainer()
 
+    /// Whether this process is a test host rather than the app somebody is
+    /// using.
+    ///
+    /// The XCTest host *is* Indigo, with the listener's real container, so
+    /// anything the app does at launch a test run does to their data. One-shot
+    /// repairs are gated on this. `Trace` reads the same variable to decide
+    /// where to write.
+    static var isRunningTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     private static func makeContainer() -> ModelContainer {
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {

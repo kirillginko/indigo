@@ -100,10 +100,31 @@ struct IndigoApp: App {
                     // own label. Off the main actor and off the critical path:
                     // nothing below waits for it, and it finds nothing to do
                     // on every launch after the first.
-                    Task.detached {
-                        await BandcampEnricher.repairSelfPublishedLabels(
-                            in: Persistence.container
-                        )
+                    // Not under test, where this window is the test host and
+                    // `Persistence.container` is the listener's real store.
+                    //
+                    // Found the hard way: running the suite swept 109 artists
+                    // and 1,484 portrait rows in a live store, because the
+                    // XCTest host launches this app and therefore this task.
+                    // A repair that is correct is still not something a test
+                    // run should do to somebody's data.
+                    if !Persistence.isRunningTests {
+                        Task.detached {
+                            await BandcampEnricher.repairSelfPublishedLabels(
+                                in: Persistence.container
+                            )
+                            // And the Discogs "no picture" pictures, for the
+                            // same reasons and on the same terms. See
+                            // `SpacerSweep`.
+                            let swept = await SpacerSweep.run(in: Persistence.container)
+                            if !swept.isEmpty {
+                                Trace.note(
+                                    "spacer.sweep artists=\(swept.artists) "
+                                        + "portraits=\(swept.portraits) "
+                                        + "releases=\(swept.releases)"
+                                )
+                            }
+                        }
                     }
                     library.restore()
                     nts.startPolling()

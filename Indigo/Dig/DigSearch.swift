@@ -417,7 +417,10 @@ extension DigSearchIndex {
     private static func addDugArtists(to add: (Entry) -> Void, context: ModelContext) {
         for artist in (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? [] {
             guard ArtistName.isRealArtist(artist.name) else { continue }
-            let picture = artist.thumbnailURLString?.nilIfEmpty ?? artist.imageURLString?.nilIfEmpty
+            // Filtered: see `DiscogsArtist.imageURL`. A search result carrying
+            // a spacer draws a blank square in the results list.
+            let picture = DiscogsClient.usableImage(artist.thumbnailURLString)?.nilIfEmpty
+                ?? DiscogsClient.usableImage(artist.imageURLString)?.nilIfEmpty
             add(Entry(
                 kind: .artist,
                 key: RecordingKey.normalizeArtist(artist.name),
@@ -458,8 +461,7 @@ extension DigSearchIndex {
                 title: release.title,
                 detail: [credit, year].compactMap { $0?.nilIfEmpty }.joined(separator: " · ")
                     .nilIfEmpty,
-                artworkURL: (release.thumbnailURLString?.nilIfEmpty
-                    ?? release.imageURLString?.nilIfEmpty).flatMap(URL.init(string:)),
+                artworkURL: release.thumbnailURL ?? release.imageURL,
                 destination: .digRelease(id: release.discogsID, title: release.title),
                 opensByIdentity: true,
                 closeness: dug
