@@ -63,12 +63,7 @@ struct ExploreView: View {
         let inverseInk = Color.black
         return VStack(alignment: .leading, spacing: 15) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Start your search here").font(Typeface.display(40)).tracking(-0.7)
-                    Text(kept.first.map { "Because you crated \($0.displayTitle)" }
-                         ?? "Recommendations shaped by your crate and local library")
-                        .microLabel(1.05, size: 9)
-                }
+                Text("Explore").font(Typeface.display(40)).tracking(-0.7)
                 Spacer()
                 Button("Crate · \(kept.count)") { appState.select(.crate) }
                     .buttonStyle(MapHeaderButtonStyle(ink: ink))
