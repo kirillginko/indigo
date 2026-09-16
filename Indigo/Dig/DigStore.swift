@@ -53,7 +53,15 @@ final class DigStore {
     /// without their change in it — a subtle, occasional wrongness that would
     /// be miserable to track down. Saving nothing costs nothing.
     /// How long a burst of writes counts as one change.
-    @ObservationIgnored private static let changeWindow = Duration.milliseconds(400)
+    /// Settable for the test that counts announcements.
+    ///
+    /// That test fires six writes and expects them to land inside one window.
+    /// At 400ms of wall clock it passed alone and failed intermittently in the
+    /// full suite, where parallel tests stretched the burst past the window —
+    /// and each new test added anywhere made it worse. What it checks is the
+    /// collapsing, not the number, so it widens the window rather than racing
+    /// it.
+    @ObservationIgnored var changeWindow = Duration.milliseconds(400)
     @ObservationIgnored private var pendingChange: Task<Void, Never>?
     @ObservationIgnored private var lastChangeAt: ContinuousClock.Instant?
 
@@ -72,7 +80,7 @@ final class DigStore {
     /// collapsed into a single announcement at the end of the burst.
     private func announceChange() {
         let now = ContinuousClock.now
-        guard let last = lastChangeAt, now - last < Self.changeWindow else {
+        guard let last = lastChangeAt, now - last < self.changeWindow else {
             pendingChange?.cancel()
             pendingChange = nil
             lastChangeAt = now
@@ -80,8 +88,9 @@ final class DigStore {
             return
         }
         pendingChange?.cancel()
+        let window = changeWindow
         pendingChange = Task { [weak self] in
-            try? await Task.sleep(for: Self.changeWindow)
+            try? await Task.sleep(for: window)
             guard !Task.isCancelled, let self else { return }
             self.pendingChange = nil
             self.lastChangeAt = .now

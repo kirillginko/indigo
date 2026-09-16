@@ -332,6 +332,9 @@ final class PortraitInvalidationTests: XCTestCase {
         try context.save()
 
         let dig = DigStore(context: context)
+        // Wide enough that the burst cannot outrun it on a busy machine. The
+        // behaviour under test is that a burst collapses, not how quickly.
+        dig.changeWindow = .seconds(3)
         let before = dig.revision
 
         // Six writes, back to back, the way an enrichment arrives.
@@ -350,8 +353,15 @@ final class PortraitInvalidationTests: XCTestCase {
             "The first write is announced at once; the rest of the burst waits for it"
         )
 
-        // And the burst is not simply dropped — it lands once, after.
-        try await Task.sleep(for: .milliseconds(900))
+        // And the burst is not simply dropped — it lands once, after. Polled
+        // rather than slept, so the test waits as long as the window and no
+        // longer.
+        let deadline = ContinuousClock.now + .seconds(6)
+        while dig.revision - before < 2, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        // A beat more, so a second trailing announcement would be caught too.
+        try await Task.sleep(for: .milliseconds(200))
         XCTAssertEqual(
             dig.revision - before, 2,
             "One trailing announcement for everything that arrived during the burst"
