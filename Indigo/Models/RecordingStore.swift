@@ -167,6 +167,14 @@ nonisolated struct RecordingStore {
             if open.confidence ?? 0 < appearance.confidence ?? 0 {
                 open.confidence = appearance.confidence
             }
+            // Filled in rather than left as it was, so a row written before
+            // appearances carried a picture gains one the next time the
+            // station's tracklist is read. Only when there is none: a station
+            // that has since changed its artwork should not overwrite what the
+            // listener saw.
+            if open.artworkURLString == nil, let found = appearance.artworkURLString {
+                open.artworkURLString = found
+            }
             return open
         }
         context.insert(appearance)

@@ -1168,6 +1168,24 @@ final class DigStore {
     /// nothing at all — a set of recommendations that rearranges itself while
     /// somebody is reading it is worse than one that is a quarter of an hour
     /// out of date.
+    /// Works EXPLORE's answer out again, for when what it was built from has
+    /// changed without the crate moving — a show gaining its picture, say.
+    ///
+    /// Offers are kept for fifteen minutes and persisted across launches, so a
+    /// correction that lands in the store otherwise goes unseen: the page has
+    /// its answer and nothing asks for another.
+    ///
+    /// It rebuilds rather than merely marking the answer stale. Staleness is
+    /// only consulted when somebody asks, and nobody asks while the page is
+    /// already open — which is exactly when this is called. The persisted copy
+    /// is deliberately left alone until the new one is ready: it is what the
+    /// next launch draws before anything is recomputed, and clearing it traded
+    /// a page with a stale picture for a page with nothing on it.
+    func invalidateExploreOffers() async {
+        offersBuiltAt = .distantPast
+        await refreshExploreOffers(crateRevision: offersCrateRevision)
+    }
+
     func refreshExploreOffers(crateRevision: Int) async {
         let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
         guard offersCrateRevision != crateRevision || exploreOffers.isEmpty || isStale
