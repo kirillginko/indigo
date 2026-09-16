@@ -224,7 +224,18 @@ nonisolated struct SceneEngine {
         /// Safe to hold because the caches beside it are: both are thrown away
         /// together when a write moves the generation. See `DigEngine`.
         var signatures: [String: [String]] = [:]
+        /// Whether this engine's fold came from the last one whole. Only a
+        /// test reads it. See `reusedInheritedFold`.
+        var reusedInheritedFold = false
     }
+
+    /// Whether this engine took the last generation's fold rather than
+    /// reading the tables again.
+    ///
+    /// Only a test reads it, for the reason `GraphStore.builtFromInheritedTables`
+    /// exists: an inherited fold and a fresh one answer identically and
+    /// differ only in what they cost.
+    var reusedInheritedFold: Bool { shared.reusedInheritedFold }
 
     private var caches: SceneCaches {
         if let existing = shared.caches { return existing }
@@ -232,6 +243,7 @@ nonisolated struct SceneEngine {
         // answers are this engine's answers.
         if let inherited, inherited.stillDescribes(context) {
             shared.caches = inherited
+            shared.reusedInheritedFold = true
             return inherited
         }
         let fresh = Trace.step("scene.tables") {
@@ -243,7 +255,17 @@ nonisolated struct SceneEngine {
 
     init(context: ModelContext, inheriting previous: SceneEngine? = nil) {
         self.context = context
-        self.inherited = previous?.shared.caches
+        // The offer passes through a generation that never asked for a scene.
+        //
+        // The same break `GraphStore.init` describes, on the same path:
+        // `DigWorker.refresh` builds one of these on every generation, and a
+        // generation that only walked the graph leaves it unassembled. Taking
+        // `caches` alone meant that engine handed on nothing and the next
+        // scene was folded from seven whole tables. Holding the offer open
+        // until somebody takes it keeps the chain intact — and it stays
+        // correct either way, because `stillDescribes` is what decides
+        // whether an inherited fold is still the right answer.
+        self.inherited = previous?.shared.caches ?? previous?.inherited
     }
 
     /// How many artists a place needs before it can be somewhere to head into.
