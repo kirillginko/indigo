@@ -123,6 +123,7 @@ struct ArtistDigView: View {
                             remoteURL: profile.coverURL,
                             previewRemoteURL: profile.previewURL,
                             side: 220, glyphScale: 0.24,
+                            placeholder: .mosaic,
                             showsGround: false
                         )
                             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

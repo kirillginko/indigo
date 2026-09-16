@@ -67,7 +67,7 @@ private struct ArtistRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                ArtworkView(localKey: artist.artworkKey, side: 34)
+                ArtworkView(localKey: artist.artworkKey, side: 34, placeholder: .mosaic)
                     .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
                 Text(artist.name)
                     .font(Typeface.body(13.5, weight: .medium))

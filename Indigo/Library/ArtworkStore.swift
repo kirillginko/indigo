@@ -355,17 +355,39 @@ struct ArtworkView: View {
             }
     }
 
+    /// What the block is built from — whichever name for this subject is to
+    /// hand, in the order they are stable.
+    ///
+    /// A tile keeps its block while a picture loads and would keep it if the
+    /// picture never arrives, so the identity must not change between those
+    /// two moments: `localKey` and the addresses are all fixed for the life of
+    /// the subject, and `mark` is its name.
+    private var mosaicIdentity: String {
+        localKey
+            ?? remoteURL?.absoluteString
+            ?? previewRemoteURL?.absoluteString
+            ?? markURL?.absoluteString
+            ?? mark
+            ?? ""
+    }
+
     @ViewBuilder
     private var placeholderGlyph: some View {
         // The two common cases size themselves, so the overwhelming majority
         // of tiles cost no layout pass at all. Only the text mark — a station
         // with no logo, which is rare — still needs to measure.
-        if remoteURL != nil || previewRemoteURL != nil {
-            // A picture is on its way, so nothing is drawn over the ground.
+        if placeholder == .mosaic {
+            // Drawn while a picture is loading as well as when there is none.
             //
-            // The glyph and the white-label mark both say "this has no
-            // artwork", and saying it while the artwork is in flight puts a
-            // wrong answer between the empty tile and the right one.
+            // The glyph and the white-label mark are both claims — "this has
+            // no artwork" — so showing either one over a picture still in
+            // flight puts a wrong answer between the empty tile and the right
+            // one, and the case below still returns `Color.clear` for them.
+            // A mosaic claims nothing: it is a block of colour standing where
+            // the picture goes, so it is as true at the moment of asking as
+            // it is once the answer is no.
+            ArtworkMosaic(identity: mosaicIdentity)
+        } else if remoteURL != nil || previewRemoteURL != nil {
             Color.clear
         } else if placeholder == .whiteLabel, mark?.isEmpty ?? true {
             WhiteLabelMark()
@@ -499,6 +521,15 @@ struct ArtworkView: View {
 
 /// What to draw in place of a picture.
 nonisolated enum ArtworkPlaceholder: Hashable, Sendable {
+    /// A block of colour built from the subject's own identity, shown both
+    /// when there is no picture and while one is still on its way.
+    ///
+    /// For **people** — an artist, a resident, a DJ — and deliberately not for
+    /// records. A sleeve that never arrives is telling you something about the
+    /// pressing, which is what `whiteLabel` is for; a missing photograph of a
+    /// person is telling you nothing at all, so a block that is at least
+    /// recognisably *theirs* beats an empty square. See `ArtworkMosaic`.
+    case mosaic
     /// The neutral stack-of-records glyph.
     case glyph
     /// A blank record label. For releases, where the absence of a sleeve is

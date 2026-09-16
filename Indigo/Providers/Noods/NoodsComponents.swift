@@ -92,7 +92,7 @@ struct NoodsResidentTile: View {
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 9) {
-                ArtworkView(remoteURL: resident.artworkURL)
+                ArtworkView(remoteURL: resident.artworkURL, placeholder: .mosaic)
                     .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
                     .overlay {
                         if isHovering { Rectangle().fill(Palette.inverse.opacity(0.12)) }

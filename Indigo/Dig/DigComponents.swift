@@ -121,7 +121,8 @@ struct ConnectionExplainer: View {
                 Rectangle()
                     .fill(isHovering ? Palette.accent : Palette.outline)
                     .frame(width: 3, height: 38)
-                ArtworkView(remoteURL: artist.imageURL ?? portrait, side: 38, glyphScale: 0.3)
+                ArtworkView(remoteURL: artist.imageURL ?? portrait, side: 38, glyphScale: 0.3,
+                            placeholder: .mosaic)
                     .overlay(Rectangle().strokeBorder(
                         isHovering ? Palette.accent : Palette.outline, lineWidth: Metrics.hairline
                     ))
