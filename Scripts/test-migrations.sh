@@ -99,6 +99,14 @@ run -f "$ROOT/supabase/migrations/0023_keep_the_queue_private.sql" >/dev/null
 run -c "do \$\$ begin if has_function_privilege('anon', 'public.enqueue_enrichment_job(text, text, text, jsonb, int, text, uuid)', 'execute') then raise exception 'the app key can still fill the queue'; end if; end \$\$;"
 echo "    a queue the app key could fill no longer can be"
 
+# As a project from before 0033: its views reading as their owner, which is a
+# hole in RLS whatever the grants happen to be. Applying 0033 again has to
+# close both of them, and has to leave the app's key unable to read either.
+run -c "alter view public.split_artist_halves reset (security_invoker); alter view public.artists_that_are_credits reset (security_invoker); grant select on public.split_artist_halves to anon;"
+run -f "$ROOT/supabase/migrations/0033_a_view_reads_as_whoever_asked.sql" >/dev/null
+run -c "do \$\$ declare v text; begin foreach v in array array['split_artist_halves', 'artists_that_are_credits'] loop if not exists (select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname = v and c.reloptions @> array['security_invoker=on']) then raise exception 'view % still reads as its owner', v; end if; if has_table_privilege('anon', 'public.' || v, 'select') then raise exception 'the app key can still read %', v; end if; end loop; end \$\$;"
+echo "    views read as whoever asked, and not for the app key"
+
 echo "· checks"
 run -f "$ROOT/supabase/tests/radio_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/scene_smoke.sql" | sed 's/^/    /'
