@@ -138,7 +138,34 @@ begin
 end $$;
 
 -- Rebuilding is a function of the evidence, so twice must equal once.
+--
+-- And equal without rewriting anything (0037). An update is a new physical
+-- row, so an edge that moved its `ctid` was written again; the hourly rebuild
+-- used to rewrite every edge this way and hold the table at twice its size.
+create temp table edges_before as
+    select id, ctid::text as at from public.music_relationships where source like 'radio%';
 select public.rebuild_radio_dig_edges();
+do $$
+declare n int;
+begin
+    select count(*) into n
+    from public.music_relationships mr join edges_before b on b.id = mr.id
+    where mr.ctid::text <> b.at;
+    if n <> 0 then
+        raise exception 'rebuilding unchanged evidence rewrote % edges', n;
+    end if;
+
+    -- The other half: a condition that skipped real changes would pass the
+    -- check above and be wrong. An edge whose stored evidence disagrees with
+    -- the evidence has to be corrected.
+    update public.music_relationships set evidence_count = 999
+    where id = (select id from edges_before limit 1);
+    perform public.rebuild_radio_dig_edges();
+    if exists (select 1 from public.music_relationships where evidence_count = 999) then
+        raise exception 'rebuilding did not correct an edge whose evidence had changed';
+    end if;
+end $$;
+drop table edges_before;
 do $$
 declare n int;
 begin
