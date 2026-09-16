@@ -44,13 +44,17 @@ nonisolated struct MetadataRepository: Sendable {
         static let liveShow: TimeInterval = 60
     }
 
+    /// A row carries its payload inline or says where it went. Discogs releases
+    /// moved to Storage in 0036; searches, shelves and NTS stayed inline.
     private struct CacheRow: Decodable {
-        let payload: AnyJSON
+        let payload: AnyJSON?
+        let payloadPath: String?
         let fetchedAt: Date
         let expiresAt: Date?
 
         enum CodingKeys: String, CodingKey {
             case payload
+            case payloadPath = "payload_path"
             case fetchedAt = "fetched_at"
             case expiresAt = "expires_at"
         }
@@ -61,14 +65,108 @@ nonisolated struct MetadataRepository: Sendable {
     /// read by one.
     private struct KeyedCacheRow: Decodable {
         let resourceID: String
-        let payload: AnyJSON
+        let payload: AnyJSON?
+        let payloadPath: String?
         let fetchedAt: Date
 
         enum CodingKeys: String, CodingKey {
             case resourceID = "resource_id"
             case payload
+            case payloadPath = "payload_path"
             case fetchedAt = "fetched_at"
         }
+    }
+
+    // MARK: - Payloads kept in Storage
+
+    /// The bucket 0036 keeps release documents in.
+    static let cacheBucket = "catalog-cache"
+
+    /// Reads one stored object by its key. A property so a test can stand in
+    /// for the network; the app uses `fetchFromStorage`.
+    var fetchStoredObject: @Sendable (String) async throws -> Data = MetadataRepository.fetchFromStorage
+
+    /// The public URL, straight to the CDN: the bucket is public, as the table
+    /// it replaced was readable by this key, so there is no signing round trip.
+    static func storedObjectURL(forPath path: String) -> URL? {
+        guard !path.isEmpty, let base = SupabaseConfiguration.url else { return nil }
+        return base
+            .appendingPathComponent("storage/v1/object/public")
+            .appendingPathComponent(cacheBucket)
+            .appendingPathComponent(path)
+    }
+
+    @Sendable static func fetchFromStorage(_ path: String) async throws -> Data {
+        guard let url = storedObjectURL(forPath: path) else { throw URLError(.badURL) }
+        let request = URLRequest(url: url, timeoutInterval: 10)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        return data
+    }
+
+    /// The JSON a row stands for, wherever it is kept.
+    ///
+    /// Nil when there is none to be had — no payload, or an object that will
+    /// not load — which every caller already treats as a miss and answers by
+    /// fetching again. A missing object is therefore a slower page, never a
+    /// broken one.
+    func payloadData(inline: AnyJSON?, path: String?) async -> Data? {
+        if let inline {
+            if case .null = inline {} else { return try? AnyJSON.encoder.encode(inline) }
+        }
+        guard let path, !path.isEmpty else { return nil }
+        return try? await fetchStoredObject(path)
+    }
+
+    /// Payloads for many rows, keyed by id, skipping any that cannot be read or
+    /// decoded.
+    ///
+    /// The batched read was one round trip for a whole artist page — the lever
+    /// that made the cache worth asking at all — and moving releases to Storage
+    /// turns it into one request per release. So those are made in parallel, a
+    /// few at a time, and inline rows are decoded without waiting on them.
+    func resolve<Payload: Decodable & Sendable>(
+        _ type: Payload.Type,
+        rows: [(id: String, inline: AnyJSON?, path: String?)],
+        concurrency: Int = 8
+    ) async -> [String: Payload] {
+        var found: [String: Payload] = [:]
+        var stored: [(id: String, path: String)] = []
+        for row in rows {
+            if let inline = row.inline, case .null = inline {
+                if let path = row.path { stored.append((row.id, path)) }
+            } else if let inline = row.inline {
+                if let data = try? AnyJSON.encoder.encode(inline),
+                   let value = try? AnyJSON.decoder.decode(Payload.self, from: data) {
+                    found[row.id] = value
+                }
+            } else if let path = row.path {
+                stored.append((row.id, path))
+            }
+        }
+        guard !stored.isEmpty else { return found }
+
+        await withTaskGroup(of: (String, Payload?).self) { group in
+            var pending = stored.makeIterator()
+            func startNext() -> Bool {
+                guard let next = pending.next() else { return false }
+                group.addTask {
+                    guard let data = try? await fetchStoredObject(next.path),
+                          let value = try? AnyJSON.decoder.decode(Payload.self, from: data)
+                    else { return (next.id, nil) }
+                    return (next.id, value)
+                }
+                return true
+            }
+            for _ in 0..<max(1, concurrency) where startNext() {}
+            while let (id, value) = await group.next() {
+                if let value { found[id] = value }
+                _ = startNext()
+            }
+        }
+        return found
     }
 
     /// The cached payload for a provider resource, fresh or not, or nil on a
@@ -83,7 +181,7 @@ nonisolated struct MetadataRepository: Sendable {
 
         let rows: [CacheRow] = try await client
             .from("metadata_cache")
-            .select("payload,fetched_at,expires_at")
+            .select("payload,payload_path,fetched_at,expires_at")
             .eq("provider", value: provider)
             .eq("resource_type", value: resourceType)
             .eq("resource_id", value: resourceID)
@@ -91,9 +189,10 @@ nonisolated struct MetadataRepository: Sendable {
             .execute()
             .value
 
-        guard let row = rows.first else { return nil }
+        guard let row = rows.first,
+              let data = await payloadData(inline: row.payload, path: row.payloadPath)
+        else { return nil }
 
-        let data = try AnyJSON.encoder.encode(row.payload)
         let value = try AnyJSON.decoder.decode(Payload.self, from: data)
         return CachedPayload(value: value, fetchedAt: row.fetchedAt, expiresAt: row.expiresAt)
     }
@@ -119,7 +218,7 @@ nonisolated struct MetadataRepository: Sendable {
 
         let rows: [KeyedCacheRow] = try await client
             .from("metadata_cache")
-            .select("resource_id,payload,fetched_at")
+            .select("resource_id,payload,payload_path,fetched_at")
             .eq("provider", value: provider)
             .eq("resource_type", value: resourceType)
             .in("resource_id", values: resourceIDs)
@@ -127,16 +226,14 @@ nonisolated struct MetadataRepository: Sendable {
             .value
 
         let oldest = Date().addingTimeInterval(-lifetime)
-        var found: [String: Payload] = [:]
-        for row in rows where row.fetchedAt > oldest {
-            // One row that will not decode is one release read from Discogs
-            // instead, not a page that fails.
-            guard let data = try? AnyJSON.encoder.encode(row.payload),
-                  let value = try? AnyJSON.decoder.decode(Payload.self, from: data)
-            else { continue }
-            found[row.resourceID] = value
-        }
-        return found
+        // One row that will not decode, or an object that will not load, is one
+        // release read from Discogs instead, not a page that fails.
+        return await resolve(
+            type,
+            rows: rows
+                .filter { $0.fetchedAt > oldest }
+                .map { (id: $0.resourceID, inline: $0.payload, path: $0.payloadPath) }
+        )
     }
 
     /// Asks the backend to fetch this resource upstream and store the result.

@@ -16,6 +16,7 @@ import {
   normalizeDiscogsSearch,
 } from "../_shared/discogs.ts";
 import { ingestNTSEpisode, ingestNTSShow } from "../_shared/nts.ts";
+import { readCachedPayload, storeReleasePayload } from "../_shared/release_cache.ts";
 
 // An allow-list, not a URL parameter. The request names a provider and a
 // resource; it never supplies a URL, so this cannot be turned into a proxy for
@@ -221,7 +222,7 @@ Deno.serve(async (req: Request) => {
     ? { data: null, error: null }
     : await supabase
     .from("metadata_cache")
-    .select("payload,expires_at")
+    .select("payload,payload_path,expires_at")
     .eq("provider", provider)
     .eq("resource_type", resourceType)
     .eq("resource_id", resourceID)
@@ -229,15 +230,22 @@ Deno.serve(async (req: Request) => {
 
   if (readError) return json({ error: "cache_read_failed", detail: readError.message }, 500);
 
-  if (cached && (!cached.expires_at || new Date(cached.expires_at) > new Date())) {
+  // A release's document lives in Storage now (0036); anything else is still
+  // inline. Null means the object could not be read, which is treated as a
+  // miss and fetched again rather than returned as nothing.
+  const cachedPayload = cached && (!cached.expires_at || new Date(cached.expires_at) > new Date())
+    ? await readCachedPayload(supabase, cached)
+    : null;
+
+  if (cached && cachedPayload !== null) {
     // Self-healing: a payload cached before this normalizer existed, or by a
     // run that failed partway, still has no rows behind it. Cheap to check —
     // one indexed lookup — and it means the normalized tables catch up without
     // anyone having to expire the cache by hand.
-    if (!(await isNormalized(supabase, provider, resourceType, resourceID, cached.payload))) {
-      await normalize(supabase, provider, resourceType, resourceID, cached.payload);
+    if (!(await isNormalized(supabase, provider, resourceType, resourceID, cachedPayload))) {
+      await normalize(supabase, provider, resourceType, resourceID, cachedPayload);
     }
-    return json(cached.payload);
+    return json(cachedPayload);
   }
 
   const headers: Record<string, string> = { "User-Agent": USER_AGENT, Accept: "application/json" };
@@ -282,13 +290,28 @@ Deno.serve(async (req: Request) => {
   // what it asked for, and making it wait for our bookkeeping was a third of
   // the time it spent here.
   const persist = (async () => {
+    // A Discogs release is kept in Storage and pointed at (0036); everything
+    // else stays inline. If the upload fails the row is not written at all —
+    // the caller already has its answer, and the next one simply fetches again.
+    const isRelease = provider === "discogs" && resourceType === "release";
+    let payloadPath: string | null = null;
+    if (isRelease) {
+      try {
+        payloadPath = await storeReleasePayload(supabase, resourceID, payload);
+      } catch (cause) {
+        console.error("cache_upload_failed", String(cause));
+        await normalize(supabase, provider, resourceType, resourceID, payload);
+        return;
+      }
+    }
     const { error: writeError } = await supabase
       .from("metadata_cache")
       .upsert({
         provider,
         resource_type: resourceType,
         resource_id: resourceID,
-        payload,
+        payload: isRelease ? null : payload,
+        payload_path: payloadPath,
         fetched_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + ttl * 1000).toISOString(),
       }, { onConflict: "provider,resource_type,resource_id" });

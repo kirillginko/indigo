@@ -22,6 +22,7 @@ import {
 } from "../_shared/discogs.ts";
 import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
+import { offloadReleasePayloads } from "../_shared/release_cache.ts";
 
 interface Job {
   id: string;
@@ -245,6 +246,21 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
       if (!discogsID) throw new Error("missing artist");
 
       await cacheDiscogsShelf(supabase, artistID, discogsID, Deno.env.get("DISCOGS_TOKEN"));
+      return;
+    }
+
+    case "offload_release_payloads": {
+      // One batch of the move out of the database (0036). A job that finds
+      // nothing left finishes at once, so over-enqueueing costs nothing.
+      const requested = Number(job.payload?.batch ?? 250);
+      const batch = Number.isFinite(requested) ? Math.min(Math.max(Math.trunc(requested), 1), 500) : 250;
+      const result = await offloadReleasePayloads(supabase, batch);
+      console.log("offload_release_payloads", JSON.stringify(result));
+      // Every upload failing is an outage, not a finished batch: throw, and
+      // let the queue's backoff try again rather than mark the job done.
+      if (result.offered > 0 && result.moved === 0) {
+        throw new Error(`no release in a batch of ${result.offered} could be moved`);
+      }
       return;
     }
 
