@@ -1,0 +1,28 @@
+-- An index nothing reads.
+--
+-- Measured on the live project, 2026-09-16: 467 MB of a 500 MB plan, with
+-- `music_relationships` the largest table at 164 MB. 91 MB of that was indexes,
+-- and one of them had never been used.
+--
+-- `music_relationships_confidence_idx` on (relationship_type, confidence),
+-- from 0003. Zero scans in twelve days of the app running, against sixty-one
+-- million on the edge index beside it. The only SQL that orders by confidence
+-- sorts by `evidence_count` first (0005), which this index cannot serve, and
+-- every other confidence sort happens in Swift after the rows arrive. It was
+-- 33 MB, and a write paid on every edge for a read that never happened.
+--
+-- An index holds no data, so this loses nothing. Should a query ever want it,
+-- the statement from 0003 puts it back.
+--
+-- Not done here, deliberately: the 39 MB of dead rows in the same table. That
+-- takes `vacuum full`, which cannot run inside a migration's transaction, and
+-- is run once by hand against the project.
+--
+-- Also not done: trimming the cached Discogs release payloads. Measured, it
+-- would have saved about 60 MB, but by permanently removing fields nothing
+-- reads *yet* -- per-track credits, master ids, release dates -- that would
+-- cost hours of Discogs rate budget to fetch back. The cache stays whole.
+--
+-- Safe to re-run.
+
+drop index if exists public.music_relationships_confidence_idx;
