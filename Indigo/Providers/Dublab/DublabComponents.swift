@@ -157,7 +157,7 @@ struct DublabDJTile: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            ArtworkView(remoteURL: dj.artworkURL)
+            ArtworkView(remoteURL: dj.artworkURL, placeholder: .mosaic)
                 .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
                 .overlay(alignment: .topLeading) {
                     if !dj.isActive, isHovering {

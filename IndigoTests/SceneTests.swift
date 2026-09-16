@@ -243,6 +243,40 @@ final class SceneTests: XCTestCase {
 
     /// And the other direction: a write that changes nothing scenes read must
     /// not be a reason to rebuild, or the inheritance buys nothing at all.
+    /// A generation that only walked the graph used to break the chain.
+    ///
+    /// `DigWorker.refresh` builds a scene engine on every generation, and an
+    /// artist page moves the generation several times while asking only for
+    /// the profile. Each of those engines was the one the next inherited
+    /// from, and none had read anything — so the next scene was folded from
+    /// seven whole tables. The trace showed it as `scene.tables` at 531ms in
+    /// the middle of an artist opening.
+    func testTheSceneFoldSurvivesAGenerationNobodyAsked() throws {
+        let artist = Artist(mbid: "mb-1", name: "Alpha", origin: "Berlin / Germany")
+        context.insert(artist)
+        let discogs = DiscogsArtist(nameKey: "alpha", discogsID: 1, name: "Alpha")
+        discogs.styles = ["Techno"]
+        context.insert(discogs)
+        try context.save()
+
+        let first = SceneEngine(context: context)
+        _ = first.scenes(forArtist: "Alpha")
+
+        // The generations an artist page spends walking the graph: built,
+        // never asked for a scene.
+        let unasked = SceneEngine(context: context, inheriting: first)
+
+        let next = SceneEngine(context: context, inheriting: unasked)
+        _ = next.scenes(forArtist: "Alpha")
+        XCTAssertTrue(next.reusedInheritedFold,
+                      "The fold should pass through an engine that never read anything")
+        XCTAssertEqual(
+            membership(next, over: ["Alpha"]),
+            membership(first, over: ["Alpha"]),
+            "And say the same thing it would have said cold"
+        )
+    }
+
     func testAWriteScenesDoNotReadIsInherited() throws {
         let artist = Artist(mbid: "mb-1", name: "Alpha", origin: "Berlin / Germany")
         context.insert(artist)

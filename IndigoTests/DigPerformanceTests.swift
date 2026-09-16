@@ -36,6 +36,15 @@ final class DigPerformanceTests: XCTestCase {
     /// A test host's `print` never reaches xcodebuild and its `Logger` lines
     /// do not reach the system log either, so a benchmark nobody can read is
     /// a benchmark nobody will run twice.
+    /// The stopwatch, for work that has to be awaited.
+    private func milliseconds2(_ body: () async -> Void) async -> Int {
+        let started = ContinuousClock.now
+        await body()
+        let elapsed = ContinuousClock.now - started
+        let parts = elapsed.components
+        return Int(parts.seconds * 1000 + parts.attoseconds / 1_000_000_000_000_000)
+    }
+
     private func record(_ line: String) {
         let path = (NSTemporaryDirectory() as NSString)
             .appendingPathComponent("indigo-bench.txt")
@@ -285,6 +294,44 @@ final class DigPerformanceTests: XCTestCase {
         )
     }
 
+    /// The sequence the app actually performs between launch and an artist
+    /// page, through the worker rather than through `GraphStore` directly.
+    ///
+    /// Something walks the graph early — EXPLORE, the crate, a stored answer
+    /// being read — and the tables are assembled then. By the time somebody
+    /// opens an artist the generation has moved several times, and the
+    /// generations in between asked for scenes or for nothing at all. Each of
+    /// those built a graph that never read a table, and the chain used to end
+    /// at the first of them: the artist page then paid for a cold read of six
+    /// tables while somebody watched an empty page.
+    func testTheWorkerKeepsItsTablesFromLaunchToAnArtistPage() async {
+        let worker = DigWorker(modelContainer: container)
+
+        // Something early walks the graph, as the app does on the way in.
+        let warm = await milliseconds2 {
+            _ = await worker.artistProfile(name: "Artist 0", mbid: nil, generation: 1)
+        }
+
+        // The generations in between: scenes, and writes nobody walked.
+        for generation in 2...5 {
+            _ = await worker.scenes(forArtist: "Artist 1", generation: generation)
+        }
+
+        // And now the artist page.
+        let opened = await milliseconds2 {
+            _ = await worker.artistProfile(name: "Artist 2", mbid: nil, generation: 6)
+        }
+        record("worker launch \(warm)ms, artist page after 4 generations \(opened)ms")
+        // Measured at 887ms with the chain intact and 3426ms without, on a
+        // machine also running the rest of this suite. The bound sits between
+        // the two rather than against the good number, so a loaded machine
+        // does not fail it and a real regression cannot pass it.
+        XCTAssertLessThan(
+            opened, 2000,
+            "An artist page must not re-read the tables the worker already had"
+        )
+    }
+
     /// What one redraw of the connection lanes costs.
     ///
     /// Every write during a page load moves `revision`, which re-runs the
@@ -381,6 +428,36 @@ final class DigPerformanceTests: XCTestCase {
         XCTAssertLessThan(
             second, 350,
             "A rebuild after a write must not re-read tables that did not change"
+        )
+    }
+
+    /// The sequence an artist page actually performs, which is not two
+    /// builds back to back.
+    ///
+    /// `DigWorker.refresh` builds a graph on every generation, and `dig.scenes`
+    /// moves the generation while using only the scene engine — so between two
+    /// walks there sits a graph that never read a table. It was still the one
+    /// the next build inherited from, and it had nothing to offer, so the next
+    /// walk read all six tables from cold. A trace of one artist opening had
+    /// `graph.tables` at 1425ms, a 7ms `dig.scenes`, then `graph.tables` again
+    /// at 1395ms.
+    func testCostOfRebuildingAcrossAGenerationNobodyWalked() {
+        let one = GraphStore(context: context)
+        let first = milliseconds { _ = one.compute(.artist("Artist 0")) }
+
+        // The generation `dig.scenes` leaves behind: built, never asked.
+        let unwalked = GraphStore(context: context, inheriting: one)
+
+        let two = GraphStore(context: context, inheriting: unwalked)
+        let second = milliseconds { _ = two.compute(.artist("Artist 0")) }
+        record("cacheBuild across unwalked generation: first \(first)ms, again \(second)ms")
+        XCTAssertTrue(two.builtFromInheritedTables,
+                      "The offer must pass through the generation nobody walked")
+        // The same bound the rebuild above holds to. Without the pass-through
+        // this was a full cold read — the whole of `first` again.
+        XCTAssertLessThan(
+            second, 350,
+            "A generation nobody walked must not cost the next one its tables"
         )
     }
 

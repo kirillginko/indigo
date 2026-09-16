@@ -137,7 +137,7 @@ struct NoodsResidentDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .top, spacing: 26) {
-                    ArtworkView(remoteURL: resident.artworkURL, side: 220)
+                    ArtworkView(remoteURL: resident.artworkURL, side: 220, placeholder: .mosaic)
                         .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
                     VStack(alignment: .leading, spacing: 14) {

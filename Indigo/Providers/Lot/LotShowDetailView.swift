@@ -118,7 +118,7 @@ struct LotShowDetailView: View {
             sectionHeader("Residents", trailing: nil)
             ForEach(artists) { artist in
                 HStack(spacing: 14) {
-                    ArtworkView(remoteURL: artist.photoURL, side: 44)
+                    ArtworkView(remoteURL: artist.photoURL, side: 44, placeholder: .mosaic)
                         .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
 
                     VStack(alignment: .leading, spacing: 3) {

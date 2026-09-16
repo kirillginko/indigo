@@ -307,7 +307,16 @@ actor DigWorker {
     func pendingPortraits() -> [String] {
         Trace.step("portraits.pending") {
             let artists = (try? modelContext.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
-            let dug = Set(artists.filter { $0.imageURLString?.isEmpty == false }.map(\.nameKey))
+            // `usableImage`, not `isEmpty`. An artist holding a Discogs
+            // `spacer.gif` counted as somebody who already had a picture, so
+            // 109 of 582 artists in a real store were excluded from this list
+            // permanently and could never be looked up. See
+            // `DiscogsArtist.imageURL`.
+            let dug = Set(
+                artists
+                    .filter { DiscogsClient.usableImage($0.imageURLString) != nil }
+                    .map(\.nameKey)
+            )
             let looked = Dictionary(
                 ((try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? [])
                     .map { ($0.nameKey, $0.isWorthRetrying) },

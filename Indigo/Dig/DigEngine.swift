@@ -656,8 +656,7 @@ nonisolated struct DigEngine {
             realName: discogs?.realName.map(DiscogsClient.withoutDisambiguator),
             biography: discogs?.biography.map(DiscogsEnricher.cleanProfile),
             imageURL: discogs?.imageURL ?? storedPortrait,
-            thumbnailURL: discogs?.thumbnailURLString.flatMap(URL.init(string:))
-                ?? storedPortrait,
+            thumbnailURL: discogs?.thumbnailURL ?? storedPortrait,
             genres: Self.merged(discogs?.genres ?? cached?.genreTags ?? [], with: bandcampTags),
             styles: discogs?.styles ?? [],
             aliases: discogs?.aliasNames ?? [],

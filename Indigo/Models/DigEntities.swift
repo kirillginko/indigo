@@ -222,7 +222,24 @@ nonisolated final class DiscogsArtist {
         fetchedAt = Date()
     }
 
-    var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
+    /// Filtered, because Discogs answers "no picture" with a picture.
+    ///
+    /// An artist with no photograph comes back carrying `spacer.gif` — a
+    /// transparent one-pixel image on a per-artist URL, so it looks like a
+    /// real and distinct address right up until it is drawn. It loads
+    /// perfectly, which is the problem: the tile stops being empty, so nothing
+    /// downstream ever reaches its placeholder, and a listener gets a blank
+    /// grey square where a portrait or a mosaic should be. In this store 22
+    /// artists shared one such address and 15 another.
+    ///
+    /// `usableImage` has always known how to spot them; it simply was not
+    /// asked here, and every read of the graph went through this one line.
+    var imageURL: URL? { DiscogsClient.usableImage(imageURLString).flatMap(URL.init(string:)) }
+
+    /// The small one, filtered the same way and for the same reason.
+    var thumbnailURL: URL? {
+        DiscogsClient.usableImage(thumbnailURLString).flatMap(URL.init(string:))
+    }
 
     /// Any picture of this artist's music we already hold — the first sleeve
     /// in their catalogue. For somebody dug into before Discogs gave us a
@@ -346,8 +363,12 @@ nonisolated final class DiscogsReleaseRecord {
         fetchedAt = Date()
     }
 
-    var imageURL: URL? { imageURLString.flatMap(URL.init(string:)) }
-    var thumbnailURL: URL? { thumbnailURLString.flatMap(URL.init(string:)) }
+    // Filtered for the reason `DiscogsArtist.imageURL` describes: a record
+    // with no sleeve is sent a `spacer.gif` rather than nothing at all.
+    var imageURL: URL? { DiscogsClient.usableImage(imageURLString).flatMap(URL.init(string:)) }
+    var thumbnailURL: URL? {
+        DiscogsClient.usableImage(thumbnailURLString).flatMap(URL.init(string:))
+    }
 
     /// Playable recordings of this release, titled as whoever catalogued them
     /// wrote them down.
@@ -433,8 +454,11 @@ nonisolated final class ArtistPortrait {
     }
 
     var imageURL: URL? {
-        guard let imageURLString, !imageURLString.isEmpty else { return nil }
-        return URL(string: imageURLString)
+        // Same filter as `DiscogsArtist.imageURL`: a row written before that
+        // one was fixed can still be holding a `spacer.gif`, and a stored
+        // miss must read as a miss rather than as a blank picture.
+        guard let usable = DiscogsClient.usableImage(imageURLString) else { return nil }
+        return URL(string: usable)
     }
 
     /// A miss is worth trying again eventually — a catalogue gains artists —

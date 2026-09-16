@@ -48,7 +48,7 @@ struct ExploreView: View {
             }
         }
         .foregroundStyle(Color.black)
-        .background(MapColor.cobalt)
+        .background(MosaicColor.cobalt)
         .task { crate.backfillLocalGenres() }
         // Kept on the store, so coming back to this page shows what it showed
         // last time rather than emptying itself and filling in again. Keyed on
@@ -63,12 +63,7 @@ struct ExploreView: View {
         let inverseInk = Color.black
         return VStack(alignment: .leading, spacing: 15) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Start your search here").font(Typeface.display(40)).tracking(-0.7)
-                    Text(kept.first.map { "Because you crated \($0.displayTitle)" }
-                         ?? "Recommendations shaped by your crate and local library")
-                        .microLabel(1.05, size: 9)
-                }
+                Text("Explore").font(Typeface.display(40)).tracking(-0.7)
                 Spacer()
                 Button("Crate · \(kept.count)") { appState.select(.crate) }
                     .buttonStyle(MapHeaderButtonStyle(ink: ink))
@@ -169,7 +164,7 @@ struct ExploreView: View {
                     if let page = suggestion.node.destination { appState.open(page) }
                 } label: {
                     MapLabel(suggestion.node.title, suggestion.node.kind.label,
-                             MapColor.lavender, artwork(for: suggestion),
+                             MosaicColor.lavender, artwork(for: suggestion),
                              stableSeed(suggestion.node.id), cardWidth(in: size),
                              connection: suggestion.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
@@ -188,7 +183,7 @@ struct ExploreView: View {
                 ForEach(Array(section.items.enumerated()), id: \.element.id) { i, item in
                     Button { play(item) } label: {
                         MapLabel(item.displayTitle, item.displaySubtitle ?? item.sourceLine,
-                                 MapColor.green, item.artworkURL, stableSeed(item.displayTitle),
+                                 MosaicColor.green, item.artworkURL, stableSeed(item.displayTitle),
                                  cardWidth(in: size))
                     }.buttonStyle(ExploreCardButtonStyle())
                         .contextMenu { Button("Open details") { open(item) } }
@@ -200,7 +195,7 @@ struct ExploreView: View {
                         if let page = suggestion.node.destination { appState.open(page) }
                     } label: {
                         MapLabel(suggestion.node.title, suggestion.node.kind.label,
-                                 MapColor.lavender, artwork(for: suggestion),
+                                 MosaicColor.lavender, artwork(for: suggestion),
                                  stableSeed(suggestion.id), cardWidth(in: size),
                                  connection: suggestion.connection)
                     }.buttonStyle(ExploreCardButtonStyle())
@@ -227,7 +222,7 @@ struct ExploreView: View {
                 .graphNode("section.scene", section: "scene", connects: false)
                 .position(x: size.width * 0.5, y: sceneTop + 24)
             Button { appState.open(.digScene(city: scene.city, sound: scene.sound)) } label: {
-                MapLabel(scene.title, scene.sound, MapColor.lavender, nil,
+                MapLabel(scene.title, scene.sound, MosaicColor.lavender, nil,
                          stableSeed(scene.city), cardWidth(in: size),
                          connection: scene.size)
             }.buttonStyle(ExploreCardButtonStyle())
@@ -257,7 +252,7 @@ struct ExploreView: View {
                 Button {
                     Task { await follow(show.node) }
                 } label: {
-                    MapLabel(show.node.title, show.node.subtitle, MapColor.paleGreen,
+                    MapLabel(show.node.title, show.node.subtitle, MosaicColor.paleGreen,
                              show.node.artworkURL, stableSeed(show.id), cardWidth(in: size),
                              connection: show.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
@@ -275,7 +270,7 @@ struct ExploreView: View {
                 .position(x: size.width * 0.5, y: libraryTop + 24)
             ForEach(Array(local.enumerated()), id: \.element.persistentModelID) { i, track in
                 Button { play(i) } label: {
-                    MapLabel(track.title, track.artist, MapColor.blue, nil,
+                    MapLabel(track.title, track.artist, MosaicColor.blue, nil,
                              stableSeed(track.path), cardWidth(in: size))
                         .localArtwork(track.artworkKey)
                 }.buttonStyle(ExploreCardButtonStyle())
@@ -565,22 +560,12 @@ private enum ExploreFilter: String, CaseIterable, Identifiable {
     var color: Color {
         switch self {
         case .all: .black
-        case .next: MapColor.lavender
-        case .crate: MapColor.green
-        case .shows: MapColor.paleGreen
-        case .library: MapColor.blue
+        case .next: MosaicColor.lavender
+        case .crate: MosaicColor.green
+        case .shows: MosaicColor.paleGreen
+        case .library: MosaicColor.blue
         }
     }
-}
-
-private enum MapColor {
-    static let cobalt = Color(red: 0.10, green: 0.34, blue: 0.91)
-    static let blue = Color(red: 0.12, green: 0.45, blue: 0.96)
-    static let blueLight = Color(red: 0.28, green: 0.82, blue: 0.94)
-    static let green = Color(red: 0.29, green: 0.94, blue: 0.57)
-    static let paleGreen = Color(red: 0.45, green: 0.96, blue: 0.68)
-    static let paper = Color(red: 0.94, green: 0.96, blue: 0.94)
-    static let lavender = Color(red: 0.73, green: 0.83, blue: 0.98)
 }
 
 /// A card's worth of nothing, held while the real one is being worked out.
@@ -672,11 +657,14 @@ private struct MapLabel: View {
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             if localArtworkKey != nil || imageURL != nil {
+                // The same block the branch below draws, so a card whose
+                // picture fails to arrive looks like a card that never had
+                // one, rather than like a hole in the map.
                 ArtworkView(localKey: localArtworkKey, remoteURL: imageURL, side: 42,
-                            mark: String(title.prefix(1)))
+                            placeholder: .mosaic, mark: String(title.prefix(1)))
                     .overlay(Rectangle().stroke(.black, lineWidth: 5))
             }
-            else { MapGlyph(seed: seed, color: color).frame(width: 42, height: 42) }
+            else { ArtworkMosaic(seed: seed, color: color).frame(width: 42, height: 42) }
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) { Rectangle().frame(width: 7, height: 7); Text(title).font(Typeface.body(12.5, weight: .bold)).lineLimit(1) }
                 if let subtitle, !subtitle.isEmpty { Text(subtitle).font(Typeface.mono(8.5)).opacity(0.72).lineLimit(1).padding(.leading, 13) }
@@ -854,19 +842,6 @@ private struct ExploreGraphLines: View {
     }
 }
 
-private struct MapGlyph: View {
-    let seed: Int; let color: Color
-    var body: some View {
-        Canvas { context, size in
-            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.black)); let u=size.width/6
-            for y in 0..<6 { for x in 0..<6 {
-                let n=(seed &+ x &* 13 &+ y &* 29 &+ x &* y) & 15
-                context.fill(Path(CGRect(x: CGFloat(x)*u, y: CGFloat(y)*u, width: u+0.3, height: u+0.3)), with: .color(n < 5 ? color : n < 8 ? .white.opacity(0.3) : .black))
-            }}
-        }.padding(5).background(.black).accessibilityHidden(true)
-    }
-}
-
 /// Where each slice of the background field begins.
 ///
 /// Its own type so the arithmetic can be tested. What it has to get right is
@@ -895,7 +870,7 @@ private struct ExploreShaderField: View {
     /// `ZStack` contributes nothing to what the stack wants to be, so what it
     /// reports back depends on what the other children asked for. A field
     /// measuring zero draws nothing, and nothing is exactly what the page
-    /// behind it looks like — flat `MapColor.cobalt`, which is the blue in the
+    /// behind it looks like — flat `MosaicColor.cobalt`, which is the blue in the
     /// bug report rather than the blue this shader starts from.
     ///
     /// The page already measures itself to lay the cards out. One measurement,
@@ -927,7 +902,7 @@ private struct ExploreShaderField: View {
     /// maximum edge — 16,384 on Apple silicon. A crate large enough to make
     /// this page 16,604 points tall asked for a 1854x16604 BGRA8Unorm, got
     /// `RBLayer: unable to create texture`, and drew nothing: flat
-    /// `MapColor.cobalt` where the field should be. It is not a limit worth
+    /// `MosaicColor.cobalt` where the field should be. It is not a limit worth
     /// approaching either, since the texture at that size is about 120MB.
     ///
     /// Four thousand leaves a fourfold margin under the limit and puts the

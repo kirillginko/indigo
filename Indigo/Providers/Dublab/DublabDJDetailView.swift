@@ -65,7 +65,7 @@ struct DublabDJDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .top, spacing: 28) {
-                    ArtworkView(remoteURL: dj.artworkURL, side: 300)
+                    ArtworkView(remoteURL: dj.artworkURL, side: 300, placeholder: .mosaic)
                         .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
                     VStack(alignment: .leading, spacing: 16) {

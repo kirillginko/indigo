@@ -1331,7 +1331,14 @@ final class DigStore {
     func digSuggestions(limit: Int = 6) async -> [DigHistory.Suggestion] {
         let _ = revision
         settle()
-        return await worker.digSuggestions(limit: limit, generation: revision)
+        // Traced for the reason `scenes(forArtist:)` below is: the landing
+        // page awaits this on every revision, it walks the graph, and it was
+        // a gap in the trace with nothing in it.
+        let asked = revision
+        let worker = worker
+        return await Trace.stage("dig.suggestions") {
+            await worker.digSuggestions(limit: limit, generation: asked)
+        }
     }
 
     func scenes(forArtist name: String) async -> [MusicScene] {
@@ -1970,14 +1977,25 @@ final class DigStore {
                 // twice as late as it needed to. The search already carries
                 // it — so it is written and the page told, and the rest fills
                 // in around a page that is already the right shape.
-                let head = try await discogsClient.artistHead(named: name)
+                // Each stage of this named, so the total above can be read
+                // against its parts. A cold artist the catalogue does not know
+                // falls past all of them to MusicBrainz below, and that fall
+                // was the whole of an eight-second page with nothing in the
+                // trace to show for it.
+                let head = try await Trace.stage("dig.head", name) {
+                    try await discogsClient.artistHead(named: name)
+                }
                 if let head {
                     discogsEnricher.artistIdentity(named: name, head: head)
                     saveContext()
                     announceChange()
                 }
 
-                if let head, let artist = try await describeArtist(named: name, head: head) {
+                let described = try await Trace.stage("dig.describe", name) { () -> DiscogsArtist? in
+                    guard let head else { return nil }
+                    return try await describeArtist(named: name, head: head)
+                }
+                if let artist = described {
                     saveContext()
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
@@ -1995,7 +2013,9 @@ final class DigStore {
                     // see `waitForRoom()`.
                     do {
                         if await waitForRoom() {
-                            try await discogsEnricher.recommendations(for: artist)
+                            try await Trace.stage("dig.recommend", name) {
+                                try await discogsEnricher.recommendations(for: artist)
+                            }
                             saveContext()
                             announceChange()
                         }
@@ -2027,10 +2047,14 @@ final class DigStore {
         // Stage one: who they are and what they released. Two requests, and
         // enough on its own for a page worth looking at.
         do {
-            if let mbid {
-                try await enricher.artist(mbid: mbid)
-            } else {
-                try await enricher.artist(named: name)
+            // The fall-through path: MusicBrainz, behind a global
+            // one-per-1.1s gate. See `mb.gate` and `mb.request`.
+            try await Trace.stage("dig.mbArtist", name) {
+                if let mbid {
+                    try await enricher.artist(mbid: mbid)
+                } else {
+                    try await enricher.artist(named: name)
+                }
             }
             // Saved here, not at the end: a throttle in stage two must not
             // discard what stage one already learned.
@@ -2050,7 +2074,9 @@ final class DigStore {
 
         // Releases are now visible. Labels/relationships continue without
         // keeping the page's loading state alive.
-        await enrichArtistConnections(name: name, mbid: mbid, key: key)
+        await Trace.stage("dig.connections", name) {
+            await enrichArtistConnections(name: name, mbid: mbid, key: key)
+        }
     }
 
     private func enrichArtistConnections(name: String, mbid: String?, key: String) async {

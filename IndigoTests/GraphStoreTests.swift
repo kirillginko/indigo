@@ -246,6 +246,53 @@ final class GraphStoreTests: XCTestCase {
         XCTAssertTrue(reached.contains { $0.node.title == "Compro" })
     }
 
+    /// A generation nobody walked used to break the chain.
+    ///
+    /// `dig.scenes` moves the generation and uses only the scene engine, so
+    /// the graph built beside it is thrown away without ever reading a table.
+    /// It was still the store the next build inherited from, and it had
+    /// nothing to give — so the next real walk read all six tables from cold.
+    /// A trace of one artist opening showed the two builds back to back,
+    /// 1425ms and then 1395ms, with a `dig.scenes` between them.
+    func testTablesSurviveAGenerationNobodyWalked() throws {
+        release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        try context.save()
+
+        let first = GraphStore(context: context)
+        _ = first.neighbors(of: .label("Ilian Tape"))
+        XCTAssertFalse(first.builtFromInheritedTables, "The first build has nothing to inherit")
+
+        // The scene engine's generation: built, never asked anything.
+        let unwalked = GraphStore(context: context, inheriting: first)
+
+        let next = GraphStore(context: context, inheriting: unwalked)
+        next.prepare()
+        XCTAssertTrue(next.builtFromInheritedTables,
+                      "The offer should pass through a store that never assembled")
+    }
+
+    /// And passing it through must not make it stale: a record written while
+    /// the unwalked generation stood in the middle still has to arrive.
+    func testTheChainThroughAnUnwalkedGenerationStillSeesNewRecords() throws {
+        release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")
+        try context.save()
+        let first = GraphStore(context: context)
+        _ = first.neighbors(of: .label("Ilian Tape"))
+
+        let unwalked = GraphStore(context: context, inheriting: first)
+
+        release("Pool", id: 67_890, label: "Ilian Tape", catalog: "ITLP10")
+        try context.save()
+        GraphStore.forget(.label("Ilian Tape"), in: context)
+
+        let reached = GraphStore(context: context, inheriting: unwalked)
+            .neighbors(of: .label("Ilian Tape")).byDestination
+        XCTAssertTrue(reached.contains { $0.node.kind == .release && $0.node.title == "Pool" },
+                      "The record written while the unwalked generation stood in the middle")
+        XCTAssertTrue(reached.contains { $0.node.kind == .release && $0.node.title == "Compro" },
+                      "And the one that was already there")
+    }
+
     func testALabelWalksOutToItsRosterCatalogueAndPressings() {
         artist("Skee Mask", labels: ["Ilian Tape"])
         release("Compro", id: 12_345, label: "Ilian Tape", catalog: "ITLP09")

@@ -166,6 +166,10 @@ struct DigView: View {
         }
     }
 
+    /// How long the page will stand still for radio, counted from when the
+    /// request was made.
+    private static let radioPatience = Duration.milliseconds(900)
+
     /// Local history first, then a moment for radio — and then the page,
     /// whether radio answered or not.
     ///
@@ -173,7 +177,20 @@ struct DigView: View {
     /// something the page waits on. A backend having a slow morning must not
     /// be able to hold DIG shut, and a backend answering promptly should not
     /// make the page move twice.
+    /// Traced because it was not.
+    ///
+    /// Every stage of an artist page is in the trace file and none of this
+    /// was, so a session reading "the dig page is slow" had nothing in it
+    /// about the dig page — the landing path does a whole-table read, a graph
+    /// walk and a network wait, and not one of them was a line anybody could
+    /// look at. `cold` is the load with nothing kept from last time.
     private func refresh() async {
+        await Trace.stage("dig.landing", dig.landing == nil ? "cold" : "warm") {
+            await refreshLanding()
+        }
+    }
+
+    private func refreshLanding() async {
         // What the page looked like last time, put straight back. Returning to
         // DIG is then a redraw rather than a rebuild — nothing to scan, nothing
         // to wait for, and no veil over a page that is already complete.
@@ -189,21 +206,57 @@ struct DigView: View {
         // confirming nothing had changed.
         let crateChanged = cached?.crateRevision != crate.revision
         if crateChanged {
-            entries = Trace.slowStep("dig.startingPoints") { startingPoints() }
+            entries = Trace.step("dig.startingPoints") { startingPoints() }
         }
+
+        // Started here rather than after the history below.
+        //
+        // The two want nothing from each other — radio needs only the names
+        // above — and the request used to be made only once the history had
+        // finished, so the page paid for a local rebuild and a round trip one
+        // after the other. On the cold landing that was 732ms of history and
+        // then the whole of the radio wait. Begun here it runs underneath.
+        let wantsRadio = crateChanged || radio == nil
+        let radioStartedAt = ContinuousClock.now
+        let radioLoad: Task<Void, Never>? = wantsRadio
+            ? {
+                let names = entries.prefix(60).map(\.name)
+                return Task { await refreshRadio(for: names) }
+            }()
+            : nil
 
         // Always re-read: they have just been somewhere, and where they have
         // been is what this block is.
         await refreshMemory()
 
-        if crateChanged || radio == nil {
-            let names = entries.prefix(60).map(\.name)
-            let radioLoad = Task { await refreshRadio(for: names) }
-            await withTaskGroup(of: Void.self) { group in
-                group.addTask { await radioLoad.value }
-                group.addTask { try? await Task.sleep(for: .milliseconds(900)) }
-                await group.next()
-                group.cancelAll()
+        if let radioLoad {
+            await Trace.stage("dig.radioGate") {
+                // The moment is counted from when the request was made, not
+                // from when the page got round to waiting on it — otherwise
+                // starting it earlier buys nothing, because the wait simply
+                // begins later and runs just as long.
+                let spent = ContinuousClock.now - radioStartedAt
+                let remaining = Self.radioPatience - spent
+                // Whichever lands first, and the other is abandoned rather
+                // than awaited.
+                //
+                // This was a task group racing the load against a sleep, and
+                // the deadline it describes above never once applied.
+                // `withTaskGroup` does not return until every child has
+                // returned; `group.cancelAll()` cancels the children, but a
+                // child awaiting an *unstructured* task cannot be cancelled
+                // out of that wait — `Task.value` on a non-throwing task is
+                // not a cancellation point. So the group went on waiting for
+                // the whole request and the page behind it did too. Measured
+                // on a cold landing at 1956ms against a 900ms cap, which was
+                // 72% of the page.
+                //
+                // A continuation resumed by whichever finishes first keeps
+                // the promise the comment makes: the request is not
+                // cancelled, it simply stops being something the page waits
+                // on, and it fills `radio` — which is `@State` — whenever it
+                // does land.
+                await waitForFirst(radioLoad, orAfter: max(.zero, remaining))
             }
         }
 
@@ -256,6 +309,10 @@ struct DigView: View {
     }
 
     private func refreshMemory() async {
+        await Trace.stage("dig.memory") { await refreshMemoryBody() }
+    }
+
+    private func refreshMemoryBody() async {
         let history = DigHistory(context: dig.context)
         recentVisits = history.recent(limit: 4)
         frequentVisits = history.haunts()
@@ -405,6 +462,10 @@ struct DigView: View {
         let context = dig.context
 
         var names: [String: (crate: Int, mbid: String?)] = [:]
+        // Split in two because they are two different costs: the crate is
+        // small and asks the catalogue a question per row, the library is
+        // large and asks nothing. One number could not say which was which.
+        Trace.step("sp.crate") {
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
             let artist = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             // "Various" is where a catalogue files a compilation, not somebody
@@ -416,10 +477,13 @@ struct DigView: View {
             names[artist] = ((existing?.crate ?? 0) + 1, existing?.mbid ?? mbid)
         }
 
+        }
+
         // Counted by the same rule the artist page uses, keyed on the
         // normalised name and displayed with the spelling the files use.
         var library: [String: Int] = [:]
         var display: [String: String] = [:]
+        Trace.step("sp.library") {
         for track in (try? context.fetch(FetchDescriptor<Track>())) ?? [] {
             for key in DigEngine.artistKeys(for: track) {
                 library[key, default: 0] += 1
@@ -429,6 +493,7 @@ struct DigView: View {
                         : track.albumArtist
                 }
             }
+        }
         }
         for (key, _) in library {
             guard let name = display[key], ArtistName.isRealArtist(name) else { continue }
@@ -449,6 +514,47 @@ struct DigView: View {
                 if $0.libraryCount != $1.libraryCount { return $0.libraryCount > $1.libraryCount }
                 return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
+    }
+}
+
+/// Waits for `work` to finish, or for `deadline` to pass — whichever happens
+/// first — and abandons the other.
+///
+/// `work` is deliberately neither cancelled nor awaited past the deadline: it
+/// goes on running and writes what it found when it lands. What this bounds is
+/// only how long the caller stands still for it.
+///
+/// Written as a continuation rather than a task group because a group cannot
+/// express it. `withTaskGroup` does not return until every child returns, and
+/// a child awaiting an unstructured `Task` cannot be cancelled out of that
+/// wait — so the obvious spelling silently waits for the slow side every time.
+/// See `DigViewRadioGateTests`.
+@MainActor
+func waitForFirst(_ work: Task<Void, Never>, orAfter deadline: Duration) async {
+    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        let gate = RadioGate(continuation)
+        Task { await work.value; gate.open() }
+        Task { try? await Task.sleep(for: deadline); gate.open() }
+    }
+}
+
+/// Resumes once, for whichever of two waits finishes first.
+///
+/// One-shot because resuming a continuation twice is a crash, and both of the
+/// waits in `refreshLanding` are expected to finish — the loser simply arrives
+/// after nobody is listening. Main-actor isolated because that is where both
+/// of them run and where `radio` is written.
+@MainActor
+private final class RadioGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+
+    init(_ continuation: CheckedContinuation<Void, Never>) {
+        self.continuation = continuation
+    }
+
+    func open() {
+        continuation?.resume()
+        continuation = nil
     }
 }
 

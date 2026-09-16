@@ -187,18 +187,32 @@ nonisolated struct MusicBrainzClient: Sendable {
         return "\"\(escaped)\""
     }
 
+    /// Traced, because none of this was.
+    ///
+    /// Every Discogs request has been a line in the trace for a long time and
+    /// not one MusicBrainz request ever was — so an artist the catalogue does
+    /// not know, who falls through to this client, was an eight-second gap in
+    /// the file with nothing in it at all. That is the shape of a cold artist:
+    /// `dig.enrich` at 8398ms wrapped around silence.
+    ///
+    /// The retry count is in the detail because a throttled request costs a
+    /// whole second of backoff before it is even sent again.
     private func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
         var lastError: Error = MusicBrainzError.rateLimited
         for attempt in 0..<Self.maxAttempts {
             do {
-                return try await attemptGet(path, query: query)
+                return try await Trace.stage("mb.request", "\(path) try=\(attempt + 1)") {
+                    try await attemptGet(path, query: query)
+                }
             } catch let error as MusicBrainzError where error == .rateLimited {
                 lastError = error
                 guard attempt < Self.maxAttempts - 1 else { break }
                 // One short retry keeps a transient throttle from turning a
                 // foreground page into a minute-long wait.
                 let backoff = UInt64(1 << attempt) * 1_000_000_000
-                try await Task.sleep(nanoseconds: backoff)
+                await Trace.stage("mb.backoff", path) {
+                    try? await Task.sleep(nanoseconds: backoff)
+                }
             }
         }
         throw lastError
@@ -221,7 +235,11 @@ nonisolated struct MusicBrainzClient: Sendable {
         // MusicBrainz blocks clients that don't say who they are.
         request.setValue(NetworkEnvironment.userAgent, forHTTPHeaderField: "User-Agent")
 
-        await Self.gate.wait()
+        // The global one-per-1.1s gate, measured apart from the request it
+        // precedes. Waiting our turn and waiting for MusicBrainz are different
+        // problems with different fixes, and one number could not tell them
+        // apart.
+        await Trace.stage("mb.gate", path) { await Self.gate.wait() }
 
         let data: Data
         let response: URLResponse

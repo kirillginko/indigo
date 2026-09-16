@@ -31,11 +31,14 @@ nonisolated struct DiscogsEnricher {
             return value
         }()
         if let id = head.id { record.discogsID = id }
+        // Never written down as a picture. See `DiscogsArtist.imageURL`: an
+        // artist with no photograph is sent a per-artist `spacer.gif`, and
+        // stored it is indistinguishable from a real address until it draws.
         if record.imageURLString == nil {
-            record.imageURLString = head.coverImage ?? head.thumbnail
+            record.imageURLString = DiscogsClient.usableImage(head.coverImage ?? head.thumbnail)
         }
         if record.thumbnailURLString == nil {
-            record.thumbnailURLString = head.thumbnail ?? head.coverImage
+            record.thumbnailURLString = DiscogsClient.usableImage(head.thumbnail ?? head.coverImage)
         }
         return record
     }
@@ -140,11 +143,14 @@ nonisolated struct DiscogsEnricher {
         record.name = DiscogsClient.withoutDisambiguator(detail.name)
         record.realName = detail.realname.map(DiscogsClient.withoutDisambiguator)
         record.biography = detail.profile.map(Self.cleanProfile)
-        record.imageURLString = detail.images?.first(where: { $0.type == "primary" })?.uri
-            ?? detail.images?.first?.uri ?? searchImageURL
-        record.thumbnailURLString = detail.images?.first(where: { $0.type == "primary" })?.uri150
-            ?? detail.images?.first?.uri150 ?? searchThumbnailURL
-            ?? record.thumbnailURLString
+        record.imageURLString = DiscogsClient.usableImage(
+            detail.images?.first(where: { $0.type == "primary" })?.uri
+                ?? detail.images?.first?.uri ?? searchImageURL
+        )
+        record.thumbnailURLString = DiscogsClient.usableImage(
+            detail.images?.first(where: { $0.type == "primary" })?.uri150
+                ?? detail.images?.first?.uri150 ?? searchThumbnailURL
+        ) ?? record.thumbnailURLString
         record.profileURLString = detail.uri
         record.aliasNames = (detail.aliases?.compactMap(\.name) ?? []).map(DiscogsClient.withoutDisambiguator)
         record.externalURLStrings = detail.urls ?? []

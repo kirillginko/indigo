@@ -49,12 +49,35 @@ nonisolated struct GraphStore {
         /// When this store began reading its tables. An answer worked out
         /// from them is only as new as this.
         var assembledAt: Date?
+        /// Whether the tables this store holds were built from an offer or
+        /// read from nothing. Only a test reads it. See `builtFromInheritedTables`.
+        var builtFromInherited = false
     }
 
     init(context: ModelContext, inheriting previous: GraphStore? = nil) {
         self.context = context
-        box.inherited = previous?.box.caches
+        // The offer passes through a generation that never walked anything.
+        //
+        // A store only fills `caches` when somebody asks it a question, and
+        // several generations go by without one: `dig.scenes` bumps the
+        // generation and uses only the scene engine, so the graph built
+        // alongside it is discarded unassembled. Inheriting `caches` alone
+        // meant that store handed on nothing, and the next real walk read all
+        // six tables from cold — 1395ms in a trace of one artist opening,
+        // immediately after another build of the same tables had just cost
+        // 1425ms. Holding the offer open until somebody takes it keeps the
+        // chain intact across the generations nobody walked.
+        box.inherited = previous?.box.caches ?? previous?.box.inherited
     }
+
+    /// Whether this store's tables came from the last generation's.
+    ///
+    /// Only a test reads it, and it exists because "the chain survived" is a
+    /// claim about work that is invisible from the outside: an inherited
+    /// build and a cold one return the same answers, and differ only in what
+    /// they cost — which is how this went unnoticed while the trace showed it
+    /// plainly. The same reason `DigStore.walksStarted` exists.
+    var builtFromInheritedTables: Bool { box.builtFromInherited }
 
     /// The fold, but only if somebody has already paid for it.
     ///
@@ -78,9 +101,11 @@ nonisolated struct GraphStore {
     private var caches: Caches {
         if let existing = box.caches { return existing }
         let started = Date()
-        let fresh = Trace.step("graph.tables") {
-            Caches(context: context, reusing: box.inherited)
+        let offered = box.inherited
+        let fresh = Trace.step("graph.tables", offered == nil ? "cold" : "inherited") {
+            Caches(context: context, reusing: offered)
         }
+        box.builtFromInherited = offered != nil
         box.assembledAt = started
         box.caches = fresh
         box.inherited = nil
