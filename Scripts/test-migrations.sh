@@ -91,6 +91,16 @@ run -f "$ROOT/supabase/migrations/0024_portrait_lane.sql" >/dev/null
 run -c "do \$\$ begin if not exists (select 1 from cron.job where jobname = 'indigo-drain-portraits' and command like '%''job_type'', ''fetch_artist_portrait''%') then raise exception 'a running drain did not get a portrait lane'; end if; end \$\$;"
 echo "    a drain that was already running now has a portrait lane"
 
+echo "· lot radio lane"
+# As a project whose drain was running before 0039: no Lot Radio crawl yet.
+# Applying 0039 and 0040 again has to add both halves of it, with the walk
+# ahead of the release cache.
+run -c "delete from cron.job where jobname like 'indigo-lotradio-%';"
+run -f "$ROOT/supabase/migrations/0039_the_lot_radio.sql" >/dev/null
+run -f "$ROOT/supabase/migrations/0040_lot_radio_ahead_of_the_cache.sql" >/dev/null
+run -c "do \$\$ begin if not exists (select 1 from cron.job where jobname = 'indigo-lotradio-backfill' and command like '%''backfill''), 1,%') then raise exception 'the Lot Radio walk is queued behind the cache'; end if; if (select count(*) from cron.job where jobname in ('indigo-lotradio-fresh', 'indigo-lotradio-backfill') and command like '%''discover_lotradio''%') <> 2 then raise exception 'a running drain did not get the Lot Radio crawl'; end if; if has_table_privilege('anon', 'public.enrichment_cursors', 'select') and exists (select 1 from pg_policies where tablename = 'enrichment_cursors') then raise exception 'the app key can read the crawl cursor'; end if; end \$\$;"
+echo "    a drain that was already running now crawls The Lot Radio"
+
 echo "· privileges"
 # As a project from before 0023: its internal functions granted to the app's
 # key by name. Applying 0023 again has to take that back.
