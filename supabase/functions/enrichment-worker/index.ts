@@ -14,6 +14,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
+import { discoverLotRadio } from "../_shared/lotradio.ts";
 import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
 import {
   cacheDiscogsRelease,
@@ -123,6 +124,15 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
 
     case "discover_nts": {
       await discoverNTS(supabase, String(job.payload?.mode ?? "fresh"));
+      return;
+    }
+
+    case "discover_lotradio": {
+      // One request per call either way: the index, or one page further back
+      // into the archive. Each page holds its broadcasts whole, so they are
+      // written here rather than queued one by one as NTS episodes are.
+      const result = await discoverLotRadio(supabase, String(job.payload?.mode ?? "fresh"));
+      console.log("discover_lotradio", JSON.stringify(result));
       return;
     }
 
