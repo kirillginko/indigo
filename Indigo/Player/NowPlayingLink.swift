@@ -114,6 +114,7 @@ nonisolated enum NowPlayingLink: Equatable, Sendable {
         if let id = identity("rovr.broadcast.") { return .detail(.rovrBroadcast(id: id)) }
         if let id = identity("panik.episode.") { return .detail(.panikEpisode(id: id)) }
         if let id = identity("radio80000.episode.") { return .detail(.radio80000Episode(id: id)) }
+        if let id = identity("n10as.episode.") { return .detail(.n10asEpisode(id: id)) }
         if let slug = identity("ida.episode.") { return .detail(.idaEpisode(slug: slug)) }
         if let slug = identity("cashmere.episode.") { return .detail(.cashmereEpisode(slug: slug)) }
         if let slug = identity("alhara.show.") { return .detail(.alharaShow(slug: slug)) }
@@ -143,6 +144,7 @@ nonisolated enum NowPlayingLink: Equatable, Sendable {
         case LYLProvider.providerID: return .route(.lylStation)
         case IdaProvider.providerID: return .route(.idaStation(item.id))
         case Radio80000Provider.providerID: return .route(.radio80000Station)
+        case N10ASProvider.providerID: return .route(.n10asStation)
         case PanikProvider.providerID: return .route(.panikStation)
         // ROVR's channel id is the station id, so the bar returns to whichever
         // of them is playing rather than always to the scheduled radio.

@@ -580,7 +580,9 @@ final class CrateTests: XCTestCase {
         crate.toggle(nowPlaying: station, liveShow: onAir("AGSS Radio", detailID: "agss-radio-15-10-2024"))
         let row = try XCTUnwrap(crate.items().first)
 
-        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        let found = await KeptShow.destination(
+            for: row, radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore(), crate: crate
+        )
         XCTAssertEqual(found, .page(.idaEpisode(slug: "agss-radio-15-10-2024")))
     }
 
@@ -598,7 +600,9 @@ final class CrateTests: XCTestCase {
             isLiveStream: true
         )
 
-        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        let found = await KeptShow.destination(
+            for: row, radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore(), crate: crate
+        )
         XCTAssertEqual(found, .section(.panikShows))
     }
 
@@ -617,7 +621,9 @@ final class CrateTests: XCTestCase {
             isLiveStream: true
         )
 
-        let found = await KeptShow.destination(for: row, radio80000: Radio80000BrowseStore(), crate: crate)
+        let found = await KeptShow.destination(
+            for: row, radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore(), crate: crate
+        )
         XCTAssertEqual(found, .section(.panikStation), "A station kept as itself opens the station")
     }
 

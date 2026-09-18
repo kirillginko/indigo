@@ -22,6 +22,7 @@ struct MiniPlayerView: View {
     @Environment(LYLProvider.self) private var lyl
     @Environment(IdaProvider.self) private var ida
     @Environment(Radio80000Provider.self) private var radio80000
+    @Environment(N10ASProvider.self) private var n10as
     @Environment(PanikProvider.self) private var panik
     @Environment(RovrProvider.self) private var rovr
     @Environment(CrateService.self) private var crate
@@ -199,6 +200,7 @@ struct MiniPlayerView: View {
             return ida.channel(for: item.id).flatMap { ida.now(for: $0) }
         }
         if item.sourceID == Radio80000Provider.providerID { return radio80000.now }
+        if item.sourceID == N10ASProvider.providerID { return n10as.now }
         if item.sourceID == PanikProvider.providerID { return panik.now }
         if item.sourceID == RovrProvider.providerID { return rovr.now }
         if item.sourceID == NTSProvider.providerID { return nts.state(for: item.id)?.now }

@@ -13,13 +13,13 @@ import AppKit
 #endif
 
 private enum RadioSidebarGroup: CaseIterable, Hashable {
-    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr
+    case nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr, n10as
 }
 
 /// Logical groups remain useful for routing, but the sidebar itself uses one
 /// dark translucent surface rather than separate colour bands.
 private enum SidebarBand: Int {
-    case explore, library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr
+    case explore, library, radio, nts, kiosk, noods, lot, dublab, alhara, cashmere, lyl, ida, radio80000, panik, rovr, n10as
 }
 
 struct SidebarView: View {
@@ -36,6 +36,7 @@ struct SidebarView: View {
     @Environment(Radio80000Provider.self) private var radio80000
     @Environment(PanikProvider.self) private var panik
     @Environment(RovrProvider.self) private var rovr
+    @Environment(N10ASProvider.self) private var n10as
     @Environment(CrateService.self) private var crate
     @Environment(PlaybackCoordinator.self) private var player
 
@@ -254,6 +255,19 @@ struct SidebarView: View {
                         row(.rovrShows, label: "Shows", trailing: nil, indent: 10)
                         row(.rovrCurators, label: "Curators", trailing: nil, indent: 10)
                     }
+
+                    radioSection("n10.as", location: "Montréal, Canada", group: .n10as)
+                    if expandedRadios.contains(.n10as) {
+                        row(
+                            .n10asStation,
+                            label: "Live",
+                            trailing: player.isCurrent(n10as.station.id) ? "live" : nil,
+                            isLive: player.isCurrent(n10as.station.id) && player.isPlaying,
+                            indent: 10
+                        )
+                        row(.n10asArchive, label: "Archive", trailing: nil, indent: 10)
+                        row(.n10asShows, label: "Shows", trailing: nil, indent: 10)
+                    }
                     }
 
 
@@ -457,6 +471,7 @@ struct SidebarView: View {
         case .radio80000Station, .radio80000Latest, .radio80000Shows: .radio80000
         case .panikStation, .panikPodcasts, .panikShows: .panik
         case .rovrStation, .rovrArchive, .rovrShows, .rovrCurators: .rovr
+        case .n10asStation, .n10asArchive, .n10asShows: .n10as
         default: nil
         }
     }
@@ -475,6 +490,7 @@ struct SidebarView: View {
         case .radio80000: .radio80000
         case .panik: .panik
         case .rovr: .rovr
+        case .n10as: .n10as
         }
     }
 
@@ -520,6 +536,8 @@ struct SidebarView: View {
             return player.isCurrent(panik.station.id)
         case .rovr:
             return rovr.channels.contains { player.isCurrent($0.id) }
+        case .n10as:
+            return player.isCurrent(n10as.station.id)
         }
     }
 

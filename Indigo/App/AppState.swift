@@ -54,6 +54,9 @@ nonisolated enum Route: Hashable {
     case rovrArchive
     case rovrShows
     case rovrCurators
+    case n10asStation
+    case n10asArchive
+    case n10asShows
     case explore
     case crate
     case dig
@@ -102,6 +105,9 @@ nonisolated enum Route: Hashable {
         case .rovrArchive: "Archive"
         case .rovrShows: "Shows"
         case .rovrCurators: "Curators"
+        case .n10asStation: "n10.as"
+        case .n10asArchive: "Archive"
+        case .n10asShows: "Shows"
         case .explore: "Explore"
         case .crate: "Crate"
         case .dig: "Dig"
@@ -162,6 +168,11 @@ nonisolated enum DetailPage: Hashable {
     case rovrBroadcast(id: String)
     case rovrShow(id: String)
     case rovrCurator(id: String)
+    /// The Mixcloud slug, which is the whole of a broadcast's identity: every
+    /// n10.as recording is on the station's one account, so the slug refetches
+    /// it. See `N10ASEpisodeKey`.
+    case n10asEpisode(id: String)
+    case n10asShow(slug: String)
 }
 
 @Observable
@@ -248,6 +259,8 @@ final class AppState {
         case .rovrBroadcast: return "Broadcast"
         case .rovrShow: return "Show"
         case .rovrCurator: return "Curator"
+        case .n10asEpisode: return "Broadcast"
+        case .n10asShow: return "Show"
         }
     }
 }
