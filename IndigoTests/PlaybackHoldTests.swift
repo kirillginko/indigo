@@ -88,3 +88,60 @@ final class PlaybackHoldTests: XCTestCase {
         player.stopAll()
     }
 }
+
+/// The hold as the portrait fill actually experiences it, rather than as a
+/// flag. The tests above prove `isHoldingBackgroundWork` flips; nothing proved
+/// the loop behind it stops sending. A trace of a real session shows the fill
+/// searching Discogs every 1.7 seconds straight through a hold that should
+/// have parked it.
+@MainActor
+final class PlaybackHoldFillTests: XCTestCase {
+    private final class Count: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value = 0
+        func bump() { lock.withLock { value += 1 } }
+        var current: Int { lock.withLock { value } }
+    }
+
+    private struct NoAnswer: DiscogsTransport {
+        func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+            (Data("{}".utf8), HTTPURLResponse(
+                url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil
+            )!)
+        }
+    }
+
+    func testTheFillReachesNoWorkWhileHeldAndResumesWhenReleased() async throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let context = ModelContext(container)
+        // Neighbours nobody has a picture for: a backlog the fill would work on.
+        let subject = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Skee Mask"),
+                                    discogsID: 1, name: "Skee Mask")
+        subject.labelNeighbourNames = ["Stenny", "Objekt", "Carl Craig"]
+        context.insert(subject)
+        try context.save()
+
+        let dig = DigStore(
+            context: context,
+            discogsClient: DiscogsClient(transport: NoAnswer(), token: "test")
+        )
+        // Reached only once the loop is past every gate and building its queue.
+        let reached = Count()
+        dig.cataloguePortraits = { _ in reached.bump(); return [:] }
+
+        dig.holdBackgroundWork()
+        let fill = Task { await dig.fillPortraitsInBackground(spacing: .milliseconds(10)) }
+
+        // Past the four seconds the fill waits for the first page to settle.
+        try await Task.sleep(for: .seconds(6))
+        XCTAssertEqual(reached.current, 0, "Held, so the backlog does no work at all")
+
+        dig.releaseBackgroundHold()
+        try await Task.sleep(for: .seconds(2))
+        XCTAssertGreaterThan(reached.current, 0, "And it picks up again once let go")
+
+        fill.cancel()
+        _ = await fill.result
+    }
+}
