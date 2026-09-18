@@ -123,6 +123,34 @@ final class StreamAudioEngine {
     @ObservationIgnored private let levelMonitor = AudioLevelMonitor()
     func audioLevel() -> Float { levelMonitor.level() }
 
+    /// How many seconds of audio are in hand beyond what is being played, or
+    /// nil when nothing is playing.
+    ///
+    /// This is the station's actual margin, and it is not something the app
+    /// chooses. `preferredForwardBufferDuration` below is a floor, not a
+    /// ceiling: AVPlayer keeps whatever the server is willing to hand over
+    /// early, and these servers differ enormously. Measured over two minutes
+    /// on the same setting, IDA holds 10.1s and n10.as holds 1.95s — IDA's
+    /// Icecast bursts eleven seconds on connect and then runs ahead of
+    /// realtime, while n10.as's bursts two and then paces exactly at it.
+    /// Asking n10.as for twenty seconds changes nothing; it simply has no
+    /// more to give.
+    ///
+    /// So a station's margin has to be read rather than assumed, which is
+    /// what this is for. See `PlaybackCoordinator.thinMargin`.
+    var bufferedAhead: TimeInterval? {
+        guard state == .playing, let item = player.currentItem else { return nil }
+        let now = item.currentTime().seconds
+        guard now.isFinite else { return nil }
+        let ends = item.loadedTimeRanges.compactMap { value -> TimeInterval? in
+            let range = value.timeRangeValue
+            let end = (range.start + range.duration).seconds
+            return end.isFinite ? end : nil
+        }
+        guard let furthest = ends.max() else { return nil }
+        return max(0, furthest - now)
+    }
+
     // MARK: - Transport
 
     func play(url: URL) {
@@ -257,7 +285,29 @@ final class StreamAudioEngine {
         // report itself unavailable. This bounds the wait instead of
         // abolishing it.
         item.preferredForwardBufferDuration = 2
-        levelMonitor.attach(to: item)
+        // No level tap on a live stream. It is what breaks them.
+        //
+        // Bisected by ear against this stream, out of the app, one setting at
+        // a time — every run 45 seconds of n10.as:
+        //
+        //   forward buffer automatic, no tap  · hitches
+        //   forward buffer 2s,        no tap  · clean
+        //   forward buffer automatic, tap     · hitches
+        //   forward buffer 2s,        tap     · hitches   ← what Indigo shipped
+        //
+        // Two seconds of buffer with no tap is clean and the same two seconds
+        // with one is not, so the tap is the whole difference. Not by failing:
+        // it never once came up short fetching audio, over a thousand pulls
+        // and every `drops` line in the trace a zero. It costs something just
+        // by being in the path, and a station holding 1.4s of audio cannot
+        // pay it. IDA carries the same tap over ten seconds of margin and is
+        // fine; Radio 80000, Cashmere and LYL never attached one at all, and
+        // are the stations nobody ever reported trouble with.
+        //
+        // What is lost is the backdrop reacting to the music on radio, which
+        // falls back to its ambient motion — exactly what those three
+        // stations have always done without anyone noticing. Local playback
+        // keeps its meter; it has a whole file in hand and no margin to lose.
         player.replaceCurrentItem(with: item)
         observe(item)
         player.play()
