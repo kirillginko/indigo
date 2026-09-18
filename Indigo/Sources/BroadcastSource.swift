@@ -132,6 +132,11 @@ nonisolated struct BroadcastSource {
                 ? String(showID.dropFirst("rovr.broadcast.".count))
                 : showID
             return id.isEmpty ? nil : .rovrBroadcast(id: id)
+        case N10ASProvider.providerID:
+            let id = showID.hasPrefix("n10as.episode.")
+                ? String(showID.dropFirst("n10as.episode.".count))
+                : showID
+            return id.isEmpty ? nil : .n10asEpisode(id: id)
         case LotProvider.providerID:
             let identity = showID.hasPrefix("lot.episode.")
                 ? String(showID.dropFirst("lot.episode.".count))
@@ -164,6 +169,7 @@ nonisolated struct BroadcastSource {
         case Radio80000Provider.providerID: .radio80000Show(slug: slug)
         case PanikProvider.providerID: .panikShow(slug: slug)
         case RovrProvider.providerID: .rovrShow(id: slug)
+        case N10ASProvider.providerID: .n10asShow(slug: slug)
         // Kiosk and dublab publish no per-show page.
         default: nil
         }
@@ -190,6 +196,7 @@ nonisolated struct BroadcastSource {
         case Radio80000Provider.providerID: .radio80000Shows
         case PanikProvider.providerID: .panikShows
         case RovrProvider.providerID: .rovrShows
+        case N10ASProvider.providerID: .n10asShows
         default: nil
         }
     }
@@ -239,6 +246,7 @@ nonisolated struct BroadcastSource {
         case Radio80000Provider.providerID: .radio80000Station
         case PanikProvider.providerID: .panikStation
         case RovrProvider.providerID: stationID.map { .rovrStation($0) } ?? .rovrShows
+        case N10ASProvider.providerID: .n10asStation
         case Track.sourceID: .tracks
         default: nil
         }
@@ -258,6 +266,7 @@ nonisolated struct BroadcastSource {
         case Radio80000Provider.providerID: "Radio 80000"
         case PanikProvider.providerID: "Radio Panik"
         case RovrProvider.providerID: "ROVR"
+        case N10ASProvider.providerID: "n10.as"
         case Track.sourceID: "Local"
         default: providerID.capitalized
         }
@@ -287,6 +296,7 @@ nonisolated enum StationMark {
         case Radio80000Provider.providerID: Radio80000Provider.logoURL
         case PanikProvider.providerID: PanikProvider.logoURL
         case RovrProvider.providerID: RovrProvider.logoURL
+        case N10ASProvider.providerID: N10ASProvider.logoURL
         default: nil
         }
     }

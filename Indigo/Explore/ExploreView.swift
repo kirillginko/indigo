@@ -6,6 +6,7 @@ struct ExploreView: View {
     /// Only for the one station whose live feed names a show and no id — see
     /// `KeptShow`.
     @Environment(Radio80000BrowseStore.self) private var radio80000Browse
+    @Environment(N10ASBrowseStore.self) private var n10asBrowse
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
@@ -537,7 +538,7 @@ struct ExploreView: View {
     }
 
     private func follow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, crate: crate) {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, n10as: n10asBrowse, crate: crate) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: appState.select(.crate)
@@ -545,7 +546,7 @@ struct ExploreView: View {
     }
 
     private func follow(_ node: MusicNode) async {
-        switch await KeptShow.destination(for: node, radio80000: radio80000Browse) {
+        switch await KeptShow.destination(for: node, radio80000: radio80000Browse, n10as: n10asBrowse) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: break

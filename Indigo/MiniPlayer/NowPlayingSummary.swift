@@ -115,6 +115,7 @@ struct NowPlayingSummary {
             }
             return "IDA"
         case Radio80000Provider.providerID: return "80K"
+        case N10ASProvider.providerID: return "N10"
         case PanikProvider.providerID: return "Panik"
         case RovrProvider.providerID: return "ROVR"
         case Track.sourceID: return "Local"

@@ -19,6 +19,7 @@ struct CrateView: View {
     @Environment(NoodsBrowseStore.self) private var noodsBrowse
     @Environment(IdaBrowseStore.self) private var idaBrowse
     @Environment(Radio80000BrowseStore.self) private var radio80000Browse
+    @Environment(N10ASBrowseStore.self) private var n10asBrowse
     @Environment(PanikBrowseStore.self) private var panikBrowse
     @Environment(RovrBrowseStore.self) private var rovrBrowse
     @Environment(NTSBrowseStore.self) private var ntsBrowse
@@ -239,6 +240,10 @@ struct CrateView: View {
             case IdaProvider.providerID where showID.hasPrefix("ida.episode."):
                 appState.open(.idaEpisode(slug: String(showID.dropFirst("ida.episode.".count))))
                 return true
+            case N10ASProvider.providerID where showID.hasPrefix("n10as.episode."):
+                appState.open(.n10asEpisode(
+                    id: String(showID.dropFirst("n10as.episode.".count))
+                ))
             case Radio80000Provider.providerID where showID.hasPrefix("radio80000.episode."):
                 appState.open(.radio80000Episode(
                     id: String(showID.dropFirst("radio80000.episode.".count))
@@ -307,7 +312,7 @@ struct CrateView: View {
 
 
     private func followKeptShow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, crate: crate) {
+        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, n10as: n10asBrowse, crate: crate) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: break
@@ -415,6 +420,10 @@ struct CrateView: View {
                 let id = String(showID.dropFirst("radio80000.episode.".count))
                 await radio80000Browse.loadDetailIfNeeded(id: id)
                 genres = radio80000Browse.episode(id: id)?.genres ?? []
+            case N10ASProvider.providerID where showID.hasPrefix("n10as.episode."):
+                let id = String(showID.dropFirst("n10as.episode.".count))
+                await n10asBrowse.loadDetailIfNeeded(id: id)
+                genres = n10asBrowse.episode(id: id)?.genres ?? []
             case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
                 // Panik tags the show rather than the broadcast, so the show's
                 // own headings are the closest thing an episode has.

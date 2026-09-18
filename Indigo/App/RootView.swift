@@ -144,6 +144,10 @@ struct RootView: View {
                     RovrShowDetailView(showID: id)
                 case .rovrCurator(let id):
                     RovrCuratorDetailView(curatorID: id)
+                case .n10asEpisode(let id):
+                    N10ASEpisodeDetailView(episodeID: id)
+                case .n10asShow(let slug):
+                    N10ASShowDetailView(slug: slug)
                 }
                 }
                 // A fresh view per page, rather than SwiftUI reusing the last
@@ -207,6 +211,9 @@ struct RootView: View {
                 case .rovrArchive: RovrArchiveView()
                 case .rovrShows: RovrShowsView()
                 case .rovrCurators: RovrCuratorsView()
+                case .n10asStation: N10ASStationView()
+                case .n10asArchive: N10ASArchiveView()
+                case .n10asShows: N10ASShowsView()
                 case .explore: ExploreView()
                 case .crate: CrateView()
                 case .dig: DigView()

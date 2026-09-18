@@ -65,6 +65,31 @@ final class PlaybackCoordinator {
     /// stopped trying. Whatever stood aside for it can stop standing aside.
     var onPlaybackSettled: (() -> Void)?
 
+    /// A margin below which a station cannot absorb the app going about its
+    /// business.
+    ///
+    /// Four seconds because the two stations either side of it behave
+    /// completely differently under load. Measured over two minutes each,
+    /// against a request every 1.7s — which is what the picture backlog
+    /// actually does while a station plays:
+    ///
+    ///   · IDA holds 10.1s of audio in hand. Under load it never dipped.
+    ///   · n10.as holds 1.95s. Under the same load its buffer ran empty and
+    ///     playback stalled inside a minute. Left alone it stalled not once
+    ///     in five minutes of listening.
+    ///
+    /// The margin is the station's, not ours — n10.as's Icecast hands over a
+    /// two-second burst and then paces exactly at realtime, so asking for
+    /// more buffer changes nothing. See `StreamAudioEngine.bufferedAhead`.
+    @ObservationIgnored private static let thinMargin: TimeInterval = 4
+    /// How often the margin is looked at. Comfortably inside the hold's own
+    /// forty-five seconds so a thin station never falls out of it, and short
+    /// enough that the trace shows the shape of a dip rather than whether one
+    /// happened to be underway on the tick. Reading it is a couple of
+    /// properties off the current item; it is not worth spacing out.
+    @ObservationIgnored private static let marginInterval = Duration.seconds(2)
+    @ObservationIgnored private var marginWatch: Task<Void, Never>?
+
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
@@ -365,6 +390,65 @@ final class PlaybackCoordinator {
         publishNowPlaying()
     }
 
+    // MARK: - Protecting a thin stream
+
+    /// Keeps background work aside for as long as the station on the air has
+    /// no room to spare.
+    ///
+    /// The hold used to end the moment a stream reached `playing`, reasoning
+    /// that a station that is playing is not competing for anything. That is
+    /// true of a station with ten seconds in hand and false of one with two:
+    /// n10.as stalls inside a minute against the picture backlog and never
+    /// stalls without it.
+    ///
+    /// Re-armed rather than held open, because the hold is a deadline: a
+    /// stream that ends badly, or a process that stops asking, gets the
+    /// backlog back on its own rather than starving it forever.
+    ///
+    /// Stations with room are let go of immediately, exactly as before — this
+    /// costs them nothing, and the listener who put IDA on still gets the
+    /// faces on the page they are reading.
+    /// Whether a station with this much audio in hand needs the app to leave
+    /// the network alone.
+    ///
+    /// Nil means the margin cannot be read yet, and is treated as thin: the
+    /// cost of being wrong that way is some artwork arriving late, and the
+    /// cost the other way is the broadcast breaking up.
+    static func shouldStandAside(forMargin ahead: TimeInterval?) -> Bool {
+        guard let ahead else { return true }
+        return ahead < thinMargin
+    }
+
+    private func watchMargin() {
+        marginWatch?.cancel()
+        marginWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self, self.source == .stream, self.stream.state == .playing else {
+                    self?.onPlaybackSettled?()
+                    return
+                }
+                let ahead = self.stream.bufferedAhead
+                // The margin beside everything else the app was doing at that
+                // second, because three synthetic reproductions of a listener's
+                // skipping all came back clean and the only account left worth
+                // having is the app's own. Written only while a station is on;
+                // the trace is off entirely unless a file sink exists.
+                // Kept because a station's margin is the one number that
+                // explains which of them can absorb what the app does, and
+                // it cost six wrong answers to learn that it has to be read
+                // rather than assumed.
+                let margin = ahead.map { String(format: "%.2f", $0) } ?? "-"
+                Trace.note("stream.margin \(margin)")
+                if Self.shouldStandAside(forMargin: ahead) {
+                    self.onPlaybackStarting?()
+                } else {
+                    self.onPlaybackSettled?()
+                }
+                try? await Task.sleep(for: Self.marginInterval)
+            }
+        }
+    }
+
     // MARK: - Engine callbacks
 
     private func handleTrackFinished() {
@@ -438,9 +522,14 @@ final class PlaybackCoordinator {
 
     private func handleStreamStateChange() {
         switch stream.state {
-        case .playing, .failed, .idle, .paused:
-            // Buffering is the one state that is still asking the network for
-            // something, and it is the one the hold exists for.
+        case .playing:
+            // Playing is not by itself a reason to let the backlog go: a
+            // station with no margin competes with it for the whole of the
+            // broadcast, not just while it is opening. See `watchMargin`.
+            watchMargin()
+        case .failed, .idle, .paused:
+            marginWatch?.cancel()
+            marginWatch = nil
             onPlaybackSettled?()
         default:
             break

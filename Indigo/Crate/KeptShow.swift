@@ -27,14 +27,16 @@ nonisolated enum KeptShowDestination: Equatable {
 enum KeptShow {
     /// Where this crate row should open.
     ///
-    /// `radio80000` is passed rather than reached for because the lookup it
-    /// answers is the one station that needs it: Airtime tells Radio 80000
-    /// what is on by name and gives no identifier at all, so the only way
-    /// back to the show is its own catalogue. Every other station either
-    /// names the broadcast or names nothing.
+    /// The two catalogues are passed rather than reached for because they
+    /// answer the lookup only two stations need: Airtime tells Radio 80000
+    /// what is on by name, and RadioCult tells n10.as the same way, neither
+    /// giving an identifier at all — so the only way back to the show is the
+    /// station's own catalogue. Every other station either names the
+    /// broadcast or names nothing.
     static func destination(
         for item: CrateItem,
         radio80000: Radio80000BrowseStore,
+        n10as: N10ASBrowseStore,
         crate: CrateService
     ) async -> KeptShowDestination? {
         if let showID = item.showID, let providerID = item.providerID,
@@ -57,6 +59,12 @@ enum KeptShow {
             crate.remember(showID: "\(Radio80000Provider.providerID).show.\(slug)", for: item)
             return .page(page)
         }
+        if item.providerID == N10ASProvider.providerID,
+           let page = await n10as.showDestination(named: item.displayTitle),
+           case .n10asShow(let slug) = page {
+            crate.remember(showID: "\(N10ASProvider.providerID).show.\(slug)", for: item)
+            return .page(page)
+        }
         return BroadcastSource.showsRoute(for: item.providerID).map { .section($0) }
     }
 
@@ -69,12 +77,17 @@ enum KeptShow {
     /// like a link.
     static func destination(
         for node: MusicNode,
-        radio80000: Radio80000BrowseStore
+        radio80000: Radio80000BrowseStore,
+        n10as: N10ASBrowseStore
     ) async -> KeptShowDestination? {
         if let page = node.destination { return .page(page) }
         guard node.kind == .broadcast, let providerID = node.providerID else { return nil }
         if providerID == Radio80000Provider.providerID,
            let page = await radio80000.showDestination(named: node.title) {
+            return .page(page)
+        }
+        if providerID == N10ASProvider.providerID,
+           let page = await n10as.showDestination(named: node.title) {
             return .page(page)
         }
         return BroadcastSource.showsRoute(for: providerID).map { .section($0) }

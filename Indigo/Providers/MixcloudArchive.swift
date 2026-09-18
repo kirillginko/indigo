@@ -44,10 +44,19 @@ nonisolated struct MixcloudCloudcastDTO: Decodable, Sendable {
     // Detail only.
     let description: String?
     let sections: [Section]?
+    /// Who uploaded it. Absent from a listing under one account, where it is
+    /// implied, and the reason a global search result can be told apart from
+    /// everyone else's — see `N10ASAPI.searchEpisodes`.
+    let user: User?
 
     nonisolated struct Tag: Decodable, Sendable {
         let name: String?
         let key: String?
+    }
+
+    nonisolated struct User: Decodable, Sendable {
+        let username: String?
+        let name: String?
     }
 
     /// Mixcloud's tracklist. Most uploads have none, and the ones that do give

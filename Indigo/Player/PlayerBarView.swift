@@ -24,6 +24,7 @@ struct PlayerBarView: View {
     @Environment(LYLProvider.self) private var lyl
     @Environment(IdaProvider.self) private var ida
     @Environment(Radio80000Provider.self) private var radio80000
+    @Environment(N10ASProvider.self) private var n10as
     @Environment(PanikProvider.self) private var panik
     @Environment(RovrProvider.self) private var rovr
     @Environment(CrateService.self) private var crate
@@ -233,6 +234,7 @@ struct PlayerBarView: View {
         case IdaProvider.providerID:
             return ida.channel(for: item.id).flatMap { ida.now(for: $0) }
         case Radio80000Provider.providerID: return radio80000.now
+        case N10ASProvider.providerID: return n10as.now
         case PanikProvider.providerID: return panik.now
         case RovrProvider.providerID: return rovr.now
         case NTSProvider.providerID: return nts.state(for: item.id)?.now
