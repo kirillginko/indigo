@@ -20,7 +20,21 @@ nonisolated enum ArtistName {
     private static let placeholders: Set<String> = [
         "various", "various artists", "various artist",
         "unknown artist", "unknown artists", "unknown",
-        "no artist", "not on label", "untitled"
+        "no artist", "not on label", "untitled", "artist not listed", "skit"
+    ]
+
+    /// What a tracklist writes in the artist column for something that is
+    /// not a record — "[Skit]", "(Instrumental)", "[Nature Sounds]".
+    ///
+    /// Only when the whole credit is bracketed. Bare, several of these are
+    /// the names of real acts, and bracketed names in general are too:
+    /// [re:jazz], (Dolch) and [multer] are all somebody. On 2026-09-23 the
+    /// backend held "[Skit]" as an artist with 65 radio plays, which is how
+    /// it came to be "played next to" the listener's crate.
+    private static let bracketedNonMusic: Set<String> = [
+        "skit", "intro", "outro", "interlude", "instrumental", "interview",
+        "nature sounds", "applause", "talk", "speech", "voice", "dialogue",
+        "silence", "unknown", "untitled", "id", "artist not listed"
     ]
 
     /// Whether this credit stands for nobody in particular.
@@ -32,7 +46,11 @@ nonisolated enum ArtistName {
         guard let name else { return false }
         let key = RecordingKey.normalize(name)
         guard !key.isEmpty else { return true }
-        return placeholders.contains(key)
+        if placeholders.contains(key) { return true }
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let bracketed = (trimmed.hasPrefix("[") && trimmed.hasSuffix("]"))
+            || (trimmed.hasPrefix("(") && trimmed.hasSuffix(")"))
+        return bracketed && bracketedNonMusic.contains(key)
     }
 
     /// Whether this credit is worth putting in the graph at all.
