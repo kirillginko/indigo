@@ -51,6 +51,9 @@ nonisolated extension RelationshipKind {
         }
     }
 
+    /// The same person under another name — never a route outward.
+    var isAlias: Bool { self == .sameAlias || self == .aliasOrProject }
+
     /// What an edge of this kind is worth before any evidence is counted.
     /// A catalogue fact outranks a shared tag, and the listener's own
     /// behaviour outranks a guess about a decade.

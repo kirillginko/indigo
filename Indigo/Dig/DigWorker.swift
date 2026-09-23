@@ -391,6 +391,36 @@ actor DigWorker {
         return DigHistory(context: modelContext, graph: graph).suggestions(limit: limit)
     }
 
+    /// The landing page's recommendations — one graph step out of each of
+    /// the listener's own artists. Here for the same reason as the above: it
+    /// walks ten neighbourhoods, and that is not work for the drawing thread.
+    ///
+    /// Kept between revisions. Every enrichment write moves the revision, and
+    /// rebuilding for each one cost ~950ms of this actor — ten stored
+    /// neighbourhoods at ~80ms apiece — every few seconds, queued in front of
+    /// whatever artist page somebody was opening. A seed's neighbourhood only
+    /// changes when it is forgotten, so that is what throws this away.
+    func crateRecommendations(
+        seeds: [CrateSeed], known: Set<String>, generation: Int
+    ) -> CrateRecommendations {
+        if let kept = keptRecommendations, kept.seeds == seeds, kept.known == known,
+           !seeds.contains(where: {
+               ForgottenNodes.shared.wasForgotten(MusicNode.artist($0.name).id, since: kept.builtAt)
+           }) {
+            return kept.result
+        }
+        refresh(generation)
+        guard let graph else { return .empty }
+        let builtAt = Date()
+        let result = CrateRecommendations.build(seeds: seeds, known: known, graph: graph)
+        keptRecommendations = (seeds, known, builtAt, result)
+        return result
+    }
+
+    private var keptRecommendations: (
+        seeds: [CrateSeed], known: Set<String>, builtAt: Date, result: CrateRecommendations
+    )?
+
     func scenes(forArtist name: String, generation: Int) -> [MusicScene] {
         sceneEngine(generation).scenes(forArtist: name)
     }

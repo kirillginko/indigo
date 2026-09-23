@@ -122,4 +122,16 @@ nonisolated struct EdgeSet: Sendable {
     }
 
     var isEmpty: Bool { edges.isEmpty }
+
+    /// Every artist this node reaches by an alias edge — its other names,
+    /// projects and members. Anything built for broadening out leaves these
+    /// out: AFX is not a recommendation for somebody who keeps Aphex Twin.
+    ///
+    /// Read off the edges rather than asked of the alias resolver. The
+    /// resolver closes over the whole artist table, and asking it from the
+    /// landing page assembled six tables cold — 1.5s of the first open —
+    /// to learn what the stored edges already said.
+    var aliasKeys: Set<String> {
+        Set(edges.values.filter { $0.kind.isAlias && $0.to.kind == .artist }.map(\.to.key))
+    }
 }

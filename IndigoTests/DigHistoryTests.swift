@@ -121,6 +121,19 @@ final class DigHistoryTests: XCTestCase {
         XCTAssertNotNil(suggestion.node.destination, "A suggestion nobody can open is not one")
     }
 
+    /// Another name for the same person is not somewhere new. Alias edges
+    /// are the strongest in the graph, so they used to lead TRY outright.
+    func testAnAliasIsNotASuggestion() {
+        let aphex = artist("Aphex Twin", id: 1, labels: ["Warp"], styles: ["IDM"])
+        aphex.aliasNames = ["AFX"]
+        artist("Autechre", id: 2, labels: ["Warp"], styles: ["IDM"])
+        for _ in 0..<3 { history.record(.artist("Aphex Twin")) }
+
+        let suggested = history.suggestions().map(\.node.title)
+        XCTAssertFalse(suggested.contains("AFX"))
+        XCTAssertTrue(suggested.contains("Autechre"))
+    }
+
     /// Nothing visited more than once means nothing to reason from, and
     /// guessing anyway would be worse than saying nothing.
     func testNoHistoryMeansNoSuggestions() {

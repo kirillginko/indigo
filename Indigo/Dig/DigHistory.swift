@@ -208,12 +208,20 @@ nonisolated struct DigHistory {
             // How much this listener trusts the place it came from, flattened
             // so one much-visited label cannot drown out everything else.
             let pull = min(1, 0.5 + Double(origin.visits) / 12)
-            for connection in graph.neighbors(of: originNode).byDestination
-            where !seen.contains(connection.node.id) && connection.node.destination != nil {
-                let score = connection.confidence * pull
+            // Another name for the same person is not somewhere new. Alias
+            // edges carry the highest confidence in the graph, so left in they
+            // took the top of TRY every time — "AFX, via Aphex Twin".
+            let neighbours = graph.neighbors(of: originNode)
+            let family = originNode.kind == .artist ? neighbours.aliasKeys : []
+            for connection in neighbours.byDestination
+            where !seen.contains(connection.node.id) && connection.node.destination != nil
+                && !(connection.node.kind == .artist && family.contains(connection.node.key)) {
+                let edges = connection.edges.filter { !$0.kind.isAlias }
+                guard !edges.isEmpty else { continue }
+                let score = ConfidenceMath.combined(edges.map(\.weight)) * pull
                 let candidate = Suggestion(
                     node: connection.node,
-                    reasons: connection.edges.map(\.relationship),
+                    reasons: edges.map(\.relationship),
                     via: originNode,
                     score: score
                 )
