@@ -170,24 +170,32 @@ nonisolated struct DigHistory {
     /// Ranked by returns rather than by visits: opening something once is
     /// curiosity, and opening it a fourth time is how they listen. A node seen
     /// exactly once tells you nothing and would crowd out the ones that do.
+    ///
+    /// The store does the filtering and the ordering. These, `recent` and
+    /// `usualNextStep` all used to read their table whole and sort it in
+    /// Swift, on the main actor, on every revision — 3.6s of main thread in
+    /// one 45-second sample of somebody switching pages.
     func haunts(kinds: Set<MusicNodeKind> = [.label, .artist, .broadcast], limit: Int = 6) -> [DigVisit] {
-        visits()
-            .filter { kinds.contains($0.kind) && $0.visits > 1 }
-            .sorted {
-                $0.visits == $1.visits
-                    ? $0.lastVisitedAt > $1.lastVisitedAt
-                    : $0.visits > $1.visits
-            }
+        let descriptor = FetchDescriptor<DigVisit>(
+            predicate: #Predicate { $0.visits > 1 },
+            sortBy: [
+                SortDescriptor(\.visits, order: .reverse),
+                SortDescriptor(\.lastVisitedAt, order: .reverse)
+            ]
+        )
+        return ((try? context.fetch(descriptor)) ?? [])
+            .filter { kinds.contains($0.kind) }
             .prefix(limit)
             .map { $0 }
     }
 
     /// Where the listener was last, so a dig can be picked back up.
     func recent(limit: Int = 5) -> [DigVisit] {
-        visits()
-            .sorted { $0.lastVisitedAt > $1.lastVisitedAt }
-            .prefix(limit)
-            .map { $0 }
+        var descriptor = FetchDescriptor<DigVisit>(
+            sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = limit
+        return (try? context.fetch(descriptor)) ?? []
     }
 
     /// "TRY" — where this listener has not been.
@@ -208,12 +216,20 @@ nonisolated struct DigHistory {
             // How much this listener trusts the place it came from, flattened
             // so one much-visited label cannot drown out everything else.
             let pull = min(1, 0.5 + Double(origin.visits) / 12)
-            for connection in graph.neighbors(of: originNode).byDestination
-            where !seen.contains(connection.node.id) && connection.node.destination != nil {
-                let score = connection.confidence * pull
+            // Another name for the same person is not somewhere new. Alias
+            // edges carry the highest confidence in the graph, so left in they
+            // took the top of TRY every time — "AFX, via Aphex Twin".
+            let neighbours = graph.neighbors(of: originNode)
+            let family = originNode.kind == .artist ? neighbours.aliasKeys : []
+            for connection in neighbours.byDestination
+            where !seen.contains(connection.node.id) && connection.node.destination != nil
+                && !(connection.node.kind == .artist && family.contains(connection.node.key)) {
+                let edges = connection.edges.filter { !$0.kind.isAlias }
+                guard !edges.isEmpty else { continue }
+                let score = ConfidenceMath.combined(edges.map(\.weight)) * pull
                 let candidate = Suggestion(
                     node: connection.node,
-                    reasons: connection.edges.map(\.relationship),
+                    reasons: edges.map(\.relationship),
                     via: originNode,
                     score: score
                 )
@@ -245,8 +261,9 @@ nonisolated struct DigHistory {
     /// from here.
     func usualNextStep(from node: MusicNode) -> DigVisit? {
         let origin = node.id
-        let best = steps()
-            .filter { $0.fromNodeID == origin }
+        let best = ((try? context.fetch(
+            FetchDescriptor<DigStep>(predicate: #Predicate { $0.fromNodeID == origin })
+        )) ?? [])
             .max { $0.count == $1.count ? $0.lastAt < $1.lastAt : $0.count < $1.count }
         return best.flatMap { visit(nodeID: $0.toNodeID) }
     }

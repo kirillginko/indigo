@@ -53,7 +53,18 @@ nonisolated struct LocalFileSource {
            let track = track(atPath: linked.identifier) {
             return track
         }
-        guard let match = findMatch(for: recording) else { return nil }
+        // A miss is remembered too, for as long as the library holds the
+        // same number of tracks. Only hits used to be: a crated radio track
+        // with no copy on disk ran three whole-library scans on every pass,
+        // and the crate makes a pass whenever enrichment writes anything —
+        // 1.3s of main thread in a sample of somebody switching pages.
+        let library = (try? context.fetchCount(FetchDescriptor<Track>())) ?? 0
+        let question = LocalMisses.question(for: recording)
+        if LocalMisses.shared.isKnownMiss(question, libraryCount: library) { return nil }
+        guard let match = findMatch(for: recording) else {
+            LocalMisses.shared.record(question, libraryCount: library)
+            return nil
+        }
         RecordingStore(context: context).link(recording, toLocalFile: match.track.path)
         return match.track
     }
@@ -125,5 +136,37 @@ nonisolated struct LocalFileSource {
     static func formatDetail(_ track: Track) -> String? {
         let ext = URL(fileURLWithPath: track.path).pathExtension.uppercased()
         return ext.isEmpty ? nil : ext
+    }
+}
+
+/// Recordings the library has been searched for and does not have.
+///
+/// Keyed on what the ladder matches on — the recording's identity, its match
+/// key and its title — so a recording that is re-credited is asked again. All
+/// of it is thrown away the moment the library's track count moves, which is
+/// the one thing that can turn a miss into a hit.
+nonisolated final class LocalMisses: @unchecked Sendable {
+    static let shared = LocalMisses()
+
+    private let lock = NSLock()
+    private var libraryCount = -1
+    private var misses: Set<String> = []
+
+    static func question(for recording: Recording) -> String {
+        "\(recording.id)|\(recording.matchKey)|\(recording.isrc ?? "")|\(recording.title ?? "")"
+    }
+
+    func isKnownMiss(_ question: String, libraryCount count: Int) -> Bool {
+        lock.withLock { libraryCount == count && misses.contains(question) }
+    }
+
+    func record(_ question: String, libraryCount count: Int) {
+        lock.withLock {
+            if libraryCount != count {
+                libraryCount = count
+                misses.removeAll()
+            }
+            misses.insert(question)
+        }
     }
 }

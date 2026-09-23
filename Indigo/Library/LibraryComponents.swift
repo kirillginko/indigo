@@ -57,7 +57,8 @@ struct PageHeader<Trailing: View>: View {
         .padding(.horizontal, Metrics.gutter)
         .padding(.top, Metrics.titleBarInset + 20)
         .padding(.bottom, 16)
-        .background(IndigoGlassBackground(tint: 0.52, shaderOpacity: 0.27))
+        // Solid, like the page under it. Only the sidebar stays glass.
+        .background(IndigoGlassBackground.content)
         // Headers are persistent dark chrome in both system appearances, just
         // like the sidebar and player. This also gives trailing controls the
         // correct inverted palette without every page restyling them.

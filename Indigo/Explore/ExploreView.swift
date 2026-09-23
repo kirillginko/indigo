@@ -86,7 +86,8 @@ struct ExploreView: View {
         }
         .padding(.top, Metrics.titleBarInset + 18).padding(.horizontal, 28).padding(.bottom, 16)
         .foregroundStyle(ink)
-        .background(IndigoGlassBackground(tint: 0.52, shaderOpacity: 0.27))
+        // Solid, like the page under it. Only the sidebar stays glass.
+        .background(IndigoGlassBackground.content)
     }
 
     @ViewBuilder private func objects(_ kept: [CrateItem], in size: CGSize) -> some View {

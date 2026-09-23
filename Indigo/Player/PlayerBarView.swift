@@ -379,6 +379,10 @@ struct PlayerShaderBackdrop: View {
 
     private var animating: Bool { player.isPlaying && !player.isBuffering && !reduceMotion }
 
+    /// The frame every paused copy shows. Written only while animating, so it
+    /// is the last frame playback reached — or zero, before anything played.
+    private static var frozenTime: Double = 0
+
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: !animating)) { timeline in
             GeometryReader { proxy in
@@ -388,10 +392,21 @@ struct PlayerShaderBackdrop: View {
                 // Track changes briefly enter buffering. Keep sampling the
                 // shared clock during that handoff instead of substituting
                 // zero, which visibly restarted the field for every song.
-                let sharedTime = reduceMotion
-                    ? 0
-                    : timeline.date.timeIntervalSinceReferenceDate
+                //
+                // Paused, a TimelineView holds whatever date it had when it
+                // was built — and a pinned day header is built lazily, as it
+                // scrolls in, so each one froze on a different frame and sat
+                // visibly offset against the page until playback put every
+                // copy back on the live clock. Paused copies all read the
+                // last moment any copy was animating instead.
+                let sharedTime: Double = {
+                    if reduceMotion { return 0 }
+                    guard animating else { return Self.frozenTime }
+                    let now = timeline.date.timeIntervalSinceReferenceDate
                         .truncatingRemainder(dividingBy: 4096)
+                    Self.frozenTime = now
+                    return now
+                }()
                 let energy = animating ? player.audioLevel() : 0
                 Rectangle().fill(.black)
                     .colorEffect(ShaderLibrary.playerFlowField(

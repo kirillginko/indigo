@@ -627,14 +627,25 @@ private final class WindowSamplingVisualEffectView: NSVisualEffectView {
 struct IndigoGlassBackground: View {
     let tint: Double
     let shaderOpacity: Double
+    /// A solid ground instead of the blur, so nothing behind the window shows
+    /// through. For surfaces that are read rather than glanced at.
+    var opaque = false
+
+    /// The page itself, and anything pinned inside it that has to hide rows
+    /// scrolling beneath — one value, so the two can never drift apart.
+    static let content = IndigoGlassBackground(tint: 0.64, shaderOpacity: 0.22, opaque: true)
 
     var body: some View {
         ZStack {
-            #if os(macOS)
-            SidebarVisualEffect()
-            #else
-            Rectangle().fill(.ultraThinMaterial)
-            #endif
+            if opaque {
+                Color(white: 0.17)
+            } else {
+                #if os(macOS)
+                SidebarVisualEffect()
+                #else
+                Rectangle().fill(.ultraThinMaterial)
+                #endif
+            }
             Color.black.opacity(tint)
             PlayerShaderBackdrop(noiseBoost: 3.5)
                 .opacity(shaderOpacity)

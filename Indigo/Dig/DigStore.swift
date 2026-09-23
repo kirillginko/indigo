@@ -1368,6 +1368,16 @@ final class DigStore {
         }
     }
 
+    func crateRecommendations(seeds: [CrateSeed], known: Set<String>) async -> CrateRecommendations {
+        let _ = revision
+        settle()
+        let asked = revision
+        let worker = worker
+        return await Trace.stage("dig.recommendations") {
+            await worker.crateRecommendations(seeds: seeds, known: known, generation: asked)
+        }
+    }
+
     func scenes(forArtist name: String) async -> [MusicScene] {
         let _ = revision
         settle()

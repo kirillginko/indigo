@@ -24,6 +24,7 @@ struct DigLanding {
     var suggestions: [DigHistory.Suggestion]
     var nextSteps: [String: String]
     var radio: Catalog.DigRadio?
+    var recommendations: CrateRecommendations
 }
 
 struct DigView: View {
@@ -41,6 +42,9 @@ struct DigView: View {
     /// What radio knows about the artists this listener keeps. The only part
     /// of this page that asks the backend anything.
     @State private var radio: Catalog.DigRadio?
+    /// Music to go and find, one step out of the artists they keep. The
+    /// top of the page, because it is the part they do not already have.
+    @State private var recommendations: CrateRecommendations = .empty
     /// The page appears once, whole. Everything above the list arrives from a
     /// task, so drawing before it lands meant showing the artists and then
     /// shoving them down a moment later.
@@ -131,6 +135,8 @@ struct DigView: View {
                         .padding(.top, 22)
                 }
 
+                recommendationShelves(shown.recommendations)
+
                 memory(shown)
 
                 if !entries.isEmpty {
@@ -198,6 +204,8 @@ struct DigView: View {
         if let cached {
             apply(cached)
             isReady = true
+        } else if recommendations.isEmpty, let saved = CrateRecommendations.saved() {
+            recommendations = saved
         }
 
         // Starting points come from the crate and the library, and the page
@@ -268,7 +276,8 @@ struct DigView: View {
             haunts: frequentVisits,
             suggestions: trySuggestions,
             nextSteps: nextSteps,
-            radio: radio
+            radio: radio,
+            recommendations: recommendations
         )
     }
 
@@ -282,12 +291,13 @@ struct DigView: View {
                 haunts: frequentVisits,
                 suggestions: trySuggestions,
                 nextSteps: nextSteps,
-                radio: radio
+                radio: radio,
+                recommendations: recommendations
             )
         }
         return dig.landing ?? DigLanding(
             crateRevision: -1, entries: [], recent: [], haunts: [],
-            suggestions: [], nextSteps: [:], radio: nil
+            suggestions: [], nextSteps: [:], radio: nil, recommendations: .empty
         )
     }
 
@@ -298,6 +308,7 @@ struct DigView: View {
         trySuggestions = landing.suggestions
         nextSteps = landing.nextSteps
         radio = landing.radio
+        recommendations = landing.recommendations
     }
 
     /// Asked about the names already worked out, not about the library again.
@@ -325,6 +336,32 @@ struct DigView: View {
         // Off the main actor: this one walks the graph, and the other three
         // are indexed fetches. See `DigStore.digSuggestions(limit:)`.
         trySuggestions = await dig.digSuggestions()
+        // Waited on only when there is nothing to show. With shelves already
+        // on screen — kept from last launch, or from the last visit — the new
+        // answer lands in place, and the page does not stand still for it.
+        let seeds = seeds
+        let known = knownArtistKeys
+        let load = Task {
+            let found = await dig.crateRecommendations(seeds: seeds, known: known)
+            recommendations = found
+            dig.landing?.recommendations = found
+            found.save()
+        }
+        if recommendations.isEmpty { await load.value }
+    }
+
+    /// Where recommendations start: the crated artists, most-kept first — or
+    /// the library's deepest, for somebody who has not crated anything yet.
+    private var seeds: [CrateSeed] {
+        let crated = entries.filter { $0.crateCount > 0 }
+        return (crated.isEmpty ? Array(entries.prefix(10)) : crated).map {
+            CrateSeed(name: $0.name, mbid: $0.mbid, crateCount: $0.crateCount, libraryCount: $0.libraryCount)
+        }
+    }
+
+    /// Everybody they already have, which is everybody not to recommend.
+    private var knownArtistKeys: Set<String> {
+        Set(entries.map { RecordingKey.normalizeArtist($0.name) })
     }
 
     /// What this listener has actually been doing. Their own history first,
@@ -422,6 +459,45 @@ struct DigView: View {
             .padding(.top, 22)
             .padding(.bottom, 6)
         }
+    }
+
+    /// Spotify's shape, Indigo's evidence: rows of faces to go and open, each
+    /// one next to somebody already in the crate and saying why.
+    @ViewBuilder
+    private func recommendationShelves(_ found: CrateRecommendations) -> some View {
+        if !found.isEmpty {
+            VStack(alignment: .leading, spacing: 26) {
+                if !found.forYou.isEmpty {
+                    DigShelf(title: "Made from your crate", picks: found.forYou, caption: \.becauseLine, open: open)
+                }
+                ForEach(found.shelves) { shelf in
+                    DigShelf(title: "More like \(shelf.seed)", picks: shelf.picks, caption: \.reason, open: open)
+                }
+                if !found.labels.isEmpty {
+                    DigSection(title: "Labels behind your crate") {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(found.labels) { label in
+                                DigLine(text: label.node.title, detail: labelLine(label)) { open(label) }
+                                Rule()
+                            }
+                        }
+                    }
+                    .padding(.horizontal, Metrics.gutter)
+                }
+            }
+            .padding(.top, 22)
+        }
+    }
+
+    private func open(_ pick: CrateRecommendations.Pick) {
+        if let page = pick.node.destination { appState.open(page) }
+    }
+
+    /// "Aphex Twin · Autechre release here"
+    private func labelLine(_ label: CrateRecommendations.Pick) -> String {
+        let shown = label.because.prefix(2).joined(separator: " · ")
+        let more = label.because.count - 2
+        return (more > 0 ? "\(shown) +\(more)" : shown) + (label.because.count == 1 ? " releases here" : " release here")
     }
 
     /// The broadcast a play refers to, when Indigo has a page for it.
@@ -587,5 +663,75 @@ private struct DigStartRow: View {
         }
         .buttonStyle(.plain)
         .onHover { isHovering = $0 }
+    }
+}
+
+/// A titled row of artist cards that scrolls sideways — the shape every
+/// streaming home page has, because it lets a page offer forty names without
+/// being forty rows long.
+private struct DigShelf: View {
+    let title: String
+    let picks: [CrateRecommendations.Pick]
+    let caption: (CrateRecommendations.Pick) -> String
+    let open: (CrateRecommendations.Pick) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            DigSection(title: title, trailing: "\(picks.count)") { EmptyView() }
+                .padding(.horizontal, Metrics.gutter)
+            ScrollView(.horizontal) {
+                LazyHStack(alignment: .top, spacing: 14) {
+                    ForEach(picks) { pick in
+                        DigArtistCard(pick: pick, caption: caption(pick)) { open(pick) }
+                    }
+                }
+                .padding(.horizontal, Metrics.gutter)
+                .padding(.bottom, 6)
+            }
+            .scrollIndicators(.never)
+        }
+    }
+}
+
+private struct DigArtistCard: View {
+    @Environment(DigStore.self) private var dig
+    let pick: CrateRecommendations.Pick
+    let caption: String
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    private static let side: CGFloat = 132
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                ArtworkView(
+                    remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                    side: Self.side,
+                    glyphScale: 0.26,
+                    placeholder: .mosaic
+                )
+                .overlay {
+                    Rectangle().strokeBorder(
+                        isHovering ? Palette.accent : Palette.outline,
+                        lineWidth: isHovering ? 2 : Metrics.hairline
+                    )
+                }
+                Text(pick.node.title)
+                    .font(Typeface.body(12.5, weight: .medium))
+                    .foregroundStyle(isHovering ? Palette.accent : Palette.ink)
+                    .lineLimit(1)
+                Text(caption)
+                    .font(Typeface.mono(9.5))
+                    .foregroundStyle(Palette.inkFaint)
+                    .lineLimit(2, reservesSpace: true)
+            }
+            .frame(width: Self.side, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+        .accessibilityHint(pick.reason)
     }
 }

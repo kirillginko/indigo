@@ -146,7 +146,10 @@ struct CrateView: View {
         .padding(.horizontal, Metrics.gutter)
         .padding(.top, 20)
         .padding(.bottom, 10)
-        .background(Palette.paper)
+        // Pinned header needs an opaque backing to hide rows scrolling
+        // beneath it — exactly the page's own, so it reads as one surface.
+        // Not the player bar's shader, which read as a bright amber band.
+        .background(IndigoGlassBackground.content)
         .overlay(alignment: .bottom) { Rule(color: Palette.outline) }
     }
 
