@@ -134,6 +134,27 @@ final class DigHistoryTests: XCTestCase {
         XCTAssertTrue(suggested.contains("Autechre"))
     }
 
+    /// One much-visited artist must not take the whole list. Ranked by score
+    /// alone, their own records — 0.9-confidence edges — filled every slot.
+    func testOneHauntDoesNotTakeTheWholeList() {
+        let aphex = artist("Aphex Twin", id: 1, labels: ["Warp"], styles: ["IDM"])
+        aphex.releaseTitles = ["Drukqs", "Syro", "Selected Ambient Works", "Richard D. James Album",
+                               "Come to Daddy", "Windowlicker", "Collapse"]
+        aphex.releaseDiscogsIDs = [11, 12, 13, 14, 15, 16, 17]
+        artist("Autechre", id: 2, labels: ["Warp"], styles: ["IDM"])
+        artist("Skee Mask", id: 3, labels: ["Ilian Tape"], styles: ["Techno"])
+        artist("Stenny", id: 4, labels: ["Ilian Tape"], styles: ["Techno"])
+        for _ in 0..<9 { history.record(.artist("Aphex Twin")) }
+        for _ in 0..<3 { history.record(.artist("Skee Mask")) }
+
+        let suggestions = history.suggestions()
+        let fromAphex = suggestions.filter { $0.via.title == "Aphex Twin" }
+        XCTAssertLessThanOrEqual(fromAphex.count, 2, suggestions.map(\.node.title).description)
+        XCTAssertTrue(suggestions.contains { $0.via.title == "Skee Mask" })
+        XCTAssertTrue(suggestions.contains { $0.node.kind == .artist },
+                      "Not only records: somebody to follow too")
+    }
+
     /// Nothing visited more than once means nothing to reason from, and
     /// guessing anyway would be worse than saying nothing.
     func testNoHistoryMeansNoSuggestions() {

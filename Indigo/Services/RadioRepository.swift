@@ -137,10 +137,16 @@ nonisolated struct RadioRepository: Sendable {
         guard !keys.isEmpty else { return Catalog.DigRadio(onRadio: [], alongside: []) }
 
         let client = try SupabaseService.requireClient()
-        return try await client
+        var radio: Catalog.DigRadio = try await client
             .rpc("dig_radio_for_artists", params: DigRadioParams(pNames: keys, pLimit: limit))
             .execute()
             .value
+        // The shared catalogue files whatever a tracklist puts in the artist
+        // column, "[Skit]" included, so a placeholder can arrive as a
+        // neighbour. Nobody can go and dig into one.
+        radio.alongside.removeAll { !ArtistName.isRealArtist($0.name) }
+        radio.onRadio.removeAll { !ArtistName.isRealArtist($0.artistName) }
+        return radio
     }
 
     /// An episode's tracklist as Indigo holds it, with the artist resolved

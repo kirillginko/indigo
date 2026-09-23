@@ -206,7 +206,7 @@ nonisolated struct DigHistory {
     /// leaving it in is how a recommendation list turns into a mirror.
     func suggestions(limit: Int = 6) -> [Suggestion] {
         let seen = Set(visits().map(\.nodeID))
-        let origins = haunts(kinds: [.artist, .label, .broadcast, .scene], limit: 4)
+        let origins = haunts(kinds: [.artist, .label, .broadcast, .scene], limit: 6)
         guard !origins.isEmpty else { return [] }
 
         let graph = shared ?? GraphStore(context: context)
@@ -237,10 +237,32 @@ nonisolated struct DigHistory {
                 best[connection.node.id] = candidate
             }
         }
-        return best.values
+        let ranked = best.values
             .sorted { $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score }
-            .prefix(limit)
-            .map { $0 }
+        return Self.varied(ranked, limit: limit)
+    }
+
+    /// The strongest suggestions, spread across where they came from.
+    ///
+    /// Ranked purely by score, the most-visited place took the whole list: an
+    /// artist's own records are 0.9-confidence edges, so somebody with 63
+    /// visits to Aphex Twin was offered six Aphex Twin records and nothing
+    /// else. Each place now gets at most two, one of each kind — a record and
+    /// an artist, say. A short list is left short: topping it back up in score
+    /// order refilled it from the same place.
+    static func varied(_ ranked: [Suggestion], limit: Int, perOrigin: Int = 2) -> [Suggestion] {
+        var chosen: [Suggestion] = []
+        var fromOrigin: [String: Int] = [:]
+        var kindsFromOrigin: Set<String> = []
+        for suggestion in ranked where chosen.count < limit {
+            let origin = suggestion.via.id
+            let kind = "\(origin)|\(suggestion.node.kind.rawValue)"
+            guard fromOrigin[origin, default: 0] < perOrigin, !kindsFromOrigin.contains(kind) else { continue }
+            chosen.append(suggestion)
+            fromOrigin[origin, default: 0] += 1
+            kindsFromOrigin.insert(kind)
+        }
+        return chosen
     }
 
     /// Somewhere worth going, and the place in the listener's own history

@@ -35,6 +35,18 @@ final class ArtistNameTests: XCTestCase {
         XCTAssertFalse(ArtistName.isRealArtist(nil))
     }
 
+    /// What a tracklist writes in the artist column for a gap between
+    /// records. Bracketed, it is nobody; bare or bracketed-but-otherwise, it
+    /// can be a real act, and those stay.
+    func testABracketedSkitIsNotAnArtist() {
+        for name in ["[Skit]", "(Instrumental)", "[Nature Sounds]", "(Artist Not Listed)", "Skit"] {
+            XCTAssertFalse(ArtistName.isRealArtist(name), name)
+        }
+        for name in ["[re:jazz]", "(Dolch)", "[multer]", "Intro", "Voice"] {
+            XCTAssertTrue(ArtistName.isRealArtist(name), name)
+        }
+    }
+
     /// Matched on the whole name, never as a prefix. Both of these are real
     /// and both would be lost to a looser rule.
     func testRealArtistsWhoseNamesStartThatWaySurvive() {
