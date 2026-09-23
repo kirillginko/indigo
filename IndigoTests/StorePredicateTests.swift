@@ -102,6 +102,20 @@ final class StorePredicateTests: XCTestCase {
     }
 
     /// `CrateService.genres(atPaths:)` and `DigStore.backfillLocalTrack`.
+    /// `DigHistory.haunts`, `recent` and `usualNextStep`, which ask the store
+    /// to filter and sort rather than reading the tables whole.
+    func testTheDigHistoryQueries() throws {
+        let history = DigHistory(context: context)
+        for _ in 0..<3 { history.record(.label("Ilian Tape")) }
+        for _ in 0..<2 { history.record(.artist("Stenny"), from: .label("Ilian Tape")) }
+        history.record(.artist("Andrea"), from: .label("Ilian Tape"))
+        history.record(.artist("Seen Once"))
+
+        XCTAssertEqual(history.haunts().map(\.title), ["Ilian Tape", "Stenny"])
+        XCTAssertEqual(history.recent(limit: 2).map(\.title), ["Seen Once", "Andrea"])
+        XCTAssertEqual(history.usualNextStep(from: .label("Ilian Tape"))?.title, "Stenny")
+    }
+
     func testFetchingTracksByPath() throws {
         for index in 0..<5 {
             context.insert(Track(

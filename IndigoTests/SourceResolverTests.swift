@@ -180,6 +180,22 @@ final class SourceResolverTests: XCTestCase {
                        "Resolving twice must not add a second link")
     }
 
+    /// A miss is remembered so the crate stops rescanning the library for it —
+    /// but only until the library changes, or a file added afterwards would
+    /// never be found.
+    func testARememberedMissIsForgottenWhenTheLibraryChanges() throws {
+        let recording = try store.upsert(title: "Gantz Graf", artistName: "Autechre")
+        makeTrack(path: "/Music/other.flac", title: "Something Else", artist: "Someone")
+
+        XCTAssertNil(LocalFileSource(context: context).resolvedTrack(for: recording))
+        makeTrack(path: "/Music/Gantz Graf.flac", title: "Gantz Graf", artist: "Autechre")
+
+        XCTAssertEqual(
+            LocalFileSource(context: context).resolvedTrack(for: recording)?.path,
+            "/Music/Gantz Graf.flac"
+        )
+    }
+
     func testNoLocalCopyYieldsNoLocalSource() throws {
         let recording = try store.upsert(title: "Nothing I Own", artistName: "Nobody")
         makeTrack(path: "/Music/different.flac", title: "Something Else", artist: "Someone")
