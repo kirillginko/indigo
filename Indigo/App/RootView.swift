@@ -68,7 +68,11 @@ struct RootView: View {
     @ViewBuilder
     private var content: some View {
         ZStack {
-            Palette.paper
+            // Opaque rather than the sidebar's glass: the desktop showing
+            // through behind text made the page harder to read. The same
+            // value backs Crate's pinned day headers, so they stay one
+            // continuous surface with the page.
+            IndigoGlassBackground.content
             if let detail = appState.detail {
                 Group {
                 switch detail {
@@ -220,6 +224,11 @@ struct RootView: View {
                 }
             }
         }
+        // Same dark glass treatment as the sidebar and player bar. Palette
+        // colours all carry a dark-appearance variant in the asset catalog,
+        // so forcing the scheme here is enough to flip every Palette.paper /
+        // Palette.ink use inside content — no per-view edits needed.
+        .environment(\.colorScheme, .dark)
     }
 
     /// Errors surface here — inline, dismissible, never modal.
