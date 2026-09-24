@@ -8,7 +8,7 @@
 // these tables.
 
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
-import { storeReleasePayload } from "./release_cache.ts";
+import { storeCachePayload, storeReleasePayload } from "./release_cache.ts";
 import { normalizeName } from "./normalize.ts";
 
 const PROVIDER = "discogs";
@@ -554,13 +554,22 @@ export async function cacheDiscogsShelf(
   // Hosono against a Discogs that was not refusing anything. The crawl was
   // already fetching exactly this listing, for exactly these artists, and
   // discarding it after enqueuing the releases named in it.
+  // In R2 where it is configured (0052), inline otherwise or if that fails.
+  const shelfID = `${path}?${SHELF_QUERY}`;
+  let storedAt: string | null = null;
+  try {
+    storedAt = await storeCachePayload(supabase, PROVIDER, path, shelfID, page);
+  } catch (cause) {
+    console.error("shelf: upload failed", String(cause).slice(0, 200));
+  }
   const stored = await supabase
     .from("metadata_cache")
     .upsert({
       provider: PROVIDER,
       resource_type: path,
-      resource_id: `${path}?${SHELF_QUERY}`,
-      payload: page,
+      resource_id: shelfID,
+      payload: storedAt ? null : page,
+      payload_path: storedAt,
       fetched_at: new Date().toISOString(),
       expires_at: new Date(Date.now() + SHELF_CACHE_TTL_SECONDS * 1000).toISOString(),
     }, { onConflict: "provider,resource_type,resource_id" });

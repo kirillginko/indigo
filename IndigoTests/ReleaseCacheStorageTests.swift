@@ -131,4 +131,24 @@ final class ReleaseCacheStorageTests: XCTestCase {
             url.absoluteString
         )
     }
+
+    /// A row that moved to R2 (0051) reads from the bucket's public host, and
+    /// one still in Supabase Storage is untouched by that: both exist while
+    /// the move runs.
+    func testAReleaseInR2IsReadFromItsPublicHost() {
+        setenv("CATALOG_CACHE_HOST", "pub-test.r2.dev", 1)
+        defer { unsetenv("CATALOG_CACHE_HOST") }
+        XCTAssertEqual(
+            MetadataRepository.storedObjectURL(forPath: "r2:releases/74698.json")?.absoluteString,
+            "https://pub-test.r2.dev/releases/74698.json"
+        )
+    }
+
+    /// With no host configured, an R2 row is a miss -- refetched through the
+    /// backend -- rather than a request to somewhere invented.
+    func testAnR2RowWithNoHostIsAMiss() {
+        unsetenv("CATALOG_CACHE_HOST")
+        guard SupabaseConfiguration.catalogCacheHost == nil else { return }
+        XCTAssertNil(MetadataRepository.storedObjectURL(forPath: "r2:releases/74698.json"))
+    }
 }

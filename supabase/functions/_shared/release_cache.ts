@@ -6,6 +6,7 @@
 // bucket, the key and the read fallback cannot drift between them.
 
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
+import { cachePayloadKey, getObject, isInR2, putObject, R2_PREFIX, r2Config, r2Key } from "./r2.ts";
 
 export const RELEASE_CACHE_BUCKET = "catalog-cache";
 
@@ -20,14 +21,43 @@ export function releasePayloadPath(releaseID: string): string {
 /// invisible.
 const CACHE_CONTROL_SECONDS = "3600";
 
+/// A write R2's budget would not allow (0053). Callers treat it as any other
+/// failed upload: nothing is cached, and the page is served live instead.
+export class R2BudgetExceeded extends Error {}
+
+function byteLength(text: string): number {
+  return new TextEncoder().encode(text).length;
+}
+
+/// Reserves room in the R2 budget, or throws. Fails closed: a budget that
+/// cannot be read is not permission to write.
+export async function reserveR2(supabase: SupabaseClient, writes: number, bytes: number): Promise<void> {
+  if (writes <= 0) return;
+  const { data, error } = await supabase.rpc("r2_reserve", { p_writes: writes, p_bytes: bytes });
+  if (error) throw new Error(`r2 budget unavailable: ${error.message}`);
+  if (data !== true) {
+    throw new R2BudgetExceeded(`r2 budget refused ${writes} write(s) of ${bytes} bytes`);
+  }
+}
+
 /// Uploads a release and returns the key to record. Throws on failure, so a
 /// caller never writes a row pointing at an object that is not there.
+///
+/// To R2 once its secrets are set (0051), recorded as `r2:releases/<id>.json`;
+/// to Supabase Storage until then.
 export async function storeReleasePayload(
   supabase: SupabaseClient,
   releaseID: string,
   payload: unknown,
 ): Promise<string> {
   const path = releasePayloadPath(releaseID);
+  const r2 = r2Config();
+  if (r2) {
+    const body = JSON.stringify(payload);
+    await reserveR2(supabase, 1, byteLength(body));
+    await putObject(r2, path, body);
+    return `${R2_PREFIX}${path}`;
+  }
   const { error } = await supabase.storage
     .from(RELEASE_CACHE_BUCKET)
     .upload(path, new Blob([JSON.stringify(payload)], { type: "application/json" }), {
@@ -51,6 +81,16 @@ export async function readCachedPayload(
 ): Promise<unknown | null> {
   if (row.payload !== null && row.payload !== undefined) return row.payload;
   if (!row.payload_path) return null;
+  if (isInR2(row.payload_path)) {
+    const r2 = r2Config();
+    if (!r2) return null;
+    try {
+      const text = await getObject(r2, r2Key(row.payload_path));
+      return text === null ? null : JSON.parse(text);
+    } catch {
+      return null;
+    }
+  }
   const { data, error } = await supabase.storage
     .from(RELEASE_CACHE_BUCKET)
     .download(row.payload_path);
@@ -112,4 +152,206 @@ export async function offloadReleasePayloads(
     moved = Number(marked.data ?? 0);
   }
   return { offered: rows.length, moved, failed: rows.length - ids.length };
+}
+
+// ---------------------------------------------------------------------------
+// The move to R2 (0051)
+// ---------------------------------------------------------------------------
+
+/// Where the move has got to, in `enrichment_cursors`: the last release id
+/// taken. Walked in id order on the cache's own unique index, so each batch is
+/// an index range rather than a scan for rows not yet moved.
+export const R2_MOVE_CHECKPOINT = "release-cache.r2-move";
+
+export interface MoveResult {
+  offered: number;
+  moved: number;
+  failed: number;
+  done: boolean;
+}
+
+/// Moves one batch of release documents from Supabase Storage to R2.
+///
+/// Copy, then point the rows at the copy, then remove the originals -- in
+/// that order, so a failure anywhere leaves every row pointing at an object
+/// that exists. An original left behind by a failure after the rows moved is
+/// only a file nobody reads, and the storage sweep at the end finds it.
+export async function moveReleasePayloadsToR2(
+  supabase: SupabaseClient,
+  batch: number,
+): Promise<MoveResult> {
+  const r2 = r2Config();
+  if (!r2) throw new Error("r2 is not configured; set the R2_* secrets first");
+
+  const { data: cursorRow, error: cursorError } = await supabase
+    .from("enrichment_cursors")
+    .select("state")
+    .eq("name", R2_MOVE_CHECKPOINT)
+    .maybeSingle();
+  if (cursorError) throw new Error(`could not read the move's checkpoint: ${cursorError.message}`);
+  const after = String((cursorRow?.state as { after?: string } | null)?.after ?? "");
+
+  const { data, error } = await supabase
+    .from("metadata_cache")
+    .select("resource_id,payload_path")
+    .eq("provider", "discogs")
+    .eq("resource_type", "release")
+    .gt("resource_id", after)
+    .order("resource_id")
+    .limit(batch);
+  if (error) throw new Error(`could not read releases to move: ${error.message}`);
+  const rows = (data ?? []) as Array<{ resource_id: string; payload_path: string | null }>;
+  if (rows.length === 0) return { offered: 0, moved: 0, failed: 0, done: true };
+
+  const waiting = rows.filter((row) => row.payload_path && !isInR2(row.payload_path));
+
+  // Read first, then reserve the whole batch in one go, then write: the
+  // budget is asked once per batch rather than once per file, and a batch it
+  // refuses writes nothing at all.
+  const read = await mapLimited(waiting, 8, async (row) => {
+    try {
+      const { data: blob, error: downloadError } = await supabase.storage
+        .from(RELEASE_CACHE_BUCKET)
+        .download(row.payload_path!);
+      if (downloadError || !blob) throw new Error(downloadError?.message ?? "no object");
+      return { row: row as { resource_id: string; payload_path: string }, body: await blob.text() };
+    } catch (cause) {
+      console.error("r2_move_read_failed", row.resource_id, String(cause).slice(0, 200));
+      return null;
+    }
+  });
+  const ready = read.filter((item): item is { row: { resource_id: string; payload_path: string }; body: string } =>
+    item !== null);
+  await reserveR2(supabase, ready.length, ready.reduce((sum, item) => sum + byteLength(item.body), 0));
+
+  const landed = await mapLimited(ready, 8, async ({ row, body }) => {
+    try {
+      await putObject(r2, row.payload_path, body);
+      return row;
+    } catch (cause) {
+      console.error("r2_move_failed", row.resource_id, String(cause).slice(0, 200));
+      return null;
+    }
+  });
+  const copied = landed.filter((row): row is { resource_id: string; payload_path: string } => row !== null);
+
+  if (copied.length > 0) {
+    const marked = await supabase.rpc("mark_release_payloads_in_r2", {
+      p_resource_ids: copied.map((row) => row.resource_id),
+    });
+    if (marked.error) throw new Error(`copied but could not repoint: ${marked.error.message}`);
+
+    // Up to a thousand paths per call; a batch is never that large.
+    const removed = await supabase.storage
+      .from(RELEASE_CACHE_BUCKET)
+      .remove(copied.map((row) => row.payload_path));
+    if (removed.error) console.error("r2_move_remove_failed", removed.error.message);
+  }
+
+  // Forward past the whole batch, failures included: a release that would not
+  // copy keeps its Storage copy and its row, and is still read from there.
+  const last = rows[rows.length - 1].resource_id;
+  const { error: advanceError } = await supabase
+    .from("enrichment_cursors")
+    .upsert({ name: R2_MOVE_CHECKPOINT, state: { after: last }, updated_at: new Date().toISOString() },
+      { onConflict: "name" });
+  if (advanceError) throw new Error(`could not advance the move: ${advanceError.message}`);
+
+  return {
+    offered: waiting.length,
+    moved: copied.length,
+    failed: waiting.length - copied.length,
+    done: false,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Everything else in the cache (0052)
+// ---------------------------------------------------------------------------
+
+/// Puts a cached response other than a release in R2 and returns the path to
+/// record, or null when R2 is not configured -- in which case the caller keeps
+/// it inline, as before. Throws when the upload fails, so a row is never
+/// written pointing at an object that is not there.
+export async function storeCachePayload(
+  supabase: SupabaseClient,
+  provider: string,
+  resourceType: string,
+  resourceID: string,
+  payload: unknown,
+): Promise<string | null> {
+  const r2 = r2Config();
+  if (!r2) return null;
+  const key = await cachePayloadKey(provider, resourceType, resourceID);
+  const body = JSON.stringify(payload);
+  await reserveR2(supabase, 1, byteLength(body));
+  await putObject(r2, key, body);
+  return `${R2_PREFIX}${key}`;
+}
+
+/// Moves one batch of responses still held inline in `metadata_cache` to R2.
+///
+/// Searches, artist and label pages, shelves and NTS documents: 4,927 rows and
+/// 36 MB when this was written, all of it in Postgres. A moved row keeps its
+/// key, expiry and everything else; only where the document is changes.
+/// Set once the inline move finds nothing left, so later runs ask one indexed
+/// question instead of scanning the cache for rows that are not there (0054).
+export const R2_INLINE_DONE_CHECKPOINT = "release-cache.r2-inline-done";
+
+export async function moveInlinePayloadsToR2(
+  supabase: SupabaseClient,
+  batch: number,
+): Promise<MoveResult> {
+  const r2 = r2Config();
+  if (!r2) throw new Error("r2 is not configured; set the R2_* secrets first");
+
+  const { data: finished } = await supabase
+    .from("enrichment_cursors")
+    .select("name")
+    .eq("name", R2_INLINE_DONE_CHECKPOINT)
+    .maybeSingle();
+  if (finished) return { offered: 0, moved: 0, failed: 0, done: true };
+
+  const { data, error } = await supabase
+    .from("metadata_cache")
+    .select("id,provider,resource_type,resource_id,payload")
+    .not("payload", "is", null)
+    .limit(batch);
+  if (error) throw new Error(`could not read inline payloads: ${error.message}`);
+  const rows = (data ?? []) as Array<{
+    id: string; provider: string; resource_type: string; resource_id: string; payload: unknown;
+  }>;
+  if (rows.length === 0) {
+    // New writes go to R2 from here on, so nothing inline will appear again
+    // unless an upload fails; the remaining stragglers are left to that.
+    await supabase.from("enrichment_cursors").upsert(
+      { name: R2_INLINE_DONE_CHECKPOINT, state: { at: new Date().toISOString() }, updated_at: new Date().toISOString() },
+      { onConflict: "name" },
+    );
+    return { offered: 0, moved: 0, failed: 0, done: true };
+  }
+
+  const bodies = rows.map((row) => JSON.stringify(row.payload));
+  await reserveR2(supabase, rows.length, bodies.reduce((sum, body) => sum + byteLength(body), 0));
+
+  const landed = await mapLimited(rows.map((row, index) => ({ row, body: bodies[index] })), 8, async ({ row, body }) => {
+    try {
+      const key = await cachePayloadKey(row.provider, row.resource_type, row.resource_id);
+      await putObject(r2, key, body);
+      return { id: row.id, path: `${R2_PREFIX}${key}` };
+    } catch (cause) {
+      console.error("r2_inline_move_failed", row.id, String(cause).slice(0, 200));
+      return null;
+    }
+  });
+  const copied = landed.filter((row): row is { id: string; path: string } => row !== null);
+
+  if (copied.length > 0) {
+    const marked = await supabase.rpc("mark_inline_payloads_in_r2", {
+      p_ids: copied.map((row) => row.id),
+      p_paths: copied.map((row) => row.path),
+    });
+    if (marked.error) throw new Error(`copied but could not repoint: ${marked.error.message}`);
+  }
+  return { offered: rows.length, moved: copied.length, failed: rows.length - copied.length, done: false };
 }

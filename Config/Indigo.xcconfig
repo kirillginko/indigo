@@ -28,3 +28,8 @@ DISCOGS_TOKEN_OBFUSCATED =
 // URL from this ref and rejects anything that is not ref-shaped.
 SUPABASE_PROJECT_REF = leynozulpkjuufbbjjpa
 SUPABASE_PUBLISHABLE_KEY = sb_publishable_hP8GTN5m8YygAs6GzTbm0Q_sqkZPjzi
+
+// The public host of the Cloudflare R2 bucket the release cache moved to
+// (0051): `pub-<id>.r2.dev`, or a domain connected to the bucket. A host
+// only, never https:// -- the `//` would start a comment. Not a secret.
+CATALOG_CACHE_HOST = pub-480815b6ab564616ae87a484cb506184.r2.dev

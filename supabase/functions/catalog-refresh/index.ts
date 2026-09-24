@@ -16,7 +16,7 @@ import {
   normalizeDiscogsSearch,
 } from "../_shared/discogs.ts";
 import { ingestNTSEpisode, ingestNTSShow } from "../_shared/nts.ts";
-import { readCachedPayload, storeReleasePayload } from "../_shared/release_cache.ts";
+import { readCachedPayload, storeCachePayload, storeReleasePayload } from "../_shared/release_cache.ts";
 
 // An allow-list, not a URL parameter. The request names a provider and a
 // resource; it never supplies a URL, so this cannot be turned into a proxy for
@@ -303,6 +303,15 @@ Deno.serve(async (req: Request) => {
         await normalize(supabase, provider, resourceType, resourceID, payload);
         return;
       }
+    } else {
+      // Everything else goes to R2 too once it is configured (0052), and
+      // stays inline until then -- or if the upload fails, since an inline
+      // copy is still a good answer for the next caller.
+      try {
+        payloadPath = await storeCachePayload(supabase, provider, resourceType, resourceID, payload);
+      } catch (cause) {
+        console.error("cache_upload_failed", String(cause));
+      }
     }
     const { error: writeError } = await supabase
       .from("metadata_cache")
@@ -310,7 +319,7 @@ Deno.serve(async (req: Request) => {
         provider,
         resource_type: resourceType,
         resource_id: resourceID,
-        payload: isRelease ? null : payload,
+        payload: payloadPath ? null : payload,
         payload_path: payloadPath,
         fetched_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + ttl * 1000).toISOString(),

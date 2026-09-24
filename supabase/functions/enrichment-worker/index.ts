@@ -24,7 +24,11 @@ import {
 } from "../_shared/discogs.ts";
 import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
-import { offloadReleasePayloads } from "../_shared/release_cache.ts";
+import {
+  moveInlinePayloadsToR2,
+  moveReleasePayloadsToR2,
+  offloadReleasePayloads,
+} from "../_shared/release_cache.ts";
 
 interface Job {
   id: string;
@@ -285,6 +289,39 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
       // let the queue's backoff try again rather than mark the job done.
       if (result.offered > 0 && result.moved === 0) {
         throw new Error(`no release in a batch of ${result.offered} could be moved`);
+      }
+      return;
+    }
+
+    case "move_release_payloads_to_r2": {
+      // One batch of the move out of Supabase Storage (0051). A job that
+      // finds nothing left finishes at once, so the lane costs nothing after.
+      const requested = Number(job.payload?.batch ?? 200);
+      const batch = Number.isFinite(requested) ? Math.min(Math.max(Math.trunc(requested), 1), 500) : 200;
+      const result = await moveReleasePayloadsToR2(supabase, batch);
+      console.log("move_release_payloads_to_r2", JSON.stringify(result));
+      // Walked to the end: switch the lane off rather than keep asking every
+      // minute (0054). The inline move is long finished by then.
+      if (result.done) {
+        const stopped = await supabase.rpc("unschedule_r2_move");
+        if (stopped.error) console.error("r2 move: could not unschedule", stopped.error.message);
+      }
+      // Every copy failing is an outage or a bad credential, not a finished
+      // batch: throw, so the queue backs off instead of walking past them.
+      if (result.offered > 0 && result.moved === 0) {
+        throw new Error(`no release in a batch of ${result.offered} could be moved`);
+      }
+      return;
+    }
+
+    case "move_inline_payloads_to_r2": {
+      // One batch of the cache's inline documents to R2 (0052).
+      const requested = Number(job.payload?.batch ?? 200);
+      const batch = Number.isFinite(requested) ? Math.min(Math.max(Math.trunc(requested), 1), 500) : 200;
+      const result = await moveInlinePayloadsToR2(supabase, batch);
+      console.log("move_inline_payloads_to_r2", JSON.stringify(result));
+      if (result.offered > 0 && result.moved === 0) {
+        throw new Error(`no payload in a batch of ${result.offered} could be moved`);
       }
       return;
     }

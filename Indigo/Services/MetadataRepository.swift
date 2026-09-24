@@ -86,9 +86,21 @@ nonisolated struct MetadataRepository: Sendable {
     /// for the network; the app uses `fetchFromStorage`.
     var fetchStoredObject: @Sendable (String) async throws -> Data = MetadataRepository.fetchFromStorage
 
+    /// A row pointing at Cloudflare R2 rather than Supabase Storage (0051).
+    static let r2Prefix = "r2:"
+
     /// The public URL, straight to the CDN: the bucket is public, as the table
     /// it replaced was readable by this key, so there is no signing round trip.
+    ///
+    /// Either store, by the row's own say: while the move runs, some releases
+    /// are in R2 and the rest still in Storage.
     static func storedObjectURL(forPath path: String) -> URL? {
+        if path.hasPrefix(r2Prefix) {
+            let key = path.dropFirst(r2Prefix.count)
+            guard !key.isEmpty, let host = SupabaseConfiguration.catalogCacheHost,
+                  !host.contains("/") else { return nil }
+            return URL(string: "https://\(host)/\(key)")
+        }
         guard !path.isEmpty, let base = SupabaseConfiguration.url else { return nil }
         return base
             .appendingPathComponent("storage/v1/object/public")

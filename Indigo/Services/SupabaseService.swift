@@ -68,6 +68,14 @@ nonisolated enum SupabaseConfiguration {
 
     static var isConfigured: Bool { url != nil && publishableKey != nil }
 
+    /// Where cached release documents are served from once they have moved
+    /// to Cloudflare R2 (0051): the bucket's public host, e.g.
+    /// `pub-<id>.r2.dev` or a domain pointed at it. A host, not a URL, for
+    /// the same `//` reason as the project ref. Not a secret: it only reads.
+    static var catalogCacheHost: String? {
+        value(forKey: "IndigoCatalogCacheHost", environment: "CATALOG_CACHE_HOST")
+    }
+
     private static func value(forKey key: String, environment name: String) -> String? {
         if let value = ProcessInfo.processInfo.environment[name]?.trimmingCharacters(in: .whitespacesAndNewlines),
            !value.isEmpty { return value }
