@@ -16,8 +16,6 @@ struct YouTubeChannelDetailView: View {
 
     @Environment(AppState.self) private var appState
     @Environment(YouTubeChannelStore.self) private var store
-    @Environment(PlaybackCoordinator.self) private var player
-    @Environment(CrateService.self) private var crate
     @State private var selectedShelf: UUID?
 
     var body: some View {
@@ -108,7 +106,7 @@ struct YouTubeChannelDetailView: View {
                     shelfPicker(shelves, selected: shelf?.id)
                 }
                 if let shelf {
-                    videoList(shelf, channel: channel.title ?? "Archive")
+                    videoList(shelf)
                 } else if store.isLoading(channelID) {
                     LoadingPane(label: "Loading playlists")
                 } else {
@@ -148,7 +146,7 @@ struct YouTubeChannelDetailView: View {
     }
 
     @ViewBuilder
-    private func videoList(_ shelf: Catalog.RadioEpisode, channel: String) -> some View {
+    private func videoList(_ shelf: Catalog.RadioEpisode) -> some View {
         let tracks = store.tracks[shelf.id] ?? []
         if tracks.isEmpty {
             if store.isLoading(shelf.id) {
@@ -157,46 +155,8 @@ struct YouTubeChannelDetailView: View {
                 note(store.error(shelf.id) ?? "Nothing in this list.")
             }
         } else {
-            // Read so a crate change anywhere redraws the buttons here.
-            let _ = crate.revision
-            LazyVStack(spacing: 0) {
-                ForEach(tracks) { track in
-                    let videoID = YouTubeChannelPlayback.videoID(of: track)
-                    let address = track.mediaURL.flatMap(URL.init(string:))
-                    let isCurrent = videoID.map { player.isCurrent(YouTubeChannelPlayback.mediaID($0)) } ?? false
-                    YouTubeVideoRow(
-                        track: track,
-                        thumbnail: videoID.flatMap(YouTubeChannelPlayback.thumbnail),
-                        isCurrent: isCurrent,
-                        isPlaying: isCurrent && player.isPlaying,
-                        play: {
-                            YouTubeChannelPlayback.play(track, in: tracks, channel: channel, using: player)
-                        },
-                        dig: digDestination(track).map { page in { appState.open(page) } },
-                        isCrated: address.map { crate.isCrated(listening: $0) } ?? false,
-                        keep: address.map { url in {
-                            // As an artist page's Listen row keeps one: a
-                            // recording with its artist and title, reachable
-                            // through this upload.
-                            crate.toggle(
-                                listening: url,
-                                title: track.rawTrackTitle ?? "Untitled",
-                                artist: track.artistName ?? track.rawArtistName,
-                                artworkURL: videoID.flatMap(YouTubeChannelPlayback.thumbnail)
-                            )
-                        } }
-                    )
-                    Rule()
-                }
-            }
+            ArchiveTrackRows(tracks: tracks)
         }
-    }
-
-    /// The artist, where the line names one. By name: the crawl resolves it
-    /// to the shared catalogue where it can, and DIG does the rest.
-    private func digDestination(_ track: Catalog.EpisodeTrack) -> DetailPage? {
-        guard let name = track.artistName ?? track.rawArtistName, !name.isEmpty else { return nil }
-        return .digArtist(mbid: nil, name: name)
     }
 
     private func note(_ text: String) -> some View {
@@ -210,8 +170,68 @@ struct YouTubeChannelDetailView: View {
     }
 }
 
+/// A list of archive lines, each playable, diggable and crateable. Shared by
+/// an archive's own page and the search across all of them, so the two can
+/// never disagree about what a press does.
+struct ArchiveTrackRows: View {
+    let tracks: [Catalog.EpisodeTrack]
+    /// Which archive each line came from, for a list that spans several.
+    var sources: [UUID: String] = [:]
+
+    @Environment(AppState.self) private var appState
+    @Environment(PlaybackCoordinator.self) private var player
+    @Environment(CrateService.self) private var crate
+
+    var body: some View {
+        // Read so a crate change anywhere redraws the buttons here.
+        let _ = crate.revision
+        LazyVStack(spacing: 0) {
+            ForEach(tracks) { track in
+                let videoID = YouTubeChannelPlayback.videoID(of: track)
+                let address = track.mediaURL.flatMap(URL.init(string:))
+                let isCurrent = videoID.map { player.isCurrent(YouTubeChannelPlayback.mediaID($0)) } ?? false
+                YouTubeVideoRow(
+                    track: track,
+                    source: sources[track.id],
+                    thumbnail: videoID.flatMap(YouTubeChannelPlayback.thumbnail),
+                    isCurrent: isCurrent,
+                    isPlaying: isCurrent && player.isPlaying,
+                    play: {
+                        // Plays on through the list it was pressed in: the
+                        // curator's order on an archive page, the results
+                        // in a search.
+                        YouTubeChannelPlayback.play(track, in: tracks, channel: "", using: player)
+                    },
+                    dig: digDestination(track).map { page in { appState.open(page) } },
+                    isCrated: address.map { crate.isCrated(listening: $0) } ?? false,
+                    keep: address.map { url in {
+                        // As an artist page's Listen row keeps one: a
+                        // recording with its artist and title, reachable
+                        // through this upload.
+                        crate.toggle(
+                            listening: url,
+                            title: track.rawTrackTitle ?? "Untitled",
+                            artist: track.artistName ?? track.rawArtistName,
+                            artworkURL: videoID.flatMap(YouTubeChannelPlayback.thumbnail)
+                        )
+                    } }
+                )
+                Rule()
+            }
+        }
+    }
+
+    /// The artist, where the line names one. By name: the crawl resolves it
+    /// to the shared catalogue where it can, and DIG does the rest.
+    private func digDestination(_ track: Catalog.EpisodeTrack) -> DetailPage? {
+        guard let name = track.artistName ?? track.rawArtistName, !name.isEmpty else { return nil }
+        return .digArtist(mbid: nil, name: name)
+    }
+}
+
 private struct YouTubeVideoRow: View {
     let track: Catalog.EpisodeTrack
+    let source: String?
     let thumbnail: URL?
     let isCurrent: Bool
     let isPlaying: Bool
@@ -241,6 +261,12 @@ private struct YouTubeVideoRow: View {
                     Text(artist)
                         .font(Typeface.body(11.5))
                         .foregroundStyle(Palette.inkMuted)
+                        .lineLimit(1)
+                }
+                if let source {
+                    Text(source)
+                        .font(Typeface.mono(9.5))
+                        .foregroundStyle(Palette.inkFaint)
                         .lineLimit(1)
                 }
             }

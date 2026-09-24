@@ -17,13 +17,72 @@ struct YouTubeChannelsView: View {
     @Environment(AppState.self) private var appState
     @Environment(YouTubeChannelStore.self) private var store
 
+    /// Two characters before anything is asked; see `YouTubeChannelStore.search`.
+    private var isSearching: Bool {
+        RecordingKey.normalize(appState.searchText).count >= 2
+    }
+
     var body: some View {
+        @Bindable var state = appState
+
         VStack(spacing: 0) {
-            PageHeader(title: "Archives", subtitle: subtitle) { EmptyView() }
+            PageHeader(title: "Archives", subtitle: subtitle) {
+                SearchField(
+                    text: $state.searchText,
+                    placeholder: "Artists, records",
+                    focusSignal: appState.searchFocusRequests
+                )
+            }
             Rule(color: Palette.outline)
-            content
+            if isSearching {
+                results
+            } else {
+                content
+            }
         }
         .task { await store.loadChannelsIfNeeded() }
+        // A pause after the last keystroke before asking: each change cancels
+        // the one before, so a word typed quickly is one query, not six.
+        .task(id: appState.searchText) {
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            await store.search(appState.searchText)
+        }
+    }
+
+    @ViewBuilder
+    private var results: some View {
+        let query = RecordingKey.normalize(appState.searchText)
+        let isCurrent = store.searchQuery == query
+        if !isCurrent || (store.searchHits.isEmpty && store.searchPhase.isLoading) {
+            LoadingPane(label: "Searching archives")
+        } else if let error = store.searchPhase.error {
+            EmptyStateView(headline: "Search unavailable", message: error) {
+                Button("Try Again") { Task { await store.search(appState.searchText) } }
+                    .buttonStyle(OutlineButtonStyle())
+            }
+        } else if store.searchHits.isEmpty {
+            EmptyStateView(
+                headline: "Nothing in the archives",
+                message: "No upload by an artist or with a title matching “\(appState.searchText)”."
+            ) {
+                Button("Clear Search") { appState.searchText = "" }
+                    .buttonStyle(OutlineButtonStyle())
+            }
+        } else {
+            let hits = store.searchHits
+            ScrollView {
+                ArchiveTrackRows(
+                    tracks: hits.map(\.track),
+                    sources: Dictionary(
+                        hits.compactMap { hit in hit.archiveTitle.map { (hit.appearanceID, $0) } },
+                        uniquingKeysWith: { first, _ in first }
+                    )
+                )
+                .padding(.bottom, 24)
+            }
+            .scrollIndicators(.visible)
+        }
     }
 
     @ViewBuilder
@@ -59,6 +118,13 @@ struct YouTubeChannelsView: View {
     }
 
     private var subtitle: String {
+        if isSearching, store.searchQuery == RecordingKey.normalize(appState.searchText),
+           store.searchPhase == .loaded {
+            let count = store.searchHits.count
+            // The server stops at 60; more than that is "60+", not a count.
+            let shown = count >= 60 ? "60+" : "\(count)"
+            return "\(shown) \(count == 1 ? "upload" : "uploads") matching “\(appState.searchText)”"
+        }
         let count = store.channels.count
         guard count > 0 else { return "Curated uploads" }
         return "\(count) \(count == 1 ? "archive" : "archives")"

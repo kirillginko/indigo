@@ -82,6 +82,29 @@ nonisolated struct RadioRepository: Sendable {
             .value
     }
 
+    /// Every archive upload whose artist or title contains each word of
+    /// `query`, one row per video. Answered from Indigo's own tables — see
+    /// migration 0045 — never by asking YouTube.
+    ///
+    /// `query` must already be normalized with `RecordingKey.normalize`, the
+    /// rules the stored keys were written with.
+    func searchArchives(_ query: String, limit: Int = 60) async throws -> [Catalog.ArchiveHit] {
+        let client = try SupabaseService.requireClient()
+        return try await client
+            .rpc("search_archives", params: ArchiveSearchParams(pQuery: query, pLimit: limit))
+            .execute()
+            .value
+    }
+
+    private struct ArchiveSearchParams: Encodable, Sendable {
+        let pQuery: String
+        let pLimit: Int
+        enum CodingKeys: String, CodingKey {
+            case pQuery = "p_query"
+            case pLimit = "p_limit"
+        }
+    }
+
     // MARK: - Reads shaped for a screen
 
     /// The radio header of an artist page: how often, across how many shows,
