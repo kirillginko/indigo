@@ -374,6 +374,44 @@ nonisolated extension Catalog {
     }
 }
 
+nonisolated extension Catalog {
+    /// One archive upload found by a search, and which archive holds it.
+    struct ArchiveHit: Codable, Sendable, Hashable, Identifiable {
+        var appearanceID: UUID
+        var mediaURL: String?
+        var rawArtistName: String?
+        var rawTrackTitle: String?
+        var artistID: UUID?
+        var artistName: String?
+        var archiveID: UUID?
+        var archiveTitle: String?
+
+        var id: UUID { appearanceID }
+
+        /// As a line of a list, so it plays, digs and crates exactly as the
+        /// same upload does on its archive's own page.
+        var track: EpisodeTrack {
+            EpisodeTrack(
+                appearanceID: appearanceID, trackIndex: nil,
+                rawArtistName: rawArtistName, rawTrackTitle: rawTrackTitle,
+                offsetSeconds: nil, artistID: artistID, artistName: artistName,
+                recordingID: nil, mediaURL: mediaURL
+            )
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case appearanceID = "appearance_id"
+            case mediaURL = "media_url"
+            case rawArtistName = "raw_artist_name"
+            case rawTrackTitle = "raw_track_title"
+            case artistID = "artist_id"
+            case artistName = "artist_name"
+            case archiveID = "archive_id"
+            case archiveTitle = "archive_title"
+        }
+    }
+}
+
 // MARK: - Grouping
 
 nonisolated extension Catalog {

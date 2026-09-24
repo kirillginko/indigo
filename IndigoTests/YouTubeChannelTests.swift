@@ -72,4 +72,22 @@ final class YouTubeChannelTests: XCTestCase {
         XCTAssertTrue(YouTubeChannelStore.isUploads(shelf("UUv5OAW45h67CJEY6kJLyisg")))
         XCTAssertFalse(YouTubeChannelStore.isUploads(shelf("PLdYVj1MSs4AAhpGZmCntSzFuefb1ZzKba")))
     }
+
+    /// A search hit plays exactly as the same upload does on its archive's
+    /// page, because it becomes the same line.
+    @MainActor
+    func testASearchHitBecomesAPlayableLine() throws {
+        let json = """
+        [{"appearance_id":"\(UUID())","media_url":"https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "raw_artist_name":"Comus","raw_track_title":"Diana","artist_id":null,
+          "artist_name":"Comus","archive_id":"\(UUID())","archive_title":"lunarmountains"}]
+        """
+        let hits = try JSONDecoder().decode([Catalog.ArchiveHit].self, from: Data(json.utf8))
+        let hit = try XCTUnwrap(hits.first)
+        XCTAssertEqual(hit.archiveTitle, "lunarmountains")
+        let media = try XCTUnwrap(YouTubeChannelPlayback.media(for: hit.track, channel: ""))
+        XCTAssertEqual(media.title, "Diana")
+        XCTAssertEqual(media.subtitle, "Comus")
+        XCTAssertEqual(media.embedProvider, .youtube)
+    }
 }

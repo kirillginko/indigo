@@ -39,7 +39,44 @@ final class YouTubeChannelStore {
     private(set) var loading: Set<UUID> = []
     private(set) var errors: [UUID: String] = [:]
 
+    /// The last search answered, and for which normalized query — so a
+    /// slow answer to an old query never replaces a newer one.
+    private(set) var searchQuery = ""
+    private(set) var searchHits: [Catalog.ArchiveHit] = []
+    private(set) var searchPhase: Phase = .idle
+
     @ObservationIgnored private let repository = RadioRepository.shared
+
+    /// Searches every archive's uploads by artist and title.
+    ///
+    /// `query` is normalized here, with the rules the stored keys were
+    /// written with, so the database compares like with like. Under two
+    /// characters is not a search: it would match most of the archive.
+    func search(_ text: String) async {
+        let query = RecordingKey.normalize(text)
+        guard query.count >= 2 else {
+            searchQuery = ""
+            searchHits = []
+            searchPhase = .idle
+            return
+        }
+        guard query != searchQuery || searchPhase.error != nil else { return }
+        searchPhase = .loading
+        do {
+            let hits = try await repository.searchArchives(query)
+            // Typing on while this was in flight cancels the task that asked.
+            guard !Task.isCancelled else { return }
+            searchQuery = query
+            searchHits = hits
+            searchPhase = .loaded
+        } catch is CancellationError {
+        } catch {
+            guard !Task.isCancelled else { return }
+            searchQuery = query
+            searchHits = []
+            searchPhase = .failed(error.localizedDescription)
+        }
+    }
 
     func loadChannelsIfNeeded() async {
         guard channels.isEmpty, !channelsPhase.isLoading else { return }
