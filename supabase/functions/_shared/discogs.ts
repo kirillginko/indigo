@@ -195,26 +195,9 @@ export async function normalizeDiscogsRelease(
 
   if (!releaseUUID) return null;
 
-  // Referenced, not re-hosted. Discogs does not clearly license permanent
-  // copies of its images, so Indigo stores the URL and leaves the storage
-  // paths empty; ArtworkRepository already treats that as a complete answer.
-  const image = Array.isArray(payload.images)
-    ? payload.images.find((candidate: Payload) => candidate?.type === "primary") ?? payload.images[0]
-    : undefined;
-
-  if (image?.uri) {
-    const artwork = await supabase.from("artwork").upsert({
-      entity_type: "release",
-      entity_id: releaseUUID,
-      provider: PROVIDER,
-      original_url: image.uri,
-      width: Number.isFinite(Number(image.width)) ? Math.trunc(Number(image.width)) : null,
-      height: Number.isFinite(Number(image.height)) ? Math.trunc(Number(image.height)) : null,
-      fetched_at: new Date().toISOString(),
-    }, { onConflict: "entity_type,entity_id" });
-
-    if (artwork.error) console.error("normalize: artwork upsert failed", artwork.error.message);
-  }
+  // No artwork row. A release's cover is in its cached payload, and nothing
+  // read the 150,000 rows this used to write -- the app reads artwork only for
+  // artist portraits. Removed to fit the free plan (0048).
 
   return releaseUUID;
 }

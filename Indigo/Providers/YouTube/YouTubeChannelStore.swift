@@ -52,6 +52,25 @@ final class YouTubeChannelStore {
     /// `query` is normalized here, with the rules the stored keys were
     /// written with, so the database compares like with like. Under two
     /// characters is not a search: it would match most of the archive.
+    /// Asks, and if the answer is a failure rather than a cancellation, asks
+    /// once more before saying so.
+    ///
+    /// The app's database role stops any statement at three seconds, and the
+    /// first search after the database has been idle can come close: its rows
+    /// are on disk. The second asking finds them in memory — which is what the
+    /// listener was doing by hand when a search had to be typed twice.
+    private func searchOnceMore(_ query: String) async throws -> [Catalog.ArchiveHit] {
+        do {
+            return try await repository.searchArchives(query)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            guard !Task.isCancelled else { throw CancellationError() }
+            try await Task.sleep(for: .milliseconds(300))
+            return try await repository.searchArchives(query)
+        }
+    }
+
     func search(_ text: String) async {
         let query = RecordingKey.normalize(text)
         guard query.count >= 2 else {
@@ -63,7 +82,7 @@ final class YouTubeChannelStore {
         guard query != searchQuery || searchPhase.error != nil else { return }
         searchPhase = .loading
         do {
-            let hits = try await repository.searchArchives(query)
+            let hits = try await searchOnceMore(query)
             // Typing on while this was in flight cancels the task that asked.
             guard !Task.isCancelled else { return }
             searchQuery = query
