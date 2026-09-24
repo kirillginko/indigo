@@ -130,7 +130,9 @@ enum Metrics {
     static let playerBarHeight: CGFloat = 68
     static let gutter: CGFloat = 22
     static let rowHeight: CGFloat = 30
-    static let hairline: CGFloat = 1.5
+    /// One point, like the window's own edge. At 1.5 every box and divider
+    /// read as drawn in marker rather than ruled.
+    static let hairline: CGFloat = 1
     /// Space reserved for the floating traffic lights when the title bar is hidden.
     static let titleBarInset: CGFloat = 30
 }

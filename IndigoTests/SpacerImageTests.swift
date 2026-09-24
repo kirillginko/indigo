@@ -57,6 +57,37 @@ final class SpacerImageTests: XCTestCase {
         XCTAssertNil(record.thumbnailURL)
     }
 
+    /// SNKLS, on the For You page: a label neighbour with no photograph was
+    /// stored with its spacer, so the card drew an empty square.
+    func testANeighbourHoldingASpacerFallsThroughToTheNextList() {
+        let artist = DiscogsArtist(nameKey: "kate-nv", discogsID: 2, name: "Kate NV")
+        artist.labelNeighbourNames = ["SNKLS"]
+        artist.labelNeighbourImageURLStrings = [spacer]
+        XCTAssertNil(artist.neighbourImageURL(for: "SNKLS"))
+        artist.styleNeighbourNames = ["SNKLS"]
+        artist.styleNeighbourImageURLStrings = [real]
+        XCTAssertEqual(artist.neighbourImageURL(for: "SNKLS")?.absoluteString, real)
+    }
+
+    /// The last line: whatever path hands a tile a spacer, it is not loaded.
+    @MainActor
+    func testATileRefusesASpacer() {
+        XCTAssertNil(ArtworkView.usable(URL(string: spacer)))
+        XCTAssertNotNil(ArtworkView.usable(URL(string: real)))
+    }
+
+    /// Two crated tracks in the live store held one, and the crate row drew
+    /// nothing at all where the mosaic belongs.
+    func testACrateRowHoldingASpacerHasNoPicture() {
+        let kept = CrateItem(
+            digKind: .release, providerID: "dig.release.discogs", entityID: "1",
+            title: "Untitled", subtitle: nil, artworkURL: URL(string: spacer)
+        )
+        XCTAssertNil(kept.artworkURL)
+        kept.artworkURLString = real
+        XCTAssertNotNil(kept.artworkURL)
+    }
+
     /// Every spacer seen in the live store, so a change to the matching rule
     /// has to keep clearing all of them.
     func testEveryShapeOfSpacerSeenInTheStoreIsRejected() {

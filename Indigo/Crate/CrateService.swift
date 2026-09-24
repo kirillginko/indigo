@@ -378,6 +378,14 @@ final class CrateService {
         save()
     }
 
+    /// Only where the row has no usable picture of its own — a found one
+    /// never replaces what the listener kept.
+    func fillArtwork(_ url: URL, for item: CrateItem) {
+        guard item.artworkURL == nil else { return }
+        item.artworkURLString = url.absoluteString
+        save()
+    }
+
     func updateArchivedBroadcast(_ item: CrateItem, from media: MediaItem) {
         guard item.kind == .broadcast, !media.isLive else { return }
         var changed = false

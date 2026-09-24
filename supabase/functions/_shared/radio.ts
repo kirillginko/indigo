@@ -66,6 +66,10 @@ export interface TracklistLine {
   isrc?: string | null;
   deezerTrackID?: string | null;
   musicbrainzRecordingID?: string | null;
+  /// Where this one line can be heard on its own. Set by sources whose lines
+  /// are each a separate recording -- a curator's YouTube uploads -- and
+  /// null for a station's set, which is heard as a whole. See 0041.
+  mediaURL?: string | null;
 }
 
 /// The rows a tracklist becomes, before anything is written.
@@ -94,6 +98,7 @@ export function appearanceRows(episodeID: string, lines: TracklistLine[]) {
       isrc: line.isrc ?? null,
       deezer_track_id: line.deezerTrackID ?? null,
       musicbrainz_recording_id: line.musicbrainzRecordingID ?? null,
+      media_url: line.mediaURL ?? null,
       identification_source: null,
     };
   }).filter((row) => row.raw_artist_name !== null || row.raw_track_title !== null);

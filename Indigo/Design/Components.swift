@@ -413,7 +413,12 @@ struct GenreFilterBar: View {
                     .scrollBounceBehavior(.basedOnSize)
                 }
             }
-            .background(Palette.paperChrome)
+            // Part of the header band rather than the page: the same darker
+            // ground, and the same shader, which is placed by window position
+            // and so runs on across the rule without a seam.
+            .background(IndigoGlassBackground.header)
+            // Dark chrome in both appearances, as `PageHeader` is.
+            .environment(\.colorScheme, .dark)
         }
     }
 }

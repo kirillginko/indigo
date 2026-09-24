@@ -571,6 +571,46 @@ final class CrateTests: XCTestCase {
         )
     }
 
+    /// The id the crate files an NTS broadcast under. For You read it with the
+    /// prefix still on, so the show came out as "nts.episode.tim-koh" and the
+    /// page could only show an error; the crate page had its own route and
+    /// never noticed.
+    func testAKeptNTSBroadcastOpensTheBroadcastEverywhere() {
+        XCTAssertEqual(
+            BroadcastSource.destination(
+                showID: "nts.episode.tim-koh/tim-koh-16th-september-2026",
+                providerID: NTSProvider.providerID
+            ),
+            .ntsEpisode(show: "tim-koh", episode: "tim-koh-16th-september-2026")
+        )
+        XCTAssertEqual(
+            BroadcastSource.destination(showID: "tim-koh/tim-koh-16th-september-2026",
+                                        providerID: NTSProvider.providerID),
+            .ntsEpisode(show: "tim-koh", episode: "tim-koh-16th-september-2026")
+        )
+        XCTAssertNil(BroadcastSource.destination(showID: "nts.2", providerID: NTSProvider.providerID))
+    }
+
+    func testAKeptKioskBroadcastOpensTheBroadcast() {
+        XCTAssertEqual(
+            BroadcastSource.destination(showID: "kiosk.episode.some-show-2026", providerID: KioskProvider.providerID),
+            .kioskEpisode(slug: "some-show-2026")
+        )
+    }
+
+    /// dublab's live feed and its archive bill the same hour differently.
+    func testADublabBillingMatchesItsArchiveTitle() {
+        let live = DublabBrowseStore.billingKey("Jasmine Salvino - Night Bloom")
+        XCTAssertEqual(DublabBrowseStore.billingKey("Jasmine Salvino — Night Bloom (07.27.26)"), live)
+        XCTAssertEqual(DublabBrowseStore.billingKey("Jasmine Salvino — Night Bloom (guest session) (03.10.26)"), live)
+        XCTAssertNotEqual(DublabBrowseStore.billingKey("Jasmine Salvino — Day Bloom (07.27.26)"), live)
+    }
+
+    private func stations() -> KeptShow.Stations {
+        KeptShow.Stations(nts: NTSBrowseStore(), lot: LotBrowseStore(), dublab: DublabBrowseStore(),
+                          radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore())
+    }
+
     // MARK: - The ladder a kept show climbs
 
     /// A row that named its broadcast opens the broadcast, and never gets as
@@ -581,7 +621,7 @@ final class CrateTests: XCTestCase {
         let row = try XCTUnwrap(crate.items().first)
 
         let found = await KeptShow.destination(
-            for: row, radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore(), crate: crate
+            for: row, stations: stations(), crate: crate
         )
         XCTAssertEqual(found, .page(.idaEpisode(slug: "agss-radio-15-10-2024")))
     }
@@ -601,7 +641,7 @@ final class CrateTests: XCTestCase {
         )
 
         let found = await KeptShow.destination(
-            for: row, radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore(), crate: crate
+            for: row, stations: stations(), crate: crate
         )
         XCTAssertEqual(found, .section(.panikShows))
     }
@@ -622,7 +662,7 @@ final class CrateTests: XCTestCase {
         )
 
         let found = await KeptShow.destination(
-            for: row, radio80000: Radio80000BrowseStore(), n10as: N10ASBrowseStore(), crate: crate
+            for: row, stations: stations(), crate: crate
         )
         XCTAssertEqual(found, .section(.panikStation), "A station kept as itself opens the station")
     }

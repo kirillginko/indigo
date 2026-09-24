@@ -172,7 +172,7 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
     /// Addresses that answered with nothing, and when. Kept for an hour: long
     /// enough to stop a grid retrying on every scroll, short enough that a
     /// service having a bad minute does not cost the rest of the session.
-    private func isKnownMissing(_ url: URL) -> Bool {
+    func isKnownMissing(_ url: URL) -> Bool {
         missingLock.lock()
         defer { missingLock.unlock() }
         guard let noted = missing[url] else { return false }
@@ -229,6 +229,9 @@ struct ArtworkView: View {
     var remoteURL: URL?
     var previewRemoteURL: URL?
     var side: CGFloat?
+    /// Width over height. Square unless the picture is not: a video still is
+    /// 16:9, and cropped square it loses half the frame. `side` is the height.
+    var aspect: CGFloat = 1
     var glyphScale: CGFloat = 0.34
     /// What to draw when there is no picture. A record with no sleeve is not
     /// the same absence as a show with no photograph.
@@ -258,9 +261,22 @@ struct ArtworkView: View {
     /// every one of them drew grey and then filled in from a cache that had
     /// the picture the whole time. `??` is lazy, so this costs a lookup only
     /// for tiles with nothing to show yet.
+    /// The addresses as asked for, less any that are known not to be a
+    /// picture. Discogs answers "no image" with a `spacer.gif` that loads
+    /// fine and draws nothing, and a dozen paths have carried one here; this
+    /// is the one place every tile passes through.
+    private var remote: URL? { Self.usable(remoteURL) }
+    private var preview: URL? { Self.usable(previewRemoteURL) }
+    private var markAddress: URL? { Self.usable(markURL) }
+
+    static func usable(_ url: URL?) -> URL? {
+        guard let url else { return nil }
+        return DiscogsClient.usableImage(url.absoluteString) == nil ? nil : url
+    }
+
     private var cachedFull: PlatformImage? {
-        guard let remoteURL else { return nil }
-        return RemoteArtworkStore.shared.cachedImage(for: remoteURL)
+        guard let remote else { return nil }
+        return RemoteArtworkStore.shared.cachedImage(for: remote)
     }
 
     private var cachedPreview: PlatformImage? {
@@ -275,8 +291,8 @@ struct ArtworkView: View {
     /// Fetched as two things that is a wasted request and an extra suspension
     /// in front of the picture, for no second picture.
     private var distinctPreviewURL: URL? {
-        guard let previewRemoteURL, previewRemoteURL != remoteURL else { return nil }
-        return previewRemoteURL
+        guard let preview, preview != remote else { return nil }
+        return preview
     }
 
     @State private var image: PlatformImage?
@@ -286,11 +302,13 @@ struct ArtworkView: View {
     @State private var previewImage: PlatformImage?
     @State private var markImage: PlatformImage?
     @State private var loadedMarkURL: URL?
+    /// The sources whose loading has finished, whatever it found.
+    @State private var settled: Sources?
 
     var body: some View {
         Rectangle()
             .fill(showsGround ? Palette.placeholder : Color.clear)
-            .aspectRatio(1, contentMode: .fit)
+            .aspectRatio(aspect, contentMode: .fit)
             .overlay {
                 if let image {
                     Image(platformImage: image)
@@ -343,30 +361,45 @@ struct ArtworkView: View {
                 }
             }
             .clipped()
-            .frame(width: side, height: side)
+            .frame(width: side.map { $0 * aspect }, height: side)
             // One task, not four.
             //
             // A dig page builds dozens of these, and a lazy grid builds them
             // while you are scrolling. Four `.task` modifiers apiece is four
             // tasks created and cancelled per tile per pass, on the main
             // actor, which is felt as the scroll catching.
-            .task(id: Sources(localKey, remoteURL, previewRemoteURL, markURL)) {
+            .task(id: sources) {
                 await loadAll()
+                if !Task.isCancelled { settled = sources }
             }
+    }
+
+    private var sources: Sources { Sources(localKey, remote, preview, markAddress) }
+
+    /// Whether it is known there is no picture, rather than not yet here.
+    ///
+    /// Until then the tile stays plain ground: the mosaic is the answer "none",
+    /// and drawing it over a picture still in flight flashed a pattern before
+    /// every cover. An address already known to be missing is answered on the
+    /// first frame, so a page revisited does not wait to say it again.
+    private var isSettledEmpty: Bool {
+        if settled == sources { return true }
+        guard localKey == nil, markAddress == nil else { return false }
+        let store = RemoteArtworkStore.shared
+        return [remote, preview].allSatisfy { url in url.map(store.isKnownMissing) ?? true }
     }
 
     /// What the block is built from — whichever name for this subject is to
     /// hand, in the order they are stable.
     ///
-    /// A tile keeps its block while a picture loads and would keep it if the
-    /// picture never arrives, so the identity must not change between those
-    /// two moments: `localKey` and the addresses are all fixed for the life of
-    /// the subject, and `mark` is its name.
+    /// Stable for the life of the subject: `localKey` and the addresses are
+    /// fixed, and `mark` is its name, so the same thing always draws the same
+    /// block.
     private var mosaicIdentity: String {
         localKey
-            ?? remoteURL?.absoluteString
-            ?? previewRemoteURL?.absoluteString
-            ?? markURL?.absoluteString
+            ?? remote?.absoluteString
+            ?? preview?.absoluteString
+            ?? markAddress?.absoluteString
             ?? mark
             ?? ""
     }
@@ -377,17 +410,16 @@ struct ArtworkView: View {
         // of tiles cost no layout pass at all. Only the text mark — a station
         // with no logo, which is rare — still needs to measure.
         if placeholder == .mosaic {
-            // Drawn while a picture is loading as well as when there is none.
-            //
-            // The glyph and the white-label mark are both claims — "this has
-            // no artwork" — so showing either one over a picture still in
-            // flight puts a wrong answer between the empty tile and the right
-            // one, and the case below still returns `Color.clear` for them.
-            // A mosaic claims nothing: it is a block of colour standing where
-            // the picture goes, so it is as true at the moment of asking as
-            // it is once the answer is no.
-            ArtworkMosaic(identity: mosaicIdentity)
-        } else if remoteURL != nil || previewRemoteURL != nil {
+            // Only once it is known there is no picture. Drawn while one was
+            // still loading too, it flashed a pattern in front of every cover
+            // that did arrive — so a loading tile is the plain ground, like
+            // the glyph cases below.
+            if isSettledEmpty {
+                ArtworkMosaic(identity: mosaicIdentity)
+            } else {
+                Color.clear
+            }
+        } else if remote != nil || preview != nil {
             Color.clear
         } else if placeholder == .whiteLabel, mark?.isEmpty ?? true {
             WhiteLabelMark()
@@ -476,44 +508,44 @@ struct ArtworkView: View {
     }
 
     private func loadRemote() async {
-        guard let remoteURL else {
+        guard let remote else {
             remoteImage = nil
             loadedRemoteURL = nil
             return
         }
-        guard loadedRemoteURL != remoteURL else { return }
-        let loaded = await RemoteArtworkStore.shared.image(for: remoteURL)
-        guard !Task.isCancelled, self.remoteURL == remoteURL else { return }
+        guard loadedRemoteURL != remote else { return }
+        let loaded = await RemoteArtworkStore.shared.image(for: remote)
+        guard !Task.isCancelled, self.remote == remote else { return }
         // Keep the last successful cover if a refresh briefly fails. This is
         // especially important for The Lot's large residency grid.
         if let loaded {
             remoteImage = loaded
-            loadedRemoteURL = remoteURL
+            loadedRemoteURL = remote
         }
     }
 
     private func loadMark() async {
-        guard let markURL else {
+        guard let markAddress else {
             markImage = nil
             loadedMarkURL = nil
             return
         }
-        guard loadedMarkURL != markURL else { return }
-        let loaded = await RemoteArtworkStore.shared.image(for: markURL)
-        guard !Task.isCancelled, self.markURL == markURL else { return }
+        guard loadedMarkURL != markAddress else { return }
+        let loaded = await RemoteArtworkStore.shared.image(for: markAddress)
+        guard !Task.isCancelled, self.markAddress == markAddress else { return }
         if let loaded {
             markImage = loaded
-            loadedMarkURL = markURL
+            loadedMarkURL = markAddress
         }
     }
 
     private func loadPreview() async {
-        guard let previewRemoteURL = distinctPreviewURL else {
+        guard let preview = distinctPreviewURL else {
             previewImage = nil
             return
         }
-        let loaded = await RemoteArtworkStore.shared.image(for: previewRemoteURL)
-        guard !Task.isCancelled, self.previewRemoteURL == previewRemoteURL else { return }
+        let loaded = await RemoteArtworkStore.shared.image(for: preview)
+        guard !Task.isCancelled, self.preview == preview else { return }
         if let loaded { previewImage = loaded }
     }
 }
@@ -521,8 +553,8 @@ struct ArtworkView: View {
 
 /// What to draw in place of a picture.
 nonisolated enum ArtworkPlaceholder: Hashable, Sendable {
-    /// A block of colour built from the subject's own identity, shown both
-    /// when there is no picture and while one is still on its way.
+    /// A block of colour built from the subject's own identity, shown once it
+    /// is known there is no picture — never while one is still on its way.
     ///
     /// For **people** — an artist, a resident, a DJ — and deliberately not for
     /// records. A sleeve that never arrives is telling you something about the

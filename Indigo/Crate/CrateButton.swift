@@ -37,6 +37,38 @@ struct CrateButton: View {
     }
 }
 
+/// Where the YouTube panel's choice is kept, so it survives relaunch.
+enum YouTubeVideoPanel {
+    static let storageKey = "player.showsYouTubeVideo"
+}
+
+/// Brings the YouTube picture out above the player bar, or puts it away.
+struct VideoGlyphButton: View {
+    let isShowing: Bool
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            // Arrows out to bring the picture out, arrows in to put it away.
+            Image(systemName: isShowing
+                  ? "arrow.down.right.and.arrow.up.left"
+                  : "arrow.up.left.and.arrow.down.right")
+                .font(.system(size: 8.5, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 20, height: 20)
+                .background(Color.black.opacity(isHovering ? 0.8 : 0.6))
+                .padding(3)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+        .help(isShowing ? "Hide video" : "Show video")
+        .accessibilityLabel(isShowing ? "Hide video" : "Show video")
+    }
+}
+
 /// Compact square variant for the player bar, where there is no room for a
 /// word next to the transport.
 struct CrateGlyphButton: View {

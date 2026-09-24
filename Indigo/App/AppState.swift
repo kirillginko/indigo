@@ -60,6 +60,7 @@ nonisolated enum Route: Hashable {
     case explore
     case crate
     case dig
+    case youtubeChannels
 
     var sectionTitle: String {
         switch self {
@@ -111,6 +112,7 @@ nonisolated enum Route: Hashable {
         case .explore: "Explore"
         case .crate: "Crate"
         case .dig: "Dig"
+        case .youtubeChannels: "Archives"
         }
     }
 }
@@ -173,6 +175,8 @@ nonisolated enum DetailPage: Hashable {
     /// it. See `N10ASEpisodeKey`.
     case n10asEpisode(id: String)
     case n10asShow(slug: String)
+    /// A followed YouTube channel, by its `radio_shows` row.
+    case youtubeChannel(id: UUID)
 }
 
 @Observable
@@ -261,6 +265,7 @@ final class AppState {
         case .rovrCurator: return "Curator"
         case .n10asEpisode: return "Broadcast"
         case .n10asShow: return "Show"
+        case .youtubeChannel: return "Archive"
         }
     }
 }

@@ -258,10 +258,13 @@ nonisolated final class DiscogsArtist {
         let key = RecordingKey.normalizeArtist(name)
         for (names, images) in [(labelNeighbourNames, labelNeighbourImageURLStrings),
                                 (styleNeighbourNames, styleNeighbourImageURLStrings)] {
+            // Filtered here too: a neighbour with no photograph was stored
+            // with its spacer, and EXPLORE drew it as an empty tile.
             guard let index = names.firstIndex(where: { RecordingKey.normalizeArtist($0) == key }),
-                  index < images.count, !images[index].isEmpty
+                  index < images.count,
+                  let image = DiscogsClient.usableImage(images[index])
             else { continue }
-            return URL(string: images[index])
+            return URL(string: image)
         }
         return nil
     }

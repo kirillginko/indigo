@@ -70,6 +70,7 @@ struct SidebarView: View {
                         row(.explore, label: "For You", trailing: nil, band: .explore)
                         row(.crate, label: "Crate", trailing: crateCount, band: .explore)
                         row(.dig, label: "Dig", trailing: nil, band: .explore)
+                        row(.youtubeChannels, label: "Archives", trailing: nil, band: .explore)
                     }
 
                     directoryHeader("Library", expanded: isLibraryExpanded, band: .library) {
@@ -634,6 +635,15 @@ struct IndigoGlassBackground: View {
     /// The page itself, and anything pinned inside it that has to hide rows
     /// scrolling beneath — one value, so the two can never drift apart.
     static let content = IndigoGlassBackground(tint: 0.64, shaderOpacity: 0.22, opaque: true)
+
+    /// Page headers: the same ground, a step darker, so the title band reads
+    /// as chrome sitting above the page rather than the top of it.
+    static let header = IndigoGlassBackground(tint: 0.82, shaderOpacity: 0.16, opaque: true)
+
+    /// For You's header, set lighter than the others on purpose. It sits over
+    /// the map's saturated blue, and at the same values it read darker than
+    /// every other page's header beside a paler page.
+    static let exploreHeader = IndigoGlassBackground(tint: 0.68, shaderOpacity: 0.2, opaque: true)
 
     var body: some View {
         ZStack {

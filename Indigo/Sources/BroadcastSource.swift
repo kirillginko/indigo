@@ -84,13 +84,20 @@ nonisolated struct BroadcastSource {
         }
         switch providerID {
         case NTSProvider.providerID:
-            guard let ref = NTSEpisodeRef.decode(showID) else {
-                return showID.isEmpty ? nil : .ntsShow(alias: showID)
+            // The crate files "nts.episode.show/episode". Decoded with the
+            // prefix on, the show came out as "nts.episode.tim-koh" and the
+            // page could only ever report an error.
+            let identity = strip(showID, providerID: providerID, noun: "episode") ?? showID
+            guard let ref = NTSEpisodeRef.decode(identity) else {
+                return identity.isEmpty ? nil : .ntsShow(alias: identity)
             }
             return .ntsEpisode(show: ref.show, episode: ref.episode)
         case KioskProvider.providerID:
-            // Kiosk publishes no per-show page; its shows live in the archive
-            // grid, so there is nothing to navigate to yet.
+            // A broadcast the crate kept has its own page. Kiosk publishes no
+            // per-show page, so a bare slug has nowhere to go.
+            if let slug = strip(showID, providerID: providerID, noun: "episode") {
+                return .kioskEpisode(slug: slug)
+            }
             return nil
         case LYLProvider.providerID:
             let slug = showID.hasPrefix("lyl.episode.")
