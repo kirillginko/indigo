@@ -131,6 +131,9 @@ struct CrateView: View {
             await hydrateMissingRadioGenres()
             await dig.enrichRadioCrateInBackground()
         }
+        .task {
+            await KeptShow.fillMissingArtwork(crate: crate, stations: stations)
+        }
     }
 
     private func dayHeader(_ day: CrateService.Day) -> some View {
@@ -215,91 +218,10 @@ struct CrateView: View {
             appState.open(.album(track.albumKey))
             return true
         }
-        if let showID = item.showID {
-            switch item.providerID {
-            case NTSProvider.providerID where item.isLiveStream && !showID.hasPrefix("nts.episode."):
-                // Older crate entries only know the station and show title.
-                // Search the NTS archive instead of reopening today's stream.
-                appState.select(.ntsSearch)
-                appState.searchText = item.displayTitle
-                return true
-            case NoodsProvider.providerID where showID.hasPrefix("noods.show."):
-                appState.open(.noodsShow(path: "shows/\(showID.dropFirst("noods.show.".count))"))
-                return true
-            case KioskProvider.providerID where showID.hasPrefix("kiosk.episode."):
-                appState.open(.kioskEpisode(slug: String(showID.dropFirst("kiosk.episode.".count))))
-                return true
-            case LYLProvider.providerID where showID.hasPrefix("lyl.episode."):
-                appState.open(.lylEpisode(slug: String(showID.dropFirst("lyl.episode.".count))))
-                return true
-            case CashmereProvider.providerID where showID.hasPrefix("cashmere.episode."):
-                appState.open(.cashmereEpisode(slug: String(showID.dropFirst("cashmere.episode.".count))))
-                return true
-            // Cashmere and Panik name the show that is on air rather than the
-            // broadcast, so a row kept off the air opens the show.
-            case CashmereProvider.providerID where showID.hasPrefix("cashmere.show."):
-                appState.open(.cashmereShow(slug: String(showID.dropFirst("cashmere.show.".count))))
-                return true
-            case IdaProvider.providerID where showID.hasPrefix("ida.episode."):
-                appState.open(.idaEpisode(slug: String(showID.dropFirst("ida.episode.".count))))
-                return true
-            case N10ASProvider.providerID where showID.hasPrefix("n10as.episode."):
-                appState.open(.n10asEpisode(
-                    id: String(showID.dropFirst("n10as.episode.".count))
-                ))
-            case Radio80000Provider.providerID where showID.hasPrefix("radio80000.episode."):
-                appState.open(.radio80000Episode(
-                    id: String(showID.dropFirst("radio80000.episode.".count))
-                ))
-                return true
-            case PanikProvider.providerID where showID.hasPrefix("panik.episode."):
-                appState.open(.panikEpisode(id: String(showID.dropFirst("panik.episode.".count))))
-                return true
-            case PanikProvider.providerID where showID.hasPrefix("panik.show."):
-                appState.open(.panikShow(slug: String(showID.dropFirst("panik.show.".count))))
-                return true
-            case RovrProvider.providerID where showID.hasPrefix("rovr.broadcast."):
-                appState.open(.rovrBroadcast(
-                    id: String(showID.dropFirst("rovr.broadcast.".count))
-                ))
-                return true
-            case AlharaProvider.providerID where showID.hasPrefix("alhara.show."):
-                appState.open(.alharaShow(slug: String(showID.dropFirst("alhara.show.".count))))
-                return true
-            case DublabProvider.providerID where showID.hasPrefix("dublab.broadcast."):
-                appState.open(.dublabBroadcast(slug: String(showID.dropFirst("dublab.broadcast.".count))))
-                return true
-            case LotProvider.providerID where showID.hasPrefix("lot.episode."):
-                let identity = String(showID.dropFirst("lot.episode.".count))
-                if let ref = LotEpisodeRef.decode(identity) {
-                    appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
-                    return true
-                }
-            case LotProvider.providerID where item.isLiveStream:
-                // Kept on air and not yet matched to a recording — either The
-                // Lot has not published it or it aired too long ago to find.
-                // The residency is the nearest true thing to open: it is where
-                // the broadcast will appear, rather than the whole directory.
-                let residency = LotScheduleEntry.residency(in: item.displayTitle)
-                if let show = lotBrowse.shows.first(where: {
-                    LibraryKey.normalize($0.name) == LibraryKey.normalize(residency)
-                }) {
-                    appState.open(.lotShow(slug: show.slug))
-                    return true
-                }
-            case NTSProvider.providerID where showID.hasPrefix("nts.episode."):
-                let identity = String(showID.dropFirst("nts.episode.".count))
-                if let ref = NTSEpisodeRef.decode(identity) {
-                    appState.open(.ntsEpisode(show: ref.show, episode: ref.episode))
-                    return true
-                }
-            default: break
-            }
-        }
-        // A broadcast row nothing above could place: a show kept off the air,
-        // a station kept as itself, or an id from a build that filed them
-        // differently. The ladder is shared, because three places climb it —
-        // see `KeptShow`.
+        // Every broadcast row climbs the one ladder — the broadcast, the
+        // show, and the station's directory last. This page used to route
+        // the ones it recognised itself, and For You, which only has the
+        // ladder, opened the same rows somewhere else. See `KeptShow`.
         if item.kind == .broadcast {
             Task { await followKeptShow(item) }
             return true
@@ -314,8 +236,13 @@ struct CrateView: View {
     }
 
 
+    private var stations: KeptShow.Stations {
+        KeptShow.Stations(nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
+                          radio80000: radio80000Browse, n10as: n10asBrowse)
+    }
+
     private func followKeptShow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, n10as: n10asBrowse, crate: crate) {
+        switch await KeptShow.destination(for: item, stations: stations, crate: crate) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: break
@@ -493,7 +420,11 @@ private struct CrateRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            ArtworkView(localKey: localArtworkKey, remoteURL: item.artworkURL, side: 44)
+            // The mosaic, not the glyph: a label, a track nobody photographed
+            // and a show kept on air all arrive without a picture, and one
+            // that fails to load drew an empty frame.
+            ArtworkView(localKey: localArtworkKey, remoteURL: item.artworkURL, side: 44,
+                        placeholder: .mosaic, mark: item.displayTitle)
                 .overlay(Rectangle().strokeBorder(
                     isCurrent ? Palette.accent : Palette.rule,
                     lineWidth: isCurrent ? 1.5 : Metrics.hairline

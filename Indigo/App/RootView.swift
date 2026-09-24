@@ -13,6 +13,7 @@ struct RootView: View {
     @Environment(LibraryStore.self) private var library
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(DigStore.self) private var dig
+    @AppStorage(YouTubeVideoPanel.storageKey) private var showsYouTubeVideo = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,12 +35,28 @@ struct RootView: View {
         .foregroundStyle(Palette.ink)
         // Parked, not hidden from WebKit: the widget has to remain in the
         // window for archived episodes to keep playing across navigation.
-        .overlay(alignment: .bottomLeading) {
+        //
+        // A YouTube video can be brought out above the player bar, at the
+        // smallest 16:9 size YouTube's player accepts (200 points tall), with
+        // the glyph beside the crate button. Parked by default: the listener
+        // is here for the music. SoundCloud and Mixcloud are audio and have no
+        // picture to show. One view either way: the web view cannot be in two
+        // places, and moving it keeps whatever is playing.
+        .overlay(alignment: .bottomTrailing) {
+            let showsVideo = player.embedProvider == .youtube && showsYouTubeVideo
             EmbedPlayerSurface(engine: player.embed)
-                .frame(width: 1, height: 1)
-                .opacity(0.02)
+                .frame(width: showsVideo ? 356 : 1, height: showsVideo ? 200 : 1)
+                .background(Color.black)
+                .overlay {
+                    if showsVideo {
+                        Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline)
+                    }
+                }
+                .opacity(showsVideo ? 1 : 0.02)
                 .allowsHitTesting(false)
-                .accessibilityHidden(true)
+                .accessibilityHidden(!showsVideo)
+                .padding(.trailing, showsVideo ? 16 : 0)
+                .padding(.bottom, showsVideo ? Metrics.playerBarHeight + 16 : 0)
         }
         .ignoresSafeArea(.container, edges: .top)
         .overlay(alignment: .bottom) { noticeOverlay }
@@ -152,6 +169,8 @@ struct RootView: View {
                     N10ASEpisodeDetailView(episodeID: id)
                 case .n10asShow(let slug):
                     N10ASShowDetailView(slug: slug)
+                case .youtubeChannel(let id):
+                    YouTubeChannelDetailView(channelID: id)
                 }
                 }
                 // A fresh view per page, rather than SwiftUI reusing the last
@@ -215,6 +234,7 @@ struct RootView: View {
                 case .rovrArchive: RovrArchiveView()
                 case .rovrShows: RovrShowsView()
                 case .rovrCurators: RovrCuratorsView()
+                case .youtubeChannels: YouTubeChannelsView()
                 case .n10asStation: N10ASStationView()
                 case .n10asArchive: N10ASArchiveView()
                 case .n10asShows: N10ASShowsView()

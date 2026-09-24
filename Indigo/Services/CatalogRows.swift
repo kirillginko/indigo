@@ -354,6 +354,9 @@ nonisolated extension Catalog {
         var artistID: UUID?
         var artistName: String?
         var recordingID: UUID?
+        /// Where this one line plays on its own — a curator's upload. Nil for
+        /// a station's set, which is heard whole. See migration 0041.
+        var mediaURL: String?
 
         var id: UUID { appearanceID }
 
@@ -366,6 +369,7 @@ nonisolated extension Catalog {
             case artistID = "artist_id"
             case artistName = "artist_name"
             case recordingID = "recording_id"
+            case mediaURL = "media_url"
         }
     }
 }

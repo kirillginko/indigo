@@ -69,6 +69,19 @@ nonisolated struct RadioRepository: Sendable {
             .value
     }
 
+    /// Every programme one provider files, by title — the YouTube channels
+    /// Indigo follows, say, which the backend chooses and the app only reads.
+    func shows(provider: String) async throws -> [Catalog.RadioShow] {
+        let client = try SupabaseService.requireClient()
+        return try await client
+            .from(CatalogLookup.Table.radioShows)
+            .select()
+            .eq("provider", value: provider)
+            .order("title", ascending: true)
+            .execute()
+            .value
+    }
+
     // MARK: - Reads shaped for a screen
 
     /// The radio header of an artist page: how often, across how many shows,

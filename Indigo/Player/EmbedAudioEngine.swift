@@ -290,7 +290,10 @@ extension EmbedAudioEngine {
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <style>
-        html, body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+        /* The height chain has to reach the window. Without it "100%" on the
+           host resolved against nothing, and YouTube's frame kept its default
+           640x390 -- cropped and off-centre in the video panel. */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
         #host { width: 100%; height: 100%; }
         iframe { border: 0; width: 100%; height: 100%; display: block; }
       </style>
@@ -498,6 +501,9 @@ extension EmbedAudioEngine {
             document.getElementById('host').appendChild(host);
             var player = new YT.Player(host, {
               videoId: videoID,
+              // Fill the panel, whatever size it is, rather than 640x390.
+              width: '100%',
+              height: '100%',
               // No chrome. The listener is here for the music, and the
               // transport they are already using is the app's own.
               playerVars: {

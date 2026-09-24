@@ -290,6 +290,29 @@ final class NTSBrowseStore {
         }
     }
 
+    /// Where a show kept on air should open: the broadcast, if NTS has posted
+    /// one within a day of when it was kept, and otherwise the show it
+    /// belongs to, which is a page and not a guess at which episode.
+    ///
+    /// The window is the difference from `archivedEpisode`: nearest-by-date
+    /// alone will hand back last month's episode of a weekly show, which is
+    /// the right show and the wrong broadcast.
+    func keptShow(matching title: String, near savedAt: Date) async -> (episode: NTSEpisodeRef?, show: String?) {
+        guard let response = try? await api.search(query: title, scope: .episode, offset: 0)
+        else { return (nil, nil) }
+        let titleKey = LibraryKey.normalize(title)
+        let candidates = response.results.enumerated()
+            .compactMap { index, dto in dto.asResult(index: index) }
+            .filter { $0.kind == .episode && $0.showAlias != nil && LibraryKey.normalize($0.title) == titleKey }
+        let nearest = candidates
+            .filter { $0.episodeAlias != nil && distance($0.date, from: savedAt) <= 60 * 60 * 24 }
+            .min { distance($0.date, from: savedAt) < distance($1.date, from: savedAt) }
+        if let nearest, let show = nearest.showAlias, let episode = nearest.episodeAlias {
+            return (NTSEpisodeRef(show: show, episode: episode), show)
+        }
+        return (nil, candidates.first?.showAlias)
+    }
+
     private func performSearch(query: String, scope: NTSSearchScope, offset: Int) async {
         searchResults.isLoading = true
         searchResults.error = nil

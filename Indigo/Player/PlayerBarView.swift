@@ -30,6 +30,7 @@ struct PlayerBarView: View {
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @State private var isIdentityHovering = false
+    @AppStorage(YouTubeVideoPanel.storageKey) private var showsVideo = false
 
     var body: some View {
         ZStack {
@@ -60,6 +61,16 @@ struct PlayerBarView: View {
         HStack(spacing: 10) {
             identityButton
                 .layoutPriority(1)
+                // Over the thumbnail's corner rather than inside the button
+                // that opens now playing: a button in a button's label takes
+                // neither press reliably.
+                .overlay(alignment: .topLeading) {
+                    if player.embedProvider == .youtube {
+                        VideoGlyphButton(isShowing: showsVideo) { showsVideo.toggle() }
+                            .frame(width: Metrics.playerBarHeight, height: Metrics.playerBarHeight,
+                                   alignment: .topTrailing)
+                    }
+                }
 
             Spacer(minLength: 6)
 

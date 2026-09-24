@@ -15,6 +15,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
 import { discoverLotRadio } from "../_shared/lotradio.ts";
+import { crawlChannel } from "../_shared/youtube.ts";
 import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
 import {
   cacheDiscogsRelease,
@@ -133,6 +134,20 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
       // written here rather than queued one by one as NTS episodes are.
       const result = await discoverLotRadio(supabase, String(job.payload?.mode ?? "fresh"));
       console.log("discover_lotradio", JSON.stringify(result));
+      return;
+    }
+
+    case "crawl_youtube_channel": {
+      // One followed channel, whole: its uploads and every playlist that has
+      // changed size since the last pass. Only channels listed in
+      // `youtube_channels` are ever queued (see 0041), never one a caller names.
+      const channelID = String(job.payload?.channel_id ?? "");
+      if (!/^UC[A-Za-z0-9_-]{22}$/.test(channelID)) throw new Error("missing channel");
+      const requested = job.payload?.title_format;
+      const format = requested === "title_only" || requested === "title_artist" ? requested : "artist_title";
+      const result = await crawlChannel(
+        supabase, channelID, Deno.env.get("YOUTUBE_API_KEY") || undefined, format);
+      console.log("crawl_youtube_channel", JSON.stringify(result));
       return;
     }
 

@@ -257,6 +257,42 @@ final class DublabBrowseStore {
         }
     }
 
+    /// Where a show kept on air should open.
+    ///
+    /// dublab files a broadcast as "Jasmine Salvino — Night Bloom (07.27.26)"
+    /// and its live feed bills the same hour as "Jasmine Salvino - Night
+    /// Bloom", so they are compared without the date and the dash. The
+    /// broadcast if it was posted within a day and a half of being kept — the
+    /// archive dates carry no time — and otherwise the DJ's page, which lists
+    /// every one of their runs. dublab publishes no page for a show itself.
+    func keptBroadcast(matching title: String, near savedAt: Date) async -> (broadcast: String?, dj: String?) {
+        let wanted = Self.billingKey(title)
+        guard !wanted.isEmpty, let page = try? await api.search(title) else { return (nil, nil) }
+        let candidates = page.broadcasts.filter { Self.billingKey($0.title) == wanted }
+        remember(candidates)
+        let nearest = candidates
+            .compactMap { broadcast -> (DublabBroadcast, TimeInterval)? in
+                guard let aired = broadcast.airedAt else { return nil }
+                return (broadcast, abs(aired.timeIntervalSince(savedAt)))
+            }
+            .filter { $0.1 <= 60 * 60 * 36 }
+            .min { $0.1 < $1.1 }?.0
+        return (nearest?.slug, candidates.lazy.compactMap(\.artistSlugs.first).first)
+    }
+
+    /// A billing with its trailing "(07.27.26)" and "(guest session)" removed
+    /// and its dashes made one kind.
+    static func billingKey(_ title: String) -> String {
+        var value = title.trimmingCharacters(in: .whitespaces)
+        while value.hasSuffix(")"), let open = value.lastIndex(of: "(") {
+            value = String(value[..<open]).trimmingCharacters(in: .whitespaces)
+        }
+        return LibraryKey.normalize(value)
+            .replacingOccurrences(of: "—", with: "-")
+            .replacingOccurrences(of: "–", with: "-")
+            .split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    }
+
     // MARK: - Helpers
 
     private func dedupe(_ broadcasts: [DublabBroadcast]) -> [DublabBroadcast] {

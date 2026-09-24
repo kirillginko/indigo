@@ -7,6 +7,14 @@ struct ExploreView: View {
     /// `KeptShow`.
     @Environment(Radio80000BrowseStore.self) private var radio80000Browse
     @Environment(N10ASBrowseStore.self) private var n10asBrowse
+    @Environment(NTSBrowseStore.self) private var ntsBrowse
+    @Environment(LotBrowseStore.self) private var lotBrowse
+    @Environment(DublabBrowseStore.self) private var dublabBrowse
+
+    private var stations: KeptShow.Stations {
+        KeptShow.Stations(nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
+                          radio80000: radio80000Browse, n10as: n10asBrowse)
+    }
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
@@ -51,6 +59,9 @@ struct ExploreView: View {
         .foregroundStyle(Color.black)
         .background(MosaicColor.cobalt)
         .task { crate.backfillLocalGenres() }
+        .task {
+            await KeptShow.fillMissingArtwork(crate: crate, stations: stations)
+        }
         // Kept on the store, so coming back to this page shows what it showed
         // last time rather than emptying itself and filling in again. Keyed on
         // the crate rather than on the graph: enrichment moves the graph
@@ -63,13 +74,10 @@ struct ExploreView: View {
         let ink = Color.white
         let inverseInk = Color.black
         return VStack(alignment: .leading, spacing: 15) {
-            HStack(alignment: .top) {
-                Text("Explore").font(Typeface.display(40)).tracking(-0.7)
-                Spacer()
-                Button("Crate · \(kept.count)") { appState.select(.crate) }
-                    .buttonStyle(MapHeaderButtonStyle(ink: ink))
-            }
-            HStack(spacing: 7) {
+            Text("Explore").font(Typeface.display(40)).tracking(-0.7)
+            // The Crate button shares the filters' row, flush right, so every
+            // control in the header sits on one baseline.
+            HStack(alignment: .bottom, spacing: 7) {
                 ForEach(ExploreFilter.allCases) { choice in
                     Button { filter = choice } label: {
                         HStack(spacing: 7) {
@@ -82,12 +90,15 @@ struct ExploreView: View {
                         .overlay(Rectangle().stroke(ink, lineWidth: 1))
                     }.buttonStyle(.plain)
                 }
+                Spacer(minLength: 12)
+                Button("Crate · \(kept.count)") { appState.select(.crate) }
+                    .buttonStyle(MapHeaderButtonStyle(ink: ink))
             }
         }
         .padding(.top, Metrics.titleBarInset + 18).padding(.horizontal, 28).padding(.bottom, 16)
         .foregroundStyle(ink)
-        // Solid, like the page under it. Only the sidebar stays glass.
-        .background(IndigoGlassBackground.content)
+        // Its own value: see `IndigoGlassBackground.exploreHeader`.
+        .background(IndigoGlassBackground.exploreHeader)
     }
 
     @ViewBuilder private func objects(_ kept: [CrateItem], in size: CGSize) -> some View {
@@ -539,7 +550,7 @@ struct ExploreView: View {
     }
 
     private func follow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, radio80000: radio80000Browse, n10as: n10asBrowse, crate: crate) {
+        switch await KeptShow.destination(for: item, stations: stations, crate: crate) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: appState.select(.crate)
@@ -547,7 +558,7 @@ struct ExploreView: View {
     }
 
     private func follow(_ node: MusicNode) async {
-        switch await KeptShow.destination(for: node, radio80000: radio80000Browse, n10as: n10asBrowse) {
+        switch await KeptShow.destination(for: node, stations: stations) {
         case .page(let page): appState.open(page)
         case .section(let route): appState.select(route)
         case nil: break
@@ -697,7 +708,7 @@ private struct MapLabel: View {
     }
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            if localArtworkKey != nil || imageURL != nil {
+            if localArtworkKey != nil || ArtworkView.usable(imageURL) != nil {
                 // The same block the branch below draws, so a card whose
                 // picture fails to arrive looks like a card that never had
                 // one, rather than like a hole in the map.

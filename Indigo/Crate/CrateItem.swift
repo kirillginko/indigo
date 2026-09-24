@@ -182,9 +182,12 @@ nonisolated final class CrateItem {
         }
     }
 
+    /// Filtered on read, like the Discogs models: a track resolved through a
+    /// Discogs search can have kept a `spacer.gif`, which loads fine and draws
+    /// a blank tile instead of the placeholder.
     var artworkURL: URL? {
-        guard let artworkURLString else { return nil }
-        return URL(string: artworkURLString)
+        guard let usable = DiscogsClient.usableImage(artworkURLString) else { return nil }
+        return URL(string: usable)
     }
 
     var genreTags: [String] {
@@ -281,19 +284,21 @@ nonisolated final class CrateItem {
 
     /// The item the player needs to hear this again, when the crate itself
     /// knows one. Recordings go through SourceResolver instead.
+    /// Legacy builds stored the NTS station stream while presenting the
+    /// on-air show as the crated item. Named as well as caught by
+    /// `isLiveShowSnapshot`, because those rows predate the subtitle carrying
+    /// the station.
+    var isLegacyNTSLiveRow: Bool {
+        providerID == "nts" && isLiveStream && (showID == "nts.1" || showID == "nts.2")
+    }
+
     func broadcastMediaItem() -> MediaItem? {
         // A show kept off the air is not a stream anybody can start again.
         // Playing the station would be playing a different show under the
         // name of the one that was kept, so fail closed and let the crate
         // page find the show itself.
         if isLiveShowSnapshot { return nil }
-        // Legacy builds stored the NTS station stream while presenting the
-        // on-air show as the crated item. Named as well as caught by the rule
-        // above, because those rows predate the subtitle carrying the station.
-        if providerID == "nts", isLiveStream,
-           showID == "nts.1" || showID == "nts.2" {
-            return nil
-        }
+        if isLegacyNTSLiveRow { return nil }
         guard kind == .broadcast,
               let playbackURLString,
               let url = URL(string: playbackURLString),
