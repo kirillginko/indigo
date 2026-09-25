@@ -10,6 +10,7 @@
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { storeCachePayload, storeReleasePayload } from "./release_cache.ts";
 import { normalizeName } from "./normalize.ts";
+import { isInR2 } from "./r2.ts";
 
 const PROVIDER = "discogs";
 
@@ -138,6 +139,45 @@ async function resolveEntity(
   return entityID;
 }
 
+/// The release row behind a Discogs release id, creating it the first time.
+///
+/// A release is named by one provider, so its id is a column on the row
+/// rather than an `external_ids` row (0056), and the column's unique index
+/// decides a race as `external_ids`' did. With `cachedAt`, also stamps when
+/// its document was stored -- on the same call that finds the row, so caching
+/// a release already on file is one request.
+export async function resolveRelease(
+  supabase: SupabaseClient,
+  discogsID: string,
+  row: Record<string, unknown>,
+  cachedAt: string | null = null,
+): Promise<string | null> {
+  const find = () =>
+    cachedAt
+      ? supabase.from("releases").update({ discogs_cached_at: cachedAt })
+        .eq("discogs_id", discogsID).select("id").maybeSingle()
+      : supabase.from("releases").select("id").eq("discogs_id", discogsID).maybeSingle();
+
+  const existing = await find();
+  if (existing.data?.id) return existing.data.id as string;
+
+  const inserted = await supabase
+    .from("releases")
+    .insert({ ...row, discogs_id: discogsID, discogs_cached_at: cachedAt })
+    .select("id")
+    .single();
+  if (!inserted.error && inserted.data) return inserted.data.id as string;
+
+  // Lost a race: another invocation filed this id first, and its row is the
+  // release.
+  if (inserted.error?.code === "23505") {
+    const winner = await find();
+    return (winner.data?.id as string) ?? null;
+  }
+  console.error("normalize: insert into releases failed", inserted.error?.message);
+  return null;
+}
+
 /// Filing conventions, not people. Treated as artists they wreck a graph:
 /// every compilation in existence would connect through "Various".
 const PLACEHOLDER_NAMES = new Set([
@@ -152,9 +192,12 @@ function isRealArtist(name: string | undefined): boolean {
   return key.length > 0 && !PLACEHOLDER_NAMES.has(key);
 }
 
+/// `cachedAt`: when this payload's document was stored in R2, for a caller
+/// that has just stored it. Left null by one that has not.
 export async function normalizeDiscogsRelease(
   supabase: SupabaseClient,
   payload: Payload,
+  cachedAt: string | null = null,
 ): Promise<string | null> {
   const releaseID = payload?.id;
   if (releaseID === undefined || releaseID === null) return null;
@@ -184,14 +227,14 @@ export async function normalizeDiscogsRelease(
 
   const format = Array.isArray(payload.formats) ? payload.formats[0]?.name : undefined;
 
-  const releaseUUID = await resolveEntity(supabase, "releases", "release", releaseExternalID, {
+  const releaseUUID = await resolveRelease(supabase, releaseExternalID, {
     title: payload.title ?? "Untitled",
     artist_id: artistUUID,
     label_id: labelUUID,
     catalog_number: label?.catno ?? null,
     release_year: releaseYear,
     release_type: format ?? null,
-  });
+  }, cachedAt);
 
   if (!releaseUUID) return null;
 
@@ -477,29 +520,19 @@ export async function cacheDiscogsRelease(
 
   const payload = await response.json();
 
-  // The document to Storage, and a row that says where (0036). Uploaded first
-  // and awaited, so a failure throws before any row can point at nothing, and
-  // the queue's backoff brings the job round again.
+  // The document to R2, at a key made from the id (0051). Uploaded first and
+  // awaited, so a failure throws before anything says it is cached, and the
+  // queue's backoff brings the job round again.
   const payloadPath = await storeReleasePayload(supabase, releaseID, payload);
-
-  const written = await supabase
-    .from("metadata_cache")
-    .upsert({
-      provider: PROVIDER,
-      resource_type: "release",
-      resource_id: releaseID,
-      payload: null,
-      payload_path: payloadPath,
-      fetched_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + RELEASE_CACHE_TTL_SECONDS * 1000).toISOString(),
-    }, { onConflict: "provider,resource_type,resource_id" });
-
-  if (written.error) throw new Error(written.error.message);
 
   // The normalized tables too, not just the blob. `search_catalog` reads
   // `releases` and `labels`, and a cache that only fed the app's release page
-  // would leave search exactly as empty as it is now.
-  await normalizeDiscogsRelease(supabase, payload);
+  // would leave search exactly as empty as it is now. The release row is also
+  // where "cached, and when" is kept (0056) -- stamped only for a document
+  // the app can read, which is one in R2.
+  const cachedAt = isInR2(payloadPath) ? new Date().toISOString() : null;
+  const releaseUUID = await normalizeDiscogsRelease(supabase, payload, cachedAt);
+  if (!releaseUUID) throw new Error(`could not file release ${releaseID}`);
   return true;
 }
 

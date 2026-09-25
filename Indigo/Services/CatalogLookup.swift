@@ -81,6 +81,18 @@ nonisolated enum CatalogLookup {
     ) async throws -> Row? {
         let client = try SupabaseService.requireClient()
 
+        // A Discogs release carries its id on its own row (0056).
+        if table == Table.releases && provider == "discogs" {
+            let rows: [Row] = try await client
+                .from(table)
+                .select()
+                .eq("discogs_id", value: externalID)
+                .limit(1)
+                .execute()
+                .value
+            return rows.first
+        }
+
         let pointers: [Pointer] = try await client
             .from(Table.externalIDs)
             .select("entity_id")

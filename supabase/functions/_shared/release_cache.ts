@@ -1,5 +1,6 @@
-// Where a cached Discogs release lives: an object in Storage, pointed at by a
-// row in `metadata_cache`. See 0036.
+// Where a cached Discogs release lives: an object in R2 at
+// `releases/<id>.json`, and the time it was stored on the release row itself
+// (0056). Before that, a `metadata_cache` row pointed at it (0036, 0051).
 //
 // One module for the three places that touch it — the worker's release job,
 // `catalog-refresh`, and the one-off move of what was already stored — so the
@@ -97,6 +98,36 @@ export async function readCachedPayload(
   if (error || !data) return null;
   try {
     return JSON.parse(await data.text());
+  } catch {
+    return null;
+  }
+}
+
+/// A cached release, read by its Discogs id alone (0056).
+///
+/// No `metadata_cache` row stands for a release any more: the release row
+/// says when its document was stored, and the document is in R2 at a key made
+/// from the id. Null for a release never cached, or a document that will not
+/// load -- a miss, as before. `fresh` is false for one older than `lifetimeMs`,
+/// which a caller may still serve when the provider will not answer.
+export async function readCachedRelease(
+  supabase: SupabaseClient,
+  releaseID: string,
+  lifetimeMs: number,
+  r2 = r2Config(),
+): Promise<{ payload: unknown; fresh: boolean } | null> {
+  if (!r2) return null;
+  const { data, error } = await supabase
+    .from("releases")
+    .select("discogs_cached_at")
+    .eq("discogs_id", releaseID)
+    .maybeSingle();
+  const cachedAt = error ? NaN : Date.parse(String(data?.discogs_cached_at ?? ""));
+  if (!Number.isFinite(cachedAt)) return null;
+  try {
+    const text = await getObject(r2, releasePayloadPath(releaseID));
+    if (text === null) return null;
+    return { payload: JSON.parse(text), fresh: Date.now() - cachedAt < lifetimeMs };
   } catch {
     return null;
   }
