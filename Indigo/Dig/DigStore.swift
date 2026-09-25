@@ -1594,7 +1594,8 @@ final class DigStore {
         if let releaseMBID = engine.metadata(for: recording.id)?.releaseMBID,
            !releaseMBID.isEmpty,
            let candidate = URL(string: "https://coverartarchive.org/release/\(releaseMBID)/front-500"),
-           await RemoteArtworkStore.shared.image(for: candidate) != nil {
+           // Only asking whether it exists, so the smallest decode will do.
+           await RemoteArtworkStore.shared.image(for: candidate, pixels: 1) != nil {
             return candidate
         }
 
