@@ -115,32 +115,125 @@ nonisolated final class ArtworkStore: @unchecked Sendable {
 nonisolated final class RemoteArtworkStore: @unchecked Sendable {
     static let shared = RemoteArtworkStore()
 
-    private let cache = NSCache<NSURL, PlatformImage>()
+    private let cache = NSCache<NSString, PlatformImage>()
     private let directory: URL
     private let fileManager = FileManager.default
     private var missing: [URL: Date] = [:]
     private let missingLock = NSLock()
 
     private init() {
-        cache.countLimit = 320
+        // By bytes, not by count: one camera photo decoded whole weighed as
+        // much as four hundred sleeves, and a count cannot tell them apart.
+        cache.totalCostLimit = 160 * 1024 * 1024
         let base = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSTemporaryDirectory())
         directory = base.appendingPathComponent("Indigo/RemoteArtwork", isDirectory: true)
         try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
     }
 
+    // MARK: Decoding at the size drawn
+
+    /// The sizes a picture is decoded to, in pixels of the edge the tile
+    /// needs covered (see `decode`).
+    ///
+    /// Pictures used to be decoded whole. Stations publish camera originals --
+    /// Kiosk's show photos are 3024x2016, a few covers are 8373 square -- and
+    /// For You drew them in 42-point cards: ~25 MB of pixels each for 84 on
+    /// screen, measured as ~200 MB of one page's footprint on 2026-09-25. A
+    /// few fixed steps rather than the exact size, so tiles of nearly the
+    /// same size share one decode.
+    static let steps = [128, 256, 512, 1024, 2048]
+
+    /// The step that covers `pixels`. No size given, or more than the largest
+    /// step, is the largest: nothing Indigo draws is wider than 2048 pixels.
+    static func step(for pixels: CGFloat?) -> Int {
+        guard let pixels, pixels.isFinite, pixels > 0 else { return steps[steps.count - 1] }
+        return steps.first { CGFloat($0) >= pixels } ?? steps[steps.count - 1]
+    }
+
+    private func cacheKey(_ url: URL, _ step: Int) -> NSString {
+        "\(step)|\(url.absoluteString)" as NSString
+    }
+
+    /// This step or any larger one already decoded: a bigger picture draws a
+    /// smaller tile perfectly well, and is already paid for.
+    private func cached(_ url: URL, atLeast step: Int) -> PlatformImage? {
+        for candidate in Self.steps where candidate >= step {
+            if let image = cache.object(forKey: cacheKey(url, candidate)) { return image }
+        }
+        return nil
+    }
+
+    private func remember(_ image: PlatformImage, _ url: URL, _ step: Int) {
+        cache.setObject(image, forKey: cacheKey(url, step), cost: Self.cost(of: image))
+    }
+
+    private static func cost(of image: PlatformImage) -> Int {
+        #if os(macOS)
+        // The bitmap itself: a representation's `pixelsWide` reports it at
+        // the screen's backing scale, which would count every picture 4x.
+        var rect = CGRect(origin: .zero, size: image.size)
+        let bitmap = image.cgImage(forProposedRect: &rect, context: nil, hints: nil)
+        let pixels = bitmap.map { $0.width * $0.height } ?? Int(image.size.width * image.size.height)
+        #else
+        let pixels = Int(image.size.width * image.scale * image.size.height * image.scale)
+        #endif
+        return max(1, pixels * 4)
+    }
+
+    /// `data` decoded so its *shorter* edge covers `step`, and never larger
+    /// than it is. Tiles fill and crop, so a 3:2 photo in a square tile is
+    /// drawn by its short side; a limit on the long side alone would leave it
+    /// soft. The shape is capped at 3:1, so a panorama cannot ask for a
+    /// decode as large as the ones this replaced. Decoded here, off the main
+    /// thread, rather than on the first frame that draws it.
+    static func decode(_ data: Data, step: Int) -> PlatformImage? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        let width = (properties?[kCGImagePropertyPixelWidth] as? Int) ?? 0
+        let height = (properties?[kCGImagePropertyPixelHeight] as? Int) ?? 0
+        let long = max(width, height)
+        let short = min(width, height)
+        let shape = short > 0 ? min(3, Double(long) / Double(short)) : 1
+        let limit = long > 0 ? min(long, Int((Double(step) * shape).rounded(.up))) : step
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceThumbnailMaxPixelSize: limit,
+        ]
+        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+            return nil
+        }
+        #if os(macOS)
+        return NSImage(cgImage: image, size: NSSize(width: image.width, height: image.height))
+        #else
+        return UIImage(cgImage: image)
+        #endif
+    }
+
     /// The picture, only if it is already in memory. Synchronous on purpose:
     /// a view being rebuilt can then draw it in its first frame instead of
     /// showing a grey square and awaiting a value it already has.
-    func cachedImage(for url: URL) -> PlatformImage? {
-        cache.object(forKey: url as NSURL)
+    func cachedImage(for url: URL, pixels: CGFloat? = nil) -> PlatformImage? {
+        cached(url, atLeast: Self.step(for: pixels))
     }
 
-    func image(for url: URL) async -> PlatformImage? {
-        if let cached = cache.object(forKey: url as NSURL) { return cached }
+    /// `pixels`: the longest edge it will be drawn at, in pixels. Left out,
+    /// it is decoded to the largest step.
+    ///
+    /// `@concurrent`, so the disk read and the decode happen off the main
+    /// thread whoever asks. Under approachable concurrency a plain
+    /// `nonisolated async` function runs on its caller's actor, and every
+    /// caller is a tile on the main actor: decoding there, a page of cards
+    /// was a page of main-thread stalls.
+    @concurrent
+    func image(for url: URL, pixels: CGFloat? = nil) async -> PlatformImage? {
+        let step = Self.step(for: pixels)
+        if let cached = cached(url, atLeast: step) { return cached }
         let destination = diskURL(for: url)
-        if let data = try? Data(contentsOf: destination), let image = PlatformImage(data: data) {
-            cache.setObject(image, forKey: url as NSURL)
+        if let data = try? Data(contentsOf: destination), let image = Self.decode(data, step: step) {
+            remember(image, url, step)
             return image
         }
         // A picture that is not there stays not there. Lazy grids rebuild a
@@ -155,11 +248,11 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
                 noteMissing(url)
                 return nil
             }
-            guard let image = PlatformImage(data: data) else {
+            guard let image = Self.decode(data, step: step) else {
                 noteMissing(url)
                 return nil
             }
-            cache.setObject(image, forKey: url as NSURL)
+            remember(image, url, step)
             try? data.write(to: destination, options: .atomic)
             return image
         } catch {
@@ -276,12 +369,31 @@ struct ArtworkView: View {
 
     private var cachedFull: PlatformImage? {
         guard let remote else { return nil }
-        return RemoteArtworkStore.shared.cachedImage(for: remote)
+        return RemoteArtworkStore.shared.cachedImage(for: remote, pixels: pixels)
     }
 
     private var cachedPreview: PlatformImage? {
         guard let preview = distinctPreviewURL else { return nil }
-        return RemoteArtworkStore.shared.cachedImage(for: preview)
+        return RemoteArtworkStore.shared.cachedImage(for: preview, pixels: pixels)
+    }
+
+    @Environment(\.displayScale) private var displayScale
+    /// The tile's size as laid out, for tiles not given a `side`.
+    @State private var measured: CGFloat?
+
+    /// The edge this tile draws, in pixels: what the store decodes to.
+    ///
+    /// Known up front when the caller gives a `side`; measured otherwise, and
+    /// until then nil, which the store reads as its largest size.
+    private var pixels: CGFloat? {
+        let points = side.map { $0 * max(aspect, 1) } ?? measured
+        return points.map { $0 * displayScale }
+    }
+
+    /// The size step, so a tile re-requests its picture only when it moves
+    /// to a different one, not on every point of a resize.
+    private var step: Int? {
+        pixels.map { RemoteArtworkStore.step(for: $0) }
     }
 
     /// The small cut, only when it is actually a different picture.
@@ -299,9 +411,11 @@ struct ArtworkView: View {
     @State private var loadedKey: String?
     @State private var remoteImage: PlatformImage?
     @State private var loadedRemoteURL: URL?
+    @State private var loadedRemoteStep: Int?
     @State private var previewImage: PlatformImage?
     @State private var markImage: PlatformImage?
     @State private var loadedMarkURL: URL?
+    @State private var loadedMarkStep: Int?
     /// The sources whose loading has finished, whatever it found.
     @State private var settled: Sources?
 
@@ -362,6 +476,9 @@ struct ArtworkView: View {
             }
             .clipped()
             .frame(width: side.map { $0 * aspect }, height: side)
+            .onGeometryChange(for: CGFloat.self) { max($0.size.width, $0.size.height) } action: { size in
+                if side == nil { measured = size }
+            }
             // One task, not four.
             //
             // A dig page builds dozens of these, and a lazy grid builds them
@@ -369,12 +486,16 @@ struct ArtworkView: View {
             // tasks created and cancelled per tile per pass, on the main
             // actor, which is felt as the scroll catching.
             .task(id: sources) {
+                // A tile that sizes itself waits to be measured: loading
+                // before then would decode at the largest size, only to decode
+                // again at its own a frame later.
+                guard side != nil || measured != nil else { return }
                 await loadAll()
                 if !Task.isCancelled { settled = sources }
             }
     }
 
-    private var sources: Sources { Sources(localKey, remote, preview, markAddress) }
+    private var sources: Sources { Sources(localKey, remote, preview, markAddress, step: step) }
 
     /// Whether it is known there is no picture, rather than not yet here.
     ///
@@ -464,12 +585,16 @@ struct ArtworkView: View {
         let remote: URL?
         let preview: URL?
         let mark: URL?
+        /// The size step it is drawn at: a tile that grows past a step wants
+        /// its picture decoded again, larger.
+        let step: Int?
 
-        init(_ local: String?, _ remote: URL?, _ preview: URL?, _ mark: URL?) {
+        init(_ local: String?, _ remote: URL?, _ preview: URL?, _ mark: URL?, step: Int? = nil) {
             self.local = local
             self.remote = remote
             self.preview = preview
             self.mark = mark
+            self.step = step
         }
     }
 
@@ -513,14 +638,16 @@ struct ArtworkView: View {
             loadedRemoteURL = nil
             return
         }
-        guard loadedRemoteURL != remote else { return }
-        let loaded = await RemoteArtworkStore.shared.image(for: remote)
+        guard loadedRemoteURL != remote || loadedRemoteStep != step else { return }
+        let asked = step
+        let loaded = await RemoteArtworkStore.shared.image(for: remote, pixels: pixels)
         guard !Task.isCancelled, self.remote == remote else { return }
         // Keep the last successful cover if a refresh briefly fails. This is
         // especially important for The Lot's large residency grid.
         if let loaded {
             remoteImage = loaded
             loadedRemoteURL = remote
+            loadedRemoteStep = asked
         }
     }
 
@@ -530,12 +657,14 @@ struct ArtworkView: View {
             loadedMarkURL = nil
             return
         }
-        guard loadedMarkURL != markAddress else { return }
-        let loaded = await RemoteArtworkStore.shared.image(for: markAddress)
+        guard loadedMarkURL != markAddress || loadedMarkStep != step else { return }
+        let asked = step
+        let loaded = await RemoteArtworkStore.shared.image(for: markAddress, pixels: pixels)
         guard !Task.isCancelled, self.markAddress == markAddress else { return }
         if let loaded {
             markImage = loaded
             loadedMarkURL = markAddress
+            loadedMarkStep = asked
         }
     }
 
@@ -544,7 +673,7 @@ struct ArtworkView: View {
             previewImage = nil
             return
         }
-        let loaded = await RemoteArtworkStore.shared.image(for: preview)
+        let loaded = await RemoteArtworkStore.shared.image(for: preview, pixels: pixels)
         guard !Task.isCancelled, self.preview == preview else { return }
         if let loaded { previewImage = loaded }
     }
