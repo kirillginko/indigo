@@ -781,8 +781,21 @@ private struct ExploreCardInteraction<Content: View>: View {
 
     var body: some View {
         content()
+            // One rectangle to hit-test, not the card's picture, texts and
+            // rules one by one.
+            //
+            // AppKit hit-tests the page on every frame of a scroll (to set the
+            // cursor), on every scroll-wheel event (to route it) and on every
+            // hover update, and SwiftUI answers by descending into every
+            // card's contents, five to nine levels deep. Time Profiler over
+            // 20 s of scrolling For You with the pointer on the cards
+            // (2026-09-25): 7.5 s of main thread in hit tests, most of it in
+            // the leaves. Nothing inside a card is interactive on its own, so
+            // the card is drawn inert and a clear rectangle over it takes the
+            // click, the hover and the context menu.
+            .allowsHitTesting(false)
+            .overlay { Color.clear.contentShape(Rectangle()) }
             .offset(y: reduceMotion || !isHovered || isPressed ? 0 : -3)
-            .contentShape(Rectangle())
             .onHover { isHovered = $0 }
             .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: isHovered)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: isPressed)
@@ -869,6 +882,38 @@ private struct ExploreGraphLines: View {
     let nodes: [ExploreGraphNode]
     let geometry: GeometryProxy
 
+    /// Anchors resolved to frames in the page, where scrolling does not move
+    /// them.
+    ///
+    /// The anchors themselves are reported as changed on every step of a
+    /// scroll, and the lines were a page-tall `Canvas` redrawn for each one:
+    /// ~0.9 s of main thread in 20 s of scrolling For You (Time Profiler,
+    /// 2026-09-25) for lines that had not moved relative to their cards.
+    /// Resolved here and compared, the drawing below runs only when a card
+    /// actually moves.
+    var body: some View {
+        ExploreGraphDrawing(
+            nodes: nodes.map {
+                ExploreGraphDrawing.Node(id: $0.id, frame: geometry[$0.bounds],
+                                         legend: $0.legend, connects: $0.connects)
+            },
+            width: geometry.size.width
+        )
+        .equatable()
+    }
+}
+
+private struct ExploreGraphDrawing: View, Equatable {
+    struct Node: Equatable {
+        let id: String
+        let frame: CGRect
+        let legend: Bool
+        let connects: Bool
+    }
+
+    let nodes: [Node]
+    let width: CGFloat
+
     var body: some View {
         Canvas { context, _ in
             guard !nodes.isEmpty else { return }
@@ -879,11 +924,11 @@ private struct ExploreGraphLines: View {
             // exactly what a section id colliding with a crate section's id
             // did.
             let frames = Dictionary(
-                nodes.map { ($0.id, geometry[$0.bounds]) }, uniquingKeysWith: { first, _ in first }
+                nodes.map { ($0.id, $0.frame) }, uniquingKeysWith: { first, _ in first }
             )
             // The cards reserve a matching clear corridor around this fixed
             // midpoint, so the trunk cannot drift into a recommendation.
-            let centerX = geometry.size.width * 0.5
+            let centerX = width * 0.5
             let root = CGPoint(x: centerX, y: 72)
             var segments = ExploreGraphSegments()
             var lastJunction = root.y
