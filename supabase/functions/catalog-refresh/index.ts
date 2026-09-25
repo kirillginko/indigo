@@ -16,7 +16,13 @@ import {
   normalizeDiscogsSearch,
 } from "../_shared/discogs.ts";
 import { ingestNTSEpisode, ingestNTSShow } from "../_shared/nts.ts";
-import { readCachedPayload, storeReleasePayload } from "../_shared/release_cache.ts";
+import {
+  readCachedPayload,
+  readCachedRelease,
+  storeCachePayload,
+  storeReleasePayload,
+} from "../_shared/release_cache.ts";
+import { isInR2 } from "../_shared/r2.ts";
 
 // An allow-list, not a URL parameter. The request names a provider and a
 // resource; it never supplies a URL, so this cannot be turned into a proxy for
@@ -218,7 +224,15 @@ Deno.serve(async (req: Request) => {
   // caller that has not checked is unaffected.
   const skipCacheRead = body.skip_cache_read === true;
 
-  const { data: cached, error: readError } = skipCacheRead
+  // A Discogs release has no `metadata_cache` row (0056): the release row says
+  // when it was stored, and the document is in R2 under its id.
+  const isRelease = provider === "discogs" && resourceType === "release";
+  const cachedRelease = isRelease && !skipCacheRead
+    ? await readCachedRelease(supabase, resourceID, ttl * 1000)
+    : null;
+  if (cachedRelease?.fresh) return json(cachedRelease.payload);
+
+  const { data: cached, error: readError } = skipCacheRead || isRelease
     ? { data: null, error: null }
     : await supabase
     .from("metadata_cache")
@@ -266,6 +280,7 @@ Deno.serve(async (req: Request) => {
   if (!upstream.ok) {
     // A stale payload is worth more than an error when the provider is simply
     // rate-limiting us.
+    if (cachedRelease) return json(cachedRelease.payload);
     if (cached) return json(cached.payload);
     // Carry the provider's own words through. This is Indigo's backend, the
     // body is a public API's error text, and without it a failure here is
@@ -290,18 +305,29 @@ Deno.serve(async (req: Request) => {
   // what it asked for, and making it wait for our bookkeeping was a third of
   // the time it spent here.
   const persist = (async () => {
-    // A Discogs release is kept in Storage and pointed at (0036); everything
-    // else stays inline. If the upload fails the row is not written at all —
-    // the caller already has its answer, and the next one simply fetches again.
-    const isRelease = provider === "discogs" && resourceType === "release";
+    // A Discogs release is kept in R2 under its id, and the release row says
+    // when (0056) -- stamped by the normalizer, so there is no cache row to
+    // write. If the upload fails it is filed unstamped: the caller already has
+    // its answer, and the next one simply fetches again.
     let payloadPath: string | null = null;
     if (isRelease) {
+      let cachedAt: string | null = null;
       try {
         payloadPath = await storeReleasePayload(supabase, resourceID, payload);
+        if (isInR2(payloadPath)) cachedAt = new Date().toISOString();
       } catch (cause) {
         console.error("cache_upload_failed", String(cause));
-        await normalize(supabase, provider, resourceType, resourceID, payload);
-        return;
+      }
+      await normalize(supabase, provider, resourceType, resourceID, payload, cachedAt);
+      return;
+    } else {
+      // Everything else goes to R2 too once it is configured (0052), and
+      // stays inline until then -- or if the upload fails, since an inline
+      // copy is still a good answer for the next caller.
+      try {
+        payloadPath = await storeCachePayload(supabase, provider, resourceType, resourceID, payload);
+      } catch (cause) {
+        console.error("cache_upload_failed", String(cause));
       }
     }
     const { error: writeError } = await supabase
@@ -310,7 +336,7 @@ Deno.serve(async (req: Request) => {
         provider,
         resource_type: resourceType,
         resource_id: resourceID,
-        payload: isRelease ? null : payload,
+        payload: payloadPath ? null : payload,
         payload_path: payloadPath,
         fetched_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + ttl * 1000).toISOString(),
@@ -355,11 +381,9 @@ async function isNormalized(
 
   if (provider === "discogs" && resourceType === "release") {
     const { data } = await supabase
-      .from("external_ids")
+      .from("releases")
       .select("id")
-      .eq("provider", provider)
-      .eq("entity_type", "release")
-      .eq("external_id", resourceID)
+      .eq("discogs_id", resourceID)
       .maybeSingle();
 
     return Boolean(data);
@@ -390,13 +414,14 @@ async function normalize(
   resourceType: string,
   resourceID: string,
   payload: unknown,
+  cachedAt: string | null = null,
 ): Promise<void> {
   try {
     if (provider === "discogs" && resourceType === SEARCH_PATH) {
       await normalizeDiscogsSearch(supabase, payload as Record<string, unknown>);
     }
     if (provider === "discogs" && resourceType === "release") {
-      await normalizeDiscogsRelease(supabase, payload as Record<string, unknown>);
+      await normalizeDiscogsRelease(supabase, payload as Record<string, unknown>, cachedAt);
     }
     if (provider === "nts" && resourceType === "show") {
       await ingestNTSShow(supabase, resourceID, payload as Record<string, unknown>);

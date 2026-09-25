@@ -86,9 +86,21 @@ nonisolated struct MetadataRepository: Sendable {
     /// for the network; the app uses `fetchFromStorage`.
     var fetchStoredObject: @Sendable (String) async throws -> Data = MetadataRepository.fetchFromStorage
 
+    /// A row pointing at Cloudflare R2 rather than Supabase Storage (0051).
+    static let r2Prefix = "r2:"
+
     /// The public URL, straight to the CDN: the bucket is public, as the table
     /// it replaced was readable by this key, so there is no signing round trip.
+    ///
+    /// Either store, by the row's own say: while the move runs, some releases
+    /// are in R2 and the rest still in Storage.
     static func storedObjectURL(forPath path: String) -> URL? {
+        if path.hasPrefix(r2Prefix) {
+            let key = path.dropFirst(r2Prefix.count)
+            guard !key.isEmpty, let host = SupabaseConfiguration.catalogCacheHost,
+                  !host.contains("/") else { return nil }
+            return URL(string: "https://\(host)/\(key)")
+        }
         guard !path.isEmpty, let base = SupabaseConfiguration.url else { return nil }
         return base
             .appendingPathComponent("storage/v1/object/public")
@@ -104,6 +116,85 @@ nonisolated struct MetadataRepository: Sendable {
             throw URLError(.badServerResponse)
         }
         return data
+    }
+
+    // MARK: - Discogs releases, by id alone
+
+    /// A Discogs release has no cache row (0056): its document is in R2 at a
+    /// key made from its id, and the object's own Last-Modified says when it
+    /// was stored. Asking Postgres first would be a round trip to learn a path
+    /// the id already gives.
+    static func isRelease(provider: String, resourceType: String) -> Bool {
+        provider == "discogs" && resourceType == "release"
+    }
+
+    static func releasePath(id: String) -> String { "\(r2Prefix)releases/\(id).json" }
+
+    /// Reads one release document and when it was stored. A property so a
+    /// test can stand in for the network; the app uses `fetchReleaseFromR2`.
+    var fetchRelease: @Sendable (String) async throws -> (data: Data, storedAt: Date?) =
+        MetadataRepository.fetchReleaseFromR2
+
+    @Sendable static func fetchReleaseFromR2(_ id: String) async throws -> (data: Data, storedAt: Date?) {
+        guard let url = storedObjectURL(forPath: releasePath(id: id)) else { throw URLError(.badURL) }
+        let request = URLRequest(url: url, timeoutInterval: 10)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        return (data, http.value(forHTTPHeaderField: "Last-Modified").flatMap(httpDate(_:)))
+    }
+
+    /// An HTTP date, as R2 writes Last-Modified.
+    static func httpDate(_ text: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "GMT")
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        return formatter.date(from: text)
+    }
+
+    /// One release, fresh or not, or nil on a miss. A document without a
+    /// date is taken as stored now: the backend keeps the cache fresh, and
+    /// an undated copy is still the record.
+    private func cachedRelease<Payload: Decodable & Sendable>(
+        _ type: Payload.Type,
+        id: String
+    ) async -> CachedPayload<Payload>? {
+        guard let (data, storedAt) = try? await fetchRelease(id),
+              let value = try? AnyJSON.decoder.decode(Payload.self, from: data)
+        else { return nil }
+        let fetchedAt = storedAt ?? Date()
+        return CachedPayload(
+            value: value,
+            fetchedAt: fetchedAt,
+            expiresAt: fetchedAt.addingTimeInterval(Lifetime.release)
+        )
+    }
+
+    /// Many releases, a few at a time, keeping those stored within `lifetime`.
+    private func cachedReleases<Payload: Decodable & Sendable>(
+        _ type: Payload.Type,
+        ids: [String],
+        fresherThan lifetime: TimeInterval,
+        concurrency: Int = 8
+    ) async -> [String: Payload] {
+        let oldest = Date().addingTimeInterval(-lifetime)
+        var found: [String: Payload] = [:]
+        await withTaskGroup(of: (String, CachedPayload<Payload>?).self) { group in
+            var pending = Array(Set(ids)).makeIterator()
+            func startNext() -> Bool {
+                guard let id = pending.next() else { return false }
+                group.addTask { (id, await cachedRelease(type, id: id)) }
+                return true
+            }
+            for _ in 0..<max(1, concurrency) where startNext() {}
+            while let (id, hit) = await group.next() {
+                if let hit, hit.fetchedAt > oldest { found[id] = hit.value }
+                _ = startNext()
+            }
+        }
+        return found
     }
 
     /// The JSON a row stands for, wherever it is kept.
@@ -177,6 +268,9 @@ nonisolated struct MetadataRepository: Sendable {
         resourceType: String,
         resourceID: String
     ) async throws -> CachedPayload<Payload>? {
+        if Self.isRelease(provider: provider, resourceType: resourceType) {
+            return await cachedRelease(type, id: resourceID)
+        }
         let client = try SupabaseService.requireClient()
 
         let rows: [CacheRow] = try await client
@@ -214,6 +308,9 @@ nonisolated struct MetadataRepository: Sendable {
         fresherThan lifetime: TimeInterval
     ) async throws -> [String: Payload] {
         guard !resourceIDs.isEmpty else { return [:] }
+        if Self.isRelease(provider: provider, resourceType: resourceType) {
+            return await cachedReleases(type, ids: resourceIDs, fresherThan: lifetime)
+        }
         let client = try SupabaseService.requireClient()
 
         let rows: [KeyedCacheRow] = try await client

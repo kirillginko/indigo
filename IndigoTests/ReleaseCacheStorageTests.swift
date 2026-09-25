@@ -131,4 +131,89 @@ final class ReleaseCacheStorageTests: XCTestCase {
             url.absoluteString
         )
     }
+
+    /// A row that moved to R2 (0051) reads from the bucket's public host, and
+    /// one still in Supabase Storage is untouched by that: both exist while
+    /// the move runs.
+    func testAReleaseInR2IsReadFromItsPublicHost() {
+        setenv("CATALOG_CACHE_HOST", "pub-test.r2.dev", 1)
+        defer { unsetenv("CATALOG_CACHE_HOST") }
+        XCTAssertEqual(
+            MetadataRepository.storedObjectURL(forPath: "r2:releases/74698.json")?.absoluteString,
+            "https://pub-test.r2.dev/releases/74698.json"
+        )
+    }
+
+    /// With no host configured, an R2 row is a miss -- refetched through the
+    /// backend -- rather than a request to somewhere invented.
+    func testAnR2RowWithNoHostIsAMiss() {
+        unsetenv("CATALOG_CACHE_HOST")
+        guard SupabaseConfiguration.catalogCacheHost == nil else { return }
+        XCTAssertNil(MetadataRepository.storedObjectURL(forPath: "r2:releases/74698.json"))
+    }
+
+    // MARK: - Releases by id alone (0056)
+
+    /// Releases with their stored dates, as R2 would answer.
+    private func releases(
+        _ objects: [String: (json: String, storedAt: Date?)]
+    ) -> (MetadataRepository, FakeStorage) {
+        let storage = FakeStorage(objects.mapValues(\.json))
+        var repository = MetadataRepository()
+        repository.fetchRelease = { id in
+            (try await storage.fetch(id), objects[id]?.storedAt)
+        }
+        return (repository, storage)
+    }
+
+    /// No cache row stands for a release any more, so no Postgres read comes
+    /// before it: this passes with no Supabase client configured at all.
+    func testAReleaseIsReadByItsIdWithoutACacheRow() async throws {
+        let stored = Date().addingTimeInterval(-86_400)
+        let (repository, _) = releases(["9": (#"{"id":9,"title":"Nine"}"#, stored)])
+        let hit = try await repository.cached(
+            Probe.self, provider: "discogs", resourceType: "release", resourceID: "9")
+        XCTAssertEqual(hit?.value, Probe(id: 9, title: "Nine"))
+        XCTAssertEqual(hit?.fetchedAt, stored, "Freshness is the object's own date")
+        XCTAssertEqual(hit?.isFresh, true)
+    }
+
+    func testAReleasePastItsLifetimeIsStaleNotMissing() async throws {
+        let stored = Date().addingTimeInterval(-61 * 86_400)
+        let (repository, _) = releases(["9": (#"{"id":9,"title":"Nine"}"#, stored)])
+        let hit = try await repository.cached(
+            Probe.self, provider: "discogs", resourceType: "release", resourceID: "9")
+        XCTAssertEqual(hit?.isFresh, false, "Stale beats empty; the caller refreshes")
+    }
+
+    func testAReleaseNobodyCachedIsAMiss() async throws {
+        let (repository, _) = releases([:])
+        let hit = try await repository.cached(
+            Probe.self, provider: "discogs", resourceType: "release", resourceID: "404")
+        XCTAssertNil(hit)
+    }
+
+    /// The batched read an artist page makes: only fresh documents come back,
+    /// fetched in parallel, and an id named twice is asked for once.
+    func testABatchOfReleasesKeepsOnlyTheFreshOnes() async throws {
+        let (repository, storage) = releases([
+            "1": (#"{"id":1,"title":"Fresh"}"#, Date().addingTimeInterval(-86_400)),
+            "2": (#"{"id":2,"title":"Old"}"#, Date().addingTimeInterval(-90 * 86_400)),
+        ])
+        let found = try await repository.cached(
+            Probe.self,
+            provider: "discogs",
+            resourceType: "release",
+            resourceIDs: ["1", "2", "3", "1"],
+            fresherThan: MetadataRepository.Lifetime.release
+        )
+        XCTAssertEqual(found.keys.sorted(), ["1"])
+        let requested = await storage.requested
+        XCTAssertEqual(requested.sorted(), ["1", "2", "3"])
+    }
+
+    func testR2sLastModifiedIsRead() {
+        let date = MetadataRepository.httpDate("Fri, 25 Sep 2026 02:49:19 GMT")
+        XCTAssertEqual(date?.timeIntervalSince1970, 1_790_304_559)
+    }
 }
