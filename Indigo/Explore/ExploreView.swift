@@ -27,6 +27,7 @@ struct ExploreView: View {
     @Environment(RovrProvider.self) private var rovr
     @Query(sort: [SortDescriptor(\Track.addedAt, order: .reverse)]) private var tracks: [Track]
     @State private var filter = ExploreFilter.all
+    @State private var scroll = ExploreScroll()
 
     var body: some View {
         // The page the shader lives on. Every stall left in the trace happens
@@ -37,12 +38,11 @@ struct ExploreView: View {
         ScrollView {
             VStack(spacing: 0) {
                 Trace.slowStep("explore.header") { header(kept) }
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                        scroll.headerHeight = height
+                    }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
-                        ExploreShaderField(
-                            seed: kept.prefix(8).reduce(193) { $0 &* 31 &+ stableSeed($1.displayTitle) },
-                            size: proxy.size
-                        )
                         Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }
                     }
                     .overlayPreferenceValue(ExploreGraphKey.self) { nodes in
@@ -56,7 +56,24 @@ struct ExploreView: View {
                 .frame(height: Trace.slowStep("explore.height") { recommendationHeight(kept) })
             }
         }
+        // Written here, read only by the field below: scrolling moves the
+        // field and nothing else, so this page's own body is not rebuilt for
+        // every frame of a scroll.
+        .onScrollGeometryChange(for: ExploreScroll.Reading.self) { geometry in
+            ExploreScroll.Reading(top: geometry.contentOffset.y, contentHeight: geometry.contentSize.height)
+        } action: { _, reading in
+            scroll.top = reading.top
+            scroll.contentHeight = reading.contentHeight
+        }
         .foregroundStyle(Color.black)
+        // Behind the scroll view rather than inside it: the field is drawn the
+        // size of the window, not the size of the page. See `ExploreViewportField`.
+        .background {
+            ExploreViewportField(
+                seed: kept.prefix(8).reduce(193) { $0 &* 31 &+ stableSeed($1.displayTitle) },
+                scroll: scroll
+            )
+        }
         .background(MosaicColor.cobalt)
         .task { crate.backfillLocalGenres() }
         .task {
@@ -913,6 +930,58 @@ enum ExploreFieldSlices {
     }
 }
 
+/// Where the page is scrolled to, for the field behind it.
+///
+/// A reference, so the page can write it on every frame of a scroll without
+/// reading it: only `ExploreViewportField` does, and only it redraws.
+@Observable
+final class ExploreScroll {
+    struct Reading: Equatable {
+        var top: CGFloat
+        var contentHeight: CGFloat
+    }
+
+    /// The page's y at the top of the window.
+    var top: CGFloat = 0
+    var contentHeight: CGFloat = 0
+    /// The field starts under the header, as it did when it was drawn inside
+    /// the page.
+    var headerHeight: CGFloat = 0
+}
+
+/// The field, drawn the size of the window and told where the page is.
+///
+/// It used to be drawn the size of the page: 10,006 points tall for a
+/// modest crate, in 4,096-point slices, every slice double-buffered and
+/// every one redrawn thirty times a second whether it was on screen or not.
+/// Measured on 2026-09-25: 330 MB of the app's 581 MB footprint was those
+/// surfaces (4 × 2112×8192 and 2 × 2112×3648 pixels), for a window showing
+/// about a tenth of them, and ~42 million shader pixels a frame.
+///
+/// The shader reads a pixel's place in the whole field as `position +
+/// origin`, and the field's height nowhere, so the window's slice of it,
+/// with the scroll offset as its origin, is exactly the pixels the page used
+/// to draw there -- the pattern still moves with the cards.
+private struct ExploreViewportField: View {
+    let seed: Int
+    let scroll: ExploreScroll
+
+    var body: some View {
+        GeometryReader { proxy in
+            let fieldTop = scroll.top - scroll.headerHeight
+            // Past the end of a page shorter than the window, where the field
+            // used to stop and the page's cobalt showed.
+            let below = max(0, min(proxy.size.height, proxy.size.height - (scroll.contentHeight - scroll.top)))
+            ZStack(alignment: .bottom) {
+                ExploreShaderField(seed: seed, size: proxy.size, origin: CGPoint(x: 0, y: fieldTop))
+                MosaicColor.cobalt.frame(height: below)
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
 private struct ExploreShaderField: View {
     let seed: Int
     /// The size to fill, from the page's own geometry.
@@ -928,6 +997,8 @@ private struct ExploreShaderField: View {
     /// The page already measures itself to lay the cards out. One measurement,
     /// passed down, and there is no second one to disagree with it.
     let size: CGSize
+    /// Where this view's top-left sits in the whole field.
+    var origin: CGPoint = .zero
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// When this visit began.
     ///
@@ -988,7 +1059,7 @@ private struct ExploreShaderField: View {
                                 // Where this slice sits in the whole field, so
                                 // the pattern runs through the seams rather
                                 // than starting again at each one.
-                                .float2(0, top)
+                                .float2(origin.x, origin.y + top)
                             )
                         )
                 }
@@ -1004,7 +1075,7 @@ private struct ExploreShaderField: View {
             .onChange(of: Int(elapsed)) { _, whole in
                 Trace.note("explore.shaderClock \(whole)s "
                            + "size=\(Int(size.width))x\(Int(size.height)) "
-                           + "slices=\(slices.count)")
+                           + "slices=\(slices.count) origin=\(Int(origin.y))")
             }
         }
         .frame(width: size.width, height: size.height)
