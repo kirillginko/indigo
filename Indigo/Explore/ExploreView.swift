@@ -60,10 +60,10 @@ struct ExploreView: View {
         // field and nothing else, so this page's own body is not rebuilt for
         // every frame of a scroll.
         .onScrollGeometryChange(for: ExploreScroll.Reading.self) { geometry in
-            ExploreScroll.Reading(top: geometry.contentOffset.y, contentHeight: geometry.contentSize.height)
+            ExploreScroll.Reading(top: geometry.contentOffset.y, contentHeight: geometry.contentSize.height,
+                                  viewportHeight: geometry.containerSize.height)
         } action: { _, reading in
-            scroll.top = reading.top
-            scroll.contentHeight = reading.contentHeight
+            scroll.update(reading)
         }
         .foregroundStyle(Color.black)
         // Behind the scroll view rather than inside it: the field is drawn the
@@ -125,6 +125,8 @@ struct ExploreView: View {
         // station and the first local track were all placed as item nought and
         // landed on top of one another.
         let offers = dig.exploreOffers
+        // Only cards near the window are built; see `ExploreScroll.band`.
+        let band = scroll.band
         // Regrouped, not re-ranked. Things reached out of the same record or
         // label sit together, so a cluster on the page is a cluster in the
         // graph rather than four cards that happened to score alike.
@@ -190,6 +192,8 @@ struct ExploreView: View {
                                     frontier: ExploreView.expectedFrontier)).zIndex(5)
             }
             ForEach(Array(suggestions.enumerated()), id: \.element.id) { i, suggestion in
+                let at = place(i, below: nextTop, in: size, frontier: suggestion.frontier)
+                if ExploreScroll.builds(at, in: band) {
                 Button {
                     if let page = suggestion.node.destination { appState.open(page) }
                 } label: {
@@ -199,8 +203,8 @@ struct ExploreView: View {
                              connection: suggestion.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
                     .graphNode("next.\(suggestion.id)", section: "next", legend: true)
-                    .position(place(i, below: nextTop, in: size,
-                                    frontier: suggestion.frontier)).zIndex(5)
+                    .position(at).zIndex(5)
+                }
             }
         }
         if showCrate {
@@ -219,6 +223,8 @@ struct ExploreView: View {
                     .graphNode("section.\(section.id)", section: section.id, connects: false)
                     .position(x: size.width * 0.5, y: top + 24)
                 ForEach(Array(section.items.enumerated()), id: \.element.id) { i, item in
+                    let at = place(i, below: top, in: size)
+                    if ExploreScroll.builds(at, in: band) {
                     Button { play(item) } label: {
                         MapLabel(item.displayTitle, item.displaySubtitle ?? item.sourceLine,
                                  MosaicColor.green, item.artworkURL, stableSeed(item.displayTitle),
@@ -233,9 +239,13 @@ struct ExploreView: View {
                     }.buttonStyle(ExploreCardButtonStyle())
                         .contextMenu { Button("Open details") { open(item) } }
                         .graphNode("crate.\(item.id)", section: section.id)
-                        .position(place(i, below: top, in: size)).zIndex(4)
+                        .position(at).zIndex(4)
+                    }
                 }
                 ForEach(Array(section.suggested.enumerated()), id: \.element.id) { i, suggestion in
+                    let at = place(section.items.count + i, below: top, in: size,
+                                   frontier: suggestion.frontier)
+                    if ExploreScroll.builds(at, in: band) {
                     Button {
                         if let page = suggestion.node.destination { appState.open(page) }
                     } label: {
@@ -245,8 +255,8 @@ struct ExploreView: View {
                                  connection: suggestion.connection)
                     }.buttonStyle(ExploreCardButtonStyle())
                         .graphNode("suggested.\(suggestion.id)", section: section.id, legend: true)
-                        .position(place(section.items.count + i, below: top, in: size,
-                                        frontier: suggestion.frontier)).zIndex(4)
+                        .position(at).zIndex(4)
+                    }
                 }
             }
         }
@@ -294,6 +304,8 @@ struct ExploreView: View {
                 .graphNode("section.radio", section: "radio", connects: false)
                 .position(x: size.width * 0.5, y: showsTop + 24)
             ForEach(Array(offers.shows.enumerated()), id: \.element.id) { i, show in
+                let at = place(i, below: showsTop, in: size, frontier: show.frontier)
+                if ExploreScroll.builds(at, in: band) {
                 Button {
                     Task { await follow(show.node) }
                 } label: {
@@ -302,8 +314,8 @@ struct ExploreView: View {
                              connection: show.connection)
                 }.buttonStyle(ExploreCardButtonStyle())
                     .graphNode("radio.\(show.id)", section: "radio", legend: true)
-                    .position(place(i, below: showsTop, in: size,
-                                    frontier: show.frontier)).zIndex(3)
+                    .position(at).zIndex(3)
+                }
             }
         }
         if showLibrary {
@@ -314,13 +326,16 @@ struct ExploreView: View {
                 .graphNode("section.library", section: "library", connects: false)
                 .position(x: size.width * 0.5, y: libraryTop + 24)
             ForEach(Array(local.enumerated()), id: \.element.persistentModelID) { i, track in
+                let at = place(i, below: libraryTop, in: size)
+                if ExploreScroll.builds(at, in: band) {
                 Button { play(i) } label: {
                     MapLabel(track.title, track.artist, MosaicColor.blue, nil,
                              stableSeed(track.path), cardWidth(in: size))
                         .localArtwork(track.artworkKey)
                 }.buttonStyle(ExploreCardButtonStyle())
                     .graphNode("local.\(track.path)", section: "library")
-                    .position(place(i, below: libraryTop, in: size)).zIndex(2)
+                    .position(at).zIndex(2)
+                }
             }
         }
     }
@@ -984,6 +999,7 @@ final class ExploreScroll {
     struct Reading: Equatable {
         var top: CGFloat
         var contentHeight: CGFloat
+        var viewportHeight: CGFloat = 0
     }
 
     /// The page's y at the top of the window.
@@ -992,6 +1008,47 @@ final class ExploreScroll {
     /// The field starts under the header, as it did when it was drawn inside
     /// the page.
     var headerHeight: CGFloat = 0
+
+    // MARK: Which cards exist
+
+    /// The card layer, cut into tiles this tall.
+    static let tile: CGFloat = 512
+
+    /// The tiles within a window's height of what is on screen, above and
+    /// below. Only cards placed in them are built.
+    ///
+    /// Every card on the page cost something on every step of a scroll,
+    /// cached or not: SwiftUI walked each one's display list to confirm and
+    /// move it, AppKit hit-tested each one for the cursor, hover and the
+    /// wheel, and walked each one's views every frame looking for layout.
+    /// ~150 cards made that 70-80% of the main thread while scrolling and
+    /// ~19% at rest (Time Profiler, 2026-09-25). With only the cards near the
+    /// window built, each of those passes is over a fraction of them.
+    ///
+    /// Tiles, not points, so this changes -- and the page re-renders -- only
+    /// when a scroll crosses one, never on every frame of it. The margin is a
+    /// whole window each side, so a card is built well before it can be seen.
+    private(set) var band: ClosedRange<Int> = 0...8
+
+    func update(_ reading: Reading) {
+        top = reading.top
+        contentHeight = reading.contentHeight
+        let cardsTop = reading.top - headerHeight
+        let margin = max(reading.viewportHeight, Self.tile)
+        let first = Int(((cardsTop - margin) / Self.tile).rounded(.down))
+        let last = Int(((cardsTop + reading.viewportHeight + margin) / Self.tile).rounded(.down))
+        let next = min(first, last)...max(first, last)
+        if next != band { band = next }
+    }
+
+    /// Whether a card centred at `point` in the card layer is built.
+    static func builds(_ point: CGPoint, in band: ClosedRange<Int>) -> Bool {
+        band.contains(Int((point.y / tile).rounded(.down)))
+    }
+
+    // Released under XCTest, a main-actor class with no deinit of its own
+    // aborts the test host; see ExploreCullingTests.
+    nonisolated deinit {}
 }
 
 /// The field, drawn the size of the window and told where the page is.
@@ -1045,6 +1102,10 @@ private struct ExploreShaderField: View {
     /// Where this view's top-left sits in the whole field.
     var origin: CGPoint = .zero
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// False while another app is in front. Every frame of the field costs a
+    /// layout pass over the whole window (~6 ms at rest, 2026-09-25), which
+    /// is worth paying only while somebody can see it move.
+    @Environment(\.appearsActive) private var appearsActive
     /// When this visit began.
     ///
     /// Reset on appear, which is the whole point. This used to be the value
@@ -1088,7 +1149,7 @@ private struct ExploreShaderField: View {
     }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { timeline in
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion || !appearsActive)) { timeline in
             let elapsed = reduceMotion ? 0 : timeline.date.timeIntervalSince(startedAt)
             VStack(spacing: 0) {
                 ForEach(slices, id: \.self) { top in
