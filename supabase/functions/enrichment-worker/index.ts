@@ -85,30 +85,99 @@ Deno.serve(async (req: Request) => {
   const jobs = (claimed ?? []) as Job[];
   const results: Array<{ job: string; type: string; ok: boolean; detail?: string }> = [];
 
+  // Written back once per batch, not once per job (0055): every call here is
+  // a gateway log line, and the plan's log allowance is 1 GB a month. Flushed
+  // early when a batch runs long, so a worker killed mid-batch loses at most
+  // FLUSH_AFTER_MS of finished work to the 15-minute reclaim (0030).
+  const pending: PendingWrites = { records: [], completions: [] };
+  let lastFlush = Date.now();
+
   // One at a time. These are all upstream fetches against one station, and a
   // burst of them in parallel is how a polite client becomes an impolite one.
   for (const job of jobs) {
-    let ok = false;
-    let detail: string | undefined;
     try {
-      await run(supabase, job);
-      ok = true;
+      await run(supabase, job, pending);
     } catch (cause) {
-      detail = String(cause).slice(0, 300);
+      const detail = String(cause).slice(0, 300);
       console.error("job_failed", job.job_type, job.dedupe_key, detail);
+      pending.completions.push({ id: job.id, type: job.job_type, ok: false, error: detail });
     }
-    await supabase.rpc("complete_enrichment_job", {
-      p_job_id: job.id,
-      p_succeeded: ok,
-      p_error: detail ?? null,
-    });
-    results.push({ job: job.id, type: job.job_type, ok, detail });
+    if (Date.now() - lastFlush > FLUSH_AFTER_MS) {
+      results.push(...await flush(supabase, pending));
+      lastFlush = Date.now();
+    }
   }
+  results.push(...await flush(supabase, pending));
 
   return json({ claimed: jobs.length, results });
 });
 
-async function run(supabase: SupabaseClient, job: Job): Promise<void> {
+const FLUSH_AFTER_MS = 45_000;
+
+interface TrackReleaseRow {
+  job: Job;
+  row: Record<string, unknown>;
+}
+
+interface Completion {
+  id: string;
+  type: string;
+  ok: boolean;
+  error?: string;
+}
+
+interface PendingWrites {
+  records: TrackReleaseRow[];
+  completions: Completion[];
+}
+
+/// Writes what the batch has found, then marks its jobs done or failed, in
+/// two calls at most. A job whose record would not write is failed, as it was
+/// when each wrote its own; a job run() finished outright is already queued
+/// as done by the time it gets here.
+async function flush(
+  supabase: SupabaseClient,
+  pending: PendingWrites,
+): Promise<Array<{ job: string; type: string; ok: boolean; detail?: string }>> {
+  const { records, completions } = pending;
+  pending.records = [];
+  pending.completions = [];
+
+  if (records.length > 0) {
+    const { data, error } = await supabase.rpc("record_track_releases", {
+      p_rows: records.map((r) => r.row),
+    });
+    const failed = (data ?? {}) as Record<string, string>;
+    for (const { job, row } of records) {
+      const why = error ? error.message : failed[String(row.deezer_track_id)];
+      if (why) console.error("job_failed", job.job_type, job.dedupe_key, why.slice(0, 300));
+      completions.push(why
+        ? { id: job.id, type: job.job_type, ok: false, error: why.slice(0, 300) }
+        : { id: job.id, type: job.job_type, ok: true });
+    }
+  }
+
+  if (completions.length > 0) {
+    const { error } = await supabase.rpc("complete_enrichment_jobs", {
+      p_results: completions.map(({ id, ok, error }) => ({ id, ok, error: error ?? null })),
+    });
+    // Not thrown: the work is done either way, and a claim nobody reports on
+    // is put back by the reclaim sweep, so the worst case is doing it twice.
+    if (error) console.error("complete_failed", completions.length, error.message);
+  }
+
+  return completions.map(({ id, type, ok, error }) => ({ job: id, type, ok, detail: error }));
+}
+
+async function run(supabase: SupabaseClient, job: Job, pending: PendingWrites): Promise<void> {
+  await perform(supabase, job, pending);
+  // A track release completes when its record is written, in flush().
+  if (job.job_type !== "fetch_track_release") {
+    pending.completions.push({ id: job.id, type: job.job_type, ok: true });
+  }
+}
+
+async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrites): Promise<void> {
   switch (job.job_type) {
     case "fetch_nts_episode": {
       const show = String(job.payload?.show ?? "");
@@ -240,19 +309,22 @@ async function run(supabase: SupabaseClient, job: Job): Promise<void> {
 
       // Recorded either way, exactly as origins and portraits are. A track
       // Deezer cannot place is a finding, and writing it down is what stops
-      // the queue coming back for it in a fortnight.
-      const { error } = await supabase.rpc("record_track_release", {
-        p_deezer_track_id: trackID,
-        p_track_title: found?.trackTitle ?? null,
-        p_title_key: found?.trackTitle ? normalizeName(found.trackTitle) : null,
-        p_album_title: found?.albumTitle ?? null,
-        p_deezer_album_id: found?.albumID ?? null,
-        p_label: found?.label ?? null,
-        p_label_key: found?.label ? normalizeName(found.label) : null,
-        p_release_year: found?.releaseYear ?? null,
-        p_isrc: found?.isrc ?? null,
+      // the queue coming back for it in a fortnight. Written with the rest of
+      // the batch's, in flush().
+      pending.records.push({
+        job,
+        row: {
+          deezer_track_id: trackID,
+          track_title: found?.trackTitle ?? null,
+          title_key: found?.trackTitle ? normalizeName(found.trackTitle) : null,
+          album_title: found?.albumTitle ?? null,
+          deezer_album_id: found?.albumID ?? null,
+          label: found?.label ?? null,
+          label_key: found?.label ? normalizeName(found.label) : null,
+          release_year: found?.releaseYear ?? null,
+          isrc: found?.isrc ?? null,
+        },
       });
-      if (error) throw new Error(error.message);
       return;
     }
 
