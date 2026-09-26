@@ -36,6 +36,7 @@ interface Job {
   job_type: string;
   dedupe_key: string | null;
   payload: Record<string, unknown> | null;
+  attempts: number;
 }
 
 // Thirty, to match what the drain now asks for; see migration 0022. A request
@@ -94,7 +95,19 @@ Deno.serve(async (req: Request) => {
 
   // One at a time. These are all upstream fetches against one station, and a
   // burst of them in parallel is how a polite client becomes an impolite one.
+  //
+  // A YouTube crawl may run for TIME_BUDGET_MS on its own, so a batch that met
+  // two long ones outlived the function's wall clock, and every job behind
+  // them sat `running` until the reclaim (0030), spending an attempt it never
+  // got. Nothing is started once the batch is old; what is left is handed
+  // straight back. A quiet channel takes a second, so many still fit.
+  const started = Date.now();
+  const unstarted: Job[] = [];
   for (const job of jobs) {
+    if (Date.now() - started > START_BEFORE_MS) {
+      unstarted.push(job);
+      continue;
+    }
     try {
       await run(supabase, job, pending);
     } catch (cause) {
@@ -108,11 +121,42 @@ Deno.serve(async (req: Request) => {
     }
   }
   results.push(...await flush(supabase, pending));
+  await release(supabase, unstarted);
 
-  return json({ claimed: jobs.length, results });
+  return json({ claimed: jobs.length, released: unstarted.length, results });
 });
 
 const FLUSH_AFTER_MS = 45_000;
+
+/// No job is started this far into a batch. A YouTube crawl begun just before
+/// it still ends inside the wall clock: this, plus its TIME_BUDGET_MS, plus a
+/// flush, is under Supabase's 150 seconds.
+const START_BEFORE_MS = 30_000;
+
+/// Puts claimed jobs back as if they had never been claimed: `pending`, due
+/// now, with the attempt the claim took refunded, since nothing was tried.
+/// One call per distinct attempt count, which in practice is one or two.
+async function release(supabase: SupabaseClient, jobs: Job[]): Promise<void> {
+  const byAttempts = new Map<number, string[]>();
+  for (const job of jobs) {
+    const ids = byAttempts.get(job.attempts) ?? [];
+    ids.push(job.id);
+    byAttempts.set(job.attempts, ids);
+  }
+  for (const [attempts, ids] of byAttempts) {
+    const { error } = await supabase
+      .from("enrichment_jobs")
+      .update({
+        status: "pending",
+        attempts: Math.max(0, attempts - 1),
+        next_attempt_at: new Date().toISOString(),
+      })
+      .in("id", ids)
+      .eq("status", "running");
+    // Left to the reclaim if this fails: late, but not lost.
+    if (error) console.error("release_failed", ids.length, error.message);
+  }
+}
 
 interface TrackReleaseRow {
   job: Job;
@@ -217,9 +261,28 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       const channelID = String(job.payload?.channel_id ?? "");
       if (!/^UC[A-Za-z0-9_-]{22}$/.test(channelID)) throw new Error("missing channel");
       const requested = job.payload?.title_format;
-      const format = requested === "title_only" || requested === "title_artist" ? requested : "artist_title";
+      const format = requested === "title_only" || requested === "title_artist" ||
+          requested === "artist_colon_title"
+        ? requested
+        : "artist_title";
+      // Null follows the whole channel; a list follows only those playlists.
+      const listed = job.payload?.playlist_ids;
+      const playlistIDs = Array.isArray(listed)
+        ? listed.map(String).filter((id) => /^(PL|UU)[A-Za-z0-9_-]{10,}$/.test(id))
+        : null;
+      // Titles to leave out, as a case-insensitive pattern from the same row.
+      const pattern = job.payload?.skip_titles;
+      let skip: RegExp | null = null;
+      if (typeof pattern === "string" && pattern) {
+        try {
+          skip = new RegExp(pattern, "i");
+        } catch {
+          throw new Error("skip_titles is not a pattern");
+        }
+      }
       const result = await crawlChannel(
-        supabase, channelID, Deno.env.get("YOUTUBE_API_KEY") || undefined, format);
+        supabase, channelID, Deno.env.get("YOUTUBE_API_KEY") || undefined, format, playlistIDs, skip,
+        job.payload?.require_artist === true);
       console.log("crawl_youtube_channel", JSON.stringify(result));
       return;
     }

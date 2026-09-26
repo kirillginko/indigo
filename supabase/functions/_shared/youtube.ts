@@ -128,6 +128,11 @@ export function parseVideoTitle(raw: string): { artist: string | null; title: st
   // Two spellings of one title: "田口久美 - Ｏ嬢の物語 // Kumi Taguchi - Mrs O's
   // story". The romanised half is the one the rest of the catalogue uses, so
   // it is the one that can match -- when it has an artist of its own.
+  // A label's catalogue number ahead of the artist, as Jackson Brown writes
+  // "[MH014] WZ - Organix". Only a bracket holding a digit, so "[Live] Song"
+  // or an artist whose name opens with brackets is left alone.
+  decoded = decoded.replace(/^\[(?=[^\]]*\d)[A-Z0-9 ._-]{2,14}\]\s+/, "");
+
   const halves = decoded.split(/\s+\/\/\s+/);
   if (halves.length === 2 && /\s[-–—~]\s/.test(halves[1])) decoded = halves[1];
 
@@ -184,7 +189,11 @@ export interface ChannelVideo {
 ///
 /// A few put the title first and the artist second ("Happy Frame Of Mind -
 /// Horace Parlan"): `title_artist` reads the same split the other way round.
-export type TitleFormat = "artist_title" | "title_artist" | "title_only";
+///
+/// FOND/SOUND writes a colon where the others write a dash: "Jan Reimer: The
+/// Point Of No Return (1985) [Album]". Its own numbered mixes ("Mix: 96. Music
+/// Box On The Seashore") use the same colon and name nobody.
+export type TitleFormat = "artist_title" | "title_artist" | "artist_colon_title" | "title_only";
 
 export function readTitle(raw: string, format: TitleFormat): { artist: string | null; title: string | null } {
   if (format === "artist_title") return parseVideoTitle(raw);
@@ -195,6 +204,16 @@ export function readTitle(raw: string, format: TitleFormat): { artist: string | 
     // `softenCapitals` as the artist; both are harmless the other way round.
     if (split.artist && split.title) return { artist: split.title, title: split.artist };
     return split;
+  }
+  if (format === "artist_colon_title") {
+    const decoded = decodeEntities(raw).replace(INVISIBLE, "").replace(/\s+/g, " ").trim();
+    const colon = decoded.indexOf(": ");
+    const artist = colon > 0 ? decoded.slice(0, colon).trim() : "";
+    if (artist && !/^mix$/i.test(artist)) {
+      const title = withoutNoisyAsides(decoded.slice(colon + 2));
+      if (title) return { artist: softenCapitals(artist), title };
+    }
+    return readTitle(raw, "title_only");
   }
   const decoded = decodeEntities(raw).replace(INVISIBLE, "").replace(/\s+/g, " ").trim();
   const title = withoutNoisyAsides(decoded);
@@ -320,6 +339,31 @@ export async function fetchPlaylists(channelID: string, key: string): Promise<Ap
     pageToken = page.nextPageToken;
   } while (pageToken && found.length < MAX_PLAYLISTS);
   return found.slice(0, MAX_PLAYLISTS);
+}
+
+/// Named playlists, for a channel followed for some of its lists and not the
+/// rest. Only those the channel itself owns are returned, so a row can never
+/// file somebody else's list under this channel's name.
+export async function fetchPlaylistsByID(channelID: string, ids: string[], key: string): Promise<ApiPlaylist[]> {
+  const found: ApiPlaylist[] = [];
+  for (let start = 0; start < ids.length; start += 50) {
+    const page = await api("playlists", {
+      part: "snippet,contentDetails",
+      id: ids.slice(start, start + 50).join(","),
+      maxResults: "50",
+    }, key);
+    for (const item of page.items ?? []) {
+      if (item.snippet?.channelId !== channelID) continue;
+      found.push({
+        id: String(item.id),
+        title: String(item.snippet?.title ?? ""),
+        publishedAt: item.snippet?.publishedAt ?? null,
+        imageURL: bestThumbnail(item.snippet?.thumbnails),
+        itemCount: Number(item.contentDetails?.itemCount ?? 0),
+      });
+    }
+  }
+  return found;
 }
 
 /// A playlist's videos in the order the curator put them, which is the order
@@ -514,15 +558,33 @@ export interface ChannelResult {
 
 /// Reads one channel and files it. With a key, the uploads and every
 /// playlist; without, the fifteen newest uploads from the public feed.
+///
+/// Given `playlistIDs`, only those lists: the channel is followed for a shelf
+/// or two, not for everything it posts. Its uploads can be one of them, named
+/// by their "UU" id. The feed carries uploads alone, so without a key such a
+/// channel is not read at all.
+///
+/// Given `skip`, a video whose title it matches is left out: Zoto's own
+/// "Guitar Noodling #482" among the records he posts. With `requireArtist`,
+/// so is one whose title names no artist -- his clips of himself playing,
+/// titled "Pinch harmonic fest", are not records.
 export async function crawlChannel(
   supabase: SupabaseClient,
   channelID: string,
   key: string | undefined,
   format: TitleFormat = "artist_title",
+  playlistIDs: string[] | null = null,
+  skip: RegExp | null = null,
+  requireArtist = false,
 ): Promise<ChannelResult> {
+  const kept = (video: ChannelVideo) =>
+    !(skip?.test(video.title)) && (!requireArtist || readTitle(video.title, format).artist !== null);
+
   const result: ChannelResult = {
     channel: channelID, mode: key ? "api" : "feed", playlists: 0, written: 0, held: 0, videos: 0,
   };
+
+  if (!key && playlistIDs) return result;
 
   if (!key) {
     const response = await fetch(`${FEED}${encodeURIComponent(channelID)}`, {
@@ -531,6 +593,7 @@ export async function crawlChannel(
     });
     if (!response.ok) throw new Error(`youtube: feed answered ${response.status} for ${channelID}`);
     const feed = parseFeed(await response.text());
+    feed.videos = feed.videos.filter(kept);
     const showID = await ensureShow(supabase, channelID, {
       title: feed.title ?? channelID, description: null, imageURL: null,
     });
@@ -555,13 +618,15 @@ export async function crawlChannel(
     title: channel.title, description: channel.description, imageURL: channel.imageURL,
   });
 
-  const playlists = await fetchPlaylists(channelID, key);
   // The uploads list has no entry of its own in `playlists`; its size is the
   // channel's public video count.
-  const shelves: Array<ApiPlaylist | { id: string; title: string; publishedAt: null; imageURL: null; itemCount: number }> = [
-    { id: channel.uploads, title: "Uploads", publishedAt: null, imageURL: null, itemCount: channel.videoCount },
-    ...playlists,
-  ];
+  const uploads = { id: channel.uploads, title: "Uploads", publishedAt: null, imageURL: null, itemCount: channel.videoCount };
+  const shelves: Array<ApiPlaylist | typeof uploads> = playlistIDs
+    ? [
+      ...(playlistIDs.includes(channel.uploads) ? [uploads] : []),
+      ...await fetchPlaylistsByID(channelID, playlistIDs.filter((id) => id !== channel.uploads), key),
+    ]
+    : [uploads, ...await fetchPlaylists(channelID, key)];
   result.playlists = shelves.length;
 
   const started = Date.now();
@@ -578,7 +643,8 @@ export async function crawlChannel(
       result.held++;
       continue;
     }
-    const videos = await fetchPlaylistItems(shelf.id, key);
+    const listed = await fetchPlaylistItems(shelf.id, key);
+    const videos = listed.filter(kept);
     const airedAt = shelf.publishedAt ?? videos[0]?.publishedAt ?? null;
     await writeEpisode(supabase, showID, shelf.id, shelf.title, airedAt, shelf.imageURL, videos, format);
     lists[shelf.id] = { count: shelf.itemCount, readAt: new Date().toISOString() };

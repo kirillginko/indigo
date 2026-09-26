@@ -18,6 +18,8 @@ import { creditedNames } from "./credit.ts";
 export const PLACEHOLDER_NAMES = new Set([
   "unknown", "unknown artist", "unknown artists", "id", "ids", "untitled",
   "unreleased", "white label", "various", "various artists", "n a", "tbc",
+  // "VA - Stress Relieving Music…", as Funeral Tango titles its compilations.
+  "va", "v a",
 ]);
 
 export function matchableName(value: string | null): string | null {
