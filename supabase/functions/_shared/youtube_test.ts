@@ -187,3 +187,25 @@ Deno.test("a country tag and genre list after the title go", () => {
   );
   assertEquals(parseVideoTitle("X - Song [Remix]").title, "Song [Remix]");
 });
+
+Deno.test("a colon channel splits on the colon, and its own mixes name nobody", () => {
+  assertEquals(readTitle("Jan Reimer: The Point Of No Return (1985) [Album]", "artist_colon_title"), {
+    artist: "Jan Reimer",
+    title: "The Point Of No Return",
+  });
+  assertEquals(
+    readTitle("Chieko Kinbara (金原千恵子): Silence (2001) [Album]", "artist_colon_title").artist,
+    "Chieko Kinbara (金原千恵子)",
+  );
+  assertEquals(readTitle("Mix: 96. Music Box On The Seashore (海辺のオルゴール)", "artist_colon_title"), {
+    artist: null,
+    title: "Mix: 96. Music Box On The Seashore (海辺のオルゴール)",
+  });
+  assertEquals(readTitle("A lone title", "artist_colon_title").artist, null);
+});
+
+Deno.test("a catalogue number ahead of the artist is not part of the name", () => {
+  assertEquals(parseVideoTitle("[MH014] WZ - Organix (Full EP)"), { artist: "WZ", title: "Organix" });
+  assertEquals(parseVideoTitle("[DIFF004] Airhead - Kazzt / Kazzt (Mumdance Remix) (Full Single)").artist, "Airhead");
+  assertEquals(parseVideoTitle("[Live] Band - Song").artist, "[Live] Band", "no digit: not a catalogue number");
+});

@@ -49,4 +49,20 @@ final class ExploreCullingTests: XCTestCase {
         XCTAssertTrue(ExploreScroll.builds(CGPoint(x: 0, y: 150), in: scroll.band))
         XCTAssertTrue(ExploreScroll.builds(CGPoint(x: 0, y: 1400), in: scroll.band))
     }
+
+    /// The sleeve lookup is kept across re-renders and dropped the moment the
+    /// crate or the library changes.
+    func testTheArtworkMemoHoldsUntilTheCrateOrLibraryChanges() {
+        let memo = ExploreArtworkKeyMemo()
+        let key = ExploreArtworkKeyMemo.Key(crateRevision: 3, crateCount: 10, trackCount: 200, newestTrack: nil)
+        XCTAssertNil(memo.keys(for: key))
+        let id = UUID()
+        memo.store([id: "sleeve"], for: key)
+        XCTAssertEqual(memo.keys(for: key), [id: "sleeve"])
+
+        var crated = key; crated.crateRevision = 4
+        XCTAssertNil(memo.keys(for: crated))
+        var imported = key; imported.trackCount = 201
+        XCTAssertNil(memo.keys(for: imported))
+    }
 }

@@ -1,3 +1,4 @@
+import QuartzCore
 import SwiftData
 import SwiftUI
 
@@ -28,6 +29,7 @@ struct ExploreView: View {
     @Query(sort: [SortDescriptor(\Track.addedAt, order: .reverse)]) private var tracks: [Track]
     @State private var filter = ExploreFilter.all
     @State private var scroll = ExploreScroll()
+    @State private var artworkKeyMemo = ExploreArtworkKeyMemo()
 
     var body: some View {
         // The page the shader lives on. Every stall left in the trace happens
@@ -215,7 +217,7 @@ struct ExploreView: View {
             // on the main actor, on a canvas that redraws whenever anything
             // moves. It cost five seconds of main-actor time in a test that
             // never opens this page, which is how it was caught.
-            let artworkKeys = localArtworkKeys
+            let artworkKeys = localArtworkKeys(for: kept)
             ForEach(Array(crateSections.enumerated()), id: \.element.id) { sectionIndex, section in
                 let top = crateSectionTop(sectionIndex, sections: crateSections,
                                           start: crateTop, in: size)
@@ -394,9 +396,26 @@ struct ExploreView: View {
     /// draws a list once, and this canvas is rebuilt whenever anything on it
     /// moves. Only the paths actually on screen are looked up, so the pass is
     /// over the library once and the dictionary is a handful of entries.
-    private var localArtworkKeys: [UUID: String] {
+    ///
+    /// And kept between passes. The card layer re-renders whenever a scroll
+    /// crosses a tile (`ExploreScroll.band`), and this walk -- every crated
+    /// recording's sources through SwiftData, then the whole library -- ran
+    /// each time: 30% of the main thread over a minute of scrolling (Time
+    /// Profiler, 2026-09-26). Neither side changes while the page scrolls, so
+    /// the answer is kept until the crate or the library does.
+    private func localArtworkKeys(for kept: [CrateItem]) -> [UUID: String] {
+        let key = ExploreArtworkKeyMemo.Key(
+            crateRevision: crate.revision, crateCount: kept.count,
+            trackCount: tracks.count, newestTrack: tracks.first?.addedAt)
+        if let cached = artworkKeyMemo.keys(for: key) { return cached }
+        let found = walkLocalArtworkKeys(kept)
+        artworkKeyMemo.store(found, for: key)
+        return found
+    }
+
+    private func walkLocalArtworkKeys(_ kept: [CrateItem]) -> [UUID: String] {
         var wanted: [String: UUID] = [:]
-        for item in crateItems {
+        for item in kept {
             guard let path = item.recording?.sources
                 .first(where: { $0.kind == AudioSourceKind.localFile })?.identifier
             else { continue }
@@ -1038,12 +1057,51 @@ final class ExploreScroll {
         let first = Int(((cardsTop - margin) / Self.tile).rounded(.down))
         let last = Int(((cardsTop + reading.viewportHeight + margin) / Self.tile).rounded(.down))
         let next = min(first, last)...max(first, last)
-        if next != band { band = next }
+        let crossed = next != band
+        if crossed { band = next }
+        #if DEBUG
+        meter.step(crossed: crossed, band: next)
+        #endif
     }
+
+    #if DEBUG
+    /// Frames dropped while scrolling, which the stall watchdog cannot see:
+    /// it reports 100 ms and up, and a dropped frame is 8-17 ms.
+    @ObservationIgnored private var meter = ScrollMeter()
+    #endif
 
     /// Whether a card centred at `point` in the card layer is built.
     static func builds(_ point: CGPoint, in band: ClosedRange<Int>) -> Bool {
         band.contains(Int((point.y / tile).rounded(.down)))
+    }
+
+    // Released under XCTest, a main-actor class with no deinit of its own
+    // aborts the test host; see ExploreCullingTests.
+    nonisolated deinit {}
+}
+
+/// `ExploreView.localArtworkKeys(for:)`, kept between passes.
+///
+/// A plain reference, not observed: storing into it must never itself
+/// invalidate the view that reads it.
+final class ExploreArtworkKeyMemo {
+    /// What the answer depends on. The crate's revision moves on every change
+    /// to it; a track added or removed changes the count or the newest.
+    struct Key: Equatable {
+        var crateRevision: Int
+        var crateCount: Int
+        var trackCount: Int
+        var newestTrack: Date?
+    }
+
+    private var key: Key?
+    private var value: [UUID: String] = [:]
+
+    func keys(for key: Key) -> [UUID: String]? { self.key == key ? value : nil }
+
+    func store(_ value: [UUID: String], for key: Key) {
+        self.key = key
+        self.value = value
     }
 
     // Released under XCTest, a main-actor class with no deinit of its own
@@ -1217,3 +1275,53 @@ private struct MapHeaderButtonStyle: ButtonStyle {
     }
 }
 private func stableSeed(_ text:String)->Int { text.unicodeScalars.reduce(5381){($0 &* 33)^Int($1.value)} }
+
+#if DEBUG
+/// Times the gaps between scroll readings. While a scroll is under way
+/// SwiftUI reports its geometry once a frame, so a gap much longer than a
+/// frame is frames the page did not draw. Each gesture is summed up in one
+/// trace line when it ends, and every gap over `hitch` is named on its own
+/// with whether a tile was crossed in the same step -- which is what says
+/// whether building the next band of cards is the hitch.
+struct ScrollMeter {
+    /// A pause longer than this ends a gesture rather than hitching it.
+    private static let gestureEnd = 0.25
+    /// Two frames at 60 Hz: a gap this long dropped at least one.
+    private static let hitch = 0.034
+
+    private var last: CFTimeInterval?
+    private var frames = 0
+    private var hitches = 0
+    private var crossingHitches = 0
+    private var crossings = 0
+    private var worst = 0.0
+    private var dropped = 0.0
+
+    mutating func step(crossed: Bool, band: ClosedRange<Int>) {
+        let now = CACurrentMediaTime()
+        defer { last = now }
+        guard let last else { return }
+        let gap = now - last
+        if gap > Self.gestureEnd {
+            report()
+            return
+        }
+        frames += 1
+        if crossed { crossings += 1 }
+        guard gap > Self.hitch else { return }
+        hitches += 1
+        if crossed { crossingHitches += 1 }
+        worst = max(worst, gap)
+        dropped += gap
+        Trace.note("explore.hitch \(Int(gap * 1000))ms crossed=\(crossed) band=\(band.lowerBound)...\(band.upperBound)")
+    }
+
+    private mutating func report() {
+        defer { self = ScrollMeter() }
+        guard frames > 10 else { return }
+        Trace.note("explore.scroll frames=\(frames) hitches=\(hitches) "
+            + "onCrossing=\(crossingHitches)/\(crossings) worst=\(Int(worst * 1000))ms "
+            + "hitchTime=\(Int(dropped * 1000))ms")
+    }
+}
+#endif
