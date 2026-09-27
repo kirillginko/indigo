@@ -297,8 +297,10 @@ struct SidebarView: View {
 
     // MARK: Pieces
 
+    /// Solid, as the page is: the desktop showing through behind the
+    /// navigation made it read as part of whatever window sat underneath.
     private var sidebarMaterial: some View {
-        IndigoGlassBackground(tint: 0.46, shaderOpacity: 0.3)
+        IndigoGlassBackground(tint: 0.46, shaderOpacity: 0.3, opaque: true)
     }
 
     private func bandSurface(_ band: SidebarBand) -> Color {
