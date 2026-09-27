@@ -124,7 +124,10 @@ struct ArtistDigView: View {
                             previewRemoteURL: profile.previewURL,
                             side: 220, glyphScale: 0.24,
                             placeholder: .mosaic,
-                            showsGround: false
+                            showsGround: false,
+                            awaitingAddress: !hasEnriched && profile.coverURL == nil
+                                && profile.previewURL == nil,
+                            blursWhileLoading: true
                         )
                             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
                         VStack(alignment: .leading, spacing: 20) {
