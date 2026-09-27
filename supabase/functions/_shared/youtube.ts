@@ -65,7 +65,7 @@ export function decodeEntities(value: string): string {
 
 /// Asides that say nothing about which recording this is. Mirrors the app's
 /// `YouTubeTitle.clean`: "(Live at Dekmantel)" or "(Original Mix)" stay.
-const NOISE = /^(official|audio|video|music|hd|hq|4k|full|album|lyrics?|visuali[sz]er|remastered|remaster|\d{4}|\d{2,4}s|vinyl|rip|lp|ep|single|1080p|720p|[\s,/&|-])+$/i;
+const NOISE = /^(official|unofficial|audio|video|music|hd|hq|4k|full|album|lyrics?|visuali[sz]er|remastered|remaster|\d{4}|\d{2,4}s|vinyl|rip|lp|ep|single|1080p|720p|[\s,/&|-])+$/i;
 
 /// Clutter at the very end of a title, outside any brackets: "- FULL ALBUM",
 /// "HQ", a year left bare ("Heated Point 1975", "Art-Istry -1972"). Repeated,
@@ -77,8 +77,16 @@ const TRAILER = /(?:(?:\s+|\s*[-–—|~]\s*)(?:full\s+album|hq|hd|official\s+(?
 /// plain words after it and nothing else, so "Song [Remix]" is left alone.
 const GENRE_TAIL = /\s+\[[^\]]{2,24}\]\s+[\p{L}][\p{L} ,&/'-]{1,60}$/u;
 
+/// A run of hashtags closing a title, as The Voice of Anton writes them:
+/// "Garden Party (Italy 1972) #cinematiclounge #easylistening".
+const HASHTAGS = /(?:\s+#\p{L}[\p{L}\p{N}_]*)+\s*$/u;
+
 function withoutNoisyAsides(value: string): string {
   let cleaned = value
+    .replace(HASHTAGS, "")
+    // Lenticular brackets name the label, as PARAĐIGMAS writes
+    // "Allamanda【Grey Report】"; never part of the record's name.
+    .replace(/\s*【[^】]*】/g, "")
     .replace(/\s*[\(\[]([^\)\]]*)[\)\]]/g, (whole, inner: string) => (NOISE.test(inner.trim()) ? "" : whole))
     .replace(/\s+/g, " ")
     .trim()
@@ -107,6 +115,13 @@ const INVISIBLE = /[\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g;
 /// Matching ignores case, so this only changes what is displayed. A word with
 /// no vowel -- DJ, MFSB, a roman numeral like II -- is an initialism or a
 /// numeral and is left as it is.
+/// "David Snell (2)" -> "David Snell". Discogs numbers namesakes that way,
+/// and curators copy the credit straight off the release page; the number
+/// is Discogs' bookkeeping, not part of anyone's name.
+export function withoutNamesakeNumber(name: string): string {
+  return name.replace(/\s+\(\d{1,3}\)$/, "").trim() || name;
+}
+
 export function softenCapitals(name: string): string {
   if (!/\p{Lu}/u.test(name) || name !== name.toUpperCase()) return name;
   return name.replace(/\p{L}[\p{L}\p{M}']*/gu, (word) => {
@@ -143,7 +158,7 @@ export function parseVideoTitle(raw: string): { artist: string | null; title: st
   if (quoted) {
     const artist = quoted[1].trim();
     const title = withoutNoisyAsides(quoted[2].trim());
-    if (artist && title) return { artist: softenCapitals(artist), title };
+    if (artist && title) return { artist: softenCapitals(withoutNamesakeNumber(artist)), title };
   }
 
   // A tilde is jazznote89's dash: "Sonny Stitt ~ Autumn In New York".
@@ -154,7 +169,7 @@ export function parseVideoTitle(raw: string): { artist: string | null; title: st
   const artist = decoded.slice(0, match.index).trim();
   const title = withoutNoisyAsides(decoded.slice(match.index + match[0].length));
   return {
-    artist: artist.length > 0 ? softenCapitals(artist) : null,
+    artist: artist.length > 0 ? softenCapitals(withoutNamesakeNumber(artist)) : null,
     title: title.length > 0 ? title : null,
   };
 }
@@ -193,7 +208,10 @@ export interface ChannelVideo {
 /// FOND/SOUND writes a colon where the others write a dash: "Jan Reimer: The
 /// Point Of No Return (1985) [Album]". Its own numbered mixes ("Mix: 96. Music
 /// Box On The Seashore") use the same colon and name nobody.
-export type TitleFormat = "artist_title" | "title_artist" | "artist_colon_title" | "title_only";
+///
+/// Vinyle Archéologie writes a slash: "The Young Ideas / People Care".
+export type TitleFormat =
+  | "artist_title" | "title_artist" | "artist_colon_title" | "artist_slash_title" | "title_only";
 
 export function readTitle(raw: string, format: TitleFormat): { artist: string | null; title: string | null } {
   if (format === "artist_title") return parseVideoTitle(raw);
@@ -205,13 +223,25 @@ export function readTitle(raw: string, format: TitleFormat): { artist: string | 
     if (split.artist && split.title) return { artist: split.title, title: split.artist };
     return split;
   }
+  if (format === "artist_slash_title") {
+    // The first spaced slash only: "Chili Charles / Where Are You Robert? /
+    // Yesterday" is one artist and a single's two sides.
+    const decoded = decodeEntities(raw).replace(INVISIBLE, "").replace(/\s+/g, " ").trim();
+    const slash = decoded.indexOf(" / ");
+    const artist = slash > 0 ? decoded.slice(0, slash).trim() : "";
+    if (artist) {
+      const title = withoutNoisyAsides(decoded.slice(slash + 3));
+      if (title) return { artist: softenCapitals(withoutNamesakeNumber(artist)), title };
+    }
+    return readTitle(raw, "title_only");
+  }
   if (format === "artist_colon_title") {
     const decoded = decodeEntities(raw).replace(INVISIBLE, "").replace(/\s+/g, " ").trim();
     const colon = decoded.indexOf(": ");
     const artist = colon > 0 ? decoded.slice(0, colon).trim() : "";
     if (artist && !/^mix$/i.test(artist)) {
       const title = withoutNoisyAsides(decoded.slice(colon + 2));
-      if (title) return { artist: softenCapitals(artist), title };
+      if (title) return { artist: softenCapitals(withoutNamesakeNumber(artist)), title };
     }
     return readTitle(raw, "title_only");
   }
@@ -368,7 +398,11 @@ export async function fetchPlaylistsByID(channelID: string, ids: string[], key: 
 
 /// A playlist's videos in the order the curator put them, which is the order
 /// the "played next to" edges are read from.
-export async function fetchPlaylistItems(playlistID: string, key: string): Promise<ChannelVideo[]> {
+export async function fetchPlaylistItems(
+  playlistID: string,
+  key: string,
+  limit = MAX_ITEMS,
+): Promise<ChannelVideo[]> {
   const videos: ChannelVideo[] = [];
   let pageToken: string | undefined;
   do {
@@ -389,8 +423,8 @@ export async function fetchPlaylistItems(playlistID: string, key: string): Promi
       });
     }
     pageToken = page.nextPageToken;
-  } while (pageToken && videos.length < MAX_ITEMS);
-  return videos.slice(0, MAX_ITEMS);
+  } while (pageToken && videos.length < limit);
+  return videos.slice(0, limit);
 }
 
 // ---------------------------------------------------------------------------
@@ -565,7 +599,9 @@ export interface ChannelResult {
 /// channel is not read at all.
 ///
 /// Given `skip`, a video whose title it matches is left out: Zoto's own
-/// "Guitar Noodling #482" among the records he posts. With `requireArtist`,
+/// "Guitar Noodling #482" among the records he posts. `maxItems` reads only
+/// the first that many of each list -- for uploads, the newest -- where a
+/// channel's whole back catalogue would not fit the database. With `requireArtist`,
 /// so is one whose title names no artist -- his clips of himself playing,
 /// titled "Pinch harmonic fest", are not records.
 export async function crawlChannel(
@@ -576,6 +612,7 @@ export async function crawlChannel(
   playlistIDs: string[] | null = null,
   skip: RegExp | null = null,
   requireArtist = false,
+  maxItems = MAX_ITEMS,
 ): Promise<ChannelResult> {
   const kept = (video: ChannelVideo) =>
     !(skip?.test(video.title)) && (!requireArtist || readTitle(video.title, format).artist !== null);
@@ -643,7 +680,7 @@ export async function crawlChannel(
       result.held++;
       continue;
     }
-    const listed = await fetchPlaylistItems(shelf.id, key);
+    const listed = await fetchPlaylistItems(shelf.id, key, Math.min(maxItems, MAX_ITEMS));
     const videos = listed.filter(kept);
     const airedAt = shelf.publishedAt ?? videos[0]?.publishedAt ?? null;
     await writeEpisode(supabase, showID, shelf.id, shelf.title, airedAt, shelf.imageURL, videos, format);

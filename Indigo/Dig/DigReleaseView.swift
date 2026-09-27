@@ -89,7 +89,10 @@ struct DigReleaseView: View {
                             ArtworkView(remoteURL: profile.coverURL,
                                         previewRemoteURL: profile.previewURL,
                                         side: 240, glyphScale: 0.23,
-                                        placeholder: .whiteLabel)
+                                        placeholder: .whiteLabel,
+                                        awaitingAddress: !hasLookedUp && profile.coverURL == nil
+                                            && profile.previewURL == nil,
+                                        blursWhileLoading: true)
                                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
                             VStack(alignment: .leading, spacing: 24) {

@@ -345,6 +345,15 @@ struct ArtworkView: View {
     /// surrounding page already says what is going on, the tile is better as
     /// an empty frame.
     var showsGround = true
+    /// The caller does not know the picture's address yet but expects one --
+    /// a dig page whose catalogue lookup has not come back. Until it does, no
+    /// address means "not yet", not "none", so the placeholder waits.
+    var awaitingAddress = false
+    /// Soft rather than empty while loading: a blurred field until anything
+    /// arrives, the small cut blurred once it does, and the cover fading in
+    /// sharp over it. For the large tiles a page is built around; a blur per
+    /// tile across a whole grid costs frames.
+    var blursWhileLoading = false
 
     /// What the store already holds, read straight through on the first
     /// frame.
@@ -434,6 +443,13 @@ struct ArtworkView: View {
                         .resizable()
                         .interpolation(.medium)
                         .aspectRatio(contentMode: .fill)
+                } else if blursWhileLoading, let preview = previewImage ?? cachedPreview {
+                    // The record itself, softened until the full one lands.
+                    Image(platformImage: preview)
+                        .resizable()
+                        .interpolation(.medium)
+                        .aspectRatio(contentMode: .fill)
+                        .blur(radius: loadingBlur, opaque: true)
                 } else if let preview = previewImage ?? cachedPreview {
                     // The record itself, at the size we have it so far.
                     //
@@ -475,6 +491,7 @@ struct ArtworkView: View {
                 }
             }
             .clipped()
+            .animation(blursWhileLoading ? .easeOut(duration: 0.28) : nil, value: hasPicture)
             .frame(width: side.map { $0 * aspect }, height: side)
             .onGeometryChange(for: CGFloat.self) { max($0.size.width, $0.size.height) } action: { size in
                 if side == nil { measured = size }
@@ -504,6 +521,7 @@ struct ArtworkView: View {
     /// every cover. An address already known to be missing is answered on the
     /// first frame, so a page revisited does not wait to say it again.
     private var isSettledEmpty: Bool {
+        if awaitingAddress { return false }
         if settled == sources { return true }
         guard localKey == nil, markAddress == nil else { return false }
         let store = RemoteArtworkStore.shared
@@ -525,12 +543,37 @@ struct ArtworkView: View {
             ?? ""
     }
 
+    /// Whether a real picture (not a placeholder) is drawn, for the fade.
+    private var hasPicture: Bool {
+        image != nil || remoteImage != nil || previewImage != nil
+    }
+
+    /// Enough to read as out of focus at any tile size, not so much that the
+    /// colours wash out to grey.
+    private var loadingBlur: CGFloat {
+        max(6, (side ?? measured ?? 120) * 0.06)
+    }
+
+    /// Still on its way: an address being fetched, or one not yet known.
+    private var isLoading: Bool {
+        !isSettledEmpty && (awaitingAddress || remote != nil || preview != nil)
+    }
+
     @ViewBuilder
     private var placeholderGlyph: some View {
         // The two common cases size themselves, so the overwhelming majority
         // of tiles cost no layout pass at all. Only the text mark — a station
         // with no logo, which is rare — still needs to measure.
-        if placeholder == .mosaic {
+        if blursWhileLoading, isLoading {
+            // The mosaic this tile would settle on, out of focus: colour where
+            // the picture will be, and the same block, sharpened, if it turns
+            // out there is none.
+            ArtworkMosaic(identity: mosaicIdentity)
+                .blur(radius: loadingBlur * 2, opaque: true)
+                .opacity(0.55)
+        } else if awaitingAddress {
+            Color.clear
+        } else if placeholder == .mosaic {
             // Only once it is known there is no picture. Drawn while one was
             // still loading too, it flashed a pattern in front of every cover
             // that did arrive — so a loading tile is the plain ground, like

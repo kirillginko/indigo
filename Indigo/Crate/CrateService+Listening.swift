@@ -46,9 +46,17 @@ extension CrateService {
         provider: EmbedProvider = .youtube
     ) -> Recording? {
         if let existing = recording(forListening: url) {
-            let wasCrated = contains(recording: existing)
-            toggle(recording: existing)
-            return wasCrated ? nil : existing
+            if let kept = item(for: existing) {
+                remove(kept)
+                return nil
+            }
+            // Kept before, let go, and kept again: the recording outlives its
+            // crate row, so this is the second row it has had, and the
+            // picture was only ever written onto the first. Written again
+            // here, or the row comes back as a placeholder.
+            let item = add(recording: existing)
+            if let artworkURL { fillArtwork(artworkURL, for: item) }
+            return existing
         }
 
         // Titles on these uploads are written by whoever posted them —
@@ -74,17 +82,8 @@ extension CrateService {
         context.insert(link)
         link.recording = recording
 
-        add(recording: recording)
-        if let artworkURL {
-            let identifier = recording.id
-            var descriptor = FetchDescriptor<CrateItem>(
-                predicate: #Predicate { $0.recording?.id == identifier }
-            )
-            descriptor.fetchLimit = 1
-            if let item = (try? context.fetch(descriptor))?.first, item.artworkURLString == nil {
-                item.artworkURLString = artworkURL.absoluteString
-            }
-        }
+        let item = add(recording: recording)
+        if let artworkURL { fillArtwork(artworkURL, for: item) }
         try? context.save()
         return recording
     }
