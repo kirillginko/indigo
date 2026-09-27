@@ -66,6 +66,23 @@ final class ListeningCrateTests: XCTestCase {
         XCTAssertEqual(recordings.count, 1, "One recording, however often it is toggled")
     }
 
+    /// Kept, let go and kept again from the player: the second row carries
+    /// the thumbnail too. It used to come back as a placeholder, because the
+    /// picture was only ever written when the recording was first made.
+    func testKeptAgainKeepsItsPicture() throws {
+        let thumbnail = URL(string: "https://i.ytimg.com/vi/irfj8pQwhno/hqdefault.jpg")!
+        let recording = try XCTUnwrap(crate.toggle(
+            listening: link, title: "Rev8617", artist: "Skee Mask", artworkURL: thumbnail
+        ))
+        XCTAssertEqual(crate.item(for: recording)?.artworkURL, thumbnail)
+
+        XCTAssertNil(crate.toggle(listening: link, title: "Rev8617", artist: "Skee Mask", artworkURL: thumbnail))
+        XCTAssertNil(crate.item(for: recording))
+
+        _ = crate.toggle(listening: link, title: "Rev8617", artist: "Skee Mask", artworkURL: thumbnail)
+        XCTAssertEqual(crate.item(for: recording)?.artworkURL, thumbnail)
+    }
+
     /// The point of filing it as a recording: it becomes playable, diggable,
     /// and gains better sources later.
     func testAKeptTrackIsPlayableFromTheCrate() throws {
