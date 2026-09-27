@@ -209,3 +209,25 @@ Deno.test("a catalogue number ahead of the artist is not part of the name", () =
   assertEquals(parseVideoTitle("[DIFF004] Airhead - Kazzt / Kazzt (Mumdance Remix) (Full Single)").artist, "Airhead");
   assertEquals(parseVideoTitle("[Live] Band - Song").artist, "[Live] Band", "no digit: not a catalogue number");
 });
+
+Deno.test("a slash channel splits on the first spaced slash", () => {
+  assertEquals(readTitle("The Young Ideas / People Care", "artist_slash_title"), {
+    artist: "The Young Ideas",
+    title: "People Care",
+  });
+  assertEquals(readTitle("Chili Charles / Where Are You Robert? / Yesterday", "artist_slash_title"), {
+    artist: "Chili Charles",
+    title: "Where Are You Robert? / Yesterday",
+  });
+  assertEquals(readTitle("AC/DC", "artist_slash_title").artist, null, "an unspaced slash is not a split");
+});
+
+Deno.test("hashtags, label brackets and Discogs namesake numbers are not the record", () => {
+  assertEquals(
+    parseVideoTitle("David Snell (2) – Laura (UK 1966) #jazzharp #jazzballad #easylistening"),
+    { artist: "David Snell", title: "Laura (UK 1966)" },
+  );
+  assertEquals(parseVideoTitle("Vera Grace - Allamanda【Grey Report】"), { artist: "Vera Grace", title: "Allamanda" });
+  assertEquals(parseVideoTitle("Autechre - Drane (Unofficial Video)"), { artist: "Autechre", title: "Drane" });
+  assertEquals(parseVideoTitle("Song - Track #1").title, "Track #1", "a number is not a hashtag run");
+});

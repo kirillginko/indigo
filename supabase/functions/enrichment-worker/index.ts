@@ -262,7 +262,7 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       if (!/^UC[A-Za-z0-9_-]{22}$/.test(channelID)) throw new Error("missing channel");
       const requested = job.payload?.title_format;
       const format = requested === "title_only" || requested === "title_artist" ||
-          requested === "artist_colon_title"
+          requested === "artist_colon_title" || requested === "artist_slash_title"
         ? requested
         : "artist_title";
       // Null follows the whole channel; a list follows only those playlists.
@@ -282,7 +282,10 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       }
       const result = await crawlChannel(
         supabase, channelID, Deno.env.get("YOUTUBE_API_KEY") || undefined, format, playlistIDs, skip,
-        job.payload?.require_artist === true);
+        job.payload?.require_artist === true,
+        typeof job.payload?.max_items === "number" && job.payload.max_items > 0
+          ? Math.trunc(job.payload.max_items)
+          : undefined);
       console.log("crawl_youtube_channel", JSON.stringify(result));
       return;
     }
