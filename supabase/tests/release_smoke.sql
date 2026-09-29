@@ -307,8 +307,9 @@ begin
     -- MARK: what the app asks for
 
     -- A cached release is not asked about again; an uncached one is queued.
-    insert into public.metadata_cache (provider, resource_type, resource_id, payload, fetched_at)
-    values ('discogs', 'release', '111111', '{"id":111111}'::jsonb, now());
+    -- Since 0056/0057 the release row itself says when it was cached.
+    insert into public.releases (title, discogs_id, discogs_cached_at)
+    values ('Warm', '111111', now());
 
     v_answer := public.request_release_cache(array['111111', '222222']);
     if (v_answer->>'cached')::int <> 1 or (v_answer->>'queued')::int <> 1 then
@@ -322,8 +323,8 @@ begin
     end if;
 
     -- A release cached long ago is cold again.
-    update public.metadata_cache set fetched_at = now() - interval '200 days'
-    where resource_id = '111111';
+    update public.releases set discogs_cached_at = now() - interval '200 days'
+    where discogs_id = '111111';
     v_answer := public.request_release_cache(array['111111']);
     if (v_answer->>'queued')::int <> 1 then
         raise exception 'a release cached beyond its lifetime should be asked for again';

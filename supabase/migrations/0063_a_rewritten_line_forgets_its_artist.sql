@@ -52,7 +52,9 @@ create trigger radio_appearance_forgets_on_rewrite
 -- What has already drifted
 -- ---------------------------------------------------------------------------
 
-create temporary table drifted (id uuid primary key, episode_id uuid not null) on commit drop;
+-- Dropped at the end rather than `on commit drop`: the test harness runs a
+-- migration a statement at a time, where that drops it before the next line.
+create temporary table drifted (id uuid primary key, episode_id uuid not null);
 
 -- YouTube: any line resolved to an artist of another name. Merges only ever
 -- join rows of one name (0028), so none of these is a merge.
@@ -107,5 +109,7 @@ begin
         perform public.resolve_radio_appearances(episode);
     end loop;
 end $$;
+
+drop table drifted;
 
 select public.enqueue_enrichment_job('indigo', 'rebuild_dig_edges', 'radio', null, -1, null, null);
