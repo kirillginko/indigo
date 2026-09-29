@@ -94,7 +94,12 @@ struct CrateView: View {
                                     // while we are still working it out is
                                     // worse than one that finds out on press —
                                     // which `play` does anyway.
+                                    //
+                                    // A show always offers play: one kept
+                                    // without a stream is looked up at the
+                                    // press. See `CrateStreamResolver`.
                                     let canPlay = playable != nil || !crate.hasResolvedRows
+                                        || item.kind == .broadcast
                                     CrateRow(
                                         item: item,
                                         localArtworkKey: localTrack?.artworkKey,
@@ -129,6 +134,7 @@ struct CrateView: View {
             dig.repairRadioCredits()
             crate.backfillLocalGenres()
             await hydrateMissingRadioGenres()
+            await resolveMissingStreams()
             await dig.enrichRadioCrateInBackground()
         }
         .task {
@@ -183,25 +189,25 @@ struct CrateView: View {
 
     private func play(_ item: CrateItem) {
         guard let source = source(for: item) else {
-            // A show kept while a station was on air has no stream of its
-            // own — its recordings are on its page, and that is what the
-            // press meant. Only say there is nothing when there is also
-            // nowhere.
-            if item.kind == .broadcast, open(item) { return }
+            // A show kept with no stream of its own is asked for one — the
+            // station has usually posted it since. Only when it has not does
+            // the press open the show, where its recordings will appear.
+            if item.kind == .broadcast {
+                Task {
+                    if let media = await streams.media(for: item) {
+                        player.start(media)
+                    } else {
+                        open(item)
+                    }
+                }
+                return
+            }
             crate.notice = "\(item.displayTitle) has no playable source yet."
             return
         }
         switch source.action {
         case .play(let media):
-            if player.isCurrent(media.id) {
-                player.toggle()
-            } else if media.isLive {
-                player.playRadio(media)
-            } else if media.isEmbedded {
-                player.playEpisode(media)
-            } else {
-                player.play([media])
-            }
+            player.start(media)
         case .openBroadcast(let page, _):
             // The music isn't addressable on its own — open the set it was in.
             appState.open(page)
@@ -210,71 +216,33 @@ struct CrateView: View {
 
     @discardableResult
     private func open(_ item: CrateItem) -> Bool {
-        if let destination = digDestination(for: item) {
-            appState.open(destination)
-            return true
-        }
-        if let track = localTrack(for: item) {
-            appState.open(.album(track.albumKey))
-            return true
-        }
-        // Every broadcast row climbs the one ladder — the broadcast, the
-        // show, and the station's directory last. This page used to route
-        // the ones it recognised itself, and For You, which only has the
-        // ladder, opened the same rows somewhere else. See `KeptShow`.
-        if item.kind == .broadcast {
-            Task { await followKeptShow(item) }
-            return true
-        }
-        // The row opens the track's own page — where it was heard, and what
-        // was heard beside it. The DIG button still means the artist.
-        if let recording = item.recording, let page = dig.recordingDestination(for: recording) {
-            appState.open(page)
-            return true
-        }
-        return false
+        CrateNavigator(appState: appState, crate: crate, dig: dig, stations: stations).open(item)
     }
 
+    private var stations: KeptShow.Stations { streams.stations }
 
-    private var stations: KeptShow.Stations {
-        KeptShow.Stations(nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
-                          radio80000: radio80000Browse, n10as: n10asBrowse)
+    private var streams: CrateStreamResolver {
+        CrateStreamResolver(
+            crate: crate, nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
+            kiosk: kioskBrowse, noods: noodsBrowse, alhara: alharaBrowse,
+            cashmere: cashmereBrowse, lyl: lylBrowse, ida: idaBrowse,
+            radio80000: radio80000Browse, n10as: n10asBrowse, panik: panikBrowse,
+            rovr: rovrBrowse
+        )
     }
 
-    private func followKeptShow(_ item: CrateItem) async {
-        switch await KeptShow.destination(for: item, stations: stations, crate: crate) {
-        case .page(let page): appState.open(page)
-        case .section(let route): appState.select(route)
-        case nil: break
-        }
-    }
-
-    private func digDestination(for item: CrateItem) -> DetailPage? {
-        guard let identifier = item.showID else { return nil }
-        switch (item.kind, item.providerID) {
-        case (.artist, "dig.artist.mbid"):
-            return .digArtist(mbid: identifier, name: item.displayTitle)
-        case (.artist, "dig.artist.name"):
-            return .digArtist(mbid: nil, name: item.displayTitle)
-        case (.release, "dig.release.discogs"):
-            guard let id = Int(identifier) else { return nil }
-            return .digRelease(id: id, title: item.displayTitle)
-        case (.label, "dig.label.mbid"):
-            return .digLabel(mbid: identifier, name: item.displayTitle)
-        case (.label, "dig.label.discogs"):
-            return .digDiscogsLabel(name: item.displayTitle)
-        default:
-            return nil
+    /// Writes a stream onto every kept broadcast whose station has posted one
+    /// since, so its play button starts it at once — here and in the mini
+    /// player, which reads the same rows.
+    private func resolveMissingStreams() async {
+        for item in crate.items() where item.kind == .broadcast && item.broadcastMediaItem() == nil {
+            if Task.isCancelled { return }
+            _ = await streams.media(for: item)
         }
     }
 
     private func localTrack(for item: CrateItem) -> Track? {
-        guard let path = item.recording?.sources.first(where: { $0.kind == .localFile })?.identifier else {
-            return nil
-        }
-        var descriptor = FetchDescriptor<Track>(predicate: #Predicate { $0.path == path })
-        descriptor.fetchLimit = 1
-        return try? crate.context.fetch(descriptor).first
+        CrateNavigator.localTrack(for: item, context: crate.context)
     }
 
     private func itemGenres(_ item: CrateItem) -> [String] {

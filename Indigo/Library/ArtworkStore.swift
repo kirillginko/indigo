@@ -354,6 +354,12 @@ struct ArtworkView: View {
     /// sharp over it. For the large tiles a page is built around; a blur per
     /// tile across a whole grid costs frames.
     var blursWhileLoading = false
+    /// Draw the placeholder while the picture is on its way, not only once it
+    /// is known there is none. Off by default because in a grid it flashes a
+    /// pattern in front of every cover; on for small rows like a tracklist,
+    /// where a record reads as "a record goes here" and blank grey reads as
+    /// the page having stalled.
+    var placeholderWhileLoading = false
 
     /// What the store already holds, read straight through on the first
     /// frame.
@@ -584,7 +590,11 @@ struct ArtworkView: View {
                 Color.clear
             }
         } else if remote != nil || preview != nil {
-            Color.clear
+            if placeholderWhileLoading, placeholder == .whiteLabel {
+                WhiteLabelMark()
+            } else {
+                Color.clear
+            }
         } else if placeholder == .whiteLabel, mark?.isEmpty ?? true {
             WhiteLabelMark()
         } else if mark?.isEmpty ?? true {
