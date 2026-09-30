@@ -21,6 +21,16 @@ final class MiniPlayerUITests: XCTestCase {
         return app
     }
 
+    /// The full player is the default: whichever window was open at the last
+    /// quit, launch shows the main window and leaves the mini player shut.
+    func testLaunchShowsTheMainWindowAndNotTheMiniPlayer() throws {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["header.miniPlayer"].firstMatch.waitForExistence(timeout: 20),
+                      "Launch did not open the main window")
+        XCTAssertFalse(app.windows["Mini Player"].exists, "The mini player was restored at launch")
+    }
+
     func testShiftCommandMOpensTheMiniPlayer() throws {
         let app = launch()
         let mini = app.windows["Mini Player"]

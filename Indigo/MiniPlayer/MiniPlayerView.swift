@@ -361,6 +361,8 @@ private struct MiniCrateDrawer: View {
         }
         .task(id: crate.revision) { reload() }
         .task(id: dig.revision) { reload() }
+        // Whatever animation is in flight above, none reaches the drawer.
+        .transaction { $0.animation = nil }
     }
 
     /// Two tabs and a chevron. A tab opens the drawer on its list; the one
@@ -373,10 +375,13 @@ private struct MiniCrateDrawer: View {
             tabButton(.library, count: libraryTracks.count)
                 .accessibilityIdentifier("mini.libraryToggle")
             Spacer(minLength: 6)
-            // Not animated: the window resizes itself to fit what is in it, and
-            // a fade running at the same time as the window moves is two
-            // things changing the layout at once. The list arrives in one
-            // step and the window follows it. Only the chevron turns.
+            // Not animated, and not by the chevron either. The window resizes
+            // itself to fit what is in it, and for a moment after it does,
+            // SwiftUI lays everything out as if centred in a window of the
+            // wrong height. That is invisible until a view has an animation
+            // of its own to carry it: the chevron's turned that moment's
+            // position (121 pt off, measured) into a visible slide. Nothing
+            // here animates, so the wrong frame is never drawn.
             Button {
                 isOpen.toggle()
             } label: {
@@ -384,7 +389,6 @@ private struct MiniCrateDrawer: View {
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(Palette.inkMuted)
                     .rotationEffect(.degrees(isOpen ? 180 : 0))
-                    .animation(.easeOut(duration: 0.16), value: isOpen)
                     .frame(width: 34, height: 30)
                     .contentShape(Rectangle())
             }
