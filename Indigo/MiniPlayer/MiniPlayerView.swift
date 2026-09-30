@@ -75,13 +75,15 @@ struct MiniPlayerView: View {
         // Legible as a dark object whatever the system appearance, exactly as
         // the player bar is.
         .environment(\.colorScheme, .dark)
-        // In the window's own header, top right, rather than among what is
-        // playing.
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) { maximizeButton }
+        // The window hides its title bar, and the shader behind all this
+        // already runs to the top edge. The strip is laid over that space
+        // rather than put in the stack: the content keeps to the safe area,
+        // so the window stays exactly as tall as what is in it.
+        .overlay {
+            titleStrip
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .ignoresSafeArea(.container, edges: .top)
         }
-        .toolbarBackground(Color.black, for: .windowToolbar)
-        .toolbarColorScheme(.dark, for: .windowToolbar)
         // Where SoundCloud and Mixcloud play from when the main window is
         // closed. See `EmbedStandbySurface`.
         .background(alignment: .bottomTrailing) {
@@ -106,23 +108,12 @@ struct MiniPlayerView: View {
             .overlay(Rectangle().strokeBorder(Palette.outline.opacity(0.6), lineWidth: Metrics.hairline))
 
             VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 8) {
-                    Text(summary.source)
-                        .microLabel(1.8, size: 10)
-                        .foregroundStyle(Palette.inkMuted)
-                        // Identified so the second window can be driven in UI
-                        // tests. macOS exposes SwiftUI Text as the
-                        // accessibility *value* (uppercased, as drawn), so
-                        // assertions read `.value`.
-                        .accessibilityIdentifier("mini.source")
-                    Spacer(minLength: 6)
-                    if summary.isLive {
-                        LiveBadge()
-                    }
-                }
-
                 // Wrapped rather than a marquee: the window is narrow enough
                 // that a scroll would never stop, and two lines fit.
+                //
+                // Identified so the second window can be driven in UI tests.
+                // macOS exposes SwiftUI Text as the accessibility *value*
+                // (uppercased, as drawn), so assertions read `.value`.
                 Text(summary.primary.uppercased())
                     .font(Typeface.banner(15))
                     .foregroundStyle(Palette.ink)
@@ -139,16 +130,31 @@ struct MiniPlayerView: View {
                         .truncationMode(.tail)
                         .accessibilityIdentifier("mini.secondary")
                 }
-
-                if !summary.status.isEmpty {
-                    StatusRow(items: summary.status)
-                        .padding(.top, 2)
-                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(12)
+        .padding(.horizontal, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 12)
     }
+
+    /// The window's title bar, drawn here. The real one is hidden so the
+    /// shader can run behind this; the traffic lights are still the system's,
+    /// sitting over the leading end.
+    private var titleStrip: some View {
+        HStack(spacing: 0) {
+            Text("Mini Player")
+                .microLabel(1.6, size: 9)
+                .foregroundStyle(Palette.inkMuted)
+                .padding(.leading, 72)
+            Spacer(minLength: 6)
+            maximizeButton
+                .padding(.trailing, 6)
+        }
+        .frame(height: Self.titleStripHeight)
+    }
+
+    private static let titleStripHeight: CGFloat = 28
 
     // MARK: Controls
 
@@ -251,6 +257,7 @@ struct MiniPlayerView: View {
             Image(systemName: "arrow.up.left.and.arrow.down.right")
                 .font(.system(size: 10, weight: .semibold))
         }
+        .buttonStyle(GlyphButtonStyle(size: 22))
         .help("Open the full player")
         .accessibilityLabel("Open the full player")
         .accessibilityIdentifier("mini.maximize")
@@ -363,6 +370,7 @@ private struct MiniCrateDrawer: View {
         HStack(spacing: 0) {
             tabButton(.crate, count: items.count)
                 .accessibilityIdentifier("mini.crateToggle")
+            VRule(color: Palette.outline.opacity(0.72))
             tabButton(.library, count: libraryTracks.count)
                 .accessibilityIdentifier("mini.libraryToggle")
             Spacer(minLength: 6)

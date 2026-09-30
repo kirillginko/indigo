@@ -54,7 +54,6 @@ final class MiniPlayerUITests: XCTestCase {
                       "The mini player should render an empty state, not blank")
         // macOS exposes SwiftUI Text as the value, uppercased as drawn.
         XCTAssertEqual(mini.staticTexts["mini.primary"].value as? String, "NOTHING PLAYING")
-        XCTAssertEqual(mini.staticTexts["mini.source"].value as? String, "INDIGO")
         XCTAssertGreaterThan(mini.frame.height, 100, "The window collapsed")
     }
 

@@ -226,9 +226,11 @@ struct IndigoApp: App {
         }
         .defaultSize(width: 320, height: 210)
         .windowResizability(.contentSize)
-        // Its title bar carries one button; the regular toolbar height is
-        // more header than a window this small can spare.
-        .windowToolbarStyle(.unifiedCompact)
+        // No title bar of its own: the view draws a short strip in its
+        // place, so the shader runs to the top edge. Dragging anywhere on the
+        // background still moves the window.
+        .windowStyle(.hiddenTitleBar)
+        .windowBackgroundDragBehavior(.enabled)
 
         // The music folder lives here rather than at the foot of the sidebar:
         // it is a setting and a progress report, not part of browsing.
