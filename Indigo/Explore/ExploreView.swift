@@ -121,9 +121,10 @@ struct ExploreView: View {
         // The same corner every other page's header keeps it in. This page
         // draws its own header, so it has to be put here as well.
         .overlay(alignment: .topTrailing) {
+            // In line with the Crate button's right edge below it.
             MiniPlayerSwitch()
                 .padding(.top, 5)
-                .padding(.trailing, 8)
+                .padding(.trailing, 28)
                 .environment(\.colorScheme, .dark)
         }
     }

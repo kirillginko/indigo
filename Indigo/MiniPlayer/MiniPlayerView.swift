@@ -143,15 +143,14 @@ struct MiniPlayerView: View {
     /// sitting over the leading end.
     private var titleStrip: some View {
         HStack(spacing: 0) {
-            Text("Mini Player")
-                .microLabel(1.6, size: 9)
-                .foregroundStyle(Palette.inkMuted)
-                .padding(.leading, 72)
             Spacer(minLength: 6)
             maximizeButton
                 .padding(.trailing, 6)
         }
         .frame(height: Self.titleStripHeight)
+        // A shade darker than the player under it, so the strip reads as the
+        // window's edge rather than as more of the same field.
+        .background(Color.black.opacity(0.45))
     }
 
     private static let titleStripHeight: CGFloat = 28

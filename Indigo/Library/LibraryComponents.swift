@@ -63,9 +63,10 @@ struct PageHeader<Trailing: View>: View {
         // The way to the mini player, in the corner of every page's header
         // rather than on the player: the player is for what is playing.
         .overlay(alignment: .topTrailing) {
+            // Its glyph ends where the header's own controls end.
             MiniPlayerSwitch()
                 .padding(.top, 5)
-                .padding(.trailing, 8)
+                .padding(.trailing, Metrics.gutter)
         }
         // Headers are persistent dark chrome in both system appearances, just
         // like the sidebar and player. This also gives trailing controls the
@@ -97,8 +98,14 @@ struct MiniPlayerSwitch: View {
         } label: {
             Image(systemName: "arrow.down.right.and.arrow.up.left")
                 .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(Palette.ink)
+                // Against the trailing edge of its own frame, not centred in
+                // it, so the padding a header gives it is where the glyph
+                // itself stops — in line with the controls below it.
+                .frame(width: 22, height: 22, alignment: .trailing)
+                .contentShape(Rectangle())
         }
-        .buttonStyle(GlyphButtonStyle(size: 22))
+        .buttonStyle(.plain)
         .help("Switch to the mini player")
         .accessibilityLabel("Switch to the mini player")
         .accessibilityIdentifier("header.miniPlayer")
