@@ -350,8 +350,8 @@ struct ArtworkView: View {
     /// address means "not yet", not "none", so the placeholder waits.
     var awaitingAddress = false
     /// Soft rather than empty while loading: a blurred field until anything
-    /// arrives, the small cut blurred once it does, and the cover fading in
-    /// sharp over it. For the large tiles a page is built around; a blur per
+    /// arrives, the small cut in focus once it does, and the cover fading in
+    /// sharp over it. One blur, and only while there is nothing to show. For the large tiles a page is built around; a blur per
     /// tile across a whole grid costs frames.
     var blursWhileLoading = false
     /// Draw the placeholder while the picture is on its way, not only once it
@@ -450,12 +450,16 @@ struct ArtworkView: View {
                         .interpolation(.medium)
                         .aspectRatio(contentMode: .fill)
                 } else if blursWhileLoading, let preview = previewImage ?? cachedPreview {
-                    // The record itself, softened until the full one lands.
+                    // The record itself, as it is. It was blurred until the
+                    // full one landed, which on a page still looking its
+                    // cover up meant a picture that had plainly arrived sat
+                    // out of focus for as long as the lookup took — and, after
+                    // the blurred field below, a second kind of blur. Smoothed
+                    // rather than blurred: soft at this size, but in focus.
                     Image(platformImage: preview)
                         .resizable()
-                        .interpolation(.medium)
+                        .interpolation(.high)
                         .aspectRatio(contentMode: .fill)
-                        .blur(radius: loadingBlur, opaque: true)
                 } else if let preview = previewImage ?? cachedPreview {
                     // The record itself, at the size we have it so far.
                     //
@@ -497,7 +501,7 @@ struct ArtworkView: View {
                 }
             }
             .clipped()
-            .animation(blursWhileLoading ? .easeOut(duration: 0.28) : nil, value: hasPicture)
+            .animation(blursWhileLoading ? .easeOut(duration: 0.28) : nil, value: pictureStage)
             .frame(width: side.map { $0 * aspect }, height: side)
             .onGeometryChange(for: CGFloat.self) { max($0.size.width, $0.size.height) } action: { size in
                 if side == nil { measured = size }
@@ -549,9 +553,12 @@ struct ArtworkView: View {
             ?? ""
     }
 
-    /// Whether a real picture (not a placeholder) is drawn, for the fade.
-    private var hasPicture: Bool {
-        image != nil || remoteImage != nil || previewImage != nil
+    /// How much of the picture is drawn, for the fade: nothing, the small
+    /// cut, or the cover. Each step up fades in, so the cover arrives over
+    /// the small cut rather than snapping in place of it.
+    private var pictureStage: Int {
+        if image != nil || remoteImage != nil { return 2 }
+        return previewImage != nil ? 1 : 0
     }
 
     /// Enough to read as out of focus at any tile size, not so much that the

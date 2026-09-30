@@ -27,6 +27,12 @@ final class NoodsProvider: RadioProvider {
 
     var station: RadioStation { stations[0] }
 
+    /// The station's own mark, for the player when there is no picture of
+    /// what is on — which for Noods is whenever the stream was not started
+    /// from its page. Their touch icon: 180 pixels, and the only square mark
+    /// the site serves.
+    static let logoURL = URL(string: "https://noodsradio.com/apple-touch-icon.png")
+
     func station(id: String) -> RadioStation? {
         stations.first { $0.id == id }
     }
@@ -34,7 +40,11 @@ final class NoodsProvider: RadioProvider {
     /// Noods publishes no public schedule feed Indigo can read — the one that
     /// drives their own site sits behind a RadioCult key that belongs to them
     /// — so the live page is the stream and nothing it can't stand behind.
-    func mediaItem() -> MediaItem {
+    ///
+    /// `artwork` is whatever the station page is showing beside its play
+    /// button, so the player carries the picture the listener pressed play
+    /// next to rather than an empty square.
+    func mediaItem(artwork: URL? = nil) -> MediaItem {
         MediaItem(
             id: station.id,
             sourceID: Self.providerID,
@@ -42,6 +52,7 @@ final class NoodsProvider: RadioProvider {
             title: station.name,
             subtitle: "Live",
             detail: station.strapline,
+            remoteArtworkURL: artwork,
             playbackURL: station.streamURL
         )
     }

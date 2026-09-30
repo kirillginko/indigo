@@ -75,6 +75,15 @@ struct MiniPlayerView: View {
         // Legible as a dark object whatever the system appearance, exactly as
         // the player bar is.
         .environment(\.colorScheme, .dark)
+        // The window hides its title bar, and the shader behind all this
+        // already runs to the top edge. The strip is laid over that space
+        // rather than put in the stack: the content keeps to the safe area,
+        // so the window stays exactly as tall as what is in it.
+        .overlay {
+            titleStrip
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .ignoresSafeArea(.container, edges: .top)
+        }
         // Where SoundCloud and Mixcloud play from when the main window is
         // closed. See `EmbedStandbySurface`.
         .background(alignment: .bottomTrailing) {
@@ -99,24 +108,12 @@ struct MiniPlayerView: View {
             .overlay(Rectangle().strokeBorder(Palette.outline.opacity(0.6), lineWidth: Metrics.hairline))
 
             VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 8) {
-                    Text(summary.source)
-                        .microLabel(1.8, size: 10)
-                        .foregroundStyle(Palette.inkMuted)
-                        // Identified so the second window can be driven in UI
-                        // tests. macOS exposes SwiftUI Text as the
-                        // accessibility *value* (uppercased, as drawn), so
-                        // assertions read `.value`.
-                        .accessibilityIdentifier("mini.source")
-                    Spacer(minLength: 6)
-                    if summary.isLive {
-                        LiveBadge()
-                    }
-                    maximizeButton
-                }
-
                 // Wrapped rather than a marquee: the window is narrow enough
                 // that a scroll would never stop, and two lines fit.
+                //
+                // Identified so the second window can be driven in UI tests.
+                // macOS exposes SwiftUI Text as the accessibility *value*
+                // (uppercased, as drawn), so assertions read `.value`.
                 Text(summary.primary.uppercased())
                     .font(Typeface.banner(15))
                     .foregroundStyle(Palette.ink)
@@ -133,16 +130,30 @@ struct MiniPlayerView: View {
                         .truncationMode(.tail)
                         .accessibilityIdentifier("mini.secondary")
                 }
-
-                if !summary.status.isEmpty {
-                    StatusRow(items: summary.status)
-                        .padding(.top, 2)
-                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(12)
+        .padding(.horizontal, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 12)
     }
+
+    /// The window's title bar, drawn here. The real one is hidden so the
+    /// shader can run behind this; the traffic lights are still the system's,
+    /// sitting over the leading end.
+    private var titleStrip: some View {
+        HStack(spacing: 0) {
+            Spacer(minLength: 6)
+            maximizeButton
+                .padding(.trailing, 6)
+        }
+        .frame(height: Self.titleStripHeight)
+        // A shade darker than the player under it, so the strip reads as the
+        // window's edge rather than as more of the same field.
+        .background(Color.black.opacity(0.45))
+    }
+
+    private static let titleStripHeight: CGFloat = 28
 
     // MARK: Controls
 
@@ -155,15 +166,16 @@ struct MiniPlayerView: View {
     }
 
     private func transport(_ summary: NowPlayingSummary) -> some View {
+        // All three always, as on the bar: a live show out of the crate
+        // has the rest of the crate to skip to, and one with nothing either
+        // side shows that by dimming rather than by the buttons vanishing.
         HStack(spacing: 14) {
-            if !summary.isLive {
-                Button { player.previous() } label: {
-                    Image(systemName: "backward.fill").font(.system(size: 11))
-                }
-                .buttonStyle(GlyphButtonStyle(size: 26))
-                .disabled(!player.canSkipPrevious)
-                .opacity(player.canSkipPrevious ? 1 : 0.25)
+            Button { player.previous() } label: {
+                Image(systemName: "backward.fill").font(.system(size: 11))
             }
+            .buttonStyle(GlyphButtonStyle(size: 26))
+            .disabled(!player.canSkipPrevious)
+            .opacity(player.canSkipPrevious ? 1 : 0.25)
 
             Button { player.toggle() } label: {
                 ZStack {
@@ -179,14 +191,12 @@ struct MiniPlayerView: View {
             .disabled(!player.hasSomethingLoaded)
             .opacity(player.hasSomethingLoaded ? 1 : 0.35)
 
-            if !summary.isLive {
-                Button { player.next() } label: {
-                    Image(systemName: "forward.fill").font(.system(size: 11))
-                }
-                .buttonStyle(GlyphButtonStyle(size: 26))
-                .disabled(!player.canSkipNext)
-                .opacity(player.canSkipNext ? 1 : 0.25)
+            Button { player.next() } label: {
+                Image(systemName: "forward.fill").font(.system(size: 11))
             }
+            .buttonStyle(GlyphButtonStyle(size: 26))
+            .disabled(!player.canSkipNext)
+            .opacity(player.canSkipNext ? 1 : 0.25)
         }
     }
 
@@ -330,47 +340,94 @@ private struct MiniCrateDrawer: View {
     @Environment(\.openWindow) private var openWindow
 
     @State private var items: [CrateItem] = []
+    @AppStorage("mini.drawerTab") private var tab = MiniDrawerTab.crate
+    /// Counted rather than fetched: the tab says how many tracks there are
+    /// whether or not the library list has ever been opened.
+    @Query private var libraryTracks: [Track]
 
-    private static let rowHeight: CGFloat = 44
-    private static let visibleRows: CGFloat = 5.5
+    fileprivate static let rowHeight: CGFloat = 44
+    fileprivate static let visibleRows: CGFloat = 5.5
 
     var body: some View {
         VStack(spacing: 0) {
             toggle
             if isOpen {
                 Rule(color: Palette.outline.opacity(0.5))
-                list
+                switch tab {
+                case .crate: list
+                case .library: MiniLibraryList()
+                }
             }
         }
         .task(id: crate.revision) { reload() }
         .task(id: dig.revision) { reload() }
+        // Whatever animation is in flight above, none reaches the drawer.
+        .transaction { $0.animation = nil }
     }
 
+    /// Two tabs and a chevron. A tab opens the drawer on its list; the one
+    /// already showing, like the chevron, closes it.
     private var toggle: some View {
-        Button {
-            withAnimation(.easeOut(duration: 0.16)) { isOpen.toggle() }
-        } label: {
-            HStack(spacing: 8) {
-                Text("Crate")
-                    .microLabel(1.8, size: 10)
-                    .foregroundStyle(Palette.ink)
-                Text("\(items.count)")
-                    .microLabel(1.2, size: 9)
-                    .foregroundStyle(Palette.inkFaint)
-                    .monospacedDigit()
-                Spacer(minLength: 6)
+        HStack(spacing: 0) {
+            tabButton(.crate, count: items.count)
+                .accessibilityIdentifier("mini.crateToggle")
+            VRule(color: Palette.outline.opacity(0.72))
+            tabButton(.library, count: libraryTracks.count)
+                .accessibilityIdentifier("mini.libraryToggle")
+            Spacer(minLength: 6)
+            // Not animated, and not by the chevron either. The window resizes
+            // itself to fit what is in it, and for a moment after it does,
+            // SwiftUI lays everything out as if centred in a window of the
+            // wrong height. That is invisible until a view has an animation
+            // of its own to carry it: the chevron's turned that moment's
+            // position (121 pt off, measured) into a visible slide. Nothing
+            // here animates, so the wrong frame is never drawn.
+            Button {
+                isOpen.toggle()
+            } label: {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(Palette.inkMuted)
                     .rotationEffect(.degrees(isOpen ? 180 : 0))
+                    .frame(width: 34, height: 30)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isOpen ? "Hide list" : "Show list")
+        }
+        .frame(height: 30)
+    }
+
+    private func tabButton(_ which: MiniDrawerTab, count: Int) -> some View {
+        let isShowing = isOpen && tab == which
+        return Button {
+            if isShowing {
+                isOpen = false
+            } else {
+                tab = which
+                isOpen = true
+            }
+        } label: {
+            HStack(spacing: 7) {
+                Text(which.title)
+                    .microLabel(1.8, size: 10)
+                    .foregroundStyle(isShowing ? Palette.ink : Palette.inkMuted)
+                Text("\(count)")
+                    .microLabel(1.2, size: 9)
+                    .foregroundStyle(Palette.inkFaint)
+                    .monospacedDigit()
             }
             .padding(.horizontal, 12)
             .frame(height: 30)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(isShowing ? Palette.ink : Color.clear)
+                    .frame(height: 1.5)
+            }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(isOpen ? "Hide crate" : "Show crate")
-        .accessibilityIdentifier("mini.crateToggle")
+        .accessibilityLabel(isShowing ? "Hide \(which.title.lowercased())" : "Show \(which.title.lowercased())")
     }
 
     @ViewBuilder
@@ -427,7 +484,7 @@ private struct MiniCrateDrawer: View {
     private func play(_ item: CrateItem) {
         switch SourceResolver(context: crate.context).best(item)?.action {
         case .play(let media):
-            player.start(media)
+            crate.play(item, as: media, on: player)
         case .openBroadcast(let page, _):
             appState.open(page)
             openWindow(id: IndigoWindow.main)
@@ -442,7 +499,7 @@ private struct MiniCrateDrawer: View {
             }
             Task {
                 if let media = await streams.media(for: item) {
-                    player.start(media)
+                    crate.play(item, as: media, on: player)
                 } else {
                     open(item)
                 }
@@ -468,6 +525,114 @@ private struct MiniCrateDrawer: View {
             .open(item)
         if opened { openWindow(id: IndigoWindow.main) }
         return opened
+    }
+}
+
+enum MiniDrawerTab: String {
+    case crate, library
+
+    var title: String {
+        switch self {
+        case .crate: "Crate"
+        case .library: "Library"
+        }
+    }
+}
+
+/// The local library, by artist and album, so a record plays through in
+/// order. Its own view so the tracks are only read while the tab is showing.
+private struct MiniLibraryList: View {
+    @Environment(PlaybackCoordinator.self) private var player
+
+    @Query(sort: [
+        SortDescriptor(\Track.artistKey), SortDescriptor(\Track.albumKey),
+        SortDescriptor(\Track.discNumber), SortDescriptor(\Track.trackNumber)
+    ])
+    private var tracks: [Track]
+
+    var body: some View {
+        if tracks.isEmpty {
+            Text("No local music yet")
+                .font(Typeface.mono(10))
+                .foregroundStyle(Palette.inkFaint)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
+        } else {
+            let shown = min(CGFloat(tracks.count), MiniCrateDrawer.visibleRows)
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(tracks.enumerated()), id: \.element.persistentModelID) { offset, track in
+                        let current = player.isCurrent(track.path)
+                        MiniLibraryRow(
+                            track: track,
+                            isCurrent: current,
+                            isPlaying: current && player.isPlaying,
+                            height: MiniCrateDrawer.rowHeight
+                        ) { play(from: offset) }
+                    }
+                }
+            }
+            .scrollIndicators(.automatic)
+            .frame(height: shown * MiniCrateDrawer.rowHeight)
+        }
+    }
+
+    /// The whole list is the queue, as on the Tracks page, so next carries
+    /// on down it.
+    private func play(from offset: Int) {
+        if player.isCurrent(tracks[offset].path) {
+            player.toggle()
+        } else {
+            player.play(tracks.mediaItems(), startingAt: offset)
+        }
+    }
+}
+
+private struct MiniLibraryRow: View {
+    let track: Track
+    let isCurrent: Bool
+    let isPlaying: Bool
+    let height: CGFloat
+    let play: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ArtworkView(localKey: track.artworkKey, side: 30)
+                .overlay(Rectangle().strokeBorder(
+                    isCurrent ? Palette.accent : Palette.outline.opacity(0.5),
+                    lineWidth: isCurrent ? 1.5 : Metrics.hairline
+                ))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(track.title)
+                    .font(Typeface.body(11.5, weight: isCurrent ? .semibold : .regular))
+                    .foregroundStyle(isCurrent ? Palette.accent : Palette.ink)
+                    .lineLimit(1)
+                Text([track.artist, track.album].filter { !$0.isEmpty }.joined(separator: " · "))
+                    .font(Typeface.mono(9.5))
+                    .foregroundStyle(Palette.inkMuted)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button(action: play) {
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 10))
+            }
+            .buttonStyle(GlyphButtonStyle(size: 24))
+            .opacity(isHovering || isCurrent ? 1 : 0.45)
+            .accessibilityLabel(isPlaying ? "Pause \(track.title)" : "Play \(track.title)")
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 8)
+        .frame(height: height)
+        .background(isHovering ? Color.white.opacity(0.08) : Color.clear)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: play)
+        .onHover { isHovering = $0 }
     }
 }
 

@@ -67,6 +67,47 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------
+-- Two artists of one name on a page, and whose turn it is (0068)
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    v_roster uuid;
+    v_first uuid;
+begin
+    insert into public.scene_rosters (place, place_key, sound, sound_key)
+    values (null, '', 'Modern Classical', 'modern classical')
+    returning id into v_roster;
+
+    -- MusicBrainz has two John Williamses. One statement may not write a row
+    -- twice, and this page used to fail every time it was tried.
+    perform public.record_scene_members(v_roster, '[
+        {"name":"John Williams","normalized_name":"john williams","mbid":"a","score":90},
+        {"name":"John Williams","normalized_name":"john williams","mbid":"b","score":100},
+        {"name":"Max Richter","normalized_name":"max richter","mbid":"c","score":80}
+    ]'::jsonb, 100, 392, false);
+    if (select count(*) from public.scene_members where roster_id = v_roster) <> 2 then
+        raise exception 'a page with a repeated name should record each name once';
+    end if;
+    if (select mbid from public.scene_members
+        where roster_id = v_roster and normalized_name = 'john williams') <> 'b' then
+        raise exception 'the better-scored of a repeated name should be kept';
+    end if;
+
+    -- Resuming takes the roster longest left alone and sends it to the back.
+    alter table public.scene_rosters disable trigger scene_rosters_touch_updated_at;
+    update public.scene_rosters set updated_at = now() - interval '2 days' where id = v_roster;
+    alter table public.scene_rosters enable trigger scene_rosters_touch_updated_at;
+    select id into v_first from public.scene_rosters
+    where status in ('pending', 'filling') order by updated_at limit 1;
+    perform public.resume_scene_rosters(1);
+    if (select id from public.scene_rosters
+        where status in ('pending', 'filling') order by updated_at limit 1) = v_first then
+        raise exception 'a resumed roster should go to the back of the line';
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
 -- What no listener sends (0065)
 -- ---------------------------------------------------------------------------
 
@@ -170,9 +211,13 @@ begin
     update public.scene_rosters set filled_at = now() where status = 'ready';
 
     -- A roster that finished long ago is walked again.
+    -- Last touched then, too: resume takes the longest left alone (0068),
+    -- and a roster finished ninety days ago has not been touched since.
+    alter table public.scene_rosters disable trigger scene_rosters_touch_updated_at;
     update public.scene_rosters
-    set filled_at = now() - interval '90 days'
+    set filled_at = now() - interval '90 days', updated_at = now() - interval '90 days'
     where sound_key = 'hip hop';
+    alter table public.scene_rosters enable trigger scene_rosters_touch_updated_at;
     delete from public.enrichment_jobs where dedupe_key = 'manchester|hip hop';
 
     resumed := public.resume_scene_rosters(4);

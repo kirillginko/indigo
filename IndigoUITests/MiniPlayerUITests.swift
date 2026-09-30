@@ -21,13 +21,29 @@ final class MiniPlayerUITests: XCTestCase {
         return app
     }
 
+    /// The full player is the default: whichever window was open at the last
+    /// quit, launch shows the main window and leaves the mini player shut.
+    func testLaunchShowsTheMainWindowAndNotTheMiniPlayer() throws {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["header.miniPlayer"].firstMatch.waitForExistence(timeout: 20),
+                      "Launch did not open the main window")
+        XCTAssertFalse(app.windows["Mini Player"].exists, "The mini player was restored at launch")
+    }
+
     func testShiftCommandMOpensTheMiniPlayer() throws {
         let app = launch()
+        let mini = app.windows["Mini Player"]
+        // macOS reopens the mini player at launch if it was open at the last
+        // quit, and then there is no new window for the shortcut to add.
+        if mini.exists {
+            mini.buttons[XCUIIdentifierCloseWindow].click()
+            XCTAssertTrue(mini.waitForNonExistence(timeout: 5), "Could not close the restored mini player")
+        }
         let before = app.windows.count
 
         app.typeKey("m", modifierFlags: [.command, .shift])
 
-        let mini = app.windows["Mini Player"]
         XCTAssertTrue(mini.waitForExistence(timeout: 10), "⇧⌘M did not open the mini player")
         XCTAssertGreaterThan(app.windows.count, before)
     }
@@ -48,7 +64,6 @@ final class MiniPlayerUITests: XCTestCase {
                       "The mini player should render an empty state, not blank")
         // macOS exposes SwiftUI Text as the value, uppercased as drawn.
         XCTAssertEqual(mini.staticTexts["mini.primary"].value as? String, "NOTHING PLAYING")
-        XCTAssertEqual(mini.staticTexts["mini.source"].value as? String, "INDIGO")
         XCTAssertGreaterThan(mini.frame.height, 100, "The window collapsed")
     }
 
@@ -67,5 +82,31 @@ final class MiniPlayerUITests: XCTestCase {
         }
 
         XCTAssertTrue(mini.exists, "Closing the main window must not take the mini player with it")
+    }
+
+    /// The two corner buttons swap one window for the other: the header's
+    /// leaves only the mini player, and the mini player's brings the main
+    /// window back and steps aside.
+    func testTheCornerButtonsSwapTheTwoWindows() throws {
+        let app = launch()
+        let mini = app.windows["Mini Player"]
+        let toMini = app.buttons["header.miniPlayer"].firstMatch
+        let toMain = app.buttons["mini.maximize"].firstMatch
+
+        // Whichever window the last quit left open, start from the main one.
+        if !toMini.exists {
+            XCTAssertTrue(toMain.waitForExistence(timeout: 5), "Neither window's switch is on screen")
+            toMain.click()
+        }
+        XCTAssertTrue(toMini.waitForExistence(timeout: 10), "No switch in the page header")
+
+        toMini.click()
+        XCTAssertTrue(mini.waitForExistence(timeout: 10), "The header switch did not open the mini player")
+        XCTAssertTrue(toMini.waitForNonExistence(timeout: 5), "The main window stayed open behind the mini player")
+
+        XCTAssertTrue(toMain.waitForExistence(timeout: 5), "No way back in the mini player's title bar")
+        toMain.click()
+        XCTAssertTrue(toMini.waitForExistence(timeout: 10), "The mini player's switch did not bring the main window back")
+        XCTAssertTrue(mini.waitForNonExistence(timeout: 5), "The mini player stayed open over the main window")
     }
 }

@@ -304,6 +304,7 @@ nonisolated enum StationMark {
         case PanikProvider.providerID: PanikProvider.logoURL
         case RovrProvider.providerID: RovrProvider.logoURL
         case N10ASProvider.providerID: N10ASProvider.logoURL
+        case NoodsProvider.providerID: NoodsProvider.logoURL
         default: nil
         }
     }

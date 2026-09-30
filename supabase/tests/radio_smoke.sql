@@ -262,6 +262,24 @@ begin
     select count(*) into claimed from public.claim_enrichment_jobs(5);
     if claimed <> 0 then raise exception 'a running job was claimed again'; end if;
 
+    -- Asked for again while a worker holds it, the claim's clock must not
+    -- move (0068): `updated_at` is the lease, and a schedule that asks every
+    -- few minutes kept a dead worker's job `running` for three weeks.
+    -- Backdated with the stamp off, or the stamp undoes the backdating.
+    alter table public.enrichment_jobs disable trigger enrichment_jobs_touch_updated_at;
+    update public.enrichment_jobs set updated_at = now() - interval '1 hour' where id = first_id;
+    alter table public.enrichment_jobs enable trigger enrichment_jobs_touch_updated_at;
+    perform public.enqueue_enrichment_job(
+        'nts', 'fetch_nts_episode', 'ben-ufo/three', null, 50, null, null);
+    if (select updated_at from public.enrichment_jobs where id = first_id) > now() - interval '30 minutes' then
+        raise exception 'asking again renewed a running job''s claim';
+    end if;
+    if public.reclaim_expired_enrichment_jobs(10) <> 1 then
+        raise exception 'a claim nobody reported on was not given back';
+    end if;
+    select count(*) into claimed from public.claim_enrichment_jobs(5);
+    if claimed <> 1 then raise exception 'the reclaimed job was not offered again'; end if;
+
     perform public.complete_enrichment_job(first_id, false, 'upstream 503');
     select status into state from public.enrichment_jobs where id = first_id;
     if state <> 'pending' then raise exception 'a failed job should retry, got %', state; end if;

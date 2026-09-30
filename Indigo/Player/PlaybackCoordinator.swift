@@ -190,8 +190,11 @@ final class PlaybackCoordinator {
     }
 
     var canSeek: Bool { (source == .local || source == .embed) && duration > 0 }
-    var canSkipNext: Bool { source != .stream && queue.hasNext }
-    var canSkipPrevious: Bool { source != .stream && (queue.hasPrevious || position > 0) }
+    // A station played on its own is a queue of one, so there is nothing to
+    // skip to. One played out of the crate has the rest of the crate behind
+    // it, and being live is no reason to be stuck on it.
+    var canSkipNext: Bool { queue.hasNext }
+    var canSkipPrevious: Bool { queue.hasPrevious || (source != .stream && position > 0) }
     var hasSomethingLoaded: Bool { current != nil }
 
     /// True when this item is the one currently loaded in an engine.
@@ -199,7 +202,9 @@ final class PlaybackCoordinator {
 
     // MARK: - Commands
 
-    /// Plays a list of local tracks, starting at `index`. Any live stream stops.
+    /// Plays a list, starting at `index`. Any live stream stops. Usually local
+    /// tracks; the crate queues whatever it holds — files, archived shows and
+    /// stations — and each is started by what it is.
     func play(_ items: [MediaItem], startingAt index: Int = 0) {
         guard !items.isEmpty else { return }
         consecutiveFailures = 0
@@ -219,21 +224,6 @@ final class PlaybackCoordinator {
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)
-    }
-
-    /// Plays one item by what it is — a station, an embed or a file — or
-    /// pauses and resumes it when it is already the one loaded. The crate and
-    /// the mini player's crate list both start music this way.
-    func start(_ item: MediaItem) {
-        if isCurrent(item.id) {
-            toggle()
-        } else if item.isLive {
-            playRadio(item)
-        } else if item.isEmbedded {
-            playEpisode(item)
-        } else {
-            play([item])
-        }
     }
 
     func toggle() {
@@ -275,7 +265,9 @@ final class PlaybackCoordinator {
     }
 
     func next() {
-        guard source != .stream else { return }
+        // A stream has no end to stop at, so with nothing after it this is
+        // nothing at all rather than a pause.
+        guard source != .stream || queue.hasNext else { return }
         guard queue.advance() != nil else {
             pause()
             seekActiveEngine(to: 0)
@@ -286,9 +278,10 @@ final class PlaybackCoordinator {
     }
 
     func previous() {
-        guard source != .stream else { return }
-        // Restart the track first, the way every other player behaves.
-        if position > 3 {
+        guard source != .stream || queue.hasPrevious else { return }
+        // Restart the track first, the way every other player behaves. A
+        // stream has no start to go back to.
+        if source != .stream, position > 3 {
             seekActiveEngine(to: 0)
             publishNowPlaying()
             return

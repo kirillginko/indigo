@@ -461,6 +461,14 @@ struct DigView: View {
         }
     }
 
+    /// The cards near the start of each shelf that have no picture of their
+    /// own — what is on screen before anybody scrolls a shelf sideways.
+    private func facesWanted(_ found: CrateRecommendations) -> [String] {
+        let rows = [found.forYou] + found.shelves.map(\.picks)
+        let names = rows.flatMap { $0.prefix(8).filter { $0.node.artworkURL == nil }.map(\.node.title) }
+        return Array(names.prefix(40))
+    }
+
     /// Spotify's shape, Indigo's evidence: rows of faces to go and open, each
     /// one next to somebody already in the crate and saying why.
     @ViewBuilder
@@ -486,6 +494,12 @@ struct DigView: View {
                 }
             }
             .padding(.top, 22)
+            // The faces on this page go to the front of the portrait queue,
+            // as an artist page's rows do. Nothing asked for them here, so
+            // they waited their turn in a backlog of every name in the
+            // library, one every second and a half, and a shelf of people
+            // nobody had opened stayed a shelf of coloured squares.
+            .task(id: facesWanted(found)) { dig.wantPortraits(for: facesWanted(found)) }
         }
     }
 

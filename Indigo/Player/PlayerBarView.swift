@@ -31,8 +31,6 @@ struct PlayerBarView: View {
     @Environment(DigStore.self) private var dig
     @State private var isIdentityHovering = false
     @AppStorage(YouTubeVideoPanel.storageKey) private var showsVideo = false
-    @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
         ZStack {
@@ -48,13 +46,6 @@ struct PlayerBarView: View {
                 volume
                     .frame(width: 168)
             }
-        }
-        // The corner the mini player keeps its way back in, so the two
-        // windows swap from the same place.
-        .overlay(alignment: .topTrailing) {
-            minimizeButton
-                .padding(.top, 4)
-                .padding(.trailing, 4)
         }
         // Keep the player legible as a dark object regardless of the system
         // appearance used by the surrounding window.
@@ -379,23 +370,6 @@ struct PlayerBarView: View {
                 .frame(width: 22, alignment: .trailing)
         }
         .padding(.horizontal, 16)
-    }
-
-    /// To the mini player, and the main window out of the way. Whatever is
-    /// playing carries on: the mini window takes the embed's web view while
-    /// this one is closed. See `EmbedStandbySurface`.
-    private var minimizeButton: some View {
-        Button {
-            openWindow(id: IndigoWindow.mini)
-            dismissWindow(id: IndigoWindow.main)
-        } label: {
-            Image(systemName: "arrow.down.right.and.arrow.up.left")
-                .font(.system(size: 9, weight: .semibold))
-        }
-        .buttonStyle(GlyphButtonStyle(size: 18))
-        .help("Switch to the mini player")
-        .accessibilityLabel("Switch to the mini player")
-        .accessibilityIdentifier("player.minimize")
     }
 
     private var volumeGlyph: String {

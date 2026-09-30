@@ -143,17 +143,8 @@ export async function storeTracklist(
   const resolved = await supabase.rpc("resolve_radio_appearances", { p_episode_id: episodeID });
   if (resolved.error) console.error(`${label}: resolve failed`, resolved.error.message);
 
-  // Rebuilding the graph reads every appearance, so it is not something to do
-  // once per episode while a page of them is landing. Queued instead, where
-  // the dedupe key collapses the burst into a single rebuild.
-  const queued = await supabase.rpc("enqueue_enrichment_job", {
-    p_provider: "indigo",
-    p_job_type: "rebuild_dig_edges",
-    p_dedupe_key: "radio",
-    p_payload: null,
-    p_priority: -1,
-    p_entity_type: null,
-    p_entity_id: null,
-  });
-  if (queued.error) console.error(`${label}: rebuild enqueue failed`, queued.error.message);
+  // The graph is not rebuilt from here. `indigo-rebuild-edges` does it on a
+  // schedule, in Postgres, where it has the twenty-odd seconds it needs. A
+  // job queued here ran through the API's eight-second limit instead: it was
+  // cancelled five times an hour, every hour, and never once finished.
 }

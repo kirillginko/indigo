@@ -172,6 +172,10 @@ struct IndigoApp: App {
         }
         .defaultSize(width: 1140, height: 760)
         #if os(macOS)
+        // The full player is what opens. Left to restoration, launch brings
+        // back whichever windows were up at the last quit — which, after
+        // switching to the mini player, was the mini player alone.
+        .defaultLaunchBehavior(.presented)
         .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(replacing: .newItem) {}
@@ -226,6 +230,14 @@ struct IndigoApp: App {
         }
         .defaultSize(width: 320, height: 210)
         .windowResizability(.contentSize)
+        // No title bar of its own: the view draws a short strip in its
+        // place, so the shader runs to the top edge. Dragging anywhere on the
+        // background still moves the window.
+        .windowStyle(.hiddenTitleBar)
+        .windowBackgroundDragBehavior(.enabled)
+        // Only ever opened on purpose: by the switch, or by ⇧⌘M.
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
 
         // The music folder lives here rather than at the foot of the sidebar:
         // it is a setting and a progress report, not part of browsing.
