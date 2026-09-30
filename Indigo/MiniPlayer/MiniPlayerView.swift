@@ -75,6 +75,13 @@ struct MiniPlayerView: View {
         // Legible as a dark object whatever the system appearance, exactly as
         // the player bar is.
         .environment(\.colorScheme, .dark)
+        // In the window's own header, top right, rather than among what is
+        // playing.
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) { maximizeButton }
+        }
+        .toolbarBackground(Color.black, for: .windowToolbar)
+        .toolbarColorScheme(.dark, for: .windowToolbar)
         // Where SoundCloud and Mixcloud play from when the main window is
         // closed. See `EmbedStandbySurface`.
         .background(alignment: .bottomTrailing) {
@@ -112,7 +119,6 @@ struct MiniPlayerView: View {
                     if summary.isLive {
                         LiveBadge()
                     }
-                    maximizeButton
                 }
 
                 // Wrapped rather than a marquee: the window is narrow enough
@@ -246,7 +252,6 @@ struct MiniPlayerView: View {
             Image(systemName: "arrow.up.left.and.arrow.down.right")
                 .font(.system(size: 10, weight: .semibold))
         }
-        .buttonStyle(GlyphButtonStyle(size: 22))
         .help("Open the full player")
         .accessibilityLabel("Open the full player")
         .accessibilityIdentifier("mini.maximize")

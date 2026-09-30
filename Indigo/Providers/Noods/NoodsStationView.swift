@@ -95,7 +95,7 @@ struct NoodsStationView: View {
             if player.isCurrent(noods.station.id) {
                 player.toggle()
             } else {
-                player.playRadio(noods.mediaItem())
+                player.playRadio(noods.mediaItem(artwork: browse.latestPicks.first?.artworkURL))
             }
         } label: {
             HStack(spacing: 9) {

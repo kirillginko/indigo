@@ -60,6 +60,13 @@ struct PageHeader<Trailing: View>: View {
         // Solid, and a step darker than the page under it. Only the sidebar
         // stays glass.
         .background(IndigoGlassBackground.header)
+        // The way to the mini player, in the corner of every page's header
+        // rather than on the player: the player is for what is playing.
+        .overlay(alignment: .topTrailing) {
+            MiniPlayerSwitch()
+                .padding(.top, Metrics.titleBarInset + 2)
+                .padding(.trailing, Metrics.gutter - 6)
+        }
         // Headers are persistent dark chrome in both system appearances, just
         // like the sidebar and player. This also gives trailing controls the
         // correct inverted palette without every page restyling them.
@@ -72,6 +79,30 @@ extension PageHeader where Trailing == EmptyView {
          subtitle: String? = nil, accessory: AnyView? = nil) {
         self.init(title: title, breadcrumb: breadcrumb, onBack: onBack,
                   subtitle: subtitle, accessory: accessory) { EmptyView() }
+    }
+}
+
+/// To the mini player, and the main window out of the way. Whatever is
+/// playing carries on: the mini window takes the embed's web view while this
+/// one is closed. See `EmbedStandbySurface`.
+struct MiniPlayerSwitch: View {
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
+
+    var body: some View {
+        #if os(macOS)
+        Button {
+            openWindow(id: IndigoWindow.mini)
+            dismissWindow(id: IndigoWindow.main)
+        } label: {
+            Image(systemName: "arrow.down.right.and.arrow.up.left")
+                .font(.system(size: 10, weight: .semibold))
+        }
+        .buttonStyle(GlyphButtonStyle(size: 22))
+        .help("Switch to the mini player")
+        .accessibilityLabel("Switch to the mini player")
+        .accessibilityIdentifier("header.miniPlayer")
+        #endif
     }
 }
 
