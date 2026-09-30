@@ -221,6 +221,21 @@ final class PlaybackCoordinator {
         startCurrent(autoplay: true)
     }
 
+    /// Plays one item by what it is — a station, an embed or a file — or
+    /// pauses and resumes it when it is already the one loaded. The crate and
+    /// the mini player's crate list both start music this way.
+    func start(_ item: MediaItem) {
+        if isCurrent(item.id) {
+            toggle()
+        } else if item.isLive {
+            playRadio(item)
+        } else if item.isEmbedded {
+            playEpisode(item)
+        } else {
+            play([item])
+        }
+    }
+
     func toggle() {
         switch source {
         case .local:

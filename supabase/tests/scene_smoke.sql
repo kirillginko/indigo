@@ -67,6 +67,41 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------
+-- What no listener sends (0065)
+-- ---------------------------------------------------------------------------
+
+do $$
+declare
+    before int := (select count(*) from public.scene_rosters);
+    i int;
+    answer jsonb;
+begin
+    answer := public.request_scene_roster(repeat('x', 81), repeat('x', 81), null, '');
+    if (answer ->> 'status') <> 'invalid' then
+        raise exception 'an overlong place should be refused, got %', answer;
+    end if;
+    answer := public.request_scene_roster('Leeds' || chr(10), 'leeds' || chr(10), null, '');
+    if (answer ->> 'status') <> 'invalid' then
+        raise exception 'a control character should be refused, got %', answer;
+    end if;
+    if (select count(*) from public.scene_rosters) <> before then
+        raise exception 'a refused request still wrote a roster';
+    end if;
+
+    -- A burst of new scenes stops at the hourly cap; ones that exist still answer.
+    for i in 1..70 loop
+        perform public.request_scene_roster('Place ' || i, 'place ' || i, null, '');
+    end loop;
+    if (select count(*) from public.scene_rosters where created_at > now() - interval '1 hour') > 60 then
+        raise exception 'more than 60 new rosters were created in an hour';
+    end if;
+    answer := public.request_scene_roster('Manchester', 'manchester', 'Hip Hop', 'hip hop');
+    if answer ->> 'roster_id' is null then
+        raise exception 'an existing roster should still answer past the cap: %', answer;
+    end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
 -- Recording a page of it
 -- ---------------------------------------------------------------------------
 

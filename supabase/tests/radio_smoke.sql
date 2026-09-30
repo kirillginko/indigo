@@ -126,14 +126,13 @@ begin
         raise exception 'expected one canonical neighbour edge, got % (stored in both directions?)', neighbours;
     end if;
 
-    -- The multiplication guard. The artist was played twice and has three
-    -- releases on the label; a join straight to `releases` reports six.
+    -- Label -> show edges are no longer built (0048): 200k of them, and
+    -- nothing read them. A rebuild that makes one again is growing the
+    -- database for nobody.
     select * into label_edge from public.music_relationships
     where relationship_type = 'played_by' and from_entity_type = 'label';
-    if label_edge is null then raise exception 'no label edge'; end if;
-    if label_edge.evidence_count <> 2 then
-        raise exception 'label edge multiplied by release count: expected 2 appearances, got %',
-            label_edge.evidence_count;
+    if label_edge is not null then
+        raise exception 'the rebuild made a label edge again';
     end if;
 end $$;
 
@@ -169,9 +168,10 @@ drop table edges_before;
 do $$
 declare n int;
 begin
-    -- Two artists played by the show, one neighbour pair, one label.
+    -- Two artists played by the show and one neighbour pair. No label edge
+    -- since 0048.
     select count(*) into n from public.music_relationships where source like 'radio%';
-    if n <> 4 then raise exception 'rebuild is not idempotent: % edges', n; end if;
+    if n <> 3 then raise exception 'rebuild is not idempotent: % edges', n; end if;
 end $$;
 
 -- ---------------------------------------------------------------------------
@@ -232,6 +232,10 @@ declare
     claimed int;
     state text;
 begin
+    -- From an empty queue: migrations queue work of their own as they apply
+    -- (0063 asks for an edge rebuild), and the counts below are about this.
+    delete from public.enrichment_jobs;
+
     first_id := public.enqueue_enrichment_job(
         'nts', 'fetch_nts_episode', 'ben-ufo/three',
         jsonb_build_object('show', 'ben-ufo', 'episode', 'three'), 0, null, null);
@@ -306,7 +310,8 @@ begin
     if (status->'radio'->>'appearances')::int <> 5 then
         raise exception 'status reported % appearances', status->'radio'->>'appearances';
     end if;
-    if (status->'radio'->>'radio_edges')::int <> 4 then
+    -- Three since 0048 stopped building the label edge.
+    if (status->'radio'->>'radio_edges')::int <> 3 then
         raise exception 'status reported % edges', status->'radio'->>'radio_edges';
     end if;
     if status->'extensions' is null then

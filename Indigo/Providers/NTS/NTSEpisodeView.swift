@@ -279,7 +279,11 @@ private struct TracklistRow: View {
                 .monospacedDigit()
                 .frame(width: 46, alignment: .trailing)
 
-            ArtworkView(remoteURL: release.artwork, side: 30, glyphScale: 0.3)
+            // A blank record until the sleeve lands — while the release is
+            // still being looked up, while the picture downloads, and for a
+            // track nobody photographed.
+            ArtworkView(remoteURL: release.artwork, side: 30, glyphScale: 0.3,
+                        placeholder: .whiteLabel, placeholderWhileLoading: true)
                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
 
             VStack(alignment: .leading, spacing: 2) {
