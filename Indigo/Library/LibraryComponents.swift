@@ -63,10 +63,11 @@ struct PageHeader<Trailing: View>: View {
         // The way to the mini player, in the corner of every page's header
         // rather than on the player: the player is for what is playing.
         .overlay(alignment: .topTrailing) {
-            // Its glyph ends where the header's own controls end.
+            // In the corner, its glyph against the trailing edge of its frame,
+            // so this padding is how far the glyph itself is from the edge.
             MiniPlayerSwitch()
                 .padding(.top, 5)
-                .padding(.trailing, Metrics.gutter)
+                .padding(.trailing, 14)
         }
         // Headers are persistent dark chrome in both system appearances, just
         // like the sidebar and player. This also gives trailing controls the

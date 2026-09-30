@@ -373,13 +373,18 @@ private struct MiniCrateDrawer: View {
             tabButton(.library, count: libraryTracks.count)
                 .accessibilityIdentifier("mini.libraryToggle")
             Spacer(minLength: 6)
+            // Not animated: the window resizes itself to fit what is in it, and
+            // a fade running at the same time as the window moves is two
+            // things changing the layout at once. The list arrives in one
+            // step and the window follows it. Only the chevron turns.
             Button {
-                withAnimation(.easeOut(duration: 0.16)) { isOpen.toggle() }
+                isOpen.toggle()
             } label: {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(Palette.inkMuted)
                     .rotationEffect(.degrees(isOpen ? 180 : 0))
+                    .animation(.easeOut(duration: 0.16), value: isOpen)
                     .frame(width: 34, height: 30)
                     .contentShape(Rectangle())
             }
@@ -392,13 +397,11 @@ private struct MiniCrateDrawer: View {
     private func tabButton(_ which: MiniDrawerTab, count: Int) -> some View {
         let isShowing = isOpen && tab == which
         return Button {
-            withAnimation(.easeOut(duration: 0.16)) {
-                if isShowing {
-                    isOpen = false
-                } else {
-                    tab = which
-                    isOpen = true
-                }
+            if isShowing {
+                isOpen = false
+            } else {
+                tab = which
+                isOpen = true
             }
         } label: {
             HStack(spacing: 7) {
