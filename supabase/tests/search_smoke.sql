@@ -93,6 +93,24 @@ begin
         raise exception 'release came back thin: %', answer -> 'releases';
     end if;
 
+    -- Short queries read the start of a name only (0067): "mas" is inside
+    -- "Skee Mask" and in six thousand other names on a real catalogue.
+    answer := public.search_catalog('mas', 'mas', 8);
+    if jsonb_array_length(answer -> 'artists') <> 0 then
+        raise exception 'three letters should not match inside a name: %', answer -> 'artists';
+    end if;
+    -- From four, "contains" is back.
+    answer := public.search_catalog('mask', 'mask', 8);
+    if jsonb_array_length(answer -> 'artists') <> 1 then
+        raise exception 'four letters should match inside a name: %', answer -> 'artists';
+    end if;
+    -- A release is still found from the start of its title.
+    answer := public.search_catalog('com', 'com', 8);
+    if jsonb_array_length(answer -> 'releases') <> 1 then
+        raise exception 'a short query should find a release by the start of its title: %',
+            answer -> 'releases';
+    end if;
+
     -- A name nobody has filed is three empty lists, not an error and not null.
     answer := public.search_catalog('qqzz', 'qqzz', 8);
     if jsonb_array_length(answer -> 'artists') <> 0
