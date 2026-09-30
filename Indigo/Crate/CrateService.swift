@@ -180,6 +180,34 @@ final class CrateService {
         hasResolvedRows = true
     }
 
+    // MARK: - Playing
+
+    /// Plays a crate row with the rest of the crate queued around it, so next
+    /// and previous move through what was kept — from the crate page and
+    /// from the mini player alike.
+    ///
+    /// `media` is what the row resolved to at the press. The rest come from
+    /// the row cache, in the order the crate lists them; a row with nothing
+    /// to play yet is simply not in the queue.
+    func play(_ item: CrateItem, as media: MediaItem, on player: PlaybackCoordinator) {
+        if player.isCurrent(media.id) {
+            player.toggle()
+            return
+        }
+        var queue: [MediaItem] = []
+        var index = 0
+        for row in items() {
+            if row.id == item.id {
+                index = queue.count
+                queue.append(media)
+            } else if case .play(let other) = resolvedSources[row.id]?.action {
+                queue.append(other)
+            }
+        }
+        if queue.isEmpty { queue = [media] }
+        player.play(queue, startingAt: index)
+    }
+
     // MARK: - Writing
 
     /// Crating the same thing twice is a no-op rather than a duplicate — the

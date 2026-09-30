@@ -195,7 +195,7 @@ struct CrateView: View {
             if item.kind == .broadcast {
                 Task {
                     if let media = await streams.media(for: item) {
-                        player.start(media)
+                        crate.play(item, as: media, on: player)
                     } else {
                         open(item)
                     }
@@ -207,7 +207,7 @@ struct CrateView: View {
         }
         switch source.action {
         case .play(let media):
-            player.start(media)
+            crate.play(item, as: media, on: player)
         case .openBroadcast(let page, _):
             // The music isn't addressable on its own — open the set it was in.
             appState.open(page)

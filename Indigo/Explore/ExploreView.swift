@@ -122,8 +122,8 @@ struct ExploreView: View {
         // draws its own header, so it has to be put here as well.
         .overlay(alignment: .topTrailing) {
             MiniPlayerSwitch()
-                .padding(.top, Metrics.titleBarInset + 2)
-                .padding(.trailing, Metrics.gutter - 6)
+                .padding(.top, 5)
+                .padding(.trailing, 8)
                 .environment(\.colorScheme, .dark)
         }
     }
