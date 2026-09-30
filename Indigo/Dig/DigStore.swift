@@ -724,7 +724,7 @@ final class DigStore {
                 // written down so the name is not asked after again.
                 portraitsSettled.insert(RecordingKey.normalizeArtist(next))
                 quiet += 1
-                try? await Task.sleep(for: spacing)
+                try? await Task.sleep(for: wasOnScreen ? min(spacing, Self.onScreenSpacing) : spacing)
                 continue
             case .found(let found):
                 address = found
@@ -752,7 +752,12 @@ final class DigStore {
                 artworkRevision &+= 1
             }
 
-            try? await Task.sleep(for: spacing)
+            // The drip is for the backlog. A face somebody is looking at
+            // follows the last one closely: the reserve checked at the top of
+            // the loop is what protects the page's own requests, and a shelf
+            // of twenty filling at one every second and a half is half a
+            // minute of coloured squares.
+            try? await Task.sleep(for: wasOnScreen ? min(spacing, Self.onScreenSpacing) : spacing)
         }
     }
 
@@ -795,6 +800,8 @@ final class DigStore {
     /// jump the queue regardless — so a minute old is new enough.
     @ObservationIgnored private var portraitQueueBuiltWhen: ContinuousClock.Instant?
     private static let portraitQueueLifetime = Duration.seconds(60)
+    /// Between two faces the listener is looking at. See the fill loop.
+    private static let onScreenSpacing = Duration.milliseconds(350)
 
     private func nextPortraitNeeded() async -> String? {
         // The on-screen list is consumed rather than re-searched: each name
