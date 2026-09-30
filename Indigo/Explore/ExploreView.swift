@@ -118,6 +118,14 @@ struct ExploreView: View {
         .foregroundStyle(ink)
         // Its own value: see `IndigoGlassBackground.exploreHeader`.
         .background(IndigoGlassBackground.exploreHeader)
+        // The same corner every other page's header keeps it in. This page
+        // draws its own header, so it has to be put here as well.
+        .overlay(alignment: .topTrailing) {
+            MiniPlayerSwitch()
+                .padding(.top, Metrics.titleBarInset + 2)
+                .padding(.trailing, Metrics.gutter - 6)
+                .environment(\.colorScheme, .dark)
+        }
     }
 
     @ViewBuilder private func objects(_ kept: [CrateItem], in size: CGSize) -> some View {
