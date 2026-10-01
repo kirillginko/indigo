@@ -8,6 +8,7 @@
 //
 
 import XCTest
+import SwiftData
 @testable import Indigo
 
 final class UITestIsolationTests: XCTestCase {
@@ -25,5 +26,15 @@ final class UITestIsolationTests: XCTestCase {
         // The unit-test host is already `isRunningTests`; this pins that the
         // flag is a way in as well, not the only one.
         XCTAssertTrue(Persistence.isRunningTests)
+    }
+
+    /// The XCTest host is Indigo, with `Persistence.container` as its store. It
+    /// wrote to the real one: a full run grew its write-ahead log by two
+    /// megabytes.
+    func testTheTestHostNeverOpensTheListenersStore() throws {
+        let configuration = try XCTUnwrap(Persistence.container.configurations.first)
+        XCTAssertTrue(configuration.isStoredInMemoryOnly)
+        XCTAssertNotEqual(configuration.url, Persistence.storeURL)
+        XCTAssertNil(Persistence.openFailure)
     }
 }
