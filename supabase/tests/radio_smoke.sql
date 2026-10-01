@@ -116,8 +116,8 @@ begin
       and from_entity_type = 'artist'
       and from_entity_id = '00000000-0000-4000-8000-0000000000A1'::uuid;
     if played is null then raise exception 'no played_by edge for the known artist'; end if;
-    if (played.metadata->>'episodes')::int <> 2 then
-        raise exception 'expected 2 episodes of evidence, got %', played.metadata->>'episodes';
+    if played.episode_count <> 2 then
+        raise exception 'expected 2 episodes of evidence, got %', played.episode_count;
     end if;
 
     select count(*) into neighbours from public.music_relationships
