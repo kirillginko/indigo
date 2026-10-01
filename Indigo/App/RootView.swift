@@ -13,6 +13,7 @@ struct RootView: View {
     @Environment(LibraryStore.self) private var library
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(DigStore.self) private var dig
+    @Environment(CrateService.self) private var crate
     @AppStorage(YouTubeVideoPanel.storageKey) private var showsYouTubeVideo = false
 
     var body: some View {
@@ -255,6 +256,16 @@ struct RootView: View {
     @ViewBuilder
     private var noticeOverlay: some View {
         VStack(spacing: 0) {
+            // Stays for as long as the session cannot save. Not dismissible:
+            // dismissing it would be agreeing to lose what comes next.
+            if !Persistence.userDataWritable {
+                NoticeStrip(text: Persistence.userDataUnavailableNotice)
+                Rule(color: Palette.outline)
+            }
+            if let notice = crate.notice {
+                NoticeStrip(text: notice) { crate.notice = nil }
+                Rule(color: Palette.outline)
+            }
             if let notice = library.notice {
                 NoticeStrip(text: notice) { library.notice = nil }
                 Rule(color: Palette.outline)

@@ -54,7 +54,7 @@ extension CrateService {
             // crate row, so this is the second row it has had, and the
             // picture was only ever written onto the first. Written again
             // here, or the row comes back as a placeholder.
-            let item = add(recording: existing)
+            guard let item = add(recording: existing) else { return nil }
             if let artworkURL { fillArtwork(artworkURL, for: item) }
             return existing
         }
@@ -82,7 +82,7 @@ extension CrateService {
         context.insert(link)
         link.recording = recording
 
-        let item = add(recording: recording)
+        guard let item = add(recording: recording) else { return nil }
         if let artworkURL { fillArtwork(artworkURL, for: item) }
         try? context.save()
         return recording

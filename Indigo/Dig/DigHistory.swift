@@ -94,10 +94,14 @@ nonisolated struct DigHistory {
     /// borne once per generation — see `DigWorker.refresh(_:)` — so sharing it
     /// is the difference between a walk and a rebuild.
     private let shared: GraphStore?
+    /// False while the listener's store could not be opened; nothing is
+    /// recorded or forgotten, because it would not outlive the session.
+    private let writable: Bool
 
-    init(context: ModelContext, graph: GraphStore? = nil) {
+    init(context: ModelContext, graph: GraphStore? = nil, writable: Bool = Persistence.userDataWritable) {
         self.context = context
         self.shared = graph
+        self.writable = writable
     }
 
     // MARK: Writing
@@ -108,6 +112,7 @@ nonisolated struct DigHistory {
     /// Crate, out of a search. That is a visit but not a step, and counting it
     /// as one would invent a path nobody walked.
     func record(_ node: MusicNode, from origin: MusicNode? = nil) {
+        guard writable else { return }
         let visit = visit(for: node) ?? {
             let fresh = DigVisit(node: node)
             context.insert(fresh)
@@ -135,6 +140,7 @@ nonisolated struct DigHistory {
     }
 
     func forget() {
+        guard writable else { return }
         for visit in visits() { context.delete(visit) }
         for step in steps() { context.delete(step) }
         try? context.save()

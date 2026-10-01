@@ -22,8 +22,21 @@ final class CrateService {
     /// private context that SwiftData would refuse to relate across.
     @ObservationIgnored let context: ModelContext
 
-    init(context: ModelContext) {
+    /// False while the listener's store could not be opened. Every write below
+    /// refuses and says why, so nothing is "crated" into a session that will
+    /// not keep it.
+    @ObservationIgnored private let writable: Bool
+
+    init(context: ModelContext, writable: Bool = Persistence.userDataWritable) {
         self.context = context
+        self.writable = writable
+    }
+
+    /// True, after saying so, when the crate cannot be written to.
+    private func refusesWrites() -> Bool {
+        guard !writable else { return false }
+        notice = Persistence.userDataUnavailableNotice
+        return true
     }
 
     /// Deallocating a main-actor-isolated observable hops to the executor to
@@ -213,7 +226,8 @@ final class CrateService {
     /// Crating the same thing twice is a no-op rather than a duplicate — the
     /// button is a toggle everywhere it appears.
     @discardableResult
-    func add(recording: Recording) -> CrateItem {
+    func add(recording: Recording) -> CrateItem? {
+        if refusesWrites() { return nil }
         if let existing = item(for: recording) { return existing }
         let item = CrateItem(recording: recording)
         item.setGenres(localGenres(for: recording))
@@ -252,6 +266,7 @@ final class CrateService {
     /// the other is worse than leaving it to be looked up again.
     @discardableResult
     func remember(showID: String, for item: CrateItem) -> Bool {
+        if refusesWrites() { return false }
         guard let providerID = item.providerID, item.showID != showID else { return false }
         guard self.item(forBroadcast: showID, providerID: providerID) == nil else { return false }
         item.showID = showID
@@ -270,7 +285,8 @@ final class CrateService {
         embedProvider: EmbedProvider?,
         isLiveStream: Bool = false,
         genres: [String] = []
-    ) -> CrateItem {
+    ) -> CrateItem? {
+        if refusesWrites() { return nil }
         if let existing = item(forBroadcast: showID, providerID: providerID) { return existing }
         let item = CrateItem(
             providerID: providerID,
@@ -298,7 +314,8 @@ final class CrateService {
         subtitle: String?,
         artworkURL: URL?,
         genres: [String] = []
-    ) -> CrateItem {
+    ) -> CrateItem? {
+        if refusesWrites() { return nil }
         if let existing = item(forDig: kind, identifier: identifier, providerID: providerID) { return existing }
         let item = CrateItem(
             digKind: kind, providerID: providerID, entityID: identifier,
@@ -330,6 +347,7 @@ final class CrateService {
     }
 
     func remove(_ item: CrateItem) {
+        if refusesWrites() { return }
         context.delete(item)
         save()
     }

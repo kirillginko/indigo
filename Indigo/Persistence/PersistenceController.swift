@@ -75,6 +75,19 @@ enum Persistence {
         return failure
     }
 
+    /// Whether what the listener makes can be written down. False while the
+    /// store on disk has failed to open and the session is running unsaved:
+    /// the crate, the listening log and the dig history refuse their writes
+    /// rather than keep rows that vanish at quit.
+    ///
+    /// Not routed through `container`, so it can be read from any actor. The
+    /// container is asked for at launch, before anything can write, so by the
+    /// time it matters the failure has been recorded.
+    nonisolated static var userDataWritable: Bool { failure == nil }
+
+    nonisolated static let userDataUnavailableNotice =
+        "Your library couldn't be opened, so nothing can be saved to your crate or history right now."
+
     /// Whether this process is a test host rather than the app somebody is
     /// using.
     ///
