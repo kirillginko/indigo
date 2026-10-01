@@ -96,10 +96,32 @@ enum Persistence {
     /// repairs are gated on this. `Trace` reads the same variable to decide
     /// where to write.
     static var isRunningTests: Bool {
-        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || isUITesting
+    }
+
+    /// The launch argument every UI test passes. A UI test launches the app as
+    /// its own process, which has no XCTest variable in its environment and
+    /// used to open the listener's real store: the first full run of the suite
+    /// migrated and backfilled it. With this argument the store is in memory
+    /// and nothing the app does survives the run.
+    nonisolated static let uiTestingArgument = "-INDIGO_UI_TESTING"
+
+    nonisolated static func isUITesting(arguments: [String]) -> Bool {
+        arguments.contains(uiTestingArgument)
+    }
+
+    static var isUITesting: Bool {
+        isUITesting(arguments: ProcessInfo.processInfo.arguments)
     }
 
     private static func makeContainer() -> ModelContainer {
+        if isUITesting {
+            let memory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            guard let container = try? ModelContainer(
+                for: schema, migrationPlan: IndigoMigrationPlan.self, configurations: memory)
+            else { fatalError("Unable to create an in-memory container for UI testing") }
+            return container
+        }
         do {
             return try openStore(role: storeRole, schema: schema, at: storeURL)
         } catch let failed as StoreOpenFailure {
