@@ -48,6 +48,7 @@ struct IndigoApp: App {
     @State private var youtubeChannels = YouTubeChannelStore()
     @State private var n10as = N10ASProvider()
     @State private var n10asBrowse = N10ASBrowseStore()
+    @State private var storeFailure = Persistence.openFailure
     @State private var library = LibraryStore(container: Persistence.container)
     @State private var crate = CrateService(context: Persistence.container.mainContext)
     @State private var dig = DigStore(context: Persistence.container.mainContext)
@@ -91,6 +92,17 @@ struct IndigoApp: App {
                 .environment(crate)
                 .environment(dig)
                 .modelContainer(Persistence.container)
+                .alert(
+                    "Your library couldn't be opened",
+                    isPresented: Binding(
+                        get: { storeFailure != nil },
+                        set: { if !$0 { storeFailure = nil } }),
+                    presenting: storeFailure
+                ) { _ in
+                    Button("OK", role: .cancel) {}
+                } message: { failure in
+                    Text("Nothing has been deleted. Until it opens, this session is not being saved, so anything you add will be gone when you quit.\n\n\(failure.url.path)")
+                }
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
                     witness.watch(player)
