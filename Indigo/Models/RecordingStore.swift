@@ -249,3 +249,56 @@ nonisolated struct RecordingStore {
         recording.updatedAt = Date()
     }
 }
+
+// MARK: - Placeholders
+
+extension RecordingStore {
+    /// The code for a placeholder, from where and when it was heard -- the same
+    /// inputs `createUnknown` uses, so a recording that is later found to be
+    /// the same moment gets the same code, and two devices that read the same
+    /// tracklist mint the same one.
+    func placeholderCode(for appearance: MediaAppearance) -> String {
+        RecordingKey.unknownCode(
+            providerID: appearance.providerID,
+            showID: appearance.showID,
+            heardAt: appearance.heardAt,
+            offsetSeconds: appearance.offsetSeconds)
+    }
+
+    /// Gives a recording that shares its match key with another one a code of
+    /// its own, if it has none.
+    ///
+    /// "Unreleased" by one artist at six points in a show is six recordings
+    /// with one key. The key says nothing about which is which, and a crate row
+    /// that has to be the same on every device cannot be told apart by an `id`
+    /// that exists on one. A recording with a key nobody else shares needs
+    /// nothing: the key already names it.
+    @discardableResult
+    func ensurePortableCode(_ recording: Recording) -> Bool {
+        guard recording.unknownCode == nil, !recording.matchKey.isEmpty,
+              let appearance = recording.firstAppearance else { return false }
+        let key = recording.matchKey
+        let peers = (try? context.fetchCount(FetchDescriptor<Recording>(
+            predicate: #Predicate { $0.matchKey == key }))) ?? 0
+        guard peers > 1 else { return false }
+        recording.unknownCode = placeholderCode(for: appearance)
+        return true
+    }
+
+    /// `ensurePortableCode` for every recording that needs it, once, for the
+    /// ones made before placeholders were given codes at creation.
+    @discardableResult
+    func assignPlaceholderCodes() -> Int {
+        let all = (try? context.fetch(FetchDescriptor<Recording>(
+            predicate: #Predicate { $0.matchKey != "" && $0.unknownCode == nil }))) ?? []
+        var counts: [String: Int] = [:]
+        for recording in all { counts[recording.matchKey, default: 0] += 1 }
+        var assigned = 0
+        for recording in all where counts[recording.matchKey, default: 0] > 1 {
+            guard let appearance = recording.firstAppearance else { continue }
+            recording.unknownCode = placeholderCode(for: appearance)
+            assigned += 1
+        }
+        return assigned
+    }
+}

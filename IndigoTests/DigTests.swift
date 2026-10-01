@@ -603,7 +603,7 @@ final class DigTests: XCTestCase {
             ),
             on: recording
         )
-        context.insert(CrateItem(recording: recording))
+        context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         context.insert(Track(
             path: "/Music/Rev8617.flac", relativePath: "Rev8617.flac",
             title: "Rev8617", artist: "Skee Mask", albumArtist: "Skee Mask", album: "Compro",

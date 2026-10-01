@@ -105,6 +105,13 @@ struct IndigoApp: App {
                 }
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
+                    // Gives a row crated before it kept its own snapshot the
+                    // snapshot. Not under test, which runs against the
+                    // listener's real store, and not while that store is
+                    // unopened: it writes the crate.
+                    if !Persistence.isRunningTests, Persistence.userDataWritable {
+                        CrateSnapshot.backfillOnce(in: Persistence.container.mainContext)
+                    }
                     witness.watch(player)
                     // Keep the picture backlog out of the way while a stream
                     // opens. See `DigStore.holdBackgroundWork`.

@@ -41,7 +41,8 @@ struct CrateNavigator {
         }
         // The row opens the track's own page — where it was heard, and what
         // was heard beside it. The DIG button still means the artist.
-        if let recording = item.recording, let page = dig.recordingDestination(for: recording) {
+        if let recording = CrateRecordings(context: crate.context).resolve(item),
+           let page = dig.recordingDestination(for: recording) {
             appState.open(page)
             return true
         }
@@ -76,7 +77,8 @@ struct CrateNavigator {
     }
 
     static func localTrack(for item: CrateItem, context: ModelContext) -> Track? {
-        guard let path = item.recording?.sources.first(where: { $0.kind == .localFile })?.identifier else {
+        guard let path = CrateRecordings(context: context).recording(for: item)?
+            .sources.first(where: { $0.kind == .localFile })?.identifier else {
             return nil
         }
         var descriptor = FetchDescriptor<Track>(predicate: #Predicate { $0.path == path })

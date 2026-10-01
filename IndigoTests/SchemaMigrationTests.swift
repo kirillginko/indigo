@@ -47,7 +47,7 @@ final class SchemaMigrationTests: XCTestCase {
         // hand rather than through CrateService: a short-lived main-actor
         // @Observable released inside a test method aborts in the test host.
         let recording = try RecordingStore(context: newContext).upsert(title: "Bike", artistName: "Autechre")
-        newContext.insert(CrateItem(recording: recording))
+        newContext.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         try newContext.save()
         XCTAssertEqual(try newContext.fetchCount(FetchDescriptor<CrateItem>()), 1)
         XCTAssertEqual(try newContext.fetchCount(FetchDescriptor<Recording>()), 1)
@@ -79,7 +79,7 @@ final class SchemaMigrationTests: XCTestCase {
             let context = ModelContext(container)
             let recording = try RecordingStore(context: context)
                 .upsert(title: "Vernal Equinox", artistName: "Jon Hassell")
-            context.insert(CrateItem(recording: recording))
+            context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
             try context.save()
         }
 
@@ -141,7 +141,7 @@ final class SchemaMigrationTests: XCTestCase {
             let context = ModelContext(container)
             let recording = try RecordingStore(context: context)
                 .upsert(title: "Vernal Equinox", artistName: "Jon Hassell")
-            context.insert(CrateItem(recording: recording))
+            context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
             try context.save()
             return recording.id
         }

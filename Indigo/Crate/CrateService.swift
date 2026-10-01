@@ -61,25 +61,41 @@ final class CrateService {
 
     func contains(recording: Recording) -> Bool {
         refreshMembershipIfNeeded()
-        return recordingMembership.contains(recording.id)
+        return recordingMembership.contains(
+            CrateSnapshot.identity(matchKey: recording.matchKey, unknownCode: recording.unknownCode))
     }
 
     func contains(broadcast showID: String, providerID: String) -> Bool {
         item(forBroadcast: showID, providerID: providerID) != nil
     }
 
+    /// The row for a recording: by its match key, or by its code when nobody
+    /// named it. The same key on every device, which a local `Recording.id`
+    /// was not.
     func item(for recording: Recording) -> CrateItem? {
-        let id = recording.id
+        item(matchKey: recording.matchKey, unknownCode: recording.unknownCode)
+    }
+
+    func item(matchKey: String, unknownCode: String?) -> CrateItem? {
+        guard !(matchKey.isEmpty && unknownCode == nil) else { return nil }
+        let kind = CrateItemKind.recording.rawValue
         var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate { $0.recording?.id == id }
-        )
+            predicate: #Predicate {
+                $0.kindRaw == kind && $0.matchKey == matchKey && $0.unknownCode == unknownCode
+            })
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
     }
 
+    /// Only a broadcast row. A recording row carries the broadcast it was heard
+    /// in under the same `providerID` and `showID`, and crating that show must
+    /// not find the track and call the show kept.
     func item(forBroadcast showID: String, providerID: String) -> CrateItem? {
+        let kind = CrateItemKind.broadcast.rawValue
         var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate { $0.showID == showID && $0.providerID == providerID }
+            predicate: #Predicate {
+                $0.kindRaw == kind && $0.showID == showID && $0.providerID == providerID
+            }
         )
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
@@ -103,7 +119,7 @@ final class CrateService {
     /// so it is folded into two sets and kept until `revision` moves.
     @ObservationIgnored private var membershipAt = -1
     @ObservationIgnored private var digMembership: Set<String> = []
-    @ObservationIgnored private var recordingMembership: Set<UUID> = []
+    @ObservationIgnored private var recordingMembership: Set<String> = []
     @ObservationIgnored private var listeningMembership: [URL: Bool] = [:]
 
     private static func digKey(
@@ -117,12 +133,15 @@ final class CrateService {
     func refreshMembershipIfNeeded() {
         guard membershipAt != revision else { return }
         var dig: Set<String> = []
-        var recordings: Set<UUID> = []
+        var recordings: Set<String> = []
         for item in items() {
+            if item.kind == .recording {
+                if item.hasRecordingSnapshot { recordings.insert(item.recordingIdentity) }
+                continue
+            }
             if let showID = item.showID, let providerID = item.providerID {
                 dig.insert(Self.digKey(item.kind, showID, providerID))
             }
-            if let id = item.recording?.id { recordings.insert(id) }
         }
         digMembership = dig
         recordingMembership = recordings
@@ -180,9 +199,12 @@ final class CrateService {
         var sources: [UUID: AudioSource] = [:]
         var pages: [UUID: DetailPage] = [:]
         let resolver = SourceResolver(context: context)
+        let recordings = CrateRecordings(context: context)
         for item in items() {
             if let found = resolver.best(item) { sources[item.id] = found }
-            if let recording = item.recording, let page = digDestination(recording) {
+            // Made here if this device has none yet: a row crated on another
+            // device has no local recording until something needs one.
+            if let recording = recordings.resolve(item), let page = digDestination(recording) {
                 pages[item.id] = page
             }
         }
@@ -229,7 +251,7 @@ final class CrateService {
     func add(recording: Recording) -> CrateItem? {
         if refusesWrites() { return nil }
         if let existing = item(for: recording) { return existing }
-        let item = CrateItem(recording: recording)
+        let item = CrateItem(snapshot: CrateSnapshot.capture(recording, context: context))
         item.setGenres(localGenres(for: recording))
         context.insert(item)
         note(item)
@@ -246,7 +268,8 @@ final class CrateService {
     /// taking a row back out of the crate is a correction, not a verdict, and
     /// reading it as one would punish people for tidying up.
     private func note(_ item: CrateItem) {
-        guard let node = item.node else { return }
+        guard let node = item.node(resolving: CrateRecordings(context: context).recording(for: item))
+        else { return }
         ListeningLog(context: context).record(
             node, action: .saved, tags: item.genreTags,
             source: item.providerID.map { ListeningSource(providerID: $0, showTitle: item.showTitle) }
@@ -399,8 +422,10 @@ final class CrateService {
     /// stopped main thread, and on any real library it is the hitch that
     /// pauses the shader a few seconds in.
     func backfillLocalGenres() {
-        let pending = items().compactMap { item -> (item: CrateItem, paths: [String])? in
-            guard item.genreTags.isEmpty, let recording = item.recording else { return nil }
+        let all = items()
+        let found = CrateRecordings(context: context).recordings(for: all)
+        let pending = all.compactMap { item -> (item: CrateItem, paths: [String])? in
+            guard item.genreTags.isEmpty, let recording = found[item.id] else { return nil }
             let paths = localPaths(of: recording)
             return paths.isEmpty ? nil : (item, paths)
         }

@@ -139,7 +139,7 @@ final class DigSearchTests: XCTestCase {
         let recording = Recording(
             title: "Rev8617", artistName: "Skee Mask", status: .identified)
         context.insert(recording)
-        context.insert(CrateItem(recording: recording))
+        context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         try context.save()
 
         let found = DigSearchIndex(context: context).search("skee")

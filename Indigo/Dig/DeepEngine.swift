@@ -292,7 +292,7 @@ nonisolated struct DeepCaches {
 
         var crate: [String: Int] = [:]
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-            let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            let name = item.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, !name.isEmpty else { continue }
             crate[RecordingKey.normalizeArtist(name), default: 0] += 1
         }

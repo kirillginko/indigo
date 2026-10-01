@@ -82,7 +82,7 @@ final class ArtistNameTests: XCTestCase {
         crate.add(recording: real)
 
         let crated = ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? [])
-            .compactMap { $0.recording?.artistName }
+            .compactMap { $0.artistName }
             .filter { ArtistName.isRealArtist($0) }
         XCTAssertEqual(crated, ["Skee Mask"])
     }

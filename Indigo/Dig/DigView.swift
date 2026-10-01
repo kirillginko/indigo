@@ -557,11 +557,12 @@ struct DigView: View {
         // large and asks nothing. One number could not say which was which.
         Trace.step("sp.crate") {
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-            let artist = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            let artist = item.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             // "Various" is where a catalogue files a compilation, not somebody
             // to go and dig into.
             guard let artist, ArtistName.isRealArtist(artist) else { continue }
-            let mbid = item.recording.flatMap { engine.metadata(for: $0.id)?.artistMBID }
+            let mbid = CrateRecordings(context: context).recording(for: item)
+                .flatMap { engine.metadata(for: $0.id)?.artistMBID }
                 ?? (item.providerID == "dig.artist.mbid" ? item.showID : nil)
             let existing = names[artist]
             names[artist] = ((existing?.crate ?? 0) + 1, existing?.mbid ?? mbid)

@@ -386,12 +386,13 @@ extension DigSearchIndex {
         var counts: [String: (name: String, count: Int, mbid: String?)] = [:]
 
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-            let name = item.recording?.artistName
+            let name = item.artistName
                 ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, ArtistName.isRealArtist(name) else { continue }
             let key = RecordingKey.normalizeArtist(name)
             guard !key.isEmpty else { continue }
-            let mbid = item.recording.flatMap { engine.metadata(for: $0.id)?.artistMBID }
+            let mbid = CrateRecordings(context: context).recording(for: item)
+                .flatMap { engine.metadata(for: $0.id)?.artistMBID }
                 ?? (item.providerID == "dig.artist.mbid" ? item.showID : nil)
             let existing = counts[key]
             counts[key] = (existing?.name ?? name, (existing?.count ?? 0) + 1, existing?.mbid ?? mbid)

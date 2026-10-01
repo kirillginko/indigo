@@ -189,7 +189,7 @@ nonisolated struct GraphStore {
         if let caches = assembledCaches { return caches.crateCount(forArtistKey: key) }
         let items = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
         return items.filter {
-            RecordingKey.normalizeArtist($0.recording?.artistName) == key
+            RecordingKey.normalizeArtist($0.artistName) == key
                 || ($0.kind == .artist && RecordingKey.normalizeArtist($0.displayTitle) == key)
         }.count
     }
@@ -1291,7 +1291,7 @@ private nonisolated struct Caches {
                 var bySpelling: [String: Int] = [:]
                 var byKey: [String: Int] = [:]
                 for item in (try? store.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-                    let artist = item.recording?.artistName
+                    let artist = item.artistName
                         ?? (item.kind == .artist ? item.displayTitle : nil)
                     guard let artist, !artist.isEmpty else { continue }
                     bySpelling[artist, default: 0] += 1

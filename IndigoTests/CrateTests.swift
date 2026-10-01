@@ -73,7 +73,7 @@ final class CrateTests: XCTestCase {
         XCTAssertEqual(Set(crate.items().map(\.kind)), [.artist, .release, .label])
         XCTAssertTrue(crate.contains(dig: .artist, identifier: "artist-123", providerID: "dig.artist.mbid"))
         XCTAssertEqual(crate.items().first(where: { $0.kind == .artist })?.genreTags, ["Ambient", "Shoegaze"])
-        XCTAssertTrue(crate.items().allSatisfy { $0.recording == nil && $0.sourceLine == "DIG" })
+        XCTAssertTrue(crate.items().allSatisfy { $0.legacyRecording == nil && !$0.hasRecordingSnapshot && $0.sourceLine == "DIG" })
         XCTAssertEqual(DigEngine(context: context).crateCount(artist: "Seefeel"), 1)
     }
 
@@ -331,7 +331,7 @@ final class CrateTests: XCTestCase {
         )
         context.insert(track)
         let recording = try recordings.recording(for: track)
-        let legacyItem = CrateItem(recording: recording)
+        let legacyItem = CrateItem(snapshot: CrateSnapshot.capture(recording))
         context.insert(legacyItem)
         try context.save()
 

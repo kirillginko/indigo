@@ -45,7 +45,7 @@ final class CrateBackfillPerformanceTests: XCTestCase {
             source.recording = recording
             context.insert(recording)
             context.insert(source)
-            context.insert(CrateItem(recording: recording))
+            context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         }
         try context.save()
     }

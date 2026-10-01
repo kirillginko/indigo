@@ -53,7 +53,7 @@ extension TasteProfile {
             if let node = item.node, node.kind == .artist {
                 crateArtistKeys.insert(RecordingKey.normalizeArtist(node.title))
             }
-            if let name = item.recording?.artistName {
+            if let name = item.artistName {
                 crateArtistKeys.insert(RecordingKey.normalizeArtist(name))
             }
         }

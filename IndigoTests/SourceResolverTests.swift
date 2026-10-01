@@ -95,7 +95,7 @@ final class SourceResolverTests: XCTestCase {
         context.insert(link)
         link.recording = recording
         recording.sources.append(link)
-        let item = CrateItem(recording: recording)
+        let item = CrateItem(snapshot: CrateSnapshot.capture(recording))
         item.artworkURLString = "https://example.com/angelo-cover.jpg"
         context.insert(item)
 
@@ -117,7 +117,7 @@ final class SourceResolverTests: XCTestCase {
         let recording = try store.upsert(title: "Hubble", artistName: "Actress")
         let track = makeTrack(path: "/Music/Hubble.flac", title: "Hubble", artist: "Actress")
         track.artworkKey = "local-sleeve"
-        let item = CrateItem(recording: recording)
+        let item = CrateItem(snapshot: CrateSnapshot.capture(recording))
         item.artworkURLString = "https://example.com/crate.jpg"
         context.insert(item)
         let source = try XCTUnwrap(SourceResolver(context: context).best(item))

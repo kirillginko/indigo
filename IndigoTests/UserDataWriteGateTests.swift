@@ -54,12 +54,13 @@ final class UserDataWriteGateTests: XCTestCase {
 
     func testAnUnwritableCrateDoesNotRemoveWhatIsThere() throws {
         let writable = CrateService(context: context, writable: true)
-        let item = try XCTUnwrap(writable.add(recording: try recording()))
+        let kept = try recording()
+        let item = try XCTUnwrap(writable.add(recording: kept))
         XCTAssertEqual(writable.count, 1)
 
         let locked = CrateService(context: context, writable: false)
         locked.remove(item)
-        locked.toggle(recording: item.recording!)
+        locked.toggle(recording: kept)
 
         XCTAssertEqual(writable.count, 1)
     }
