@@ -11,27 +11,8 @@ import Foundation
 import SwiftData
 
 enum Persistence {
-    static let schema = Schema([
-        Track.self,
-        Recording.self,
-        MediaAppearance.self,
-        RecordingSource.self,
-        CrateItem.self,
-        Artist.self,
-        MusicLabel.self,
-        RecordingMetadata.self,
-        DiscogsArtist.self,
-        DiscogsReleaseRecord.self,
-        BandcampRelease.self,
-        BandcampArtistIndex.self,
-        DigVisit.self,
-        DigStep.self,
-        ListeningEvent.self,
-        ExploreOffersRecord.self,
-        ArtistPortrait.self,
-        StoredEdge.self,
-        GraphSnapshot.self
-    ])
+    /// The current version of the store's schema; see `IndigoSchema.swift`.
+    static let schema = Schema(versionedSchema: IndigoSchemaV1.self)
 
     static let container: ModelContainer = makeContainer()
 
@@ -49,11 +30,13 @@ enum Persistence {
     private static func makeContainer() -> ModelContainer {
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
-            return try ModelContainer(for: schema, configurations: configuration)
+            return try ModelContainer(
+                for: schema, migrationPlan: IndigoMigrationPlan.self, configurations: configuration)
         } catch {
             // Most likely an incompatible store from an earlier build. Discard and retry.
             destroyStore()
-            if let rebuilt = try? ModelContainer(for: schema, configurations: configuration) {
+            if let rebuilt = try? ModelContainer(
+                for: schema, migrationPlan: IndigoMigrationPlan.self, configurations: configuration) {
                 return rebuilt
             }
             // Last resort: run in memory so the app still launches.
