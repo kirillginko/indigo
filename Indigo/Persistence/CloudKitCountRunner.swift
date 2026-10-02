@@ -45,6 +45,14 @@ enum CloudKitCountRunner {
             for (type, group) in Dictionary(grouping: records, by: \.recordType).sorted(by: { $0.key < $1.key }) {
                 let ids = group.compactMap { $0["CD_id"] as? String }
                 print("\(type): records \(group.count), distinct ids \(Set(ids).count), digest \(RowIDs.digest(Array(Set(ids))))")
+                // Any id that appears twice: which records, when they were written, and
+                // whether they are this test's. No content.
+                for (id, copies) in Dictionary(grouping: group, by: { ($0["CD_id"] as? String) ?? "?" }) where copies.count > 1 {
+                    for copy in copies {
+                        let key = ((copy["CD_nodeKey"] as? String) ?? (copy["CD_nodeID"] as? String) ?? (copy["CD_identity"] as? String) ?? (copy["CD_showID"] as? String) ?? "").lowercased()
+                        print("  repeated \(id): record \(copy.recordID.recordName.prefix(8)), modified \(copy.modificationDate.map { "\($0)" } ?? "?"), marker \(key.contains("indigo-sync-test")), seconds \((copy["CD_seconds"] as? Double).map { "\($0)" } ?? "-")")
+                    }
+                }
             }
             return 0
         } catch let error as CKError where error.code == .zoneNotFound {

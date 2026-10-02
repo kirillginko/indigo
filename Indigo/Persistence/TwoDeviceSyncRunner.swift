@@ -34,8 +34,17 @@ enum TwoDeviceSyncRunner {
     /// `Scripts/two-device-offline.sh` creates, because the app cannot cut the
     /// network itself.
     static let offlineArgument = "-INDIGO_TWO_DEVICE_OFFLINE"
+    /// Runs the import, crate, listening and counter stages, then cleans up.
+    static let onlyCounterArgument = "-INDIGO_TWO_DEVICE_ONLY_COUNTER"
     static let marker = "indigo-sync-test"
     static let provider = "indigo-sync-test"
+
+    /// A key folded the way a node's key is -- hyphens become spaces -- still
+    /// carries the marker. Matching only the spelled-out form once left a run's
+    /// events, visits and steps behind.
+    static func isMarker(_ text: String) -> Bool {
+        text.lowercased().replacingOccurrences(of: "-", with: " ").contains(marker.replacingOccurrences(of: "-", with: " "))
+    }
 
     private static var lines: [String] = []
     private static var problems: [String] = []
@@ -61,26 +70,119 @@ enum TwoDeviceSyncRunner {
     @MainActor
     final class Device {
         let name: String
-        let container: ModelContainer
-        let context: ModelContext
+        private let url: URL
+        private(set) var container: ModelContainer
+        private(set) var context: ModelContext
         private var watcher: Task<Void, Never>?
+        /// How many times this device was closed and opened again to take in
+        /// what CloudKit holds. Two stores in one process are not both told
+        /// about a push, which a real second device always is.
+        private(set) var reopened = 0
+        /// What this device's observer was told and did: counts only.
+        private(set) var notifications = 0
+        private(set) var passes = 0
+        private(set) var merged = 0
+        /// The last passes that looked at anything from another writer.
+        private(set) var recentPasses: [String] = []
+        private(set) var passKinds: [String: Int] = [:]
 
         init(name: String, directory: URL) throws {
             self.name = name
-            container = try Persistence.makeSplitContainer(
-                userData: directory.appendingPathComponent("UserDataTwoDevice\(name).store"), local: nil,
-                sync: .privateDatabase)
+            url = directory.appendingPathComponent("UserDataTwoDevice\(name).store")
+            container = try Persistence.makeSplitContainer(userData: url, local: nil, sync: .privateDatabase)
             context = container.mainContext
             context.author = IndigoApp.writerAuthor
+            start()
+        }
+
+        private func start() {
             let defaults = UserDefaults(suiteName: "indigo.twodevice.\(name)")!
-            defaults.removePersistentDomain(forName: "indigo.twodevice.\(name)")
-            let observer = HistoryObserver(context: context, defaults: defaults, ownAuthor: IndigoApp.writerAuthor)
-            watcher = Task { @MainActor in
-                observer.process()
-                for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
-                    observer.process()
+            var observer = HistoryObserver(context: context, defaults: defaults, ownAuthor: IndigoApp.writerAuthor)
+            observer.onPass = { [weak self] pass in
+                guard let self else { return }
+                if pass.transactions == -1 { self.passKinds["history fetch failed", default: 0] += 1 }
+                else if pass.transactions == 0 { self.passKinds["nothing after the token", default: 0] += 1 }
+                else if pass.foreign == 0 { self.passKinds["only own transactions", default: 0] += 1 }
+                else {
+                    self.passKinds["saw another writer", default: 0] += 1
+                    self.recentPasses.append("token \(pass.hadToken) transactions \(pass.transactions) foreign \(pass.foreign) named \(pass.named) rows \(pass.fetched) merged \(pass.merged)")
+                    if self.recentPasses.count > 12 { self.recentPasses.removeFirst() }
                 }
             }
+            // A device that was reopened has a new container and context; the
+            // old watcher must not touch the old one, whose container is gone.
+            watcher = Task { @MainActor [weak self] in
+                guard !Task.isCancelled else { return }
+                self?.count(observer.process())
+                for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
+                    guard !Task.isCancelled else { return }
+                    self?.notifications += 1
+                    self?.count(observer.process())
+                }
+            }
+        }
+
+        /// Opens the same store again: a relaunch, which imports at setup.
+        func reopen() async throws {
+            stop()
+            context.author = nil
+            try? context.save()
+            reopened += 1
+            container = try Persistence.makeSplitContainer(userData: url, local: nil, sync: .privateDatabase)
+            context = container.mainContext
+            context.author = IndigoApp.writerAuthor
+            start()
+        }
+
+        /// What the store's history holds, as counts: who wrote, and what kind
+        /// of change to which entity. No row content.
+        func historyReport() -> String {
+            let transactions = (try? context.fetchHistory(HistoryDescriptor<DefaultHistoryTransaction>())) ?? []
+            var authors: [String: Int] = [:], kinds: [String: Int] = [:], entities: [String: Int] = [:]
+            for transaction in transactions {
+                authors[transaction.author ?? "nil", default: 0] += 1
+                for change in transaction.changes {
+                    switch change {
+                    case .insert(let insert):
+                        kinds["insert", default: 0] += 1
+                        entities[insert.changedPersistentIdentifier.entityName, default: 0] += 1
+                    case .update: kinds["update", default: 0] += 1
+                    case .delete: kinds["delete", default: 0] += 1
+                    default: kinds["other", default: 0] += 1
+                    }
+                }
+            }
+            return "\(transactions.count) transactions; authors \(authors.sorted { $0.key < $1.key }); changes \(kinds.sorted { $0.key < $1.key }); inserts by entity \(entities.sorted { $0.key < $1.key })"
+        }
+
+        /// Whether the history's token filter returns what it should, and
+        /// whether a pass that has no stored token finds and merges the
+        /// duplicates. The second one merges rows, as the product would.
+        func probe() -> String {
+            let all = (try? context.fetchHistory(HistoryDescriptor<DefaultHistoryTransaction>())) ?? []
+            guard all.count > 4 else { return "history too short to probe" }
+            let middle = all.count / 2
+            let token = all[middle].token
+            var descriptor = HistoryDescriptor<DefaultHistoryTransaction>()
+            descriptor.predicate = #Predicate { $0.token > token }
+            let after = (try? context.fetchHistory(descriptor))?.count ?? -1
+            // The observer keeps its token as JSON and reads it back.
+            var viaJSON = -2
+            if let data = try? JSONEncoder().encode(token), let decoded = try? JSONDecoder().decode(DefaultHistoryToken.self, from: data) {
+                var d = HistoryDescriptor<DefaultHistoryTransaction>()
+                d.predicate = #Predicate { $0.token > decoded }
+                viaJSON = (try? context.fetchHistory(d))?.count ?? -1
+            }
+            let suite = "indigo.twodevice.\(name).probe"
+            let fresh = UserDefaults(suiteName: suite)!
+            fresh.removePersistentDomain(forName: suite)
+            let report = HistoryObserver(context: context, defaults: fresh, ownAuthor: IndigoApp.writerAuthor).process()
+            return "predicate token > transaction \(middle) of \(all.count) returns \(after) (expected \(all.count - middle - 1)); the same token after a JSON round trip returns \(viaJSON); a pass with no stored token merged: visits \(report.visitsMerged), steps \(report.stepsMerged), crate \(report.crateMerged), events \(report.eventsMerged)"
+        }
+
+        private func count(_ report: UserDataDedupe.Report) {
+            passes += 1
+            merged += report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged
         }
 
         func stop() { watcher?.cancel(); watcher = nil }
@@ -92,12 +194,11 @@ enum TwoDeviceSyncRunner {
         func snapshot() -> SyncRehearsalRunner.Snapshot { (try? SyncRehearsalRunner.snapshot(container)) ?? .init(ids: [:]) }
 
         func markerRows() -> (crate: [CrateItem], events: [ListeningEvent], visits: [DigVisit], steps: [DigStep]) {
-            let m = TwoDeviceSyncRunner.marker
             return (
-                ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? []).filter { ($0.providerID ?? "") == TwoDeviceSyncRunner.provider },
-                ((try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? []).filter { $0.nodeKey.lowercased().contains(m) },
-                ((try? context.fetch(FetchDescriptor<DigVisit>())) ?? []).filter { $0.nodeID.lowercased().contains(m) },
-                ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).filter { $0.identity.lowercased().contains(m) })
+                ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.providerID ?? "") },
+                ((try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.nodeKey) },
+                ((try? context.fetch(FetchDescriptor<DigVisit>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.nodeID) },
+                ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.identity) })
         }
 
         func removeMarkerRows() {
@@ -120,6 +221,7 @@ enum TwoDeviceSyncRunner {
     ) async -> SyncRehearsalRunner.Snapshot? {
         let deadline = Date().addingTimeInterval(seconds)
         var steady = 0
+        var behind = 0
         var last: SyncRehearsalRunner.Snapshot?
         while Date() < deadline {
             try? await Task.sleep(for: .seconds(10))
@@ -130,6 +232,19 @@ enum TwoDeviceSyncRunner {
             if same, x == last { steady += 1 } else { steady = same ? 1 : 0 }
             last = same ? x : nil
             if steady >= 3 { return x }
+            if !same {
+                behind += 1
+                if behind >= 6 {                         // a minute without agreeing
+                    behind = 0
+                    for device in [a, b] {
+                        let have = device.snapshot()
+                        if entities.contains(where: { (cloud.ids[$0] ?? []).sorted() != have.ids[$0] }) {
+                            say("  [\(label)] \(device.name) is behind CloudKit; opening it again, as a relaunch would")
+                            try? await device.reopen()
+                        }
+                    }
+                }
+            } else { behind = 0 }
         }
         check("\(label): A, B and CloudKit settle on the same rows", false, "did not agree within \(Int(seconds))s")
         return nil
@@ -193,6 +308,7 @@ enum TwoDeviceSyncRunner {
             say("\n1. two new devices import the zone")
             let a = try Device(name: "A", directory: directory)
             let b = try Device(name: "B", directory: directory)
+            devices = [a, b]
             defer { a.stop(); b.stop() }
             guard var baseline = await settle("import", a, b, database, within: 900) else { return finish(log) }
             let leftovers = a.markerRows()
@@ -223,12 +339,12 @@ enum TwoDeviceSyncRunner {
 
             // 3. Different activity on each; both survive everywhere.
             say("\n3. independent listening")
-            let ea = a.log.record(node(run, "listened on A"), action: .played, seconds: 30, completion: 0.2)
-            let eb = b.log.record(node(run, "listened on B"), action: .played, seconds: 40, completion: 0.3)
+            let ea = a.log.record(node(run, "listened on A"), action: .played, seconds: 30, completion: 0.2)?.id
+            let eb = b.log.record(node(run, "listened on B"), action: .played, seconds: 40, completion: 0.3)?.id
             if await settle("independent", a, b, database) != nil, let ea, let eb {
                 for device in [a, b] {
                     let ids = Set(device.snapshot().ids["ListeningEvent"] ?? [])
-                    check("listening: \(device.name) holds both events", ids.contains(ea.id.uuidString) && ids.contains(eb.id.uuidString))
+                    check("listening: \(device.name) holds both events", ids.contains(ea.uuidString) && ids.contains(eb.uuidString))
                 }
             }
 
@@ -245,6 +361,9 @@ enum TwoDeviceSyncRunner {
                     check("counter: \(device.name) has one step row, summing both", steps.count == 1 && steps.first?.count == 2, "rows \(steps.count), count \(steps.map(\.count))")
                 }
             }
+            for device in [a, b] { say("  history \(device.name): \(device.historyReport())") }
+            for device in [a, b] { say("  passes \(device.name): \(device.passKinds.sorted { $0.key < $1.key }) last \(device.recentPasses.suffix(4))") }
+            for device in [a, b] { say("  probe \(device.name): \(device.probe())") }
             for _ in 0..<3 { a.dig.record(target, from: origin); b.dig.record(target, from: origin) }  // the same row, both
             if await settle("same row, both", a, b, database) != nil {
                 for device in [a, b] {
@@ -253,6 +372,13 @@ enum TwoDeviceSyncRunner {
                     say("  MEASURED \(device.name): the same row incremented 3 times on each device: visits \(total) (every increment kept would be 8)")
                     check("counter: \(device.name) still has one visit row", rows.count == 1, "rows \(rows.count)")
                 }
+            }
+
+            if ProcessInfo.processInfo.arguments.contains(onlyCounterArgument) {
+                say("\n(stopping after the counter stage: \(onlyCounterArgument))")
+                a.removeMarkerRows()
+                _ = await settle("cleanup", a, b, database)
+                return finish(log)
             }
 
             // 5. Replays.
@@ -267,8 +393,8 @@ enum TwoDeviceSyncRunner {
             }
             copyOfEvent(a); copyOfEvent(b)                                         // the same id on both
             let twin = node(run, "twin")
-            let t1 = a.log.record(twin, action: .played, at: Date(timeIntervalSince1970: 1_700_000_100), seconds: 7, completion: 0.2)
-            let t2 = b.log.record(twin, action: .played, at: Date(timeIntervalSince1970: 1_700_000_100), seconds: 7, completion: 0.2)
+            let t1 = a.log.record(twin, action: .played, at: Date(timeIntervalSince1970: 1_700_000_100), seconds: 7, completion: 0.2)?.id
+            let t2 = b.log.record(twin, action: .played, at: Date(timeIntervalSince1970: 1_700_000_100), seconds: 7, completion: 0.2)?.id
             let crateID = UUID()
             for device in [a, b] {
                 device.context.insert(CrateItem(restoring: CrateValue(
@@ -281,7 +407,7 @@ enum TwoDeviceSyncRunner {
                     let events = device.snapshot().ids["ListeningEvent"] ?? []
                     check("replay: \(device.name) has the same-id event once", events.filter { $0 == replayID.uuidString }.count == 1)
                     check("replay: \(device.name) keeps identical events with different ids apart",
-                          t1 != nil && t2 != nil && events.contains(t1!.id.uuidString) && events.contains(t2!.id.uuidString))
+                          t1 != nil && t2 != nil && events.contains(t1!.uuidString) && events.contains(t2!.uuidString))
                     let crate = UserDataDedupe(context: device.context).rows(forCrateKey: .broadcast(providerID: provider, showID: "\(run)-replay"))
                     check("replay: \(device.name) has the same crate item once", crate.count == 1, "rows \(crate.count)")
                 }
@@ -310,7 +436,12 @@ enum TwoDeviceSyncRunner {
         return finish(log)
     }
 
+    private static var devices: [Device] = []
+
     private static func finish(_ log: ExportLog) -> Int32 {
+        for d in devices {
+            say("observer \(d.name): \(d.notifications) remote-change notifications, \(d.passes) passes, \(d.merged) rows merged, reopened \(d.reopened) times")
+        }
         say("\nmirroring events: \(log.summary)")
         say(problems.isEmpty ? "RESULT: every check held" : "RESULT: \(problems.count) problem(s)")
         for problem in problems { say("  - \(problem)") }
@@ -348,8 +479,8 @@ enum TwoDeviceSyncRunner {
                     artworkURL: nil, playbackURL: nil, embedProvider: nil)
         b.crate.add(broadcast: "\(run)-offline-b", providerID: provider, title: "INDIGO-SYNC-TEST offline B", subtitle: nil,
                     artworkURL: nil, playbackURL: nil, embedProvider: nil)
-        let ea = a.log.record(node(run, "offline listen A"), action: .played, seconds: 11, completion: 0.4)
-        let eb = b.log.record(node(run, "offline listen B"), action: .played, seconds: 12, completion: 0.5)
+        let ea = a.log.record(node(run, "offline listen A"), action: .played, seconds: 11, completion: 0.4)?.id
+        let eb = b.log.record(node(run, "offline listen B"), action: .played, seconds: 12, completion: 0.5)?.id
         for _ in 0..<2 { a.dig.record(counter, from: origin) }
         for _ in 0..<3 { b.dig.record(counter, from: origin) }
         let fresh = node(run, "offline new key")
@@ -360,7 +491,7 @@ enum TwoDeviceSyncRunner {
         if await settle("reconnected", a, b, database, within: 900) != nil {
             for device in [a, b] {
                 let events = Set(device.snapshot().ids["ListeningEvent"] ?? [])
-                check("offline: \(device.name) holds both offline events", ea != nil && eb != nil && events.contains(ea!.id.uuidString) && events.contains(eb!.id.uuidString))
+                check("offline: \(device.name) holds both offline events", ea != nil && eb != nil && events.contains(ea!.uuidString) && events.contains(eb!.uuidString))
                 check("offline: \(device.name) has both new crate items",
                       device.crate.item(forBroadcast: "\(run)-offline-a", providerID: provider) != nil
                       && device.crate.item(forBroadcast: "\(run)-offline-b", providerID: provider) != nil)

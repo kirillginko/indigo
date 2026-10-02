@@ -62,6 +62,74 @@ final class HistoryObserverTests: XCTestCase {
         XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 2)
     }
 
+    /// What a removal on another device looks like to this one: the history
+    /// holds the insert, and the row is gone. Asking SwiftData for the model of
+    /// a row that no longer exists and reading a property off it traps -- found
+    /// by two devices that crated and removed something, where it ended the app.
+    func testARowAnotherWriterInsertedAndThenDeletedIsSkippedNotRead() throws {
+        show(remote, "gone", added: 1)
+        remote.insert(DigVisit(node: MusicNode.artist("Gone Artist")))
+        remote.insert(DigStep(from: "artist:a", to: "artist:b"))
+        remote.insert(ListeningEvent(node: MusicNode.artist("Gone Artist"), action: .played, at: Date(), seconds: 1, completion: 0.1, tags: [], source: nil))
+        try remote.save()
+        for item in try remote.fetch(FetchDescriptor<CrateItem>()) { remote.delete(item) }
+        for visit in try remote.fetch(FetchDescriptor<DigVisit>()) { remote.delete(visit) }
+        for step in try remote.fetch(FetchDescriptor<DigStep>()) { remote.delete(step) }
+        for event in try remote.fetch(FetchDescriptor<ListeningEvent>()) { remote.delete(event) }
+        try remote.save()
+
+        let report = observer().process()
+
+        XCTAssertTrue(report.isEmpty)
+        XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 0)
+    }
+
+    /// The same, with a copy that survives: the row that was removed must not
+    /// stop the one that is still there from being merged.
+    func testADeletedRowDoesNotHideTheDuplicatesBesideIt() throws {
+        show(remote, "kept", added: 100)
+        show(remote, "kept", added: 200)
+        show(remote, "removed", added: 300)
+        try remote.save()
+        for item in try remote.fetch(FetchDescriptor<CrateItem>()) where item.showID == "removed" { remote.delete(item) }
+        try remote.save()
+
+        let report = observer().process()
+
+        XCTAssertEqual(report.crateMerged, 1)
+        XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 1)
+    }
+
+    /// A store made again at the same path -- restored, rebuilt after a
+    /// failure, emptied and re-downloaded by iCloud -- starts a history of its
+    /// own. A token kept from the old one compared as newer than everything in
+    /// the new one, so every pass found nothing and nothing was ever merged
+    /// again. Found by a sync harness whose stores were new each run.
+    func testATokenFromAStoreThatWasMadeAgainIsNotTrusted() throws {
+        show(remote, "first", added: 1)
+        show(remote, "first", added: 2)
+        try remote.save()
+        XCTAssertEqual(observer().process().crateMerged, 1)
+
+        // The same path, a new store.
+        local = nil; remote = nil; container = nil
+        for suffix in ["", "-wal", "-shm"] {
+            try? FileManager.default.removeItem(atPath: directory.appendingPathComponent("UserData.store").path + suffix)
+        }
+        container = try Persistence.makeSplitContainer(
+            userData: directory.appendingPathComponent("UserData.store"),
+            local: directory.appendingPathComponent("Local.store"))
+        local = ModelContext(container); local.author = "local"
+        remote = ModelContext(container); remote.author = "remote"
+
+        show(remote, "second", added: 1)
+        show(remote, "second", added: 2)
+        try remote.save()
+
+        XCTAssertEqual(observer().process().crateMerged, 1, "the old store's token must not hide the new store's rows")
+        XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 1)
+    }
+
     func testWhatItHasSeenIsNotLookedAtAgain() throws {
         show(remote, "s", added: 200)
         show(remote, "s", added: 100)
