@@ -91,11 +91,6 @@ struct IndigoApp: App {
     var body: some Scene {
         WindowGroup(id: IndigoWindow.main) {
             RootView()
-                #if os(iOS) && DEBUG
-                // The iPhone interface is not laid out yet; this is how its
-                // store and sync are seen. See `SyncDiagnosticsView`.
-                .overlay(alignment: .bottomTrailing) { SyncDiagnosticsButton() }
-                #endif
                 .environment(appState)
                 .environment(player)
                 .environment(nts)
@@ -140,7 +135,16 @@ struct IndigoApp: App {
                 } message: { failure in
                     Text("Nothing has been deleted. Until it opens, this session is not being saved, so anything you add will be gone when you quit.\n\n\(failure.explanation.map { $0 + "\n\n" } ?? "")\(failure.url.path)")
                 }
+                #if os(macOS)
                 .frame(minWidth: 900, minHeight: 580)
+                #endif
+                #if os(iOS) && DEBUG
+                // The iPhone interface is not laid out yet; this is how its
+                // store and sync are seen. Attached last, so it sits on the
+                // screen and not on a layout wider than it. See
+                // `SyncDiagnosticsView`.
+                .modifier(ScreenCornerSyncButton())
+                #endif
                 .task {
                     // Rows another writer made -- once the listener's data
                     // syncs, CloudKit's import -- are found through the store's
