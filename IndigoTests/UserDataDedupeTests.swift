@@ -266,4 +266,114 @@ final class UserDataDedupeTests: XCTestCase {
         XCTAssertNotNil(DigVisit(node: .artist("Skee Mask")).id)
         XCTAssertNotNil(DigStep(from: "a", to: "b").id)
     }
+
+    // MARK: Visits and steps, now that nothing refuses a second row
+
+    private func visitRow(_ context: ModelContext, _ node: MusicNode, visits: Int, last: TimeInterval, id: String) -> DigVisit {
+        let row = DigVisit(node: node)
+        row.id = UUID(uuidString: id)
+        row.visits = visits
+        row.firstVisitedAt = Date(timeIntervalSince1970: last - 50)
+        row.lastVisitedAt = Date(timeIntervalSince1970: last)
+        context.insert(row)
+        return row
+    }
+
+    func testTwoDevicesVisitsToOneNodeBecomeOneRowThatKeepsTheLowestId() throws {
+        let (_, context) = try open()
+        let node = MusicNode.artist("Skee Mask")
+        _ = visitRow(context, node, visits: 3, last: 200, id: "00000000-0000-0000-0000-00000000000B")
+        _ = visitRow(context, node, visits: 4, last: 300, id: "00000000-0000-0000-0000-00000000000A")
+        _ = visitRow(context, .artist("Actress"), visits: 1, last: 100, id: "00000000-0000-0000-0000-00000000000C")
+        try context.save()
+
+        let report = UserDataDedupe(context: context).all()
+
+        XCTAssertEqual(report.visitsMerged, 1)
+        let rows = try context.fetch(FetchDescriptor<DigVisit>(predicate: #Predicate { $0.nodeID == "artist:skee mask" }))
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.visits, 7)
+        XCTAssertEqual(rows.first?.id, UUID(uuidString: "00000000-0000-0000-0000-00000000000A"))
+        XCTAssertTrue(UserDataDedupe(context: context).all().isEmpty)
+    }
+
+    func testStepsForOnePathAreSummed() throws {
+        let (_, context) = try open()
+        for (count, id) in [(2, "00000000-0000-0000-0000-000000000002"), (5, "00000000-0000-0000-0000-000000000001")] {
+            let step = DigStep(from: "artist:a", to: "artist:b")
+            step.id = UUID(uuidString: id); step.count = count
+            context.insert(step)
+        }
+        try context.save()
+
+        XCTAssertEqual(UserDataDedupe(context: context).all().stepsMerged, 1)
+        let rows = try context.fetch(FetchDescriptor<DigStep>())
+        XCTAssertEqual(rows.map(\.count), [7])
+        XCTAssertEqual(rows.first?.id, UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    }
+
+    func testARowWithNoIdIsGivenOneBeforeItIsComparedNotAfter() throws {
+        let (_, context) = try open()
+        let node = MusicNode.artist("Skee Mask")
+        let withID = visitRow(context, node, visits: 1, last: 100, id: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+        let without = DigVisit(node: node)
+        without.id = nil
+        without.visits = 1
+        context.insert(without)
+        try context.save()
+
+        UserDataDedupe(context: context).all()
+
+        let rows = try context.fetch(FetchDescriptor<DigVisit>())
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertNotNil(rows.first?.id)
+        XCTAssertEqual(rows.first?.visits, 2)
+        _ = withID
+    }
+
+    func testOpeningANodeThatHasTwoRowsCountsOnTheOneThatStays() throws {
+        let (_, context) = try open()
+        let node = MusicNode.artist("Skee Mask")
+        _ = visitRow(context, node, visits: 3, last: 200, id: "00000000-0000-0000-0000-00000000000B")
+        _ = visitRow(context, node, visits: 4, last: 300, id: "00000000-0000-0000-0000-00000000000A")
+        let a = MusicNode.artist("Actress")
+        for (count, id) in [(1, "00000000-0000-0000-0000-000000000002"), (2, "00000000-0000-0000-0000-000000000001")] {
+            let step = DigStep(from: a.id, to: node.id)
+            step.id = UUID(uuidString: id); step.count = count
+            context.insert(step)
+        }
+        try context.save()
+
+        DigHistory(context: context, writable: true).record(node, from: a)
+
+        let visits = try context.fetch(FetchDescriptor<DigVisit>())
+        XCTAssertEqual(visits.map(\.visits), [8], "3 + 4, and this one")
+        let steps = try context.fetch(FetchDescriptor<DigStep>())
+        XCTAssertEqual(steps.map(\.count), [4], "1 + 2, and this one")
+    }
+
+    func testALookupBeforeAMergeAnswersWithTheRowTheMergeKeeps() throws {
+        let (_, context) = try open()
+        let node = MusicNode.artist("Skee Mask")
+        _ = visitRow(context, node, visits: 3, last: 200, id: "00000000-0000-0000-0000-00000000000B")
+        _ = visitRow(context, node, visits: 4, last: 300, id: "00000000-0000-0000-0000-00000000000A")
+        try context.save()
+
+        XCTAssertEqual(DigHistory(context: context).visit(for: node)?.id,
+                       UUID(uuidString: "00000000-0000-0000-0000-00000000000A"))
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<DigVisit>()), 2, "reading merges nothing")
+    }
+
+    func testAListOfRecentVisitsHasOneRowPerNode() throws {
+        let (_, context) = try open()
+        let node = MusicNode.artist("Skee Mask")
+        _ = visitRow(context, node, visits: 3, last: 200, id: "00000000-0000-0000-0000-00000000000B")
+        _ = visitRow(context, node, visits: 4, last: 300, id: "00000000-0000-0000-0000-00000000000A")
+        _ = visitRow(context, .artist("Actress"), visits: 1, last: 100, id: "00000000-0000-0000-0000-00000000000C")
+        try context.save()
+
+        let recent = DigHistory(context: context).recent(limit: 5)
+
+        XCTAssertEqual(recent.map(\.nodeID), ["artist:skee mask", "artist:actress"])
+    }
 }

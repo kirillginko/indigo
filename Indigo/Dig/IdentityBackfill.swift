@@ -100,18 +100,6 @@ nonisolated enum IdentityBackfill {
             let node = MusicNode.recording(recording)
             targets[visit.nodeID, default: []].insert(node.id)
             if visit.nodeID != node.id {
-                let newID = node.id
-                var descriptor = FetchDescriptor<DigVisit>(predicate: #Predicate { $0.nodeID == newID })
-                descriptor.fetchLimit = 1
-                if let existing = try context.fetch(descriptor).first, existing !== visit {
-                    existing.visits += visit.visits
-                    existing.firstVisitedAt = min(existing.firstVisitedAt, visit.firstVisitedAt)
-                    existing.lastVisitedAt = max(existing.lastVisitedAt, visit.lastVisitedAt)
-                    context.delete(visit)
-                    report.merged += 1
-                    report.visitsRewritten += 1
-                    continue
-                }
                 visit.nodeID = node.id
                 visit.kindRaw = node.kind.rawValue
                 report.visitsRewritten += 1
@@ -119,12 +107,17 @@ nonisolated enum IdentityBackfill {
             rewrittenVisits.append((visit, RecordingIdentity(recording)))
         }
         try context.save()
+        // Visits that now name one node are one visit.
+        let dedupe = UserDataDedupe(context: context)
+        for nodeID in Set(rewrittenVisits.map { $0.0.nodeID }) { report.merged += dedupe.visit(nodeID: nodeID) }
+        try context.save()
 
         // Steps. A step names its ends by node id, and an end that was rewritten
         // is rewritten here, when the old id meant one thing.
         let moves = targets.compactMapValues { $0.count == 1 ? $0.first : nil }
             .filter { $0.key != $0.value }
         let ambiguous = Set(targets.filter { $0.value.count > 1 }.keys)
+        var touchedSteps = Set<String>()
         if !moves.isEmpty || !ambiguous.isEmpty {
             for step in try context.fetch(FetchDescriptor<DigStep>()) {
                 if ambiguous.contains(step.fromNodeID) || ambiguous.contains(step.toNodeID) {
@@ -133,21 +126,14 @@ nonisolated enum IdentityBackfill {
                 let from = moves[step.fromNodeID] ?? step.fromNodeID
                 let to = moves[step.toNodeID] ?? step.toNodeID
                 guard from != step.fromNodeID || to != step.toNodeID else { continue }
-                let identity = "\(from)→\(to)"
-                var descriptor = FetchDescriptor<DigStep>(predicate: #Predicate { $0.identity == identity })
-                descriptor.fetchLimit = 1
-                if let existing = try context.fetch(descriptor).first, existing !== step {
-                    existing.count += step.count
-                    existing.lastAt = max(existing.lastAt, step.lastAt)
-                    context.delete(step)
-                    report.merged += 1
-                } else {
-                    step.fromNodeID = from
-                    step.toNodeID = to
-                    step.identity = identity
-                }
+                step.fromNodeID = from
+                step.toNodeID = to
+                step.identity = "\(from)→\(to)"
+                touchedSteps.insert(step.identity)
                 report.stepsRewritten += 1
             }
+            try context.save()
+            for identity in touchedSteps { report.merged += dedupe.step(identity: identity) }
             try context.save()
         }
 

@@ -11,6 +11,13 @@
 //  "the shape changed" into a stage that runs, instead of a store that is
 //  thrown away.
 //
+//  A model that changes is frozen in every version before the change, and every
+//  version that has not seen the change lists the frozen copy, not the live
+//  class. A version that lists a live class drifts when the class does, and a
+//  store written by the shipped shape then no longer matches it. That happened
+//  once, found by opening a copy of a real store; `SchemaFixtureTests` opens
+//  stores written under each version so it cannot go unnoticed again.
+//
 //  V1 is the shape every install had before the crate stopped pointing at a
 //  `Recording`. Only `CrateItem` differs between V1 and V2, so V1 carries its
 //  own frozen copy of that one class and shares every other model with V2.
@@ -49,12 +56,12 @@ nonisolated enum IndigoSchemaV1: VersionedSchema {
             DiscogsReleaseRecord.self,
             BandcampRelease.self,
             BandcampArtistIndex.self,
-            DigVisit.self,
-            DigStep.self,
-            ListeningEvent.self,
+            IndigoSchemaV2.DigVisit.self,
+            IndigoSchemaV3.DigStep.self,
+            IndigoSchemaV2.ListeningEvent.self,
             ExploreOffersRecord.self,
             ArtistPortrait.self,
-            StoredEdge.self,
+            IndigoSchemaV2.StoredEdge.self,
             GraphSnapshot.self
         ]
     }
@@ -103,7 +110,7 @@ nonisolated enum IndigoSchemaV2: VersionedSchema {
             BandcampRelease.self,
             BandcampArtistIndex.self,
             DigVisit.self,
-            DigStep.self,
+            IndigoSchemaV3.DigStep.self,
             ListeningEvent.self,
             ExploreOffersRecord.self,
             ArtistPortrait.self,

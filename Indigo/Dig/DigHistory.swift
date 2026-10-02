@@ -26,7 +26,10 @@ nonisolated final class DigVisit {
     /// keeps the id it was born with, and a merge never makes a new one. Nil
     /// only until `UserDataIDs.assign` has run on a row from before it existed.
     var id: UUID?
-    @Attribute(.unique) var nodeID: String
+    /// Not unique: two devices' rows for one node are two rows until
+    /// `UserDataDedupe` folds them, and a constraint would have refused the
+    /// second. It names the node; `id` names the row.
+    var nodeID: String
     var kindRaw: String
     var title: String
     var subtitle: String?
@@ -77,7 +80,8 @@ nonisolated final class DigVisit {
 nonisolated final class DigStep {
     /// See `DigVisit.id`.
     var id: UUID?
-    @Attribute(.unique) var identity: String
+    /// Not unique, for the same reason as `DigVisit.nodeID`.
+    var identity: String
     var fromNodeID: String
     var toNodeID: String
     var count: Int

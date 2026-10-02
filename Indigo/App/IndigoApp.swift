@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import CoreData
 import SwiftData
 
 /// Window identifiers, so opening one by name isn't a loose string.
@@ -14,6 +15,10 @@ enum IndigoWindow {
 
 @main
 struct IndigoApp: App {
+    /// The author of this process's own writes to the store, so the history
+    /// observer can tell them from an import.
+    static let writerAuthor = "indigo.app"
+
     init() {
         // Before the first view draws, so nothing renders in the fallback face.
         Typeface.registerBundledFonts()
@@ -104,6 +109,21 @@ struct IndigoApp: App {
                     Text("Nothing has been deleted. Until it opens, this session is not being saved, so anything you add will be gone when you quit.\n\n\(failure.url.path)")
                 }
                 .frame(minWidth: 900, minHeight: 580)
+                .task {
+                    // Rows another writer made -- once the listener's data
+                    // syncs, CloudKit's import -- are found through the store's
+                    // history and merged by key. See `HistoryObserver`.
+                    guard !Persistence.isRunningTests, Persistence.userDataWritable else { return }
+                    let context = Persistence.container.mainContext
+                    context.author = Self.writerAuthor
+                    let observer = HistoryObserver(context: context, ownAuthor: Self.writerAuthor)
+                    observer.process()
+                    for await _ in NotificationCenter.default.notifications(
+                        named: .NSPersistentStoreRemoteChange
+                    ) {
+                        observer.process()
+                    }
+                }
                 .task {
                     // Gives a row crated before it kept its own snapshot the
                     // snapshot. Not under test, which runs against the
