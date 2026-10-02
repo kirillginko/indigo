@@ -54,6 +54,12 @@ enum CloudKitCountRunner {
             print("environment: Development; records in the zone: \(records.count)")
             let test = records.filter(isTestRow)
             print("harness test rows: \(Dictionary(grouping: test, by: \.recordType).mapValues(\.count).sorted { $0.key < $1.key })")
+            // Counter components from any writer but the base, and crate rows
+            // from the test provider: their keys and writers only.
+            for record in records where record.recordType == "CD_DigCounter" && (record["CD_deviceID"] as? String) != CounterID.base
+                && (record["CD_kindRaw"] as? String) != "generation" {
+                print("component: \(record["CD_kindRaw"] as? String ?? "?") writer \((record["CD_deviceID"] as? String ?? "?").prefix(8)) count \(record["CD_count"] as? Int ?? -1) test-key \(TwoDeviceSyncRunner.isMarker(record["CD_key"] as? String ?? ""))")
+            }
             if ProcessInfo.processInfo.arguments.contains(cleanArgument), !test.isEmpty {
                 let result = try await database.modifyRecords(saving: [], deleting: test.map(\.recordID))
                 let deleted = result.deleteResults.values.filter { (try? $0.get()) != nil }.count

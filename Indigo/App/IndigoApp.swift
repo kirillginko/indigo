@@ -49,7 +49,28 @@ struct IndigoApp: App {
     init() {
         // Before the first view draws, so nothing renders in the fallback face.
         Typeface.registerBundledFonts()
+        #if DEBUG
+        Self.runTestVisitsIfAsked()
+        #endif
     }
+
+    #if DEBUG
+    /// The two-device test's visits, made by the app itself at launch when asked:
+    /// `-INDIGO_TEST_VISIT_SHARED <times>`. In `init`, after the store has opened,
+    /// so it does not wait on a window appearing.
+    private static func runTestVisitsIfAsked() {
+        let args = ProcessInfo.processInfo.arguments
+        guard let at = args.firstIndex(of: "-INDIGO_TEST_VISIT_SHARED"), at + 1 < args.count,
+              let times = Int(args[at + 1]), (1...20).contains(times) else { return }
+        guard Persistence.userDataWritable else { Trace.note("sync test: UserData is not writable"); Trace.flush(); return }
+        let history = DigHistory(context: Persistence.container.mainContext)
+        for _ in 0..<times {
+            history.record(SyncDiagnosticsView.testArtist, from: SyncDiagnosticsView.testOrigin)
+        }
+        Trace.note("sync test: visited the shared test artist \(times) times")
+        Trace.flush()
+    }
+    #endif
 
     @State private var appState = AppState()
     @State private var player = PlaybackCoordinator()
