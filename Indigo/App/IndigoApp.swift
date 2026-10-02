@@ -24,6 +24,12 @@ enum Launcher {
         if CommandLine.arguments.contains(CloudKitSeedGuard.argument) {
             MainActor.assumeIsolated { CloudKitSeedRunner.runAndExit() }
         }
+        if CommandLine.arguments.contains(SyncRehearsalRunner.argument) {
+            MainActor.assumeIsolated { SyncRehearsalRunner.runAndExit() }
+        }
+        if CommandLine.arguments.contains(CloudKitCountRunner.argument) {
+            MainActor.assumeIsolated { CloudKitCountRunner.runAndExit() }
+        }
         #endif
         IndigoApp.main()
     }

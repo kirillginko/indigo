@@ -19,9 +19,16 @@ nonisolated enum SplitLaunch {
         /// Set when the listener's data is not the thing that was opened, and the
         /// session is running unsaved.
         let failure: StoreOpenFailure?
+        /// Whether `UserData` was opened mirroring to CloudKit.
+        var syncing = false
     }
 
-    static func open(layout: StoreLayout, crashAt: SplitMigration.Checkpoint? = nil) -> Opened {
+    /// `sync` is off unless the caller -- the launch, nothing else -- asks. Only
+    /// a store already on the split layout is mirrored; the launch that moves
+    /// the old store runs unmirrored and the next one starts it.
+    static func open(
+        layout: StoreLayout, crashAt: SplitMigration.Checkpoint? = nil, sync: UserDataSync = .off
+    ) -> Opened {
         let store = SplitStateStore(url: layout.sidecar)
         let decision = LaunchDecision.decide(
             layout: layout, state: store.load(), exists: { FileManager.default.fileExists(atPath: $0.path) })
@@ -30,16 +37,16 @@ nonisolated enum SplitLaunch {
         do {
             switch decision {
             case .fresh:
-                let container = try Persistence.openSplitStores(layout: layout)
+                let opened = try Persistence.openSplitStoresReporting(layout: layout, sync: sync)
                 var state = SplitState(phase: .splitComplete)
                 state.fresh = true
                 try store.save(state)
-                return Opened(container: container, failure: nil)
+                return Opened(container: opened.container, failure: nil, syncing: opened.syncing)
 
             case .split:
-                let container = try Persistence.openSplitStores(layout: layout)
+                let opened = try Persistence.openSplitStoresReporting(layout: layout, sync: sync)
                 recordLaunch(layout: layout, store: store)
-                return Opened(container: container, failure: nil)
+                return Opened(container: opened.container, failure: nil, syncing: opened.syncing)
 
             case .migrate:
                 let container = try SplitMigration(layout: layout, crashAt: crashAt).run()

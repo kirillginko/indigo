@@ -57,6 +57,35 @@ nonisolated struct StoreOpenFailure: Error, LocalizedError, Equatable {
     }
 }
 
+/// Whether `UserData` mirrors to the listener's private CloudKit database.
+///
+/// Off unless a caller says otherwise, so that a test, the move from the old
+/// store, or a rehearsal never syncs by accident: with the iCloud entitlement
+/// signed in, anything that is not told is a risk. Only the launch path
+/// (`Persistence.makeContainer`) asks for `.privateDatabase`, and only for the
+/// store the listener made. `Local` is never mirrored.
+nonisolated enum UserDataSync: Equatable {
+    case off
+    case privateDatabase
+
+    static let containerID = "iCloud.com.oblaststudio.Indigo"
+
+    /// A launch argument that turns it off for one run -- to open the store
+    /// without mirroring while something is looked into.
+    static let disableArgument = "-INDIGO_USERDATA_SYNC_OFF"
+
+    static func forLaunch(arguments: [String]) -> UserDataSync {
+        arguments.contains(disableArgument) ? .off : .privateDatabase
+    }
+
+    var database: ModelConfiguration.CloudKitDatabase {
+        switch self {
+        case .off: return .none
+        case .privateDatabase: return .private(Self.containerID)
+        }
+    }
+}
+
 enum Persistence {
     /// The current version of the store's schema; see `IndigoSchema.swift`.
     static let schema = Schema(versionedSchema: IndigoSchemaV6.self)
@@ -133,8 +162,10 @@ enum Persistence {
             return container
         }
 
-        let opened = SplitLaunch.open(layout: layout)
+        let sync = UserDataSync.forLaunch(arguments: ProcessInfo.processInfo.arguments)
+        let opened = SplitLaunch.open(layout: layout, sync: sync)
         failure = opened.failure
+        if opened.syncing { MirroringMonitor.start() }
         if let failed = opened.failure {
             Trace.note("store: \(failed.errorDescription ?? "unknown"); running unsaved")
         }
@@ -145,32 +176,68 @@ enum Persistence {
     /// nil for a store in memory. The schema is the whole thing and each store
     /// is told which models are its own, so that nothing is ever opened with a
     /// schema that leaves a model out.
+    ///
+    /// `sync` applies to `UserData` alone, and only to one on disk: a store in
+    /// memory has nothing to mirror, and `Local` is never mirrored.
     nonisolated static func makeSplitContainer(
-        userData: URL?, local: URL?, migrationPlan: (any SchemaMigrationPlan.Type)? = IndigoMigrationPlan.self
+        userData: URL?, local: URL?, migrationPlan: (any SchemaMigrationPlan.Type)? = IndigoMigrationPlan.self,
+        sync: UserDataSync = .off
     ) throws -> ModelContainer {
-        func configuration(_ name: String, _ models: [any PersistentModel.Type], _ url: URL?) -> ModelConfiguration {
+        try ModelContainer(
+            for: Schema(versionedSchema: IndigoSchemaV6.self),
+            migrationPlan: migrationPlan,
+            configurations: splitConfigurations(userData: userData, local: local, sync: sync))
+    }
+
+    /// The two configurations. The one place that decides which store mirrors:
+    /// `UserData`, when it is on disk and `sync` asks, and nothing else.
+    nonisolated static func splitConfigurations(
+        userData: URL?, local: URL?, sync: UserDataSync
+    ) -> [ModelConfiguration] {
+        func configuration(
+            _ name: String, _ models: [any PersistentModel.Type], _ url: URL?,
+            _ cloudKit: ModelConfiguration.CloudKitDatabase
+        ) -> ModelConfiguration {
             let schema = Schema(models)
             if let url {
-                return ModelConfiguration(name, schema: schema, url: url, cloudKitDatabase: .none)
+                return ModelConfiguration(name, schema: schema, url: url, cloudKitDatabase: cloudKit)
             }
             return ModelConfiguration(name, schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         }
-        return try ModelContainer(
-            for: Schema(versionedSchema: IndigoSchemaV6.self),
-            migrationPlan: migrationPlan,
-            configurations: [
-                configuration("UserData", IndigoSchemaV6.userDataModels, userData),
-                configuration("Local", IndigoSchemaV6.localModels, local)
-            ])
+        return [
+            configuration("UserData", IndigoSchemaV6.userDataModels, userData, sync.database),
+            configuration("Local", IndigoSchemaV6.localModels, local, .none)
+        ]
     }
 
     /// Opens `UserData.store` and `Local.store`, creating them if they are new.
     /// If `Local` is what will not open it is thrown away and made again, since
     /// it holds nothing that cannot be fetched; if `UserData` will not open,
     /// nothing is touched and the failure is thrown.
-    nonisolated static func openSplitStores(layout: StoreLayout) throws -> ModelContainer {
+    ///
+    /// If mirroring is what will not open, the listener's data is still theirs
+    /// to use: it is opened again without mirroring, and that is noted. A sync
+    /// that cannot start must never be what stops the crate being written to.
+    nonisolated static func openSplitStores(layout: StoreLayout, sync: UserDataSync = .off) throws -> ModelContainer {
+        try openSplitStoresReporting(layout: layout, sync: sync).container
+    }
+
+    nonisolated static func openSplitStoresReporting(
+        layout: StoreLayout, sync: UserDataSync = .off
+    ) throws -> (container: ModelContainer, syncing: Bool) {
+        if sync != .off {
+            do {
+                return (try openSplitStoresUnsynced(layout: layout, sync: sync), true)
+            } catch {
+                Trace.note("sync: could not open UserData with mirroring (\(error)); opening it without")
+            }
+        }
+        return (try openSplitStoresUnsynced(layout: layout, sync: .off), false)
+    }
+
+    nonisolated private static func openSplitStoresUnsynced(layout: StoreLayout, sync: UserDataSync) throws -> ModelContainer {
         do {
-            return try makeSplitContainer(userData: layout.userData, local: layout.local)
+            return try makeSplitContainer(userData: layout.userData, local: layout.local, sync: sync)
         } catch {
             // Is it the cache? Open the listener's data alone, beside a cache in
             // memory: if that works, the cache was the problem.
@@ -179,7 +246,7 @@ enum Persistence {
             }
             destroyCache(at: layout.local, layout: layout)
             do {
-                return try makeSplitContainer(userData: layout.userData, local: layout.local)
+                return try makeSplitContainer(userData: layout.userData, local: layout.local, sync: sync)
             } catch {
                 throw StoreOpenFailure(role: .cache, url: layout.local, reason: "\(error)")
             }

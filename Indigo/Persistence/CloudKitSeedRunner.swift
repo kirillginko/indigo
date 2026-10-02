@@ -171,7 +171,7 @@ enum CloudKitSeedRunner {
 
     /// Every record in the zone, through the zone's change feed -- which needs no
     /// queryable index, so it works on a schema that does not have one yet.
-    private static func fetchAll(_ database: CKDatabase) async throws -> [CKRecord] {
+    static func fetchAll(_ database: CKDatabase) async throws -> [CKRecord] {
         var records: [CKRecord] = []
         var token: CKServerChangeToken?
         var more = true
@@ -323,7 +323,7 @@ enum CloudKitSeedRunner {
 
     // MARK: - What the process is signed for
 
-    private static func signedEntitlements() -> (containers: [String], environment: String?) {
+    static func signedEntitlements() -> (containers: [String], environment: String?) {
         guard let task = SecTaskCreateFromSelf(nil) else { return ([], nil) }
         func value(_ key: String) -> Any? { SecTaskCopyValueForEntitlement(task, key as CFString, nil) }
         let containers = (value("com.apple.developer.icloud-container-identifiers") as? [String]) ?? []
@@ -335,7 +335,7 @@ enum CloudKitSeedRunner {
 
 /// What the mirroring reported while the seed went out.
 @MainActor
-private final class ExportLog {
+final class ExportLog {
     private var exports = 0, imports = 0, setups = 0, failed: [String] = []
 
     func record(_ event: NSPersistentCloudKitContainer.Event) {
