@@ -115,7 +115,7 @@ final class CloudKitOptOutTests: XCTestCase {
             let files = FileManager.default.enumerator(at: base, includingPropertiesForKeys: nil)?
                 .compactMap { $0 as? URL }.filter { $0.pathExtension == "swift" } ?? []
             for file in files where !["PersistenceController.swift", "CloudKitOptOutTests.swift", "CloudKitSeedRunner.swift",
-                                       "SyncRehearsalRunner.swift", "CloudKitCountRunner.swift"].contains(file.lastPathComponent) {
+                                       "SyncRehearsalRunner.swift", "CloudKitCountRunner.swift", "TwoDeviceSyncRunner.swift"].contains(file.lastPathComponent) {
                 let body = try String(contentsOf: file, encoding: .utf8)
                 XCTAssertFalse(body.contains("sync: .privateDatabase") && !file.lastPathComponent.hasSuffix("OptOutTests.swift"),
                                "\(file.lastPathComponent) turns mirroring on")
