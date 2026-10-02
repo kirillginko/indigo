@@ -97,6 +97,12 @@ nonisolated final class ListeningEvent {
     /// than what a catalogue says about it now.
     var tags: [String] = []
 
+    /// A row as it was; see `CrateItem.init(restoring:)`.
+    init(restoring value: EventValue) {
+        self.id = value.id
+        value.apply(to: self)
+    }
+
     init(
         id: UUID = UUID(),
         node: MusicNode,

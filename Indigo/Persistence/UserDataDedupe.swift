@@ -455,6 +455,20 @@ nonisolated struct UserDataDedupe {
         return assigned
     }
 
+    /// Whether anything here would be merged, without merging it.
+    func hasDuplicates() -> Bool {
+        let crate = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
+        let keys = crate.compactMap { Self.key(of: $0) }
+        if Set(keys).count != keys.count { return true }
+        if Set(crate.map(\.id)).count != crate.count { return true }
+        let events = (try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? []
+        if Set(events.map(\.id)).count != events.count { return true }
+        let visits = (try? context.fetch(FetchDescriptor<DigVisit>())) ?? []
+        if Set(visits.map(\.nodeID)).count != visits.count { return true }
+        let steps = (try? context.fetch(FetchDescriptor<DigStep>())) ?? []
+        return Set(steps.map(\.identity)).count != steps.count
+    }
+
     // MARK: Merging
 
     /// Everything, once: ids first, then every group of rows for one thing.

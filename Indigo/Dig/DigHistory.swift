@@ -46,6 +46,13 @@ nonisolated final class DigVisit {
     var providerID: String?
     var handle: String?
 
+    /// A row as it was; see `CrateItem.init(restoring:)`.
+    init(restoring value: VisitValue) {
+        id = value.id
+        nodeID = value.nodeID
+        value.apply(to: self)
+    }
+
     init(node: MusicNode) {
         id = UUID()
         nodeID = node.id
@@ -87,6 +94,15 @@ nonisolated final class DigStep {
     var toNodeID: String = ""
     var count: Int = 0
     var lastAt: Date = Date.distantPast
+
+    /// A row as it was; see `CrateItem.init(restoring:)`.
+    init(restoring value: StepValue) {
+        id = value.id
+        identity = value.identity
+        fromNodeID = value.fromNodeID
+        toNodeID = value.toNodeID
+        value.apply(to: self)
+    }
 
     init(from: String, to: String) {
         id = UUID()

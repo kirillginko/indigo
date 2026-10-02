@@ -75,6 +75,15 @@ nonisolated final class CrateItem {
     /// a normal array to filtering views.
     var genreTagsRaw: String = ""
 
+    /// A row as it was, with the id and the date it was made. For moving rows
+    /// into a store, not for making new ones.
+    init(restoring value: CrateValue) {
+        self.id = value.id
+        self.kindRaw = value.kindRaw
+        self.addedAt = value.addedAt
+        value.apply(to: self)
+    }
+
     init(snapshot: CrateSnapshot) {
         self.id = UUID()
         self.kindRaw = CrateItemKind.recording.rawValue

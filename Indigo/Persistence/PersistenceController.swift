@@ -133,38 +133,12 @@ enum Persistence {
             return container
         }
 
-        let decision = LaunchDecision.decide(
-            layout: layout, state: SplitStateStore(url: layout.sidecar).load(),
-            exists: { FileManager.default.fileExists(atPath: $0.path) })
-        Trace.note("store: launch decision \(decision)")
-
-        switch decision {
-        case .fresh, .split:
-            do {
-                return try openSplitStores(layout: layout)
-            } catch let failed as StoreOpenFailure {
-                failure = failed
-            } catch {
-                failure = StoreOpenFailure(role: .userData, url: layout.userData, reason: "\(error)")
-            }
-        case .migrate:
-            // Moving the old data into the new stores is not built yet, and the
-            // old store is not opened with the current schema: that would drop
-            // the columns the move reads. So it is left exactly as it is.
-            failure = StoreOpenFailure(
-                role: .legacy, url: layout.legacy, reason: "migration pending",
-                explanation: "Your library is being moved to a new format and that is not ready yet.")
-        case .safeMode(let why):
-            failure = StoreOpenFailure(role: .userData, url: layout.userData, reason: why, explanation: why)
+        let opened = SplitLaunch.open(layout: layout)
+        failure = opened.failure
+        if let failed = opened.failure {
+            Trace.note("store: \(failed.errorDescription ?? "unknown"); running unsaved")
         }
-
-        Trace.note("store: \(failure?.errorDescription ?? "unknown"); running unsaved")
-        // The files stay exactly as they are. This session runs in memory so
-        // the app still launches, and nothing it does is written anywhere.
-        guard let fallback = try? makeSplitContainer(userData: nil, local: nil) else {
-            fatalError("Unable to create a SwiftData container")
-        }
-        return fallback
+        return opened.container
     }
 
     /// One container over two stores. `userData` and `local` are file URLs, or

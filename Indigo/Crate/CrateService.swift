@@ -192,12 +192,16 @@ final class CrateService {
         var sources: [UUID: AudioSource] = [:]
         var pages: [UUID: DetailPage] = [:]
         let resolver = SourceResolver(context: context)
-        let recordings = CrateRecordings(context: context)
-        for item in items() {
-            if let found = resolver.best(item) { sources[item.id] = found }
-            // Made here if this device has none yet: a row crated on another
-            // device has no local recording until something needs one.
-            if let recording = recordings.resolve(item), let page = digDestination(recording) {
+        let rows = items()
+        // Looked up, never made. The crate is the listener's data and displays
+        // from what each row kept; the recordings are a cache beside it, which
+        // can be empty -- on a new device, or after it is thrown away -- and
+        // viewing the crate does not fill it. A row with no recording here has
+        // no DIG page on the row until something opens it, which makes one.
+        let found = CrateRecordings(context: context).recordings(for: rows)
+        for item in rows {
+            if let source = resolver.best(item) { sources[item.id] = source }
+            if let recording = found[item.id], let page = digDestination(recording) {
                 pages[item.id] = page
             }
         }
