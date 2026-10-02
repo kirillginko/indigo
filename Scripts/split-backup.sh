@@ -9,7 +9,14 @@
 #
 # Copies default.store, default.store-wal and default.store-shm, and writes
 # their SHA-256 sums and sizes beside them. Deletes nothing. Refuses to run
-# while Indigo is open.
+# while Indigo is open. The default destination is in your home folder, not
+# /tmp, so it survives a reboot.
+#
+# What this is a way back to: the store as it was *before* the move. Going back
+# to it, and to a build that opens it, is safe only while no one has used the
+# split build for real. Once something has been crated, played or dug into on
+# UserData.store, reverting discards those newer changes, and the old store --
+# or this copy -- does not have them.
 #
 set -euo pipefail
 

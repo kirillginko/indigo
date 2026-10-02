@@ -11,6 +11,12 @@
 //  at each phase is repeatable, so an interrupted phase is simply done again,
 //  and the databases -- not this file -- say whether it is finished.
 //
+//  Rollback is not safe forever. Until the split build has been used for real,
+//  deleting `UserData.store`, `Local.store` and this file and going back to an
+//  older build restores exactly what was there. After it has been -- once the
+//  listener has crated, played or dug into anything on `UserData` -- that would
+//  throw away everything made since, because the old store never has it.
+//
 //  Before `splitComplete` the old store is authoritative and the new ones are
 //  a work in progress nobody sees. From `splitComplete` on, `UserData` is the
 //  truth and the old store is an archive: this launch never goes back to it,
