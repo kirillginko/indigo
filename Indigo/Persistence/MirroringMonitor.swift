@@ -19,15 +19,18 @@ nonisolated enum MirroringMonitor {
     private static let lock = NSLock()
     private nonisolated(unsafe) static var observer: NSObjectProtocol?
     private nonisolated(unsafe) static var lines: [String] = []
+    /// Its own lock: `start` holds `lock` while it calls `remember`, and an
+    /// NSLock taken twice on one thread never comes back -- that froze launch.
+    private static let linesLock = NSLock()
 
     /// The last few outcomes, newest last, for a diagnostics view.
     static var recent: [String] {
-        lock.lock(); defer { lock.unlock() }
+        linesLock.lock(); defer { linesLock.unlock() }
         return lines
     }
 
     private static func remember(_ line: String) {
-        lock.lock(); defer { lock.unlock() }
+        linesLock.lock(); defer { linesLock.unlock() }
         let stamp = Date().formatted(date: .omitted, time: .standard)
         lines.append("\(stamp)  \(line)")
         if lines.count > 30 { lines.removeFirst(lines.count - 30) }

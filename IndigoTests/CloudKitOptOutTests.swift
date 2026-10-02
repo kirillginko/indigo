@@ -123,3 +123,13 @@ final class CloudKitOptOutTests: XCTestCase {
         }
     }
 }
+
+/// Starting the monitor twice, and reading what it remembers, must return.
+/// A lock taken twice on one thread froze launch on every device that syncs.
+final class MirroringMonitorTests: XCTestCase {
+    func testStartingAndReadingDoNotBlock() {
+        MirroringMonitor.start()
+        MirroringMonitor.start()
+        XCTAssertFalse(MirroringMonitor.recent.isEmpty)
+    }
+}
