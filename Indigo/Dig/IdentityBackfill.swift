@@ -18,6 +18,13 @@
 //  only ever rewritten to the identity of the recording their id pointed at,
 //  and merged only when that lands two visits on one node.
 //
+//  Some history is meant to have no recording behind it. 283 of a real store's
+//  recording events name a recording by its portable identity -- the match key
+//  of something that was played -- and this device has no `Recording` for it,
+//  because nothing ever made one. That is valid state, not damage: the identity
+//  is complete without a local object, and the page for it says so. Do not
+//  "repair" such a row by creating a recording for it, and do not delete it.
+//
 //  Safe to run twice, and to stop part-way: a row already in line is left
 //  alone, and progress is saved before anything is looked up.
 //
