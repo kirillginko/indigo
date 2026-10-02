@@ -52,7 +52,7 @@ nonisolated struct StoreOpenFailure: Error, LocalizedError, Equatable {
 
 enum Persistence {
     /// The current version of the store's schema; see `IndigoSchema.swift`.
-    static let schema = Schema(versionedSchema: IndigoSchemaV4.self)
+    static let schema = Schema(versionedSchema: IndigoSchemaV5.self)
 
     /// Where the store the app has always used lives. Read from SwiftData's own
     /// default rather than rebuilt from a path, so it can never point at a
@@ -61,7 +61,7 @@ enum Persistence {
 
     /// Everything is in one store until the split into `UserData` and `Local`,
     /// so it holds the crate and is `userData`.
-    static let storeRole = StoreRole.role(holding: IndigoSchemaV4.models)
+    static let storeRole = StoreRole.role(holding: IndigoSchemaV5.models)
 
     static let container: ModelContainer = makeContainer()
 

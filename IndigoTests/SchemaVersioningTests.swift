@@ -28,14 +28,14 @@ final class SchemaVersioningTests: XCTestCase {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    func testTheCurrentSchemaIsVersionFour() {
-        XCTAssertEqual(Persistence.schema.version, Schema.Version(4, 0, 0))
-        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 4)
-        XCTAssertEqual(IndigoMigrationPlan.stages.count, 3)
+    func testTheCurrentSchemaIsVersionFive() {
+        XCTAssertEqual(Persistence.schema.version, Schema.Version(5, 0, 0))
+        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 5)
+        XCTAssertEqual(IndigoMigrationPlan.stages.count, 4)
     }
 
     func testEveryModelTheAppStoresIsInTheVersionedSchema() {
-        let names = Set(IndigoSchemaV4.models.map { String(describing: $0) })
+        let names = Set(IndigoSchemaV5.models.map { String(describing: $0) })
         XCTAssertEqual(names.count, 19)
         for model in ["CrateItem", "ListeningEvent", "DigVisit", "DigStep", "Recording"] {
             XCTAssertTrue(names.contains(model), "\(model) missing from SchemaV1")
@@ -45,7 +45,7 @@ final class SchemaVersioningTests: XCTestCase {
     /// The store on a listener's disk was written with no version at all.
     func testAStoreWrittenWithoutAVersionOpensThroughThePlanWithItsRows() throws {
         let url = directory.appendingPathComponent("legacy.store")
-        let unversioned = Schema(IndigoSchemaV4.models)
+        let unversioned = Schema(IndigoSchemaV5.models)
 
         do {
             let legacy = try ModelContainer(
@@ -127,5 +127,43 @@ extension SchemaVersioningTests {
         XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0, collisions: 0))
         XCTAssertEqual(rows.first?.artistName, "Skee Mask")
         XCTAssertEqual(rows.first?.matchKey, rows.first?.legacyRecording?.matchKey)
+    }
+}
+
+
+// MARK: - V4 -> V5: nothing refuses a second row, and a row can arrive without a field
+
+extension SchemaVersioningTests {
+    func testAV4StoreKeepsEveryRowThroughTheMigrationAndThenAllowsACopy() throws {
+        let url = directory.appendingPathComponent("v4.store")
+        let v4 = Schema(IndigoSchemaV4.models)
+        let id = UUID()
+        try autoreleasepool {
+            let container = try ModelContainer(for: v4, configurations: ModelConfiguration(schema: v4, url: url))
+            let context = ModelContext(container)
+            context.insert(IndigoSchemaV4.CrateItem(id: id, kindRaw: "broadcast", addedAt: Date(timeIntervalSince1970: 7)))
+            context.insert(IndigoSchemaV4.ListeningEvent(id: id, nodeKey: "skee mask", seconds: 90))
+            context.insert(IndigoSchemaV4.DigVisit(nodeID: "artist:skee mask", visits: 4))
+            context.insert(IndigoSchemaV4.DigStep(identity: "artist:a→artist:b", count: 3))
+            try context.save()
+        }
+
+        let container = try ModelContainer(
+            for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
+            configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+        let context = ModelContext(container)
+
+        XCTAssertEqual(try context.fetch(FetchDescriptor<CrateItem>()).map(\.id), [id])
+        XCTAssertEqual(try context.fetch(FetchDescriptor<ListeningEvent>()).first?.seconds, 90)
+        XCTAssertEqual(try context.fetch(FetchDescriptor<DigVisit>()).first?.visits, 4)
+        XCTAssertEqual(try context.fetch(FetchDescriptor<DigStep>()).first?.count, 3)
+
+        // And the constraint is gone: a second row with the id is a second row.
+        let copy = CrateItem(providerID: "nts", showID: "s", showTitle: "S", showSubtitle: nil, artworkURL: nil,
+                             playbackURL: nil, embedProvider: nil, isLiveStream: false)
+        copy.id = id
+        context.insert(copy)
+        try context.save()
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<CrateItem>()), 2)
     }
 }

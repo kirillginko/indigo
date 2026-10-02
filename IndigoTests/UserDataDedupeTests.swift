@@ -73,6 +73,18 @@ final class UserDataDedupeTests: XCTestCase {
             genreTagsRaw: g.pick(["", "ambient", "techno\nhouse"]), isLiveStream: g.next() % 2 == 0)
     }
 
+    /// Copies of one event: one id, fields that may disagree.
+    private func eventCopy(_ g: inout Generator) -> EventValue {
+        EventValue(
+            id: UUID(uuidString: "00000000-0000-0000-0000-0000000000E1")!, at: g.date(),
+            actionRaw: g.pick(["played", "skipped"]), nodeID: g.pick(["artist:a", "artist:b"]),
+            nodeKindRaw: "artist", nodeKey: g.pick(["a", "b"]), title: g.pick(["A", "B", ""]),
+            subtitle: g.pick([nil, "s"]), mbid: g.pick([nil, "m1", "m2"]), discogsID: g.pick([nil, 1, 2]),
+            legacyRecordingID: g.pick([nil, g.uuid()]), providerID: g.pick([nil, "p"]),
+            sourceShowID: g.pick([nil, "x"]), seconds: Double(g.next() % 5), completion: Double(g.next() % 3) / 2,
+            tags: g.pick([[], ["a"], ["a", "b"]]))
+    }
+
     private func permutations<T>(_ values: [T]) -> [[T]] {
         guard values.count > 1 else { return [values] }
         return values.indices.flatMap { index -> [[T]] in
@@ -111,6 +123,14 @@ final class UserDataDedupeTests: XCTestCase {
     func testMergingVisitsIsIndependentOfOrderAndGrouping() { check(visit, VisitValue.merged) }
     func testMergingStepsIsIndependentOfOrderAndGrouping() { check(step, StepValue.merged) }
     func testMergingCrateRowsIsIndependentOfOrderAndGrouping() { check(crate, CrateValue.merged) }
+    func testMergingCopiesOfOneEventIsIndependentOfOrderAndGrouping() { check(eventCopy, EventValue.merged) }
+
+    func testIdenticalCopiesOfAnEventAreThatEvent() {
+        let event = EventValue(
+            id: UUID(), at: Date(timeIntervalSince1970: 5), actionRaw: "played", nodeID: "artist:a",
+            nodeKey: "a", title: "A", seconds: 90, completion: 0.5, tags: ["ambient"])
+        XCTAssertEqual(EventValue.merged([event, event, event]), event, "a copy is not counted twice")
+    }
 
     // MARK: What a merge holds
 
@@ -375,5 +395,124 @@ final class UserDataDedupeTests: XCTestCase {
         let recent = DigHistory(context: context).recent(limit: 5)
 
         XCTAssertEqual(recent.map(\.nodeID), ["artist:skee mask", "artist:actress"])
+    }
+
+    // MARK: A row that arrives without its date
+
+    func testARowWithNoDateNeverBeatsARowThatHasOne() {
+        let real = CrateValue(id: UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!,
+                              addedAt: Date(timeIntervalSince1970: 500), providerID: "nts", showID: "s",
+                              showTitle: "Show")
+        let undated = CrateValue(id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+                                 addedAt: .distantPast, providerID: "nts", showID: "s",
+                                 artworkURLString: "https://art")
+
+        for rows in [[real, undated], [undated, real]] {
+            let merged = CrateValue.merged(rows)!
+            XCTAssertEqual(merged.id, real.id, "the row with a date is the one kept")
+            XCTAssertEqual(merged.addedAt, Date(timeIntervalSince1970: 500))
+            XCTAssertEqual(merged.artworkURLString, "https://art", "and it still takes what the other had")
+        }
+        XCTAssertEqual(CrateValue.merged([undated])!.addedAt, .distantPast, "alone, it is still undated")
+    }
+
+    func testAnEmptyVisitIsNeutralToAMerge() {
+        let real = VisitValue(id: UUID(), nodeID: "artist:x", title: "X", visits: 4,
+                              firstVisitedAt: Date(timeIntervalSince1970: 10),
+                              lastVisitedAt: Date(timeIntervalSince1970: 20))
+        let empty = VisitValue(id: UUID(), nodeID: "artist:x", visits: 0,
+                               firstVisitedAt: .distantFuture, lastVisitedAt: .distantPast)
+
+        let merged = VisitValue.merged([real, empty])!
+
+        XCTAssertEqual(merged.visits, 4)
+        XCTAssertEqual(merged.firstVisitedAt, real.firstVisitedAt)
+        XCTAssertEqual(merged.lastVisitedAt, real.lastVisitedAt)
+        XCTAssertEqual(merged.title, "X")
+    }
+
+    func testARowThatArrivedWithNoVisitsIsNotSomewhereTheListenerWas() throws {
+        let (_, context) = try open()
+        let empty = DigVisit(node: .artist("Nowhere"))
+        empty.visits = 0
+        context.insert(empty)
+        let real = DigVisit(node: .artist("Skee Mask"))
+        real.visits = 2
+        real.lastVisitedAt = Date(timeIntervalSince1970: 100)
+        context.insert(real)
+        try context.save()
+
+        XCTAssertEqual(DigHistory(context: context).recent(limit: 5).map(\.nodeID), ["artist:skee mask"])
+    }
+
+    // MARK: An event is whole or it is not there
+
+    func testCopiesOfAnEventResolveToOneOfTheCopiesNeverToAMixture() {
+        let id = UUID()
+        let a = EventValue(id: id, at: Date(timeIntervalSince1970: 5), nodeID: "artist:a", nodeKey: "a",
+                           title: "x", seconds: 10, completion: 0.2, tags: ["t"])
+        let b = EventValue(id: id, at: Date(timeIntervalSince1970: 5), nodeID: "artist:a", nodeKey: "a",
+                           title: "a", seconds: 20, completion: 0.9, tags: ["u"])
+
+        let merged = EventValue.merged([a, b])
+
+        XCTAssertTrue(merged == a || merged == b, "an event that existed")
+        XCTAssertEqual(EventValue.merged([b, a]), merged)
+    }
+
+    // MARK: Two physical rows with one id, once nothing refuses the second
+
+    func testTwoCrateRowsWithOneIdAreTwoRowsUntilFolded() throws {
+        let (_, context) = try open()
+        let id = UUID()
+        let enriched = broadcast(context, show: "nts.episode.a/b", added: 100, artwork: "https://art", genres: ["ambient"])
+        let bare = broadcast(context, show: "nts.episode.a/b", added: 100)
+        enriched.id = id
+        bare.id = id
+        try context.save()
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<CrateItem>()), 2, "nothing refuses the second")
+
+        let report = UserDataDedupe(context: context).all()
+
+        XCTAssertEqual(report.crateMerged, 1)
+        let rows = try context.fetch(FetchDescriptor<CrateItem>())
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.id, id)
+        XCTAssertEqual(rows.first?.artworkURLString, "https://art")
+        XCTAssertEqual(rows.first?.genreTags, ["ambient"])
+        XCTAssertTrue(UserDataDedupe(context: context).all().isEmpty)
+    }
+
+    func testTwoListeningEventsWithOneIdAreOneEventAndItsSecondsAreCountedOnce() throws {
+        let (_, context) = try open()
+        let id = UUID()
+        let node = MusicNode.artist("Skee Mask")
+        for _ in 0..<2 {
+            let event = ListeningEvent(node: node, action: .played, seconds: 90)
+            event.id = id
+            context.insert(event)
+        }
+        try context.save()
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<ListeningEvent>()), 2)
+
+        let report = UserDataDedupe(context: context).all()
+
+        XCTAssertEqual(report.eventsMerged, 1)
+        let rows = try context.fetch(FetchDescriptor<ListeningEvent>())
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows.first?.seconds, 90, "heard once, not twice")
+        XCTAssertTrue(UserDataDedupe(context: context).all().isEmpty)
+    }
+
+    func testListeningEventsWithDifferentIdsAreAlwaysDifferentEvents() throws {
+        let (_, context) = try open()
+        let node = MusicNode.artist("Skee Mask")
+        let at = Date(timeIntervalSince1970: 1_000)
+        for _ in 0..<3 { context.insert(ListeningEvent(node: node, action: .played, at: at, seconds: 90)) }
+        try context.save()
+
+        XCTAssertTrue(UserDataDedupe(context: context).all().isEmpty)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<ListeningEvent>()), 3,
+                       "identical in every field, and still three listens")
     }
 }

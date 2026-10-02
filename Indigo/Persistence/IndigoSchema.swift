@@ -22,6 +22,14 @@
 //  `Recording`. Only `CrateItem` differs between V1 and V2, so V1 carries its
 //  own frozen copy of that one class and shares every other model with V2.
 //
+//  V5 is the shape a synced store can hold: no unique constraints, and every
+//  property optional or defaulted. A property gets a default only where an
+//  empty value means something harmless -- an empty history, no time -- and
+//  stays optional where absence means something. `legacyRecording` is still
+//  here, and is the one thing that stops `CrateItem` being final: a relationship
+//  cannot cross the split into a synced store and the catalogue, so step 7
+//  removes it with the split.
+//
 //  V4 gives a dig visit and a dig step an id of their own, the stable part of
 //  deciding which of two rows for the same node survives a merge.
 //
@@ -101,7 +109,7 @@ nonisolated enum IndigoSchemaV2: VersionedSchema {
             Recording.self,
             MediaAppearance.self,
             RecordingSource.self,
-            CrateItem.self,
+            IndigoSchemaV4.CrateItem.self,
             Artist.self,
             MusicLabel.self,
             RecordingMetadata.self,
@@ -233,7 +241,7 @@ nonisolated enum IndigoSchemaV3: VersionedSchema {
             Recording.self,
             MediaAppearance.self,
             RecordingSource.self,
-            CrateItem.self,
+            IndigoSchemaV4.CrateItem.self,
             Artist.self,
             MusicLabel.self,
             RecordingMetadata.self,
@@ -243,7 +251,7 @@ nonisolated enum IndigoSchemaV3: VersionedSchema {
             BandcampArtistIndex.self,
             DigVisit.self,
             DigStep.self,
-            ListeningEvent.self,
+            IndigoSchemaV4.ListeningEvent.self,
             ExploreOffersRecord.self,
             ArtistPortrait.self,
             StoredEdge.self,
@@ -322,10 +330,155 @@ nonisolated enum IndigoSchemaV4: VersionedSchema {
             GraphSnapshot.self
         ]
     }
+
+    /// `CrateItem` as it was in V2 through V4: a unique id and no defaults.
+    @Model
+    nonisolated final class CrateItem {
+        @Attribute(.unique) var id: UUID
+        var kindRaw: String
+        var addedAt: Date
+        var matchKey: String = ""
+        var unknownCode: String?
+        var title: String?
+        var artistName: String?
+        var albumTitle: String?
+        var identificationStatusRaw: String?
+        var stationName: String?
+        var broadcastOffsetSeconds: Double?
+        @Relationship(originalName: "recording") var legacyRecording: Recording?
+        var providerID: String?
+        var showID: String?
+        var showTitle: String?
+        var showSubtitle: String?
+        var artworkURLString: String?
+        var playbackURLString: String?
+        var embedProviderRaw: String?
+        var isLiveStream: Bool = false
+        var genreTagsRaw: String = ""
+
+        init(id: UUID = UUID(), kindRaw: String = "recording", addedAt: Date = Date()) {
+            self.id = id
+            self.kindRaw = kindRaw
+            self.addedAt = addedAt
+        }
+    }
+
+    /// `ListeningEvent` as it was in V3 and V4: a unique id and no defaults.
+    @Model
+    nonisolated final class ListeningEvent {
+        @Attribute(.unique) var id: UUID
+        var at: Date
+        var actionRaw: String
+        var nodeID: String
+        var nodeKindRaw: String
+        var nodeKey: String
+        var title: String
+        var subtitle: String?
+        var mbid: String?
+        var discogsID: Int?
+        @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
+        var providerID: String?
+        var handle: String?
+        var sourceProviderID: String?
+        var sourceShowID: String?
+        var sourceShowTitle: String?
+        var seconds: Double
+        var completion: Double
+        var tags: [String]
+
+        init(id: UUID = UUID(), nodeKey: String, seconds: Double = 0) {
+            self.id = id
+            self.at = Date()
+            self.actionRaw = "played"
+            self.nodeID = "artist:\(nodeKey)"
+            self.nodeKindRaw = "artist"
+            self.nodeKey = nodeKey
+            self.title = nodeKey
+            self.seconds = seconds
+            self.completion = 0
+            self.tags = []
+        }
+    }
+
+    /// `DigVisit` as it was in V4: an id, and no defaults.
+    @Model
+    nonisolated final class DigVisit {
+        var id: UUID?
+        var nodeID: String
+        var kindRaw: String
+        var title: String
+        var subtitle: String?
+        var visits: Int
+        var firstVisitedAt: Date
+        var lastVisitedAt: Date
+        var mbid: String?
+        var discogsID: Int?
+        @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
+        var providerID: String?
+        var handle: String?
+
+        init(nodeID: String, visits: Int) {
+            self.id = UUID()
+            self.nodeID = nodeID
+            self.kindRaw = "artist"
+            self.title = nodeID
+            self.visits = visits
+            self.firstVisitedAt = Date()
+            self.lastVisitedAt = Date()
+        }
+    }
+
+    /// `DigStep` as it was in V4.
+    @Model
+    nonisolated final class DigStep {
+        var id: UUID?
+        var identity: String
+        var fromNodeID: String
+        var toNodeID: String
+        var count: Int
+        var lastAt: Date
+
+        init(identity: String, count: Int) {
+            self.id = UUID()
+            self.identity = identity
+            self.fromNodeID = "a"
+            self.toNodeID = "b"
+            self.count = count
+            self.lastAt = Date()
+        }
+    }
+}
+
+nonisolated enum IndigoSchemaV5: VersionedSchema {
+    static let versionIdentifier = Schema.Version(5, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [
+            Track.self,
+            Recording.self,
+            MediaAppearance.self,
+            RecordingSource.self,
+            CrateItem.self,
+            Artist.self,
+            MusicLabel.self,
+            RecordingMetadata.self,
+            DiscogsArtist.self,
+            DiscogsReleaseRecord.self,
+            BandcampRelease.self,
+            BandcampArtistIndex.self,
+            DigVisit.self,
+            DigStep.self,
+            ListeningEvent.self,
+            ExploreOffersRecord.self,
+            ArtistPortrait.self,
+            StoredEdge.self,
+            GraphSnapshot.self
+        ]
+    }
 }
 
 nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self] }
+    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self] }
 
     /// V1 -> V2 is additive: eight optional or defaulted fields on `CrateItem`,
     /// and one rename. V2 -> V3 renames the recording id on `ListeningEvent` and
@@ -337,7 +490,8 @@ nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
         [
             .lightweight(fromVersion: IndigoSchemaV1.self, toVersion: IndigoSchemaV2.self),
             .lightweight(fromVersion: IndigoSchemaV2.self, toVersion: IndigoSchemaV3.self),
-            .lightweight(fromVersion: IndigoSchemaV3.self, toVersion: IndigoSchemaV4.self)
+            .lightweight(fromVersion: IndigoSchemaV3.self, toVersion: IndigoSchemaV4.self),
+            .lightweight(fromVersion: IndigoSchemaV4.self, toVersion: IndigoSchemaV5.self)
         ]
     }
 }

@@ -25,6 +25,14 @@
 //  Those hold for the pure functions on values below, and are tested there. The
 //  operations on a store apply them and delete what they replaced.
 //
+//  Two things are different and the rule is the same for both. A row with an id
+//  of its own -- a crate row, a listening event -- is that id's one thing:
+//  different ids are always different things, however alike, and two rows with
+//  the *same* id are two copies of one, which a replayed import can make once
+//  nothing refuses the second. Rows keyed by what they are about -- a node, a
+//  path, a recording -- are the ones that can be two things' worth of the same
+//  key, and are merged by it.
+//
 //  Reading never merges. A lookup uses the same orderings, so it finds the same
 //  row the merge will keep, but nothing is written or deleted until somebody
 //  calls an operation here.
@@ -167,6 +175,96 @@ nonisolated struct StepValue: Equatable, Sendable {
     }
 }
 
+/// One listening event, as its copies are merged. An event is made once and
+/// never edited, so copies of it are identical and any of them is the answer;
+/// the rule below is for the case where they are not, and gives the same result
+/// whichever device runs it.
+nonisolated struct EventValue: Equatable, Sendable {
+    var id: UUID
+    var at: Date
+    var actionRaw: String
+    var nodeID: String
+    var nodeKindRaw: String
+    var nodeKey: String
+    var title: String
+    var subtitle: String?
+    var mbid: String?
+    var discogsID: Int?
+    var legacyRecordingID: UUID?
+    var providerID: String?
+    var handle: String?
+    var sourceProviderID: String?
+    var sourceShowID: String?
+    var sourceShowTitle: String?
+    var seconds: Double
+    var completion: Double
+    var tags: [String]
+
+    init(
+        id: UUID, at: Date = .distantPast, actionRaw: String = "played", nodeID: String = "",
+        nodeKindRaw: String = "artist", nodeKey: String = "", title: String = "", subtitle: String? = nil,
+        mbid: String? = nil, discogsID: Int? = nil, legacyRecordingID: UUID? = nil, providerID: String? = nil,
+        handle: String? = nil, sourceProviderID: String? = nil, sourceShowID: String? = nil,
+        sourceShowTitle: String? = nil, seconds: Double = 0, completion: Double = 0, tags: [String] = []
+    ) {
+        self.id = id; self.at = at; self.actionRaw = actionRaw; self.nodeID = nodeID
+        self.nodeKindRaw = nodeKindRaw; self.nodeKey = nodeKey; self.title = title; self.subtitle = subtitle
+        self.mbid = mbid; self.discogsID = discogsID; self.legacyRecordingID = legacyRecordingID
+        self.providerID = providerID; self.handle = handle; self.sourceProviderID = sourceProviderID
+        self.sourceShowID = sourceShowID; self.sourceShowTitle = sourceShowTitle
+        self.seconds = seconds; self.completion = completion; self.tags = tags
+    }
+
+    init(_ e: ListeningEvent) {
+        self.init(
+            id: e.id, at: e.at, actionRaw: e.actionRaw, nodeID: e.nodeID, nodeKindRaw: e.nodeKindRaw,
+            nodeKey: e.nodeKey, title: e.title, subtitle: e.subtitle, mbid: e.mbid, discogsID: e.discogsID,
+            legacyRecordingID: e.legacyRecordingID, providerID: e.providerID, handle: e.handle,
+            sourceProviderID: e.sourceProviderID, sourceShowID: e.sourceShowID,
+            sourceShowTitle: e.sourceShowTitle, seconds: e.seconds, completion: e.completion, tags: e.tags)
+    }
+
+    func apply(to e: ListeningEvent) {
+        e.at = at; e.actionRaw = actionRaw; e.nodeID = nodeID; e.nodeKindRaw = nodeKindRaw
+        e.nodeKey = nodeKey; e.title = title; e.subtitle = subtitle; e.mbid = mbid
+        e.discogsID = discogsID; e.legacyRecordingID = legacyRecordingID; e.providerID = providerID
+        e.handle = handle; e.sourceProviderID = sourceProviderID; e.sourceShowID = sourceShowID
+        e.sourceShowTitle = sourceShowTitle; e.seconds = seconds; e.completion = completion
+        e.tags = tags
+    }
+
+    /// Copies of one event, as one: the greatest *whole row* by a total order
+    /// over every persisted field. An event is made once and never edited, so
+    /// its copies are identical and this returns the event itself; where they
+    /// are not, it still returns a row that exists, never fields taken from
+    /// several to make one that never did. Commutative, associative and
+    /// idempotent, because it is a maximum.
+    static func merged(_ rows: [EventValue]) -> EventValue? {
+        rows.max { $0.sortKey < $1.sortKey }
+    }
+
+    /// Every field, in an order that does not change, with a missing value
+    /// sorting before any present one so that `nil` and `""` stay different.
+    fileprivate var sortKey: [String] {
+        func opt(_ value: String?) -> String { value.map { "1" + $0 } ?? "0" }
+        func num(_ value: Double) -> String { String(format: "%020.6f", value + 1_000_000_000_000) }
+        return [
+            num(at.timeIntervalSinceReferenceDate), actionRaw, nodeID, nodeKindRaw, nodeKey, title,
+            opt(subtitle), opt(mbid), opt(discogsID.map { String($0 + 1_000_000_000) }),
+            opt(legacyRecordingID?.uuidString), opt(providerID), opt(handle), opt(sourceProviderID),
+            opt(sourceShowID), opt(sourceShowTitle), num(seconds), num(completion),
+            tags.joined(separator: "\u{1F}")
+        ]
+    }
+}
+
+private extension Array where Element == String {
+    static func < (lhs: [String], rhs: [String]) -> Bool {
+        for (l, r) in zip(lhs, rhs) where l != r { return l < r }
+        return lhs.count < rhs.count
+    }
+}
+
 nonisolated struct CrateValue: Equatable, Sendable {
     var id: UUID
     var kindRaw: String
@@ -278,6 +376,7 @@ nonisolated struct UserDataDedupe {
     nonisolated struct Report: Equatable {
         var idsAssigned = 0
         var crateMerged = 0
+        var eventsMerged = 0
         var visitsMerged = 0
         var stepsMerged = 0
         var isEmpty: Bool { self == Report() }
@@ -304,16 +403,28 @@ nonisolated struct UserDataDedupe {
         (lhs?.uuidString ?? "") < (rhs?.uuidString ?? "")
     }
 
+    /// A crate row that arrived without its date holds `Date.distantPast`, which
+    /// sorts to the bottom of a newest-first crate and so is safe to show. It
+    /// would also win every "earliest" contest, so a merge treats it as what it
+    /// is: no date, and later than any row that has one.
+    static func hasDate(_ date: Date) -> Bool { date != .distantPast }
+
     /// The order crate rows for one thing are kept in: the earliest first, and
-    /// among rows made at the same moment by id.
+    /// among rows made at the same moment by id. A row with no date comes after
+    /// every row that has one.
     static func crateIsBefore(_ lhs: CrateValue, _ rhs: CrateValue) -> Bool {
-        if lhs.addedAt != rhs.addedAt { return lhs.addedAt < rhs.addedAt }
-        return lhs.id.uuidString < rhs.id.uuidString
+        crateIsBefore(lhs.addedAt, lhs.id, rhs.addedAt, rhs.id)
     }
 
     static func crateIsBefore(_ lhs: CrateItem, _ rhs: CrateItem) -> Bool {
-        if lhs.addedAt != rhs.addedAt { return lhs.addedAt < rhs.addedAt }
-        return lhs.id.uuidString < rhs.id.uuidString
+        crateIsBefore(lhs.addedAt, lhs.id, rhs.addedAt, rhs.id)
+    }
+
+    private static func crateIsBefore(_ lhsDate: Date, _ lhsID: UUID, _ rhsDate: Date, _ rhsID: UUID) -> Bool {
+        let lhsHas = hasDate(lhsDate), rhsHas = hasDate(rhsDate)
+        if lhsHas != rhsHas { return lhsHas }
+        if lhsDate != rhsDate { return lhsDate < rhsDate }
+        return lhsID.uuidString < rhsID.uuidString
     }
 
     /// The row a lookup should answer with, now, whether or not a merge has run.
@@ -356,6 +467,17 @@ nonisolated struct UserDataDedupe {
         report.idsAssigned = assignIDs()
         if report.idsAssigned > 0 { try? context.save() }
 
+        // Copies of one row first: same id, one thing. Then rows for one key.
+        for group in Dictionary(
+            grouping: (try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? [], by: \.id
+        ).values where group.count > 1 {
+            report.eventsMerged += mergeEvents(group)
+        }
+        for group in Dictionary(
+            grouping: (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [], by: \.id
+        ).values where group.count > 1 {
+            report.crateMerged += mergeCrate(group)
+        }
         let crate = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
         for group in Dictionary(grouping: crate.compactMap { item in Self.key(of: item).map { ($0, item) } },
                                 by: { $0.0 }).values where group.count > 1 {
@@ -369,8 +491,23 @@ nonisolated struct UserDataDedupe {
         for group in Dictionary(grouping: steps, by: \.identity).values where group.count > 1 {
             report.stepsMerged += mergeSteps(group)
         }
-        if report.crateMerged + report.visitsMerged + report.stepsMerged > 0 { try? context.save() }
+        if report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged > 0 {
+            try? context.save()
+        }
         return report
+    }
+
+    /// Copies of one listening event, by its id. Events with different ids are
+    /// different events and are never touched.
+    @discardableResult
+    func event(id: UUID) -> Int {
+        mergeEvents(fetch(FetchDescriptor<ListeningEvent>(predicate: #Predicate { $0.id == id })))
+    }
+
+    /// Copies of one crate row, by its id.
+    @discardableResult
+    func crateRow(id: UUID) -> Int {
+        mergeCrate(fetch(FetchDescriptor<CrateItem>(predicate: #Predicate { $0.id == id })))
     }
 
     @discardableResult
@@ -430,6 +567,16 @@ nonisolated struct UserDataDedupe {
     private func mergeCrate(_ rows: [CrateItem]) -> Int {
         guard rows.count > 1, let kept = Self.survivor(ofCrate: rows),
               let merged = CrateValue.merged(rows.map(CrateValue.init)) else { return 0 }
+        merged.apply(to: kept)
+        for row in rows where row !== kept { context.delete(row) }
+        return rows.count - 1
+    }
+
+    /// Copies of one event are equal, so which physical row stays does not
+    /// change what it holds; the first by a stable local order is kept.
+    private func mergeEvents(_ rows: [ListeningEvent]) -> Int {
+        guard rows.count > 1, let merged = EventValue.merged(rows.map(EventValue.init)) else { return 0 }
+        let kept = rows.min { String(describing: $0.persistentModelID) < String(describing: $1.persistentModelID) }!
         merged.apply(to: kept)
         for row in rows where row !== kept { context.delete(row) }
         return rows.count - 1

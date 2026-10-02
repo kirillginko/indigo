@@ -23,9 +23,15 @@ nonisolated enum CrateItemKind: String, Codable, CaseIterable, Sendable {
 
 @Model
 nonisolated final class CrateItem {
-    @Attribute(.unique) var id: UUID
-    var kindRaw: String
-    var addedAt: Date
+    /// Not unique: nothing in a synced store can refuse a second row with an
+    /// id, so two rows with one id are two copies of one row, and
+    /// `UserDataDedupe` folds them. The defaults below are what a row that
+    /// arrives without a field holds, chosen so that it neither wins nor
+    /// distorts anything: `addedAt` is `distantPast`, which sorts to the bottom
+    /// of a newest-first crate and which a merge reads as "no date".
+    var id: UUID = UUID()
+    var kindRaw: String = CrateItemKind.recording.rawValue
+    var addedAt: Date = Date.distantPast
 
     // MARK: Recording snapshot
     //

@@ -50,6 +50,8 @@ struct HistoryObserver {
         if token != nil, transactions.isEmpty { return .init() }
 
         var crate = Set<CrateKey>()
+        var crateIDs = Set<UUID>()
+        var eventIDs = Set<UUID>()
         var visits = Set<String>()
         var steps = Set<String>()
         var newest: DefaultHistoryToken?
@@ -66,8 +68,12 @@ struct HistoryObserver {
                 }
                 switch identifier.entityName {
                 case "CrateItem":
-                    if let item = context.model(for: identifier) as? CrateItem,
-                       let key = UserDataDedupe.key(of: item) { crate.insert(key) }
+                    if let item = context.model(for: identifier) as? CrateItem {
+                        crateIDs.insert(item.id)
+                        if let key = UserDataDedupe.key(of: item) { crate.insert(key) }
+                    }
+                case "ListeningEvent":
+                    if let event = context.model(for: identifier) as? ListeningEvent { eventIDs.insert(event.id) }
                 case "DigVisit":
                     if let visit = context.model(for: identifier) as? DigVisit { visits.insert(visit.nodeID) }
                 case "DigStep":
@@ -80,6 +86,8 @@ struct HistoryObserver {
 
         var report = UserDataDedupe.Report()
         report.idsAssigned = dedupe.assignIDs()
+        for id in eventIDs { report.eventsMerged += dedupe.event(id: id) }
+        for id in crateIDs { report.crateMerged += dedupe.crateRow(id: id) }
         for key in crate { report.crateMerged += dedupe.crate(key: key) }
         for nodeID in visits { report.visitsMerged += dedupe.visit(nodeID: nodeID) }
         for identity in steps { report.stepsMerged += dedupe.step(identity: identity) }

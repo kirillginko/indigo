@@ -29,13 +29,16 @@ nonisolated final class DigVisit {
     /// Not unique: two devices' rows for one node are two rows until
     /// `UserDataDedupe` folds them, and a constraint would have refused the
     /// second. It names the node; `id` names the row.
-    var nodeID: String
-    var kindRaw: String
-    var title: String
+    var nodeID: String = ""
+    var kindRaw: String = MusicNodeKind.artist.rawValue
+    var title: String = ""
     var subtitle: String?
-    var visits: Int
-    var firstVisitedAt: Date
-    var lastVisitedAt: Date
+    /// A row that arrives with none of these is an empty history: no visits, and
+    /// an interval that is empty -- `firstVisitedAt` in the far future and
+    /// `lastVisitedAt` in the far past -- so it changes neither end of a merge.
+    var visits: Int = 0
+    var firstVisitedAt: Date = Date.distantFuture
+    var lastVisitedAt: Date = Date.distantPast
 
     // Enough to reopen it. A visit nobody can act on is a statistic.
     var mbid: String?
@@ -81,11 +84,11 @@ nonisolated final class DigStep {
     /// See `DigVisit.id`.
     var id: UUID?
     /// Not unique, for the same reason as `DigVisit.nodeID`.
-    var identity: String
-    var fromNodeID: String
-    var toNodeID: String
-    var count: Int
-    var lastAt: Date
+    var identity: String = ""
+    var fromNodeID: String = ""
+    var toNodeID: String = ""
+    var count: Int = 0
+    var lastAt: Date = Date.distantPast
 
     init(from: String, to: String) {
         id = UUID()
@@ -220,7 +223,9 @@ nonisolated struct DigHistory {
 
     /// Where the listener was last, so a dig can be picked back up.
     func recent(limit: Int = 5) -> [DigVisit] {
+        // A row that arrived with no visits is not somewhere the listener was.
         var descriptor = FetchDescriptor<DigVisit>(
+            predicate: #Predicate { $0.visits > 0 },
             sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]
         )
         // Room for the nodes that appear twice.

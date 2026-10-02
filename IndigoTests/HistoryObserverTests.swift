@@ -105,4 +105,20 @@ final class HistoryObserverTests: XCTestCase {
         XCTAssertEqual(try local.fetch(FetchDescriptor<DigVisit>()).map(\.visits), [7])
         XCTAssertEqual(try local.fetch(FetchDescriptor<DigStep>()).map(\.count), [7])
     }
+
+    func testACopyOfAnEventAnotherWriterReplayedIsCollapsed() throws {
+        let node = MusicNode.artist("Skee Mask")
+        let id = UUID()
+        for _ in 0..<2 {
+            let event = ListeningEvent(node: node, action: .played, seconds: 60)
+            event.id = id
+            remote.insert(event)
+        }
+        try remote.save()
+
+        let report = observer().process()
+
+        XCTAssertEqual(report.eventsMerged, 1)
+        XCTAssertEqual(try local.fetchCount(FetchDescriptor<ListeningEvent>()), 1)
+    }
 }
