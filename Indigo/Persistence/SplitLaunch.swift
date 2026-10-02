@@ -21,10 +21,6 @@ nonisolated enum SplitLaunch {
         let failure: StoreOpenFailure?
     }
 
-    /// After this many launches on the split stores the old store has done its
-    /// job as a safety net and is renamed to an archive.
-    static let launchesBeforeArchiving = 3
-
     static func open(layout: StoreLayout, crashAt: SplitMigration.Checkpoint? = nil) -> Opened {
         let store = SplitStateStore(url: layout.sidecar)
         let decision = LaunchDecision.decide(
@@ -71,13 +67,25 @@ nonisolated enum SplitLaunch {
         return Opened(container: memory, failure: failure)
     }
 
-    /// Counts a launch on the split stores, and once enough have happened renames
-    /// the old store's three files to the archive, together. Never deletes.
+    /// Counts a launch on the split stores. The old store is renamed to the
+    /// archive only once the split has been marked finalized -- by `finalize`,
+    /// which nothing in the app calls -- and never because of how many launches
+    /// there have been. Never deletes.
     private static func recordLaunch(layout: StoreLayout, store: SplitStateStore) {
         guard case .valid(var state) = store.load(), state.phase == .splitComplete else { return }
         state.splitLaunches += 1
-        if !state.archived, state.splitLaunches >= launchesBeforeArchiving { state.archived = retireLegacy(layout: layout) }
+        if state.finalized, !state.archived { state.archived = retireLegacy(layout: layout) }
         try? store.save(state)
+    }
+
+    /// The deliberate act that says the split has proved itself. After it, the
+    /// next launch on the split stores renames the old store to the archive.
+    @discardableResult
+    static func finalize(layout: StoreLayout) -> Bool {
+        let store = SplitStateStore(url: layout.sidecar)
+        guard case .valid(var state) = store.load(), state.phase == .splitComplete else { return false }
+        state.finalized = true
+        return (try? store.save(state)) != nil
     }
 
     /// Renames `default.store` and its log files to the archive, all or none.

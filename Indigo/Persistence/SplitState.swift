@@ -45,6 +45,11 @@ nonisolated struct SplitState: Codable, Equatable, Sendable {
     /// Launches that have opened the split stores since `splitComplete`. The
     /// old store is renamed to the archive only after several.
     var splitLaunches: Int = 0
+    /// Set only by a deliberate act, when the split has been looked at long
+    /// enough to trust. Launches alone never set it: a few launches can happen
+    /// in the time it takes to rebuild, and say nothing about whether the
+    /// stores are sound.
+    var finalized: Bool = false
     var archived: Bool = false
     var fresh: Bool = false
     var updatedAt: Date = Date()

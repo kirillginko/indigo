@@ -206,18 +206,42 @@ final class SplitMigrationTests: XCTestCase {
         XCTAssertNil(first.failure)
         XCTAssertEqual(try held(first.container).events.count, 6)
 
-        // Launches on the split stores. The old store is untouched for the first
-        // two, and renamed -- every file, together, and not deleted -- on the third.
-        for launch in 1...SplitLaunch.launchesBeforeArchiving {
+        // However many launches there are, the old store stays where it is.
+        for _ in 1...6 {
             let opened = SplitLaunch.open(layout: layout)
             XCTAssertNil(opened.failure)
             XCTAssertEqual(try held(opened.container).crate.count, 5)
-            let archived = launch >= SplitLaunch.launchesBeforeArchiving
-            XCTAssertEqual(FileManager.default.fileExists(atPath: layout.legacy.path), !archived, "launch \\(launch)")
+        }
+        XCTAssertEqual(LegacyStoreFixture.fingerprint(layout, layout.legacy), before)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: layout.archive.path))
+        XCTAssertEqual(state(layout)?.splitLaunches, 6)
+        XCTAssertEqual(state(layout)?.finalized, false)
+    }
+
+    func testTheOldStoreIsArchivedOnlyAfterTheSplitIsDeliberatelyFinalized() throws {
+        let (layout, _) = try make()
+        let before = LegacyStoreFixture.fingerprint(layout, layout.legacy)
+        _ = SplitLaunch.open(layout: layout)
+
+        XCTAssertTrue(SplitLaunch.finalize(layout: layout))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: layout.legacy.path), "finalizing renames nothing by itself")
+
+        let opened = SplitLaunch.open(layout: layout)
+
+        XCTAssertNil(opened.failure)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: layout.legacy.path))
+        for suffix in ["", "-wal", "-shm"] {
+            XCTAssertFalse(FileManager.default.fileExists(atPath: layout.legacy.path + suffix), suffix)
         }
         XCTAssertEqual(LegacyStoreFixture.fingerprint(layout, layout.archive)["pre-split-v5.store"],
                        before["default.store"], "the archive is the old store, byte for byte")
-        XCTAssertTrue(SplitLaunch.open(layout: layout).failure == nil)
+        XCTAssertEqual(state(layout)?.archived, true)
+        XCTAssertEqual(try held(SplitLaunch.open(layout: layout).container).crate.count, 5)
+    }
+
+    func testFinalizingBeforeTheSplitIsCompleteDoesNothing() throws {
+        let (layout, _) = try make()
+        XCTAssertFalse(SplitLaunch.finalize(layout: layout))
     }
 
     func testAfterTheSplitAMissingDataStoreIsSafeModeAndNotAFallbackToTheOldOne() throws {
