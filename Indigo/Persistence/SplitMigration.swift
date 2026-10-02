@@ -210,7 +210,7 @@ nonisolated enum LegacyReader {
         let schema = Schema(versionedSchema: IndigoSchemaV5.self)
         let container = try ModelContainer(
             for: schema, migrationPlan: IndigoLegacyMigrationPlan.self,
-            configurations: ModelConfiguration(schema: schema, url: url))
+            configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none))
         let context = ModelContext(container)
         var old = LegacyUserData()
 

@@ -18,7 +18,7 @@ final class ListeningCrateTests: XCTestCase {
     private var crate: CrateService!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         crate = CrateService(context: context)
@@ -140,7 +140,7 @@ final class KeptTrackArtworkTests: XCTestCase {
     private var crate: CrateService!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         crate = CrateService(context: context)

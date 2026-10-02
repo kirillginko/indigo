@@ -18,7 +18,7 @@ final class EncounterSectionTests: XCTestCase {
     private var log: ListeningLog!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         log = ListeningLog(context: context)

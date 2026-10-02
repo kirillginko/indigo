@@ -106,7 +106,7 @@ final class CreditAndLabelTests: XCTestCase {
     // MARK: What was written down under the old rules
 
     func testAStoredAnswerIsRetiredWhenTheRulesChange() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
 
@@ -128,7 +128,7 @@ final class CreditAndLabelTests: XCTestCase {
     }
 
     func testAStoredAnswerFromThisVersionIsKept() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
 

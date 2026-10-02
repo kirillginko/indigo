@@ -40,7 +40,7 @@ final class SchemaPinTests: XCTestCase {
         let url = directory.appendingPathComponent("\(name).store")
         let schema = Schema(versionedSchema: version)
         try autoreleasepool {
-            _ = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url))
+            _ = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none))
         }
         let metadata = try NSPersistentStoreCoordinator.metadataForPersistentStore(
             ofType: NSSQLiteStoreType, at: url)

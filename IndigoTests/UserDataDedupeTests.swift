@@ -29,7 +29,7 @@ final class UserDataDedupeTests: XCTestCase {
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
             configurations: ModelConfiguration(
-                schema: Persistence.schema, url: directory.appendingPathComponent(name)))
+                schema: Persistence.schema, url: directory.appendingPathComponent(name), cloudKitDatabase: .none))
         return (container, ModelContext(container))
     }
 
@@ -258,7 +258,7 @@ final class UserDataDedupeTests: XCTestCase {
         let url = directory.appendingPathComponent("v3.store")
         let v3 = Schema(IndigoSchemaV3.models)
         try autoreleasepool {
-            let container = try ModelContainer(for: v3, configurations: ModelConfiguration(schema: v3, url: url))
+            let container = try ModelContainer(for: v3, configurations: ModelConfiguration(schema: v3, url: url, cloudKitDatabase: .none))
             let context = ModelContext(container)
             context.insert(IndigoSchemaV3.DigVisit(kind: "artist", key: "a", title: "A", visits: 2))
             context.insert(IndigoSchemaV3.DigVisit(kind: "artist", key: "b", title: "B", visits: 1))
@@ -267,7 +267,7 @@ final class UserDataDedupeTests: XCTestCase {
         }
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+            configurations: ModelConfiguration(schema: Persistence.schema, url: url, cloudKitDatabase: .none))
         let context = ModelContext(container)
         XCTAssertTrue(try context.fetch(FetchDescriptor<DigVisit>()).allSatisfy { $0.id == nil })
 

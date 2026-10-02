@@ -39,7 +39,7 @@ enum LegacyStoreFixture {
         var c = Contents()
         let schema = Schema(versionedSchema: IndigoSchemaV2.self)
         try autoreleasepool {
-            let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: layout.legacy))
+            let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: layout.legacy, cloudKitDatabase: .none))
             let ctx = ModelContext(container)
 
             func recording(_ id: UUID, _ title: String?, _ artist: String?, status: String = "identified", code: String? = nil) -> IndigoLegacy.Recording {

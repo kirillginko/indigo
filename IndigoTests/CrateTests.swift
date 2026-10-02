@@ -17,7 +17,7 @@ final class CrateTests: XCTestCase {
     private var recordings: RecordingStore!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         crate = CrateService(context: context)

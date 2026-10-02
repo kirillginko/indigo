@@ -21,7 +21,7 @@ final class LibraryStoreBookmarkTests: XCTestCase {
     override func setUpWithError() throws {
         container = try ModelContainer(
             for: Schema([Track.self]),
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
         folder = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("lib-\(UUID().uuidString)", isDirectory: true)

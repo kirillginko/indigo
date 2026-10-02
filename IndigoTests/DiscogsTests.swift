@@ -178,7 +178,7 @@ final class DiscogsTests: XCTestCase {
     }
 
     func testDiscogsEnrichmentPersistsArtistDetailsAndReusesCache() async throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
         let recorder = StubDiscogsTransport.Recorder()
@@ -217,7 +217,7 @@ final class DiscogsTests: XCTestCase {
     }
 
     func testReleaseEnrichmentPersistsBrowsableAlbumData() async throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
         let recorder = StubDiscogsTransport.Recorder()
@@ -248,7 +248,7 @@ final class DiscogsTests: XCTestCase {
     /// Discogs names the spelling a particular record used separately from the
     /// canonical one. The record's own spelling is what belongs on its page.
     func testACreditKeepsTheSpellingTheRecordUsed() async throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
         let client = DiscogsClient(transport: StubDiscogsTransport(
@@ -651,7 +651,7 @@ final class CreditSpellingTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -758,7 +758,7 @@ final class ArtistLabelSourceTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -835,7 +835,7 @@ final class LabelIdentityTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -895,7 +895,7 @@ final class LabelIdentityBackfillTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -934,7 +934,7 @@ final class NeighbourFreshnessTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -993,7 +993,7 @@ final class VideoLabelExclusionTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }

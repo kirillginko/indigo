@@ -26,7 +26,7 @@ final class BandcampRepairTests: XCTestCase {
             .appendingPathComponent("indigo-bandcamp-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let configuration = ModelConfiguration(
-            schema: Persistence.schema, url: directory.appendingPathComponent("store.sqlite")
+            schema: Persistence.schema, url: directory.appendingPathComponent("store.sqlite"), cloudKitDatabase: .none
         )
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)

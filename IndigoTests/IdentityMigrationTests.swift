@@ -30,7 +30,7 @@ final class IdentityMigrationTests: XCTestCase {
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
             configurations: ModelConfiguration(
-                schema: Persistence.schema, url: directory.appendingPathComponent(name)))
+                schema: Persistence.schema, url: directory.appendingPathComponent(name), cloudKitDatabase: .none))
         return (container, ModelContext(container))
     }
 
@@ -42,7 +42,7 @@ final class IdentityMigrationTests: XCTestCase {
         let v2 = Schema(IndigoSchemaV2.models)
         try autoreleasepool {
             let container = try ModelContainer(
-                for: v2, configurations: ModelConfiguration(schema: v2, url: url))
+                for: v2, configurations: ModelConfiguration(schema: v2, url: url, cloudKitDatabase: .none))
             let context = ModelContext(container)
             context.insert(IndigoSchemaV2.ListeningEvent(
                 nodeKind: "recording", nodeKey: "boards of canadaaquarius", title: "Aquarius", recordingID: rid))
@@ -54,7 +54,7 @@ final class IdentityMigrationTests: XCTestCase {
 
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+            configurations: ModelConfiguration(schema: Persistence.schema, url: url, cloudKitDatabase: .none))
         let context = ModelContext(container)
 
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<ListeningEvent>()), 1)

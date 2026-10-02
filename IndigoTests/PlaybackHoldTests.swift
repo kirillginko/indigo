@@ -41,7 +41,7 @@ final class PlaybackHoldTests: XCTestCase {
 
     func testAStoreAskedToStandAsideDoesSoAndThenStops() throws {
         let configuration = ModelConfiguration(
-            schema: Persistence.schema, isStoredInMemoryOnly: true
+            schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none
         )
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let dig = DigStore(context: ModelContext(container))
@@ -68,7 +68,7 @@ final class PlaybackHoldTests: XCTestCase {
     @MainActor
     func testTheHoldLastsWhileTheStreamIsStillOpening() throws {
         let configuration = ModelConfiguration(
-            schema: Persistence.schema, isStoredInMemoryOnly: true
+            schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none
         )
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let dig = DigStore(context: ModelContext(container))
@@ -112,7 +112,7 @@ final class PlaybackHoldFillTests: XCTestCase {
     }
 
     func testTheFillReachesNoWorkWhileHeldAndResumesWhenReleased() async throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
         // Neighbours nobody has a picture for: a backlog the fill would work on.

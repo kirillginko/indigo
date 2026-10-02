@@ -25,7 +25,7 @@ final class IdentityLookupOnDiskTests: XCTestCase {
         container = try ModelContainer(
             for: Persistence.schema,
             configurations: ModelConfiguration(
-                schema: Persistence.schema, url: directory.appendingPathComponent("lookup.store")))
+                schema: Persistence.schema, url: directory.appendingPathComponent("lookup.store"), cloudKitDatabase: .none))
         context = ModelContext(container)
     }
 

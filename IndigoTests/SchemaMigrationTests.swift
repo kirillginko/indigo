@@ -20,7 +20,7 @@ final class SchemaMigrationTests: XCTestCase {
             let oldSchema = Schema([Track.self])
             let oldContainer = try ModelContainer(
                 for: oldSchema,
-                configurations: ModelConfiguration(schema: oldSchema, url: storeURL)
+                configurations: ModelConfiguration(schema: oldSchema, url: storeURL, cloudKitDatabase: .none)
             )
             let oldContext = ModelContext(oldContainer)
             oldContext.insert(Track(
@@ -35,7 +35,7 @@ final class SchemaMigrationTests: XCTestCase {
         // Reopen it with the shipping Phase 2 schema.
         let newContainer = try ModelContainer(
             for: Persistence.schema,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL)
+            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL, cloudKitDatabase: .none)
         )
         let newContext = ModelContext(newContainer)
 
@@ -74,7 +74,7 @@ final class SchemaMigrationTests: XCTestCase {
         try autoreleasepool {
             let container = try ModelContainer(
                 for: previous,
-                configurations: ModelConfiguration(schema: previous, url: storeURL)
+                configurations: ModelConfiguration(schema: previous, url: storeURL, cloudKitDatabase: .none)
             )
             let context = ModelContext(container)
             let recording = try RecordingStore(context: context)
@@ -85,7 +85,7 @@ final class SchemaMigrationTests: XCTestCase {
 
         let container = try ModelContainer(
             for: Persistence.schema,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL)
+            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL, cloudKitDatabase: .none)
         )
         let context = ModelContext(container)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<CrateItem>()), 1,
@@ -136,7 +136,7 @@ final class SchemaMigrationTests: XCTestCase {
             ])
             let container = try ModelContainer(
                 for: previous,
-                configurations: ModelConfiguration(schema: previous, url: storeURL)
+                configurations: ModelConfiguration(schema: previous, url: storeURL, cloudKitDatabase: .none)
             )
             let context = ModelContext(container)
             let recording = try RecordingStore(context: context)
@@ -148,7 +148,7 @@ final class SchemaMigrationTests: XCTestCase {
 
         let container = try ModelContainer(
             for: Persistence.schema,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL)
+            configurations: ModelConfiguration(schema: Persistence.schema, url: storeURL, cloudKitDatabase: .none)
         )
         let context = ModelContext(container)
 

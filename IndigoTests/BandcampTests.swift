@@ -54,7 +54,7 @@ final class BandcampTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -419,7 +419,7 @@ final class BandcampImageTests: XCTestCase {
     /// The small cut arrives first and stands in while the other loads, so a
     /// grid fills rather than staying empty.
     func testEveryTileHasSomethingToShowImmediately() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
 
@@ -444,7 +444,7 @@ final class BandcampImageTests: XCTestCase {
     /// A record Discogs pictures with nothing, and the artist's own Bandcamp
     /// has a sleeve for. Already cached, so it costs no request at all.
     func testABandcampSleeveFillsInAReleaseDiscogsHasNoPictureFor() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
 

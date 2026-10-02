@@ -196,7 +196,7 @@ enum Persistence {
         at url: URL
     ) throws -> ModelContainer {
         func open() throws -> ModelContainer {
-            let configuration = ModelConfiguration(schema: schema, url: url)
+            let configuration = ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
             return try ModelContainer(
                 for: schema, migrationPlan: migrationPlan, configurations: configuration)
         }

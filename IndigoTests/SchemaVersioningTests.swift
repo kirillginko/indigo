@@ -50,7 +50,7 @@ final class SchemaVersioningTests: XCTestCase {
         do {
             let legacy = try ModelContainer(
                 for: unversioned,
-                configurations: ModelConfiguration(schema: unversioned, url: url))
+                configurations: ModelConfiguration(schema: unversioned, url: url, cloudKitDatabase: .none))
             let context = ModelContext(legacy)
             let visit = DigVisit(node: MusicNode.label("Ilian Tape"))
             visit.visits = 3
@@ -61,7 +61,7 @@ final class SchemaVersioningTests: XCTestCase {
         let versioned = try ModelContainer(
             for: Persistence.schema,
             migrationPlan: IndigoMigrationPlan.self,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+            configurations: ModelConfiguration(schema: Persistence.schema, url: url, cloudKitDatabase: .none))
         let rows = try ModelContext(versioned).fetch(FetchDescriptor<DigVisit>())
 
         XCTAssertEqual(rows.count, 1)
@@ -78,7 +78,7 @@ final class SchemaVersioningTests: XCTestCase {
             try ModelContainer(
                 for: Persistence.schema,
                 migrationPlan: IndigoMigrationPlan.self,
-                configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+                configurations: ModelConfiguration(schema: Persistence.schema, url: url, cloudKitDatabase: .none))
         }
 
         do {
@@ -105,7 +105,7 @@ extension SchemaVersioningTests {
         let v1 = Schema(IndigoSchemaV1.models)
         try autoreleasepool {
             let container = try ModelContainer(
-                for: v1, configurations: ModelConfiguration(schema: v1, url: url))
+                for: v1, configurations: ModelConfiguration(schema: v1, url: url, cloudKitDatabase: .none))
             let context = ModelContext(container)
             let recording = IndigoLegacy.Recording(title: "Rev8617", artistName: "Skee Mask")
             context.insert(recording)
@@ -121,14 +121,14 @@ extension SchemaVersioningTests {
         let v5 = Schema(versionedSchema: IndigoSchemaV5.self)
         let legacy = try ModelContainer(
             for: v5, migrationPlan: IndigoLegacyMigrationPlan.self,
-            configurations: ModelConfiguration(schema: v5, url: legacyCopy))
+            configurations: ModelConfiguration(schema: v5, url: legacyCopy, cloudKitDatabase: .none))
         let old = try ModelContext(legacy).fetch(FetchDescriptor<IndigoSchemaV5.CrateItem>())
         XCTAssertEqual(old.count, 1)
         XCTAssertEqual(old.first?.legacyRecording?.title, "Rev8617")
 
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+            configurations: ModelConfiguration(schema: Persistence.schema, url: url, cloudKitDatabase: .none))
         let rows = try ModelContext(container).fetch(FetchDescriptor<CrateItem>())
         XCTAssertEqual(rows.count, 1, "the row survives; the bridge does not")
         XCTAssertEqual(rows.first?.kind, .recording)
@@ -143,7 +143,7 @@ extension SchemaVersioningTests {
         let v4 = Schema(IndigoSchemaV4.models)
         let id = UUID()
         try autoreleasepool {
-            let container = try ModelContainer(for: v4, configurations: ModelConfiguration(schema: v4, url: url))
+            let container = try ModelContainer(for: v4, configurations: ModelConfiguration(schema: v4, url: url, cloudKitDatabase: .none))
             let context = ModelContext(container)
             context.insert(IndigoSchemaV4.CrateItem(id: id, kindRaw: "broadcast", addedAt: Date(timeIntervalSince1970: 7)))
             context.insert(IndigoSchemaV4.ListeningEvent(id: id, nodeKey: "skee mask", seconds: 90))
@@ -154,7 +154,7 @@ extension SchemaVersioningTests {
 
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
-            configurations: ModelConfiguration(schema: Persistence.schema, url: url))
+            configurations: ModelConfiguration(schema: Persistence.schema, url: url, cloudKitDatabase: .none))
         let context = ModelContext(container)
 
         XCTAssertEqual(try context.fetch(FetchDescriptor<CrateItem>()).map(\.id), [id])
