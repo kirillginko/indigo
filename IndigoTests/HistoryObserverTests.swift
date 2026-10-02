@@ -23,10 +23,9 @@ final class HistoryObserverTests: XCTestCase {
         directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("HistoryObserverTests-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        container = try ModelContainer(
-            for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
-            configurations: ModelConfiguration(
-                schema: Persistence.schema, url: directory.appendingPathComponent("history.store")))
+        container = try Persistence.makeSplitContainer(
+            userData: directory.appendingPathComponent("UserData.store"),
+            local: directory.appendingPathComponent("Local.store"))
         local = ModelContext(container)
         local.author = "local"
         remote = ModelContext(container)

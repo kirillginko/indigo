@@ -56,7 +56,7 @@ final class UserDataDedupeTests: XCTestCase {
             title: g.pick(["A", "B", "C"]), subtitle: g.pick([nil, "s", "t"]),
             visits: Int(g.next() % 7), firstVisitedAt: g.date(), lastVisitedAt: g.date(),
             mbid: g.pick([nil, "m1", "m2"]), discogsID: g.pick([nil, 1, 2]),
-            legacyRecordingID: g.pick([nil, g.uuid()]), providerID: g.pick([nil, "p", "q"]),
+            providerID: g.pick([nil, "p", "q"]),
             handle: g.pick([nil, "h"]))
     }
 
@@ -80,7 +80,7 @@ final class UserDataDedupeTests: XCTestCase {
             actionRaw: g.pick(["played", "skipped"]), nodeID: g.pick(["artist:a", "artist:b"]),
             nodeKindRaw: "artist", nodeKey: g.pick(["a", "b"]), title: g.pick(["A", "B", ""]),
             subtitle: g.pick([nil, "s"]), mbid: g.pick([nil, "m1", "m2"]), discogsID: g.pick([nil, 1, 2]),
-            legacyRecordingID: g.pick([nil, g.uuid()]), providerID: g.pick([nil, "p"]),
+            providerID: g.pick([nil, "p"]),
             sourceShowID: g.pick([nil, "x"]), seconds: Double(g.next() % 5), completion: Double(g.next() % 3) / 2,
             tags: g.pick([[], ["a"], ["a", "b"]]))
     }

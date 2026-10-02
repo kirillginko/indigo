@@ -22,6 +22,11 @@
 //  `Recording`. Only `CrateItem` differs between V1 and V2, so V1 carries its
 //  own frozen copy of that one class and shares every other model with V2.
 //
+//  V6 removes the bridge fields (`CrateItem.legacyRecording` and the local
+//  recording id on events and visits), which existed only to carry the old local
+//  representation to the portable one. With them gone nothing in the four synced
+//  models points at anything else, and V6 is what a split store can hold.
+//
 //  V5 is the shape a synced store can hold: no unique constraints, and every
 //  property optional or defaulted. A property gets a default only where an
 //  empty value means something harmless -- an empty history, no time -- and
@@ -47,15 +52,102 @@
 import Foundation
 import SwiftData
 
+/// The `Recording` family as it was through V5, frozen.
+///
+/// The old versions of `CrateItem` point at a `Recording`, and a model that
+/// points at another is pulled into any schema that holds the other, whether or
+/// not it was asked for. So if those old versions pointed at the live class, the
+/// local store's schema would quietly gain an entity called `CrateItem` -- the
+/// old one -- beside the real one in the synced store, and the pair would not
+/// open. They point at these instead, which no current schema contains.
+nonisolated enum IndigoLegacy {
+    @Model
+    nonisolated final class Recording {
+        @Attribute(.unique) var id: UUID
+        var title: String?
+        var artistName: String?
+        var albumTitle: String?
+        var musicBrainzRecordingID: String?
+        var isrc: String?
+        var identificationStatusRaw: String
+        var matchKey: String
+        var unknownCode: String?
+        var durationSeconds: Double?
+        var createdAt: Date
+        var updatedAt: Date
+
+        @Relationship(deleteRule: .cascade, inverse: \MediaAppearance.recording)
+        var appearances: [MediaAppearance] = []
+
+        @Relationship(deleteRule: .cascade, inverse: \RecordingSource.recording)
+        var sources: [RecordingSource] = []
+
+        init(id: UUID = UUID(), title: String? = nil, artistName: String? = nil, matchKey: String = "") {
+            self.id = id
+            self.title = title
+            self.artistName = artistName
+            self.identificationStatusRaw = "identified"
+            self.matchKey = matchKey
+            self.createdAt = Date()
+            self.updatedAt = Date()
+        }
+    }
+
+    @Model
+    nonisolated final class MediaAppearance {
+        @Attribute(.unique) var id: UUID
+        var providerID: String
+        var stationID: String?
+        var stationName: String?
+        var showTitle: String?
+        var showID: String?
+        var artworkURLString: String?
+        var heardAt: Date
+        var offsetSeconds: Double?
+        var endedAt: Date?
+        var isLive: Bool
+        var confidence: Double?
+        var identificationMethodRaw: String
+        var originalMetadata: String?
+        var recording: Recording?
+
+        init(id: UUID = UUID(), providerID: String = "nts") {
+            self.id = id
+            self.providerID = providerID
+            self.heardAt = Date()
+            self.isLive = false
+            self.identificationMethodRaw = "providerTracklist"
+        }
+    }
+
+    @Model
+    nonisolated final class RecordingSource {
+        @Attribute(.unique) var id: UUID
+        var kindRaw: String
+        var identifier: String
+        var providerID: String?
+        var offsetSeconds: Double?
+        var addedAt: Date
+        var recording: Recording?
+
+        init(id: UUID = UUID(), kindRaw: String = "streamingLink", identifier: String) {
+            self.id = id
+            self.kindRaw = kindRaw
+            self.identifier = identifier
+            self.addedAt = Date()
+        }
+    }
+}
+
 nonisolated enum IndigoSchemaV1: VersionedSchema {
     static let versionIdentifier = Schema.Version(1, 0, 0)
 
     static var models: [any PersistentModel.Type] {
         [
             Track.self,
-            Recording.self,
-            MediaAppearance.self,
-            RecordingSource.self,
+            IndigoLegacy.Recording.self,
+            IndigoLegacy.MediaAppearance.self,
+            IndigoLegacy.RecordingSource.self,
             CrateItem.self,
             Artist.self,
             MusicLabel.self,
@@ -80,7 +172,7 @@ nonisolated enum IndigoSchemaV1: VersionedSchema {
         @Attribute(.unique) var id: UUID
         var kindRaw: String
         var addedAt: Date
-        var recording: Recording?
+        var recording: IndigoLegacy.Recording?
         var providerID: String?
         var showID: String?
         var showTitle: String?
@@ -91,7 +183,7 @@ nonisolated enum IndigoSchemaV1: VersionedSchema {
         var isLiveStream: Bool = false
         var genreTagsRaw: String = ""
 
-        init(recording: Recording) {
+        init(recording: IndigoLegacy.Recording) {
             self.id = UUID()
             self.kindRaw = CrateItemKind.recording.rawValue
             self.addedAt = Date()
@@ -106,9 +198,9 @@ nonisolated enum IndigoSchemaV2: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [
             Track.self,
-            Recording.self,
-            MediaAppearance.self,
-            RecordingSource.self,
+            IndigoLegacy.Recording.self,
+            IndigoLegacy.MediaAppearance.self,
+            IndigoLegacy.RecordingSource.self,
             IndigoSchemaV4.CrateItem.self,
             Artist.self,
             MusicLabel.self,
@@ -238,9 +330,9 @@ nonisolated enum IndigoSchemaV3: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [
             Track.self,
-            Recording.self,
-            MediaAppearance.self,
-            RecordingSource.self,
+            IndigoLegacy.Recording.self,
+            IndigoLegacy.MediaAppearance.self,
+            IndigoLegacy.RecordingSource.self,
             IndigoSchemaV4.CrateItem.self,
             Artist.self,
             MusicLabel.self,
@@ -310,9 +402,9 @@ nonisolated enum IndigoSchemaV4: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [
             Track.self,
-            Recording.self,
-            MediaAppearance.self,
-            RecordingSource.self,
+            IndigoLegacy.Recording.self,
+            IndigoLegacy.MediaAppearance.self,
+            IndigoLegacy.RecordingSource.self,
             CrateItem.self,
             Artist.self,
             MusicLabel.self,
@@ -345,7 +437,7 @@ nonisolated enum IndigoSchemaV4: VersionedSchema {
         var identificationStatusRaw: String?
         var stationName: String?
         var broadcastOffsetSeconds: Double?
-        @Relationship(originalName: "recording") var legacyRecording: Recording?
+        @Relationship(originalName: "recording") var legacyRecording: IndigoLegacy.Recording?
         var providerID: String?
         var showID: String?
         var showTitle: String?
@@ -455,6 +547,132 @@ nonisolated enum IndigoSchemaV5: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [
             Track.self,
+            IndigoLegacy.Recording.self,
+            IndigoLegacy.MediaAppearance.self,
+            IndigoLegacy.RecordingSource.self,
+            CrateItem.self,
+            Artist.self,
+            MusicLabel.self,
+            RecordingMetadata.self,
+            DiscogsArtist.self,
+            DiscogsReleaseRecord.self,
+            BandcampRelease.self,
+            BandcampArtistIndex.self,
+            DigVisit.self,
+            DigStep.self,
+            ListeningEvent.self,
+            ExploreOffersRecord.self,
+            ArtistPortrait.self,
+            StoredEdge.self,
+            GraphSnapshot.self
+        ]
+    }
+
+    /// `CrateItem` as it was in V5: defaulted, not unique, and still holding the
+    /// relationship to the `Recording` it was crated from. It exists so the
+    /// listener's old store can be read once, by `LegacyStore`, and moved.
+    @Model
+    nonisolated final class CrateItem {
+        var id: UUID = UUID()
+        var kindRaw: String = "recording"
+        var addedAt: Date = Date.distantPast
+        var matchKey: String = ""
+        var unknownCode: String?
+        var title: String?
+        var artistName: String?
+        var albumTitle: String?
+        var identificationStatusRaw: String?
+        var stationName: String?
+        var broadcastOffsetSeconds: Double?
+        @Relationship(originalName: "recording") var legacyRecording: IndigoLegacy.Recording?
+        var providerID: String?
+        var showID: String?
+        var showTitle: String?
+        var showSubtitle: String?
+        var artworkURLString: String?
+        var playbackURLString: String?
+        var embedProviderRaw: String?
+        var isLiveStream: Bool = false
+        var genreTagsRaw: String = ""
+
+        init(id: UUID = UUID(), kindRaw: String = "recording", addedAt: Date = Date()) {
+            self.id = id
+            self.kindRaw = kindRaw
+            self.addedAt = addedAt
+        }
+    }
+
+    /// `ListeningEvent` as it was in V5, with the local recording id.
+    @Model
+    nonisolated final class ListeningEvent {
+        var id: UUID = UUID()
+        var at: Date = Date.distantPast
+        var actionRaw: String = "played"
+        var nodeID: String = ""
+        var nodeKindRaw: String = "artist"
+        var nodeKey: String = ""
+        var title: String = ""
+        var subtitle: String?
+        var mbid: String?
+        var discogsID: Int?
+        @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
+        var providerID: String?
+        var handle: String?
+        var sourceProviderID: String?
+        var sourceShowID: String?
+        var sourceShowTitle: String?
+        var seconds: Double = 0
+        var completion: Double = 0
+        var tags: [String] = []
+
+        init(id: UUID = UUID(), nodeKind: String = "artist", nodeKey: String, title: String = "",
+             legacyRecordingID: UUID? = nil, seconds: Double = 0, at: Date = Date()) {
+            self.id = id
+            self.at = at
+            self.nodeID = "\(nodeKind):\(nodeKey)"
+            self.nodeKindRaw = nodeKind
+            self.nodeKey = nodeKey
+            self.title = title
+            self.legacyRecordingID = legacyRecordingID
+            self.seconds = seconds
+        }
+    }
+
+    /// `DigVisit` as it was in V5, with the local recording id.
+    @Model
+    nonisolated final class DigVisit {
+        var id: UUID?
+        var nodeID: String = ""
+        var kindRaw: String = "artist"
+        var title: String = ""
+        var subtitle: String?
+        var visits: Int = 0
+        var firstVisitedAt: Date = Date.distantFuture
+        var lastVisitedAt: Date = Date.distantPast
+        var mbid: String?
+        var discogsID: Int?
+        @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
+        var providerID: String?
+        var handle: String?
+
+        init(id: UUID? = UUID(), nodeKind: String = "artist", nodeKey: String, title: String = "",
+             visits: Int = 0, legacyRecordingID: UUID? = nil) {
+            self.id = id
+            self.nodeID = "\(nodeKind):\(nodeKey)"
+            self.kindRaw = nodeKind
+            self.title = title
+            self.visits = visits
+            self.legacyRecordingID = legacyRecordingID
+        }
+    }
+}
+
+nonisolated enum IndigoSchemaV6: VersionedSchema {
+    static let versionIdentifier = Schema.Version(6, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [
+            Track.self,
             Recording.self,
             MediaAppearance.self,
             RecordingSource.self,
@@ -475,10 +693,22 @@ nonisolated enum IndigoSchemaV5: VersionedSchema {
             GraphSnapshot.self
         ]
     }
+
+    /// What belongs in the synced store, and what stays on the device. A model
+    /// is in exactly one, and nothing in one points at anything in the other.
+    static let userDataModelNames: Set<String> = ["CrateItem", "ListeningEvent", "DigVisit", "DigStep"]
+
+    static var userDataModels: [any PersistentModel.Type] {
+        models.filter { userDataModelNames.contains(String(describing: $0)) }
+    }
+
+    static var localModels: [any PersistentModel.Type] {
+        models.filter { !userDataModelNames.contains(String(describing: $0)) }
+    }
 }
 
 nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self] }
+    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self, IndigoSchemaV6.self] }
 
     /// V1 -> V2 is additive: eight optional or defaulted fields on `CrateItem`,
     /// and one rename. V2 -> V3 renames the recording id on `ListeningEvent` and
@@ -491,7 +721,18 @@ nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
             .lightweight(fromVersion: IndigoSchemaV1.self, toVersion: IndigoSchemaV2.self),
             .lightweight(fromVersion: IndigoSchemaV2.self, toVersion: IndigoSchemaV3.self),
             .lightweight(fromVersion: IndigoSchemaV3.self, toVersion: IndigoSchemaV4.self),
-            .lightweight(fromVersion: IndigoSchemaV4.self, toVersion: IndigoSchemaV5.self)
+            .lightweight(fromVersion: IndigoSchemaV4.self, toVersion: IndigoSchemaV5.self),
+            .lightweight(fromVersion: IndigoSchemaV5.self, toVersion: IndigoSchemaV6.self)
         ]
     }
+}
+
+/// The same plan, stopping at V5: how a copy of the listener's old store is
+/// brought to the last shape that still held the bridge fields, so that it can
+/// be read. Never pointed at the old store itself.
+nonisolated enum IndigoLegacyMigrationPlan: SchemaMigrationPlan {
+    static var schemas: [any VersionedSchema.Type] {
+        [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self]
+    }
+    static var stages: [MigrationStage] { Array(IndigoMigrationPlan.stages.prefix(4)) }
 }

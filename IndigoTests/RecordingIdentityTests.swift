@@ -243,13 +243,12 @@ final class RecordingIdentityTests: XCTestCase {
         XCTAssertEqual(store.identityCollisions().count, 1)
         store.repairIdentities()
 
-        // The visit kept a recording id and the key as its node id.
-        let visit = DigVisit(node: MusicNode(
-            kind: .recording, key: aggregate.matchKey, title: "Unreleased"))
-        visit.legacyRecordingID = visited.id
+        // A visit to the placeholder, as it is made now: its node names it.
+        let visit = DigVisit(node: MusicNode.recording(visited))
         context.insert(visit)
 
-        let resolved = try XCTUnwrap(store.recording(id: try XCTUnwrap(visit.legacyRecordingID)))
+        let resolved = try XCTUnwrap(store.recording(identity: try XCTUnwrap(RecordingIdentity(node: visit.node))))
+        XCTAssertEqual(resolved.id, visited.id)
         let identity = RecordingIdentity(resolved)
         let sharing = (try context.fetch(FetchDescriptor<Recording>()))
             .filter { RecordingIdentity($0) == identity }

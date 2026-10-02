@@ -43,8 +43,6 @@ nonisolated final class DigVisit {
     // Enough to reopen it. A visit nobody can act on is a statistic.
     var mbid: String?
     var discogsID: Int?
-    /// A local `Recording.id`; see `ListeningEvent.legacyRecordingID`.
-    @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
     var providerID: String?
     var handle: String?
 

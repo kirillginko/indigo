@@ -83,20 +83,19 @@ nonisolated struct VisitValue: Equatable, Sendable {
     var lastVisitedAt: Date
     var mbid: String?
     var discogsID: Int?
-    var legacyRecordingID: UUID?
     var providerID: String?
     var handle: String?
 
     init(
         id: UUID?, nodeID: String, kindRaw: String = "artist", title: String = "",
         subtitle: String? = nil, visits: Int, firstVisitedAt: Date, lastVisitedAt: Date,
-        mbid: String? = nil, discogsID: Int? = nil, legacyRecordingID: UUID? = nil,
+        mbid: String? = nil, discogsID: Int? = nil,
         providerID: String? = nil, handle: String? = nil
     ) {
         self.id = id; self.nodeID = nodeID; self.kindRaw = kindRaw; self.title = title
         self.subtitle = subtitle; self.visits = visits
         self.firstVisitedAt = firstVisitedAt; self.lastVisitedAt = lastVisitedAt
-        self.mbid = mbid; self.discogsID = discogsID; self.legacyRecordingID = legacyRecordingID
+        self.mbid = mbid; self.discogsID = discogsID
         self.providerID = providerID; self.handle = handle
     }
 
@@ -105,7 +104,7 @@ nonisolated struct VisitValue: Equatable, Sendable {
             id: visit.id, nodeID: visit.nodeID, kindRaw: visit.kindRaw, title: visit.title,
             subtitle: visit.subtitle, visits: visit.visits,
             firstVisitedAt: visit.firstVisitedAt, lastVisitedAt: visit.lastVisitedAt,
-            mbid: visit.mbid, discogsID: visit.discogsID, legacyRecordingID: visit.legacyRecordingID,
+            mbid: visit.mbid, discogsID: visit.discogsID,
             providerID: visit.providerID, handle: visit.handle)
     }
 
@@ -113,7 +112,7 @@ nonisolated struct VisitValue: Equatable, Sendable {
         visit.kindRaw = kindRaw; visit.title = title; visit.subtitle = subtitle
         visit.visits = visits
         visit.firstVisitedAt = firstVisitedAt; visit.lastVisitedAt = lastVisitedAt
-        visit.mbid = mbid; visit.discogsID = discogsID; visit.legacyRecordingID = legacyRecordingID
+        visit.mbid = mbid; visit.discogsID = discogsID
         visit.providerID = providerID; visit.handle = handle
     }
 
@@ -136,7 +135,6 @@ nonisolated struct VisitValue: Equatable, Sendable {
         result.lastVisitedAt = rows.map(\.lastVisitedAt).max()!
         result.mbid = rows.compactMap(\.mbid).max()
         result.discogsID = rows.compactMap(\.discogsID).max()
-        result.legacyRecordingID = rows.compactMap(\.legacyRecordingID).max { $0.uuidString < $1.uuidString }
         result.providerID = rows.compactMap(\.providerID).max()
         result.handle = rows.compactMap(\.handle).max()
         return result
@@ -190,7 +188,6 @@ nonisolated struct EventValue: Equatable, Sendable {
     var subtitle: String?
     var mbid: String?
     var discogsID: Int?
-    var legacyRecordingID: UUID?
     var providerID: String?
     var handle: String?
     var sourceProviderID: String?
@@ -203,13 +200,13 @@ nonisolated struct EventValue: Equatable, Sendable {
     init(
         id: UUID, at: Date = .distantPast, actionRaw: String = "played", nodeID: String = "",
         nodeKindRaw: String = "artist", nodeKey: String = "", title: String = "", subtitle: String? = nil,
-        mbid: String? = nil, discogsID: Int? = nil, legacyRecordingID: UUID? = nil, providerID: String? = nil,
+        mbid: String? = nil, discogsID: Int? = nil, providerID: String? = nil,
         handle: String? = nil, sourceProviderID: String? = nil, sourceShowID: String? = nil,
         sourceShowTitle: String? = nil, seconds: Double = 0, completion: Double = 0, tags: [String] = []
     ) {
         self.id = id; self.at = at; self.actionRaw = actionRaw; self.nodeID = nodeID
         self.nodeKindRaw = nodeKindRaw; self.nodeKey = nodeKey; self.title = title; self.subtitle = subtitle
-        self.mbid = mbid; self.discogsID = discogsID; self.legacyRecordingID = legacyRecordingID
+        self.mbid = mbid; self.discogsID = discogsID
         self.providerID = providerID; self.handle = handle; self.sourceProviderID = sourceProviderID
         self.sourceShowID = sourceShowID; self.sourceShowTitle = sourceShowTitle
         self.seconds = seconds; self.completion = completion; self.tags = tags
@@ -219,7 +216,7 @@ nonisolated struct EventValue: Equatable, Sendable {
         self.init(
             id: e.id, at: e.at, actionRaw: e.actionRaw, nodeID: e.nodeID, nodeKindRaw: e.nodeKindRaw,
             nodeKey: e.nodeKey, title: e.title, subtitle: e.subtitle, mbid: e.mbid, discogsID: e.discogsID,
-            legacyRecordingID: e.legacyRecordingID, providerID: e.providerID, handle: e.handle,
+            providerID: e.providerID, handle: e.handle,
             sourceProviderID: e.sourceProviderID, sourceShowID: e.sourceShowID,
             sourceShowTitle: e.sourceShowTitle, seconds: e.seconds, completion: e.completion, tags: e.tags)
     }
@@ -227,7 +224,7 @@ nonisolated struct EventValue: Equatable, Sendable {
     func apply(to e: ListeningEvent) {
         e.at = at; e.actionRaw = actionRaw; e.nodeID = nodeID; e.nodeKindRaw = nodeKindRaw
         e.nodeKey = nodeKey; e.title = title; e.subtitle = subtitle; e.mbid = mbid
-        e.discogsID = discogsID; e.legacyRecordingID = legacyRecordingID; e.providerID = providerID
+        e.discogsID = discogsID; e.providerID = providerID
         e.handle = handle; e.sourceProviderID = sourceProviderID; e.sourceShowID = sourceShowID
         e.sourceShowTitle = sourceShowTitle; e.seconds = seconds; e.completion = completion
         e.tags = tags
@@ -251,7 +248,7 @@ nonisolated struct EventValue: Equatable, Sendable {
         return [
             num(at.timeIntervalSinceReferenceDate), actionRaw, nodeID, nodeKindRaw, nodeKey, title,
             opt(subtitle), opt(mbid), opt(discogsID.map { String($0 + 1_000_000_000) }),
-            opt(legacyRecordingID?.uuidString), opt(providerID), opt(handle), opt(sourceProviderID),
+            opt(providerID), opt(handle), opt(sourceProviderID),
             opt(sourceShowID), opt(sourceShowTitle), num(seconds), num(completion),
             tags.joined(separator: "\u{1F}")
         ]

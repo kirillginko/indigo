@@ -92,21 +92,4 @@ final class IdentityLookupOnDiskTests: XCTestCase {
         XCTAssertTrue(RecordingStore(context: context).identityCollisions().isEmpty)
     }
 
-    /// The repair cleared a code and had not saved it. The store still held two
-    /// recordings with that identity, a fetch limited to one took the aggregate,
-    /// and the unsaved edit then removed it from the answer.
-    func testALookupAfterTheBackfillRepairResolvesTheCratedPlaceholder() throws {
-        let aggregate = try make(.identified, code: "EAE1B")   // the old, wrong code
-        let placeholder = try make(.probable, code: "EAE1B")
-        let item = CrateItem(snapshot: CrateSnapshot.capture(placeholder))
-        item.legacyRecording = placeholder
-        context.insert(item)
-        try context.save()
-        XCTAssertEqual(RecordingStore(context: context).identityCollisions().count, 1)
-
-        try CrateSnapshot.backfill(in: context)
-
-        XCTAssertNil(aggregate.unknownCode)
-        XCTAssertEqual(CrateRecordings(context: context).recording(for: item)?.id, placeholder.id)
-    }
 }

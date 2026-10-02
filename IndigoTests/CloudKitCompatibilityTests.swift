@@ -7,13 +7,12 @@
 //  carrying a default. Relationships are not allowed to cross into a synced
 //  store, and exactly one remains.
 //
-//  `CrateItem.legacyRecording` is the named exception. It points at a
-//  `Recording`, which stays on the device, so it cannot be synced and cannot
-//  stay once `CrateItem` moves into the synced store. It is here because the
-//  one-time backfill reads it, and step 7 removes it with the split. Do not
-//  initialise the CloudKit schema while it is on this list: the test that
-//  names it fails the moment the list is empty and the property is not, and is
-//  meant to be edited then, not before.
+//  There are no exceptions. `CrateItem.legacyRecording` was the last, and it
+//  went in V6: a relationship from a synced model to a `Recording` that stays on
+//  the device does not fail when the two live in different stores, it silently
+//  writes a copy of the `Recording` into the synced one. This test is what keeps
+//  that from coming back, and it has to pass before the first two-store container
+//  is created.
 //
 
 import XCTest
@@ -22,9 +21,6 @@ import SwiftData
 
 final class CloudKitCompatibilityTests: XCTestCase {
     private let synced = ["CrateItem", "ListeningEvent", "DigVisit", "DigStep"]
-
-    /// Relationships that are known not to be synced yet, by `Entity.property`.
-    private let namedRelationshipExceptions: Set<String> = ["CrateItem.legacyRecording"]
 
     private func entity(_ name: String) throws -> Schema.Entity {
         try XCTUnwrap(Persistence.schema.entities.first { $0.name == name }, name)
@@ -50,13 +46,31 @@ final class CloudKitCompatibilityTests: XCTestCase {
         }
     }
 
-    func testTheOnlyRelationshipOnASyncedModelIsTheNamedException() throws {
-        var found = Set<String>()
+    func testNoSyncedModelHasARelationshipAtAll() throws {
         for name in synced {
-            for relationship in try entity(name).relationships { found.insert("\(name).\(relationship.name)") }
+            let relationships = try entity(name).relationships.map(\.name)
+            XCTAssertTrue(relationships.isEmpty, "\(name) points at \(relationships)")
         }
-        XCTAssertEqual(found, namedRelationshipExceptions,
-                       "A synced model gained or lost a relationship; step 7 empties this list")
+    }
+
+    func testNothingOnTheDeviceAndNothingSyncedPointAtEachOther() throws {
+        let userNames = IndigoSchemaV6.userDataModelNames
+        for entity in Persistence.schema.entities {
+            for relationship in entity.relationships {
+                let crosses = userNames.contains(entity.name) != userNames.contains(relationship.destination)
+                XCTAssertFalse(crosses, "\(entity.name).\(relationship.name) -> \(relationship.destination)")
+            }
+        }
+    }
+
+    func testTheSplitMembershipCoversEveryModelExactlyOnce() {
+        let all = IndigoSchemaV6.models.map { String(describing: $0) }
+        let user = IndigoSchemaV6.userDataModels.map { String(describing: $0) }
+        let local = IndigoSchemaV6.localModels.map { String(describing: $0) }
+        XCTAssertEqual(Set(user), IndigoSchemaV6.userDataModelNames)
+        XCTAssertEqual(user.count + local.count, all.count)
+        XCTAssertTrue(Set(user).isDisjoint(with: Set(local)))
+        XCTAssertEqual(local.count, 15)
     }
 
     func testTheModelsThatStayOnTheDeviceAreNotHeldToIt() throws {

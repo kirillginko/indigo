@@ -106,7 +106,7 @@ struct IndigoApp: App {
                 ) { _ in
                     Button("OK", role: .cancel) {}
                 } message: { failure in
-                    Text("Nothing has been deleted. Until it opens, this session is not being saved, so anything you add will be gone when you quit.\n\n\(failure.url.path)")
+                    Text("Nothing has been deleted. Until it opens, this session is not being saved, so anything you add will be gone when you quit.\n\n\(failure.explanation.map { $0 + "\n\n" } ?? "")\(failure.url.path)")
                 }
                 .frame(minWidth: 900, minHeight: 580)
                 .task {
@@ -130,8 +130,6 @@ struct IndigoApp: App {
                     // listener's real store, and not while that store is
                     // unopened: it writes the crate.
                     if !Persistence.isRunningTests, Persistence.userDataWritable {
-                        CrateSnapshot.backfillOnce(in: Persistence.container.mainContext)
-                        IdentityBackfill.runOnce(in: Persistence.container.mainContext)
                         UserDataDedupe(context: Persistence.container.mainContext).all()
                     }
                     witness.watch(player)

@@ -116,7 +116,6 @@ final class CrateSnapshotTests: XCTestCase {
 
         XCTAssertTrue(crate.contains(recording: rec))
         XCTAssertEqual(crate.item(for: rec)?.id, item.id)
-        XCTAssertNil(item.legacyRecording, "a new row does not point at a recording")
     }
 
     func testCratingTheSameThingTwiceIsOneRow() throws {
@@ -186,70 +185,6 @@ final class CrateSnapshotTests: XCTestCase {
 
     // MARK: The backfill
 
-    private func oldRow(for recording: Recording?) -> CrateItem {
-        let item = CrateItem(snapshot: CrateSnapshot())
-        item.legacyRecording = recording
-        context.insert(item)
-        return item
-    }
-
-    func testTheBackfillGivesAnOldRowItsSnapshotAndKeepsTheRelationship() throws {
-        let rec = try recording("Rev8617", "Skee Mask", album: "Compro")
-        link(rec, "https://www.youtube.com/watch?v=abc")
-        heard(rec)
-        let item = oldRow(for: rec)
-        XCTAssertFalse(item.hasRecordingSnapshot)
-
-        let report = try CrateSnapshot.backfill(in: context)
-
-        XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0, collisions: 0))
-        XCTAssertEqual(item.matchKey, rec.matchKey)
-        XCTAssertEqual(item.albumTitle, "Compro")
-        XCTAssertEqual(item.sourceLine, "NTS 1 / Moxie @ 01:21:43")
-        XCTAssertTrue(item.legacyRecording === rec, "nothing is taken away, so it can be run again")
-    }
-
-    func testTheBackfillCanBeRunTwiceAndTheSecondChangesNothing() throws {
-        _ = oldRow(for: try recording("Rev8617", "Skee Mask"))
-        XCTAssertEqual(try CrateSnapshot.backfill(in: context).filled, 1)
-        XCTAssertEqual(try CrateSnapshot.backfill(in: context).filled, 0)
-    }
-
-    func testARowWithNoRecordingBehindItIsLeftExactlyAsItWas() throws {
-        let item = oldRow(for: nil)
-        let id = item.id
-
-        let report = try CrateSnapshot.backfill(in: context)
-
-        XCTAssertEqual(report.dangling, 1)
-        XCTAssertEqual(report.filled, 0)
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<CrateItem>()), 1)
-        XCTAssertEqual(item.id, id)
-        XCTAssertEqual(item.displayTitle, "Unknown", "what it showed before")
-        XCTAssertNil(item.displaySubtitle)
-        XCTAssertNil(item.statusLabel)
-    }
-
-    func testTheBackfillDoesNotTouchBroadcastOrDigRows() throws {
-        let show = CrateItem(
-            providerID: "nts", showID: "nts.episode.a/b", showTitle: "A", showSubtitle: nil,
-            artworkURL: nil, playbackURL: nil, embedProvider: nil, isLiveStream: false)
-        context.insert(show)
-
-        let report = try CrateSnapshot.backfill(in: context)
-
-        XCTAssertEqual(report, CrateSnapshot.BackfillReport())
-        XCTAssertEqual(show.showTitle, "A")
-        XCTAssertFalse(show.hasRecordingSnapshot)
-    }
-
-    func testTheBackfillIsMarkedDoneOnlyOnceItFinishedCleanly() throws {
-        let suite = UserDefaults(suiteName: "CrateSnapshotTests-\(UUID().uuidString)")!
-        _ = oldRow(for: try recording("Rev8617", "Skee Mask"))
-
-        XCTAssertEqual(CrateSnapshot.backfillOnce(in: context, defaults: suite)?.filled, 1)
-        XCTAssertNil(CrateSnapshot.backfillOnce(in: context, defaults: suite), "not run again once marked")
-    }
 
     // MARK: Placeholders share a key and are still different recordings
 
@@ -287,36 +222,4 @@ final class CrateSnapshotTests: XCTestCase {
         XCTAssertNil(crate.item(for: twins[0]))
     }
 
-    func testAnOldRowForAPlaceholderStillFindsItsOwnRecordingAfterTheBackfill() throws {
-        let twins = legacyPlaceholders()
-        let item = oldRow(for: twins[2])
-
-        let report = try CrateSnapshot.backfill(in: context)
-
-        XCTAssertEqual(report.mismatches, 0)
-        XCTAssertEqual(CrateRecordings(context: context).recording(for: item)?.id, twins[2].id)
-        let crate = CrateService(context: context)
-        XCTAssertTrue(crate.contains(recording: twins[2]))
-        XCTAssertFalse(crate.contains(recording: twins[0]))
-    }
-
-    func testARowCopiedBeforeItsPlaceholderHadACodeIsBroughtInLine() throws {
-        let twins = legacyPlaceholders()
-        // What the first version of the backfill wrote: the key, no code.
-        let item = CrateItem(snapshot: CrateSnapshot())
-        item.legacyRecording = twins[1]
-        item.matchKey = twins[1].matchKey
-        item.title = twins[1].title
-        item.artistName = twins[1].artistName
-        context.insert(item)
-        XCTAssertTrue(item.hasRecordingSnapshot)
-
-        let report = try CrateSnapshot.backfill(in: context)
-
-        XCTAssertEqual(report.repaired, 1)
-        XCTAssertEqual(report.mismatches, 0)
-        XCTAssertEqual(CrateRecordings(context: context).recording(for: item)?.id, twins[1].id)
-        XCTAssertFalse(CrateService(context: context).contains(recording: twins[0]))
-        XCTAssertEqual(try CrateSnapshot.backfill(in: context).repaired, 0)
-    }
 }

@@ -47,7 +47,7 @@ final class StoreSafetyTests: XCTestCase {
             XCTAssertEqual(StoreRole.role(holding: [Track.self, model]), .userData,
                            "\(model) must make its store user data")
         }
-        XCTAssertEqual(StoreRole.role(holding: IndigoSchemaV5.models), .userData)
+        XCTAssertEqual(StoreRole.role(holding: IndigoSchemaV6.models), .userData)
     }
 
     func testAStoreOfOnlyCachesIsACache() {
@@ -61,14 +61,14 @@ final class StoreSafetyTests: XCTestCase {
         XCTAssertFalse(StoreRole.userData.mayBeDestroyed)
     }
 
-    func testTheAppsStoreIsUserDataAndIsTheFileExistingInstallsHave() {
-        XCTAssertEqual(Persistence.storeRole, .userData)
+    func testTheLegacyStoreIsTheFileExistingInstallsHave() {
+        XCTAssertEqual(Persistence.layout.legacy, Persistence.storeURL)
         XCTAssertEqual(Persistence.storeURL, ModelConfiguration(schema: Persistence.schema).url)
         XCTAssertEqual(Persistence.storeURL.lastPathComponent, "default.store")
     }
 
     func testTheUserOwnedModelsAreAllInTheSchema() {
-        let names = Set(IndigoSchemaV5.models.map { String(describing: $0) })
+        let names = Set(IndigoSchemaV6.models.map { String(describing: $0) })
         for model in StoreRole.userOwnedModels {
             XCTAssertTrue(names.contains(String(describing: model)))
         }

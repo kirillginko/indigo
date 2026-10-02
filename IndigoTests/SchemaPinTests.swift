@@ -14,7 +14,7 @@
 //  the versions before the change: copy its old shape into those versions as a
 //  nested type (see `IndigoSchema.swift`) rather than updating the digest.
 //
-//  V5 is not pinned: it is the current version and still being built.
+//  V6 is not pinned: it is the current version and still being built.
 //
 
 import XCTest
@@ -57,6 +57,12 @@ final class SchemaPinTests: XCTestCase {
 
     func testVersionTwoIsStillTheShapeItWas() throws {
         XCTAssertEqual(try digest(of: IndigoSchemaV2.self, named: "v2"), "15af6a0a2bdd4221")
+    }
+
+    /// Taken from the V5 definition as it stood before it was frozen, so a match
+    /// shows the frozen copies reproduce it exactly.
+    func testVersionFiveIsStillTheShapeItWas() throws {
+        XCTAssertEqual(try digest(of: IndigoSchemaV5.self, named: "v5"), "dc9090266b233fb7")
     }
 
     func testVersionFourIsStillTheShapeItWas() throws {

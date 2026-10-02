@@ -60,12 +60,6 @@ nonisolated final class CrateItem {
     /// Seconds into that broadcast.
     var broadcastOffsetSeconds: Double?
 
-    /// The relationship every row had before the snapshot. Nothing reads it:
-    /// the one-time backfill copies it into the fields above, and the store
-    /// split removes it. Named so that any code still reaching for it fails to
-    /// compile instead of working on one device and not another.
-    @Relationship(originalName: "recording") var legacyRecording: Recording?
-
     /// Set for `.broadcast`. Kept as plain fields rather than a relationship
     /// so a crated show survives the provider's catalogue changing under it.
     var providerID: String?

@@ -22,6 +22,10 @@ import SwiftData
 nonisolated enum StoreRole: Equatable {
     /// Holds something the listener made. Never deleted.
     case userData
+    /// The listener's old combined store, and the archive it becomes. Holds
+    /// everything, including what they made. Never deleted, and never opened
+    /// by SwiftData with a schema that leaves anything out.
+    case legacy
     /// Holds only what can be fetched or rebuilt again.
     case cache
 
@@ -44,6 +48,9 @@ nonisolated struct StoreOpenFailure: Error, LocalizedError, Equatable {
     let role: StoreRole
     let url: URL
     let reason: String
+    /// A plain sentence for the listener, when the cause is one the app knows
+    /// and not an error SwiftData reported.
+    var explanation: String? = nil
 
     var errorDescription: String? {
         "The store at \(url.path) could not be opened: \(reason)"
@@ -52,20 +59,18 @@ nonisolated struct StoreOpenFailure: Error, LocalizedError, Equatable {
 
 enum Persistence {
     /// The current version of the store's schema; see `IndigoSchema.swift`.
-    static let schema = Schema(versionedSchema: IndigoSchemaV5.self)
+    static let schema = Schema(versionedSchema: IndigoSchemaV6.self)
 
-    /// Where the store the app has always used lives. Read from SwiftData's own
-    /// default rather than rebuilt from a path, so it can never point at a
-    /// different file from the one an existing install wrote.
+    /// Where the three stores live; see `StoreLayout`.
+    static let layout = StoreLayout.standard
+
+    /// The old combined store. Kept as a name for the one place tests compare
+    /// it with SwiftData's own default: it is the file `layout.legacy` names.
     static let storeURL: URL = ModelConfiguration(schema: schema).url
-
-    /// Everything is in one store until the split into `UserData` and `Local`,
-    /// so it holds the crate and is `userData`.
-    static let storeRole = StoreRole.role(holding: IndigoSchemaV5.models)
 
     static let container: ModelContainer = makeContainer()
 
-    /// Set when the store on disk could not be opened and the session is
+    /// Set when the listener's data could not be opened and the session is
     /// running unsaved. Read through `openFailure`, which makes sure the
     /// container has been asked for first.
     private nonisolated(unsafe) static var failure: StoreOpenFailure?
@@ -75,10 +80,10 @@ enum Persistence {
         return failure
     }
 
-    /// Whether what the listener makes can be written down. False while the
-    /// store on disk has failed to open and the session is running unsaved:
-    /// the crate, the listening log and the dig history refuse their writes
-    /// rather than keep rows that vanish at quit.
+    /// Whether what the listener makes can be written down. False while their
+    /// data has failed to open and the session is running unsaved: the crate,
+    /// the listening log and the dig history refuse their writes rather than
+    /// keep rows that vanish at quit.
     ///
     /// Not routed through `container`, so it can be read from any actor. The
     /// container is asked for at launch, before anything can write, so by the
@@ -114,38 +119,102 @@ enum Persistence {
         isUITesting(arguments: ProcessInfo.processInfo.arguments)
     }
 
+    // MARK: - The container
+
     private static func makeContainer() -> ModelContainer {
-        // A test run never opens the listener's store. The XCTest host *is*
+        // A test run never opens the listener's stores. The XCTest host *is*
         // Indigo, and a UI test launches it as a child process; either one
         // opened the real store, migrated it, and wrote to it. Tests that
         // need a store make their own, in memory or on a temporary disk.
         if isRunningTests {
-            let memory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            guard let container = try? ModelContainer(
-                for: schema, migrationPlan: IndigoMigrationPlan.self, configurations: memory)
-            else { fatalError("Unable to create an in-memory container for testing") }
+            guard let container = try? makeSplitContainer(userData: nil, local: nil) else {
+                fatalError("Unable to create an in-memory container for testing")
+            }
             return container
         }
-        do {
-            return try openStore(role: storeRole, schema: schema, at: storeURL)
-        } catch let failed as StoreOpenFailure {
-            failure = failed
-            Trace.note("store: \(failed.errorDescription ?? "could not be opened"); running unsaved")
-        } catch {
-            failure = StoreOpenFailure(role: storeRole, url: storeURL, reason: "\(error)")
+
+        let decision = LaunchDecision.decide(
+            layout: layout, state: SplitStateStore(url: layout.sidecar).load(),
+            exists: { FileManager.default.fileExists(atPath: $0.path) })
+        Trace.note("store: launch decision \(decision)")
+
+        switch decision {
+        case .fresh, .split:
+            do {
+                return try openSplitStores(layout: layout)
+            } catch let failed as StoreOpenFailure {
+                failure = failed
+            } catch {
+                failure = StoreOpenFailure(role: .userData, url: layout.userData, reason: "\(error)")
+            }
+        case .migrate:
+            // Moving the old data into the new stores is not built yet, and the
+            // old store is not opened with the current schema: that would drop
+            // the columns the move reads. So it is left exactly as it is.
+            failure = StoreOpenFailure(
+                role: .legacy, url: layout.legacy, reason: "migration pending",
+                explanation: "Your library is being moved to a new format and that is not ready yet.")
+        case .safeMode(let why):
+            failure = StoreOpenFailure(role: .userData, url: layout.userData, reason: why, explanation: why)
         }
+
+        Trace.note("store: \(failure?.errorDescription ?? "unknown"); running unsaved")
         // The files stay exactly as they are. This session runs in memory so
         // the app still launches, and nothing it does is written anywhere.
-        let memory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        guard let fallback = try? ModelContainer(for: schema, configurations: memory) else {
+        guard let fallback = try? makeSplitContainer(userData: nil, local: nil) else {
             fatalError("Unable to create a SwiftData container")
         }
         return fallback
     }
 
-    /// Opens the store at `url`. A `.cache` store that will not open is deleted
-    /// and made again; a `.userData` store is never touched, and the failure is
-    /// thrown for the caller to show.
+    /// One container over two stores. `userData` and `local` are file URLs, or
+    /// nil for a store in memory. The schema is the whole thing and each store
+    /// is told which models are its own, so that nothing is ever opened with a
+    /// schema that leaves a model out.
+    nonisolated static func makeSplitContainer(
+        userData: URL?, local: URL?, migrationPlan: (any SchemaMigrationPlan.Type)? = IndigoMigrationPlan.self
+    ) throws -> ModelContainer {
+        func configuration(_ name: String, _ models: [any PersistentModel.Type], _ url: URL?) -> ModelConfiguration {
+            let schema = Schema(models)
+            if let url {
+                return ModelConfiguration(name, schema: schema, url: url, cloudKitDatabase: .none)
+            }
+            return ModelConfiguration(name, schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        }
+        return try ModelContainer(
+            for: Schema(versionedSchema: IndigoSchemaV6.self),
+            migrationPlan: migrationPlan,
+            configurations: [
+                configuration("UserData", IndigoSchemaV6.userDataModels, userData),
+                configuration("Local", IndigoSchemaV6.localModels, local)
+            ])
+    }
+
+    /// Opens `UserData.store` and `Local.store`, creating them if they are new.
+    /// If `Local` is what will not open it is thrown away and made again, since
+    /// it holds nothing that cannot be fetched; if `UserData` will not open,
+    /// nothing is touched and the failure is thrown.
+    nonisolated static func openSplitStores(layout: StoreLayout) throws -> ModelContainer {
+        do {
+            return try makeSplitContainer(userData: layout.userData, local: layout.local)
+        } catch {
+            // Is it the cache? Open the listener's data alone, beside a cache in
+            // memory: if that works, the cache was the problem.
+            guard (try? makeSplitContainer(userData: layout.userData, local: nil)) != nil else {
+                throw StoreOpenFailure(role: .userData, url: layout.userData, reason: "\(error)")
+            }
+            destroyCache(at: layout.local, layout: layout)
+            do {
+                return try makeSplitContainer(userData: layout.userData, local: layout.local)
+            } catch {
+                throw StoreOpenFailure(role: .cache, url: layout.local, reason: "\(error)")
+            }
+        }
+    }
+
+    /// Opens one store at `url`. A `.cache` store that will not open is deleted
+    /// and made again; anything else is never touched, and the failure is thrown
+    /// for the caller to show.
     nonisolated static func openStore(
         role: StoreRole,
         schema: Schema,
@@ -178,5 +247,12 @@ enum Persistence {
         for suffix in ["", "-shm", "-wal"] {
             try? fileManager.removeItem(at: URL(fileURLWithPath: url.path + suffix))
         }
+    }
+
+    /// The only deletion of a store the app does. It refuses anything the layout
+    /// does not call a cache, so a path that is wrong costs nothing.
+    nonisolated static func destroyCache(at url: URL, layout: StoreLayout) {
+        guard layout.role(of: url).mayBeDestroyed else { return }
+        destroyStore(at: url)
     }
 }

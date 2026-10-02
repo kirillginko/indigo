@@ -8,10 +8,11 @@
 //    * `CrateSnapshot`, the values taken from a `Recording` when it is crated.
 //    * `CrateRecordings`, which finds -- or makes -- this device's own
 //      `Recording` for a row, by `matchKey` or `unknownCode`.
-//    * The one-time backfill that gives every row crated before this existed
-//      the same snapshot.
 //
-//  Nothing outside this file reads `CrateItem.legacyRecording`.
+//  Rows crated before the snapshot existed were given one by a backfill that
+//  read the relationship they used to carry. That relationship is gone from the
+//  model; the one-time move of the listener's data into the synced store does
+//  the same work from a frozen copy of the old shape (see `UserDataMigrator`).
 //
 
 import Foundation
@@ -218,110 +219,5 @@ nonisolated struct CrateRecordings {
             source.recording = recording
         }
         return recording
-    }
-}
-
-// MARK: - Backfill
-
-extension CrateSnapshot {
-    nonisolated struct BackfillReport: Equatable {
-        /// Rows given a snapshot by this run.
-        var filled = 0
-        /// Recording rows that had no recording behind them and so had nothing
-        /// to copy. They are left exactly as they were.
-        var dangling = 0
-        /// Rows that already had a snapshot whose identity no longer matched
-        /// their recording -- a placeholder given its code after the row was
-        /// copied -- and were brought back in line.
-        var repaired = 0
-        /// Rows whose snapshot still disagrees with the recording it was copied
-        /// from after that.
-        var mismatches = 0
-        /// Identities more than one recording in the store has. Zero is the
-        /// invariant; anything else means a lookup by identity is ambiguous.
-        var collisions = 0
-    }
-
-    /// Gives every recording row crated before the snapshot existed its
-    /// snapshot, copied from the recording it points at.
-    ///
-    /// Safe to run twice, and to stop part-way: a row that has a snapshot is
-    /// skipped, and progress is saved in batches. It does not clear the old
-    /// relationship, so nothing is lost if this needs to be done again.
-    @discardableResult
-    static func backfill(in context: ModelContext, batch: Int = 100) throws -> BackfillReport {
-        var report = BackfillReport()
-        // Saved before anything looks a recording up. A fetch with a limit takes
-        // its rows from the store and only then drops the ones an unsaved edit
-        // has changed, so a code cleared in memory and not written leaves a
-        // lookup by that code with one row to return and no way to return it.
-        let repair = RecordingStore(context: context).repairIdentities()
-        if repair.cleared > 0 || repair.assigned > 0 { try context.save() }
-        let recordingKind = CrateItemKind.recording.rawValue
-        let rows = try context.fetch(FetchDescriptor<CrateItem>(
-            predicate: #Predicate { $0.kindRaw == recordingKind }))
-
-        var unsaved = 0
-        for item in rows where !item.hasRecordingSnapshot {
-            guard let recording = item.legacyRecording else {
-                report.dangling += 1
-                continue
-            }
-            capture(recording, context: context).apply(to: item)
-            report.filled += 1
-            unsaved += 1
-            if unsaved >= batch { try context.save(); unsaved = 0 }
-        }
-        if unsaved > 0 { try context.save() }
-
-        // A row copied before its placeholder had a code names its recording by
-        // key alone, and that key is shared. Brought in line with the recording
-        // it came from.
-        for item in rows {
-            guard let recording = item.legacyRecording, item.hasRecordingSnapshot else { continue }
-            let identity = CrateSnapshot.identity(
-                matchKey: recording.matchKey, unknownCode: recording.unknownCode)
-            if item.recordingIdentity != identity {
-                item.matchKey = recording.matchKey
-                item.unknownCode = recording.unknownCode
-                report.repaired += 1
-            }
-        }
-        if report.repaired > 0 { try context.save() }
-        report.collisions = RecordingStore(context: context).identityCollisions().count
-
-        // Verify against what was copied from, not against the copy.
-        for item in rows {
-            guard let recording = item.legacyRecording, item.hasRecordingSnapshot else { continue }
-            let same = item.matchKey == recording.matchKey
-                && item.unknownCode == recording.unknownCode
-                && item.title == (recording.title.flatMap { $0.isEmpty ? nil : $0 })
-                && item.artistName == (recording.artistName.flatMap { $0.isEmpty ? nil : $0 })
-            if !same { report.mismatches += 1 }
-        }
-        return report
-    }
-}
-
-extension CrateSnapshot {
-    static let backfillVersionKey = "crateSnapshotBackfillVersion"
-    /// 2: the first run copied placeholders by key alone; this one repairs those.
-    /// 3: identified recordings that were given a code they shared with a
-    /// placeholder lose it, so every identity in the store is one recording's.
-    static let backfillVersion = 3
-
-    /// The backfill, once per install: marked done only when it finished with
-    /// nothing disagreeing, so a run that failed or found a mismatch happens
-    /// again next launch instead of being believed.
-    @discardableResult
-    static func backfillOnce(
-        in context: ModelContext, defaults: UserDefaults = .standard
-    ) -> BackfillReport? {
-        guard defaults.integer(forKey: backfillVersionKey) < backfillVersion else { return nil }
-        guard let report = try? backfill(in: context) else { return nil }
-        if report.mismatches == 0, report.collisions == 0 {
-            defaults.set(backfillVersion, forKey: backfillVersionKey)
-        }
-        return report
     }
 }

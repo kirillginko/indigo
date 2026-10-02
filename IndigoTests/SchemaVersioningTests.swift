@@ -28,14 +28,14 @@ final class SchemaVersioningTests: XCTestCase {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    func testTheCurrentSchemaIsVersionFive() {
-        XCTAssertEqual(Persistence.schema.version, Schema.Version(5, 0, 0))
-        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 5)
-        XCTAssertEqual(IndigoMigrationPlan.stages.count, 4)
+    func testTheCurrentSchemaIsVersionSix() {
+        XCTAssertEqual(Persistence.schema.version, Schema.Version(6, 0, 0))
+        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 6)
+        XCTAssertEqual(IndigoMigrationPlan.stages.count, 5)
     }
 
     func testEveryModelTheAppStoresIsInTheVersionedSchema() {
-        let names = Set(IndigoSchemaV5.models.map { String(describing: $0) })
+        let names = Set(IndigoSchemaV6.models.map { String(describing: $0) })
         XCTAssertEqual(names.count, 19)
         for model in ["CrateItem", "ListeningEvent", "DigVisit", "DigStep", "Recording"] {
             XCTAssertTrue(names.contains(model), "\(model) missing from SchemaV1")
@@ -45,7 +45,7 @@ final class SchemaVersioningTests: XCTestCase {
     /// The store on a listener's disk was written with no version at all.
     func testAStoreWrittenWithoutAVersionOpensThroughThePlanWithItsRows() throws {
         let url = directory.appendingPathComponent("legacy.store")
-        let unversioned = Schema(IndigoSchemaV5.models)
+        let unversioned = Schema(IndigoSchemaV6.models)
 
         do {
             let legacy = try ModelContainer(
@@ -95,41 +95,45 @@ final class SchemaVersioningTests: XCTestCase {
 // MARK: - V1 -> V2: the crate keeps its own snapshot
 
 extension SchemaVersioningTests {
-    /// A crate row written when it still pointed at a `Recording`. It has to
-    /// come through the plan with its relationship intact -- that is what the
-    /// backfill reads -- and with the new fields empty until it has run.
-    func testAV1CrateRowKeepsItsRecordingThroughTheMigration() throws {
+    /// A crate row written when it still pointed at a `Recording`. Read through
+    /// the plan that stops at V5 -- how a copy of the old store is brought to
+    /// the last shape that held the bridge -- it keeps the relationship. Through
+    /// the plan to the current version it keeps the row and loses the bridge,
+    /// which is why the old store itself is never opened that way.
+    func testAV1CrateRowKeepsItsRecordingOnlyThroughTheLegacyPlan() throws {
         let url = directory.appendingPathComponent("v1-crate.store")
         let v1 = Schema(IndigoSchemaV1.models)
-
         try autoreleasepool {
             let container = try ModelContainer(
                 for: v1, configurations: ModelConfiguration(schema: v1, url: url))
             let context = ModelContext(container)
-            let recording = Recording(title: "Rev8617", artistName: "Skee Mask", status: .identified)
+            let recording = IndigoLegacy.Recording(title: "Rev8617", artistName: "Skee Mask")
             context.insert(recording)
             context.insert(IndigoSchemaV1.CrateItem(recording: recording))
             try context.save()
         }
+        let legacyCopy = directory.appendingPathComponent("v1-crate-legacy.store")
+        for suffix in ["", "-wal", "-shm"] {
+            try? FileManager.default.copyItem(
+                at: URL(fileURLWithPath: url.path + suffix), to: URL(fileURLWithPath: legacyCopy.path + suffix))
+        }
+
+        let v5 = Schema(versionedSchema: IndigoSchemaV5.self)
+        let legacy = try ModelContainer(
+            for: v5, migrationPlan: IndigoLegacyMigrationPlan.self,
+            configurations: ModelConfiguration(schema: v5, url: legacyCopy))
+        let old = try ModelContext(legacy).fetch(FetchDescriptor<IndigoSchemaV5.CrateItem>())
+        XCTAssertEqual(old.count, 1)
+        XCTAssertEqual(old.first?.legacyRecording?.title, "Rev8617")
 
         let container = try ModelContainer(
             for: Persistence.schema, migrationPlan: IndigoMigrationPlan.self,
             configurations: ModelConfiguration(schema: Persistence.schema, url: url))
-        let context = ModelContext(container)
-        let rows = try context.fetch(FetchDescriptor<CrateItem>())
-
-        XCTAssertEqual(rows.count, 1)
-        XCTAssertEqual(rows.first?.legacyRecording?.title, "Rev8617")
+        let rows = try ModelContext(container).fetch(FetchDescriptor<CrateItem>())
+        XCTAssertEqual(rows.count, 1, "the row survives; the bridge does not")
         XCTAssertEqual(rows.first?.kind, .recording)
-        XCTAssertFalse(rows.first?.hasRecordingSnapshot ?? true, "nothing is filled until the backfill runs")
-
-        let report = try CrateSnapshot.backfill(in: context)
-        XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0, collisions: 0))
-        XCTAssertEqual(rows.first?.artistName, "Skee Mask")
-        XCTAssertEqual(rows.first?.matchKey, rows.first?.legacyRecording?.matchKey)
     }
 }
-
 
 // MARK: - V4 -> V5: nothing refuses a second row, and a row can arrive without a field
 
