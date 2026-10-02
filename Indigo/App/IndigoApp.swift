@@ -49,6 +49,9 @@ struct IndigoApp: App {
     init() {
         // Before the first view draws, so nothing renders in the fallback face.
         Typeface.registerBundledFonts()
+        // Rows another writer made -- CloudKit's imports -- are merged as they
+        // arrive, whether or not a window is open. See `HistoryObserver`.
+        UserDataObserving.start(author: Self.writerAuthor)
         #if DEBUG
         Self.runTestVisitsIfAsked()
         #endif
@@ -166,21 +169,6 @@ struct IndigoApp: App {
                 // `SyncDiagnosticsView`.
                 .modifier(ScreenCornerSyncButton())
                 #endif
-                .task {
-                    // Rows another writer made -- once the listener's data
-                    // syncs, CloudKit's import -- are found through the store's
-                    // history and merged by key. See `HistoryObserver`.
-                    guard !Persistence.isRunningTests, Persistence.userDataWritable else { return }
-                    let context = Persistence.container.mainContext
-                    context.author = Self.writerAuthor
-                    let observer = HistoryObserver(context: context, ownAuthor: Self.writerAuthor)
-                    observer.process()
-                    for await _ in NotificationCenter.default.notifications(
-                        named: .NSPersistentStoreRemoteChange
-                    ) {
-                        observer.process()
-                    }
-                }
                 .task {
                     // Gives a row crated before it kept its own snapshot the
                     // snapshot. Not under test, which runs against the

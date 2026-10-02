@@ -233,6 +233,28 @@ final class DigCounterTests: XCTestCase {
         XCTAssertEqual(onB, 2)
     }
 
+    /// What happened on a real Mac: this device had already loaded the other
+    /// device's component (at 6), the import raised it to 9, and the row was
+    /// projected from the copy still in memory -- 12, not 15 -- until a
+    /// relaunch. A projection must read what the store holds now.
+    func testAnImportedUpdateIsProjectedEvenWhenTheOldValueIsLoaded() throws {
+        let a = try Device("A", in: directory), b = try Device("B", in: directory)
+        let node = MusicNode.artist("Objekt"), origin = MusicNode.artist("Skee Mask")
+        for _ in 0..<3 { b.dig.record(node, from: origin) }
+        try deliver([.counters, .parents], from: b, to: a)
+        for _ in 0..<3 { a.dig.record(node, from: origin) }          // A loads B's component (3) here
+        XCTAssertEqual(a.visits(node).first?.visits, 6)
+        // B raises its own component; A imports only that update.
+        for _ in 0..<3 { b.dig.record(node, from: origin) }
+        let id = CounterID.make(kind: .visit, key: node.id, deviceID: "B")
+        let fresh = try XCTUnwrap(b.local.fetch(FetchDescriptor<DigCounter>(predicate: #Predicate { $0.id == id })).first)
+        let there = try XCTUnwrap(a.remote.fetch(FetchDescriptor<DigCounter>(predicate: #Predicate { $0.id == id })).first)
+        there.count = fresh.count; there.lastAt = fresh.lastAt
+        try a.remote.save()
+        a.observe()
+        XCTAssertEqual(a.visits(node).first?.visits, 9)
+    }
+
     // MARK: - Moving a store's counts into components
 
     private func v6Store(_ layout: StoreLayout, _ fill: (ModelContext) throws -> Void) throws {

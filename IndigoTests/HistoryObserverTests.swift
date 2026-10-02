@@ -130,6 +130,54 @@ final class HistoryObserverTests: XCTestCase {
         XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 1)
     }
 
+    /// The container holds two stores, and the cache in `Local` is written far
+    /// more often than the listener's data. The observer kept the newest
+    /// transaction of *either* store as its place; when that was a cache write,
+    /// the next pass asked for UserData transactions after a token that named
+    /// only `Local`, got nothing, and imports went unmerged until a relaunch.
+    /// Found on a real Mac whose token named the Local store at 46,016 while
+    /// UserData had 49 transactions.
+    func testCacheWritesBetweenImportsDoNotHideTheImports() throws {
+        show(remote, "first", added: 1)
+        show(remote, "first", added: 2)
+        try remote.save()
+        XCTAssertEqual(observer().process().crateMerged, 1)
+
+        // The cache is written, often: the other store's transactions run far
+        // ahead of UserData's, as they do in the app (46,016 against 49).
+        for index in 0..<60 {
+            local.insert(ArtistPortrait(nameKey: "artist \(index)", name: "Artist \(index)"))
+            try local.save()
+        }
+        XCTAssertEqual(observer().process().crateMerged, 0)
+
+        show(remote, "second", added: 1)
+        show(remote, "second", added: 2)
+        try remote.save()
+        local.insert(ArtistPortrait(nameKey: "objekt", name: "Objekt"))
+        try local.save()
+
+        XCTAssertEqual(observer().process().crateMerged, 1, "an import after a cache write must still be seen")
+        XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 2)
+    }
+
+    /// After a pass, the place kept covers both stores: a pass with nothing new
+    /// in either reads nothing, however many cache writes came before.
+    func testAPassWithNothingNewReadsNothing() throws {
+        show(remote, "a", added: 1)
+        try remote.save()
+        for index in 0..<40 {
+            local.insert(ArtistPortrait(nameKey: "artist \(index)", name: "Artist \(index)"))
+            try local.save()
+        }
+        observer().process()
+        var seen: [Int] = []
+        var again = observer()
+        again.onPass = { seen.append($0.transactions) }
+        again.process()
+        XCTAssertEqual(seen, [0])
+    }
+
     func testWhatItHasSeenIsNotLookedAtAgain() throws {
         show(remote, "s", added: 200)
         show(remote, "s", added: 100)

@@ -27,11 +27,9 @@ struct HistoryObserver {
     /// The author of this process's own writes, which are not looked at.
     let ownAuthor: String?
 
-    static let tokenKey = "userDataHistoryToken"
-    /// Which store the token belongs to. A token is a place in one store's
-    /// history; a store made again at the same path has a history of its own,
-    /// and the old token compares as newer than all of it.
-    static let storeKey = "userDataHistoryStore"
+    /// Each store's position, `{uuid: n}`. v2: the token kept before named
+    /// whichever store wrote last -- usually `Local` -- and is not read.
+    static let tokenKey = "userDataHistoryPositions.v2"
 
     /// What one pass looked at, as counts. For a harness that wants to know why
     /// a pass did nothing; the app does not set it.
@@ -55,8 +53,15 @@ struct HistoryObserver {
     @discardableResult
     func process() -> UserDataDedupe.Report {
         let dedupe = UserDataDedupe(context: context)
-        let token = storedToken()
+        let positions = storedPositions()
+        let token = positions.flatMap(Self.token(at:))
 
+        // The container holds two stores, and a transaction's token names only
+        // its own. Resuming from one transaction's token -- usually a `Local`
+        // cache write, which outnumber the listener's by hundreds to one --
+        // left the other store's position unknown. So the place kept is every
+        // store's newest position, merged, and only UserData's transactions
+        // are acted on.
         var descriptor = HistoryDescriptor<DefaultHistoryTransaction>()
         if let token { descriptor.predicate = #Predicate { $0.token > token } }
         guard let transactions = try? context.fetchHistory(descriptor) else {
@@ -76,11 +81,13 @@ struct HistoryObserver {
         // So the identifiers are only ever used to *fetch*, which returns the
         // rows that are still there and nothing else.
         var named: [String: Set<PersistentIdentifier>] = [:]
-        var newest: DefaultHistoryToken?
+        var reached = positions ?? [:]
         var pass = Pass(hadToken: token != nil, transactions: transactions.count)
+        let userData = storeIdentity
 
         for transaction in transactions {
-            newest = transaction.token
+            for (store, position) in Self.positions(of: transaction.token) { reached[store] = max(reached[store] ?? 0, position) }
+            if let userData, transaction.storeIdentifier != userData { continue }
             if let ownAuthor, transaction.author == ownAuthor { continue }
             pass.foreign += 1
             for change in transaction.changes {
@@ -147,7 +154,7 @@ struct HistoryObserver {
         pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
         onPass?(pass)
 
-        if let newest { store(newest) }
+        store(reached)
         return report
     }
 
@@ -160,33 +167,64 @@ struct HistoryObserver {
 
     private func fullPass(_ dedupe: UserDataDedupe) -> UserDataDedupe.Report {
         let report = dedupe.all()
-        if let latest = try? context.fetchHistory(HistoryDescriptor<DefaultHistoryTransaction>()).last?.token {
-            store(latest)
+        var reached: [String: Int] = [:]
+        for transaction in (try? context.fetchHistory(HistoryDescriptor<DefaultHistoryTransaction>())) ?? [] {
+            for (store, position) in Self.positions(of: transaction.token) { reached[store] = max(reached[store] ?? 0, position) }
         }
+        store(reached)
         return report
     }
 
-    // MARK: The token
+    // MARK: The place
 
-    private func storedToken() -> DefaultHistoryToken? {
-        guard let token = defaults.data(forKey: Self.tokenKey)
-            .flatMap({ try? JSONDecoder().decode(DefaultHistoryToken.self, from: $0) }) else { return nil }
-        // A store on disk can say who it is; one in memory cannot, and its
-        // token is trusted as it always was.
-        guard let current = storeIdentity else { return token }
-        return defaults.string(forKey: Self.storeKey) == current ? token : nil
+    /// Each store's position in a token: `{"storeTokens": {uuid: n}}`, the
+    /// form SwiftData encodes it in. A token that does not read that way gives
+    /// nothing, and the next pass is a full one.
+    static func positions(of token: DefaultHistoryToken) -> [String: Int] {
+        guard let data = try? JSONEncoder().encode(token),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let stores = object["storeTokens"] as? [String: Any] else { return [:] }
+        return stores.compactMapValues { ($0 as? NSNumber)?.intValue }
     }
 
-    private func store(_ token: DefaultHistoryToken) {
-        if let data = try? JSONEncoder().encode(token) { defaults.set(data, forKey: Self.tokenKey) }
-        defaults.set(storeIdentity, forKey: Self.storeKey)
+    static func token(at positions: [String: Int]) -> DefaultHistoryToken? {
+        guard !positions.isEmpty,
+              let data = try? JSONSerialization.data(withJSONObject: ["storeTokens": positions]) else { return nil }
+        return try? JSONDecoder().decode(DefaultHistoryToken.self, from: data)
+    }
+
+    /// Where the last pass got to, store by store -- if it is about these
+    /// stores. A position in a store that has since been made again names
+    /// nothing in it, so it is dropped; without UserData's own, the place is
+    /// not trusted and the next pass is a full one.
+    private func storedPositions() -> [String: Int]? {
+        guard let data = defaults.data(forKey: Self.tokenKey),
+              let saved = try? JSONSerialization.jsonObject(with: data) as? [String: Int], !saved.isEmpty else { return nil }
+        let known = knownStores
+        guard !known.isEmpty else { return saved }           // stores in memory say nothing
+        let kept = saved.filter { known.contains($0.key) }
+        guard let userData = storeIdentity, kept[userData] != nil else { return nil }
+        return kept
+    }
+
+    private func store(_ positions: [String: Int]) {
+        guard !positions.isEmpty, let data = try? JSONSerialization.data(withJSONObject: positions) else { return }
+        defaults.set(data, forKey: Self.tokenKey)
     }
 
     /// The UUID Core Data gave the `UserData` store when it was made.
     private var storeIdentity: String? {
         let configurations = context.container.configurations
-        guard let url = (configurations.first { $0.name == "UserData" } ?? configurations.first)?.url,
-              url.path != "/dev/null", FileManager.default.fileExists(atPath: url.path),
+        return Self.uuid(of: (configurations.first { $0.name == "UserData" } ?? configurations.first)?.url)
+    }
+
+    /// Every store on disk in the container.
+    private var knownStores: Set<String> {
+        Set(context.container.configurations.compactMap { Self.uuid(of: $0.url) })
+    }
+
+    private static func uuid(of url: URL?) -> String? {
+        guard let url, url.path != "/dev/null", FileManager.default.fileExists(atPath: url.path),
               let metadata = try? NSPersistentStoreCoordinator.metadataForPersistentStore(type: .sqlite, at: url)
         else { return nil }
         return metadata[NSStoreUUIDKey] as? String
