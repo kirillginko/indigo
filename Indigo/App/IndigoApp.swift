@@ -46,6 +46,14 @@ struct IndigoApp: App {
     /// observer can tell them from an import.
     static let writerAuthor = "indigo.app"
 
+    /// Registers for the silent pushes CloudKit sends when another device
+    /// changes the listener's data. See `IndigoAppDelegate`.
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(IndigoAppDelegate.self) private var appDelegate
+    #else
+    @UIApplicationDelegateAdaptor(IndigoAppDelegate.self) private var appDelegate
+    #endif
+
     init() {
         // Before the first view draws, so nothing renders in the fallback face.
         Typeface.registerBundledFonts()
