@@ -141,11 +141,8 @@ nonisolated struct CrateRecordings {
     }
 
     func recording(matchKey: String, unknownCode: String?) -> Recording? {
-        guard !(matchKey.isEmpty && unknownCode == nil) else { return nil }
-        var descriptor = FetchDescriptor<Recording>(
-            predicate: #Predicate { $0.matchKey == matchKey && $0.unknownCode == unknownCode })
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        RecordingStore(context: context).recording(
+            identity: RecordingIdentity(matchKey: matchKey, unknownCode: unknownCode))
     }
 
     /// The crate row for a recording: by its match key, or by its code when

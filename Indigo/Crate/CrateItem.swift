@@ -185,20 +185,9 @@ nonisolated final class CrateItem {
 
     private var recordingNodeFromSnapshot: MusicNode? {
         guard hasRecordingSnapshot else { return nil }
-        let status = identificationStatusRaw.flatMap(IdentificationStatus.init(rawValue:)) ?? .unknown
-        if status != .unknown, !matchKey.isEmpty {
-            return MusicNode(
-                kind: .recording, key: matchKey,
-                title: displayTitle, subtitle: displaySubtitle,
-                artworkURL: artworkURL
-            )
-        }
-        return MusicNode(
-            kind: .unknownRecording,
-            key: unknownCode ?? matchKey,
-            title: displayTitle, subtitle: displaySubtitle,
-            handle: unknownCode, artworkURL: artworkURL
-        )
+        return MusicNode.recording(
+            identity: RecordingIdentity(matchKey: matchKey, unknownCode: unknownCode),
+            title: displayTitle, subtitle: displaySubtitle, artwork: artworkURL)
     }
 
     // MARK: Display

@@ -121,10 +121,10 @@ final class DigTests: XCTestCase {
 
         XCTAssertTrue(edges.contains { $0.to.kind == .broadcast })
         XCTAssertTrue(edges.contains { $0.to.kind == .selector && $0.to.title == "Ben UFO" })
-        let unknown = try XCTUnwrap(edges.first { $0.to.recordingID == neighbor.id })
+        let unknown = try XCTUnwrap(edges.first { RecordingIdentity(node: $0.to) == RecordingIdentity(neighbor) })
         XCTAssertTrue(unknown.reasons.contains { $0.kind == .sharedBroadcast })
         XCTAssertTrue(unknown.reasons.contains { $0.kind == .frequentlyPlayedNearby })
-        XCTAssertFalse(edges.first { $0.to.recordingID == distant.id }?.reasons.contains {
+        XCTAssertFalse(edges.first { RecordingIdentity(node: $0.to) == RecordingIdentity(distant) }?.reasons.contains {
             $0.kind == .frequentlyPlayedNearby
         } ?? true)
     }
@@ -149,7 +149,7 @@ final class DigTests: XCTestCase {
 
         let edge = RadioNeighborhoodEngine(context: context).graph(around: subject)
             .connections(from: MusicNode.recording(subject))
-            .first { $0.to.recordingID == peer.id }
+            .first { RecordingIdentity(node: $0.to) == RecordingIdentity(peer) }
 
         XCTAssertEqual(edge?.reasons.first { $0.kind == .sharedBroadcast }?.detail,
                        "Played in 3 of the same radio shows")

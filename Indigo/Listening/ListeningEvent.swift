@@ -66,7 +66,11 @@ nonisolated final class ListeningEvent {
     // can be reopened. An encounter nobody can act on is a statistic.
     var mbid: String?
     var discogsID: Int?
-    var recordingID: UUID?
+    /// A local `Recording.id`, and so meaningful on one device only. Nothing
+    /// reads it: what recording an encounter was with is the node's key, which
+    /// is the same on every device. It is here for the one-time migration that
+    /// rewrote older rows from it, and goes when the store is split.
+    @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
     var providerID: String?
     var handle: String?
 
@@ -113,7 +117,6 @@ nonisolated final class ListeningEvent {
         self.subtitle = node.subtitle
         self.mbid = node.mbid
         self.discogsID = node.discogsID
-        self.recordingID = node.recordingID
         self.providerID = node.providerID
         self.handle = node.handle
         self.sourceProviderID = source?.providerID
@@ -131,7 +134,7 @@ nonisolated final class ListeningEvent {
     var node: MusicNode {
         MusicNode(
             kind: kind, key: nodeKey, title: title, subtitle: subtitle,
-            mbid: mbid, discogsID: discogsID, recordingID: recordingID,
+            mbid: mbid, discogsID: discogsID,
             providerID: providerID, handle: handle
         )
     }

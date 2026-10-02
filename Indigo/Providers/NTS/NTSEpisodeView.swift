@@ -165,14 +165,14 @@ struct NTSEpisodeView: View {
     /// has produced artwork for it.
     private func resolvedRows(
         _ detail: NTSEpisodeDetail
-    ) -> [String: (recordingID: UUID?, line: String?, artwork: URL?)] {
+    ) -> [String: (identity: RecordingIdentity?, line: String?, artwork: URL?)] {
         let _ = dig.revision
         let engine = RadioNeighborhoodEngine(context: dig.context)
-        var found: [String: (recordingID: UUID?, line: String?, artwork: URL?)] = [:]
+        var found: [String: (identity: RecordingIdentity?, line: String?, artwork: URL?)] = [:]
         for entry in detail.tracklist {
             guard let recording = engine.recording(for: entry, in: detail) else { continue }
             let release = dig.releaseDetail(for: recording)
-            found[entry.id] = (recording.id, release.line, release.artwork)
+            found[entry.id] = (RecordingIdentity(recording), release.line, release.artwork)
         }
         return found
     }
@@ -255,7 +255,7 @@ private struct TracklistRow: View {
     let detail: NTSEpisodeDetail
     let showsTimestamps: Bool
     /// Resolved by the episode, not by the row — see `resolvedRows`.
-    let release: (recordingID: UUID?, line: String?, artwork: URL?)
+    let release: (identity: RecordingIdentity?, line: String?, artwork: URL?)
 
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
@@ -296,9 +296,9 @@ private struct TracklistRow: View {
                 // a recording. That happens when the episode loads, so it is
                 // a moment rather than a wait — but until then the title is
                 // text, because a link to nothing is worse than no link.
-                if let recordingID = release.recordingID {
+                if let identity = release.identity {
                     Button {
-                        appState.open(.digRecording(id: recordingID, title: entry.title))
+                        appState.open(.digRecording(identity: identity, title: entry.title))
                     } label: {
                         Text(entry.title)
                             .font(Typeface.body(12.5, weight: .medium))

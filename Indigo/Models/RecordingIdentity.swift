@@ -72,12 +72,17 @@ nonisolated struct RecordingIdentity: Hashable, Sendable {
         self.init(matchKey: "", unknownCode: code)
     }
 
-    /// The identity a node names, when it names a recording.
+    /// The identity a node names, when it names a recording. An unnamed
+    /// recording's key is its code alone, unless something also named it.
     init?(node: MusicNode) {
         switch node.kind {
-        case .recording: self.init(key: node.key)
-        case .unknownRecording: self.init(unnamedCode: node.key)
-        default: return nil
+        case .recording:
+            self.init(key: node.key)
+        case .unknownRecording:
+            if node.key.contains(Self.separator) { self.init(key: node.key) }
+            else { self.init(unnamedCode: node.key) }
+        default:
+            return nil
         }
     }
 }

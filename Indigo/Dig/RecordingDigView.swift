@@ -15,7 +15,7 @@ import SwiftUI
 import SwiftData
 
 struct RecordingDigView: View {
-    let recordingID: UUID
+    let identity: RecordingIdentity
     let fallbackTitle: String
 
     @Environment(AppState.self) private var appState
@@ -34,11 +34,11 @@ struct RecordingDigView: View {
             } else {
                 EmptyStateView(
                     headline: fallbackTitle,
-                    message: "Indigo no longer has this recording."
+                    message: "Indigo does not have this recording on this device."
                 ) { EmptyView() }
             }
         }
-        .task(id: recordingID) {
+        .task(id: identity) {
             guard let recording = fetch() else { return }
             // The co-appearance walk reads the whole appearance log, so it is
             // done once here rather than during a redraw.
@@ -180,8 +180,8 @@ struct RecordingDigView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(peers) { peer in
                         AlongsideRow(connection: peer) {
-                            guard let identifier = peer.to.recordingID else { return }
-                            appState.open(.digRecording(id: identifier, title: peer.to.title))
+                            guard let identity = RecordingIdentity(node: peer.to) else { return }
+                            appState.open(.digRecording(identity: identity, title: peer.to.title))
                         }
                         Rule()
                     }
@@ -211,10 +211,7 @@ struct RecordingDigView: View {
     }
 
     private func fetch() -> Recording? {
-        let identifier = recordingID
-        var descriptor = FetchDescriptor<Recording>(predicate: #Predicate { $0.id == identifier })
-        descriptor.fetchLimit = 1
-        return (try? dig.context.fetch(descriptor))?.first
+        RecordingStore(context: dig.context).recording(identity: identity)
     }
 }
 

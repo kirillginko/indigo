@@ -223,7 +223,7 @@ final class DeepTests: XCTestCase {
         let show = MusicNode.broadcast(providerID: "nts", showID: "ben-ufo/1", title: "Ben UFO")
         let deepest = DeepEngine(context: context).results(from: show, at: .unknown)
 
-        XCTAssertEqual(deepest.map(\.node.recordingID), [unknown.id],
+        XCTAssertEqual(deepest.compactMap { RecordingIdentity(node: $0.node) }, [RecordingIdentity(unknown)],
                        "The unnamed recording, and only it, is at the bottom level")
         XCTAssertNotNil(deepest.first?.why, "Even the deepest result has to say why")
     }
@@ -277,8 +277,8 @@ final class CoAppearanceTests: XCTestCase {
         let peers = graph.connections(from: .recording(subject))
             .filter { $0.to.kind == .recording || $0.to.kind == .unknownRecording }
 
-        let stenny = try XCTUnwrap(peers.first { $0.to.recordingID == travelling.id })
-        let passerby = try XCTUnwrap(peers.first { $0.to.recordingID == once.id })
+        let stenny = try XCTUnwrap(peers.first { RecordingIdentity(node: $0.to) == RecordingIdentity(travelling) })
+        let passerby = try XCTUnwrap(peers.first { RecordingIdentity(node: $0.to) == RecordingIdentity(once) })
 
         XCTAssertGreaterThan(stenny.confidence, passerby.confidence,
                              "Four shared hours outrank one")
@@ -299,7 +299,7 @@ final class CoAppearanceTests: XCTestCase {
 
         let dig = DigStore(context: context)
         XCTAssertEqual(dig.recordingDestination(for: heardOnAir),
-                       .digRecording(id: heardOnAir.id, title: "Rev8617"))
+                       .digRecording(identity: RecordingIdentity(heardOnAir), title: "Rev8617"))
         XCTAssertEqual(dig.recordingDestination(for: neverHeard),
                        .digArtist(mbid: nil, name: "Skee Mask"),
                        "Nothing heard means nothing to show; the artist is the page")

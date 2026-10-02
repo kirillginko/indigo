@@ -629,7 +629,7 @@ struct ExploreView: View {
 
     private func open(_ item: CrateItem) {
         if let recording = CrateRecordings(context: crate.context).resolve(item) {
-            appState.open(.digRecording(id: recording.id, title: item.displayTitle))
+            appState.open(.digRecording(identity: RecordingIdentity(recording), title: item.displayTitle))
             return
         }
         // Every broadcast row goes up the one ladder — the broadcast, then

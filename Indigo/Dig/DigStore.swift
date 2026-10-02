@@ -282,7 +282,7 @@ final class DigStore {
     func recordingDestination(for recording: Recording) -> DetailPage? {
         let _ = revision
         if !recording.appearances.isEmpty {
-            return .digRecording(id: recording.id, title: recording.displayTitle)
+            return .digRecording(identity: RecordingIdentity(recording), title: recording.displayTitle)
         }
         return destination(for: recording)
     }
@@ -1057,12 +1057,14 @@ final class DigStore {
             return .catalogNumber(number)
         case .digScene(let city, let sound):
             return SceneEngine(context: context).scene(city: city, sound: sound)?.node
-        case .digRecording(let id, _):
-            // Resolved through the recording itself so an identified track and
-            // its unknown past are one node rather than two.
-            var descriptor = FetchDescriptor<Recording>(predicate: #Predicate { $0.id == id })
-            descriptor.fetchLimit = 1
-            return (try? context.fetch(descriptor))?.first.map { MusicNode.recording($0) }
+        case .digRecording(let identity, let title):
+            // Resolved through the recording itself when this device has one, so
+            // an identified track and its unknown past are one node rather than
+            // two; named from the page when it has not.
+            if let recording = RecordingStore(context: context).recording(identity: identity) {
+                return MusicNode.recording(recording)
+            }
+            return MusicNode.recording(identity: identity, title: title, subtitle: nil)
         default:
             return nil
         }

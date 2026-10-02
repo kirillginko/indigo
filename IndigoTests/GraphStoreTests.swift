@@ -358,8 +358,8 @@ final class GraphStoreTests: XCTestCase {
         let show = MusicNode.broadcast(providerID: "nts", showID: "ben-ufo/2026-08-28", title: "Ben UFO")
         let reached = GraphStore(context: context).neighbors(of: show).byDestination
 
-        XCTAssertTrue(reached.contains { $0.node.recordingID == named.id })
-        let white = try XCTUnwrap(reached.first { $0.node.recordingID == unknown.id })
+        XCTAssertTrue(reached.contains { RecordingIdentity(node: $0.node) == RecordingIdentity(named) })
+        let white = try XCTUnwrap(reached.first { RecordingIdentity(node: $0.node) == RecordingIdentity(unknown) })
         XCTAssertEqual(white.node.kind, .unknownRecording)
         XCTAssertTrue(white.node.isUnidentified)
     }

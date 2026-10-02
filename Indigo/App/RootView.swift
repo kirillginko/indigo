@@ -118,8 +118,8 @@ struct RootView: View {
                     DigReleaseView(releaseID: id, fallbackTitle: title)
                 case .digReleaseNamed(let title, let artist):
                     DigReleaseView(releaseID: nil, fallbackTitle: title, artistName: artist)
-                case .digRecording(let id, let title):
-                    RecordingDigView(recordingID: id, fallbackTitle: title)
+                case .digRecording(let identity, let title):
+                    RecordingDigView(identity: identity, fallbackTitle: title)
                 case .digCatalog(let number):
                     CatalogDigView(number: number)
                 case .digScene(let city, let sound):

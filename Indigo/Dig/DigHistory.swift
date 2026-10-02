@@ -31,7 +31,8 @@ nonisolated final class DigVisit {
     // Enough to reopen it. A visit nobody can act on is a statistic.
     var mbid: String?
     var discogsID: Int?
-    var recordingID: UUID?
+    /// A local `Recording.id`; see `ListeningEvent.legacyRecordingID`.
+    @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
     var providerID: String?
     var handle: String?
 
@@ -45,7 +46,6 @@ nonisolated final class DigVisit {
         lastVisitedAt = Date()
         mbid = node.mbid
         discogsID = node.discogsID
-        recordingID = node.recordingID
         providerID = node.providerID
         handle = node.handle
     }
@@ -58,7 +58,7 @@ nonisolated final class DigVisit {
             kind: kind,
             key: String(nodeID.drop { $0 != ":" }.dropFirst()),
             title: title, subtitle: subtitle,
-            mbid: mbid, discogsID: discogsID, recordingID: recordingID,
+            mbid: mbid, discogsID: discogsID,
             providerID: providerID, handle: handle
         )
     }
@@ -125,7 +125,6 @@ nonisolated struct DigHistory {
         // should end up knowing both.
         visit.mbid = visit.mbid ?? node.mbid
         visit.discogsID = visit.discogsID ?? node.discogsID
-        visit.recordingID = visit.recordingID ?? node.recordingID
 
         if let origin, origin.id != node.id {
             let step = step(from: origin.id, to: node.id) ?? {

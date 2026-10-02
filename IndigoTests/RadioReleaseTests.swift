@@ -127,7 +127,7 @@ final class RadioReleaseTests: XCTestCase {
 
         let show = MusicNode.broadcast(providerID: "nts", showID: "ben-ufo/2026-08-28", title: "Ben UFO")
         let played = GraphStore(context: context).neighbors(of: show).byDestination
-        let track = try XCTUnwrap(played.first { $0.node.recordingID == recording.id })
+        let track = try XCTUnwrap(played.first { RecordingIdentity(node: $0.node) == RecordingIdentity(recording) })
 
         XCTAssertEqual(track.node.artworkURL?.absoluteString, "https://img.example/untrue.jpg")
     }

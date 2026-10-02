@@ -82,8 +82,12 @@ nonisolated final class Recording {
         self.musicBrainzRecordingID = musicBrainzRecordingID
         self.isrc = isrc
         self.identificationStatusRaw = status.rawValue
-        self.matchKey = RecordingKey.match(artist: artistName, title: title)
+        let key = RecordingKey.match(artist: artistName, title: title)
+        self.matchKey = key
+        // A recording with no key and no code has no identity on any device but
+        // this one, so it is given a code of its own.
         self.unknownCode = unknownCode
+            ?? (key.isEmpty ? RecordingKey.code(from: "local|\(id.uuidString)") : nil)
         self.durationSeconds = durationSeconds
         self.createdAt = Date()
         self.updatedAt = Date()

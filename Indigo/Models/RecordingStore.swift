@@ -42,6 +42,19 @@ nonisolated struct RecordingStore {
         return try first(#Predicate<Recording> { $0.matchKey == key && $0.unknownCode == nil })
     }
 
+    /// The recording an identity names on this device, if it has one. Exact:
+    /// a key with no code is the recording the key names alone, never one of
+    /// the coded placeholders that share it.
+    func recording(identity: RecordingIdentity) -> Recording? {
+        guard !identity.isEmpty else { return nil }
+        let key = identity.matchKey
+        let code = identity.unknownCode
+        var descriptor = FetchDescriptor<Recording>(
+            predicate: #Predicate { $0.matchKey == key && $0.unknownCode == code })
+        descriptor.fetchLimit = 1
+        return try? context.fetch(descriptor).first
+    }
+
     func recording(id: UUID) throws -> Recording? {
         try first(#Predicate<Recording> { $0.id == id })
     }

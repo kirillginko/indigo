@@ -190,7 +190,7 @@ final class DigHistoryTests: XCTestCase {
         let dig = DigStore(context: context)
 
         XCTAssertEqual(
-            dig.node(for: .digRecording(id: recording.id, title: "Rev8617"))?.id,
+            dig.node(for: .digRecording(identity: RecordingIdentity(recording), title: "Rev8617"))?.id,
             MusicNode.recording(recording).id
         )
     }

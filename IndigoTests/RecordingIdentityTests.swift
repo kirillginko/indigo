@@ -245,10 +245,11 @@ final class RecordingIdentityTests: XCTestCase {
 
         // The visit kept a recording id and the key as its node id.
         let visit = DigVisit(node: MusicNode(
-            kind: .recording, key: aggregate.matchKey, title: "Unreleased", recordingID: visited.id))
+            kind: .recording, key: aggregate.matchKey, title: "Unreleased"))
+        visit.legacyRecordingID = visited.id
         context.insert(visit)
 
-        let resolved = try XCTUnwrap(store.recording(id: try XCTUnwrap(visit.recordingID)))
+        let resolved = try XCTUnwrap(store.recording(id: try XCTUnwrap(visit.legacyRecordingID)))
         let identity = RecordingIdentity(resolved)
         let sharing = (try context.fetch(FetchDescriptor<Recording>()))
             .filter { RecordingIdentity($0) == identity }
