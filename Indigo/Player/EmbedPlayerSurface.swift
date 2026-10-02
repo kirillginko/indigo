@@ -84,4 +84,11 @@ struct EmbedPlayerSurface: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView { engine.webView }
     func updateUIView(_ view: WKWebView, context: Context) {}
 }
+
+/// There is no separate mini player window on iOS to keep a closed main
+/// window's player alive in, so there is nothing to stand by.
+struct EmbedStandbySurface: View {
+    let engine: EmbedAudioEngine
+    var body: some View { EmptyView() }
+}
 #endif

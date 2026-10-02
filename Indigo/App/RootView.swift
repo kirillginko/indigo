@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct RootView: View {
     @Environment(AppState.self) private var appState

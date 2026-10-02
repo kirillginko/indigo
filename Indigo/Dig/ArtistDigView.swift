@@ -6,7 +6,6 @@
 //  biography — it's that every line is somewhere else you can go.
 //
 
-import AppKit
 import SwiftUI
 import SwiftData
 
