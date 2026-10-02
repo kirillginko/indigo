@@ -183,7 +183,7 @@ nonisolated enum UserDataTransform {
             let to = moves[value.toNodeID] ?? value.toNodeID
             if from != value.fromNodeID || to != value.toNodeID {
                 value.fromNodeID = from; value.toNodeID = to
-                value.identity = "\(from)→\(to)"
+                value.identity = DigStep.canonicalIdentity(from: from, to: to)
                 result.stepsRewritten += 1
             }
             if value.id == nil { value.id = stableID("indigo.step|\(value.identity)") }
@@ -487,6 +487,9 @@ nonisolated struct SplitMigration {
         // Nothing in the new store names a local id, and every identity is one
         // recording's.
         if !RecordingStore(context: context).identityCollisions().isEmpty { problems.append("recording identities collide") }
+        // And no row disagrees with itself: the fields stored beside the parts
+        // they are made of still match them.
+        for violation in UserDataInvariants.violations(in: context).prefix(5) { problems.append("\(violation)") }
         if UserDataDedupe(context: context).hasDuplicates() { problems.append("duplicate rows remain") }
 
         if !problems.isEmpty { throw SplitMigrationError.verificationFailed(problems) }

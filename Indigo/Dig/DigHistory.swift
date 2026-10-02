@@ -96,6 +96,10 @@ nonisolated final class DigStep {
     var lastAt: Date = Date.distantPast
 
     /// A row as it was; see `CrateItem.init(restoring:)`.
+    /// The one place a step's identity is written: where it left, an arrow,
+    /// where it went.
+    static func canonicalIdentity(from: String, to: String) -> String { "\(from)→\(to)" }
+
     init(restoring value: StepValue) {
         id = value.id
         identity = value.identity
@@ -106,7 +110,7 @@ nonisolated final class DigStep {
 
     init(from: String, to: String) {
         id = UUID()
-        identity = "\(from)→\(to)"
+        identity = DigStep.canonicalIdentity(from: from, to: to)
         fromNodeID = from
         toNodeID = to
         count = 0
@@ -148,7 +152,7 @@ nonisolated struct DigHistory {
         // before the count moves, so it moves on the row that stays.
         let dedupe = UserDataDedupe(context: context)
         dedupe.visit(nodeID: node.id)
-        if let origin, origin.id != node.id { dedupe.step(identity: "\(origin.id)→\(node.id)") }
+        if let origin, origin.id != node.id { dedupe.step(identity: DigStep.canonicalIdentity(from: origin.id, to: node.id)) }
         let visit = visit(for: node) ?? {
             let fresh = DigVisit(node: node)
             context.insert(fresh)
@@ -200,7 +204,7 @@ nonisolated struct DigHistory {
 
     private func step(from: String, to: String) -> DigStep? {
         UserDataDedupe.survivor(
-            ofSteps: UserDataDedupe(context: context).rows(forStepIdentity: "\(from)→\(to)"))
+            ofSteps: UserDataDedupe(context: context).rows(forStepIdentity: DigStep.canonicalIdentity(from: from, to: to)))
     }
 
     /// "YOU OFTEN DIG THROUGH" — the things this listener keeps going back to.

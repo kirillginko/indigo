@@ -60,6 +60,20 @@ nonisolated final class CrateItem {
     /// Seconds into that broadcast.
     var broadcastOffsetSeconds: Double?
 
+    // What `providerID`, `showID`, `showTitle` and `showSubtitle` hold depends
+    // on `kind`. They are named for the first thing the crate kept, a show, and
+    // reused since, and their names are fixed in the synced schema:
+    //
+    //   .broadcast    the show: its provider, its id, its title, its subtitle.
+    //   .artist       the catalogue entry: `providerID` says which catalogue
+    //   .release        ("dig.artist.mbid"), `showID` is the entity's id,
+    //   .label          `showTitle` its name, `showSubtitle` a line under it.
+    //   .recording    where it was heard: the broadcast it came from, or
+    //                 "local" for a file. `showTitle` is that broadcast's title.
+    //
+    // `CrateService.item(forBroadcast:)` therefore matches on kind as well, or
+    // crating a show would find the track heard in it.
+
     /// Set for `.broadcast`. Kept as plain fields rather than a relationship
     /// so a crated show survives the provider's catalogue changing under it.
     var providerID: String?

@@ -80,7 +80,17 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     /// a list of strings.
     var artworkURL: URL?
 
-    var id: String { "\(kind.rawValue):\(key)" }
+    var id: String { Self.canonicalID(kindRaw: kind.rawValue, key: key) }
+
+    /// The one place a node id is written: the kind, a colon, the key. Events
+    /// and visits store it beside the parts it is made of, and
+    /// `UserDataInvariants` checks that the two never disagree.
+    static func canonicalID(kindRaw: String, key: String) -> String { "\(kindRaw):\(key)" }
+
+    /// The kind a node id names, which is what comes before its first colon.
+    static func kindRaw(ofID id: String) -> String? {
+        id.firstIndex(of: ":").map { String(id[..<$0]) }
+    }
 
     // MARK: Constructors
 
