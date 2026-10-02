@@ -132,11 +132,19 @@ nonisolated struct DigHistory {
     /// False while the listener's store could not be opened; nothing is
     /// recorded or forgotten, because it would not outlive the session.
     private let writable: Bool
+    /// Whose counter components this writes. One per installation; see
+    /// `DeviceIdentity`. A test or a harness standing in for two devices passes
+    /// its own.
+    private let deviceID: String
 
-    init(context: ModelContext, graph: GraphStore? = nil, writable: Bool = Persistence.userDataWritable) {
+    init(
+        context: ModelContext, graph: GraphStore? = nil, writable: Bool = Persistence.userDataWritable,
+        deviceID: String = DeviceIdentity.current
+    ) {
         self.context = context
         self.shared = graph
         self.writable = writable
+        self.deviceID = deviceID
     }
 
     // MARK: Writing
@@ -153,13 +161,17 @@ nonisolated struct DigHistory {
         let dedupe = UserDataDedupe(context: context)
         dedupe.visit(nodeID: node.id)
         if let origin, origin.id != node.id { dedupe.step(identity: DigStep.canonicalIdentity(from: origin.id, to: node.id)) }
+        let now = Date()
+        let counters = DigCounters(context: context)
         let visit = visit(for: node) ?? {
             let fresh = DigVisit(node: node)
             context.insert(fresh)
             return fresh
         }()
-        visit.visits += 1
-        visit.lastVisitedAt = Date()
+        // The count is this device's component, raised; the row is what all the
+        // components add up to. See `DigCounter`.
+        counters.increment(.visit, key: node.id, deviceID: deviceID, at: now)
+        counters.project(visit)
         visit.title = node.title
         // Identifiers accumulate: a node met by name first and by MBID later
         // should end up knowing both.
@@ -172,8 +184,8 @@ nonisolated struct DigHistory {
                 context.insert(fresh)
                 return fresh
             }()
-            step.count += 1
-            step.lastAt = Date()
+            counters.increment(.step, key: step.identity, deviceID: deviceID, at: now)
+            counters.project(step)
         }
         try? context.save()
     }
@@ -182,6 +194,11 @@ nonisolated struct DigHistory {
         guard writable else { return }
         for visit in visits() { context.delete(visit) }
         for step in steps() { context.delete(step) }
+        // The components too, or the next projection would bring the rows back.
+        // The generation marker stays: the store still counts in components.
+        for counter in (try? context.fetch(FetchDescriptor<DigCounter>())) ?? [] where counter.kind != .generation {
+            context.delete(counter)
+        }
         try? context.save()
     }
 

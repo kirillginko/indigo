@@ -54,6 +54,11 @@ nonisolated enum CloudKitSchemaManifest {
         "DigStep": [
             "id": "STRING", "identity": "STRING", "fromNodeID": "STRING", "toNodeID": "STRING",
             "count": "INT64", "lastAt": "TIMESTAMP"
+        ],
+        // V7. Additive: a new record type, nothing above changes.
+        "DigCounter": [
+            "id": "STRING", "kindRaw": "STRING", "key": "STRING", "deviceID": "STRING",
+            "count": "INT64", "firstAt": "TIMESTAMP", "lastAt": "TIMESTAMP"
         ]
     ]
 

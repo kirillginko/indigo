@@ -28,15 +28,15 @@ final class SchemaVersioningTests: XCTestCase {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    func testTheCurrentSchemaIsVersionSix() {
-        XCTAssertEqual(Persistence.schema.version, Schema.Version(6, 0, 0))
-        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 6)
-        XCTAssertEqual(IndigoMigrationPlan.stages.count, 5)
+    func testTheCurrentSchemaIsVersionSeven() {
+        XCTAssertEqual(Persistence.schema.version, Schema.Version(7, 0, 0))
+        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 7)
+        XCTAssertEqual(IndigoMigrationPlan.stages.count, 6)
     }
 
     func testEveryModelTheAppStoresIsInTheVersionedSchema() {
-        let names = Set(IndigoSchemaV6.models.map { String(describing: $0) })
-        XCTAssertEqual(names.count, 19)
+        let names = Set(IndigoSchemaCurrent.models.map { String(describing: $0) })
+        XCTAssertEqual(names.count, 20)
         for model in ["CrateItem", "ListeningEvent", "DigVisit", "DigStep", "Recording"] {
             XCTAssertTrue(names.contains(model), "\(model) missing from SchemaV1")
         }
@@ -45,7 +45,7 @@ final class SchemaVersioningTests: XCTestCase {
     /// The store on a listener's disk was written with no version at all.
     func testAStoreWrittenWithoutAVersionOpensThroughThePlanWithItsRows() throws {
         let url = directory.appendingPathComponent("legacy.store")
-        let unversioned = Schema(IndigoSchemaV6.models)
+        let unversioned = Schema(IndigoSchemaCurrent.models)
 
         do {
             let legacy = try ModelContainer(

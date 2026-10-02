@@ -17,11 +17,11 @@ final class CloudKitSchemaManifestTests: XCTestCase {
     }
 
     func testTheManifestNamesExactlyTheFieldsOfExactlyTheSyncedModels() throws {
-        XCTAssertEqual(Set(CloudKitSchemaManifest.expected.keys), IndigoSchemaV6.userDataModelNames)
+        XCTAssertEqual(Set(CloudKitSchemaManifest.expected.keys), IndigoSchemaCurrent.userDataModelNames)
         for (name, fields) in CloudKitSchemaManifest.expected {
             XCTAssertEqual(Set(fields.keys), Set(try entity(name).attributes.map(\.name)), name)
         }
-        XCTAssertEqual(CloudKitSchemaManifest.expected.values.reduce(0) { $0 + $1.count }, 56)
+        XCTAssertEqual(CloudKitSchemaManifest.expected.values.reduce(0) { $0 + $1.count }, 63)
     }
 
     func testEveryTypeInTheManifestIsWhatTheRuleSaysItsSwiftTypeIs() throws {

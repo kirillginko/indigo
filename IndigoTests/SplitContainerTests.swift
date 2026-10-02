@@ -114,10 +114,10 @@ final class SplitContainerTests: XCTestCase {
     /// was never given -- which is how the pair first failed to open. Each
     /// store's schema has to be exactly its own models.
     func testEachStoresSchemaIsExactlyItsOwnModels() {
-        let user = Set(Schema(IndigoSchemaV6.userDataModels).entities.map(\.name))
-        let local = Set(Schema(IndigoSchemaV6.localModels).entities.map(\.name))
-        XCTAssertEqual(user, IndigoSchemaV6.userDataModelNames)
-        XCTAssertEqual(local, Set(IndigoSchemaV6.localModels.map { String(describing: $0) }))
+        let user = Set(Schema(IndigoSchemaCurrent.userDataModels).entities.map(\.name))
+        let local = Set(Schema(IndigoSchemaCurrent.localModels).entities.map(\.name))
+        XCTAssertEqual(user, IndigoSchemaCurrent.userDataModelNames)
+        XCTAssertEqual(local, Set(IndigoSchemaCurrent.localModels.map { String(describing: $0) }))
         XCTAssertTrue(user.isDisjoint(with: local))
         XCTAssertEqual(local.count, 15)
     }

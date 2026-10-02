@@ -30,6 +30,9 @@ enum Launcher {
         if CommandLine.arguments.contains(TwoDeviceSyncRunner.argument) {
             MainActor.assumeIsolated { TwoDeviceSyncRunner.runAndExit() }
         }
+        if CommandLine.arguments.contains(CounterRehearsalRunner.argument) {
+            MainActor.assumeIsolated { CounterRehearsalRunner.runAndExit() }
+        }
         if CommandLine.arguments.contains(CloudKitCountRunner.argument) {
             MainActor.assumeIsolated { CloudKitCountRunner.runAndExit() }
         }

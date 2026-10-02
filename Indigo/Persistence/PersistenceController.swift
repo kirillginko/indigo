@@ -34,7 +34,7 @@ nonisolated enum StoreRole: Equatable {
     /// The models that are the listener's own. A store holding any one of them
     /// is `userData`; this list is the only place that is decided.
     static var userOwnedModels: [any PersistentModel.Type] {
-        [CrateItem.self, ListeningEvent.self, DigVisit.self, DigStep.self]
+        [CrateItem.self, ListeningEvent.self, DigVisit.self, DigStep.self, DigCounter.self]
     }
 
     static func role(holding models: [any PersistentModel.Type]) -> StoreRole {
@@ -88,7 +88,7 @@ nonisolated enum UserDataSync: Equatable {
 
 enum Persistence {
     /// The current version of the store's schema; see `IndigoSchema.swift`.
-    static let schema = Schema(versionedSchema: IndigoSchemaV6.self)
+    static let schema = Schema(versionedSchema: IndigoSchemaCurrent.self)
 
     /// Where the three stores live; see `StoreLayout`.
     static let layout = StoreLayout.standard
@@ -184,7 +184,7 @@ enum Persistence {
         sync: UserDataSync = .off
     ) throws -> ModelContainer {
         try ModelContainer(
-            for: Schema(versionedSchema: IndigoSchemaV6.self),
+            for: Schema(versionedSchema: IndigoSchemaCurrent.self),
             migrationPlan: migrationPlan,
             configurations: splitConfigurations(userData: userData, local: local, sync: sync))
     }
@@ -205,8 +205,8 @@ enum Persistence {
             return ModelConfiguration(name, schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         }
         return [
-            configuration("UserData", IndigoSchemaV6.userDataModels, userData, sync.database),
-            configuration("Local", IndigoSchemaV6.localModels, local, .none)
+            configuration("UserData", IndigoSchemaCurrent.userDataModels, userData, sync.database),
+            configuration("Local", IndigoSchemaCurrent.localModels, local, .none)
         ]
     }
 
@@ -236,6 +236,21 @@ enum Persistence {
     }
 
     nonisolated private static func openSplitStoresUnsynced(layout: StoreLayout, sync: UserDataSync) throws -> ModelContainer {
+        // A store from before counter components owes its counts to them. Noted
+        // before it is opened -- opening migrates it, and then it can no longer
+        // tell -- and paid once it is. See `CounterBaseline`.
+        CounterBaseline.prepare(layout: layout)
+        let container = try openSplitStoresOnce(layout: layout, sync: sync)
+        do {
+            try CounterBaseline.complete(layout: layout, context: ModelContext(container))
+        } catch {
+            throw StoreOpenFailure(
+                role: .userData, url: layout.userData, reason: "the counts could not be moved into components: \(error)")
+        }
+        return container
+    }
+
+    nonisolated private static func openSplitStoresOnce(layout: StoreLayout, sync: UserDataSync) throws -> ModelContainer {
         do {
             return try makeSplitContainer(userData: layout.userData, local: layout.local, sync: sync)
         } catch {

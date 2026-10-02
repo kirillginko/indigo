@@ -707,8 +707,30 @@ nonisolated enum IndigoSchemaV6: VersionedSchema {
     }
 }
 
+/// V6 and one new synced model: `DigCounter`, the per-device components that
+/// visits and steps are counted in from here on (see `DigCounter.swift`).
+/// Nothing in V6 changes; every V6 model is the same class, so V6 is pinned.
+nonisolated enum IndigoSchemaV7: VersionedSchema {
+    static let versionIdentifier = Schema.Version(7, 0, 0)
+
+    static var models: [any PersistentModel.Type] { IndigoSchemaV6.models + [DigCounter.self] }
+
+    static let userDataModelNames: Set<String> = IndigoSchemaV6.userDataModelNames.union(["DigCounter"])
+
+    static var userDataModels: [any PersistentModel.Type] {
+        models.filter { userDataModelNames.contains(String(describing: $0)) }
+    }
+
+    static var localModels: [any PersistentModel.Type] {
+        models.filter { !userDataModelNames.contains(String(describing: $0)) }
+    }
+}
+
+/// The schema the app opens its stores with now.
+typealias IndigoSchemaCurrent = IndigoSchemaV7
+
 nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self, IndigoSchemaV6.self] }
+    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self, IndigoSchemaV6.self, IndigoSchemaV7.self] }
 
     /// V1 -> V2 is additive: eight optional or defaulted fields on `CrateItem`,
     /// and one rename. V2 -> V3 renames the recording id on `ListeningEvent` and
@@ -722,7 +744,10 @@ nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
             .lightweight(fromVersion: IndigoSchemaV2.self, toVersion: IndigoSchemaV3.self),
             .lightweight(fromVersion: IndigoSchemaV3.self, toVersion: IndigoSchemaV4.self),
             .lightweight(fromVersion: IndigoSchemaV4.self, toVersion: IndigoSchemaV5.self),
-            .lightweight(fromVersion: IndigoSchemaV5.self, toVersion: IndigoSchemaV6.self)
+            .lightweight(fromVersion: IndigoSchemaV5.self, toVersion: IndigoSchemaV6.self),
+            // Adds a table. The counts move into it after the store opens, from
+            // `CounterBaseline`, which can tell a store that predates it.
+            .lightweight(fromVersion: IndigoSchemaV6.self, toVersion: IndigoSchemaV7.self)
         ]
     }
 }

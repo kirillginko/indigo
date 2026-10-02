@@ -363,8 +363,11 @@ final class UserDataDedupeTests: XCTestCase {
             context.insert(step)
         }
         try context.save()
+        // Rows from before V7 carry their counts into components when the store
+        // opens; from then on a record raises a component.
+        try CounterBaseline.create(in: context)
 
-        DigHistory(context: context, writable: true).record(node, from: a)
+        DigHistory(context: context, writable: true, deviceID: "this-device").record(node, from: a)
 
         let visits = try context.fetch(FetchDescriptor<DigVisit>())
         XCTAssertEqual(visits.map(\.visits), [8], "3 + 4, and this one")

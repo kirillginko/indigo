@@ -203,22 +203,25 @@ enum TwoDeviceSyncRunner {
 
         var crate: CrateService { CrateService(context: context, writable: true) }
         var log: ListeningLog { ListeningLog(context: context, writable: true) }
-        var dig: DigHistory { DigHistory(context: context, writable: true) }
+        // Each stands in for a device of its own, so each writes its own counter
+        // components; sharing this Mac's id would make them one writer.
+        var dig: DigHistory { DigHistory(context: context, writable: true, deviceID: "harness-\(name)") }
 
         func snapshot() -> SyncRehearsalRunner.Snapshot { (try? SyncRehearsalRunner.snapshot(container)) ?? .init(ids: [:]) }
 
-        func markerRows() -> (crate: [CrateItem], events: [ListeningEvent], visits: [DigVisit], steps: [DigStep]) {
+        func markerRows() -> (crate: [CrateItem], events: [ListeningEvent], visits: [DigVisit], steps: [DigStep], counters: [DigCounter]) {
             return (
                 ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.providerID ?? "") },
                 ((try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.nodeKey) },
                 ((try? context.fetch(FetchDescriptor<DigVisit>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.nodeID) },
-                ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.identity) })
+                ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.identity) },
+                ((try? context.fetch(FetchDescriptor<DigCounter>())) ?? []).filter { TwoDeviceSyncRunner.isMarker($0.key) })
         }
 
         func removeMarkerRows() {
             let rows = markerRows()
             rows.crate.forEach(context.delete); rows.events.forEach(context.delete)
-            rows.visits.forEach(context.delete); rows.steps.forEach(context.delete)
+            rows.visits.forEach(context.delete); rows.steps.forEach(context.delete); rows.counters.forEach(context.delete)
             try? context.save()
         }
     }
@@ -333,7 +336,7 @@ enum TwoDeviceSyncRunner {
             defer { a.stop(); b.stop() }
             guard var baseline = await settle("import", a, b, database) else { return finish(log) }
             let leftovers = a.markerRows()
-            let leftoverCount = leftovers.crate.count + leftovers.events.count + leftovers.visits.count + leftovers.steps.count
+            let leftoverCount = leftovers.crate.count + leftovers.events.count + leftovers.visits.count + leftovers.steps.count + leftovers.counters.count
             if leftoverCount > 0 {
                 say("  \(leftoverCount) marker rows left by an earlier run; removing them first")
                 a.removeMarkerRows()
@@ -391,8 +394,8 @@ enum TwoDeviceSyncRunner {
                     let rows = UserDataDedupe(context: device.context).rows(forNodeID: target.id)
                     let total = rows.map(\.visits).reduce(0, +)
                     check("counter: \(device.name) still has one visit row", rows.count == 1, "rows \(rows.count)")
-                    expectFailure("counter: \(device.name) keeps every concurrent increment (expected 8)", total == 8,
-                                  because: "got \(total); CloudKit resolves one row's concurrent changes by last writer, so increments are lost. Per-device counter components are the planned fix.")
+                    // Was a known failure (5) before counts were per-device components.
+                    check("counter: \(device.name) keeps every concurrent increment", total == 8, "got \(total), not 8")
                 }
             }
 
@@ -450,7 +453,7 @@ enum TwoDeviceSyncRunner {
                     check("cleanup: \(entity) is back to the baseline", end.ids[entity] == base.ids[entity],
                           "\(end.counts[entity] ?? 0) rows against \(base.counts[entity] ?? 0)")
                 }
-                let left = a.markerRows(); let rest = left.crate.count + left.events.count + left.visits.count + left.steps.count
+                let left = a.markerRows(); let rest = left.crate.count + left.events.count + left.visits.count + left.steps.count + left.counters.count
                 check("cleanup: no marker row remains", rest == 0, "\(rest)")
             }
             healthy("end", [a, b])

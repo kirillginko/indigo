@@ -12,7 +12,11 @@ default = os.path.expanduser(
 path = sys.argv[1] if len(sys.argv) > 1 else default
 db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
 for entity, table in [("CrateItem", "ZCRATEITEM"), ("ListeningEvent", "ZLISTENINGEVENT"),
-                      ("DigVisit", "ZDIGVISIT"), ("DigStep", "ZDIGSTEP")]:
-    ids = [str(uuid.UUID(bytes=bytes(r[0]))).upper() for r in db.execute(f"select ZID from {table}")]
+                      ("DigVisit", "ZDIGVISIT"), ("DigStep", "ZDIGSTEP"), ("DigCounter", "ZDIGCOUNTER")]:
+    try:
+        ids = [str(uuid.UUID(bytes=bytes(r[0]))).upper() for r in db.execute(f"select ZID from {table}")]
+    except sqlite3.OperationalError:
+        print(f"CD_{entity}: no table (a store from before it)")
+        continue
     digest = hashlib.sha256("\n".join(sorted(ids)).encode()).hexdigest()
     print(f"CD_{entity}: rows {len(ids)}, distinct ids {len(set(ids))}, digest {digest}")

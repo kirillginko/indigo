@@ -54,7 +54,7 @@ enum SyncRehearsalRunner {
         var digests: [String: String] { ids.mapValues(RowIDs.digest) }
     }
 
-    static let entities = ["CrateItem", "ListeningEvent", "DigVisit", "DigStep"]
+    static let entities = ["CrateItem", "ListeningEvent", "DigVisit", "DigStep", "DigCounter"]
 
     static func snapshot(_ container: ModelContainer) throws -> Snapshot {
         let context = ModelContext(container)
@@ -65,7 +65,8 @@ enum SyncRehearsalRunner {
             "CrateItem": try ids(CrateItem.self) { $0.id },
             "ListeningEvent": try ids(ListeningEvent.self) { $0.id },
             "DigVisit": try ids(DigVisit.self) { $0.id },
-            "DigStep": try ids(DigStep.self) { $0.id }
+            "DigStep": try ids(DigStep.self) { $0.id },
+            "DigCounter": try ids(DigCounter.self) { $0.id }
         ])
     }
 

@@ -438,6 +438,7 @@ nonisolated struct SplitMigration {
             try context.delete(model: ListeningEvent.self)
             try context.delete(model: DigVisit.self)
             try context.delete(model: DigStep.self)
+            try context.delete(model: DigCounter.self)
             try context.save()
         }
 
@@ -446,6 +447,9 @@ nonisolated struct SplitMigration {
         for value in result.visits { context.insert(DigVisit(restoring: value)) }
         for value in result.steps { context.insert(DigStep(restoring: value)) }
         try context.save()
+        // The counts the old store held become the base of each counter, as
+        // they do for any store from before components.
+        try CounterBaseline.create(in: context)
         return expected
     }
 

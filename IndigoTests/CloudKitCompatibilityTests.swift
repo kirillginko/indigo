@@ -54,7 +54,7 @@ final class CloudKitCompatibilityTests: XCTestCase {
     }
 
     func testNothingOnTheDeviceAndNothingSyncedPointAtEachOther() throws {
-        let userNames = IndigoSchemaV6.userDataModelNames
+        let userNames = IndigoSchemaCurrent.userDataModelNames
         for entity in Persistence.schema.entities {
             for relationship in entity.relationships {
                 let crosses = userNames.contains(entity.name) != userNames.contains(relationship.destination)
@@ -64,10 +64,10 @@ final class CloudKitCompatibilityTests: XCTestCase {
     }
 
     func testTheSplitMembershipCoversEveryModelExactlyOnce() {
-        let all = IndigoSchemaV6.models.map { String(describing: $0) }
-        let user = IndigoSchemaV6.userDataModels.map { String(describing: $0) }
-        let local = IndigoSchemaV6.localModels.map { String(describing: $0) }
-        XCTAssertEqual(Set(user), IndigoSchemaV6.userDataModelNames)
+        let all = IndigoSchemaCurrent.models.map { String(describing: $0) }
+        let user = IndigoSchemaCurrent.userDataModels.map { String(describing: $0) }
+        let local = IndigoSchemaCurrent.localModels.map { String(describing: $0) }
+        XCTAssertEqual(Set(user), IndigoSchemaCurrent.userDataModelNames)
         XCTAssertEqual(user.count + local.count, all.count)
         XCTAssertTrue(Set(user).isDisjoint(with: Set(local)))
         XCTAssertEqual(local.count, 15)

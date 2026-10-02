@@ -98,6 +98,46 @@ nonisolated enum UserDataInvariants {
         for step in ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).map(StepValue.init) {
             add("DigStep", step.identity, problems(in: step))
         }
+
+        // Components, and what they project.
+        let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
+        for counter in counters { add("DigCounter", counter.key, problems(in: counter)) }
+        let byKey = Dictionary(grouping: counters, by: { "\($0.kindRaw)\u{0}\($0.key)" })
+        for visit in (try? context.fetch(FetchDescriptor<DigVisit>())) ?? [] {
+            guard let rows = byKey["visit\u{0}\(visit.nodeID)"],
+                  let total = CounterValue.total(rows.map(CounterValue.init)) else { continue }
+            if visit.visits != total.count || visit.lastVisitedAt != total.lastAt
+                || visit.firstVisitedAt != (total.firstAt ?? Date.distantFuture) {
+                add("DigVisit", visit.nodeID, ["says \(visit.visits) visits; its components say \(total.count)"])
+            }
+        }
+        for step in (try? context.fetch(FetchDescriptor<DigStep>())) ?? [] {
+            guard let rows = byKey["step\u{0}\(step.identity)"],
+                  let total = CounterValue.total(rows.map(CounterValue.init)) else { continue }
+            if step.count != total.count || step.lastAt != total.lastAt {
+                add("DigStep", step.identity, ["says \(step.count); its components say \(total.count)"])
+            }
+        }
         return all
+    }
+
+    static func problems(in counter: DigCounter) -> [String] {
+        var found: [String] = []
+        guard let kind = counter.kind else { return ["unknown kind \(counter.kindRaw)"] }
+        if counter.id != CounterID.make(kind: kind, key: counter.key, deviceID: counter.deviceID) {
+            found.append("id is not the id of \(kind.rawValue)/\(counter.deviceID)")
+        }
+        if counter.count < 0 { found.append("negative count") }
+        if counter.deviceID.isEmpty { found.append("no writer") }
+        switch kind {
+        case .visit:
+            if MusicNode.kindRaw(ofID: counter.key) == nil { found.append("key is not a node id") }
+            if let first = counter.firstAt, first > counter.lastAt { found.append("first after last") }
+        case .step:
+            if counter.firstAt != nil { found.append("a step has no first visit") }
+        case .generation:
+            break
+        }
+        return found
     }
 }

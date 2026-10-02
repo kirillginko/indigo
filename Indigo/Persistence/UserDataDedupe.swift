@@ -376,6 +376,8 @@ nonisolated struct UserDataDedupe {
         var eventsMerged = 0
         var visitsMerged = 0
         var stepsMerged = 0
+        /// Copies of one counter component folded into one row.
+        var countersMerged = 0
         var isEmpty: Bool { self == Report() }
     }
 
@@ -466,7 +468,9 @@ nonisolated struct UserDataDedupe {
         let visits = (try? context.fetch(FetchDescriptor<DigVisit>())) ?? []
         if Set(visits.map(\.nodeID)).count != visits.count { return true }
         let steps = (try? context.fetch(FetchDescriptor<DigStep>())) ?? []
-        return Set(steps.map(\.identity)).count != steps.count
+        if Set(steps.map(\.identity)).count != steps.count { return true }
+        let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
+        return Set(counters.map { "\($0.kindRaw)\u{0}\($0.key)\u{0}\($0.deviceID)" }).count != counters.count
     }
 
     // MARK: Merging
@@ -494,15 +498,25 @@ nonisolated struct UserDataDedupe {
                                 by: { $0.0 }).values where group.count > 1 {
             report.crateMerged += mergeCrate(group.map(\.1))
         }
+        // Components before the rows they project, so a merged row is projected
+        // from merged components.
+        let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
+        for group in Dictionary(grouping: counters, by: { "\($0.kindRaw)\u{0}\($0.key)" }).values {
+            guard let first = group.first, let kind = first.kind else { continue }
+            report.countersMerged += DigCounters(context: context).mergeCopies(kind, key: first.key)
+        }
         let visits = (try? context.fetch(FetchDescriptor<DigVisit>())) ?? []
-        for group in Dictionary(grouping: visits, by: \.nodeID).values where group.count > 1 {
-            report.visitsMerged += mergeVisits(group)
+        for group in Dictionary(grouping: visits, by: \.nodeID).values {
+            report.visitsMerged += group.count > 1 ? mergeVisits(group) : 0
+            if let row = group.first(where: { !$0.isDeleted }) { DigCounters(context: context).project(row) }
         }
         let steps = (try? context.fetch(FetchDescriptor<DigStep>())) ?? []
-        for group in Dictionary(grouping: steps, by: \.identity).values where group.count > 1 {
-            report.stepsMerged += mergeSteps(group)
+        for group in Dictionary(grouping: steps, by: \.identity).values {
+            report.stepsMerged += group.count > 1 ? mergeSteps(group) : 0
+            if let row = group.first(where: { !$0.isDeleted }) { DigCounters(context: context).project(row) }
         }
-        if report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged > 0 {
+        if context.hasChanges || report.countersMerged > 0
+            || report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged > 0 {
             try? context.save()
         }
         return report
@@ -526,14 +540,39 @@ nonisolated struct UserDataDedupe {
         mergeCrate(rows(forCrateKey: key))
     }
 
+    /// The rows for one node, as one, projected from its components. Two rows
+    /// for one node no longer add: each already says what every component says.
     @discardableResult
     func visit(nodeID: String) -> Int {
-        mergeVisits(rows(forNodeID: nodeID))
+        let merged = mergeVisits(rows(forNodeID: nodeID))
+        if let row = Self.survivor(ofVisits: rows(forNodeID: nodeID)) { DigCounters(context: context).project(row) }
+        return merged
     }
 
     @discardableResult
     func step(identity: String) -> Int {
-        mergeSteps(rows(forStepIdentity: identity))
+        let merged = mergeSteps(rows(forStepIdentity: identity))
+        if let row = Self.survivor(ofSteps: rows(forStepIdentity: identity)) { DigCounters(context: context).project(row) }
+        return merged
+    }
+
+    /// The rule before V7, where rows for one node added their counts. Used only
+    /// when a store's counts move into components (`CounterBaseline`), on rows
+    /// that have none yet.
+    @discardableResult
+    func legacyVisit(nodeID: String) -> Int { mergeVisits(rows(forNodeID: nodeID)) }
+
+    @discardableResult
+    func legacyStep(identity: String) -> Int { mergeSteps(rows(forStepIdentity: identity)) }
+
+    /// Copies of the components of one counter, folded, and the rows they
+    /// project brought up to date.
+    @discardableResult
+    func counter(kind: DigCounterKind, key: String) -> Int {
+        let counters = DigCounters(context: context)
+        let merged = counters.mergeCopies(kind, key: key)
+        counters.reproject(kind, key: key)
+        return merged
     }
 
     // MARK: Finding rows for one thing

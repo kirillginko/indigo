@@ -97,6 +97,7 @@ struct HistoryObserver {
         var eventIDs = Set<UUID>()
         var visits = Set<String>()
         var steps = Set<String>()
+        var counters = Set<String>()   // kind NUL key
         for chunk in Self.chunks(named["CrateItem"]) {
             for item in (try? context.fetch(FetchDescriptor<CrateItem>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
                 crateIDs.insert(item.id)
@@ -118,9 +119,18 @@ struct HistoryObserver {
                 steps.insert(step.identity)
             }
         }
+        // A component from another device changes what its row should say, and
+        // may arrive before or after that row. Either order ends the same way:
+        // the row is projected when the component arrives, and again when the
+        // row does.
+        for chunk in Self.chunks(named["DigCounter"]) {
+            for counter in (try? context.fetch(FetchDescriptor<DigCounter>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
+                counters.insert("\(counter.kindRaw)\u{0}\(counter.key)")
+            }
+        }
 
         pass.named = named.values.reduce(0) { $0 + $1.count }
-        pass.fetched = crateIDs.count + eventIDs.count + visits.count + steps.count
+        pass.fetched = crateIDs.count + eventIDs.count + visits.count + steps.count + counters.count
         var report = UserDataDedupe.Report()
         report.idsAssigned = dedupe.assignIDs()
         for id in eventIDs { report.eventsMerged += dedupe.event(id: id) }
@@ -128,8 +138,13 @@ struct HistoryObserver {
         for key in crate { report.crateMerged += dedupe.crate(key: key) }
         for nodeID in visits { report.visitsMerged += dedupe.visit(nodeID: nodeID) }
         for identity in steps { report.stepsMerged += dedupe.step(identity: identity) }
-        if !report.isEmpty { try? context.save() }
-        pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged
+        for entry in counters {
+            let parts = entry.split(separator: "\u{0}", maxSplits: 1, omittingEmptySubsequences: false)
+            guard parts.count == 2, let kind = DigCounterKind(rawValue: String(parts[0])) else { continue }
+            report.countersMerged += dedupe.counter(kind: kind, key: String(parts[1]))
+        }
+        if !report.isEmpty || context.hasChanges { try? context.save() }
+        pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
         onPass?(pass)
 
         if let newest { store(newest) }
