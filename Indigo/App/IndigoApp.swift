@@ -13,7 +13,22 @@ enum IndigoWindow {
     static let mini = "indigo.mini"
 }
 
+/// The entry point. A debug build checks first whether a run was asked for by
+/// name -- the CloudKit schema seed -- so that it happens before `IndigoApp`'s
+/// properties open the listener's stores. Without the argument, and always in a
+/// release build, it is the app, unchanged.
 @main
+enum Launcher {
+    static func main() {
+        #if DEBUG
+        if CommandLine.arguments.contains(CloudKitSeedGuard.argument) {
+            MainActor.assumeIsolated { CloudKitSeedRunner.runAndExit() }
+        }
+        #endif
+        IndigoApp.main()
+    }
+}
+
 struct IndigoApp: App {
     /// The author of this process's own writes to the store, so the history
     /// observer can tell them from an import.

@@ -15,6 +15,13 @@
 //  difference there is settled before anything is deployed, and then this list
 //  is what a later change is held to.
 //
+//  Read back from CloudKit's development environment on 2026-10-01 by
+//  `CloudKitSeedRunner`: all 56 fields exist with the types below, and nothing
+//  else but `CD_entityName`, a STRING on every record type, which is Core
+//  Data's. A [String] is BYTES holding an NSKeyedArchiver archive of the
+//  array's JSON. A UUID is its uuidString, a Bool is 0 or 1, a Date is the same
+//  instant, and a string holding U+001F comes back scalar for scalar.
+//
 
 import Foundation
 
