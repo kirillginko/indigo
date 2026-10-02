@@ -202,7 +202,7 @@ final class CrateSnapshotTests: XCTestCase {
 
         let report = try CrateSnapshot.backfill(in: context)
 
-        XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0))
+        XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0, collisions: 0))
         XCTAssertEqual(item.matchKey, rec.matchKey)
         XCTAssertEqual(item.albumTitle, "Compro")
         XCTAssertEqual(item.sourceLine, "NTS 1 / Moxie @ 01:21:43")

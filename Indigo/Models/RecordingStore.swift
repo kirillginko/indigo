@@ -36,7 +36,10 @@ nonisolated struct RecordingStore {
         // An empty key means "not enough metadata to claim identity". Two
         // unknowns are not the same recording just because neither has a name.
         guard !key.isEmpty else { return nil }
-        return try first(#Predicate<Recording> { $0.matchKey == key })
+        // The recording the key names on its own. A coded one is a single moment
+        // of a track that shares its key with others ("Unreleased" at six points
+        // in a show), and an upsert for the track is not about any one of them.
+        return try first(#Predicate<Recording> { $0.matchKey == key && $0.unknownCode == nil })
     }
 
     func recording(id: UUID) throws -> Recording? {
@@ -265,8 +268,29 @@ extension RecordingStore {
             offsetSeconds: appearance.offsetSeconds)
     }
 
-    /// Gives a recording that shares its match key with another one a code of
-    /// its own, if it has none.
+    /// A code for `recording` that nothing else in its key group already uses:
+    /// the one its first appearance gives it, or, if that is taken or it has no
+    /// appearance, one made from its own id and kept.
+    private func uniqueCode(for recording: Recording, taken: Set<String>) -> String {
+        var code = recording.firstAppearance.map(placeholderCode(for:))
+            ?? RecordingKey.code(from: "local|\(recording.id.uuidString)")
+        var salt = 0
+        while taken.contains(code) {
+            salt += 1
+            code = RecordingKey.code(from: "\(code)|\(recording.id.uuidString)|\(salt)")
+        }
+        return code
+    }
+
+    /// Who may carry a code: a placeholder, which is anything short of
+    /// identified. An identified recording is the one the key names, and stays
+    /// key-only.
+    private func mayCarryCode(_ recording: Recording) -> Bool {
+        recording.identificationStatus != .identified
+    }
+
+    /// Gives a recording that shares its match key with another a code of its
+    /// own, if it is a placeholder and has none.
     ///
     /// "Unreleased" by one artist at six points in a show is six recordings
     /// with one key. The key says nothing about which is which, and a crate row
@@ -276,29 +300,62 @@ extension RecordingStore {
     @discardableResult
     func ensurePortableCode(_ recording: Recording) -> Bool {
         guard recording.unknownCode == nil, !recording.matchKey.isEmpty,
-              let appearance = recording.firstAppearance else { return false }
+              mayCarryCode(recording) else { return false }
         let key = recording.matchKey
-        let peers = (try? context.fetchCount(FetchDescriptor<Recording>(
-            predicate: #Predicate { $0.matchKey == key }))) ?? 0
-        guard peers > 1 else { return false }
-        recording.unknownCode = placeholderCode(for: appearance)
+        let group = (try? context.fetch(FetchDescriptor<Recording>(
+            predicate: #Predicate { $0.matchKey == key }))) ?? []
+        guard group.count > 1 else { return false }
+        recording.unknownCode = uniqueCode(
+            for: recording, taken: Set(group.compactMap(\.unknownCode)))
         return true
     }
 
-    /// `ensurePortableCode` for every recording that needs it, once, for the
-    /// ones made before placeholders were given codes at creation.
+    /// Brings every key group to the invariant: at most one recording names the
+    /// key alone, and every placeholder beside it has a code of its own.
+    ///
+    /// Two things it undoes. A code given to an identified recording that
+    /// shared it with a placeholder -- an earlier version of this coded the
+    /// aggregate from its first appearance, which is the same moment as one of
+    /// the placeholders. And the codes the placeholders still lack.
     @discardableResult
-    func assignPlaceholderCodes() -> Int {
-        let all = (try? context.fetch(FetchDescriptor<Recording>(
-            predicate: #Predicate { $0.matchKey != "" && $0.unknownCode == nil }))) ?? []
-        var counts: [String: Int] = [:]
-        for recording in all { counts[recording.matchKey, default: 0] += 1 }
+    func repairIdentities() -> (cleared: Int, assigned: Int) {
+        let keyed = (try? context.fetch(FetchDescriptor<Recording>(
+            predicate: #Predicate { $0.matchKey != "" }))) ?? []
+        var cleared = 0
         var assigned = 0
-        for recording in all where counts[recording.matchKey, default: 0] > 1 {
-            guard let appearance = recording.firstAppearance else { continue }
-            recording.unknownCode = placeholderCode(for: appearance)
-            assigned += 1
+        for group in Dictionary(grouping: keyed, by: \.matchKey).values where group.count > 1 {
+            for member in group where member.identificationStatus == .identified {
+                guard let code = member.unknownCode,
+                      group.contains(where: { $0 !== member && $0.unknownCode == code })
+                else { continue }
+                member.unknownCode = nil
+                cleared += 1
+            }
+            var taken = Set(group.compactMap(\.unknownCode))
+            for member in group where member.unknownCode == nil && mayCarryCode(member) {
+                let code = uniqueCode(for: member, taken: taken)
+                member.unknownCode = code
+                taken.insert(code)
+                assigned += 1
+            }
         }
-        return assigned
+        return (cleared, assigned)
+    }
+
+    /// `repairIdentities`, reporting only what it gave a code to.
+    @discardableResult
+    func assignPlaceholderCodes() -> Int { repairIdentities().assigned }
+
+    /// Every identity that more than one recording has. Empty is the invariant:
+    /// no two recordings in a store answer to the same `RecordingIdentity`.
+    func identityCollisions() -> [String: [Recording]] {
+        let all = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
+        var byIdentity: [String: [Recording]] = [:]
+        for recording in all {
+            let identity = RecordingIdentity(recording)
+            if identity.isEmpty { continue }
+            byIdentity[identity.key, default: []].append(recording)
+        }
+        return byIdentity.filter { $0.value.count > 1 }
     }
 }

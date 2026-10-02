@@ -38,8 +38,7 @@ nonisolated struct CrateSnapshot: Equatable {
     /// artist at two points in a show shares a key and is two recordings, told
     /// apart by the code its position gave it. Empty only when neither exists.
     static func identity(matchKey: String, unknownCode: String?) -> String {
-        guard let code = unknownCode, !code.isEmpty else { return matchKey }
-        return matchKey.isEmpty ? code : "\(matchKey)#\(code)"
+        RecordingIdentity.key(matchKey: matchKey, unknownCode: unknownCode)
     }
 
     var identity: String { Self.identity(matchKey: matchKey, unknownCode: unknownCode) }
@@ -182,8 +181,7 @@ nonisolated struct CrateRecordings {
         }
         var byIdentity: [String: Recording] = [:]
         for recording in found {
-            let identity = CrateSnapshot.identity(
-                matchKey: recording.matchKey, unknownCode: recording.unknownCode)
+            let identity = RecordingIdentity(recording).key
             byIdentity[identity] = byIdentity[identity] ?? recording
         }
         var result: [UUID: Recording] = [:]
@@ -248,6 +246,9 @@ extension CrateSnapshot {
         /// Rows whose snapshot still disagrees with the recording it was copied
         /// from after that.
         var mismatches = 0
+        /// Identities more than one recording in the store has. Zero is the
+        /// invariant; anything else means a lookup by identity is ambiguous.
+        var collisions = 0
     }
 
     /// Gives every recording row crated before the snapshot existed its
@@ -259,7 +260,12 @@ extension CrateSnapshot {
     @discardableResult
     static func backfill(in context: ModelContext, batch: Int = 100) throws -> BackfillReport {
         var report = BackfillReport()
-        RecordingStore(context: context).assignPlaceholderCodes()
+        // Saved before anything looks a recording up. A fetch with a limit takes
+        // its rows from the store and only then drops the ones an unsaved edit
+        // has changed, so a code cleared in memory and not written leaves a
+        // lookup by that code with one row to return and no way to return it.
+        let repair = RecordingStore(context: context).repairIdentities()
+        if repair.cleared > 0 || repair.assigned > 0 { try context.save() }
         let recordingKind = CrateItemKind.recording.rawValue
         let rows = try context.fetch(FetchDescriptor<CrateItem>(
             predicate: #Predicate { $0.kindRaw == recordingKind }))
@@ -291,6 +297,7 @@ extension CrateSnapshot {
             }
         }
         if report.repaired > 0 { try context.save() }
+        report.collisions = RecordingStore(context: context).identityCollisions().count
 
         // Verify against what was copied from, not against the copy.
         for item in rows {
@@ -308,7 +315,9 @@ extension CrateSnapshot {
 extension CrateSnapshot {
     static let backfillVersionKey = "crateSnapshotBackfillVersion"
     /// 2: the first run copied placeholders by key alone; this one repairs those.
-    static let backfillVersion = 2
+    /// 3: identified recordings that were given a code they shared with a
+    /// placeholder lose it, so every identity in the store is one recording's.
+    static let backfillVersion = 3
 
     /// The backfill, once per install: marked done only when it finished with
     /// nothing disagreeing, so a run that failed or found a mismatch happens
@@ -319,7 +328,9 @@ extension CrateSnapshot {
     ) -> BackfillReport? {
         guard defaults.integer(forKey: backfillVersionKey) < backfillVersion else { return nil }
         guard let report = try? backfill(in: context) else { return nil }
-        if report.mismatches == 0 { defaults.set(backfillVersion, forKey: backfillVersionKey) }
+        if report.mismatches == 0, report.collisions == 0 {
+            defaults.set(backfillVersion, forKey: backfillVersionKey)
+        }
         return report
     }
 }

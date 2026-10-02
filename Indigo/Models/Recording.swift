@@ -147,8 +147,14 @@ nonisolated final class Recording {
         if let status, status.confidenceRank > identificationStatus.confidenceRank {
             identificationStatus = status
         }
+        let wasUnnamed = matchKey.isEmpty
         matchKey = RecordingKey.match(artist: self.artistName, title: self.title)
-        if isIdentified { unknownCode = nil }
+        // The code is the handle for music nobody had named. Naming it ends
+        // that. A recording that already had a key and kept a code has it for
+        // a reason -- it is one of several with the same key, told apart by
+        // where each was heard -- and losing it would put two recordings on
+        // one identity.
+        if isIdentified && wasUnnamed { unknownCode = nil }
         updatedAt = Date()
     }
 }

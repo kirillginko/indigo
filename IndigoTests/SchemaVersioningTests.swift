@@ -124,7 +124,7 @@ extension SchemaVersioningTests {
         XCTAssertFalse(rows.first?.hasRecordingSnapshot ?? true, "nothing is filled until the backfill runs")
 
         let report = try CrateSnapshot.backfill(in: context)
-        XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0))
+        XCTAssertEqual(report, CrateSnapshot.BackfillReport(filled: 1, dangling: 0, repaired: 0, mismatches: 0, collisions: 0))
         XCTAssertEqual(rows.first?.artistName, "Skee Mask")
         XCTAssertEqual(rows.first?.matchKey, rows.first?.legacyRecording?.matchKey)
     }
