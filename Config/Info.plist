@@ -18,15 +18,19 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>IndigoCatalogCacheHost</key>
+	<string>$(CATALOG_CACHE_HOST)</string>
 	<key>IndigoDiscogsToken</key>
 	<string>$(DISCOGS_TOKEN_OBFUSCATED)</string>
 	<key>IndigoSupabaseProjectRef</key>
 	<string>$(SUPABASE_PROJECT_REF)</string>
 	<key>IndigoSupabasePublishableKey</key>
 	<string>$(SUPABASE_PUBLISHABLE_KEY)</string>
-	<key>IndigoCatalogCacheHost</key>
-	<string>$(CATALOG_CACHE_HOST)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>
