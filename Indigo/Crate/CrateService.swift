@@ -77,32 +77,25 @@ final class CrateService {
     }
 
     func item(matchKey: String, unknownCode: String?) -> CrateItem? {
-        guard !(matchKey.isEmpty && unknownCode == nil) else { return nil }
-        let kind = CrateItemKind.recording.rawValue
-        var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate {
-                $0.kindRaw == kind && $0.matchKey == matchKey && $0.unknownCode == unknownCode
-            })
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        let identity = RecordingIdentity(matchKey: matchKey, unknownCode: unknownCode)
+        guard !identity.isEmpty else { return nil }
+        // The row a merge would keep, so the answer is the same before and
+        // after one runs.
+        return UserDataDedupe.survivor(
+            ofCrate: UserDataDedupe(context: context).rows(forCrateKey: .recording(identity)))
     }
 
     /// Only a broadcast row. A recording row carries the broadcast it was heard
     /// in under the same `providerID` and `showID`, and crating that show must
     /// not find the track and call the show kept.
     func item(forBroadcast showID: String, providerID: String) -> CrateItem? {
-        let kind = CrateItemKind.broadcast.rawValue
-        var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate {
-                $0.kindRaw == kind && $0.showID == showID && $0.providerID == providerID
-            }
-        )
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        UserDataDedupe.survivor(ofCrate: UserDataDedupe(context: context).rows(
+            forCrateKey: .broadcast(providerID: providerID, showID: showID)))
     }
 
     func item(forDig kind: CrateItemKind, identifier: String, providerID: String) -> CrateItem? {
-        items().first { $0.kind == kind && $0.showID == identifier && $0.providerID == providerID }
+        UserDataDedupe.survivor(ofCrate: UserDataDedupe(context: context).rows(
+            forCrateKey: .dig(kind: kind.rawValue, providerID: providerID, entityID: identifier)))
     }
 
     // MARK: - Membership, held in memory
@@ -369,9 +362,15 @@ final class CrateService {
         }
     }
 
+    /// Takes the thing out of the crate: every row for it. Two devices that
+    /// each kept the same record made two rows, and removing one would leave the
+    /// other saying it is still kept.
     func remove(_ item: CrateItem) {
         if refusesWrites() { return }
-        context.delete(item)
+        if let key = UserDataDedupe.key(of: item) {
+            for row in UserDataDedupe(context: context).rows(forCrateKey: key) { context.delete(row) }
+        }
+        if !item.isDeleted { context.delete(item) }
         save()
     }
 
@@ -516,6 +515,7 @@ final class CrateService {
                 item.showSubtitle = subtitle
             }
         }
+        mergeDuplicates(of: item)
         save()
     }
 
@@ -533,7 +533,16 @@ final class CrateService {
             item.artworkURLString = media.remoteArtworkURL?.absoluteString ?? item.artworkURLString
             item.setGenres(media.genres)
         }
+        mergeDuplicates(of: item)
         save()
+    }
+
+    /// A repair that rewrites a row's `showID` can land it on one that is
+    /// already there. They are one kept thing, so they are merged now, not left
+    /// for the next pass to find.
+    private func mergeDuplicates(of item: CrateItem) {
+        guard let key = UserDataDedupe.key(of: item) else { return }
+        UserDataDedupe(context: context).crate(key: key)
     }
 
     private func localGenres(for recording: Recording) -> [String] {

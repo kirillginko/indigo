@@ -15,6 +15,9 @@
 //  `Recording`. Only `CrateItem` differs between V1 and V2, so V1 carries its
 //  own frozen copy of that one class and shares every other model with V2.
 //
+//  V4 gives a dig visit and a dig step an id of their own, the stable part of
+//  deciding which of two rows for the same node survives a merge.
+//
 //  V3 stops persisting a local `Recording.id` in the listening log and the dig
 //  history. What recording an encounter was with is the node's key, which
 //  `RecordingIdentity` makes the same on every device.
@@ -240,10 +243,82 @@ nonisolated enum IndigoSchemaV3: VersionedSchema {
             GraphSnapshot.self
         ]
     }
+
+    /// `DigVisit` as it was in V3: no id of its own.
+    @Model
+    nonisolated final class DigVisit {
+        @Attribute(.unique) var nodeID: String
+        var kindRaw: String
+        var title: String
+        var subtitle: String?
+        var visits: Int
+        var firstVisitedAt: Date
+        var lastVisitedAt: Date
+        var mbid: String?
+        var discogsID: Int?
+        @Attribute(originalName: "recordingID") var legacyRecordingID: UUID?
+        var providerID: String?
+        var handle: String?
+
+        init(kind: String, key: String, title: String, visits: Int) {
+            self.nodeID = "\(kind):\(key)"
+            self.kindRaw = kind
+            self.title = title
+            self.visits = visits
+            self.firstVisitedAt = Date()
+            self.lastVisitedAt = Date()
+        }
+    }
+
+    /// `DigStep` as it was in V3.
+    @Model
+    nonisolated final class DigStep {
+        @Attribute(.unique) var identity: String
+        var fromNodeID: String
+        var toNodeID: String
+        var count: Int
+        var lastAt: Date
+
+        init(from: String, to: String, count: Int) {
+            self.identity = "\(from)→\(to)"
+            self.fromNodeID = from
+            self.toNodeID = to
+            self.count = count
+            self.lastAt = Date()
+        }
+    }
+}
+
+nonisolated enum IndigoSchemaV4: VersionedSchema {
+    static let versionIdentifier = Schema.Version(4, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [
+            Track.self,
+            Recording.self,
+            MediaAppearance.self,
+            RecordingSource.self,
+            CrateItem.self,
+            Artist.self,
+            MusicLabel.self,
+            RecordingMetadata.self,
+            DiscogsArtist.self,
+            DiscogsReleaseRecord.self,
+            BandcampRelease.self,
+            BandcampArtistIndex.self,
+            DigVisit.self,
+            DigStep.self,
+            ListeningEvent.self,
+            ExploreOffersRecord.self,
+            ArtistPortrait.self,
+            StoredEdge.self,
+            GraphSnapshot.self
+        ]
+    }
 }
 
 nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self] }
+    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self] }
 
     /// V1 -> V2 is additive: eight optional or defaulted fields on `CrateItem`,
     /// and one rename. V2 -> V3 renames the recording id on `ListeningEvent` and
@@ -254,7 +329,8 @@ nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
     static var stages: [MigrationStage] {
         [
             .lightweight(fromVersion: IndigoSchemaV1.self, toVersion: IndigoSchemaV2.self),
-            .lightweight(fromVersion: IndigoSchemaV2.self, toVersion: IndigoSchemaV3.self)
+            .lightweight(fromVersion: IndigoSchemaV2.self, toVersion: IndigoSchemaV3.self),
+            .lightweight(fromVersion: IndigoSchemaV3.self, toVersion: IndigoSchemaV4.self)
         ]
     }
 }

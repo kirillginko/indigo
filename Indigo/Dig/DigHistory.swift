@@ -20,6 +20,12 @@ import SwiftData
 /// A node the listener opened, and how often.
 @Model
 nonisolated final class DigVisit {
+    /// Names this row, as `nodeID` names the node it counts. Two devices that
+    /// each opened the same node make two rows with one `nodeID` and two ids,
+    /// and which row survives their merge is decided by the ids -- so a row
+    /// keeps the id it was born with, and a merge never makes a new one. Nil
+    /// only until `UserDataIDs.assign` has run on a row from before it existed.
+    var id: UUID?
     @Attribute(.unique) var nodeID: String
     var kindRaw: String
     var title: String
@@ -37,6 +43,7 @@ nonisolated final class DigVisit {
     var handle: String?
 
     init(node: MusicNode) {
+        id = UUID()
         nodeID = node.id
         kindRaw = node.kind.rawValue
         title = node.title
@@ -68,6 +75,8 @@ nonisolated final class DigVisit {
 /// resulting list of tracks is only the residue.
 @Model
 nonisolated final class DigStep {
+    /// See `DigVisit.id`.
+    var id: UUID?
     @Attribute(.unique) var identity: String
     var fromNodeID: String
     var toNodeID: String
@@ -75,6 +84,7 @@ nonisolated final class DigStep {
     var lastAt: Date
 
     init(from: String, to: String) {
+        id = UUID()
         identity = "\(from)→\(to)"
         fromNodeID = from
         toNodeID = to
@@ -113,6 +123,11 @@ nonisolated struct DigHistory {
     /// as one would invent a path nobody walked.
     func record(_ node: MusicNode, from origin: MusicNode? = nil) {
         guard writable else { return }
+        // Two devices that opened this node made two rows. Folded into one
+        // before the count moves, so it moves on the row that stays.
+        let dedupe = UserDataDedupe(context: context)
+        dedupe.visit(nodeID: node.id)
+        if let origin, origin.id != node.id { dedupe.step(identity: "\(origin.id)→\(node.id)") }
         let visit = visit(for: node) ?? {
             let fresh = DigVisit(node: node)
             context.insert(fresh)
@@ -157,17 +172,14 @@ nonisolated struct DigHistory {
 
     func visit(for node: MusicNode) -> DigVisit? { visit(nodeID: node.id) }
 
+    /// The row a merge would keep, whether or not one has run.
     func visit(nodeID: String) -> DigVisit? {
-        var descriptor = FetchDescriptor<DigVisit>(predicate: #Predicate { $0.nodeID == nodeID })
-        descriptor.fetchLimit = 1
-        return (try? context.fetch(descriptor))?.first
+        UserDataDedupe.survivor(ofVisits: UserDataDedupe(context: context).rows(forNodeID: nodeID))
     }
 
     private func step(from: String, to: String) -> DigStep? {
-        let identity = "\(from)→\(to)"
-        var descriptor = FetchDescriptor<DigStep>(predicate: #Predicate { $0.identity == identity })
-        descriptor.fetchLimit = 1
-        return (try? context.fetch(descriptor))?.first
+        UserDataDedupe.survivor(
+            ofSteps: UserDataDedupe(context: context).rows(forStepIdentity: "\(from)→\(to)"))
     }
 
     /// "YOU OFTEN DIG THROUGH" — the things this listener keeps going back to.
@@ -188,10 +200,18 @@ nonisolated struct DigHistory {
                 SortDescriptor(\.lastVisitedAt, order: .reverse)
             ]
         )
-        return ((try? context.fetch(descriptor)) ?? [])
+        return Self.onePerNode((try? context.fetch(descriptor)) ?? [])
             .filter { kinds.contains($0.kind) }
             .prefix(limit)
             .map { $0 }
+    }
+
+    /// A list is drawn one row to a node. Until a merge has run, two devices'
+    /// rows for the same node are two rows here, and the first -- the most
+    /// returned to, or the most recent -- speaks for both.
+    private static func onePerNode(_ visits: [DigVisit]) -> [DigVisit] {
+        var seen = Set<String>()
+        return visits.filter { seen.insert($0.nodeID).inserted }
     }
 
     /// Where the listener was last, so a dig can be picked back up.
@@ -199,8 +219,9 @@ nonisolated struct DigHistory {
         var descriptor = FetchDescriptor<DigVisit>(
             sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]
         )
-        descriptor.fetchLimit = limit
-        return (try? context.fetch(descriptor)) ?? []
+        // Room for the nodes that appear twice.
+        descriptor.fetchLimit = limit * 2
+        return Array(Self.onePerNode((try? context.fetch(descriptor)) ?? []).prefix(limit))
     }
 
     /// "TRY" — where this listener has not been.

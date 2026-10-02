@@ -148,16 +148,10 @@ nonisolated struct CrateRecordings {
     /// The crate row for a recording: by its match key, or by its code when
     /// nobody named it.
     func crateItem(for recording: Recording) -> CrateItem? {
-        let kind = CrateItemKind.recording.rawValue
-        let key = recording.matchKey
-        let code = recording.unknownCode
-        guard !(key.isEmpty && code == nil) else { return nil }
-        var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate {
-                $0.kindRaw == kind && $0.matchKey == key && $0.unknownCode == code
-            })
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        let identity = RecordingIdentity(recording)
+        guard !identity.isEmpty else { return nil }
+        return UserDataDedupe.survivor(
+            ofCrate: UserDataDedupe(context: context).rows(forCrateKey: .recording(identity)))
     }
 
     /// One fetch for a whole crate, keyed by the row's id.

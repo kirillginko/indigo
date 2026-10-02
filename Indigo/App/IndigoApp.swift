@@ -112,6 +112,7 @@ struct IndigoApp: App {
                     if !Persistence.isRunningTests, Persistence.userDataWritable {
                         CrateSnapshot.backfillOnce(in: Persistence.container.mainContext)
                         IdentityBackfill.runOnce(in: Persistence.container.mainContext)
+                        UserDataDedupe(context: Persistence.container.mainContext).all()
                     }
                     witness.watch(player)
                     // Keep the picture backlog out of the way while a stream

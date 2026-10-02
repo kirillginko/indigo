@@ -47,7 +47,7 @@ final class StoreSafetyTests: XCTestCase {
             XCTAssertEqual(StoreRole.role(holding: [Track.self, model]), .userData,
                            "\(model) must make its store user data")
         }
-        XCTAssertEqual(StoreRole.role(holding: IndigoSchemaV3.models), .userData)
+        XCTAssertEqual(StoreRole.role(holding: IndigoSchemaV4.models), .userData)
     }
 
     func testAStoreOfOnlyCachesIsACache() {
@@ -68,7 +68,7 @@ final class StoreSafetyTests: XCTestCase {
     }
 
     func testTheUserOwnedModelsAreAllInTheSchema() {
-        let names = Set(IndigoSchemaV3.models.map { String(describing: $0) })
+        let names = Set(IndigoSchemaV4.models.map { String(describing: $0) })
         for model in StoreRole.userOwnedModels {
             XCTAssertTrue(names.contains(String(describing: model)))
         }
