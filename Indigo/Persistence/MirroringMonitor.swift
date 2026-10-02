@@ -18,6 +18,20 @@ import Foundation
 nonisolated enum MirroringMonitor {
     private static let lock = NSLock()
     private nonisolated(unsafe) static var observer: NSObjectProtocol?
+    private nonisolated(unsafe) static var lines: [String] = []
+
+    /// The last few outcomes, newest last, for a diagnostics view.
+    static var recent: [String] {
+        lock.lock(); defer { lock.unlock() }
+        return lines
+    }
+
+    private static func remember(_ line: String) {
+        lock.lock(); defer { lock.unlock() }
+        let stamp = Date().formatted(date: .omitted, time: .standard)
+        lines.append("\(stamp)  \(line)")
+        if lines.count > 30 { lines.removeFirst(lines.count - 30) }
+    }
 
     /// What one finished event is written as. Pure, so it can be tested.
     static func describe(
@@ -45,10 +59,13 @@ nonisolated enum MirroringMonitor {
             @unknown default: type = "event"
             }
             let error = event.error as NSError?
-            Trace.note(describe(
+            let line = describe(
                 type: type, succeeded: event.succeeded, seconds: end.timeIntervalSince(event.startDate),
-                errorDomain: error?.domain, errorCode: error?.code))
+                errorDomain: error?.domain, errorCode: error?.code)
+            Trace.note(line)
+            remember(line)
         }
         Trace.note("sync: UserData mirrors to the private CloudKit database")
+        remember("sync: UserData mirrors to the private CloudKit database")
     }
 }

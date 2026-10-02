@@ -91,6 +91,11 @@ struct IndigoApp: App {
     var body: some Scene {
         WindowGroup(id: IndigoWindow.main) {
             RootView()
+                #if os(iOS) && DEBUG
+                // The iPhone interface is not laid out yet; this is how its
+                // store and sync are seen. See `SyncDiagnosticsView`.
+                .overlay(alignment: .bottomTrailing) { SyncDiagnosticsButton() }
+                #endif
                 .environment(appState)
                 .environment(player)
                 .environment(nts)
@@ -250,7 +255,17 @@ struct IndigoApp: App {
                 Button("Find") { appState.requestSearchFocus() }
                     .keyboardShortcut("f", modifiers: .command)
                 MiniPlayerCommand()
+                #if DEBUG
+                SyncTestCommand()
+                #endif
             }
+        }
+        #endif
+
+        #if os(macOS) && DEBUG
+        Window("Sync Test", id: "sync-test") {
+            SyncDiagnosticsView()
+                .modelContainer(Persistence.container)
         }
         #endif
 
@@ -318,6 +333,18 @@ struct IndigoApp: App {
         #endif
     }
 }
+
+#if os(macOS) && DEBUG
+/// Opens the sync diagnostics and two-device test actions.
+private struct SyncTestCommand: View {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Button("Sync Test") { openWindow(id: "sync-test") }
+            .keyboardShortcut("y", modifiers: [.command, .shift])
+    }
+}
+#endif
 
 #if os(macOS)
 /// Lives in its own view so it can reach `openWindow`, which a `Commands`

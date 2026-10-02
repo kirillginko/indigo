@@ -104,6 +104,9 @@ enum Persistence {
     /// container has been asked for first.
     private nonisolated(unsafe) static var failure: StoreOpenFailure?
 
+    /// Whether `UserData` was opened mirroring to CloudKit this launch.
+    nonisolated(unsafe) static private(set) var syncing = false
+
     static var openFailure: StoreOpenFailure? {
         _ = container
         return failure
@@ -165,6 +168,7 @@ enum Persistence {
         let sync = UserDataSync.forLaunch(arguments: ProcessInfo.processInfo.arguments)
         let opened = SplitLaunch.open(layout: layout, sync: sync)
         failure = opened.failure
+        syncing = opened.syncing
         if opened.syncing { MirroringMonitor.start() }
         if let failed = opened.failure {
             Trace.note("store: \(failed.errorDescription ?? "unknown"); running unsaved")
