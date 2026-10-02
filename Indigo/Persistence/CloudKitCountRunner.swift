@@ -61,6 +61,17 @@ enum CloudKitCountRunner {
                 records = try await CloudKitSeedRunner.fetchAll(database)
                 print("test rows left: \(records.filter(isTestRow).count); records in the zone: \(records.count)")
             }
+            // The fields each type has in CloudKit, against the manifest.
+            for (type, group) in Dictionary(grouping: records, by: \.recordType).sorted(by: { $0.key < $1.key }) {
+                let entity = String(type.dropFirst(3))
+                guard let expected = CloudKitSchemaManifest.expected[entity] else { print("\(type): not in the manifest"); continue }
+                var seen: [String: Set<String>] = [:]
+                for record in group { for key in record.allKeys() { if let value = record[key] { seen[key, default: []].insert(CloudKitSchemaManifest.classify(value)) } } }
+                let wrong = expected.filter { attribute, kind in seen[CloudKitSchemaManifest.fieldName(attribute)].map { $0 != [kind] } ?? false }
+                let missing = expected.keys.filter { seen[CloudKitSchemaManifest.fieldName($0)] == nil }
+                let extra = Set(seen.keys).subtracting(expected.keys.map(CloudKitSchemaManifest.fieldName)).subtracting(["CD_entityName"])
+                print("\(type) fields: \(expected.count - wrong.count - missing.count) of \(expected.count) as the manifest says; wrong \(wrong.keys.sorted()); absent \(missing.sorted()); extra \(extra.sorted())")
+            }
             for (type, group) in Dictionary(grouping: records, by: \.recordType).sorted(by: { $0.key < $1.key }) {
                 let ids = group.compactMap { $0["CD_id"] as? String }
                 print("\(type): records \(group.count), distinct ids \(Set(ids).count), digest \(RowIDs.digest(Array(Set(ids))))")
