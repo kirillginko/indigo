@@ -349,6 +349,8 @@ final class ExportLog {
         if !event.succeeded { failed.append("\(event.type.rawValue): \(event.error.map { "\($0)" } ?? "unknown")") }
     }
 
+    var hasFailures: Bool { !failed.isEmpty }
+
     var summary: String { "setup \(setups), export \(exports), import \(imports), failed \(failed)" }
 }
 

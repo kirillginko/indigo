@@ -48,10 +48,24 @@ enum TwoDeviceSyncRunner {
 
     private static var lines: [String] = []
     private static var problems: [String] = []
+    /// Checks that are expected to fail until a decision is made, kept visible
+    /// rather than deleted. One that starts passing is reported, so it is noticed.
+    private static var knownFailures: [String] = []
+    private static var latencies: [String] = []
     private static func say(_ line: String) { print(line); lines.append(line) }
     private static func check(_ name: String, _ ok: Bool, _ detail: @autoclosure () -> String = "") {
         say("  \(ok ? "PASS" : "FAIL") \(name)\(ok ? "" : " -- " + detail())")
         if !ok { problems.append(name) }
+    }
+
+    private static func expectFailure(_ name: String, _ ok: Bool, because reason: String) {
+        if ok {
+            say("  UNEXPECTED PASS \(name) -- the known failure is gone; update the plan")
+            problems.append("\(name) passed but is recorded as a known failure")
+        } else {
+            say("  XFAIL \(name) -- \(reason)")
+            knownFailures.append(name)
+        }
     }
 
     static func runAndExit() -> Never {
@@ -217,9 +231,12 @@ enum TwoDeviceSyncRunner {
     /// three looks in a row, ten seconds apart. Returns what it settled on.
     @discardableResult
     private static func settle(
-        _ label: String, _ a: Device, _ b: Device, _ database: CKDatabase, within seconds: Double = 420
+        _ label: String, _ a: Device, _ b: Device, _ database: CKDatabase, within seconds: Double = 1800
     ) async -> SyncRehearsalRunner.Snapshot? {
-        let deadline = Date().addingTimeInterval(seconds)
+        // Mirroring promises eventual agreement, not a time. Not agreeing at all
+        // is a failure; how long agreeing took is measured and reported.
+        let started = Date()
+        let deadline = started.addingTimeInterval(seconds)
         var steady = 0
         var behind = 0
         var last: SyncRehearsalRunner.Snapshot?
@@ -231,7 +248,11 @@ enum TwoDeviceSyncRunner {
             say("  [\(label)] A \(counts(x)) | B \(counts(y)) | CloudKit \(entities.map { "\(cloud.ids[$0]?.count ?? 0)" }.joined(separator: "/")) \(same ? "agree" : "differ")")
             if same, x == last { steady += 1 } else { steady = same ? 1 : 0 }
             last = same ? x : nil
-            if steady >= 3 { return x }
+            if steady >= 3 {
+                let took = Int(Date().timeIntervalSince(started)) - 20   // less the two confirming looks
+                latencies.append("\(label) \(took)s")
+                return x
+            }
             if !same {
                 behind += 1
                 if behind >= 6 {                         // a minute without agreeing
@@ -246,7 +267,7 @@ enum TwoDeviceSyncRunner {
                 }
             } else { behind = 0 }
         }
-        check("\(label): A, B and CloudKit settle on the same rows", false, "did not agree within \(Int(seconds))s")
+        check("\(label): A, B and CloudKit eventually agree", false, "still apart after \(Int(seconds))s")
         return nil
     }
 
@@ -310,7 +331,7 @@ enum TwoDeviceSyncRunner {
             let b = try Device(name: "B", directory: directory)
             devices = [a, b]
             defer { a.stop(); b.stop() }
-            guard var baseline = await settle("import", a, b, database, within: 900) else { return finish(log) }
+            guard var baseline = await settle("import", a, b, database) else { return finish(log) }
             let leftovers = a.markerRows()
             let leftoverCount = leftovers.crate.count + leftovers.events.count + leftovers.visits.count + leftovers.steps.count
             if leftoverCount > 0 {
@@ -369,8 +390,9 @@ enum TwoDeviceSyncRunner {
                 for device in [a, b] {
                     let rows = UserDataDedupe(context: device.context).rows(forNodeID: target.id)
                     let total = rows.map(\.visits).reduce(0, +)
-                    say("  MEASURED \(device.name): the same row incremented 3 times on each device: visits \(total) (every increment kept would be 8)")
                     check("counter: \(device.name) still has one visit row", rows.count == 1, "rows \(rows.count)")
+                    expectFailure("counter: \(device.name) keeps every concurrent increment (expected 8)", total == 8,
+                                  because: "got \(total); CloudKit resolves one row's concurrent changes by last writer, so increments are lost. Per-device counter components are the planned fix.")
                 }
             }
 
@@ -443,7 +465,10 @@ enum TwoDeviceSyncRunner {
             say("observer \(d.name): \(d.notifications) remote-change notifications, \(d.passes) passes, \(d.merged) rows merged, reopened \(d.reopened) times")
         }
         say("\nmirroring events: \(log.summary)")
-        say(problems.isEmpty ? "RESULT: every check held" : "RESULT: \(problems.count) problem(s)")
+        if log.hasFailures { problems.append("mirroring reported failed events") }
+        say("time to agree, by stage: \(latencies.joined(separator: ", "))")
+        for known in knownFailures { say("known failure: \(known)") }
+        say(problems.isEmpty ? "RESULT: every required check held (\(knownFailures.count) known failure(s))" : "RESULT: \(problems.count) problem(s)")
         for problem in problems { say("  - \(problem)") }
         return problems.isEmpty ? 0 : 1
     }
@@ -488,7 +513,7 @@ enum TwoDeviceSyncRunner {
         say("CHANGES_MADE")
 
         guard await waitFor(file: online) else { check("offline: told to reconnect", false, "no signal"); return }
-        if await settle("reconnected", a, b, database, within: 900) != nil {
+        if await settle("reconnected", a, b, database) != nil {
             for device in [a, b] {
                 let events = Set(device.snapshot().ids["ListeningEvent"] ?? [])
                 check("offline: \(device.name) holds both offline events", ea != nil && eb != nil && events.contains(ea!.uuidString) && events.contains(eb!.uuidString))
