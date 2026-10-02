@@ -56,7 +56,7 @@ enum SyncRehearsalRunner {
 
     static let entities = ["CrateItem", "ListeningEvent", "DigVisit", "DigStep"]
 
-    private static func snapshot(_ container: ModelContainer) throws -> Snapshot {
+    static func snapshot(_ container: ModelContainer) throws -> Snapshot {
         let context = ModelContext(container)
         func ids<T: PersistentModel>(_ type: T.Type, _ id: (T) -> UUID?) throws -> [String] {
             try context.fetch(FetchDescriptor<T>()).compactMap { id($0)?.uuidString }.sorted()
@@ -93,7 +93,7 @@ enum SyncRehearsalRunner {
 
     // MARK: - CloudKit counts
 
-    private static func cloudCounts(_ database: CKDatabase) async throws -> (counts: [String: Int], ids: [String: [String]]) {
+    static func cloudCounts(_ database: CKDatabase) async throws -> (counts: [String: Int], ids: [String: [String]]) {
         let records = try await CloudKitSeedRunner.fetchAll(database)
         var ids: [String: [String]] = [:]
         for record in records { ids[String(record.recordType.dropFirst(3)), default: []].append((record["CD_id"] as? String) ?? "?") }
