@@ -26,6 +26,15 @@ nonisolated enum RowIDs {
 @MainActor
 enum CloudKitCountRunner {
     static let argument = "-INDIGO_COUNT_CLOUDKIT_DEV"
+    /// Also deletes the two-device harness's own rows -- every record whose key
+    /// carries its marker, in any field that names a thing -- and nothing else.
+    static let cleanArgument = "-INDIGO_CLEAN_TEST_ROWS_DEV"
+
+    static func isTestRow(_ record: CKRecord) -> Bool {
+        ["CD_nodeKey", "CD_nodeID", "CD_identity", "CD_key", "CD_providerID", "CD_showID"]
+            .compactMap { record[$0] as? String }
+            .contains(where: TwoDeviceSyncRunner.isMarker)
+    }
 
     static func runAndExit() -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
@@ -40,8 +49,18 @@ enum CloudKitCountRunner {
         }
         guard entitlements.containers.contains(CloudKitSeedRunner.containerID) else { print("REFUSED: not signed for the container"); return 2 }
         do {
-            let records = try await CloudKitSeedRunner.fetchAll(CKContainer(identifier: CloudKitSeedRunner.containerID).privateCloudDatabase)
+            let database = CKContainer(identifier: CloudKitSeedRunner.containerID).privateCloudDatabase
+            var records = try await CloudKitSeedRunner.fetchAll(database)
             print("environment: Development; records in the zone: \(records.count)")
+            let test = records.filter(isTestRow)
+            print("harness test rows: \(Dictionary(grouping: test, by: \.recordType).mapValues(\.count).sorted { $0.key < $1.key })")
+            if ProcessInfo.processInfo.arguments.contains(cleanArgument), !test.isEmpty {
+                let result = try await database.modifyRecords(saving: [], deleting: test.map(\.recordID))
+                let deleted = result.deleteResults.values.filter { (try? $0.get()) != nil }.count
+                print("deleted \(deleted) of \(test.count) test rows")
+                records = try await CloudKitSeedRunner.fetchAll(database)
+                print("test rows left: \(records.filter(isTestRow).count); records in the zone: \(records.count)")
+            }
             for (type, group) in Dictionary(grouping: records, by: \.recordType).sorted(by: { $0.key < $1.key }) {
                 let ids = group.compactMap { $0["CD_id"] as? String }
                 print("\(type): records \(group.count), distinct ids \(Set(ids).count), digest \(RowIDs.digest(Array(Set(ids))))")

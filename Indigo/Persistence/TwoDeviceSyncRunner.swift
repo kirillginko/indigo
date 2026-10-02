@@ -137,15 +137,28 @@ enum TwoDeviceSyncRunner {
         }
 
         /// Opens the same store again: a relaunch, which imports at setup.
-        func reopen() async throws {
+        ///
+        /// Only once the old container is really gone. Core Data allows one
+        /// mirroring instance of a store per process; a second one opened while
+        /// the first is still registered fails setup (134422, "another instance
+        /// of this persistent store actively syncing") and never syncs again.
+        /// Returns false, and opens nothing, if the old one will not let go.
+        func reopen() async throws -> Bool {
             stop()
-            context.author = nil
-            try? context.save()
+            weak var old = container
+            context = ModelContext(try Persistence.makeSplitContainer(userData: nil, local: nil))  // a placeholder, in memory
+            container = context.container
+            for _ in 0..<60 where old != nil {
+                try? await Task.sleep(for: .seconds(1))
+            }
+            guard old == nil else { return false }
+            try? await Task.sleep(for: .seconds(3))   // let its activities unregister
             reopened += 1
             container = try Persistence.makeSplitContainer(userData: url, local: nil, sync: .privateDatabase)
             context = container.mainContext
             context.author = IndigoApp.writerAuthor
             start()
+            return true
         }
 
         /// What the store's history holds, as counts: who wrote, and what kind
@@ -242,6 +255,7 @@ enum TwoDeviceSyncRunner {
         let deadline = started.addingTimeInterval(seconds)
         var steady = 0
         var behind = 0
+        var lastSeen: [String: SyncRehearsalRunner.Snapshot] = [:]
         var last: SyncRehearsalRunner.Snapshot?
         while Date() < deadline {
             try? await Task.sleep(for: .seconds(10))
@@ -258,16 +272,20 @@ enum TwoDeviceSyncRunner {
             }
             if !same {
                 behind += 1
-                if behind >= 6 {                         // a minute without agreeing
+                // Three minutes apart, and never while a device is still moving:
+                // a reopen in the middle of an import throws the import away.
+                if behind >= 18 {
                     behind = 0
                     for device in [a, b] {
                         let have = device.snapshot()
+                        guard have == lastSeen[device.name] else { continue }
                         if entities.contains(where: { (cloud.ids[$0] ?? []).sorted() != have.ids[$0] }) {
-                            say("  [\(label)] \(device.name) is behind CloudKit; opening it again, as a relaunch would")
-                            try? await device.reopen()
+                            say("  [\(label)] \(device.name) is behind CloudKit and still; opening it again, as a relaunch would")
+                            if (try? await device.reopen()) != true { say("  [\(label)] \(device.name)'s old container would not let go; not reopened") }
                         }
                     }
                 }
+                lastSeen = [a.name: a.snapshot(), b.name: b.snapshot()]
             } else { behind = 0 }
         }
         check("\(label): A, B and CloudKit eventually agree", false, "still apart after \(Int(seconds))s")

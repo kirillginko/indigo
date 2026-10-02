@@ -33,7 +33,7 @@ enum Launcher {
         if CommandLine.arguments.contains(CounterRehearsalRunner.argument) {
             MainActor.assumeIsolated { CounterRehearsalRunner.runAndExit() }
         }
-        if CommandLine.arguments.contains(CloudKitCountRunner.argument) {
+        if CommandLine.arguments.contains(CloudKitCountRunner.argument) || CommandLine.arguments.contains(CloudKitCountRunner.cleanArgument) {
             MainActor.assumeIsolated { CloudKitCountRunner.runAndExit() }
         }
         #endif
