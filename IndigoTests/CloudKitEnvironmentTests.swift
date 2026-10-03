@@ -6,6 +6,7 @@
 //  Production build mirrors.
 //
 
+import SQLite3
 import XCTest
 @testable import Indigo
 
@@ -27,5 +28,57 @@ final class CloudKitEnvironmentTests: XCTestCase {
     func testADebugBuildOpensTheDevelopmentStores() {
         XCTAssertEqual(CloudKitEnvironment.current, .development)
         XCTAssertEqual(Persistence.layout, StoreLayout.forEnvironment(.development))
+    }
+}
+
+/// A new Development folder starts with a copy of the real cache.
+final class CacheSeedTests: XCTestCase {
+    private var root: URL!
+
+    override func setUpWithError() throws {
+        root = FileManager.default.temporaryDirectory.appendingPathComponent("CacheSeedTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        try? FileManager.default.removeItem(at: root)
+    }
+
+    private func cache(at url: URL, rows: Int) throws {
+        var db: OpaquePointer?
+        XCTAssertEqual(sqlite3_open(url.path, &db), SQLITE_OK)
+        defer { sqlite3_close(db) }
+        sqlite3_exec(db, "PRAGMA journal_mode=WAL; CREATE TABLE ZTHING (Z_PK INTEGER PRIMARY KEY)", nil, nil, nil)
+        for _ in 0..<rows { sqlite3_exec(db, "INSERT INTO ZTHING DEFAULT VALUES", nil, nil, nil) }
+    }
+
+    func testANewFolderStartsFromACopyOfTheRealCache() throws {
+        let source = StoreLayout(directory: root)
+        let development = StoreLayout(directory: root.appendingPathComponent("Development", isDirectory: true))
+        try FileManager.default.createDirectory(at: development.directory, withIntermediateDirectories: true)
+        try cache(at: source.local, rows: 3)
+
+        development.seedCache(from: source)
+
+        XCTAssertEqual(SQLiteFiles.count("ZTHING", in: development.local), 3)
+        XCTAssertEqual(SQLiteFiles.count("ZTHING", in: source.local), 3)
+    }
+
+    func testAFolderThatHasACacheKeepsIt() throws {
+        let source = StoreLayout(directory: root)
+        let development = StoreLayout(directory: root.appendingPathComponent("Development", isDirectory: true))
+        try FileManager.default.createDirectory(at: development.directory, withIntermediateDirectories: true)
+        try cache(at: source.local, rows: 3)
+        try cache(at: development.local, rows: 1)
+
+        development.seedCache(from: source)
+
+        XCTAssertEqual(SQLiteFiles.count("ZTHING", in: development.local), 1)
+    }
+
+    func testTheRealLayoutIsNeverSeededFromItself() throws {
+        let source = StoreLayout(directory: root)
+        source.seedCache(from: source)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: source.local.path))
     }
 }
