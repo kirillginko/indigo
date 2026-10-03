@@ -22,6 +22,11 @@
 //  array's JSON. A UUID is its uuidString, a Bool is 0 or 1, a Date is the same
 //  instant, and a string holding U+001F comes back scalar for scalar.
 //
+//  Production, before any data, is `CloudKitSchema.production.ckdb` beside
+//  this file: `cktool export-schema --environment production` on 2026-10-03,
+//  unedited, and byte for byte the same as the development export that day.
+//  `CloudKitProductionSchemaTests` holds it to this list.
+//
 
 import Foundation
 

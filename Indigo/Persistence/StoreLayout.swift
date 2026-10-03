@@ -34,9 +34,20 @@ nonisolated struct StoreLayout: Equatable, Sendable {
     /// Scratch space for the move. Disposable.
     var work: URL { directory.appendingPathComponent("split-work", isDirectory: true) }
 
-    /// The app's own: next to the store SwiftData has always made.
+    /// Next to the store SwiftData has always made. The listener's real
+    /// stores, mirrored to Production.
     static var standard: StoreLayout {
         StoreLayout(directory: ModelConfiguration(schema: Persistence.schema).url.deletingLastPathComponent())
+    }
+
+    /// The stores a build signed for `environment` opens. Development's are a
+    /// folder of their own, so that no store is ever mirrored to both; see
+    /// `CloudKitEnvironment`.
+    static func forEnvironment(_ environment: CloudKitEnvironment) -> StoreLayout {
+        switch environment {
+        case .production: return standard
+        case .development: return StoreLayout(directory: standard.directory.appendingPathComponent("Development", isDirectory: true))
+        }
     }
 
     /// A SQLite store is three files, and has to be treated as one.

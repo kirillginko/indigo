@@ -21,6 +21,8 @@ nonisolated enum SplitLaunch {
         let failure: StoreOpenFailure?
         /// Whether `UserData` was opened mirroring to CloudKit.
         var syncing = false
+        /// Set when `UserData` was written by a newer build; see `SyncGeneration`.
+        var newerGeneration: Int? = nil
     }
 
     /// `sync` is off unless the caller -- the launch, nothing else -- asks. Only
@@ -41,12 +43,14 @@ nonisolated enum SplitLaunch {
                 var state = SplitState(phase: .splitComplete)
                 state.fresh = true
                 try store.save(state)
-                return Opened(container: opened.container, failure: nil, syncing: opened.syncing)
+                return Opened(container: opened.container, failure: nil, syncing: opened.syncing,
+                              newerGeneration: opened.newerGeneration)
 
             case .split:
                 let opened = try Persistence.openSplitStoresReporting(layout: layout, sync: sync)
                 recordLaunch(layout: layout, store: store)
-                return Opened(container: opened.container, failure: nil, syncing: opened.syncing)
+                return Opened(container: opened.container, failure: nil, syncing: opened.syncing,
+                              newerGeneration: opened.newerGeneration)
 
             case .migrate:
                 let container = try SplitMigration(layout: layout, crashAt: crashAt).run()

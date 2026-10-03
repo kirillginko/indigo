@@ -260,7 +260,7 @@ struct RootView: View {
             // Stays for as long as the session cannot save. Not dismissible:
             // dismissing it would be agreeing to lose what comes next.
             if !Persistence.userDataWritable {
-                NoticeStrip(text: Persistence.userDataUnavailableNotice)
+                NoticeStrip(text: Persistence.userDataNotice)
                 Rule(color: Palette.outline)
             }
             if let notice = crate.notice {

@@ -25,19 +25,25 @@ enum UserDataObserving {
         guard task == nil, !Persistence.isRunningTests, Persistence.userDataWritable else { return }
         let context = Persistence.container.mainContext
         context.author = author
-        let observer = HistoryObserver(context: context, ownAuthor: author)
+        let observer = {
+            var observer = HistoryObserver(context: context, ownAuthor: author)
+            observer.onNewerGeneration = { Persistence.refuse(newerGeneration: $0) }
+            return observer
+        }()
         observer.process()
         task = Task { @MainActor in
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { @MainActor in
                     for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
+                        guard Persistence.userDataWritable else { continue }
                         observer.process()
                     }
                 }
                 group.addTask { @MainActor in
                     for await note in NotificationCenter.default.notifications(named: NSPersistentCloudKitContainer.eventChangedNotification) {
                         guard let event = note.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey]
-                            as? NSPersistentCloudKitContainer.Event, event.type == .import, event.endDate != nil else { continue }
+                            as? NSPersistentCloudKitContainer.Event, event.type == .import, event.endDate != nil,
+                              Persistence.userDataWritable else { continue }
                         observer.process()
                     }
                 }

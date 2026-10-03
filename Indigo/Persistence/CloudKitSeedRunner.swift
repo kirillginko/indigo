@@ -323,19 +323,9 @@ enum CloudKitSeedRunner {
 
     // MARK: - What the process is signed for
 
+    /// On iOS this is always empty, so every runner refuses there.
     static func signedEntitlements() -> (containers: [String], environment: String?) {
-        #if os(macOS)
-        guard let task = SecTaskCreateFromSelf(nil) else { return ([], nil) }
-        func value(_ key: String) -> Any? { SecTaskCopyValueForEntitlement(task, key as CFString, nil) }
-        let containers = (value("com.apple.developer.icloud-container-identifiers") as? [String]) ?? []
-        let raw = value("com.apple.developer.icloud-container-environment")
-        let environment = (raw as? String) ?? (raw as? [String])?.joined(separator: ",")
-        return (containers, environment)
-        #else
-        // A process cannot read its own entitlements on iOS. The runners are
-        // macOS tools; here every one of them refuses.
-        return ([], nil)
-        #endif
+        CloudKitEnvironment.signedEntitlements()
     }
 }
 

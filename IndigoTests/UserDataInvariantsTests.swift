@@ -91,4 +91,52 @@ final class UserDataInvariantsTests: XCTestCase {
 
         XCTAssertEqual(UserDataInvariants.violations(in: ModelContext(container)).map(\.description), [])
     }
+
+    // MARK: One thing held twice
+
+    private var directory: URL!
+
+    override func tearDownWithError() throws {
+        if let directory { try? FileManager.default.removeItem(at: directory) }
+    }
+
+    private func onDisk(_ fill: (ModelContext) -> Void) throws {
+        directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("UserDataInvariantsTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let context = ModelContext(try reopened())
+        fill(context)
+        try context.save()
+    }
+
+    private func reopened() throws -> ModelContainer {
+        try Persistence.makeSplitContainer(
+            userData: directory.appendingPathComponent("UserData.store"), local: directory.appendingPathComponent("Local.store"))
+    }
+
+    func testOneThingHeldTwiceIsAViolationEvenWhenEveryRowIsValid() throws {
+        try onDisk { context in
+            context.insert(DigVisit(node: .artist("Skee Mask")))
+            context.insert(DigVisit(node: .artist("Skee Mask")))
+            context.insert(DigStep(from: "artist:a", to: "artist:b"))
+            context.insert(DigStep(from: "artist:a", to: "artist:b"))
+        }
+        let container = try reopened()
+        let problems = UserDataInvariants.violations(in: ModelContext(container)).map(\.description)
+        XCTAssertTrue(problems.contains("DigVisit -: 1 node ids repeat"), "\(problems)")
+        XCTAssertTrue(problems.contains("DigStep -: 1 identities repeat"), "\(problems)")
+    }
+
+    func testWritersAreCountedWithoutTheGenerationRow() throws {
+        try onDisk { context in
+            let generation = DigCounter(kind: .generation, key: "counters", deviceID: CounterID.base)
+            generation.count = 7
+            context.insert(generation)
+            context.insert(DigCounter(kind: .visit, key: "artist:a", deviceID: CounterID.base))
+            context.insert(DigCounter(kind: .visit, key: "artist:a", deviceID: "mac"))
+            context.insert(DigCounter(kind: .step, key: "artist:a→artist:b", deviceID: "mac"))
+        }
+        let container = try reopened()
+        XCTAssertEqual(UserDataInvariants.writers(in: ModelContext(container)), [CounterID.base: 1, "mac": 2])
+    }
 }

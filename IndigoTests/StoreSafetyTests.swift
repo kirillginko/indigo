@@ -62,7 +62,7 @@ final class StoreSafetyTests: XCTestCase {
     }
 
     func testTheLegacyStoreIsTheFileExistingInstallsHave() {
-        XCTAssertEqual(Persistence.layout.legacy, Persistence.storeURL)
+        XCTAssertEqual(StoreLayout.standard.legacy, Persistence.storeURL)
         XCTAssertEqual(Persistence.storeURL, ModelConfiguration(schema: Persistence.schema).url)
         XCTAssertEqual(Persistence.storeURL.lastPathComponent, "default.store")
     }
