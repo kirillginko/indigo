@@ -318,12 +318,7 @@ struct SidebarView: View {
 
     private var wordmark: some View {
         HStack(spacing: 6) {
-            Text("Indigo")
-                .microLabel(2.4, size: 11)
-                .foregroundStyle(Palette.inverseInk)
-                .padding(.horizontal, 7)
-                .padding(.vertical, 4)
-                .background(Palette.inverse)
+            MineralWordmark()
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 14)
