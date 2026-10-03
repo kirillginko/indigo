@@ -84,24 +84,38 @@ nonisolated enum UserDataInvariants {
             all += problems.map { InvariantViolation(entity: entity, row: row, problem: $0) }
         }
 
-        let crate = ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? []).map(CrateValue.init)
+        // Ids and natural keys that repeat. Counts can agree with a store that
+        // holds one thing twice; these cannot.
+        func once<T: Hashable>(_ entity: String, _ what: String, _ values: [T]) {
+            let repeated = Dictionary(grouping: values, by: { $0 }).filter { $0.value.count > 1 }.count
+            if repeated > 0 { add(entity, "-", ["\(repeated) \(what) repeat"]) }
+        }
+
+        let crateItems = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
+        let crate = crateItems.map(CrateValue.init)
         for item in crate { add("CrateItem", item.id.uuidString, problems(in: item)) }
         if Set(crate.map(\.id)).count != crate.count { add("CrateItem", "-", ["an id repeats"]) }
+        once("CrateItem", "natural keys", crateItems.compactMap(UserDataDedupe.key(of:)))
 
         let events = ((try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? []).map(EventValue.init)
         for event in events { add("ListeningEvent", event.id.uuidString, problems(in: event)) }
         if Set(events.map(\.id)).count != events.count { add("ListeningEvent", "-", ["an id repeats"]) }
 
-        for visit in ((try? context.fetch(FetchDescriptor<DigVisit>())) ?? []).map(VisitValue.init) {
-            add("DigVisit", visit.nodeID, problems(in: visit))
-        }
-        for step in ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).map(StepValue.init) {
-            add("DigStep", step.identity, problems(in: step))
-        }
+        let visitValues = ((try? context.fetch(FetchDescriptor<DigVisit>())) ?? []).map(VisitValue.init)
+        for visit in visitValues { add("DigVisit", visit.nodeID, problems(in: visit)) }
+        once("DigVisit", "ids", visitValues.compactMap(\.id))
+        once("DigVisit", "node ids", visitValues.map(\.nodeID))
 
-        // Components, and what they project.
+        let stepValues = ((try? context.fetch(FetchDescriptor<DigStep>())) ?? []).map(StepValue.init)
+        for step in stepValues { add("DigStep", step.identity, problems(in: step)) }
+        once("DigStep", "ids", stepValues.compactMap(\.id))
+        once("DigStep", "identities", stepValues.map(\.identity))
+
+        // Components, and what they project. A component's id is its natural
+        // key: what it counts and who writes it.
         let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
         for counter in counters { add("DigCounter", counter.key, problems(in: counter)) }
+        once("DigCounter", "ids", counters.compactMap(\.id))
         let byKey = Dictionary(grouping: counters, by: { "\($0.kindRaw)\u{0}\($0.key)" })
         for visit in (try? context.fetch(FetchDescriptor<DigVisit>())) ?? [] {
             guard let rows = byKey["visit\u{0}\(visit.nodeID)"],
@@ -119,6 +133,14 @@ nonisolated enum UserDataInvariants {
             }
         }
         return all
+    }
+
+    /// Counter components by writer: `base` for counts a store held when it
+    /// moved to components, otherwise one entry per device. The generation row
+    /// is left out. For comparing two stores, or a store with CloudKit.
+    static func writers(in context: ModelContext) -> [String: Int] {
+        let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
+        return Dictionary(grouping: counters.filter { $0.kind != .generation }, by: \.deviceID).mapValues(\.count)
     }
 
     static func problems(in counter: DigCounter) -> [String] {
