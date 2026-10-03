@@ -5,9 +5,9 @@
 //  The app's name at the top of the sidebar: monospaced caps on a plate of
 //  green metal whose light drifts across it (`mineralSheen`).
 //
-//  It moves only while the window is active and Reduce Motion is off, at 30
-//  frames a second; otherwise it holds one frame. Time is wrapped so the
-//  shader's float32 clock never grows large enough to stall.
+//  It moves at 30 frames a second unless Reduce Motion is on, in a background
+//  window too; macOS stops drawing a window nobody can see. Time is wrapped so
+//  the shader's float32 clock never grows large enough to stall.
 //
 
 import SwiftUI
@@ -16,15 +16,15 @@ struct MineralWordmark: View {
     var title = "Mineral"
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.appearsActive) private var appearsActive
     @State private var startedAt = Date()
 
-    /// One full cycle of both waves (2π / 0.9 and 2π / 0.5 share 20π), so the
-    /// wrap is seamless.
-    private static let period: Double = 20 * .pi
+    /// When all three of the shader's waves are back where they started: its
+    /// rates are 0.9, 0.35 and 0.5 radians a second, and 0.9t, 0.35t and 0.5t
+    /// are all whole turns first at t = 40π. Wrapping anywhere sooner jumps.
+    static let period: Double = 40 * .pi
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion || !appearsActive)) { timeline in
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { timeline in
             MineralWordmarkFrame(
                 title: title,
                 time: reduceMotion ? 2 : timeline.date.timeIntervalSince(startedAt).truncatingRemainder(dividingBy: Self.period))
