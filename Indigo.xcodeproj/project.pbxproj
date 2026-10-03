@@ -34,9 +34,22 @@
 		A10000013040B143002E7036 /* Indigo.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Indigo.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		58C0DB5A3070000100A1B2C3 /* Exceptions for "Indigo" folder in "Indigo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Persistence/CloudKitSchema.production.ckdb,
+			);
+			target = 5811302A3040B143002E7036 /* Indigo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5811302D3040B143002E7036 /* Indigo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				58C0DB5A3070000100A1B2C3 /* Exceptions for "Indigo" folder in "Indigo" target */,
+			);
 			path = Indigo;
 			sourceTree = "<group>";
 		};
