@@ -84,7 +84,7 @@ struct HistoryObserver {
         // and asking for the model of a row that is gone and reading it traps.
         // So the identifiers are only ever used to *fetch*, which returns the
         // rows that are still there and nothing else.
-        var named: [String: Set<PersistentIdentifier>] = [:]
+        var changed: [String: Set<PersistentIdentifier>] = [:]
         var reached = positions ?? [:]
         var pass = Pass(hadToken: token != nil, transactions: transactions.count)
         let userData = storeIdentity
@@ -96,49 +96,45 @@ struct HistoryObserver {
             pass.foreign += 1
             for change in transaction.changes {
                 switch change {
-                case .insert(let insert): named[insert.changedPersistentIdentifier.entityName, default: []].insert(insert.changedPersistentIdentifier)
-                case .update(let update): named[update.changedPersistentIdentifier.entityName, default: []].insert(update.changedPersistentIdentifier)
+                case .insert(let insert): changed[insert.changedPersistentIdentifier.entityName, default: []].insert(insert.changedPersistentIdentifier)
+                case .update(let update): changed[update.changedPersistentIdentifier.entityName, default: []].insert(update.changedPersistentIdentifier)
                 default: continue
                 }
             }
         }
 
-        var crate = Set<CrateKey>()
-        var crateIDs = Set<UUID>()
-        var eventIDs = Set<UUID>()
-        var visits = Set<String>()
-        var steps = Set<String>()
-        var counters = Set<String>()   // kind NUL key
+        var named = UserDataDedupe.Named()
         var generation: Int?
-        for chunk in Self.chunks(named["CrateItem"]) {
+        for chunk in Self.chunks(changed["CrateItem"]) {
             for item in (try? context.fetch(FetchDescriptor<CrateItem>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                crateIDs.insert(item.id)
-                if let key = UserDataDedupe.key(of: item) { crate.insert(key) }
+                named.crateIDs.insert(item.id)
+                if let key = UserDataDedupe.key(of: item) { named.crateKeys.insert(key) }
             }
         }
-        for chunk in Self.chunks(named["ListeningEvent"]) {
+        for chunk in Self.chunks(changed["ListeningEvent"]) {
             for event in (try? context.fetch(FetchDescriptor<ListeningEvent>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                eventIDs.insert(event.id)
+                named.eventIDs.insert(event.id)
             }
         }
-        for chunk in Self.chunks(named["DigVisit"]) {
+        for chunk in Self.chunks(changed["DigVisit"]) {
             for visit in (try? context.fetch(FetchDescriptor<DigVisit>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                visits.insert(visit.nodeID)
+                named.visits.insert(visit.nodeID)
             }
         }
-        for chunk in Self.chunks(named["DigStep"]) {
+        for chunk in Self.chunks(changed["DigStep"]) {
             for step in (try? context.fetch(FetchDescriptor<DigStep>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                steps.insert(step.identity)
+                named.steps.insert(step.identity)
             }
         }
         // A component from another device changes what its row should say, and
         // may arrive before or after that row. Either order ends the same way:
         // the row is projected when the component arrives, and again when the
         // row does.
-        for chunk in Self.chunks(named["DigCounter"]) {
+        for chunk in Self.chunks(changed["DigCounter"]) {
             for counter in (try? context.fetch(FetchDescriptor<DigCounter>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                counters.insert("\(counter.kindRaw)\u{0}\(counter.key)")
-                if counter.kind == .generation { generation = max(generation ?? 0, counter.count) }
+                guard let kind = counter.kind else { continue }
+                named.counters.insert(.init(kind: kind, key: counter.key))
+                if kind == .generation { generation = max(generation ?? 0, counter.count) }
             }
         }
         // A newer build wrote this store. Its rows are left as it wrote them,
@@ -149,20 +145,9 @@ struct HistoryObserver {
             return .init()
         }
 
-        pass.named = named.values.reduce(0) { $0 + $1.count }
-        pass.fetched = crateIDs.count + eventIDs.count + visits.count + steps.count + counters.count
-        var report = UserDataDedupe.Report()
-        report.idsAssigned = dedupe.assignIDs()
-        for id in eventIDs { report.eventsMerged += dedupe.event(id: id) }
-        for id in crateIDs { report.crateMerged += dedupe.crateRow(id: id) }
-        for key in crate { report.crateMerged += dedupe.crate(key: key) }
-        for nodeID in visits { report.visitsMerged += dedupe.visit(nodeID: nodeID) }
-        for identity in steps { report.stepsMerged += dedupe.step(identity: identity) }
-        for entry in counters {
-            let parts = entry.split(separator: "\u{0}", maxSplits: 1, omittingEmptySubsequences: false)
-            guard parts.count == 2, let kind = DigCounterKind(rawValue: String(parts[0])) else { continue }
-            report.countersMerged += dedupe.counter(kind: kind, key: String(parts[1]))
-        }
+        pass.named = changed.values.reduce(0) { $0 + $1.count }
+        pass.fetched = named.crateIDs.count + named.eventIDs.count + named.visits.count + named.steps.count + named.counters.count
+        let report = dedupe.merge(named)
         if !report.isEmpty || context.hasChanges { try? context.save() }
         pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
         onPass?(pass)

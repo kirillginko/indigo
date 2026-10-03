@@ -575,6 +575,122 @@ nonisolated struct UserDataDedupe {
         return merged
     }
 
+    // MARK: A batch
+
+    /// One counter: its kind and what it counts.
+    nonisolated struct CounterKey: Hashable, Sendable {
+        let kind: DigCounterKind
+        let key: String
+    }
+
+    /// The things another writer touched since the last pass, by natural key.
+    nonisolated struct Named: Sendable {
+        var eventIDs = Set<UUID>()
+        var crateIDs = Set<UUID>()
+        var crateKeys = Set<CrateKey>()
+        var visits = Set<String>()
+        var steps = Set<String>()
+        var counters = Set<CounterKey>()
+    }
+
+    /// Everything `Named` holds, merged and projected by the same rules as the
+    /// calls for one thing -- `event(id:)`, `crateRow(id:)`, `crate(key:)`,
+    /// `visit(nodeID:)`, `step(identity:)`, `counter(kind:key:)`, in that order --
+    /// but found with one query per table rather than one per thing.
+    ///
+    /// None of the columns a thing is found by has an index, so each of those
+    /// queries read its whole table. An import from CloudKit arrives 200 rows at
+    /// a time and the history observer met every batch on the main thread with
+    /// 200-odd table reads: 57ms a pass at the start of a first sync and 167ms
+    /// by the end, 3.4 seconds of stopped main thread across one import.
+    @discardableResult
+    func merge(_ named: Named) -> Report {
+        var report = Report()
+        report.idsAssigned = assignIDs()
+
+        let events = fetchChunked(Array(named.eventIDs)) { chunk in
+            FetchDescriptor<ListeningEvent>(predicate: #Predicate { chunk.contains($0.id) })
+        }
+        for (_, rows) in Dictionary(grouping: events, by: \.id) { report.eventsMerged += mergeEvents(rows) }
+
+        // The crate is small and its keys have three shapes: read it once.
+        if !named.crateIDs.isEmpty || !named.crateKeys.isEmpty {
+            let crate = fetch(FetchDescriptor<CrateItem>())
+            for id in named.crateIDs {
+                report.crateMerged += mergeCrate(crate.filter { !$0.isDeleted && $0.id == id })
+            }
+            for key in named.crateKeys {
+                report.crateMerged += mergeCrate(crate.filter { !$0.isDeleted && Self.matches($0, key) })
+            }
+        }
+
+        // Visits, steps and the components that project them, for every key
+        // either side names.
+        let visitKeys = named.visits.union(named.counters.filter { $0.kind == .visit }.map(\.key))
+        let stepKeys = named.steps.union(named.counters.filter { $0.kind == .step }.map(\.key))
+        let visitRows = Dictionary(grouping: fetchChunked(Array(visitKeys)) { chunk in
+            FetchDescriptor<DigVisit>(predicate: #Predicate { chunk.contains($0.nodeID) })
+        }, by: \.nodeID)
+        let stepRows = Dictionary(grouping: fetchChunked(Array(stepKeys)) { chunk in
+            FetchDescriptor<DigStep>(predicate: #Predicate { chunk.contains($0.identity) })
+        }, by: \.identity)
+        let components = Dictionary(grouping: fetchChunked(Array(visitKeys.union(stepKeys))) { chunk in
+            FetchDescriptor<DigCounter>(predicate: #Predicate { chunk.contains($0.key) })
+        }, by: { CounterKey(kind: $0.kind ?? .generation, key: $0.key) })
+        let counters = DigCounters(context: context)
+        func live<T: PersistentModel>(_ rows: [T]?) -> [T] { (rows ?? []).filter { !$0.isDeleted } }
+
+        for nodeID in named.visits {
+            report.visitsMerged += mergeVisits(live(visitRows[nodeID]))
+            if let row = Self.survivor(ofVisits: live(visitRows[nodeID])) {
+                counters.project(row, from: live(components[CounterKey(kind: .visit, key: nodeID)]))
+            }
+        }
+        for identity in named.steps {
+            report.stepsMerged += mergeSteps(live(stepRows[identity]))
+            if let row = Self.survivor(ofSteps: live(stepRows[identity])) {
+                counters.project(row, from: live(components[CounterKey(kind: .step, key: identity)]))
+            }
+        }
+        for counter in named.counters where counter.kind != .generation {
+            report.countersMerged += counters.mergeCopies(of: live(components[counter]))
+            let parts = live(components[counter])
+            switch counter.kind {
+            case .visit: for row in live(visitRows[counter.key]) { counters.project(row, from: parts) }
+            case .step: for row in live(stepRows[counter.key]) { counters.project(row, from: parts) }
+            case .generation: break
+            }
+        }
+        // The generation row has no parent; its copies fold like any other.
+        for counter in named.counters where counter.kind == .generation {
+            report.countersMerged += counters.mergeCopies(counter.kind, key: counter.key)
+        }
+        return report
+    }
+
+    /// Whether `item` is one of the rows `rows(forCrateKey:)` finds for `key`.
+    static func matches(_ item: CrateItem, _ key: CrateKey) -> Bool {
+        switch key {
+        case .recording(let identity):
+            return item.kindRaw == CrateItemKind.recording.rawValue && item.matchKey == identity.matchKey
+                && item.unknownCode == identity.unknownCode
+        case .broadcast(let provider, let show):
+            return item.kindRaw == CrateItemKind.broadcast.rawValue && item.providerID == provider && item.showID == show
+        case .dig(let kind, let provider, let entity):
+            return item.kindRaw == kind && item.providerID == provider && item.showID == entity
+        }
+    }
+
+    /// One query per 400 keys: small enough for SQLite's limit on a statement's
+    /// parameters.
+    private func fetchChunked<Key, T: PersistentModel>(
+        _ keys: [Key], _ descriptor: ([Key]) -> FetchDescriptor<T>
+    ) -> [T] {
+        stride(from: 0, to: keys.count, by: 400).flatMap { start in
+            fetch(descriptor(Array(keys[start..<min(start + 400, keys.count)])))
+        }
+    }
+
     // MARK: Finding rows for one thing
 
     func rows(forCrateKey key: CrateKey) -> [CrateItem] {

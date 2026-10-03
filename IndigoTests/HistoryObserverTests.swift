@@ -236,4 +236,90 @@ final class HistoryObserverTests: XCTestCase {
         XCTAssertEqual(report.eventsMerged, 1)
         XCTAssertEqual(try local.fetchCount(FetchDescriptor<ListeningEvent>()), 1)
     }
+
+    // MARK: One batch, the same answer
+
+    /// Duplicates of every kind, and components that disagree with their rows.
+    private func untidy(_ context: ModelContext) {
+        show(context, "nts.episode.a/b", added: 200)
+        show(context, "nts.episode.a/b", added: 100)
+        let eventID = UUID(uuidString: "5F32F85D-75AE-4FF6-BBEB-E16C879E79AA")!
+        for _ in 0..<2 {
+            let event = ListeningEvent(node: .artist("Skee Mask"), action: .played, seconds: 60)
+            event.id = eventID
+            context.insert(event)
+        }
+        let a = MusicNode.artist("Skee Mask"), b = MusicNode.label("Ilian Tape")
+        for visits in [3, 4] {
+            let visit = DigVisit(node: a)
+            visit.visits = visits
+            visit.firstVisitedAt = Date(timeIntervalSince1970: Double(visits * 10))
+            visit.lastVisitedAt = Date(timeIntervalSince1970: Double(visits * 100))
+            context.insert(visit)
+        }
+        context.insert(DigVisit(node: b))
+        for count in [2, 5] {
+            let step = DigStep(from: a.id, to: b.id)
+            step.count = count
+            context.insert(step)
+        }
+        // Two devices' components for b, one of them twice; one for the step.
+        for (device, count, last) in [("mac", 4, 300.0), ("mac", 6, 200.0), ("phone", 3, 400.0)] {
+            let counter = DigCounter(kind: .visit, key: b.id, deviceID: device)
+            counter.count = count
+            counter.firstAt = Date(timeIntervalSince1970: 50)
+            counter.lastAt = Date(timeIntervalSince1970: last)
+            context.insert(counter)
+        }
+        let stepCounter = DigCounter(kind: .step, key: DigStep.canonicalIdentity(from: a.id, to: b.id), deviceID: "phone")
+        stepCounter.count = 9
+        stepCounter.lastAt = Date(timeIntervalSince1970: 500)
+        context.insert(stepCounter)
+    }
+
+    private func snapshot(_ context: ModelContext) throws -> [String] {
+        try context.fetch(FetchDescriptor<CrateItem>()).map { "crate \($0.showID ?? "") \($0.addedAt.timeIntervalSince1970)" }.sorted()
+            + context.fetch(FetchDescriptor<ListeningEvent>()).map { "event \($0.id)" }.sorted()
+            + context.fetch(FetchDescriptor<DigVisit>()).map {
+                "visit \($0.nodeID) \($0.visits) \($0.firstVisitedAt.timeIntervalSince1970) \($0.lastVisitedAt.timeIntervalSince1970)" }.sorted()
+            + context.fetch(FetchDescriptor<DigStep>()).map { "step \($0.identity) \($0.count) \($0.lastAt.timeIntervalSince1970)" }.sorted()
+            + context.fetch(FetchDescriptor<DigCounter>()).map {
+                "counter \($0.kindRaw) \($0.key) \($0.deviceID) \($0.count) \($0.lastAt.timeIntervalSince1970)" }.sorted()
+    }
+
+    /// The observer merges a batch with one query per table. What it leaves
+    /// must be exactly what the calls for one thing at a time leave.
+    func testABatchMergesExactlyAsOneThingAtATimeDoes() throws {
+        untidy(remote)
+        try remote.save()
+        let report = observer().process()
+        XCTAssertGreaterThan(report.crateMerged + report.eventsMerged + report.visitsMerged
+                             + report.stepsMerged + report.countersMerged, 0)
+        let batched = try snapshot(local)
+
+        // The same rows in a second store, merged the old way.
+        let other = directory.appendingPathComponent("other", isDirectory: true)
+        try FileManager.default.createDirectory(at: other, withIntermediateDirectories: true)
+        let container2 = try Persistence.makeSplitContainer(
+            userData: other.appendingPathComponent("UserData.store"), local: other.appendingPathComponent("Local.store"))
+        let context2 = ModelContext(container2)
+        untidy(context2)
+        try context2.save()
+        let dedupe = UserDataDedupe(context: context2)
+        dedupe.assignIDs()
+        for id in Set(try context2.fetch(FetchDescriptor<ListeningEvent>()).map(\.id)) { dedupe.event(id: id) }
+        let crate = try context2.fetch(FetchDescriptor<CrateItem>())
+        for id in Set(crate.map(\.id)) { dedupe.crateRow(id: id) }
+        for key in Set(crate.compactMap(UserDataDedupe.key(of:))) { dedupe.crate(key: key) }
+        for nodeID in Set(try context2.fetch(FetchDescriptor<DigVisit>()).map(\.nodeID)) { dedupe.visit(nodeID: nodeID) }
+        for identity in Set(try context2.fetch(FetchDescriptor<DigStep>()).map(\.identity)) { dedupe.step(identity: identity) }
+        for counter in Set(try context2.fetch(FetchDescriptor<DigCounter>()).map { "\($0.kindRaw)\u{0}\($0.key)" }) {
+            let parts = counter.split(separator: "\u{0}", maxSplits: 1).map(String.init)
+            dedupe.counter(kind: DigCounterKind(rawValue: parts[0])!, key: parts[1])
+        }
+        try context2.save()
+
+        XCTAssertEqual(batched, try snapshot(context2))
+        XCTAssertEqual(UserDataInvariants.violations(in: local), [])
+    }
 }

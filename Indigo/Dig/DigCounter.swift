@@ -151,8 +151,15 @@ nonisolated struct DigCounters {
     /// Folds copies of one component into one row. Returns how many went.
     @discardableResult
     func mergeCopies(_ kind: DigCounterKind, key: String) -> Int {
+        mergeCopies(of: components(kind, key: key))
+    }
+
+    /// The same, for the components of one counter already in hand. Rows
+    /// already deleted are passed over.
+    @discardableResult
+    func mergeCopies(of components: [DigCounter]) -> Int {
         var removed = 0
-        for (_, copies) in Dictionary(grouping: components(kind, key: key), by: \.deviceID) where copies.count > 1 {
+        for (_, copies) in Dictionary(grouping: components.filter { !$0.isDeleted }, by: \.deviceID) where copies.count > 1 {
             let kept = copies.min { UserDataDedupe.idIsBefore($0.id, $1.id) }!
             let merged = CounterValue.mergedCopies(copies.map(CounterValue.init))!
             kept.count = merged.count; kept.firstAt = merged.firstAt; kept.lastAt = merged.lastAt
@@ -166,7 +173,13 @@ nonisolated struct DigCounters {
     /// is: what it says came from somewhere that does.
     @discardableResult
     func project(_ visit: DigVisit) -> Bool {
-        guard let total = CounterValue.total(components(.visit, key: visit.nodeID).map(CounterValue.init)) else { return false }
+        project(visit, from: components(.visit, key: visit.nodeID))
+    }
+
+    /// The same, from the visit's components already in hand.
+    @discardableResult
+    func project(_ visit: DigVisit, from components: [DigCounter]) -> Bool {
+        guard let total = CounterValue.total(components.filter { !$0.isDeleted }.map(CounterValue.init)) else { return false }
         let first = total.firstAt ?? Date.distantFuture
         guard visit.visits != total.count || visit.firstVisitedAt != first || visit.lastVisitedAt != total.lastAt else { return false }
         visit.visits = total.count; visit.firstVisitedAt = first; visit.lastVisitedAt = total.lastAt
@@ -175,7 +188,12 @@ nonisolated struct DigCounters {
 
     @discardableResult
     func project(_ step: DigStep) -> Bool {
-        guard let total = CounterValue.total(components(.step, key: step.identity).map(CounterValue.init)) else { return false }
+        project(step, from: components(.step, key: step.identity))
+    }
+
+    @discardableResult
+    func project(_ step: DigStep, from components: [DigCounter]) -> Bool {
+        guard let total = CounterValue.total(components.filter { !$0.isDeleted }.map(CounterValue.init)) else { return false }
         guard step.count != total.count || step.lastAt != total.lastAt else { return false }
         step.count = total.count; step.lastAt = total.lastAt
         return true
