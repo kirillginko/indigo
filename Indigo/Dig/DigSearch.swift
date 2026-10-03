@@ -72,7 +72,7 @@ nonisolated struct DigSearchResult: Sendable, Hashable, Identifiable {
         var label: String {
             switch self {
             case .yours: "Yours"
-            case .catalogue: "Indigo"
+            case .catalogue: "Mineral"
             case .discogs: "Discogs"
             }
         }

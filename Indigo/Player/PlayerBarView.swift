@@ -116,7 +116,23 @@ struct PlayerBarView: View {
 
     /// Flush to the leading edge and the full height of the bar, so it reads
     /// as the end of the row rather than a tile dropped onto it.
+    @ViewBuilder
     private var artwork: some View {
+        if player.current == nil {
+            // Nothing playing: the wordmark's green, still and blurred, rather
+            // than an empty square.
+            Image("MineralGround")
+                .resizable()
+                .scaledToFill()
+                .frame(width: Metrics.playerBarHeight, height: Metrics.playerBarHeight)
+                .clipped()
+                .accessibilityHidden(true)
+        } else {
+            playingArtwork
+        }
+    }
+
+    private var playingArtwork: some View {
         ArtworkView(
             localKey: player.current?.artworkKey,
             remoteURL: liveShow?.artworkURL ?? player.current?.remoteArtworkURL,

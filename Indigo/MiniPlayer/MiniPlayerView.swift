@@ -98,13 +98,25 @@ struct MiniPlayerView: View {
 
     private func identity(_ summary: NowPlayingSummary) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            ArtworkView(
-                localKey: player.current?.artworkKey,
-                remoteURL: liveShow?.artworkURL ?? player.current?.remoteArtworkURL,
-                side: Self.artworkSide,
-                glyphScale: 0.3,
-                markURL: StationMark.logoURL(for: player.current?.sourceID)
-            )
+            Group {
+                if player.current == nil {
+                    // Nothing playing: the same still green as the player bar.
+                    Image("MineralGround")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: Self.artworkSide, height: Self.artworkSide)
+                        .clipped()
+                        .accessibilityHidden(true)
+                } else {
+                    ArtworkView(
+                        localKey: player.current?.artworkKey,
+                        remoteURL: liveShow?.artworkURL ?? player.current?.remoteArtworkURL,
+                        side: Self.artworkSide,
+                        glyphScale: 0.3,
+                        markURL: StationMark.logoURL(for: player.current?.sourceID)
+                    )
+                }
+            }
             .overlay(Rectangle().strokeBorder(Palette.outline.opacity(0.6), lineWidth: Metrics.hairline))
 
             VStack(alignment: .leading, spacing: 5) {
