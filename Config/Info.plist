@@ -18,6 +18,8 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>IndigoCatalogCacheHost</key>
 	<string>$(CATALOG_CACHE_HOST)</string>
 	<key>IndigoDiscogsToken</key>
@@ -28,11 +30,11 @@
 	<string>$(SUPABASE_PUBLISHABLE_KEY)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-	<key>UILaunchScreen</key>
-	<dict/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
 </dict>
 </plist>
