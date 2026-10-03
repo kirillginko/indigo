@@ -41,7 +41,7 @@ final class EmbedPlaybackUITests: XCTestCase {
     private func duration(_ app: XCUIApplication) -> String { readout(app, "player.duration") }
 
     func testArchivedEpisodePlaysInsideTheApp() throws {
-        let app = XCUIApplication()
+        let app = XCUIApplication.indigo()
         app.launch()
         Thread.sleep(forTimeInterval: 3)
 

@@ -53,7 +53,7 @@ final class DigCacheTests: XCTestCase {
     /// come back. The artist page must not be rebuilt from nothing.
     @MainActor
     func testReturningToAnArtistDoesNotStartOver() async throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
 

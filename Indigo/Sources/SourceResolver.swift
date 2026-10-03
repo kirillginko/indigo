@@ -46,13 +46,56 @@ nonisolated struct SourceResolver {
                                label: BroadcastSource.label(for: item.providerID ?? ""),
                                detail: nil, rank: 0)
         }
-        guard let recording = item.recording, let source = best(recording) else { return nil }
-        guard case .play(var media) = source.action,
-              media.remoteArtworkURL == nil, media.artworkKey == nil,
-              let artwork = item.artworkURL else { return source }
-        media.remoteArtworkURL = artwork
-        return AudioSource(kind: source.kind, action: .play(media), label: source.label,
-                           detail: source.detail, rank: source.rank)
+        guard item.kind == .recording else { return nil }
+        // This device's own recording knows its local file, which is always
+        // the best way to hear it.
+        if let recording = CrateRecordings(context: context).recording(for: item),
+           let source = best(recording) {
+            guard case .play(var media) = source.action,
+                  media.remoteArtworkURL == nil, media.artworkKey == nil,
+                  let artwork = item.artworkURL else { return source }
+            media.remoteArtworkURL = artwork
+            return AudioSource(kind: source.kind, action: .play(media), label: source.label,
+                               detail: source.detail, rank: source.rank)
+        }
+        // A row kept on another device has no recording here yet, and does not
+        // need one to play: the row itself kept where it was heard and a link.
+        return fromSnapshot(item)
+    }
+
+    /// What a row can play from what it kept itself.
+    private func fromSnapshot(_ item: CrateItem) -> AudioSource? {
+        guard item.hasRecordingSnapshot else { return nil }
+        var found: [AudioSource] = []
+        if let provider = item.providerID, provider != "local", let showID = item.showID,
+           let page = BroadcastSource.destination(showID: showID, providerID: provider) {
+            found.append(AudioSource(
+                kind: .broadcastAppearance,
+                action: .openBroadcast(page, offsetSeconds: item.broadcastOffsetSeconds),
+                label: BroadcastSource.label(for: provider),
+                detail: item.showTitle,
+                rank: 11))
+        }
+        if let link = item.playbackURLString, let url = URL(string: link),
+           let provider = item.embedProviderRaw.flatMap(EmbedProvider.init(rawValue:))
+            ?? (YouTubeLink.isYouTube(url) ? .youtube : nil) {
+            found.append(AudioSource(
+                kind: .streamingLink,
+                action: .play(MediaItem(
+                    id: "link.\(link)",
+                    sourceID: item.embedProviderRaw ?? provider.rawValue,
+                    kind: .track,
+                    title: item.displayTitle,
+                    subtitle: item.displaySubtitle,
+                    detail: provider.displayName,
+                    remoteArtworkURL: item.artworkURL,
+                    playbackURL: url,
+                    embedProvider: provider)),
+                label: provider.displayName,
+                detail: nil,
+                rank: 20))
+        }
+        return found.min { $0.rank < $1.rank }
     }
 
     /// True when there is nothing to hear — the state the UI has to render

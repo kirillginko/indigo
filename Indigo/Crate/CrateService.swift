@@ -22,8 +22,21 @@ final class CrateService {
     /// private context that SwiftData would refuse to relate across.
     @ObservationIgnored let context: ModelContext
 
-    init(context: ModelContext) {
+    /// False while the listener's store could not be opened. Every write below
+    /// refuses and says why, so nothing is "crated" into a session that will
+    /// not keep it.
+    @ObservationIgnored private let writable: Bool
+
+    init(context: ModelContext, writable: Bool = Persistence.userDataWritable) {
         self.context = context
+        self.writable = writable
+    }
+
+    /// True, after saying so, when the crate cannot be written to.
+    private func refusesWrites() -> Bool {
+        guard !writable else { return false }
+        notice = Persistence.userDataUnavailableNotice
+        return true
     }
 
     /// Deallocating a main-actor-isolated observable hops to the executor to
@@ -48,32 +61,41 @@ final class CrateService {
 
     func contains(recording: Recording) -> Bool {
         refreshMembershipIfNeeded()
-        return recordingMembership.contains(recording.id)
+        return recordingMembership.contains(
+            CrateSnapshot.identity(matchKey: recording.matchKey, unknownCode: recording.unknownCode))
     }
 
     func contains(broadcast showID: String, providerID: String) -> Bool {
         item(forBroadcast: showID, providerID: providerID) != nil
     }
 
+    /// The row for a recording: by its match key, or by its code when nobody
+    /// named it. The same key on every device, which a local `Recording.id`
+    /// was not.
     func item(for recording: Recording) -> CrateItem? {
-        let id = recording.id
-        var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate { $0.recording?.id == id }
-        )
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        item(matchKey: recording.matchKey, unknownCode: recording.unknownCode)
     }
 
+    func item(matchKey: String, unknownCode: String?) -> CrateItem? {
+        let identity = RecordingIdentity(matchKey: matchKey, unknownCode: unknownCode)
+        guard !identity.isEmpty else { return nil }
+        // The row a merge would keep, so the answer is the same before and
+        // after one runs.
+        return UserDataDedupe.survivor(
+            ofCrate: UserDataDedupe(context: context).rows(forCrateKey: .recording(identity)))
+    }
+
+    /// Only a broadcast row. A recording row carries the broadcast it was heard
+    /// in under the same `providerID` and `showID`, and crating that show must
+    /// not find the track and call the show kept.
     func item(forBroadcast showID: String, providerID: String) -> CrateItem? {
-        var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate { $0.showID == showID && $0.providerID == providerID }
-        )
-        descriptor.fetchLimit = 1
-        return try? context.fetch(descriptor).first
+        UserDataDedupe.survivor(ofCrate: UserDataDedupe(context: context).rows(
+            forCrateKey: .broadcast(providerID: providerID, showID: showID)))
     }
 
     func item(forDig kind: CrateItemKind, identifier: String, providerID: String) -> CrateItem? {
-        items().first { $0.kind == kind && $0.showID == identifier && $0.providerID == providerID }
+        UserDataDedupe.survivor(ofCrate: UserDataDedupe(context: context).rows(
+            forCrateKey: .dig(kind: kind.rawValue, providerID: providerID, entityID: identifier)))
     }
 
     // MARK: - Membership, held in memory
@@ -90,7 +112,7 @@ final class CrateService {
     /// so it is folded into two sets and kept until `revision` moves.
     @ObservationIgnored private var membershipAt = -1
     @ObservationIgnored private var digMembership: Set<String> = []
-    @ObservationIgnored private var recordingMembership: Set<UUID> = []
+    @ObservationIgnored private var recordingMembership: Set<String> = []
     @ObservationIgnored private var listeningMembership: [URL: Bool] = [:]
 
     private static func digKey(
@@ -104,12 +126,15 @@ final class CrateService {
     func refreshMembershipIfNeeded() {
         guard membershipAt != revision else { return }
         var dig: Set<String> = []
-        var recordings: Set<UUID> = []
+        var recordings: Set<String> = []
         for item in items() {
+            if item.kind == .recording {
+                if item.hasRecordingSnapshot { recordings.insert(item.recordingIdentity) }
+                continue
+            }
             if let showID = item.showID, let providerID = item.providerID {
                 dig.insert(Self.digKey(item.kind, showID, providerID))
             }
-            if let id = item.recording?.id { recordings.insert(id) }
         }
         digMembership = dig
         recordingMembership = recordings
@@ -167,9 +192,16 @@ final class CrateService {
         var sources: [UUID: AudioSource] = [:]
         var pages: [UUID: DetailPage] = [:]
         let resolver = SourceResolver(context: context)
-        for item in items() {
-            if let found = resolver.best(item) { sources[item.id] = found }
-            if let recording = item.recording, let page = digDestination(recording) {
+        let rows = items()
+        // Looked up, never made. The crate is the listener's data and displays
+        // from what each row kept; the recordings are a cache beside it, which
+        // can be empty -- on a new device, or after it is thrown away -- and
+        // viewing the crate does not fill it. A row with no recording here has
+        // no DIG page on the row until something opens it, which makes one.
+        let found = CrateRecordings(context: context).recordings(for: rows)
+        for item in rows {
+            if let source = resolver.best(item) { sources[item.id] = source }
+            if let recording = found[item.id], let page = digDestination(recording) {
                 pages[item.id] = page
             }
         }
@@ -213,9 +245,10 @@ final class CrateService {
     /// Crating the same thing twice is a no-op rather than a duplicate — the
     /// button is a toggle everywhere it appears.
     @discardableResult
-    func add(recording: Recording) -> CrateItem {
+    func add(recording: Recording) -> CrateItem? {
+        if refusesWrites() { return nil }
         if let existing = item(for: recording) { return existing }
-        let item = CrateItem(recording: recording)
+        let item = CrateItem(snapshot: CrateSnapshot.capture(recording, context: context))
         item.setGenres(localGenres(for: recording))
         context.insert(item)
         note(item)
@@ -232,7 +265,8 @@ final class CrateService {
     /// taking a row back out of the crate is a correction, not a verdict, and
     /// reading it as one would punish people for tidying up.
     private func note(_ item: CrateItem) {
-        guard let node = item.node else { return }
+        guard let node = item.node(resolving: CrateRecordings(context: context).recording(for: item))
+        else { return }
         ListeningLog(context: context).record(
             node, action: .saved, tags: item.genreTags,
             source: item.providerID.map { ListeningSource(providerID: $0, showTitle: item.showTitle) }
@@ -252,6 +286,7 @@ final class CrateService {
     /// the other is worse than leaving it to be looked up again.
     @discardableResult
     func remember(showID: String, for item: CrateItem) -> Bool {
+        if refusesWrites() { return false }
         guard let providerID = item.providerID, item.showID != showID else { return false }
         guard self.item(forBroadcast: showID, providerID: providerID) == nil else { return false }
         item.showID = showID
@@ -270,7 +305,8 @@ final class CrateService {
         embedProvider: EmbedProvider?,
         isLiveStream: Bool = false,
         genres: [String] = []
-    ) -> CrateItem {
+    ) -> CrateItem? {
+        if refusesWrites() { return nil }
         if let existing = item(forBroadcast: showID, providerID: providerID) { return existing }
         let item = CrateItem(
             providerID: providerID,
@@ -298,7 +334,8 @@ final class CrateService {
         subtitle: String?,
         artworkURL: URL?,
         genres: [String] = []
-    ) -> CrateItem {
+    ) -> CrateItem? {
+        if refusesWrites() { return nil }
         if let existing = item(forDig: kind, identifier: identifier, providerID: providerID) { return existing }
         let item = CrateItem(
             digKind: kind, providerID: providerID, entityID: identifier,
@@ -329,8 +366,15 @@ final class CrateService {
         }
     }
 
+    /// Takes the thing out of the crate: every row for it. Two devices that
+    /// each kept the same record made two rows, and removing one would leave the
+    /// other saying it is still kept.
     func remove(_ item: CrateItem) {
-        context.delete(item)
+        if refusesWrites() { return }
+        if let key = UserDataDedupe.key(of: item) {
+            for row in UserDataDedupe(context: context).rows(forCrateKey: key) { context.delete(row) }
+        }
+        if !item.isDeleted { context.delete(item) }
         save()
     }
 
@@ -381,8 +425,10 @@ final class CrateService {
     /// stopped main thread, and on any real library it is the hitch that
     /// pauses the shader a few seconds in.
     func backfillLocalGenres() {
-        let pending = items().compactMap { item -> (item: CrateItem, paths: [String])? in
-            guard item.genreTags.isEmpty, let recording = item.recording else { return nil }
+        let all = items()
+        let found = CrateRecordings(context: context).recordings(for: all)
+        let pending = all.compactMap { item -> (item: CrateItem, paths: [String])? in
+            guard item.genreTags.isEmpty, let recording = found[item.id] else { return nil }
             let paths = localPaths(of: recording)
             return paths.isEmpty ? nil : (item, paths)
         }
@@ -473,6 +519,7 @@ final class CrateService {
                 item.showSubtitle = subtitle
             }
         }
+        mergeDuplicates(of: item)
         save()
     }
 
@@ -490,7 +537,16 @@ final class CrateService {
             item.artworkURLString = media.remoteArtworkURL?.absoluteString ?? item.artworkURLString
             item.setGenres(media.genres)
         }
+        mergeDuplicates(of: item)
         save()
+    }
+
+    /// A repair that rewrites a row's `showID` can land it on one that is
+    /// already there. They are one kept thing, so they are merged now, not left
+    /// for the next pass to find.
+    private func mergeDuplicates(of item: CrateItem) {
+        guard let key = UserDataDedupe.key(of: item) else { return }
+        UserDataDedupe(context: context).crate(key: key)
     }
 
     private func localGenres(for recording: Recording) -> [String] {

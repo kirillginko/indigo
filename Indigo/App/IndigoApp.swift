@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import CoreData
 import SwiftData
 
 /// Window identifiers, so opening one by name isn't a loose string.
@@ -12,12 +13,75 @@ enum IndigoWindow {
     static let mini = "indigo.mini"
 }
 
+/// The entry point. A debug build checks first whether a run was asked for by
+/// name -- the CloudKit schema seed -- so that it happens before `IndigoApp`'s
+/// properties open the listener's stores. Without the argument, and always in a
+/// release build, it is the app, unchanged.
 @main
+enum Launcher {
+    static func main() {
+        #if DEBUG
+        if CommandLine.arguments.contains(CloudKitSeedGuard.argument) {
+            MainActor.assumeIsolated { CloudKitSeedRunner.runAndExit() }
+        }
+        if CommandLine.arguments.contains(SyncRehearsalRunner.argument) {
+            MainActor.assumeIsolated { SyncRehearsalRunner.runAndExit() }
+        }
+        if CommandLine.arguments.contains(TwoDeviceSyncRunner.argument) {
+            MainActor.assumeIsolated { TwoDeviceSyncRunner.runAndExit() }
+        }
+        if CommandLine.arguments.contains(CounterRehearsalRunner.argument) {
+            MainActor.assumeIsolated { CounterRehearsalRunner.runAndExit() }
+        }
+        if CommandLine.arguments.contains(CloudKitCountRunner.argument) || CommandLine.arguments.contains(CloudKitCountRunner.cleanArgument) {
+            MainActor.assumeIsolated { CloudKitCountRunner.runAndExit() }
+        }
+        #endif
+        IndigoApp.main()
+    }
+}
+
 struct IndigoApp: App {
+    /// The author of this process's own writes to the store, so the history
+    /// observer can tell them from an import.
+    static let writerAuthor = "indigo.app"
+
+    /// Registers for the silent pushes CloudKit sends when another device
+    /// changes the listener's data. See `IndigoAppDelegate`.
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(IndigoAppDelegate.self) private var appDelegate
+    #else
+    @UIApplicationDelegateAdaptor(IndigoAppDelegate.self) private var appDelegate
+    #endif
+
     init() {
         // Before the first view draws, so nothing renders in the fallback face.
         Typeface.registerBundledFonts()
+        // Rows another writer made -- CloudKit's imports -- are merged as they
+        // arrive, whether or not a window is open. See `HistoryObserver`.
+        UserDataObserving.start(author: Self.writerAuthor)
+        #if DEBUG
+        Self.runTestVisitsIfAsked()
+        #endif
     }
+
+    #if DEBUG
+    /// The two-device test's visits, made by the app itself at launch when asked:
+    /// `-INDIGO_TEST_VISIT_SHARED <times>`. In `init`, after the store has opened,
+    /// so it does not wait on a window appearing.
+    private static func runTestVisitsIfAsked() {
+        let args = ProcessInfo.processInfo.arguments
+        guard let at = args.firstIndex(of: "-INDIGO_TEST_VISIT_SHARED"), at + 1 < args.count,
+              let times = Int(args[at + 1]), (1...20).contains(times) else { return }
+        guard Persistence.userDataWritable else { Trace.note("sync test: UserData is not writable"); Trace.flush(); return }
+        let history = DigHistory(context: Persistence.container.mainContext)
+        for _ in 0..<times {
+            history.record(SyncDiagnosticsView.testArtist, from: SyncDiagnosticsView.testOrigin)
+        }
+        Trace.note("sync test: visited the shared test artist \(times) times")
+        Trace.flush()
+    }
+    #endif
 
     @State private var appState = AppState()
     @State private var player = PlaybackCoordinator()
@@ -48,6 +112,7 @@ struct IndigoApp: App {
     @State private var youtubeChannels = YouTubeChannelStore()
     @State private var n10as = N10ASProvider()
     @State private var n10asBrowse = N10ASBrowseStore()
+    @State private var storeFailure = Persistence.openFailure
     @State private var library = LibraryStore(container: Persistence.container)
     @State private var crate = CrateService(context: Persistence.container.mainContext)
     @State private var dig = DigStore(context: Persistence.container.mainContext)
@@ -91,8 +156,35 @@ struct IndigoApp: App {
                 .environment(crate)
                 .environment(dig)
                 .modelContainer(Persistence.container)
+                .alert(
+                    "Your library couldn't be opened",
+                    isPresented: Binding(
+                        get: { storeFailure != nil },
+                        set: { if !$0 { storeFailure = nil } }),
+                    presenting: storeFailure
+                ) { _ in
+                    Button("OK", role: .cancel) {}
+                } message: { failure in
+                    Text("Nothing has been deleted. Until it opens, this session is not being saved, so anything you add will be gone when you quit.\n\n\(failure.explanation.map { $0 + "\n\n" } ?? "")\(failure.url.path)")
+                }
+                #if os(macOS)
                 .frame(minWidth: 900, minHeight: 580)
+                #endif
+                #if os(iOS) && DEBUG
+                // The iPhone interface is not laid out yet; this is how its
+                // store and sync are seen. Attached last, so it sits on the
+                // screen and not on a layout wider than it. See
+                // `SyncDiagnosticsView`.
+                .modifier(ScreenCornerSyncButton())
+                #endif
                 .task {
+                    // Gives a row crated before it kept its own snapshot the
+                    // snapshot. Not under test, which runs against the
+                    // listener's real store, and not while that store is
+                    // unopened: it writes the crate.
+                    if !Persistence.isRunningTests, Persistence.userDataWritable {
+                        UserDataDedupe(context: Persistence.container.mainContext).all()
+                    }
                     witness.watch(player)
                     // Keep the picture backlog out of the way while a stream
                     // opens. See `DigStore.holdBackgroundWork`.
@@ -184,7 +276,17 @@ struct IndigoApp: App {
                 Button("Find") { appState.requestSearchFocus() }
                     .keyboardShortcut("f", modifiers: .command)
                 MiniPlayerCommand()
+                #if DEBUG
+                SyncTestCommand()
+                #endif
             }
+        }
+        #endif
+
+        #if os(macOS) && DEBUG
+        Window("Sync Test", id: "sync-test") {
+            SyncDiagnosticsView()
+                .modelContainer(Persistence.container)
         }
         #endif
 
@@ -252,6 +354,18 @@ struct IndigoApp: App {
         #endif
     }
 }
+
+#if os(macOS) && DEBUG
+/// Opens the sync diagnostics and two-device test actions.
+private struct SyncTestCommand: View {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Button("Sync Test") { openWindow(id: "sync-test") }
+            .keyboardShortcut("y", modifiers: [.command, .shift])
+    }
+}
+#endif
 
 #if os(macOS)
 /// Lives in its own view so it can reach `openWindow`, which a `Commands`

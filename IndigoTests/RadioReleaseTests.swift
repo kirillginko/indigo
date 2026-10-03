@@ -19,7 +19,7 @@ final class RadioReleaseTests: XCTestCase {
     private var store: RecordingStore!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         store = RecordingStore(context: context)
@@ -127,7 +127,7 @@ final class RadioReleaseTests: XCTestCase {
 
         let show = MusicNode.broadcast(providerID: "nts", showID: "ben-ufo/2026-08-28", title: "Ben UFO")
         let played = GraphStore(context: context).neighbors(of: show).byDestination
-        let track = try XCTUnwrap(played.first { $0.node.recordingID == recording.id })
+        let track = try XCTUnwrap(played.first { RecordingIdentity(node: $0.node) == RecordingIdentity(recording) })
 
         XCTAssertEqual(track.node.artworkURL?.absoluteString, "https://img.example/untrue.jpg")
     }

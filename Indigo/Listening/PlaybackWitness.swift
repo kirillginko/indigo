@@ -45,9 +45,10 @@ final class PlaybackWitness {
     /// Writes one play down, as every node it was an encounter with.
     func record(_ item: MediaItem, seconds: TimeInterval, completion: Double, at: Date = Date()) {
         let reading = Self.reading(for: item, resolveRecording: { [log] key in
-            var descriptor = FetchDescriptor<Recording>(predicate: #Predicate { $0.matchKey == key })
-            descriptor.fetchLimit = 1
-            return (try? log.context.fetch(descriptor))?.first
+            // The recording the key names on its own, not one of the coded
+            // placeholders that share it.
+            RecordingStore(context: log.context).recording(
+                identity: RecordingIdentity(matchKey: key, unknownCode: nil))
         })
         // Three outcomes, not two. Long enough is listening; long enough to
         // have been a decision and no longer is a rejection, which is worth
@@ -119,8 +120,8 @@ final class PlaybackWitness {
                 if let known = resolveRecording(key) {
                     reading.subjects.append(.recording(known))
                 } else {
-                    reading.subjects.append(MusicNode(
-                        kind: .recording, key: key,
+                    reading.subjects.append(MusicNode.recording(
+                        identity: RecordingIdentity(matchKey: key, unknownCode: nil),
                         title: credit.title, subtitle: credit.artist
                     ))
                 }

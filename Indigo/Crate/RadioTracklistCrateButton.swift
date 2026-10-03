@@ -53,9 +53,15 @@ extension CrateService {
             return wasCrated ? nil : recording
         }
         let credit = item.resolvedCredit
-        let recording = Recording(title: credit.title, artistName: credit.artist, status: .probable)
-        context.insert(recording)
         let heardAt = (item.airedAt ?? Date()).addingTimeInterval(item.offsetSeconds ?? 0)
+        // Coded from where it was heard, like the NTS placeholders, so two rows
+        // with the same credit are two recordings in the crate.
+        let recording = Recording(
+            title: credit.title, artistName: credit.artist, status: .probable,
+            unknownCode: RecordingKey.unknownCode(
+                providerID: item.providerID, showID: item.showID,
+                heardAt: heardAt, offsetSeconds: item.offsetSeconds))
+        context.insert(recording)
         RecordingStore(context: context).note(
             appearance: MediaAppearance(
                 providerID: item.providerID, showTitle: item.showTitle, showID: item.showID,

@@ -18,7 +18,7 @@ final class DigHistoryTests: XCTestCase {
     private var history: DigHistory!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         history = DigHistory(context: context)
@@ -190,7 +190,7 @@ final class DigHistoryTests: XCTestCase {
         let dig = DigStore(context: context)
 
         XCTAssertEqual(
-            dig.node(for: .digRecording(id: recording.id, title: "Rev8617"))?.id,
+            dig.node(for: .digRecording(identity: RecordingIdentity(recording), title: "Rev8617"))?.id,
             MusicNode.recording(recording).id
         )
     }

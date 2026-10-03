@@ -907,7 +907,7 @@ nonisolated struct SceneCaches {
         }
         }
         for item in fetched.crate {
-            let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            let name = item.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, !name.isEmpty else { continue }
             crateForArtist[RecordingKey.normalizeArtist(name), default: 0] += 1
         }

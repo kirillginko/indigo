@@ -23,12 +23,56 @@ nonisolated enum CrateItemKind: String, Codable, CaseIterable, Sendable {
 
 @Model
 nonisolated final class CrateItem {
-    @Attribute(.unique) var id: UUID
-    var kindRaw: String
-    var addedAt: Date
+    /// Not unique: nothing in a synced store can refuse a second row with an
+    /// id, so two rows with one id are two copies of one row, and
+    /// `UserDataDedupe` folds them. The defaults below are what a row that
+    /// arrives without a field holds, chosen so that it neither wins nor
+    /// distorts anything: `addedAt` is `distantPast`, which sorts to the bottom
+    /// of a newest-first crate and which a merge reads as "no date".
+    var id: UUID = UUID()
+    var kindRaw: String = CrateItemKind.recording.rawValue
+    var addedAt: Date = Date.distantPast
 
-    /// Set for `.recording`.
-    var recording: Recording?
+    // MARK: Recording snapshot
+    //
+    // Set for `.recording`. What a crated recording is, kept on the row itself
+    // rather than as a relationship into the catalogue: a row that has to be
+    // the same on every device cannot point at an object that exists on one of
+    // them. Each device resolves it to its own `Recording` by `matchKey`, or by
+    // `unknownCode` for music nobody named -- see `CrateRecordings`.
+    //
+    // `artworkURLString`, `genreTagsRaw`, `playbackURLString` and
+    // `embedProviderRaw` below are the same snapshot's picture, genres and one
+    // link to play it, and `providerID`, `showID`, `showTitle` are the
+    // broadcast it was heard in ("local" for a file from the library).
+
+    /// Normalised artist + title. Empty for unnamed music, which `unknownCode`
+    /// identifies instead.
+    var matchKey: String = ""
+    var unknownCode: String?
+    var title: String?
+    var artistName: String?
+    var albumTitle: String?
+    /// `IdentificationStatus.rawValue`.
+    var identificationStatusRaw: String?
+    /// "NTS 1": the station, when the broadcast it was heard in had one.
+    var stationName: String?
+    /// Seconds into that broadcast.
+    var broadcastOffsetSeconds: Double?
+
+    // What `providerID`, `showID`, `showTitle` and `showSubtitle` hold depends
+    // on `kind`. They are named for the first thing the crate kept, a show, and
+    // reused since, and their names are fixed in the synced schema:
+    //
+    //   .broadcast    the show: its provider, its id, its title, its subtitle.
+    //   .artist       the catalogue entry: `providerID` says which catalogue
+    //   .release        ("dig.artist.mbid"), `showID` is the entity's id,
+    //   .label          `showTitle` its name, `showSubtitle` a line under it.
+    //   .recording    where it was heard: the broadcast it came from, or
+    //                 "local" for a file. `showTitle` is that broadcast's title.
+    //
+    // `CrateService.item(forBroadcast:)` therefore matches on kind as well, or
+    // crating a show would find the track heard in it.
 
     /// Set for `.broadcast`. Kept as plain fields rather than a relationship
     /// so a crated show survives the provider's catalogue changing under it.
@@ -45,11 +89,20 @@ nonisolated final class CrateItem {
     /// a normal array to filtering views.
     var genreTagsRaw: String = ""
 
-    init(recording: Recording) {
+    /// A row as it was, with the id and the date it was made. For moving rows
+    /// into a store, not for making new ones.
+    init(restoring value: CrateValue) {
+        self.id = value.id
+        self.kindRaw = value.kindRaw
+        self.addedAt = value.addedAt
+        value.apply(to: self)
+    }
+
+    init(snapshot: CrateSnapshot) {
         self.id = UUID()
         self.kindRaw = CrateItemKind.recording.rawValue
         self.addedAt = Date()
-        self.recording = recording
+        snapshot.apply(to: self)
     }
 
     init(
@@ -112,10 +165,16 @@ nonisolated final class CrateItem {
     ///
     /// Nil is a real answer: a broadcast whose provider forgot to say which
     /// one, or a dig row saved under a provider tag written after this was.
-    var node: MusicNode? {
+    var node: MusicNode? { node(resolving: nil) }
+
+    /// The same, with the local `Recording` this device resolved the row to,
+    /// when it has one. A node carries that recording's id so it can be
+    /// reopened; the row on its own cannot know it.
+    func node(resolving recording: Recording?) -> MusicNode? {
         switch kind {
         case .recording:
-            return recording.map { MusicNode.recording($0, artwork: artworkURL) }
+            if let recording { return MusicNode.recording(recording, artwork: artworkURL) }
+            return recordingNodeFromSnapshot
         case .broadcast:
             guard let providerID, let showID else { return nil }
             // A kept live stream is the station itself; there is no episode
@@ -139,21 +198,38 @@ nonisolated final class CrateItem {
         }
     }
 
+    /// What identifies this row's recording across devices: the match key, or
+    /// the code for unnamed music. Empty only for a row with no snapshot.
+    var recordingIdentity: String {
+        CrateSnapshot.identity(matchKey: matchKey, unknownCode: unknownCode)
+    }
+
+    var hasRecordingSnapshot: Bool { !recordingIdentity.isEmpty }
+
+    private var recordingNodeFromSnapshot: MusicNode? {
+        guard hasRecordingSnapshot else { return nil }
+        return MusicNode.recording(
+            identity: RecordingIdentity(matchKey: matchKey, unknownCode: unknownCode),
+            title: displayTitle, subtitle: displaySubtitle, artwork: artworkURL)
+    }
+
     // MARK: Display
 
     var displayTitle: String {
         switch kind {
-        case .recording: recording?.displayTitle ?? "Unknown"
-        case .broadcast: showTitle ?? "Broadcast"
-        case .artist: showTitle ?? "Artist"
-        case .release: showTitle ?? "Release"
-        case .label: showTitle ?? "Label"
+        case .recording:
+            if let title, !title.isEmpty { return title }
+            return hasRecordingSnapshot ? "UNKNOWN/\(unknownCode ?? "?????")" : "Unknown"
+        case .broadcast: return showTitle ?? "Broadcast"
+        case .artist: return showTitle ?? "Artist"
+        case .release: return showTitle ?? "Release"
+        case .label: return showTitle ?? "Label"
         }
     }
 
     var displaySubtitle: String? {
         switch kind {
-        case .recording: recording?.displayArtist
+        case .recording: artistName.flatMap { $0.isEmpty ? nil : $0 }
         case .broadcast, .artist, .release, .label: showSubtitle
         }
     }
@@ -163,13 +239,11 @@ nonisolated final class CrateItem {
     var sourceLine: String? {
         switch kind {
         case .recording:
-            guard let appearance = recording?.firstAppearance else {
-                return recording?.sources.contains { $0.kind == .localFile } == true
-                    ? "Local Library"
-                    : nil
-            }
-            var line = appearance.sourceLine
-            if let offset = appearance.offsetLabel { line += " @ \(offset)" }
+            guard let providerID else { return nil }
+            let left = stationName ?? Self.providerName(providerID)
+            var line = left
+            if let showTitle, !showTitle.isEmpty { line += " / \(showTitle)" }
+            if let offset = Self.offsetLabel(broadcastOffsetSeconds) { line += " @ \(offset)" }
             return line
         case .broadcast:
             switch providerID {
@@ -205,10 +279,32 @@ nonisolated final class CrateItem {
             .filter { !$0.isEmpty && seen.insert(LibraryKey.normalize($0)).inserted }
     }
 
+    private var recordingStatus: IdentificationStatus? {
+        identificationStatusRaw.flatMap(IdentificationStatus.init(rawValue:))
+    }
+
+    /// The names `MediaAppearance` gives the providers a track was heard
+    /// through, so a row reads the same as it did when it asked the appearance.
+    private static func providerName(_ providerID: String) -> String {
+        switch providerID {
+        case "nts": "NTS"
+        case "kiosk": "Kiosk Radio"
+        case "local": "Local Library"
+        default: providerID.capitalized
+        }
+    }
+
+    /// "01:14:32" into the broadcast.
+    private static func offsetLabel(_ seconds: Double?) -> String? {
+        guard let seconds, seconds >= 0 else { return nil }
+        let total = Int(seconds.rounded())
+        return String(format: "%02d:%02d:%02d", total / 3600, (total % 3600) / 60, total % 60)
+    }
+
     /// Status chip: MATCH / PROBABLE / UNKNOWN, or the kind of thing it is.
     var statusLabel: String? {
         switch kind {
-        case .recording: recording?.identificationStatus.label
+        case .recording: recordingStatus?.label
         case .broadcast: "Show"
         case .artist: "Artist"
         case .release: "Release"
@@ -221,7 +317,7 @@ nonisolated final class CrateItem {
     var statusItem: StatusItem? {
         switch kind {
         case .recording:
-            switch recording?.identificationStatus {
+            switch recordingStatus {
             case .identified: StatusItem("Match ✓", .affirmed)
             case .probable: StatusItem("Probable", .pending)
             case .unknown: StatusItem("Unknown", .pending)

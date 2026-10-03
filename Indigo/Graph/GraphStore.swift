@@ -189,7 +189,7 @@ nonisolated struct GraphStore {
         if let caches = assembledCaches { return caches.crateCount(forArtistKey: key) }
         let items = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
         return items.filter {
-            RecordingKey.normalizeArtist($0.recording?.artistName) == key
+            RecordingKey.normalizeArtist($0.artistName) == key
                 || ($0.kind == .artist && RecordingKey.normalizeArtist($0.displayTitle) == key)
         }.count
     }
@@ -847,8 +847,8 @@ nonisolated struct GraphStore {
     // MARK: - Recording
 
     private func addRecordingNeighbors(_ node: MusicNode, caches: Caches, into edges: inout EdgeSet) {
-        guard let identifier = node.recordingID,
-              let recording = caches.recordings.first(where: { $0.id == identifier }) else { return }
+        guard let identity = RecordingIdentity(node: node),
+              let recording = caches.recording(identity: identity) else { return }
 
         for appearance in recording.appearances {
             guard let showID = appearance.showID else { continue }
@@ -963,6 +963,12 @@ nonisolated struct GraphStore {
 /// every time if nobody stops it.
 private nonisolated struct Caches {
     let recordings: [Recording]
+
+    /// The recording a node names, if the cache holds one.
+    func recording(identity: RecordingIdentity) -> Recording? {
+        recordingsByIdentity[identity]
+    }
+    private let recordingsByIdentity: [RecordingIdentity: Recording]
     let discogsArtists: [DiscogsArtist]
     let discogsReleases: [DiscogsReleaseRecord]
     let metadata: [UUID: RecordingMetadata]
@@ -1132,6 +1138,8 @@ private nonisolated struct Caches {
         let entries = kept(3) { Array($0.metadata.values) }
             ?? Trace.step("t.metadata") { (try? store.fetch(FetchDescriptor<RecordingMetadata>())) ?? [] }
         recordings = fetchedRecordings
+        recordingsByIdentity = Dictionary(
+            fetchedRecordings.map { (RecordingIdentity($0), $0) }, uniquingKeysWith: { first, _ in first })
         discogsArtists = fetchedArtists
         discogsReleases = fetchedReleases
         let builtDicts = Trace.step("t.dicts") {(
@@ -1291,7 +1299,7 @@ private nonisolated struct Caches {
                 var bySpelling: [String: Int] = [:]
                 var byKey: [String: Int] = [:]
                 for item in (try? store.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-                    let artist = item.recording?.artistName
+                    let artist = item.artistName
                         ?? (item.kind == .artist ? item.displayTitle : nil)
                     guard let artist, !artist.isEmpty else { continue }
                     bySpelling[artist, default: 0] += 1

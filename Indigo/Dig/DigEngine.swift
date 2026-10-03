@@ -909,7 +909,7 @@ nonisolated struct DigEngine {
         let items = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
         var counts: [String: Int] = [:]
         for item in items {
-            let artist = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            let artist = item.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let artist, !artist.isEmpty else { continue }
             counts[artist, default: 0] += 1
         }
@@ -942,10 +942,7 @@ nonisolated struct DigEngine {
     }
 
     private func isCrated(_ recording: Recording) -> Bool {
-        let id = recording.id
-        var descriptor = FetchDescriptor<CrateItem>(predicate: #Predicate { $0.recording?.id == id })
-        descriptor.fetchLimit = 1
-        return ((try? context.fetch(descriptor))?.first) != nil
+        CrateRecordings(context: context).crateItem(for: recording) != nil
     }
 
     /// What a recording's catalogue entry says.

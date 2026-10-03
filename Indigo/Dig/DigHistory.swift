@@ -20,22 +20,41 @@ import SwiftData
 /// A node the listener opened, and how often.
 @Model
 nonisolated final class DigVisit {
-    @Attribute(.unique) var nodeID: String
-    var kindRaw: String
-    var title: String
+    /// Names this row, as `nodeID` names the node it counts. Two devices that
+    /// each opened the same node make two rows with one `nodeID` and two ids,
+    /// and which row survives their merge is decided by the ids -- so a row
+    /// keeps the id it was born with, and a merge never makes a new one. Nil
+    /// only until `UserDataIDs.assign` has run on a row from before it existed.
+    var id: UUID?
+    /// Not unique: two devices' rows for one node are two rows until
+    /// `UserDataDedupe` folds them, and a constraint would have refused the
+    /// second. It names the node; `id` names the row.
+    var nodeID: String = ""
+    var kindRaw: String = MusicNodeKind.artist.rawValue
+    var title: String = ""
     var subtitle: String?
-    var visits: Int
-    var firstVisitedAt: Date
-    var lastVisitedAt: Date
+    /// A row that arrives with none of these is an empty history: no visits, and
+    /// an interval that is empty -- `firstVisitedAt` in the far future and
+    /// `lastVisitedAt` in the far past -- so it changes neither end of a merge.
+    var visits: Int = 0
+    var firstVisitedAt: Date = Date.distantFuture
+    var lastVisitedAt: Date = Date.distantPast
 
     // Enough to reopen it. A visit nobody can act on is a statistic.
     var mbid: String?
     var discogsID: Int?
-    var recordingID: UUID?
     var providerID: String?
     var handle: String?
 
+    /// A row as it was; see `CrateItem.init(restoring:)`.
+    init(restoring value: VisitValue) {
+        id = value.id
+        nodeID = value.nodeID
+        value.apply(to: self)
+    }
+
     init(node: MusicNode) {
+        id = UUID()
         nodeID = node.id
         kindRaw = node.kind.rawValue
         title = node.title
@@ -45,7 +64,6 @@ nonisolated final class DigVisit {
         lastVisitedAt = Date()
         mbid = node.mbid
         discogsID = node.discogsID
-        recordingID = node.recordingID
         providerID = node.providerID
         handle = node.handle
     }
@@ -58,7 +76,7 @@ nonisolated final class DigVisit {
             kind: kind,
             key: String(nodeID.drop { $0 != ":" }.dropFirst()),
             title: title, subtitle: subtitle,
-            mbid: mbid, discogsID: discogsID, recordingID: recordingID,
+            mbid: mbid, discogsID: discogsID,
             providerID: providerID, handle: handle
         )
     }
@@ -68,14 +86,31 @@ nonisolated final class DigVisit {
 /// resulting list of tracks is only the residue.
 @Model
 nonisolated final class DigStep {
-    @Attribute(.unique) var identity: String
-    var fromNodeID: String
-    var toNodeID: String
-    var count: Int
-    var lastAt: Date
+    /// See `DigVisit.id`.
+    var id: UUID?
+    /// Not unique, for the same reason as `DigVisit.nodeID`.
+    var identity: String = ""
+    var fromNodeID: String = ""
+    var toNodeID: String = ""
+    var count: Int = 0
+    var lastAt: Date = Date.distantPast
+
+    /// A row as it was; see `CrateItem.init(restoring:)`.
+    /// The one place a step's identity is written: where it left, an arrow,
+    /// where it went.
+    static func canonicalIdentity(from: String, to: String) -> String { "\(from)→\(to)" }
+
+    init(restoring value: StepValue) {
+        id = value.id
+        identity = value.identity
+        fromNodeID = value.fromNodeID
+        toNodeID = value.toNodeID
+        value.apply(to: self)
+    }
 
     init(from: String, to: String) {
-        identity = "\(from)→\(to)"
+        id = UUID()
+        identity = DigStep.canonicalIdentity(from: from, to: to)
         fromNodeID = from
         toNodeID = to
         count = 0
@@ -94,10 +129,22 @@ nonisolated struct DigHistory {
     /// borne once per generation — see `DigWorker.refresh(_:)` — so sharing it
     /// is the difference between a walk and a rebuild.
     private let shared: GraphStore?
+    /// False while the listener's store could not be opened; nothing is
+    /// recorded or forgotten, because it would not outlive the session.
+    private let writable: Bool
+    /// Whose counter components this writes. One per installation; see
+    /// `DeviceIdentity`. A test or a harness standing in for two devices passes
+    /// its own.
+    private let deviceID: String
 
-    init(context: ModelContext, graph: GraphStore? = nil) {
+    init(
+        context: ModelContext, graph: GraphStore? = nil, writable: Bool = Persistence.userDataWritable,
+        deviceID: String = DeviceIdentity.current
+    ) {
         self.context = context
         self.shared = graph
+        self.writable = writable
+        self.deviceID = deviceID
     }
 
     // MARK: Writing
@@ -108,19 +155,28 @@ nonisolated struct DigHistory {
     /// Crate, out of a search. That is a visit but not a step, and counting it
     /// as one would invent a path nobody walked.
     func record(_ node: MusicNode, from origin: MusicNode? = nil) {
+        guard writable else { return }
+        // Two devices that opened this node made two rows. Folded into one
+        // before the count moves, so it moves on the row that stays.
+        let dedupe = UserDataDedupe(context: context)
+        dedupe.visit(nodeID: node.id)
+        if let origin, origin.id != node.id { dedupe.step(identity: DigStep.canonicalIdentity(from: origin.id, to: node.id)) }
+        let now = Date()
+        let counters = DigCounters(context: context)
         let visit = visit(for: node) ?? {
             let fresh = DigVisit(node: node)
             context.insert(fresh)
             return fresh
         }()
-        visit.visits += 1
-        visit.lastVisitedAt = Date()
+        // The count is this device's component, raised; the row is what all the
+        // components add up to. See `DigCounter`.
+        counters.increment(.visit, key: node.id, deviceID: deviceID, at: now)
+        counters.project(visit)
         visit.title = node.title
         // Identifiers accumulate: a node met by name first and by MBID later
         // should end up knowing both.
         visit.mbid = visit.mbid ?? node.mbid
         visit.discogsID = visit.discogsID ?? node.discogsID
-        visit.recordingID = visit.recordingID ?? node.recordingID
 
         if let origin, origin.id != node.id {
             let step = step(from: origin.id, to: node.id) ?? {
@@ -128,15 +184,21 @@ nonisolated struct DigHistory {
                 context.insert(fresh)
                 return fresh
             }()
-            step.count += 1
-            step.lastAt = Date()
+            counters.increment(.step, key: step.identity, deviceID: deviceID, at: now)
+            counters.project(step)
         }
         try? context.save()
     }
 
     func forget() {
+        guard writable else { return }
         for visit in visits() { context.delete(visit) }
         for step in steps() { context.delete(step) }
+        // The components too, or the next projection would bring the rows back.
+        // The generation marker stays: the store still counts in components.
+        for counter in (try? context.fetch(FetchDescriptor<DigCounter>())) ?? [] where counter.kind != .generation {
+            context.delete(counter)
+        }
         try? context.save()
     }
 
@@ -152,17 +214,14 @@ nonisolated struct DigHistory {
 
     func visit(for node: MusicNode) -> DigVisit? { visit(nodeID: node.id) }
 
+    /// The row a merge would keep, whether or not one has run.
     func visit(nodeID: String) -> DigVisit? {
-        var descriptor = FetchDescriptor<DigVisit>(predicate: #Predicate { $0.nodeID == nodeID })
-        descriptor.fetchLimit = 1
-        return (try? context.fetch(descriptor))?.first
+        UserDataDedupe.survivor(ofVisits: UserDataDedupe(context: context).rows(forNodeID: nodeID))
     }
 
     private func step(from: String, to: String) -> DigStep? {
-        let identity = "\(from)→\(to)"
-        var descriptor = FetchDescriptor<DigStep>(predicate: #Predicate { $0.identity == identity })
-        descriptor.fetchLimit = 1
-        return (try? context.fetch(descriptor))?.first
+        UserDataDedupe.survivor(
+            ofSteps: UserDataDedupe(context: context).rows(forStepIdentity: DigStep.canonicalIdentity(from: from, to: to)))
     }
 
     /// "YOU OFTEN DIG THROUGH" — the things this listener keeps going back to.
@@ -183,19 +242,30 @@ nonisolated struct DigHistory {
                 SortDescriptor(\.lastVisitedAt, order: .reverse)
             ]
         )
-        return ((try? context.fetch(descriptor)) ?? [])
+        return Self.onePerNode((try? context.fetch(descriptor)) ?? [])
             .filter { kinds.contains($0.kind) }
             .prefix(limit)
             .map { $0 }
     }
 
+    /// A list is drawn one row to a node. Until a merge has run, two devices'
+    /// rows for the same node are two rows here, and the first -- the most
+    /// returned to, or the most recent -- speaks for both.
+    private static func onePerNode(_ visits: [DigVisit]) -> [DigVisit] {
+        var seen = Set<String>()
+        return visits.filter { seen.insert($0.nodeID).inserted }
+    }
+
     /// Where the listener was last, so a dig can be picked back up.
     func recent(limit: Int = 5) -> [DigVisit] {
+        // A row that arrived with no visits is not somewhere the listener was.
         var descriptor = FetchDescriptor<DigVisit>(
+            predicate: #Predicate { $0.visits > 0 },
             sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]
         )
-        descriptor.fetchLimit = limit
-        return (try? context.fetch(descriptor)) ?? []
+        // Room for the nodes that appear twice.
+        descriptor.fetchLimit = limit * 2
+        return Array(Self.onePerNode((try? context.fetch(descriptor)) ?? []).prefix(limit))
     }
 
     /// "TRY" — where this listener has not been.

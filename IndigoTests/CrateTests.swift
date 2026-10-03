@@ -17,7 +17,7 @@ final class CrateTests: XCTestCase {
     private var recordings: RecordingStore!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         crate = CrateService(context: context)
@@ -73,7 +73,7 @@ final class CrateTests: XCTestCase {
         XCTAssertEqual(Set(crate.items().map(\.kind)), [.artist, .release, .label])
         XCTAssertTrue(crate.contains(dig: .artist, identifier: "artist-123", providerID: "dig.artist.mbid"))
         XCTAssertEqual(crate.items().first(where: { $0.kind == .artist })?.genreTags, ["Ambient", "Shoegaze"])
-        XCTAssertTrue(crate.items().allSatisfy { $0.recording == nil && $0.sourceLine == "DIG" })
+        XCTAssertTrue(crate.items().allSatisfy { !$0.hasRecordingSnapshot && $0.sourceLine == "DIG" })
         XCTAssertEqual(DigEngine(context: context).crateCount(artist: "Seefeel"), 1)
     }
 
@@ -94,7 +94,7 @@ final class CrateTests: XCTestCase {
     /// music, and its provenance, outlive the decision to keep it.
     func testRemovingFromCrateKeepsTheRecording() throws {
         let recording = try recordings.upsert(title: "Hubble", artistName: "Actress")
-        let item = crate.add(recording: recording)
+        let item = try XCTUnwrap(crate.add(recording: recording))
         crate.remove(item)
 
         XCTAssertEqual(crate.count, 0)
@@ -120,7 +120,7 @@ final class CrateTests: XCTestCase {
             on: unknown
         )
 
-        let item = crate.add(recording: unknown)
+        let item = try XCTUnwrap(crate.add(recording: unknown))
 
         XCTAssertEqual(crate.count, 1)
         XCTAssertTrue(item.displayTitle.hasPrefix("UNKNOWN/"))
@@ -331,7 +331,7 @@ final class CrateTests: XCTestCase {
         )
         context.insert(track)
         let recording = try recordings.recording(for: track)
-        let legacyItem = CrateItem(recording: recording)
+        let legacyItem = CrateItem(snapshot: CrateSnapshot.capture(recording))
         context.insert(legacyItem)
         try context.save()
 
@@ -357,9 +357,9 @@ final class CrateTests: XCTestCase {
         let old = try recordings.upsert(title: "Old", artistName: "A")
         let new = try recordings.upsert(title: "New", artistName: "B")
 
-        let oldItem = crate.add(recording: old)
+        let oldItem = try XCTUnwrap(crate.add(recording: old))
         oldItem.addedAt = Calendar.current.date(byAdding: .day, value: -2, to: .now)!
-        let newItem = crate.add(recording: new)
+        let newItem = try XCTUnwrap(crate.add(recording: new))
 
         let days = crate.days()
         XCTAssertEqual(days.count, 2)
@@ -378,7 +378,7 @@ final class CrateTests: XCTestCase {
     /// the name of something else — which is how crating "Neue Rituale" on
     /// Radio 80000 came to open Radio 80000 live.
     func testAShowKeptOffTheAirDoesNotReplayAsTheStation() throws {
-        let kept = crate.add(
+        let kept = try XCTUnwrap(crate.add(
             broadcast: "radio80000.live",
             providerID: Radio80000Provider.providerID,
             title: "Neue Rituale",
@@ -387,7 +387,7 @@ final class CrateTests: XCTestCase {
             playbackURL: URL(string: "https://radio80k.out.airtime.pro/radio80k_a"),
             embedProvider: nil,
             isLiveStream: true
-        )
+        ))
 
         XCTAssertTrue(kept.isLiveShowSnapshot, "The title is a show and the id is a station")
         XCTAssertNil(
@@ -400,7 +400,7 @@ final class CrateTests: XCTestCase {
     /// the ordinary case: somebody who crates a station with nothing on air
     /// has kept the station, and pressing play should open it.
     func testAStationKeptAsAStationStillPlays() throws {
-        let kept = crate.add(
+        let kept = try XCTUnwrap(crate.add(
             broadcast: "radio80000.live",
             providerID: Radio80000Provider.providerID,
             title: "Radio 80000",
@@ -409,7 +409,7 @@ final class CrateTests: XCTestCase {
             playbackURL: URL(string: "https://radio80k.out.airtime.pro/radio80k_a"),
             embedProvider: nil,
             isLiveStream: true
-        )
+        ))
 
         XCTAssertFalse(kept.isLiveShowSnapshot)
         XCTAssertEqual(kept.broadcastMediaItem()?.kind, .radioStation)
@@ -629,7 +629,7 @@ final class CrateTests: XCTestCase {
     /// A row that named only its station lands on that station's shows —
     /// where the broadcast will appear once it is posted.
     func testAKeptShowWithNoIdLandsOnTheStationsShows() async throws {
-        let row = crate.add(
+        let row = try XCTUnwrap(crate.add(
             broadcast: "panik.live",
             providerID: PanikProvider.providerID,
             title: "Digging Deeper",
@@ -638,7 +638,7 @@ final class CrateTests: XCTestCase {
             playbackURL: URL(string: "https://stream.test/panik"),
             embedProvider: nil,
             isLiveStream: true
-        )
+        ))
 
         let found = await KeptShow.destination(
             for: row, stations: stations(), crate: crate
@@ -650,7 +650,7 @@ final class CrateTests: XCTestCase {
     /// and opens it. Before this the row did nothing at all when pressed,
     /// which reads as a broken row rather than as a station.
     func testAStationKeptAsAStationOpensTheStation() async throws {
-        let row = crate.add(
+        let row = try XCTUnwrap(crate.add(
             broadcast: "panik.live",
             providerID: PanikProvider.providerID,
             title: "Radio Panik",
@@ -659,7 +659,7 @@ final class CrateTests: XCTestCase {
             playbackURL: URL(string: "https://stream.test/panik"),
             embedProvider: nil,
             isLiveStream: true
-        )
+        ))
 
         let found = await KeptShow.destination(
             for: row, stations: stations(), crate: crate
@@ -674,7 +674,7 @@ final class CrateTests: XCTestCase {
     /// the difference between a row that is slow once and a row that is slow
     /// forever.
     func testAResolvedShowIdIsKeptOnTheRow() throws {
-        let row = crate.add(
+        let row = try XCTUnwrap(crate.add(
             broadcast: "radio80000.live",
             providerID: Radio80000Provider.providerID,
             title: "Neue Rituale",
@@ -683,7 +683,7 @@ final class CrateTests: XCTestCase {
             playbackURL: nil,
             embedProvider: nil,
             isLiveStream: true
-        )
+        ))
 
         XCTAssertTrue(crate.remember(showID: "radio80000.show.neue-rituale", for: row))
         XCTAssertEqual(row.showID, "radio80000.show.neue-rituale")
@@ -706,14 +706,14 @@ final class CrateTests: XCTestCase {
             title: "Neue Rituale",
             subtitle: nil, artworkURL: nil, playbackURL: nil, embedProvider: nil
         )
-        let live = crate.add(
+        let live = try XCTUnwrap(crate.add(
             broadcast: "radio80000.live",
             providerID: Radio80000Provider.providerID,
             title: "Neue Rituale",
             subtitle: "Radio 80000",
             artworkURL: nil, playbackURL: nil, embedProvider: nil,
             isLiveStream: true
-        )
+        ))
 
         XCTAssertFalse(crate.remember(showID: "radio80000.show.neue-rituale", for: live))
         XCTAssertEqual(live.showID, "radio80000.live")

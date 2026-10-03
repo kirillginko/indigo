@@ -17,7 +17,7 @@ final class ArtistNameTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -82,7 +82,7 @@ final class ArtistNameTests: XCTestCase {
         crate.add(recording: real)
 
         let crated = ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? [])
-            .compactMap { $0.recording?.artistName }
+            .compactMap { $0.artistName }
             .filter { ArtistName.isRealArtist($0) }
         XCTAssertEqual(crated, ["Skee Mask"])
     }
@@ -152,7 +152,7 @@ final class LabelNameTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }

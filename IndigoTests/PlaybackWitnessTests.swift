@@ -103,7 +103,7 @@ final class PlaybackWitnessTests: XCTestCase {
 
     @MainActor
     func testAMisClickIsNotWrittenDownAtAll() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
         let witness = PlaybackWitness(context: context)
@@ -118,7 +118,7 @@ final class PlaybackWitnessTests: XCTestCase {
 
     @MainActor
     func testARejectionIsWrittenDownAsOne() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
         let witness = PlaybackWitness(context: context)

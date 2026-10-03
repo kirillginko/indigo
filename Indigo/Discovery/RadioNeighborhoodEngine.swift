@@ -63,7 +63,16 @@ nonisolated struct RadioNeighborhoodEngine {
                 // Repeated placeholders such as “Unreleased” are not evidence
                 // that two positions contain the same music. Keep each row as
                 // a probable recording until stronger metadata can merge it.
-                recording = Recording(title: entry.title, artistName: artist, status: .probable)
+                // Coded from where it sits in the show, so the crate can tell
+                // the six of them apart, here and on any other device that
+                // reads the same tracklist.
+                let offset = entry.offset.map(Double.init)
+                recording = Recording(
+                    title: entry.title, artistName: artist, status: .probable,
+                    unknownCode: RecordingKey.unknownCode(
+                        providerID: "nts", showID: showID,
+                        heardAt: broadcastAt.addingTimeInterval(offset ?? 0),
+                        offsetSeconds: offset))
                 context.insert(recording)
             } else if let resolved = try? store.upsert(
                 title: entry.title,

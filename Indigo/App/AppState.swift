@@ -136,7 +136,7 @@ nonisolated enum DetailPage: Hashable {
     /// entry to open. It still has a page.
     case digReleaseNamed(title: String, artist: String)
     /// One piece of music: where it was heard, and what was heard beside it.
-    case digRecording(id: UUID, title: String)
+    case digRecording(identity: RecordingIdentity, title: String)
     /// A catalogue number, treated as somewhere you can go.
     case digCatalog(number: String)
     /// A place and a stretch of time.

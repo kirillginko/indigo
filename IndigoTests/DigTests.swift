@@ -42,7 +42,7 @@ final class DigTests: XCTestCase {
     private var recorder: StubTransport.Recorder!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
         store = RecordingStore(context: context)
@@ -121,10 +121,10 @@ final class DigTests: XCTestCase {
 
         XCTAssertTrue(edges.contains { $0.to.kind == .broadcast })
         XCTAssertTrue(edges.contains { $0.to.kind == .selector && $0.to.title == "Ben UFO" })
-        let unknown = try XCTUnwrap(edges.first { $0.to.recordingID == neighbor.id })
+        let unknown = try XCTUnwrap(edges.first { RecordingIdentity(node: $0.to) == RecordingIdentity(neighbor) })
         XCTAssertTrue(unknown.reasons.contains { $0.kind == .sharedBroadcast })
         XCTAssertTrue(unknown.reasons.contains { $0.kind == .frequentlyPlayedNearby })
-        XCTAssertFalse(edges.first { $0.to.recordingID == distant.id }?.reasons.contains {
+        XCTAssertFalse(edges.first { RecordingIdentity(node: $0.to) == RecordingIdentity(distant) }?.reasons.contains {
             $0.kind == .frequentlyPlayedNearby
         } ?? true)
     }
@@ -149,7 +149,7 @@ final class DigTests: XCTestCase {
 
         let edge = RadioNeighborhoodEngine(context: context).graph(around: subject)
             .connections(from: MusicNode.recording(subject))
-            .first { $0.to.recordingID == peer.id }
+            .first { RecordingIdentity(node: $0.to) == RecordingIdentity(peer) }
 
         XCTAssertEqual(edge?.reasons.first { $0.kind == .sharedBroadcast }?.detail,
                        "Played in 3 of the same radio shows")
@@ -603,7 +603,7 @@ final class DigTests: XCTestCase {
             ),
             on: recording
         )
-        context.insert(CrateItem(recording: recording))
+        context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         context.insert(Track(
             path: "/Music/Rev8617.flac", relativePath: "Rev8617.flac",
             title: "Rev8617", artist: "Skee Mask", albumArtist: "Skee Mask", album: "Compro",
@@ -709,7 +709,7 @@ final class LoadingStateTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }

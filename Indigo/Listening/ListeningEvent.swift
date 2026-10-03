@@ -48,25 +48,29 @@ nonisolated enum ListeningAction: String, Codable, CaseIterable, Sendable {
 
 @Model
 nonisolated final class ListeningEvent {
-    @Attribute(.unique) var id: UUID
-    var at: Date
-    var actionRaw: String
+    /// Not unique, and different ids are always different events. Two rows
+    /// with the same id are two copies of one immutable event, which
+    /// `UserDataDedupe` collapses to one, so a replayed import cannot count a
+    /// listen twice. Defaults are what a row that arrives without a field
+    /// holds: no time, nothing heard.
+    var id: UUID = UUID()
+    var at: Date = Date.distantPast
+    var actionRaw: String = ListeningAction.played.rawValue
 
     // MARK: What was met
 
     /// `MusicNode.id` — "artist:susosaiz". Queried against directly, so it is
     /// stored rather than recomputed from the parts below.
-    var nodeID: String
-    var nodeKindRaw: String
-    var nodeKey: String
-    var title: String
+    var nodeID: String = ""
+    var nodeKindRaw: String = MusicNodeKind.artist.rawValue
+    var nodeKey: String = ""
+    var title: String = ""
     var subtitle: String?
 
     // Whatever identifiers were known at the time, so a remembered encounter
     // can be reopened. An encounter nobody can act on is a statistic.
     var mbid: String?
     var discogsID: Int?
-    var recordingID: UUID?
     var providerID: String?
     var handle: String?
 
@@ -82,16 +86,22 @@ nonisolated final class ListeningEvent {
 
     /// Seconds actually heard, paused time excluded. Zero for actions that
     /// are not listening.
-    var seconds: Double
+    var seconds: Double = 0
     /// 0…1 of the way through. Zero when unknowable, which is every live
     /// stream — `seconds` carries those.
-    var completion: Double
+    var completion: Double = 0
 
     /// Genres and styles as they were described at the time, kept here rather
     /// than looked up later so building a taste profile never has to walk the
     /// graph. What a provider called a show in August is also better evidence
     /// than what a catalogue says about it now.
-    var tags: [String]
+    var tags: [String] = []
+
+    /// A row as it was; see `CrateItem.init(restoring:)`.
+    init(restoring value: EventValue) {
+        self.id = value.id
+        value.apply(to: self)
+    }
 
     init(
         id: UUID = UUID(),
@@ -113,7 +123,6 @@ nonisolated final class ListeningEvent {
         self.subtitle = node.subtitle
         self.mbid = node.mbid
         self.discogsID = node.discogsID
-        self.recordingID = node.recordingID
         self.providerID = node.providerID
         self.handle = node.handle
         self.sourceProviderID = source?.providerID
@@ -131,7 +140,7 @@ nonisolated final class ListeningEvent {
     var node: MusicNode {
         MusicNode(
             kind: kind, key: nodeKey, title: title, subtitle: subtitle,
-            mbid: mbid, discogsID: discogsID, recordingID: recordingID,
+            mbid: mbid, discogsID: discogsID,
             providerID: providerID, handle: handle
         )
     }

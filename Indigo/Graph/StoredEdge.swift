@@ -42,7 +42,6 @@ nonisolated final class StoredEdge {
     var toSubtitle: String?
     var toMBID: String?
     var toDiscogsID: Int?
-    var toRecordingID: UUID?
     var toProviderID: String?
     var toHandle: String?
     var toArtworkURLString: String?
@@ -63,7 +62,6 @@ nonisolated final class StoredEdge {
         toSubtitle = edge.to.subtitle
         toMBID = edge.to.mbid
         toDiscogsID = edge.to.discogsID
-        toRecordingID = edge.to.recordingID
         toProviderID = edge.to.providerID
         toHandle = edge.to.handle
         toArtworkURLString = edge.to.artworkURL?.absoluteString
@@ -77,7 +75,6 @@ nonisolated final class StoredEdge {
             subtitle: toSubtitle,
             mbid: toMBID,
             discogsID: toDiscogsID,
-            recordingID: toRecordingID,
             providerID: toProviderID,
             handle: toHandle,
             artworkURL: toArtworkURLString.flatMap(URL.init(string:))

@@ -22,7 +22,7 @@ final class CrateBackfillPerformanceTests: XCTestCase {
     private let cratedCount = 120
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
 
@@ -45,7 +45,7 @@ final class CrateBackfillPerformanceTests: XCTestCase {
             source.recording = recording
             context.insert(recording)
             context.insert(source)
-            context.insert(CrateItem(recording: recording))
+            context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         }
         try context.save()
     }

@@ -11,7 +11,7 @@ final class SearchFieldUITests: XCTestCase {
     }
 
     func testTypingLandsInTheSearchField() throws {
-        let app = XCUIApplication()
+        let app = XCUIApplication.indigo()
         app.launch()
 
         let field = app.textFields.firstMatch
@@ -26,7 +26,7 @@ final class SearchFieldUITests: XCTestCase {
     /// occupies, so clicks landing in the padding inside the bordered box did
     /// nothing at all. Anywhere in the box must take focus.
     func testClickingThePaddingInsideTheBoxTakesFocus() throws {
-        let app = XCUIApplication()
+        let app = XCUIApplication.indigo()
         app.launch()
 
         let field = app.textFields.firstMatch

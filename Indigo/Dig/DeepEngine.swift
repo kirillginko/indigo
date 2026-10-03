@@ -267,7 +267,7 @@ nonisolated struct DeepEngine {
 /// candidate, and each of those scanned the whole track table. Twenty
 /// candidates on a decent library is twenty full scans — per redraw.
 nonisolated struct DeepCaches {
-    private let recordingsByID: [UUID: Recording]
+    private let recordingsByIdentity: [RecordingIdentity: Recording]
     private let artistsByKey: [String: DiscogsArtist]
     private let libraryCounts: [String: Int]
     private let crateCounts: [String: Int]
@@ -279,7 +279,7 @@ nonisolated struct DeepCaches {
 
     init(context: ModelContext) {
         let recordings = (try? context.fetch(FetchDescriptor<Recording>())) ?? []
-        recordingsByID = Dictionary(recordings.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        recordingsByIdentity = Dictionary(recordings.map { (RecordingIdentity($0), $0) }, uniquingKeysWith: { first, _ in first })
 
         let artists = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
         artistsByKey = Dictionary(artists.map { ($0.nameKey, $0) }, uniquingKeysWith: { first, _ in first })
@@ -292,7 +292,7 @@ nonisolated struct DeepCaches {
 
         var crate: [String: Int] = [:]
         for item in (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [] {
-            let name = item.recording?.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
+            let name = item.artistName ?? (item.kind == .artist ? item.displayTitle : nil)
             guard let name, !name.isEmpty else { continue }
             crate[RecordingKey.normalizeArtist(name), default: 0] += 1
         }
@@ -366,14 +366,14 @@ nonisolated struct DeepCaches {
             signals.releaseKind = .album
 
         case .recording, .unknownRecording:
-            if let identifier = node.recordingID, let recording = recordingsByID[identifier] {
+            if let identity = RecordingIdentity(node: node), let recording = recordingsByIdentity[identity] {
                 signals.radioAppearances = recording.appearances.count
                 let artistKey = RecordingKey.normalizeArtist(recording.artistName)
                 signals.libraryMatches = libraryCounts[artistKey] ?? 0
                 // Known to Bandcamp and to no catalogue: a record that exists
                 // only where the artist put it.
                 signals.isBandcampOnly = bandcampArtistKeys.contains(artistKey)
-                    && metadataByRecording[identifier]?.releaseMBID == nil
+                    && metadataByRecording[recording.id]?.releaseMBID == nil
             }
             signals.releaseKind = node.isUnidentified ? .unknown : .single
 

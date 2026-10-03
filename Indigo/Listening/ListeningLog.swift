@@ -16,9 +16,13 @@ import SwiftData
 
 nonisolated struct ListeningLog {
     let context: ModelContext
+    /// False while the listener's store could not be opened; nothing is
+    /// recorded or forgotten, because it would not outlive the session.
+    let writable: Bool
 
-    init(context: ModelContext) {
+    init(context: ModelContext, writable: Bool = Persistence.userDataWritable) {
         self.context = context
+        self.writable = writable
     }
 
     // MARK: - Writing
@@ -38,7 +42,7 @@ nonisolated struct ListeningLog {
         tags: [String] = [],
         source: ListeningSource? = nil
     ) -> ListeningEvent? {
-        guard !node.key.isEmpty else { return nil }
+        guard writable, !node.key.isEmpty else { return nil }
         let event = ListeningEvent(
             node: node, action: action, at: at,
             seconds: seconds, completion: completion,
@@ -67,6 +71,7 @@ nonisolated struct ListeningLog {
     }
 
     func forget() {
+        guard writable else { return }
         for event in all() { context.delete(event) }
         try? context.save()
     }

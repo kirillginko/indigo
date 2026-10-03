@@ -40,7 +40,6 @@ nonisolated struct MusicGraph: Sendable {
         }
         existing.mbid = existing.mbid ?? node.mbid
         existing.discogsID = existing.discogsID ?? node.discogsID
-        existing.recordingID = existing.recordingID ?? node.recordingID
         existing.providerID = existing.providerID ?? node.providerID
         existing.handle = existing.handle ?? node.handle
         existing.subtitle = existing.subtitle ?? node.subtitle

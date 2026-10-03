@@ -51,7 +51,7 @@ final class DigSearchTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -139,7 +139,7 @@ final class DigSearchTests: XCTestCase {
         let recording = Recording(
             title: "Rev8617", artistName: "Skee Mask", status: .identified)
         context.insert(recording)
-        context.insert(CrateItem(recording: recording))
+        context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording)))
         try context.save()
 
         let found = DigSearchIndex(context: context).search("skee")

@@ -82,8 +82,12 @@ nonisolated final class Recording {
         self.musicBrainzRecordingID = musicBrainzRecordingID
         self.isrc = isrc
         self.identificationStatusRaw = status.rawValue
-        self.matchKey = RecordingKey.match(artist: artistName, title: title)
+        let key = RecordingKey.match(artist: artistName, title: title)
+        self.matchKey = key
+        // A recording with no key and no code has no identity on any device but
+        // this one, so it is given a code of its own.
         self.unknownCode = unknownCode
+            ?? (key.isEmpty ? RecordingKey.code(from: "local|\(id.uuidString)") : nil)
         self.durationSeconds = durationSeconds
         self.createdAt = Date()
         self.updatedAt = Date()
@@ -147,8 +151,14 @@ nonisolated final class Recording {
         if let status, status.confidenceRank > identificationStatus.confidenceRank {
             identificationStatus = status
         }
+        let wasUnnamed = matchKey.isEmpty
         matchKey = RecordingKey.match(artist: self.artistName, title: self.title)
-        if isIdentified { unknownCode = nil }
+        // The code is the handle for music nobody had named. Naming it ends
+        // that. A recording that already had a key and kept a code has it for
+        // a reason -- it is one of several with the same key, told apart by
+        // where each was heard -- and losing it would put two recordings on
+        // one identity.
+        if isIdentified && wasUnnamed { unknownCode = nil }
         updatedAt = Date()
     }
 }

@@ -21,7 +21,7 @@ final class PageReturnTests: XCTestCase {
     private var context: ModelContext!
 
     override func setUpWithError() throws {
-        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         context = ModelContext(container)
     }
@@ -34,7 +34,7 @@ final class PageReturnTests: XCTestCase {
     private func crateARecording(_ title: String) {
         let store = RecordingStore(context: context)
         let recording = try? store.upsert(title: title, artistName: "Somebody")
-        if let recording { context.insert(CrateItem(recording: recording)) }
+        if let recording { context.insert(CrateItem(snapshot: CrateSnapshot.capture(recording))) }
         try? context.save()
     }
 

@@ -249,7 +249,9 @@ struct CrateView: View {
         let stored = item.genreTags
         if !stored.isEmpty { return stored }
         if let genre = localTrack(for: item)?.genre, !genre.isEmpty { return [genre] }
-        if let recording = item.recording { return dig.genres(for: recording) }
+        if let recording = CrateRecordings(context: crate.context).recording(for: item) {
+            return dig.genres(for: recording)
+        }
         return []
     }
 

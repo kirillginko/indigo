@@ -282,7 +282,7 @@ final class DigStore {
     func recordingDestination(for recording: Recording) -> DetailPage? {
         let _ = revision
         if !recording.appearances.isEmpty {
-            return .digRecording(id: recording.id, title: recording.displayTitle)
+            return .digRecording(identity: RecordingIdentity(recording), title: recording.displayTitle)
         }
         return destination(for: recording)
     }
@@ -1057,12 +1057,14 @@ final class DigStore {
             return .catalogNumber(number)
         case .digScene(let city, let sound):
             return SceneEngine(context: context).scene(city: city, sound: sound)?.node
-        case .digRecording(let id, _):
-            // Resolved through the recording itself so an identified track and
-            // its unknown past are one node rather than two.
-            var descriptor = FetchDescriptor<Recording>(predicate: #Predicate { $0.id == id })
-            descriptor.fetchLimit = 1
-            return (try? context.fetch(descriptor))?.first.map { MusicNode.recording($0) }
+        case .digRecording(let identity, let title):
+            // Resolved through the recording itself when this device has one, so
+            // an identified track and its unknown past are one node rather than
+            // two; named from the page when it has not.
+            if let recording = RecordingStore(context: context).recording(identity: identity) {
+                return MusicNode.recording(recording)
+            }
+            return MusicNode.recording(identity: identity, title: title, subtitle: nil)
         default:
             return nil
         }
@@ -1429,9 +1431,7 @@ final class DigStore {
         try? await Task.sleep(for: .seconds(2))
         guard !Task.isCancelled else { return }
 
-        let crated = ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? [])
-            .compactMap(\.recording)
-        var recordings = uniqueRecordings(crated)
+        var recordings = uniqueRecordings(cratedRecordings())
 
         if recordings.count < recordingLimit {
             let localTracks = (try? context.fetch(FetchDescriptor<Track>())) ?? []
@@ -1672,12 +1672,7 @@ final class DigStore {
     func enrichCratedRecording(_ recording: Recording) async {
         let metadata = await resolveRelease(for: recording)
 
-        let recordingID = recording.id
-        var descriptor = FetchDescriptor<CrateItem>(
-            predicate: #Predicate { $0.recording?.id == recordingID }
-        )
-        descriptor.fetchLimit = 1
-        guard let item = try? context.fetch(descriptor).first else { return }
+        guard let item = CrateRecordings(context: context).crateItem(for: recording) else { return }
 
         // Overwrites rather than fills. A crate row imported by an earlier
         // build is carrying whatever the old, name-search-first ladder found,
@@ -1751,10 +1746,8 @@ final class DigStore {
     /// is no reason to make somebody open the Crate four times for that.
     @discardableResult
     func repairRadioCredits() -> Int {
-        let crated = ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? [])
-            .compactMap(\.recording)
         var repaired = 0
-        for recording in uniqueRecordings(crated) where recording.recreditFromTitle() {
+        for recording in uniqueRecordings(cratedRecordings()) where recording.recreditFromTitle() {
             repaired += 1
         }
         if repaired > 0 {
@@ -1769,22 +1762,30 @@ final class DigStore {
     func enrichRadioCrateInBackground(limit: Int = 6) async {
         repairRadioCredits()
 
-        let candidates = ((try? context.fetch(FetchDescriptor<CrateItem>())) ?? [])
-            .filter { item in
-                guard item.kind == .recording, let recording = item.recording else { return false }
-                guard !recording.appearances.isEmpty else { return false }
-                // A row that already shows *a* cover still needs revisiting if
-                // the recording itself has none: that picture came from the
-                // older, name-search-first ladder and may not be the record
-                // this track is on.
-                let resolved = engine.metadata(for: recording.id)?.artworkURLString
-                return resolved == nil || item.artworkURL == nil || item.genreTags.isEmpty
-            }
-            .compactMap(\.recording)
+        let rows = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
+        let local = CrateRecordings(context: context).recordings(for: rows)
+        let candidates = rows.compactMap { item -> Recording? in
+            guard item.kind == .recording, let recording = local[item.id] else { return nil }
+            guard !recording.appearances.isEmpty else { return nil }
+            // A row that already shows *a* cover still needs revisiting if
+            // the recording itself has none: that picture came from the
+            // older, name-search-first ladder and may not be the record
+            // this track is on.
+            let resolved = engine.metadata(for: recording.id)?.artworkURLString
+            return resolved == nil || item.artworkURL == nil || item.genreTags.isEmpty ? recording : nil
+        }
         for recording in candidates.prefix(limit) {
             guard !Task.isCancelled else { return }
             await enrichCratedRecording(recording)
         }
+    }
+
+    /// The recordings this device holds for the crate. Rows it has not
+    /// resolved yet are not here; the crate page makes those as it is opened.
+    private func cratedRecordings() -> [Recording] {
+        let rows = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
+        let found = CrateRecordings(context: context).recordings(for: rows)
+        return rows.compactMap { found[$0.id] }
     }
 
     private static func catalogueKey(_ value: String) -> String {

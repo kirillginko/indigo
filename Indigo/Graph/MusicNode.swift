@@ -73,7 +73,6 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     // they are what lets a node open the right page and be enriched further.
     var mbid: String?
     var discogsID: Int?
-    var recordingID: UUID?
     var providerID: String?
     var handle: String?
     /// The release sleeve, when the catalogue has been asked. A node in a
@@ -81,7 +80,17 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     /// a list of strings.
     var artworkURL: URL?
 
-    var id: String { "\(kind.rawValue):\(key)" }
+    var id: String { Self.canonicalID(kindRaw: kind.rawValue, key: key) }
+
+    /// The one place a node id is written: the kind, a colon, the key. Events
+    /// and visits store it beside the parts it is made of, and
+    /// `UserDataInvariants` checks that the two never disagree.
+    static func canonicalID(kindRaw: String, key: String) -> String { "\(kindRaw):\(key)" }
+
+    /// The kind a node id names, which is what comes before its first colon.
+    static func kindRaw(ofID id: String) -> String? {
+        id.firstIndex(of: ":").map { String(id[..<$0]) }
+    }
 
     // MARK: Constructors
 
@@ -193,23 +202,29 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     /// and has no store to ask. Whoever builds the node has the metadata row
     /// in hand already.
     static func recording(_ recording: Recording, artwork: URL? = nil) -> MusicNode {
-        if recording.isIdentified, !recording.matchKey.isEmpty {
+        self.recording(
+            identity: RecordingIdentity(recording),
+            title: recording.displayTitle, subtitle: recording.displayArtist,
+            mbid: recording.musicBrainzRecordingID, artwork: artwork)
+    }
+
+    /// The same node from an identity and what to call it, for a caller that
+    /// has no `Recording` -- a crate row kept on another device, a track played
+    /// that the library does not hold. The one place that decides the kind and
+    /// the key.
+    static func recording(
+        identity: RecordingIdentity, title: String, subtitle: String?,
+        mbid: String? = nil, artwork: URL? = nil
+    ) -> MusicNode {
+        if identity.matchKey.isEmpty {
             return MusicNode(
-                kind: .recording, key: recording.matchKey,
-                title: recording.displayTitle, subtitle: recording.displayArtist,
-                mbid: recording.musicBrainzRecordingID, recordingID: recording.id,
-                artworkURL: artwork
-            )
+                kind: .unknownRecording, key: identity.key,
+                title: title, subtitle: subtitle,
+                handle: identity.unknownCode, artworkURL: artwork)
         }
         return MusicNode(
-            kind: .unknownRecording,
-            key: recording.unknownCode ?? recording.id.uuidString,
-            title: recording.displayTitle,
-            subtitle: recording.displayArtist,
-            recordingID: recording.id,
-            handle: recording.unknownCode,
-            artworkURL: artwork
-        )
+            kind: .recording, key: identity.key,
+            title: title, subtitle: subtitle, mbid: mbid, artworkURL: artwork)
     }
 
     // MARK: Navigation
@@ -232,7 +247,7 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
         case .recording, .unknownRecording:
             // Including the unnamed. A white label having its own page is the
             // point: it is a destination, not a gap.
-            return recordingID.map { .digRecording(id: $0, title: title) }
+            return RecordingIdentity(node: self).map { .digRecording(identity: $0, title: title) }
         case .catalogNumber:
             return .digCatalog(number: title)
         case .scene:

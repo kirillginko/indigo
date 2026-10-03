@@ -424,8 +424,10 @@ struct ExploreView: View {
 
     private func walkLocalArtworkKeys(_ kept: [CrateItem]) -> [UUID: String] {
         var wanted: [String: UUID] = [:]
+        // One fetch for the whole crate, not one per card.
+        let recordings = CrateRecordings(context: crate.context).recordings(for: kept)
         for item in kept {
-            guard let path = item.recording?.sources
+            guard let path = recordings[item.id]?.sources
                 .first(where: { $0.kind == AudioSourceKind.localFile })?.identifier
             else { continue }
             wanted[path] = item.id
@@ -626,7 +628,10 @@ struct ExploreView: View {
     }
 
     private func open(_ item: CrateItem) {
-        if let recording = item.recording { appState.open(.digRecording(id: recording.id, title: item.displayTitle)); return }
+        if let recording = CrateRecordings(context: crate.context).resolve(item) {
+            appState.open(.digRecording(identity: RecordingIdentity(recording), title: item.displayTitle))
+            return
+        }
         // Every broadcast row goes up the one ladder — the broadcast, then
         // the show, then the station or its shows. Asking `BroadcastSource`
         // here as well is how this view came to disagree with the crate about
