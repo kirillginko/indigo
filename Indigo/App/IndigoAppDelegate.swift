@@ -22,8 +22,19 @@ final class IndigoAppDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared.registerForRemoteNotifications()
     }
 
+    func application(_ application: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Trace.note("sync: registered for pushes")
+        Trace.flush()
+    }
+
+    func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
+        Trace.note("sync: push received")
+        Trace.flush()
+    }
+
     func application(_ application: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         Trace.note("sync: could not register for pushes (\(error)); other devices' changes arrive at launch only")
+        Trace.flush()
     }
 }
 #else
@@ -35,6 +46,10 @@ final class IndigoAppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         application.registerForRemoteNotifications()
         return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Trace.note("sync: registered for pushes")
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
