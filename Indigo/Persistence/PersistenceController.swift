@@ -90,11 +90,13 @@ enum Persistence {
     /// The current version of the store's schema; see `IndigoSchema.swift`.
     static let schema = Schema(versionedSchema: IndigoSchemaCurrent.self)
 
-    /// Where the three stores live; see `StoreLayout`.
-    static let layout = StoreLayout.standard
+    /// Where the three stores live; see `StoreLayout`. Which ones depends on
+    /// the CloudKit environment the build is signed for.
+    static let layout = StoreLayout.forEnvironment(CloudKitEnvironment.current)
 
     /// The old combined store. Kept as a name for the one place tests compare
-    /// it with SwiftData's own default: it is the file `layout.legacy` names.
+    /// it with SwiftData's own default: it is the file `StoreLayout.standard.legacy`
+    /// names.
     static let storeURL: URL = ModelConfiguration(schema: schema).url
 
     static let container: ModelContainer = makeContainer()
@@ -187,6 +189,10 @@ enum Persistence {
         }
 
         let sync = UserDataSync.forLaunch(arguments: ProcessInfo.processInfo.arguments)
+        // Development's folder is new on a machine that ran a Production build
+        // first, or ran before it existed.
+        try? FileManager.default.createDirectory(at: layout.directory, withIntermediateDirectories: true)
+        Trace.note("store: CloudKit environment \(CloudKitEnvironment.current.rawValue); stores in \(layout.directory.lastPathComponent)")
         let opened = SplitLaunch.open(layout: layout, sync: sync)
         failure = opened.failure
         syncing = opened.syncing
