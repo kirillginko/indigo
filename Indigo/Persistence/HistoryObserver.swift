@@ -42,6 +42,10 @@ struct HistoryObserver {
         var merged = 0
     }
     var onPass: ((Pass) -> Void)? = nil
+    /// Told the generation when a row arrives saying the store was written by
+    /// a build newer than this one. Nothing in that pass is merged; see
+    /// `SyncGeneration`.
+    var onNewerGeneration: ((Int) -> Void)? = nil
 
     init(context: ModelContext, defaults: UserDefaults = .standard, ownAuthor: String? = nil) {
         self.context = context
@@ -105,6 +109,7 @@ struct HistoryObserver {
         var visits = Set<String>()
         var steps = Set<String>()
         var counters = Set<String>()   // kind NUL key
+        var generation: Int?
         for chunk in Self.chunks(named["CrateItem"]) {
             for item in (try? context.fetch(FetchDescriptor<CrateItem>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
                 crateIDs.insert(item.id)
@@ -133,7 +138,15 @@ struct HistoryObserver {
         for chunk in Self.chunks(named["DigCounter"]) {
             for counter in (try? context.fetch(FetchDescriptor<DigCounter>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
                 counters.insert("\(counter.kindRaw)\u{0}\(counter.key)")
+                if counter.kind == .generation { generation = max(generation ?? 0, counter.count) }
             }
+        }
+        // A newer build wrote this store. Its rows are left as it wrote them,
+        // and the place is not kept, so a later pass sees them again.
+        if SyncGeneration.isNewer(generation), let generation {
+            onPass?(pass)
+            onNewerGeneration?(generation)
+            return .init()
         }
 
         pass.named = named.values.reduce(0) { $0 + $1.count }

@@ -42,7 +42,7 @@ nonisolated struct ListeningLog {
         tags: [String] = [],
         source: ListeningSource? = nil
     ) -> ListeningEvent? {
-        guard writable, !node.key.isEmpty else { return nil }
+        guard writable, Persistence.newerGeneration == nil, !node.key.isEmpty else { return nil }
         let event = ListeningEvent(
             node: node, action: action, at: at,
             seconds: seconds, completion: completion,
@@ -71,7 +71,7 @@ nonisolated struct ListeningLog {
     }
 
     func forget() {
-        guard writable else { return }
+        guard writable, Persistence.newerGeneration == nil else { return }
         for event in all() { context.delete(event) }
         try? context.save()
     }

@@ -107,6 +107,19 @@ enum Persistence {
     /// Whether `UserData` was opened mirroring to CloudKit this launch.
     nonisolated(unsafe) static private(set) var syncing = false
 
+    /// Set when `UserData` says it was written by a build newer than this one:
+    /// at launch, before it is opened, or by a row that arrives while the app
+    /// runs. The store is then read and not written; see `SyncGeneration`.
+    nonisolated(unsafe) static private(set) var newerGeneration: Int?
+
+    /// Records a newer generation that arrived while the app runs. Writes
+    /// already refused stay refused; mirroring stops at the next launch.
+    nonisolated static func refuse(newerGeneration generation: Int) {
+        guard newerGeneration == nil else { return }
+        newerGeneration = generation
+        Trace.note("sync: UserData advertises generation \(generation); this build understands \(SyncGeneration.understood); writes refused")
+    }
+
     static var openFailure: StoreOpenFailure? {
         _ = container
         return failure
@@ -120,10 +133,18 @@ enum Persistence {
     /// Not routed through `container`, so it can be read from any actor. The
     /// container is asked for at launch, before anything can write, so by the
     /// time it matters the failure has been recorded.
-    nonisolated static var userDataWritable: Bool { failure == nil }
+    ///
+    /// Also false when the store was written by a newer build: it is shown,
+    /// and left as that build wrote it.
+    nonisolated static var userDataWritable: Bool { failure == nil && newerGeneration == nil }
 
     nonisolated static let userDataUnavailableNotice =
         "Your library couldn't be opened, so nothing can be saved to your crate or history right now."
+
+    /// What the listener is told while `userDataWritable` is false.
+    nonisolated static var userDataNotice: String {
+        newerGeneration != nil && failure == nil ? SyncGeneration.notice : userDataUnavailableNotice
+    }
 
     /// Whether this process is a test host rather than the app somebody is
     /// using.
@@ -169,6 +190,7 @@ enum Persistence {
         let opened = SplitLaunch.open(layout: layout, sync: sync)
         failure = opened.failure
         syncing = opened.syncing
+        if let generation = opened.newerGeneration { refuse(newerGeneration: generation) }
         if opened.syncing { MirroringMonitor.start() }
         if let failed = opened.failure {
             Trace.note("store: \(failed.errorDescription ?? "unknown"); running unsaved")
@@ -228,15 +250,22 @@ enum Persistence {
 
     nonisolated static func openSplitStoresReporting(
         layout: StoreLayout, sync: UserDataSync = .off
-    ) throws -> (container: ModelContainer, syncing: Bool) {
+    ) throws -> (container: ModelContainer, syncing: Bool, newerGeneration: Int?) {
+        // A store a newer build wrote is not mirrored by this one, or written
+        // to. Read from the file, before anything opens it.
+        let advertised = SyncGeneration.advertised(inStoreAt: layout.userData)
+        if SyncGeneration.isNewer(advertised) {
+            Trace.note("sync: UserData advertises generation \(advertised ?? 0); opening it without mirroring")
+            return (try openSplitStoresUnsynced(layout: layout, sync: .off), false, advertised)
+        }
         if sync != .off {
             do {
-                return (try openSplitStoresUnsynced(layout: layout, sync: sync), true)
+                return (try openSplitStoresUnsynced(layout: layout, sync: sync), true, nil)
             } catch {
                 Trace.note("sync: could not open UserData with mirroring (\(error)); opening it without")
             }
         }
-        return (try openSplitStoresUnsynced(layout: layout, sync: .off), false)
+        return (try openSplitStoresUnsynced(layout: layout, sync: .off), false, nil)
     }
 
     nonisolated private static func openSplitStoresUnsynced(layout: StoreLayout, sync: UserDataSync) throws -> ModelContainer {

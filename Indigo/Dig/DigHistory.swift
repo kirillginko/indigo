@@ -155,7 +155,7 @@ nonisolated struct DigHistory {
     /// Crate, out of a search. That is a visit but not a step, and counting it
     /// as one would invent a path nobody walked.
     func record(_ node: MusicNode, from origin: MusicNode? = nil) {
-        guard writable else { return }
+        guard writable, Persistence.newerGeneration == nil else { return }
         // Two devices that opened this node made two rows. Folded into one
         // before the count moves, so it moves on the row that stays.
         let dedupe = UserDataDedupe(context: context)
@@ -191,7 +191,7 @@ nonisolated struct DigHistory {
     }
 
     func forget() {
-        guard writable else { return }
+        guard writable, Persistence.newerGeneration == nil else { return }
         for visit in visits() { context.delete(visit) }
         for step in steps() { context.delete(step) }
         // The components too, or the next projection would bring the rows back.

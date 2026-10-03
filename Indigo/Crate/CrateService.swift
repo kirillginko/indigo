@@ -34,8 +34,9 @@ final class CrateService {
 
     /// True, after saying so, when the crate cannot be written to.
     private func refusesWrites() -> Bool {
-        guard !writable else { return false }
-        notice = Persistence.userDataUnavailableNotice
+        // A newer build's generation can arrive after this was made.
+        guard !writable || Persistence.newerGeneration != nil else { return false }
+        notice = writable ? SyncGeneration.notice : Persistence.userDataUnavailableNotice
         return true
     }
 

@@ -76,6 +76,20 @@ nonisolated enum SQLiteFiles {
         return sqlite3_step(statement) == SQLITE_ROW ? Int(sqlite3_column_int64(statement, 0)) : nil
     }
 
+    /// The first column of the first row of `query`, read without writing, or
+    /// nil if there is no store, no such table, or no value.
+    static func integer(_ query: String, in url: URL) -> Int? {
+        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+        var db: OpaquePointer?
+        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else { return nil }
+        defer { sqlite3_close(db) }
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, query, -1, &statement, nil) == SQLITE_OK else { return nil }
+        defer { sqlite3_finalize(statement) }
+        guard sqlite3_step(statement) == SQLITE_ROW, sqlite3_column_type(statement, 0) != SQLITE_NULL else { return nil }
+        return Int(sqlite3_column_int64(statement, 0))
+    }
+
     /// Empties tables in a store that is not open. Used on the copy the cache
     /// is built from, to drop rows of the listener's own that it inherited and
     /// must not keep.
