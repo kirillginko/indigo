@@ -48,7 +48,7 @@ static float exploreWave(float2 p, float phase) {
     // touched to change pace, because moving one moves the field's character
     // rather than its speed. They all read this clock instead, so halving it
     // halves everything and keeps the relationships intact.
-    const float pace = 0.33;
+    const float pace = 0.27;
     float t = time * pace;
 
     // Shared waves keep adjacent bars related while each cut stays crisp:
@@ -84,7 +84,7 @@ static float exploreWave(float2 p, float phase) {
     p.y += breath * sin(rhythm + t * 0.22);
     // A quicker ripple across the bars, over the slow breath: motion seen
     // passing through the tiles rather than each tile moving on its own.
-    p.y += 0.55 * sin(strip * 0.85 - t * 0.9);
+    p.y += 0.55 * sin(strip * 0.85 - t * 0.45);
     p.y += verticalOffset;
     p += float2(seed * 0.007, seed * 0.003);
     const float motionSpeed = 4.0;
@@ -102,9 +102,10 @@ static float exploreWave(float2 p, float phase) {
     // a second, slower pattern orders its points, and the warm palette grows
     // in along that pattern's contours with a crisp edge, and later recedes
     // the same way. Bars turn at their own times (about 3.5 minutes a cycle).
-    // `warmIn` rises from 0 to 1 over the first ninety seconds anybody looks
-    // at the page, ever -- not since `time` last wrapped -- so For You opened
-    // in its blues once, and a wrap never takes the warmth away again.
+    // `warmIn` rises from 0 to 1 over the first ninety seconds the page is
+    // looked at in each run of the app -- not since `time` last wrapped, and
+    // not restarted by leaving the page -- so every launch opens For You in
+    // its blues and the warmth morphs in.
     const half3 blue = half3(0.157, 0.392, 0.941);
     const half3 turquoise = half3(0.216, 0.847, 0.816);
     const half3 mint = half3(0.573, 0.957, 0.816);

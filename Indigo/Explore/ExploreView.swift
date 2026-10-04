@@ -1189,8 +1189,9 @@ private struct ExploreShaderField: View {
     /// it restarted at zero on each visit, which kept it small but threw the
     /// field -- and its fade into warm colours -- back to the start whenever
     /// somebody left the page and came back. Now only time spent looking
-    /// counts, wrapped at an hour; the fade reads the unwrapped total
-    /// (`warmIn`), so a wrap never undoes it.
+    /// counts, wrapped at an hour. The fade into warm colours (`warmIn`) reads
+    /// the time looked at in this run of the app, so each launch opens in the
+    /// blues and a wrap or a visit elsewhere never undoes it.
     private var clock: ShaderClock { .explore }
     private var moving: Bool { appearsActive && !reduceMotion }
 
@@ -1220,7 +1221,7 @@ private struct ExploreShaderField: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion || !appearsActive)) { timeline in
             let elapsed = reduceMotion ? 0 : clock.time(at: timeline.date)
-            let warmIn = reduceMotion ? 0 : min(1, clock.totalTime(at: timeline.date) / 90)
+            let warmIn = reduceMotion ? 0 : min(1, clock.sessionTime(at: timeline.date) / 90)
             VStack(spacing: 0) {
                 ForEach(slices, id: \.self) { top in
                     Rectangle()

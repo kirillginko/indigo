@@ -33,8 +33,11 @@ final class ShaderClock {
     let grace: TimeInterval
     private(set) var isRunning = false
     @ObservationIgnored private var accumulated: Double
-    /// Like `accumulated`, never wrapped: for what happens once, like a fade.
+    /// Like `accumulated`, never wrapped.
     @ObservationIgnored private var total: Double
+    /// Like `total`, for this run of the app only: for what should happen again
+    /// at every launch, like a fade in.
+    @ObservationIgnored private var session: Double = 0
     @ObservationIgnored private var runningSince: Date?
     @ObservationIgnored private var pendingStop = 0
     @ObservationIgnored private let defaults: UserDefaults
@@ -63,6 +66,11 @@ final class ShaderClock {
     /// All the time the field has moved, never wrapped.
     func totalTime(at date: Date) -> Double {
         total + (runningSince.map { max(0, date.timeIntervalSince($0)) } ?? 0)
+    }
+
+    /// The time the field has moved since the app launched, never wrapped.
+    func sessionTime(at date: Date) -> Double {
+        session + (runningSince.map { max(0, date.timeIntervalSince($0)) } ?? 0)
     }
 
     /// The field should or should not be moving. Calling it again with the
@@ -94,6 +102,7 @@ final class ShaderClock {
         let ran = max(0, date.timeIntervalSince(since))
         accumulated = (accumulated + ran).truncatingRemainder(dividingBy: wrap)
         total += ran
+        session += ran
         runningSince = nil
         isRunning = false
         defaults.set(accumulated, forKey: key)

@@ -92,4 +92,19 @@ final class ShaderClockTests: XCTestCase {
         XCTAssertEqual(again.totalTime(at: start), 250, accuracy: 1e-9)
         XCTAssertEqual(again.time(at: start), 50, accuracy: 1e-9)
     }
+
+    /// For You's fade into warm colours reads this: it starts again at every
+    /// launch, but not when the page is left and come back to.
+    func testSessionTimeStartsAgainAtLaunchButNotOnReturn() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "ShaderClockTests-\(UUID().uuidString)"))
+        let first = ShaderClock(key: "test", wrap: 3600, grace: 0, defaults: defaults)
+        first.setRunning(true, at: start)
+        first.setRunning(false, at: start + 60)
+        first.setRunning(true, at: start + 500)
+        XCTAssertEqual(first.sessionTime(at: start + 520), 80, accuracy: 1e-9, "a return carries on")
+        first.stop(at: start + 520)
+        let relaunched = ShaderClock(key: "test", wrap: 3600, grace: 0, defaults: defaults)
+        XCTAssertEqual(relaunched.sessionTime(at: start + 600), 0, "a launch starts over")
+        XCTAssertEqual(relaunched.time(at: start + 600), 80, accuracy: 1e-9, "while the field keeps its place")
+    }
 }
