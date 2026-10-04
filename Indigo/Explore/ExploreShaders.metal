@@ -48,7 +48,7 @@ static float exploreWave(float2 p, float phase) {
     // touched to change pace, because moving one moves the field's character
     // rather than its speed. They all read this clock instead, so halving it
     // halves everything and keeps the relationships intact.
-    const float pace = 0.4;
+    const float pace = 0.33;
     float t = time * pace;
 
     // Shared waves keep adjacent bars related while each cut stays crisp:
