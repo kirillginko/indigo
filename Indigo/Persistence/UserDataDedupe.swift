@@ -478,47 +478,17 @@ nonisolated struct UserDataDedupe {
     /// Everything, once: ids first, then every group of rows for one thing.
     @discardableResult
     func all() -> Report {
-        var report = Report()
-        report.idsAssigned = assignIDs()
-        if report.idsAssigned > 0 { try? context.save() }
+        // Ids first, and kept, so every row compared below has one.
+        let assigned = assignIDs()
+        if assigned > 0 { try? context.save() }
 
-        // Copies of one row first: same id, one thing. Then rows for one key.
-        for group in Dictionary(
-            grouping: (try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? [], by: \.id
-        ).values where group.count > 1 {
-            report.eventsMerged += mergeEvents(group)
-        }
-        for group in Dictionary(
-            grouping: (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [], by: \.id
-        ).values where group.count > 1 {
-            report.crateMerged += mergeCrate(group)
-        }
-        let crate = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
-        for group in Dictionary(grouping: crate.compactMap { item in Self.key(of: item).map { ($0, item) } },
-                                by: { $0.0 }).values where group.count > 1 {
-            report.crateMerged += mergeCrate(group.map(\.1))
-        }
-        // Components before the rows they project, so a merged row is projected
-        // from merged components.
-        let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
-        for group in Dictionary(grouping: counters, by: { "\($0.kindRaw)\u{0}\($0.key)" }).values {
-            guard let first = group.first, let kind = first.kind else { continue }
-            report.countersMerged += DigCounters(context: context).mergeCopies(kind, key: first.key)
-        }
-        let visits = (try? context.fetch(FetchDescriptor<DigVisit>())) ?? []
-        for group in Dictionary(grouping: visits, by: \.nodeID).values {
-            report.visitsMerged += group.count > 1 ? mergeVisits(group) : 0
-            if let row = group.first(where: { !$0.isDeleted }) { DigCounters(context: context).project(row) }
-        }
-        let steps = (try? context.fetch(FetchDescriptor<DigStep>())) ?? []
-        for group in Dictionary(grouping: steps, by: \.identity).values {
-            report.stepsMerged += group.count > 1 ? mergeSteps(group) : 0
-            if let row = group.first(where: { !$0.isDeleted }) { DigCounters(context: context).project(row) }
-        }
-        if context.hasChanges || report.countersMerged > 0
-            || report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged > 0 {
-            try? context.save()
-        }
+        // Every thing in the store, with one query per table. This used to
+        // walk each group and look its components up one counter at a time --
+        // a whole-table read per counter, 2,760 of them -- and the launch that
+        // calls it froze the main thread for 1.7s (sampled, 2026-10-03).
+        var report = merge(everything())
+        report.idsAssigned += assigned
+        if context.hasChanges || !report.isEmpty { try? context.save() }
         return report
     }
 
@@ -573,6 +543,139 @@ nonisolated struct UserDataDedupe {
         let merged = counters.mergeCopies(kind, key: key)
         counters.reproject(kind, key: key)
         return merged
+    }
+
+    // MARK: A batch
+
+    /// One counter: its kind and what it counts.
+    nonisolated struct CounterKey: Hashable, Sendable {
+        let kind: DigCounterKind
+        let key: String
+    }
+
+    /// The things another writer touched since the last pass, by natural key.
+    nonisolated struct Named: Sendable {
+        var eventIDs = Set<UUID>()
+        var crateIDs = Set<UUID>()
+        var crateKeys = Set<CrateKey>()
+        var visits = Set<String>()
+        var steps = Set<String>()
+        var counters = Set<CounterKey>()
+    }
+
+    /// Everything `Named` holds, merged and projected by the same rules as the
+    /// calls for one thing -- `event(id:)`, `crateRow(id:)`, `crate(key:)`,
+    /// `visit(nodeID:)`, `step(identity:)`, `counter(kind:key:)`, in that order --
+    /// but found with one query per table rather than one per thing.
+    ///
+    /// None of the columns a thing is found by has an index, so each of those
+    /// queries read its whole table. An import from CloudKit arrives 200 rows at
+    /// a time and the history observer met every batch on the main thread with
+    /// 200-odd table reads: 57ms a pass at the start of a first sync and 167ms
+    /// by the end, 3.4 seconds of stopped main thread across one import.
+    @discardableResult
+    func merge(_ named: Named) -> Report {
+        var report = Report()
+        report.idsAssigned = assignIDs()
+
+        let events = fetchChunked(Array(named.eventIDs)) { chunk in
+            FetchDescriptor<ListeningEvent>(predicate: #Predicate { chunk.contains($0.id) })
+        }
+        for (_, rows) in Dictionary(grouping: events, by: \.id) { report.eventsMerged += mergeEvents(rows) }
+
+        // The crate is small and its keys have three shapes: read it once.
+        if !named.crateIDs.isEmpty || !named.crateKeys.isEmpty {
+            let crate = fetch(FetchDescriptor<CrateItem>())
+            for id in named.crateIDs {
+                report.crateMerged += mergeCrate(crate.filter { !$0.isDeleted && $0.id == id })
+            }
+            for key in named.crateKeys {
+                report.crateMerged += mergeCrate(crate.filter { !$0.isDeleted && Self.matches($0, key) })
+            }
+        }
+
+        // Visits, steps and the components that project them, for every key
+        // either side names.
+        let visitKeys = named.visits.union(named.counters.filter { $0.kind == .visit }.map(\.key))
+        let stepKeys = named.steps.union(named.counters.filter { $0.kind == .step }.map(\.key))
+        let visitRows = Dictionary(grouping: fetchChunked(Array(visitKeys)) { chunk in
+            FetchDescriptor<DigVisit>(predicate: #Predicate { chunk.contains($0.nodeID) })
+        }, by: \.nodeID)
+        let stepRows = Dictionary(grouping: fetchChunked(Array(stepKeys)) { chunk in
+            FetchDescriptor<DigStep>(predicate: #Predicate { chunk.contains($0.identity) })
+        }, by: \.identity)
+        let components = Dictionary(grouping: fetchChunked(Array(visitKeys.union(stepKeys))) { chunk in
+            FetchDescriptor<DigCounter>(predicate: #Predicate { chunk.contains($0.key) })
+        }, by: { CounterKey(kind: $0.kind ?? .generation, key: $0.key) })
+        let counters = DigCounters(context: context)
+        func live<T: PersistentModel>(_ rows: [T]?) -> [T] { (rows ?? []).filter { !$0.isDeleted } }
+
+        for nodeID in named.visits {
+            report.visitsMerged += mergeVisits(live(visitRows[nodeID]))
+            if let row = Self.survivor(ofVisits: live(visitRows[nodeID])) {
+                counters.project(row, from: live(components[CounterKey(kind: .visit, key: nodeID)]))
+            }
+        }
+        for identity in named.steps {
+            report.stepsMerged += mergeSteps(live(stepRows[identity]))
+            if let row = Self.survivor(ofSteps: live(stepRows[identity])) {
+                counters.project(row, from: live(components[CounterKey(kind: .step, key: identity)]))
+            }
+        }
+        for counter in named.counters where counter.kind != .generation {
+            report.countersMerged += counters.mergeCopies(of: live(components[counter]))
+            let parts = live(components[counter])
+            switch counter.kind {
+            case .visit: for row in live(visitRows[counter.key]) { counters.project(row, from: parts) }
+            case .step: for row in live(stepRows[counter.key]) { counters.project(row, from: parts) }
+            case .generation: break
+            }
+        }
+        // The generation row has no parent; its copies fold like any other.
+        for counter in named.counters where counter.kind == .generation {
+            report.countersMerged += counters.mergeCopies(counter.kind, key: counter.key)
+        }
+        return report
+    }
+
+    /// Every thing in the store, by natural key: for a pass with nothing to go
+    /// on but the tables. `merge(everything())` does what `all()` does, with
+    /// one query per table: 0.5s rather than 2.3s on a real library.
+    func everything() -> Named {
+        var named = Named()
+        named.eventIDs = Set(fetch(FetchDescriptor<ListeningEvent>()).map(\.id))
+        let crate = fetch(FetchDescriptor<CrateItem>())
+        named.crateIDs = Set(crate.map(\.id))
+        named.crateKeys = Set(crate.compactMap(Self.key(of:)))
+        named.visits = Set(fetch(FetchDescriptor<DigVisit>()).map(\.nodeID))
+        named.steps = Set(fetch(FetchDescriptor<DigStep>()).map(\.identity))
+        named.counters = Set(fetch(FetchDescriptor<DigCounter>()).compactMap { counter in
+            counter.kind.map { CounterKey(kind: $0, key: counter.key) }
+        })
+        return named
+    }
+
+    /// Whether `item` is one of the rows `rows(forCrateKey:)` finds for `key`.
+    static func matches(_ item: CrateItem, _ key: CrateKey) -> Bool {
+        switch key {
+        case .recording(let identity):
+            return item.kindRaw == CrateItemKind.recording.rawValue && item.matchKey == identity.matchKey
+                && item.unknownCode == identity.unknownCode
+        case .broadcast(let provider, let show):
+            return item.kindRaw == CrateItemKind.broadcast.rawValue && item.providerID == provider && item.showID == show
+        case .dig(let kind, let provider, let entity):
+            return item.kindRaw == kind && item.providerID == provider && item.showID == entity
+        }
+    }
+
+    /// One query per 400 keys: small enough for SQLite's limit on a statement's
+    /// parameters.
+    private func fetchChunked<Key, T: PersistentModel>(
+        _ keys: [Key], _ descriptor: ([Key]) -> FetchDescriptor<T>
+    ) -> [T] {
+        stride(from: 0, to: keys.count, by: 400).flatMap { start in
+            fetch(descriptor(Array(keys[start..<min(start + 400, keys.count)])))
+        }
     }
 
     // MARK: Finding rows for one thing

@@ -32,7 +32,7 @@ static float exploreWave(float2 p, float phase) {
 /// visible as hard steps across the page.
 [[ stitchable ]] half4 exploreOffsetField(float2 position, half4 source,
                                           float2 size, float time, float seed,
-                                          float2 origin) {
+                                          float2 origin, float warmIn) {
     float2 place = position + origin;
     // Fixed point scale keeps the shapes consistent as the crate grows taller.
     const float scale = 430.0;
@@ -48,16 +48,18 @@ static float exploreWave(float2 p, float phase) {
     // touched to change pace, because moving one moves the field's character
     // rather than its speed. They all read this clock instead, so halving it
     // halves everything and keeps the relationships intact.
-    const float pace = 0.25;
+    const float pace = 0.27;
     float t = time * pace;
 
-    // Shared slow waves keep adjacent bars related while each cut stays crisp.
-    // Scale breathes within ±8%; alternating bars add a deeper stagger.
-    float rhythm = strip * 0.58 + seed * 0.017;
+    // Shared waves keep adjacent bars related while each cut stays crisp:
+    // their phase steps a little from bar to bar, so the breath travels across
+    // the bars as one wave. Scale breathes within ±8%; alternating bars add a
+    // slight stagger, small enough that neighbours still read as one surface.
+    float rhythm = strip * 0.42 + seed * 0.017;
     float zoom = 1.0 + 0.08 * sin(rhythm + t * 0.22);
     float verticalOffset = 0.15 * sin(rhythm * 0.87 - t * 0.19);
     float alternating = fmod(strip, 2.0);
-    verticalOffset += alternating * (0.19 + 0.05 * sin(t * 0.17 + seed * 0.01));
+    verticalOffset += alternating * (0.06 + 0.03 * sin(t * 0.17 + seed * 0.01));
 
     // The zoom is horizontal only, and the vertical breath is a fixed size.
     //
@@ -80,6 +82,9 @@ static float exploreWave(float2 p, float phase) {
     // turn if it wants to be calmer or busier.
     const float breath = 1.45;
     p.y += breath * sin(rhythm + t * 0.22);
+    // A quicker ripple across the bars, over the slow breath: motion seen
+    // passing through the tiles rather than each tile moving on its own.
+    p.y += 0.55 * sin(strip * 0.85 - t * 0.45);
     p.y += verticalOffset;
     p += float2(seed * 0.007, seed * 0.003);
     const float motionSpeed = 4.0;
@@ -87,13 +92,42 @@ static float exploreWave(float2 p, float phase) {
     float wave = exploreWave(p, t * 0.008 * motionSpeed);
     float value = smoothstep(-0.85, 0.85, wave);
 
+    // Two palettes for the same four steps: the field's blues and a warm one
+    // -- red, orange, yellow. A point is in one or the other, never a blend
+    // of the two: blended colour by colour, blue and red met in purple and
+    // turquoise and orange in grey, and the field went muddy.
+    //
+    // Warmth is decided per bar, so warm and cool sit side by side across the
+    // field's own hard cuts as complements. A bar turning warm does not fade:
+    // a second, slower pattern orders its points, and the warm palette grows
+    // in along that pattern's contours with a crisp edge, and later recedes
+    // the same way. Bars turn at their own times (about 3.5 minutes a cycle).
+    // `warmIn` rises from 0 to 1 over the first ninety seconds the page is
+    // looked at in each run of the app -- not since `time` last wrapped, and
+    // not restarted by leaving the page -- so every launch opens For You in
+    // its blues and the warmth morphs in.
     const half3 blue = half3(0.157, 0.392, 0.941);
     const half3 turquoise = half3(0.216, 0.847, 0.816);
     const half3 mint = half3(0.573, 0.957, 0.816);
     const half3 paper = half3(0.949, 0.961, 0.937);
-    half3 color = mix(blue, turquoise, half(smoothstep(0.12, 0.49, value)));
-    color = mix(color, mint, half(smoothstep(0.44, 0.68, value)));
-    color = mix(color, paper, half(smoothstep(0.65, 0.88, value)));
+    const half3 red = half3(0.78, 0.15, 0.11);
+    const half3 orange = half3(0.97, 0.48, 0.12);
+    const half3 yellow = half3(0.99, 0.84, 0.30);
+    const half3 warmPaper = half3(0.98, 0.95, 0.89);
+
+    float barTurn = ihash(float2(strip + 11.3, seed * 0.029)) * 6.2831853;
+    float reach = (0.5 + 0.5 * sin(time * 0.03 + barTurn)) * smoothstep(0.0, 1.0, warmIn);
+    float order = smoothstep(-0.9, 0.9, exploreWave(place / scale * 0.6 + float2(7.1, 3.3), t * 0.004));
+    half warm = half(smoothstep(order - 0.012, order + 0.012, reach * 1.1 - 0.05));
+
+    // Each palette in full; they meet only across the edge's pixel or two,
+    // which keeps it smooth without a muddy band.
+    half s1 = half(smoothstep(0.12, 0.49, value));
+    half s2 = half(smoothstep(0.44, 0.68, value));
+    half s3 = half(smoothstep(0.65, 0.88, value));
+    half3 cool = mix(mix(mix(blue, turquoise, s1), mint, s2), paper, s3);
+    half3 hot = mix(mix(mix(red, orange, s1), yellow, s2), warmPaper, s3);
+    half3 color = mix(cool, hot, warm);
 
     // Hard cuts in the image create the bars; no lines or translucent overlays.
     color *= half(0.98 + lift * 0.04);
@@ -104,8 +138,9 @@ static float exploreWave(float2 p, float phase) {
     return half4(clamp(color, half3(0.0), half3(1.0)), 1.0);
 }
 
-// A continuous gold field across the player. Sound expands its wavefronts;
-// a restrained luminance keeps the transport text legible.
+// A continuous field across the player that turns through green, blue, red
+// and gold. Sound expands its wavefronts; a restrained luminance keeps the
+// transport text legible.
 [[ stitchable ]] half4 playerFlowField(float2 position, half4 source,
                                       float2 origin, float time, float energy,
                                       float noiseBoost) {
@@ -120,8 +155,27 @@ static float exploreWave(float2 p, float phase) {
     float wave = exploreWave(p, time * 0.032);
     float field = smoothstep(-0.9, 0.95, wave);
     float glow = 0.22 + field * 0.44 + energy * 0.16;
-    half3 color = mix(half3(0.10, 0.07, 0.012), half3(0.95, 0.64, 0.075), half(field));
-    color *= half(glow);
+
+    // The field turns slowly through green, blue, red and gold and back to
+    // green, 128 seconds to each, and its light rises and falls on a cycle of
+    // its own. Both periods divide the 4,096 seconds the caller wraps `time`
+    // at, so the wrap is never a jump: colours 512s, light 128s, a quarter
+    // turn apart. Each colour is a dark base and the bright it rises to; gold
+    // is the field's original.
+    const half3 lows[4] = { half3(0.05, 0.10, 0.055), half3(0.04, 0.06, 0.13),
+                            half3(0.12, 0.03, 0.03), half3(0.10, 0.07, 0.012) };
+    const half3 highs[4] = { half3(0.40, 0.62, 0.38), half3(0.36, 0.52, 0.86),
+                             half3(0.88, 0.34, 0.28), half3(0.95, 0.64, 0.075) };
+    float cycle = fract(time / 512.0) * 4.0;
+    int from = int(floor(cycle)) % 4;
+    int to = (from + 1) % 4;
+    half blend = half(smoothstep(0.0, 1.0, fract(cycle)));
+    half3 low = mix(lows[from], lows[to], blend);
+    half3 high = mix(highs[from], highs[to], blend);
+    const float turn = 6.2831853;
+    float light = 1.0 + 0.15 * sin(time * turn / 128.0 + 1.5707963);
+    half3 color = mix(low, high, half(field));
+    color *= half(glow * light);
     color += half( (ihash(floor(canvasPosition * 1.5)) - 0.5)
                   * 0.018 * noiseBoost );
     return half4(clamp(color, half3(0), half3(1)), 1);

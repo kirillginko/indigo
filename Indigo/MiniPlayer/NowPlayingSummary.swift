@@ -24,7 +24,7 @@ struct NowPlayingSummary {
     let isLive: Bool
 
     static let empty = NowPlayingSummary(
-        source: "Indigo", status: [], primary: "Nothing playing",
+        source: "Mineral", status: [], primary: "Nothing playing",
         secondary: "Pick a track or a station", recording: nil, isLive: false
     )
 

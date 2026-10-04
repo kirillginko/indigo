@@ -192,6 +192,7 @@ enum Persistence {
         // Development's folder is new on a machine that ran a Production build
         // first, or ran before it existed.
         try? FileManager.default.createDirectory(at: layout.directory, withIntermediateDirectories: true)
+        layout.seedCache()
         Trace.note("store: CloudKit environment \(CloudKitEnvironment.current.rawValue); stores in \(layout.directory.lastPathComponent)")
         let opened = SplitLaunch.open(layout: layout, sync: sync)
         failure = opened.failure

@@ -1,0 +1,3 @@
+/* The name Finder, the Dock and the Home Screen show. The file stays Indigo.app. */
+"CFBundleDisplayName" = "Mineral";
+"CFBundleName" = "Mineral";

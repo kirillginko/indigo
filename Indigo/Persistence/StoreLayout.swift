@@ -50,6 +50,29 @@ nonisolated struct StoreLayout: Equatable, Sendable {
         }
     }
 
+    /// Gives a new Development folder the real cache rather than an empty one.
+    ///
+    /// Only `UserData` has to be kept apart from Production's; `Local` is never
+    /// mirrored. An empty one cost a Debug build every artist picture and the
+    /// warm tables behind For You, refilled at the pace Discogs allows. So the
+    /// first time this layout has no cache, it starts from a consistent copy of
+    /// the standard one -- copied as bytes, never opened -- and after that the
+    /// two go their own ways. A copy that fails leaves no file, and the cache
+    /// is built from nothing as before.
+    func seedCache(from source: StoreLayout = .standard) {
+        let fileManager = FileManager.default
+        guard self != source, !fileManager.fileExists(atPath: local.path),
+              fileManager.fileExists(atPath: source.local.path) else { return }
+        do {
+            try Trace.step("store.seedCache") {
+                try SQLiteFiles.snapshot(of: source.local, to: local, scratch: work)
+            }
+        } catch {
+            for file in files(of: local) { try? fileManager.removeItem(at: file) }
+            Trace.note("store: cache not seeded (\(error)); building it from nothing")
+        }
+    }
+
     /// A SQLite store is three files, and has to be treated as one.
     func files(of base: URL) -> [URL] {
         ["", "-wal", "-shm"].map { URL(fileURLWithPath: base.path + $0) }

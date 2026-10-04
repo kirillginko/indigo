@@ -28,15 +28,21 @@ enum UserDataObserving {
         let observer = {
             var observer = HistoryObserver(context: context, ownAuthor: author)
             observer.onNewerGeneration = { Persistence.refuse(newerGeneration: $0) }
+            // What each pass looked at, beside what it cost: whether the
+            // passes during a first import are what stalls the main thread.
+            observer.onPass = { pass in
+                Trace.note("userdata.pass transactions=\(pass.transactions) foreign=\(pass.foreign) "
+                           + "named=\(pass.named) fetched=\(pass.fetched) merged=\(pass.merged)")
+            }
             return observer
         }()
-        observer.process()
+        Trace.step("userdata.observe", "launch") { observer.process() }
         task = Task { @MainActor in
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { @MainActor in
                     for await _ in NotificationCenter.default.notifications(named: .NSPersistentStoreRemoteChange) {
                         guard Persistence.userDataWritable else { continue }
-                        observer.process()
+                        Trace.step("userdata.observe", "remoteChange") { observer.process() }
                     }
                 }
                 group.addTask { @MainActor in
@@ -44,7 +50,7 @@ enum UserDataObserving {
                         guard let event = note.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey]
                             as? NSPersistentCloudKitContainer.Event, event.type == .import, event.endDate != nil,
                               Persistence.userDataWritable else { continue }
-                        observer.process()
+                        Trace.step("userdata.observe", "importEnded") { observer.process() }
                     }
                 }
             }

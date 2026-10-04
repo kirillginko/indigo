@@ -1178,24 +1178,22 @@ private struct ExploreShaderField: View {
     /// layout pass over the whole window (~6 ms at rest, 2026-09-25), which
     /// is worth paying only while somebody can see it move.
     @Environment(\.appearsActive) private var appearsActive
-    /// When this visit began.
+    /// The field's time: `ShaderClock.explore`, which moves only while this
+    /// page is on screen and the window is active, and carries on from where
+    /// it stopped -- across visits and launches.
     ///
-    /// Reset on appear, which is the whole point. This used to be the value
-    /// `@State` gave it the first time the page was ever shown, and
-    /// `timeIntervalSince` it grew for as long as the app stayed open — so
-    /// coming back to this page after a few hours handed the shader a `time`
-    /// in the tens of thousands. Every term it drives is a `float`: at that
-    /// size the per-frame step is a handful of ULPs, the wave stops resolving
-    /// it, and the field settles on the flat blue it starts from
-    /// (`half3(0.157, 0.392, 0.941)` in `exploreOffsetField`) and stops.
-    ///
-    /// `PlayerShaderBackdrop` has always known this — "keeping the value small
-    /// preserves float precision in the Metal shader" — and wraps a shared
-    /// clock at 4096s. Wrapping suits it because its field is not translated
-    /// by time; this one is (`p.x += time * 0.072`), so a wrap would jump the
-    /// pattern sideways every hour. Starting each visit at zero bounds the
-    /// value just as well and never jumps while anybody is looking at it.
-    @State private var startedAt = Date()
+    /// Kept small. It was once the time since the page was first shown, and
+    /// after a few hours the shader was handed a `time` in the tens of
+    /// thousands: every term it drives is a `float`, the per-frame step
+    /// stopped resolving, and the field settled on flat blue and froze. Then
+    /// it restarted at zero on each visit, which kept it small but threw the
+    /// field -- and its fade into warm colours -- back to the start whenever
+    /// somebody left the page and came back. Now only time spent looking
+    /// counts, wrapped at an hour. The fade into warm colours (`warmIn`) reads
+    /// the time looked at in this run of the app, so each launch opens in the
+    /// blues and a wrap or a visit elsewhere never undoes it.
+    private var clock: ShaderClock { .explore }
+    private var moving: Bool { appearsActive && !reduceMotion }
 
     /// How tall one slice of the field may be.
     ///
@@ -1222,7 +1220,8 @@ private struct ExploreShaderField: View {
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion || !appearsActive)) { timeline in
-            let elapsed = reduceMotion ? 0 : timeline.date.timeIntervalSince(startedAt)
+            let elapsed = reduceMotion ? 0 : clock.time(at: timeline.date)
+            let warmIn = reduceMotion ? 0 : min(1, clock.sessionTime(at: timeline.date) / 90)
             VStack(spacing: 0) {
                 ForEach(slices, id: \.self) { top in
                     Rectangle()
@@ -1237,7 +1236,8 @@ private struct ExploreShaderField: View {
                                 // Where this slice sits in the whole field, so
                                 // the pattern runs through the seams rather
                                 // than starting again at each one.
-                                .float2(origin.x, origin.y + top)
+                                .float2(origin.x, origin.y + top),
+                                .float(Float(warmIn))
                             )
                         )
                 }
@@ -1257,20 +1257,12 @@ private struct ExploreShaderField: View {
             }
         }
         .frame(width: size.width, height: size.height)
-        // No `.id` keyed on anything this view mutates on appear. Tried, and
-        // it is a remount loop: the id changes, SwiftUI rebuilds the view,
-        // `onAppear` fires again and changes it again, so the timeline is torn
-        // down every frame and never draws.
-        // Only when the clock has actually grown, not on every return.
-        //
-        // Assigning here unconditionally is a state change on the way back to
-        // this page, and a state change rebuilds every slice below — nine
-        // layers thrown away and allocated again for a value that was fine.
-        // Ten minutes is far inside the range where a `float` still resolves a
-        // 1/30s step, and far outside the length of a visit.
-        .onAppear {
-            if Date().timeIntervalSince(startedAt) > 600 { startedAt = Date() }
-        }
+        // No `.id` keyed on anything this view mutates on appear: tried, and
+        // it is a remount loop. Appearing only starts the shared clock, which
+        // changes no state of this view.
+        .onAppear { clock.setRunning(moving) }
+        .onDisappear { clock.setRunning(false) }
+        .onChange(of: moving) { _, moving in clock.setRunning(moving) }
         .accessibilityHidden(true)
     }
 }

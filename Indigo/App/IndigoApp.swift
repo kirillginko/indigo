@@ -178,13 +178,6 @@ struct IndigoApp: App {
                 .modifier(ScreenCornerSyncButton())
                 #endif
                 .task {
-                    // Gives a row crated before it kept its own snapshot the
-                    // snapshot. Not under test, which runs against the
-                    // listener's real store, and not while that store is
-                    // unopened: it writes the crate.
-                    if !Persistence.isRunningTests, Persistence.userDataWritable {
-                        UserDataDedupe(context: Persistence.container.mainContext).all()
-                    }
                     witness.watch(player)
                     // Keep the picture backlog out of the way while a stream
                     // opens. See `DigStore.holdBackgroundWork`.
@@ -194,6 +187,23 @@ struct IndigoApp: App {
                     // recomputed. A page that opens empty and grows its
                     // headline a second later has loaded twice.
                     dig.restoreExploreOffers()
+                    // Rows for one thing, merged, and counts projected from
+                    // their components: a net under the history observer for
+                    // anything that reached the store without it. On a context
+                    // of its own, off the main actor: even batched it held the
+                    // main thread for a second at every launch. What it saves
+                    // reaches the window like any other writer's, and the
+                    // observer merges by the same rule, so the two keep the same
+                    // row. Not under test, which runs against the listener's
+                    // real store, and not while that store is unopened: it
+                    // writes.
+                    if !Persistence.isRunningTests, Persistence.userDataWritable {
+                        Task.detached(priority: .utility) {
+                            let context = ModelContext(Persistence.container)
+                            context.author = "launchMerge"
+                            Trace.step("userdata.launchMerge") { UserDataDedupe(context: context).all() }
+                        }
+                    }
                     // One-shot repair of rows that stored an artist as their
                     // own label. Off the main actor and off the critical path:
                     // nothing below waits for it, and it finds nothing to do

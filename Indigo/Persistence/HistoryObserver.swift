@@ -29,7 +29,16 @@ struct HistoryObserver {
 
     /// Each store's position, `{uuid: n}`. v2: the token kept before named
     /// whichever store wrote last -- usually `Local` -- and is not read.
-    static let tokenKey = "userDataHistoryPositions.v2"
+    ///
+    /// One per CloudKit environment. A Debug build and a TestFlight build on
+    /// one Mac share these defaults but not their stores, and with one key each
+    /// overwrote the other's place: every pass after the other app wrote began
+    /// again from the tables. Production keeps the key it has always had.
+    static var tokenKey: String { tokenKey(for: CloudKitEnvironment.current) }
+
+    static func tokenKey(for environment: CloudKitEnvironment) -> String {
+        environment == .production ? "userDataHistoryPositions.v2" : "userDataHistoryPositions.v2.development"
+    }
 
     /// What one pass looked at, as counts. For a harness that wants to know why
     /// a pass did nothing; the app does not set it.
@@ -66,15 +75,20 @@ struct HistoryObserver {
         // left the other store's position unknown. So the place kept is every
         // store's newest position, merged, and only UserData's transactions
         // are acted on.
+        // With no place to resume from, the history is not read at all: see
+        // `startFromNow`.
+        guard let token else { return startFromNow(dedupe) }
         var descriptor = HistoryDescriptor<DefaultHistoryTransaction>()
-        if let token { descriptor.predicate = #Predicate { $0.token > token } }
-        guard let transactions = try? context.fetchHistory(descriptor) else {
-            onPass?(Pass(hadToken: token != nil, transactions: -1))
+        descriptor.predicate = #Predicate { $0.token > token }
+        let fetched = Trace.step("userdata.history") {
+            try? context.fetchHistory(descriptor)
+        }
+        guard let transactions = fetched else {
+            onPass?(Pass(hadToken: true, transactions: -1))
             return fullPass(dedupe)
         }
-        // A token that names nothing any more returns the whole history or none
-        // of it; either way what it cannot tell us is covered by a full pass.
-        if token != nil, transactions.isEmpty {
+        // Nothing since the last pass.
+        if transactions.isEmpty {
             onPass?(Pass(hadToken: true))
             return .init()
         }
@@ -84,9 +98,9 @@ struct HistoryObserver {
         // and asking for the model of a row that is gone and reading it traps.
         // So the identifiers are only ever used to *fetch*, which returns the
         // rows that are still there and nothing else.
-        var named: [String: Set<PersistentIdentifier>] = [:]
+        var changed: [String: Set<PersistentIdentifier>] = [:]
         var reached = positions ?? [:]
-        var pass = Pass(hadToken: token != nil, transactions: transactions.count)
+        var pass = Pass(hadToken: true, transactions: transactions.count)
         let userData = storeIdentity
 
         for transaction in transactions {
@@ -96,49 +110,45 @@ struct HistoryObserver {
             pass.foreign += 1
             for change in transaction.changes {
                 switch change {
-                case .insert(let insert): named[insert.changedPersistentIdentifier.entityName, default: []].insert(insert.changedPersistentIdentifier)
-                case .update(let update): named[update.changedPersistentIdentifier.entityName, default: []].insert(update.changedPersistentIdentifier)
+                case .insert(let insert): changed[insert.changedPersistentIdentifier.entityName, default: []].insert(insert.changedPersistentIdentifier)
+                case .update(let update): changed[update.changedPersistentIdentifier.entityName, default: []].insert(update.changedPersistentIdentifier)
                 default: continue
                 }
             }
         }
 
-        var crate = Set<CrateKey>()
-        var crateIDs = Set<UUID>()
-        var eventIDs = Set<UUID>()
-        var visits = Set<String>()
-        var steps = Set<String>()
-        var counters = Set<String>()   // kind NUL key
+        var named = UserDataDedupe.Named()
         var generation: Int?
-        for chunk in Self.chunks(named["CrateItem"]) {
+        for chunk in Self.chunks(changed["CrateItem"]) {
             for item in (try? context.fetch(FetchDescriptor<CrateItem>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                crateIDs.insert(item.id)
-                if let key = UserDataDedupe.key(of: item) { crate.insert(key) }
+                named.crateIDs.insert(item.id)
+                if let key = UserDataDedupe.key(of: item) { named.crateKeys.insert(key) }
             }
         }
-        for chunk in Self.chunks(named["ListeningEvent"]) {
+        for chunk in Self.chunks(changed["ListeningEvent"]) {
             for event in (try? context.fetch(FetchDescriptor<ListeningEvent>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                eventIDs.insert(event.id)
+                named.eventIDs.insert(event.id)
             }
         }
-        for chunk in Self.chunks(named["DigVisit"]) {
+        for chunk in Self.chunks(changed["DigVisit"]) {
             for visit in (try? context.fetch(FetchDescriptor<DigVisit>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                visits.insert(visit.nodeID)
+                named.visits.insert(visit.nodeID)
             }
         }
-        for chunk in Self.chunks(named["DigStep"]) {
+        for chunk in Self.chunks(changed["DigStep"]) {
             for step in (try? context.fetch(FetchDescriptor<DigStep>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                steps.insert(step.identity)
+                named.steps.insert(step.identity)
             }
         }
         // A component from another device changes what its row should say, and
         // may arrive before or after that row. Either order ends the same way:
         // the row is projected when the component arrives, and again when the
         // row does.
-        for chunk in Self.chunks(named["DigCounter"]) {
+        for chunk in Self.chunks(changed["DigCounter"]) {
             for counter in (try? context.fetch(FetchDescriptor<DigCounter>(predicate: #Predicate { chunk.contains($0.persistentModelID) }))) ?? [] {
-                counters.insert("\(counter.kindRaw)\u{0}\(counter.key)")
-                if counter.kind == .generation { generation = max(generation ?? 0, counter.count) }
+                guard let kind = counter.kind else { continue }
+                named.counters.insert(.init(kind: kind, key: counter.key))
+                if kind == .generation { generation = max(generation ?? 0, counter.count) }
             }
         }
         // A newer build wrote this store. Its rows are left as it wrote them,
@@ -149,20 +159,9 @@ struct HistoryObserver {
             return .init()
         }
 
-        pass.named = named.values.reduce(0) { $0 + $1.count }
-        pass.fetched = crateIDs.count + eventIDs.count + visits.count + steps.count + counters.count
-        var report = UserDataDedupe.Report()
-        report.idsAssigned = dedupe.assignIDs()
-        for id in eventIDs { report.eventsMerged += dedupe.event(id: id) }
-        for id in crateIDs { report.crateMerged += dedupe.crateRow(id: id) }
-        for key in crate { report.crateMerged += dedupe.crate(key: key) }
-        for nodeID in visits { report.visitsMerged += dedupe.visit(nodeID: nodeID) }
-        for identity in steps { report.stepsMerged += dedupe.step(identity: identity) }
-        for entry in counters {
-            let parts = entry.split(separator: "\u{0}", maxSplits: 1, omittingEmptySubsequences: false)
-            guard parts.count == 2, let kind = DigCounterKind(rawValue: String(parts[0])) else { continue }
-            report.countersMerged += dedupe.counter(kind: kind, key: String(parts[1]))
-        }
+        pass.named = changed.values.reduce(0) { $0 + $1.count }
+        pass.fetched = named.crateIDs.count + named.eventIDs.count + named.visits.count + named.steps.count + named.counters.count
+        let report = Trace.step("userdata.merge", "\(pass.fetched) keys") { dedupe.merge(named) }
         if !report.isEmpty || context.hasChanges { try? context.save() }
         pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
         onPass?(pass)
@@ -176,6 +175,55 @@ struct HistoryObserver {
         guard let identifiers, !identifiers.isEmpty else { return [] }
         let all = Array(identifiers)
         return stride(from: 0, to: all.count, by: 400).map { Array(all[$0..<min($0 + 400, all.count)]) }
+    }
+
+    /// A pass with no place to resume from: dedupe what is in the tables, and
+    /// take up the history from where each store is now.
+    ///
+    /// Reading the history from its start meant reading the cache's too. A
+    /// fetch cannot be limited to one store, the cache writes hundreds of
+    /// times for every write of the listener's, and a new UserData store beside
+    /// a well-used cache (38,569 transactions) held the main thread for 41
+    /// seconds at launch to find 35. A token cannot skip only the cache either:
+    /// a store left out of one returns nothing, and a position before a store's
+    /// oldest transaction is refused as expired.
+    ///
+    /// So the newest transaction of each store is read from its file first;
+    /// then every row already there is merged from the tables; then that is
+    /// the place. Whatever commits after the positions were read is after the
+    /// place, and the next pass reads it. If the files cannot be read -- stores
+    /// in memory -- it falls back to the full pass.
+    private func startFromNow(_ dedupe: UserDataDedupe) -> UserDataDedupe.Report {
+        guard let now = newestPositions() else { return fullPass(dedupe) }
+        if let generation = SyncGeneration.advertised(in: context), SyncGeneration.isNewer(generation) {
+            onPass?(Pass())
+            onNewerGeneration?(generation)
+            return .init()
+        }
+        let report = Trace.step("userdata.merge", "every row") { dedupe.merge(dedupe.everything()) }
+        if !report.isEmpty || context.hasChanges { try? context.save() }
+        var pass = Pass()
+        pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
+        onPass?(pass)
+        store(now)
+        return report
+    }
+
+    /// Each store's newest transaction, from the history table in its file
+    /// (`Z_PK` is the position a token holds for that store). A store with no
+    /// history yet has none; UserData without one is kept from being a place
+    /// by `storedPositions`, so the next pass starts from the tables again --
+    /// cheap, since a store with no history is new. Nil only when no file could
+    /// be read at all: stores in memory.
+    private func newestPositions() -> [String: Int]? {
+        var positions: [String: Int] = [:]
+        for configuration in context.container.configurations {
+            let url = configuration.url
+            guard let store = Self.uuid(of: url),
+                  let newest = SQLiteFiles.integer("SELECT MAX(Z_PK) FROM ATRANSACTION", in: url) else { continue }
+            positions[store] = newest
+        }
+        return positions.isEmpty ? nil : positions
     }
 
     private func fullPass(_ dedupe: UserDataDedupe) -> UserDataDedupe.Report {

@@ -48,6 +48,14 @@ struct SidebarView: View {
     private final class LibraryCounts {
         var trackCount = -1
         var value: (tracks: Int, albums: Int, artists: Int) = (0, 0, 0)
+
+        /// `@State`'s initial value is built every time the sidebar is, and
+        /// SwiftUI throws all but the first away, so these are freed
+        /// constantly. A main-actor deinit hops to the executor to run, and that
+        /// hop aborts the process (the same as `CrateService`'s): the test host
+        /// crashed in it three times on 2026-10-03, blaming whichever test was
+        /// running. Nothing here needs the main actor to be torn down.
+        nonisolated deinit {}
     }
 
     @State private var isLibraryExpanded = true
@@ -318,12 +326,7 @@ struct SidebarView: View {
 
     private var wordmark: some View {
         HStack(spacing: 6) {
-            Text("Indigo")
-                .microLabel(2.4, size: 11)
-                .foregroundStyle(Palette.inverseInk)
-                .padding(.horizontal, 7)
-                .padding(.vertical, 4)
-                .background(Palette.inverse)
+            MineralWordmark()
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 14)
