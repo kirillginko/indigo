@@ -49,6 +49,11 @@ final class ShaderClock {
         total = defaults.double(forKey: key + ".total")
     }
 
+    /// A main-actor deinit hops to the executor, and the hop aborts the
+    /// process (as `CrateService`'s and the sidebar's did). The app's two
+    /// clocks are never freed; tests make and drop their own.
+    nonisolated deinit {}
+
     /// Where the field is at `date`.
     func time(at date: Date) -> Double {
         let running = runningSince.map { max(0, date.timeIntervalSince($0)) } ?? 0
