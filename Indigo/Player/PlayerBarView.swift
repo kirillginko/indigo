@@ -407,7 +407,7 @@ struct PlayerShaderBackdrop: View {
     /// Whether playback is running, buffering between tracks included:
     /// `isPlaying` already counts a stream's buffering as playing.
     private var playing: Bool { player.isPlaying }
-    private var clock: PlayerFieldClock { .shared }
+    private var clock: ShaderClock { .player }
     private var animating: Bool { clock.isRunning && !reduceMotion }
 
     var body: some View {
@@ -416,7 +416,7 @@ struct PlayerShaderBackdrop: View {
                 let frame = proxy.frame(in: .global)
                 // Every copy reads one clock that moves only while something
                 // plays and carries on from where it stopped; see
-                // `PlayerFieldClock`. A paused TimelineView holds a stale
+                // `ShaderClock`. A paused TimelineView holds a stale
                 // date, which no longer matters: a stopped clock reads the
                 // same at any date. Kept small for float precision.
                 let sharedTime: Double = reduceMotion ? 0 : clock.time(at: timeline.date)
@@ -430,7 +430,7 @@ struct PlayerShaderBackdrop: View {
                     ))
             }
         }
-        .onChange(of: playing, initial: true) { _, playing in clock.playbackChanged(playing) }
+        .onChange(of: playing, initial: true) { _, playing in clock.setRunning(playing) }
         .accessibilityHidden(true)
         .allowsHitTesting(false)
     }

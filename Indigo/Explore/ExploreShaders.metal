@@ -32,7 +32,7 @@ static float exploreWave(float2 p, float phase) {
 /// visible as hard steps across the page.
 [[ stitchable ]] half4 exploreOffsetField(float2 position, half4 source,
                                           float2 size, float time, float seed,
-                                          float2 origin) {
+                                          float2 origin, float warmIn) {
     float2 place = position + origin;
     // Fixed point scale keeps the shapes consistent as the crate grows taller.
     const float scale = 430.0;
@@ -96,9 +96,10 @@ static float exploreWave(float2 p, float phase) {
     // field's own hard cuts as complements. A bar turning warm does not fade:
     // a second, slower pattern orders its points, and the warm palette grows
     // in along that pattern's contours with a crisp edge, and later recedes
-    // the same way. Bars turn at their own times (about 3.5 minutes a cycle),
-    // and none does in the page's first ninety seconds, so For You still
-    // opens in its blues.
+    // the same way. Bars turn at their own times (about 3.5 minutes a cycle).
+    // `warmIn` rises from 0 to 1 over the first ninety seconds anybody looks
+    // at the page, ever -- not since `time` last wrapped -- so For You opened
+    // in its blues once, and a wrap never takes the warmth away again.
     const half3 blue = half3(0.157, 0.392, 0.941);
     const half3 turquoise = half3(0.216, 0.847, 0.816);
     const half3 mint = half3(0.573, 0.957, 0.816);
@@ -109,7 +110,7 @@ static float exploreWave(float2 p, float phase) {
     const half3 warmPaper = half3(0.98, 0.95, 0.89);
 
     float barTurn = ihash(float2(strip + 11.3, seed * 0.029)) * 6.2831853;
-    float reach = (0.5 + 0.5 * sin(time * 0.03 + barTurn)) * smoothstep(0.0, 90.0, time);
+    float reach = (0.5 + 0.5 * sin(time * 0.03 + barTurn)) * smoothstep(0.0, 1.0, warmIn);
     float order = smoothstep(-0.9, 0.9, exploreWave(place / scale * 0.6 + float2(7.1, 3.3), t * 0.004));
     half warm = half(smoothstep(order - 0.012, order + 0.012, reach * 1.1 - 0.05));
 
