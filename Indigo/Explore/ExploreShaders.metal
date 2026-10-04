@@ -48,16 +48,18 @@ static float exploreWave(float2 p, float phase) {
     // touched to change pace, because moving one moves the field's character
     // rather than its speed. They all read this clock instead, so halving it
     // halves everything and keeps the relationships intact.
-    const float pace = 0.25;
+    const float pace = 0.4;
     float t = time * pace;
 
-    // Shared slow waves keep adjacent bars related while each cut stays crisp.
-    // Scale breathes within ±8%; alternating bars add a deeper stagger.
-    float rhythm = strip * 0.58 + seed * 0.017;
+    // Shared waves keep adjacent bars related while each cut stays crisp:
+    // their phase steps a little from bar to bar, so the breath travels across
+    // the bars as one wave. Scale breathes within ±8%; alternating bars add a
+    // slight stagger, small enough that neighbours still read as one surface.
+    float rhythm = strip * 0.42 + seed * 0.017;
     float zoom = 1.0 + 0.08 * sin(rhythm + t * 0.22);
     float verticalOffset = 0.15 * sin(rhythm * 0.87 - t * 0.19);
     float alternating = fmod(strip, 2.0);
-    verticalOffset += alternating * (0.19 + 0.05 * sin(t * 0.17 + seed * 0.01));
+    verticalOffset += alternating * (0.06 + 0.03 * sin(t * 0.17 + seed * 0.01));
 
     // The zoom is horizontal only, and the vertical breath is a fixed size.
     //
@@ -80,6 +82,9 @@ static float exploreWave(float2 p, float phase) {
     // turn if it wants to be calmer or busier.
     const float breath = 1.45;
     p.y += breath * sin(rhythm + t * 0.22);
+    // A quicker ripple across the bars, over the slow breath: motion seen
+    // passing through the tiles rather than each tile moving on its own.
+    p.y += 0.55 * sin(strip * 0.85 - t * 0.9);
     p.y += verticalOffset;
     p += float2(seed * 0.007, seed * 0.003);
     const float motionSpeed = 4.0;
