@@ -189,13 +189,19 @@ struct IndigoApp: App {
                     dig.restoreExploreOffers()
                     // Rows for one thing, merged, and counts projected from
                     // their components: a net under the history observer for
-                    // anything that reached the store without it. After the
-                    // page above is restored, so it never waits for this. Not
-                    // under test, which runs against the listener's real
-                    // store, and not while that store is unopened: it writes.
+                    // anything that reached the store without it. On a context
+                    // of its own, off the main actor: even batched it held the
+                    // main thread for a second at every launch. What it saves
+                    // reaches the window like any other writer's, and the
+                    // observer merges by the same rule, so the two keep the same
+                    // row. Not under test, which runs against the listener's
+                    // real store, and not while that store is unopened: it
+                    // writes.
                     if !Persistence.isRunningTests, Persistence.userDataWritable {
-                        Trace.step("userdata.launchMerge") {
-                            UserDataDedupe(context: Persistence.container.mainContext).all()
+                        Task.detached(priority: .utility) {
+                            let context = ModelContext(Persistence.container)
+                            context.author = "launchMerge"
+                            Trace.step("userdata.launchMerge") { UserDataDedupe(context: context).all() }
                         }
                     }
                     // One-shot repair of rows that stored an artist as their
