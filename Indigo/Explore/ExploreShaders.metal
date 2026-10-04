@@ -104,9 +104,9 @@ static float exploreWave(float2 p, float phase) {
     return half4(clamp(color, half3(0.0), half3(1.0)), 1.0);
 }
 
-// A continuous green field across the player, a darker cut of the wordmark's
-// greens (`MineralSheen`). Sound expands its wavefronts; a restrained
-// luminance keeps the transport text legible.
+// A continuous field across the player that turns through green, blue, red
+// and gold. Sound expands its wavefronts; a restrained luminance keeps the
+// transport text legible.
 [[ stitchable ]] half4 playerFlowField(float2 position, half4 source,
                                       float2 origin, float time, float energy,
                                       float noiseBoost) {
@@ -122,15 +122,24 @@ static float exploreWave(float2 p, float phase) {
     float field = smoothstep(-0.9, 0.95, wave);
     float glow = 0.22 + field * 0.44 + energy * 0.16;
 
-    // The field turns slowly from green to blue and back, and its light rises
-    // and falls on a cycle of its own. Both periods divide the 4,096 seconds
-    // the caller wraps `time` at, so the wrap is never a jump: hue 256s,
-    // light 128s, a quarter turn apart so the two do not move together.
+    // The field turns slowly through green, blue, red and gold and back to
+    // green, 128 seconds to each, and its light rises and falls on a cycle of
+    // its own. Both periods divide the 4,096 seconds the caller wraps `time`
+    // at, so the wrap is never a jump: colours 512s, light 128s, a quarter
+    // turn apart. Each colour is a dark base and the bright it rises to; gold
+    // is the field's original.
+    const half3 lows[4] = { half3(0.05, 0.10, 0.055), half3(0.04, 0.06, 0.13),
+                            half3(0.12, 0.03, 0.03), half3(0.10, 0.07, 0.012) };
+    const half3 highs[4] = { half3(0.40, 0.62, 0.38), half3(0.36, 0.52, 0.86),
+                             half3(0.88, 0.34, 0.28), half3(0.95, 0.64, 0.075) };
+    float cycle = fract(time / 512.0) * 4.0;
+    int from = int(floor(cycle)) % 4;
+    int to = (from + 1) % 4;
+    half blend = half(smoothstep(0.0, 1.0, fract(cycle)));
+    half3 low = mix(lows[from], lows[to], blend);
+    half3 high = mix(highs[from], highs[to], blend);
     const float turn = 6.2831853;
-    float toBlue = 0.5 - 0.5 * cos(time * turn / 256.0);
     float light = 1.0 + 0.15 * sin(time * turn / 128.0 + 1.5707963);
-    half3 low = mix(half3(0.04, 0.08, 0.045), half3(0.03, 0.05, 0.10), half(toBlue));
-    half3 high = mix(half3(0.30, 0.47, 0.28), half3(0.26, 0.40, 0.66), half(toBlue));
     half3 color = mix(low, high, half(field));
     color *= half(glow * light);
     color += half( (ihash(floor(canvasPosition * 1.5)) - 0.5)
