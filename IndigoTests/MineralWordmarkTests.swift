@@ -2,22 +2,30 @@
 //  MineralWordmarkTests.swift
 //  IndigoTests
 //
-//  The wordmark wraps its clock; the wrap is only invisible if every wave in
-//  `mineralSheen` has completed whole turns by then. Wrapping at 20π left the
-//  slowest wave half a turn out, and the bands jumped every 63 seconds.
+//  The wordmark's light is one tile, slid sideways forever. It only reads as
+//  one moving surface if the tile's right edge runs into its left without a
+//  step.
 //
 
 import XCTest
 @testable import Indigo
 
 final class MineralWordmarkTests: XCTestCase {
-    /// The rates in `MineralShaders.metal`, radians a second. Change both together.
-    private let rates = [0.9, 0.35, 0.5]
-
-    func testEveryWaveCompletesWholeTurnsAtTheWrap() {
-        for rate in rates {
-            let turns = rate * MineralWordmark.period / (2 * .pi)
-            XCTAssertEqual(turns, turns.rounded(), accuracy: 1e-9, "rate \(rate)")
+    func testTheTileRepeatsWithoutASeam() {
+        for v in stride(from: 0.0, through: 1.0, by: 0.1) {
+            XCTAssertEqual(MineralSheen.light(u: 0, v: v), MineralSheen.light(u: 1, v: v), accuracy: 1e-9, "v \(v)")
         }
+    }
+
+    func testTheLightSpansDarkToBright() {
+        let samples = stride(from: 0.0, to: 1.0, by: 0.01).map { MineralSheen.light(u: $0, v: 0.5) }
+        XCTAssertLessThan(samples.min()!, 0.2)
+        XCTAssertGreaterThan(samples.max()!, 0.8)
+    }
+
+    func testATileIsDrawn() throws {
+        let tile = try XCTUnwrap(MineralSheen.tile(width: 240, height: 40))
+        XCTAssertEqual(tile.width, 240)
+        XCTAssertEqual(tile.height, 40)
     }
 }
