@@ -29,7 +29,16 @@ struct HistoryObserver {
 
     /// Each store's position, `{uuid: n}`. v2: the token kept before named
     /// whichever store wrote last -- usually `Local` -- and is not read.
-    static let tokenKey = "userDataHistoryPositions.v2"
+    ///
+    /// One per CloudKit environment. A Debug build and a TestFlight build on
+    /// one Mac share these defaults but not their stores, and with one key each
+    /// overwrote the other's place: every pass after the other app wrote began
+    /// again from the tables. Production keeps the key it has always had.
+    static var tokenKey: String { tokenKey(for: CloudKitEnvironment.current) }
+
+    static func tokenKey(for environment: CloudKitEnvironment) -> String {
+        environment == .production ? "userDataHistoryPositions.v2" : "userDataHistoryPositions.v2.development"
+    }
 
     /// What one pass looked at, as counts. For a harness that wants to know why
     /// a pass did nothing; the app does not set it.

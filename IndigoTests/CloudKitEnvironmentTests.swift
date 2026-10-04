@@ -82,3 +82,13 @@ final class CacheSeedTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: source.local.path))
     }
 }
+
+/// A Debug build and a TestFlight build on one Mac keep separate places.
+@MainActor
+final class HistoryPlaceKeyTests: XCTestCase {
+    func testEachEnvironmentKeepsItsOwnPlace() {
+        XCTAssertEqual(HistoryObserver.tokenKey(for: .production), "userDataHistoryPositions.v2", "Production's key never changes")
+        XCTAssertNotEqual(HistoryObserver.tokenKey(for: .development), HistoryObserver.tokenKey(for: .production))
+        XCTAssertEqual(HistoryObserver.tokenKey, HistoryObserver.tokenKey(for: .development), "the test host is a Debug build")
+    }
+}
