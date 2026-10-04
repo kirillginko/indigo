@@ -192,13 +192,19 @@ final class HistoryObserverTests: XCTestCase {
         XCTAssertEqual(observer().process().crateMerged, 1, "only the new transaction")
     }
 
+    /// Once it has a place. Before UserData has any history there is none: a
+    /// pass reads no history and merges whatever the tables hold, whoever
+    /// wrote it.
     func testItsOwnWritesAreLeftToTheCodeThatMadeThem() throws {
+        show(remote, "r", added: 1)
+        try remote.save()
+        XCTAssertTrue(observer().process().isEmpty)
         show(local, "s", added: 200)
         show(local, "s", added: 100)
         try local.save()
 
         XCTAssertTrue(observer().process().isEmpty)
-        XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 2)
+        XCTAssertEqual(try local.fetchCount(FetchDescriptor<CrateItem>()), 3)
     }
 
     func testVisitsAndStepsAnotherWriterMadeAreMergedToo() throws {
@@ -235,6 +241,54 @@ final class HistoryObserverTests: XCTestCase {
 
         XCTAssertEqual(report.eventsMerged, 1)
         XCTAssertEqual(try local.fetchCount(FetchDescriptor<ListeningEvent>()), 1)
+    }
+
+    // MARK: No place yet
+
+    /// A new UserData beside a busy cache: the first pass read the whole
+    /// history from its start, the cache's included, and held the main thread
+    /// for 41 seconds. With no place it reads none, and merges from the tables.
+    func testAFirstPassReadsNoHistoryAndStillMerges() throws {
+        for index in 0..<40 {
+            local.insert(ArtistPortrait(nameKey: "artist \(index)", name: "Artist \(index)"))
+            try local.save()
+        }
+        show(remote, "s", added: 200)
+        show(remote, "s", added: 100)
+        try remote.save()
+
+        var passes: [HistoryObserver.Pass] = []
+        var first = observer()
+        first.onPass = { passes.append($0) }
+        XCTAssertEqual(first.process().crateMerged, 1)
+        XCTAssertEqual(passes.map(\.transactions), [0], "no history read")
+        XCTAssertEqual(passes.map(\.hadToken), [false])
+
+        // And from then on, only what is new.
+        show(remote, "t", added: 1)
+        show(remote, "t", added: 2)
+        try remote.save()
+        passes = []
+        var next = observer()
+        next.onPass = { passes.append($0) }
+        XCTAssertEqual(next.process().crateMerged, 1)
+        XCTAssertEqual(passes.map(\.hadToken), [true])
+        // The other writer's one, and the first pass's own merge, skipped.
+        XCTAssertEqual(passes.first?.foreign, 1)
+    }
+
+    /// A store with no history of its own yet is not a reason to read the
+    /// cache's from the start either.
+    func testANewStoreBesideABusyCacheReadsNoHistory() throws {
+        for index in 0..<40 {
+            local.insert(ArtistPortrait(nameKey: "artist \(index)", name: "Artist \(index)"))
+            try local.save()
+        }
+        var passes: [HistoryObserver.Pass] = []
+        var first = observer()
+        first.onPass = { passes.append($0) }
+        XCTAssertTrue(first.process().isEmpty)
+        XCTAssertEqual(passes.map(\.transactions), [0])
     }
 
     // MARK: One batch, the same answer

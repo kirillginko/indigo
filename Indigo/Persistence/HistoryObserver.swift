@@ -66,15 +66,20 @@ struct HistoryObserver {
         // left the other store's position unknown. So the place kept is every
         // store's newest position, merged, and only UserData's transactions
         // are acted on.
+        // With no place to resume from, the history is not read at all: see
+        // `startFromNow`.
+        guard let token else { return startFromNow(dedupe) }
         var descriptor = HistoryDescriptor<DefaultHistoryTransaction>()
-        if let token { descriptor.predicate = #Predicate { $0.token > token } }
-        guard let transactions = try? context.fetchHistory(descriptor) else {
-            onPass?(Pass(hadToken: token != nil, transactions: -1))
+        descriptor.predicate = #Predicate { $0.token > token }
+        let fetched = Trace.step("userdata.history") {
+            try? context.fetchHistory(descriptor)
+        }
+        guard let transactions = fetched else {
+            onPass?(Pass(hadToken: true, transactions: -1))
             return fullPass(dedupe)
         }
-        // A token that names nothing any more returns the whole history or none
-        // of it; either way what it cannot tell us is covered by a full pass.
-        if token != nil, transactions.isEmpty {
+        // Nothing since the last pass.
+        if transactions.isEmpty {
             onPass?(Pass(hadToken: true))
             return .init()
         }
@@ -86,7 +91,7 @@ struct HistoryObserver {
         // rows that are still there and nothing else.
         var changed: [String: Set<PersistentIdentifier>] = [:]
         var reached = positions ?? [:]
-        var pass = Pass(hadToken: token != nil, transactions: transactions.count)
+        var pass = Pass(hadToken: true, transactions: transactions.count)
         let userData = storeIdentity
 
         for transaction in transactions {
@@ -147,7 +152,7 @@ struct HistoryObserver {
 
         pass.named = changed.values.reduce(0) { $0 + $1.count }
         pass.fetched = named.crateIDs.count + named.eventIDs.count + named.visits.count + named.steps.count + named.counters.count
-        let report = dedupe.merge(named)
+        let report = Trace.step("userdata.merge", "\(pass.fetched) keys") { dedupe.merge(named) }
         if !report.isEmpty || context.hasChanges { try? context.save() }
         pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
         onPass?(pass)
@@ -161,6 +166,55 @@ struct HistoryObserver {
         guard let identifiers, !identifiers.isEmpty else { return [] }
         let all = Array(identifiers)
         return stride(from: 0, to: all.count, by: 400).map { Array(all[$0..<min($0 + 400, all.count)]) }
+    }
+
+    /// A pass with no place to resume from: dedupe what is in the tables, and
+    /// take up the history from where each store is now.
+    ///
+    /// Reading the history from its start meant reading the cache's too. A
+    /// fetch cannot be limited to one store, the cache writes hundreds of
+    /// times for every write of the listener's, and a new UserData store beside
+    /// a well-used cache (38,569 transactions) held the main thread for 41
+    /// seconds at launch to find 35. A token cannot skip only the cache either:
+    /// a store left out of one returns nothing, and a position before a store's
+    /// oldest transaction is refused as expired.
+    ///
+    /// So the newest transaction of each store is read from its file first;
+    /// then every row already there is merged from the tables; then that is
+    /// the place. Whatever commits after the positions were read is after the
+    /// place, and the next pass reads it. If the files cannot be read -- stores
+    /// in memory -- it falls back to the full pass.
+    private func startFromNow(_ dedupe: UserDataDedupe) -> UserDataDedupe.Report {
+        guard let now = newestPositions() else { return fullPass(dedupe) }
+        if let generation = SyncGeneration.advertised(in: context), SyncGeneration.isNewer(generation) {
+            onPass?(Pass())
+            onNewerGeneration?(generation)
+            return .init()
+        }
+        let report = Trace.step("userdata.merge", "every row") { dedupe.merge(dedupe.everything()) }
+        if !report.isEmpty || context.hasChanges { try? context.save() }
+        var pass = Pass()
+        pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
+        onPass?(pass)
+        store(now)
+        return report
+    }
+
+    /// Each store's newest transaction, from the history table in its file
+    /// (`Z_PK` is the position a token holds for that store). A store with no
+    /// history yet has none; UserData without one is kept from being a place
+    /// by `storedPositions`, so the next pass starts from the tables again --
+    /// cheap, since a store with no history is new. Nil only when no file could
+    /// be read at all: stores in memory.
+    private func newestPositions() -> [String: Int]? {
+        var positions: [String: Int] = [:]
+        for configuration in context.container.configurations {
+            let url = configuration.url
+            guard let store = Self.uuid(of: url),
+                  let newest = SQLiteFiles.integer("SELECT MAX(Z_PK) FROM ATRANSACTION", in: url) else { continue }
+            positions[store] = newest
+        }
+        return positions.isEmpty ? nil : positions
     }
 
     private func fullPass(_ dedupe: UserDataDedupe) -> UserDataDedupe.Report {
