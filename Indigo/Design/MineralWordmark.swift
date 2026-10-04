@@ -70,19 +70,21 @@ enum MineralSheen {
         return (c.0 * edge, c.1 * edge, c.2 * edge)
     }
 
-    /// One tile, `width` by `height` pixels.
-    static func tile(width: Int, height: Int) -> CGImage? {
-        guard width > 0, height > 0,
-              let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+    /// `tiles` tiles side by side, each `width` by `height` pixels, in one
+    /// image: copies in separate layers met at a hairline the eye could see.
+    static func tile(width: Int, height: Int, tiles: Int = 1) -> CGImage? {
+        let total = width * tiles
+        guard width > 0, height > 0, tiles > 0,
+              let context = CGContext(data: nil, width: total, height: height, bitsPerComponent: 8, bytesPerRow: total * 4,
                                       space: CGColorSpaceCreateDeviceRGB(),
                                       bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
               let pixels = context.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
         for y in 0..<height {
             let v = (Double(y) + 0.5) / Double(height)
-            for x in 0..<width {
-                let u = Double(x) / Double(width)
+            for x in 0..<total {
+                let u = Double(x % width) / Double(width)
                 let c = colour(light: light(u: u, v: v), v: v)
-                let i = (y * width + x) * 4
+                let i = (y * total + x) * 4
                 pixels[i] = UInt8(c.red * 255); pixels[i + 1] = UInt8(c.green * 255)
                 pixels[i + 2] = UInt8(c.blue * 255); pixels[i + 3] = 255
             }
@@ -101,7 +103,7 @@ private typealias PlatformView = UIView
 private typealias PlatformRepresentable = UIViewRepresentable
 #endif
 
-/// Two tiles side by side in one layer, slid left by one tile and around again.
+/// Two tiles side by side in one image, slid left by one tile and around again.
 private struct MineralSheenLayer: PlatformRepresentable {
     let moving: Bool
 
@@ -116,6 +118,7 @@ private struct MineralSheenLayer: PlatformRepresentable {
     final class SheenView: PlatformView {
         private let strip = CALayer()
         private var drawnFor: CGSize = .zero
+        private var tileWidth: CGFloat = 0
         var moving = true { didSet { if moving != oldValue { restart() } } }
 
         #if os(macOS)
@@ -150,28 +153,24 @@ private struct MineralSheenLayer: PlatformRepresentable {
             drawnFor = size
             let tileWidth = (size.width * MineralSheen.tileWidthInPlates).rounded(.up)
             let pixelsWide = Int(tileWidth * scale), pixelsHigh = Int((size.height * scale).rounded(.up))
-            guard let tile = MineralSheen.tile(width: pixelsWide, height: pixelsHigh) else { return }
+            guard let image = MineralSheen.tile(width: pixelsWide, height: pixelsHigh, tiles: 2) else { return }
 
             CATransaction.begin()
             CATransaction.setDisableActions(true)
-            strip.sublayers?.forEach { $0.removeFromSuperlayer() }
-            for index in 0..<2 {
-                let copy = CALayer()
-                copy.contents = tile
-                copy.contentsScale = scale
-                copy.frame = CGRect(x: CGFloat(index) * tileWidth, y: 0, width: tileWidth, height: size.height)
-                strip.addSublayer(copy)
-            }
+            strip.contents = image
+            strip.contentsScale = scale
+            strip.contentsGravity = .resize
             strip.anchorPoint = .zero
             strip.bounds = CGRect(x: 0, y: 0, width: tileWidth * 2, height: size.height)
             strip.position = .zero
+            self.tileWidth = tileWidth
             CATransaction.commit()
             restart()
         }
 
         private func restart() {
             strip.removeAnimation(forKey: "drift")
-            guard moving, window != nil, let tileWidth = strip.sublayers?.first?.frame.width, tileWidth > 0 else { return }
+            guard moving, window != nil, tileWidth > 0 else { return }
             let drift = CABasicAnimation(keyPath: "position.x")
             drift.fromValue = 0
             drift.toValue = -tileWidth
