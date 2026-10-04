@@ -121,8 +121,18 @@ static float exploreWave(float2 p, float phase) {
     float wave = exploreWave(p, time * 0.032);
     float field = smoothstep(-0.9, 0.95, wave);
     float glow = 0.22 + field * 0.44 + energy * 0.16;
-    half3 color = mix(half3(0.04, 0.08, 0.045), half3(0.30, 0.47, 0.28), half(field));
-    color *= half(glow);
+
+    // The field turns slowly from green to blue and back, and its light rises
+    // and falls on a cycle of its own. Both periods divide the 4,096 seconds
+    // the caller wraps `time` at, so the wrap is never a jump: hue 256s,
+    // light 128s, a quarter turn apart so the two do not move together.
+    const float turn = 6.2831853;
+    float toBlue = 0.5 - 0.5 * cos(time * turn / 256.0);
+    float light = 1.0 + 0.15 * sin(time * turn / 128.0 + 1.5707963);
+    half3 low = mix(half3(0.04, 0.08, 0.045), half3(0.03, 0.05, 0.10), half(toBlue));
+    half3 high = mix(half3(0.30, 0.47, 0.28), half3(0.26, 0.40, 0.66), half(toBlue));
+    half3 color = mix(low, high, half(field));
+    color *= half(glow * light);
     color += half( (ihash(floor(canvasPosition * 1.5)) - 0.5)
                   * 0.018 * noiseBoost );
     return half4(clamp(color, half3(0), half3(1)), 1);
