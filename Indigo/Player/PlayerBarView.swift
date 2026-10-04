@@ -404,36 +404,22 @@ struct PlayerShaderBackdrop: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var noiseBoost: Float = 1
 
-    private var animating: Bool { player.isPlaying && !player.isBuffering && !reduceMotion }
-
-    /// The frame every paused copy shows. Written only while animating, so it
-    /// is the last frame playback reached — or zero, before anything played.
-    private static var frozenTime: Double = 0
+    /// Whether playback is running, buffering between tracks included:
+    /// `isPlaying` already counts a stream's buffering as playing.
+    private var playing: Bool { player.isPlaying }
+    private var clock: PlayerFieldClock { .shared }
+    private var animating: Bool { clock.isRunning && !reduceMotion }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: !animating)) { timeline in
             GeometryReader { proxy in
                 let frame = proxy.frame(in: .global)
-                // Every instance receives the same clock. Keeping the value
-                // small preserves float precision in the Metal shader.
-                // Track changes briefly enter buffering. Keep sampling the
-                // shared clock during that handoff instead of substituting
-                // zero, which visibly restarted the field for every song.
-                //
-                // Paused, a TimelineView holds whatever date it had when it
-                // was built — and a pinned day header is built lazily, as it
-                // scrolls in, so each one froze on a different frame and sat
-                // visibly offset against the page until playback put every
-                // copy back on the live clock. Paused copies all read the
-                // last moment any copy was animating instead.
-                let sharedTime: Double = {
-                    if reduceMotion { return 0 }
-                    guard animating else { return Self.frozenTime }
-                    let now = timeline.date.timeIntervalSinceReferenceDate
-                        .truncatingRemainder(dividingBy: 4096)
-                    Self.frozenTime = now
-                    return now
-                }()
+                // Every copy reads one clock that moves only while something
+                // plays and carries on from where it stopped; see
+                // `PlayerFieldClock`. A paused TimelineView holds a stale
+                // date, which no longer matters: a stopped clock reads the
+                // same at any date. Kept small for float precision.
+                let sharedTime: Double = reduceMotion ? 0 : clock.time(at: timeline.date)
                 let energy = animating ? player.audioLevel() : 0
                 Rectangle().fill(.black)
                     .colorEffect(ShaderLibrary.playerFlowField(
@@ -444,6 +430,7 @@ struct PlayerShaderBackdrop: View {
                     ))
             }
         }
+        .onChange(of: playing, initial: true) { _, playing in clock.playbackChanged(playing) }
         .accessibilityHidden(true)
         .allowsHitTesting(false)
     }
