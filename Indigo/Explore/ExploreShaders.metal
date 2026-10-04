@@ -87,30 +87,40 @@ static float exploreWave(float2 p, float phase) {
     float wave = exploreWave(p, t * 0.008 * motionSpeed);
     float value = smoothstep(-0.85, 0.85, wave);
 
-    // Two palettes for the same four steps: the field's blues, and a warm one
-    // -- red, orange, yellow -- that morphs in where a slow, broad wave of
-    // warmth rises and drifts across the page. The page opens in its blues;
-    // the warmth fades in over its first ninety seconds, then wanders (about
-    // 3.5 minutes a pass). Where it is neither, the two mix briefly.
+    // Two palettes for the same four steps: the field's blues and a warm one
+    // -- red, orange, yellow. A point is in one or the other, never a blend
+    // of the two: blended colour by colour, blue and red met in purple and
+    // turquoise and orange in grey, and the field went muddy.
+    //
+    // Warmth is decided per bar, so warm and cool sit side by side across the
+    // field's own hard cuts as complements. A bar turning warm does not fade:
+    // a second, slower pattern orders its points, and the warm palette grows
+    // in along that pattern's contours with a crisp edge, and later recedes
+    // the same way. Bars turn at their own times (about 3.5 minutes a cycle),
+    // and none does in the page's first ninety seconds, so For You still
+    // opens in its blues.
     const half3 blue = half3(0.157, 0.392, 0.941);
     const half3 turquoise = half3(0.216, 0.847, 0.816);
     const half3 mint = half3(0.573, 0.957, 0.816);
     const half3 paper = half3(0.949, 0.961, 0.937);
-    const half3 red = half3(0.70, 0.13, 0.10);
-    const half3 orange = half3(0.96, 0.46, 0.13);
-    const half3 yellow = half3(0.98, 0.82, 0.30);
-    const half3 warmPaper = half3(0.97, 0.95, 0.90);
-    float2 broad = place / scale;
-    float warmWave = 0.5 + 0.5 * sin(broad.x * 0.9 + broad.y * 0.35 - time * 0.03);
-    float warmth = smoothstep(0.0, 90.0, time) * smoothstep(0.3, 0.7, warmWave);
-    half w = half(warmth);
-    half3 deep = mix(blue, red, w);
-    half3 midTone = mix(turquoise, orange, w);
-    half3 light = mix(mint, yellow, w);
-    half3 sheet = mix(paper, warmPaper, w);
-    half3 color = mix(deep, midTone, half(smoothstep(0.12, 0.49, value)));
-    color = mix(color, light, half(smoothstep(0.44, 0.68, value)));
-    color = mix(color, sheet, half(smoothstep(0.65, 0.88, value)));
+    const half3 red = half3(0.78, 0.15, 0.11);
+    const half3 orange = half3(0.97, 0.48, 0.12);
+    const half3 yellow = half3(0.99, 0.84, 0.30);
+    const half3 warmPaper = half3(0.98, 0.95, 0.89);
+
+    float barTurn = ihash(float2(strip + 11.3, seed * 0.029)) * 6.2831853;
+    float reach = (0.5 + 0.5 * sin(time * 0.03 + barTurn)) * smoothstep(0.0, 90.0, time);
+    float order = smoothstep(-0.9, 0.9, exploreWave(place / scale * 0.6 + float2(7.1, 3.3), t * 0.004));
+    half warm = half(smoothstep(order - 0.012, order + 0.012, reach * 1.1 - 0.05));
+
+    // Each palette in full; they meet only across the edge's pixel or two,
+    // which keeps it smooth without a muddy band.
+    half s1 = half(smoothstep(0.12, 0.49, value));
+    half s2 = half(smoothstep(0.44, 0.68, value));
+    half s3 = half(smoothstep(0.65, 0.88, value));
+    half3 cool = mix(mix(mix(blue, turquoise, s1), mint, s2), paper, s3);
+    half3 hot = mix(mix(mix(red, orange, s1), yellow, s2), warmPaper, s3);
+    half3 color = mix(cool, hot, warm);
 
     // Hard cuts in the image create the bars; no lines or translucent overlays.
     color *= half(0.98 + lift * 0.04);
