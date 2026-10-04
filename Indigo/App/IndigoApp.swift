@@ -178,13 +178,6 @@ struct IndigoApp: App {
                 .modifier(ScreenCornerSyncButton())
                 #endif
                 .task {
-                    // Gives a row crated before it kept its own snapshot the
-                    // snapshot. Not under test, which runs against the
-                    // listener's real store, and not while that store is
-                    // unopened: it writes the crate.
-                    if !Persistence.isRunningTests, Persistence.userDataWritable {
-                        UserDataDedupe(context: Persistence.container.mainContext).all()
-                    }
                     witness.watch(player)
                     // Keep the picture backlog out of the way while a stream
                     // opens. See `DigStore.holdBackgroundWork`.
@@ -194,6 +187,17 @@ struct IndigoApp: App {
                     // recomputed. A page that opens empty and grows its
                     // headline a second later has loaded twice.
                     dig.restoreExploreOffers()
+                    // Rows for one thing, merged, and counts projected from
+                    // their components: a net under the history observer for
+                    // anything that reached the store without it. After the
+                    // page above is restored, so it never waits for this. Not
+                    // under test, which runs against the listener's real
+                    // store, and not while that store is unopened: it writes.
+                    if !Persistence.isRunningTests, Persistence.userDataWritable {
+                        Trace.step("userdata.launchMerge") {
+                            UserDataDedupe(context: Persistence.container.mainContext).all()
+                        }
+                    }
                     // One-shot repair of rows that stored an artist as their
                     // own label. Off the main actor and off the critical path:
                     // nothing below waits for it, and it finds nothing to do

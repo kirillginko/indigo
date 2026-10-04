@@ -478,47 +478,17 @@ nonisolated struct UserDataDedupe {
     /// Everything, once: ids first, then every group of rows for one thing.
     @discardableResult
     func all() -> Report {
-        var report = Report()
-        report.idsAssigned = assignIDs()
-        if report.idsAssigned > 0 { try? context.save() }
+        // Ids first, and kept, so every row compared below has one.
+        let assigned = assignIDs()
+        if assigned > 0 { try? context.save() }
 
-        // Copies of one row first: same id, one thing. Then rows for one key.
-        for group in Dictionary(
-            grouping: (try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? [], by: \.id
-        ).values where group.count > 1 {
-            report.eventsMerged += mergeEvents(group)
-        }
-        for group in Dictionary(
-            grouping: (try? context.fetch(FetchDescriptor<CrateItem>())) ?? [], by: \.id
-        ).values where group.count > 1 {
-            report.crateMerged += mergeCrate(group)
-        }
-        let crate = (try? context.fetch(FetchDescriptor<CrateItem>())) ?? []
-        for group in Dictionary(grouping: crate.compactMap { item in Self.key(of: item).map { ($0, item) } },
-                                by: { $0.0 }).values where group.count > 1 {
-            report.crateMerged += mergeCrate(group.map(\.1))
-        }
-        // Components before the rows they project, so a merged row is projected
-        // from merged components.
-        let counters = (try? context.fetch(FetchDescriptor<DigCounter>())) ?? []
-        for group in Dictionary(grouping: counters, by: { "\($0.kindRaw)\u{0}\($0.key)" }).values {
-            guard let first = group.first, let kind = first.kind else { continue }
-            report.countersMerged += DigCounters(context: context).mergeCopies(kind, key: first.key)
-        }
-        let visits = (try? context.fetch(FetchDescriptor<DigVisit>())) ?? []
-        for group in Dictionary(grouping: visits, by: \.nodeID).values {
-            report.visitsMerged += group.count > 1 ? mergeVisits(group) : 0
-            if let row = group.first(where: { !$0.isDeleted }) { DigCounters(context: context).project(row) }
-        }
-        let steps = (try? context.fetch(FetchDescriptor<DigStep>())) ?? []
-        for group in Dictionary(grouping: steps, by: \.identity).values {
-            report.stepsMerged += group.count > 1 ? mergeSteps(group) : 0
-            if let row = group.first(where: { !$0.isDeleted }) { DigCounters(context: context).project(row) }
-        }
-        if context.hasChanges || report.countersMerged > 0
-            || report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged > 0 {
-            try? context.save()
-        }
+        // Every thing in the store, with one query per table. This used to
+        // walk each group and look its components up one counter at a time --
+        // a whole-table read per counter, 2,760 of them -- and the launch that
+        // calls it froze the main thread for 1.7s (sampled, 2026-10-03).
+        var report = merge(everything())
+        report.idsAssigned += assigned
+        if context.hasChanges || !report.isEmpty { try? context.save() }
         return report
     }
 
