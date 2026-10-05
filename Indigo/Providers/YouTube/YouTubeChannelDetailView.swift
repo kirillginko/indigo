@@ -360,7 +360,7 @@ private struct ArchivePhonePage: View {
             .padding(.vertical, 12)
         }
         .scrollIndicators(.hidden)
-        .background(PhoneShowPage.rowB)
+        .background(PhoneShowPage.rowGround)
     }
 
     private func episode(_ track: Catalog.EpisodeTrack, in tracks: [Catalog.EpisodeTrack]) -> PhoneEpisode {

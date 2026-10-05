@@ -29,6 +29,7 @@ struct CrateView: View {
     @Environment(CashmereBrowseStore.self) private var cashmereBrowse
     @Environment(LYLBrowseStore.self) private var lylBrowse
     @State private var selectedGenres: Set<String> = []
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         @Bindable var state = appState
@@ -100,20 +101,27 @@ struct CrateView: View {
                                     // press. See `CrateStreamResolver`.
                                     let canPlay = playable != nil || !crate.hasResolvedRows
                                         || item.kind == .broadcast
-                                    CrateRow(
-                                        item: item,
-                                        localArtworkKey: localTrack?.artworkKey,
-                                        genres: itemGenres(item),
-                                        canPlay: canPlay,
-                                        isCurrent: current,
-                                        isPlaying: current && player.isPlaying,
-                                        digDestination: crate.digDestinations[item.id],
-                                        open: { open(item) },
-                                        play: { play(item) },
-                                        dig: { page in appState.open(page) },
-                                        remove: { crate.remove(item) }
-                                    )
-                                    Rule()
+                                    if isPhone {
+                                        PhoneEpisodeRow(episode: phoneRow(
+                                            item, localArtworkKey: localTrack?.artworkKey,
+                                            canPlay: canPlay, isCurrent: current
+                                        ))
+                                    } else {
+                                        CrateRow(
+                                            item: item,
+                                            localArtworkKey: localTrack?.artworkKey,
+                                            genres: itemGenres(item),
+                                            canPlay: canPlay,
+                                            isCurrent: current,
+                                            isPlaying: current && player.isPlaying,
+                                            digDestination: crate.digDestinations[item.id],
+                                            open: { open(item) },
+                                            play: { play(item) },
+                                            dig: { page in appState.open(page) },
+                                            remove: { crate.remove(item) }
+                                        )
+                                        Rule()
+                                    }
                                 }
                             } header: {
                                 dayHeader(day)
@@ -140,6 +148,27 @@ struct CrateView: View {
         .task {
             await KeptShow.fillMissingArtwork(crate: crate, stations: stations)
         }
+    }
+
+    /// A kept thing as the phone's show pages list an episode: the crate's
+    /// tick takes it out, and a long press digs from it.
+    private func phoneRow(_ item: CrateItem, localArtworkKey: String?, canPlay: Bool, isCurrent: Bool) -> PhoneEpisode {
+        PhoneEpisode(
+            id: String(describing: item.id),
+            title: item.displayTitle,
+            subtitle: item.displaySubtitle,
+            genres: itemGenres(item),
+            imageURL: item.artworkURL,
+            localArtworkKey: localArtworkKey,
+            isPlayable: canPlay,
+            fadesUnplayable: false,
+            isCurrent: isCurrent,
+            isPlaying: isCurrent && player.isPlaying,
+            play: { play(item) },
+            open: { open(item) },
+            crate: AnyView(CrateGlyphButton(isCrated: true) { crate.remove(item) }),
+            dig: crate.digDestinations[item.id].map { page in { appState.open(page) } }
+        )
     }
 
     private func dayHeader(_ day: CrateService.Day) -> some View {

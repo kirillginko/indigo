@@ -30,13 +30,20 @@ struct PhoneEpisode: Identifiable {
     var date: Date? = nil
     var genres: [String] = []
     var imageURL: URL? = nil
+    /// A picture kept on this device, for a track from the library.
+    var localArtworkKey: String? = nil
     var isPlayable = true
+    /// Whether a row that cannot play is drawn faded: an episode without
+    /// audio, yes; a kept artist or label, no.
+    var fadesUnplayable = true
     var isCurrent = false
     var isPlaying = false
     let play: () -> Void
     let open: () -> Void
     /// The station's own crate button for it, compact.
     var crate: AnyView? = nil
+    /// Where to dig from it, offered on a long press.
+    var dig: (() -> Void)? = nil
 }
 
 struct PhoneShowPage: View {
@@ -63,10 +70,9 @@ struct PhoneShowPage: View {
     /// a ground and the show's name.
     @State private var scrolledPast = false
 
-    /// Rows alternate lighter and darker, both see-through: the page's
-    /// moving ground shows under the list.
-    static let rowA = Color.white.opacity(0.06)
-    static let rowB = Color.black.opacity(0.28)
+    /// The rows' one ground, see-through: the page's moving ground shows
+    /// under the list.
+    static let rowGround = Color.black.opacity(0.28)
 
     var body: some View {
         ScrollView {
@@ -151,12 +157,11 @@ struct PhoneShowPage: View {
                 .foregroundStyle(.white.opacity(0.6))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(20)
-                .background(Self.rowA)
+                .background(Self.rowGround)
         } else {
             LazyVStack(spacing: 0) {
-                ForEach(Array(episodes.enumerated()), id: \.element.id) { index, episode in
+                ForEach(episodes) { episode in
                     PhoneEpisodeRow(episode: episode)
-                        .background(index.isMultiple(of: 2) ? Self.rowA : Self.rowB)
                 }
                 if let loadMore {
                     ProgressView()
@@ -201,8 +206,9 @@ struct PhoneShowPage: View {
     }
 }
 
-/// An episode's row: the picture with a play box on it, the title and the
-/// date, who was on, the genres.
+/// An episode's row: the picture; the title and who was on in boxes, the
+/// date, the genres; play and crate on the right. One dark ground, a line
+/// under each. The crate page's rows are these too.
 struct PhoneEpisodeRow: View {
     let episode: PhoneEpisode
 
@@ -216,16 +222,16 @@ struct PhoneEpisodeRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            ArtworkView(remoteURL: episode.imageURL, side: Self.side, glyphScale: 0.3)
+            ArtworkView(localKey: episode.localArtworkKey, remoteURL: episode.imageURL, side: Self.side, glyphScale: 0.3)
                 .frame(width: Self.side, height: Self.side)
                 .clipped()
 
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(episode.title)
-                        .font(Typeface.mono(14))
-                        .foregroundStyle(episode.isCurrent ? Chip.green.mix(with: .white, by: 0.35) : .white.opacity(0.92))
-                        .lineLimit(2)
+                HStack(alignment: .top, spacing: 8) {
+                    // Playing, the title takes the wordmark's sheen.
+                    Chip(text: episode.title, tone: episode.isCurrent ? .sheen : .plain, size: 13)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     if let date = episode.date {
                         Text(date.formatted(Self.dateFormat))
@@ -233,12 +239,11 @@ struct PhoneEpisodeRow: View {
                             .foregroundStyle(.white.opacity(0.6))
                             .monospacedDigit()
                             .fixedSize()
+                            .padding(.top, 6)
                     }
                 }
                 if let subtitle = episode.subtitle, !subtitle.isEmpty {
-                    Text(subtitle)
-                        .font(Typeface.mono(13))
-                        .foregroundStyle(.white.opacity(0.6))
+                    Chip(text: subtitle, tone: .lead, size: 12)
                         .lineLimit(1)
                 }
                 Spacer(minLength: 6)
@@ -271,9 +276,18 @@ struct PhoneEpisodeRow: View {
             .padding(.horizontal, 10)
             .frame(minHeight: Self.side)
         }
-        .opacity(episode.isPlayable ? 1 : 0.55)
+        .opacity(episode.isPlayable || !episode.fadesUnplayable ? 1 : 0.55)
+        .background(PhoneShowPage.rowGround)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(.white.opacity(0.1)).frame(height: 1)
+        }
         .contentShape(Rectangle())
         .onTapGesture(perform: episode.open)
+        .contextMenu {
+            if let dig = episode.dig {
+                Button("Dig", systemImage: "arrow.right", action: dig)
+            }
+        }
         .accessibilityElement(children: .contain)
     }
 
