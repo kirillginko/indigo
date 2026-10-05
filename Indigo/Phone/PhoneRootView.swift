@@ -12,14 +12,16 @@
 //  for the player and tabs: pages are inset above them, and while the
 //  keyboard is up they step aside, so search is never typed under a tab bar.
 //
-//  Three layers, in one view: the page; the full player, over it when open;
-//  and the web player that archived episodes and uploads play through. There
-//  is one web view, and taken out of the window WebKit suspends it, so it is
+//  Layers, in one view: the page; the full player, over it when open; and
+//  the web player that archived episodes and uploads play through. There is
+//  one web view, and taken out of the window WebKit suspends it, so it is
 //  never moved anywhere else -- only resized, placed and stacked. Parked, it
-//  sits under the page's opaque ground at 356x200, the smallest a YouTube
-//  player will play at (at 320x180 uploads would not play at all). With the
-//  video on, it sits over the full player, in the artwork's place. Close the
-//  player and it goes back under the page, still playing.
+//  sits under the page's opaque ground, as wide as the screen at 16:9:
+//  YouTube picks its stream for the player's size (it would not play at all
+//  under 200 points tall), so parked small an upload played, and maximised
+//  it showed, at its lowest quality. Maximised from the full player, it is
+//  laid over everything, the whole screen, with one button back to the
+//  thumbnail; it plays throughout.
 //
 
 #if os(iOS)
@@ -29,39 +31,47 @@ import UIKit
 struct PhoneRootView: View {
     @Environment(AppState.self) private var appState
     @Environment(PlaybackCoordinator.self) private var player
-    @AppStorage("phone.showsVideo") private var showsVideo = true
+    /// The video over the whole screen.
+    @State private var videoFullScreen = false
     @State private var keyboardUp = false
     @State private var showsNowPlaying = false
     @State private var shellHeight: CGFloat = 0
-    /// Where the full player keeps its artwork, in this view's space.
-    @State private var videoFrame: CGRect = .zero
     @State private var opened = false
     /// The window's size, for parking the web player in its corner. Measured
     /// rather than read from a GeometryReader: inside one, the full player's
     /// ground could not reach under the status bar and the home indicator.
     @State private var size: CGSize = .zero
 
-    private static let space = PlayerVideoFrame.space
-    private static let parked = CGSize(width: 356, height: 200)
-
     private var videoUp: Bool {
-        showsNowPlaying && showsVideo && player.embedProvider == .youtube && videoFrame.width > 0
+        videoFullScreen && player.embedProvider == .youtube
     }
 
     var body: some View {
         ZStack {
+            if videoUp {
+                Color.black.ignoresSafeArea()
+                    .zIndex(3)
+            }
             embedLayer(in: size)
-                .zIndex(videoUp ? 3 : 0)
+                .zIndex(videoUp ? 4 : 0)
             page
                 .zIndex(1)
             if showsNowPlaying {
-                PhoneNowPlayingView(showsVideo: $showsVideo) { close() }
-                    .onPreferenceChange(PlayerVideoFrame.Key.self) { videoFrame = $0 }
+                PhoneNowPlayingView(maximize: { videoFullScreen = true }) { close() }
                     .transition(.move(edge: .bottom))
                     .zIndex(2)
             }
+            if videoUp {
+                minimizeButton
+                    .zIndex(5)
+            }
         }
-        .coordinateSpace(name: Self.space)
+        .animation(.easeInOut(duration: 0.25), value: videoUp)
+        // Nothing left to show full screen when the upload ends or something
+        // else plays.
+        .onChange(of: player.embedProvider) { _, provider in
+            if provider != .youtube { videoFullScreen = false }
+        }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
         .modifier(RootChrome(bottomInset: keyboardUp || showsNowPlaying ? 0 : shellHeight, hostsEmbedPlayer: false))
         // The page's dark ground to the screen's edges, under the status bar
@@ -99,16 +109,39 @@ struct PhoneRootView: View {
             .background { IndigoGlassBackground.content.ignoresSafeArea() }
     }
 
-    /// The one web view: parked under the page, or over the full player.
+    /// The one web view: parked under the page, or the whole screen.
     private func embedLayer(in size: CGSize) -> some View {
-        EmbedPlayerSurface(engine: player.embed)
-            .frame(width: videoUp ? videoFrame.width : Self.parked.width,
-                   height: videoUp ? videoFrame.height : Self.parked.height)
+        let parked = CGSize(width: max(size.width, 356), height: max(size.width, 356) * 9 / 16)
+        return EmbedPlayerSurface(engine: player.embed)
+            .frame(width: videoUp ? size.width : parked.width,
+                   height: videoUp ? size.height : parked.height)
             .position(videoUp
-                      ? CGPoint(x: videoFrame.midX, y: videoFrame.midY)
-                      : CGPoint(x: size.width - Self.parked.width / 2, y: size.height - Self.parked.height / 2))
+                      ? CGPoint(x: size.width / 2, y: size.height / 2)
+                      : CGPoint(x: size.width / 2, y: size.height - parked.height / 2))
             .allowsHitTesting(false)
             .accessibilityHidden(!videoUp)
+    }
+
+    /// Back to the thumbnail; the video plays on. Top left, where the full
+    /// player's close button is (the top right is the Debug sync button's).
+    private var minimizeButton: some View {
+        VStack {
+            HStack {
+                Button { videoFullScreen = false } label: {
+                    Image(systemName: "arrow.down.right.and.arrow.up.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Minimise the video")
+                Spacer()
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
     }
 
     private func close() {

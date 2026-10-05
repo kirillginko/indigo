@@ -190,26 +190,13 @@ enum NowPlayingLines {
     }
 }
 
-/// Where the full player keeps its artwork, so the phone's one web player can
-/// be laid over it when the video is on (`PhoneRootView`).
-enum PlayerVideoFrame {
-    static let space = "phone.root"
-
-    struct Key: PreferenceKey {
-        static let defaultValue: CGRect = .zero
-        static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-            let next = nextValue()
-            if next != .zero { value = next }
-        }
-    }
-}
-
-/// The full player, the whole screen: the picture, square, or the video in its
-/// place; what is playing in IDA's boxes; the seek bar; the transport -- over
-/// the player's moving field. Closed with its button or a swipe down; closed,
+/// The full player, the whole screen: the picture, square -- for an upload,
+/// its thumbnail, with a button in the corner to watch it full screen; what
+/// is playing in IDA's boxes; the seek bar; the transport -- over the
+/// player's moving field. Closed with its button or a swipe down; closed,
 /// whatever plays goes on playing.
 struct PhoneNowPlayingView: View {
-    @Binding var showsVideo: Bool
+    var maximize: () -> Void = {}
     var close: () -> Void = {}
     @Environment(PlaybackCoordinator.self) private var player
     @State private var drag: CGFloat = 0
@@ -225,20 +212,16 @@ struct PhoneNowPlayingView: View {
                         picture(item, show)
                         VStack(spacing: 10) {
                             ChipFlow {
-                                Chip(text: NowPlayingSummary.sourceLabel(for: item), tone: .lead, size: 13, uppercase: true)
+                                // An upload's source says nothing the
+                                // thumbnail does not.
+                                if !isVideo {
+                                    Chip(text: NowPlayingSummary.sourceLabel(for: item), tone: .lead, size: 13, uppercase: true)
+                                }
                                 Chip(text: NowPlayingLines.primary(item, show), size: 18)
                             }
                             let secondary = NowPlayingLines.secondary(item, show)
                             if !secondary.isEmpty {
                                 ChipFlow { Chip(text: secondary, size: 13) }
-                            }
-                            if isVideo {
-                                Button { showsVideo.toggle() } label: {
-                                    Chip(text: showsVideo ? "Video on" : "Video off",
-                                         tone: showsVideo ? .sheen : .plain, size: 13, uppercase: true)
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityLabel(showsVideo ? "Hide the video" : "Show the video")
                             }
                         }
                         .padding(.horizontal, 20)
@@ -291,31 +274,29 @@ struct PhoneNowPlayingView: View {
         )
     }
 
-    /// The artwork, square -- or, with the video on, a 16:9 space the video is
-    /// laid over, reported upwards so the web player can find it.
-    @ViewBuilder
+    /// The artwork, square; for an upload its thumbnail, with the way to
+    /// watch it full screen in the corner.
     private func picture(_ item: MediaItem, _ show: RadioShow?) -> some View {
-        if isVideo && showsVideo {
-            Color.black
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .padding(.horizontal, 12)
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear.preference(
-                            key: PlayerVideoFrame.Key.self,
-                            value: proxy.frame(in: .named(PlayerVideoFrame.space)).insetBy(dx: 12, dy: 0)
-                        )
-                    }
+        ArtworkView(
+            localKey: item.artworkKey,
+            remoteURL: show?.artworkURL ?? item.remoteArtworkURL,
+            side: 300,
+            glyphScale: 0.3,
+            markURL: StationMark.logoURL(for: item.sourceID)
+        )
+        .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
+        .overlay(alignment: .topTrailing) {
+            if isVideo {
+                Button(action: maximize) {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                        .font(.system(size: 15, weight: .semibold))
+                        .frame(width: 40, height: 40)
+                        .background(.ultraThinMaterial, in: Circle())
                 }
-        } else {
-            ArtworkView(
-                localKey: item.artworkKey,
-                remoteURL: show?.artworkURL ?? item.remoteArtworkURL,
-                side: 300,
-                glyphScale: 0.3,
-                markURL: StationMark.logoURL(for: item.sourceID)
-            )
-            .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
+                .buttonStyle(.plain)
+                .padding(8)
+                .accessibilityLabel("Watch the video full screen")
+            }
         }
     }
 

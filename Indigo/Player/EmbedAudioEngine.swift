@@ -515,6 +515,9 @@ extension EmbedAudioEngine {
               playerVars: {
                 autoplay: autoplay ? 1 : 0, controls: 0, disablekb: 1,
                 modestbranding: 1, rel: 0, playsinline: 1, fs: 0,
+                // Unofficial, and YouTube may ignore it: ask for 720p rather
+                // than leave the first stream to the player's size.
+                vq: 'hd720',
                 enablejsapi: 1, origin: window.location.origin
               },
               events: {
