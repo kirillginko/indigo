@@ -53,9 +53,10 @@ struct PhoneRootView: View {
                 opened = true
                 appState.select(.live)
             }
-            .sheet(isPresented: $showsNowPlaying) {
-                PhoneNowPlayingView()
-                    .presentationDragIndicator(.visible)
+            // Full screen, top to bottom -- a sheet stops short of the top.
+            // Closed with its button or a swipe down.
+            .fullScreenCover(isPresented: $showsNowPlaying) {
+                PhoneNowPlayingView { showsNowPlaying = false }
                     .environment(\.colorScheme, .dark)
             }
     }

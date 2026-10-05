@@ -61,7 +61,7 @@ struct PhoneForYouView: View {
                             Group {
                                 switch slide {
                                 case .cover:
-                                    PhoneForYouCover(insets: insets, hasSuggestions: !suggestions.isEmpty)
+                                    PhoneForYouCover(entries: entries, playable: playable, insets: insets)
                                 case .suggestion(let suggestion):
                                     PhoneForYouSlide(
                                         suggestion: suggestion,
@@ -146,7 +146,7 @@ private struct PhoneForYouSlide: View {
                     if let picture {
                         ArtworkView(remoteURL: picture, side: max(proxy.size.width, proxy.size.height), glyphScale: 0.3)
                     } else {
-                        Image("MineralGround").resizable().scaledToFill()
+                        PlayerShaderBackdrop()
                     }
                 }
                 .frame(width: proxy.size.width, height: proxy.size.height)
@@ -235,37 +235,122 @@ private struct PhoneForYouSlide: View {
     }
 }
 
-/// The first screen of For You: its moving field, full frame, and the way in.
+/// The first screen of For You: its moving field, full frame, and two rows
+/// of square cards over it to start listening from -- every station, played
+/// with a tap, and the archives, opened with one. The suggestions are swiped
+/// up from here.
 private struct PhoneForYouCover: View {
+    let entries: [StationEntry]
+    let playable: (StationEntry) -> MediaItem?
     let insets: EdgeInsets
-    let hasSuggestions: Bool
+
+    @Environment(AppState.self) private var appState
+    @Environment(PlaybackCoordinator.self) private var player
+    @Environment(YouTubeChannelStore.self) private var archives
+
+    private static let card: CGFloat = 132
 
     var body: some View {
         GeometryReader { proxy in
             ZStack {
                 ExploreShaderField(seed: 0, size: proxy.size)
-                LinearGradient(colors: [.clear, .black.opacity(0.55)], startPoint: .center, endPoint: .bottom)
-                VStack(spacing: 12) {
-                    Spacer()
-                    Text("For You")
-                        .font(.system(size: 44, weight: .bold))
-                    Text(hasSuggestions
-                         ? "Artists and shows, from what you keep"
-                         : "Start with what the stations have on now")
-                        .font(Typeface.mono(13))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
-                    Spacer()
-                    VStack(spacing: 4) {
-                        Image(systemName: "chevron.up")
-                            .font(.system(size: 18, weight: .semibold))
-                        Text("SWIPE UP").microLabel(2, size: 10)
+                VStack(alignment: .leading, spacing: 22) {
+                    Spacer(minLength: 0)
+                    row("Radio") {
+                        ForEach(entries) { entry in
+                            stationCard(entry)
+                        }
                     }
-                    .padding(.bottom, insets.bottom + 26)
+                    if !archives.channels.isEmpty {
+                        row("Archives") {
+                            ForEach(archives.channels) { channel in
+                                archiveCard(channel)
+                            }
+                        }
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 18, weight: .semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, insets.bottom + 22)
+                        .accessibilityHidden(true)
                 }
+                .padding(.top, insets.top)
                 .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.35), radius: 10)
             }
         }
+        .task { await archives.loadChannelsIfNeeded() }
+    }
+
+    private func row<Cards: View>(_ title: String, @ViewBuilder cards: () -> Cards) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title.uppercased())
+                .microLabel(2, size: 10.5)
+                .padding(.horizontal, 18)
+                .shadow(color: .black.opacity(0.4), radius: 6)
+            // As tall as a card: a horizontal scroll view takes every point
+            // of height it is offered, which pushed its title to the top.
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 10) { cards() }
+                    .padding(.horizontal, 18)
+            }
+            .scrollIndicators(.hidden)
+            .frame(height: Self.card)
+        }
+    }
+
+    private func stationCard(_ entry: StationEntry) -> some View {
+        let item = playable(entry)
+        let playing = item.map { player.isCurrent($0.id) && player.isPlaying } ?? false
+        return Button {
+            guard let item else { return }
+            if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item) }
+        } label: {
+            LiveShowReader(providerID: entry.station.providerID, stationID: entry.station.id) { show in
+                card(
+                    picture: show?.artworkURL,
+                    mark: StationMark.logoURL(for: entry.station.providerID),
+                    title: entry.station.name,
+                    playing: playing
+                )
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(playing ? "Pause \(entry.station.name)" : "Play \(entry.station.name)")
+    }
+
+    private func archiveCard(_ channel: Catalog.RadioShow) -> some View {
+        Button { appState.open(.youtubeChannel(id: channel.id)) } label: {
+            card(
+                picture: channel.imageURL.flatMap(URL.init(string:)),
+                mark: nil,
+                title: channel.title ?? "Archive",
+                playing: false
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Open \(channel.title ?? "archive")")
+    }
+
+    private func card(picture: URL?, mark: URL?, title: String, playing: Bool) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            ArtworkView(remoteURL: picture, side: Self.card, glyphScale: 0.3, markURL: mark)
+            LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .center, endPoint: .bottom)
+            HStack(spacing: 5) {
+                if playing {
+                    Image(systemName: "speaker.wave.2.fill").font(.system(size: 10, weight: .semibold))
+                }
+                Text(title)
+                    .font(Typeface.mono(11, weight: .medium))
+                    .lineLimit(1)
+            }
+            .padding(8)
+        }
+        .frame(width: Self.card, height: Self.card)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(playing ? .white : .white.opacity(0.14), lineWidth: playing ? 2 : 1)
+        )
     }
 }

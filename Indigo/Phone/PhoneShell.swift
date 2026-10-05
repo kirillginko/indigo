@@ -186,7 +186,9 @@ enum NowPlayingLines {
 /// The full player: the picture large, the two lines, and the transport, over
 /// the player's moving field.
 struct PhoneNowPlayingView: View {
+    var close: () -> Void = {}
     @Environment(PlaybackCoordinator.self) private var player
+    @State private var drag: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -232,8 +234,33 @@ struct PhoneNowPlayingView: View {
                 Text("Nothing playing")
                     .font(Typeface.mono(13))
             }
+            VStack {
+                Button(action: close) {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 18, weight: .semibold))
+                        .frame(width: 46, height: 46)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close the player")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                Spacer()
+            }
         }
         .foregroundStyle(.white)
+        .offset(y: drag)
+        .gesture(
+            DragGesture()
+                .onChanged { drag = max(0, $0.translation.height) }
+                .onEnded { value in
+                    if value.translation.height > 140 || value.predictedEndTranslation.height > 320 {
+                        close()
+                    } else {
+                        withAnimation(.spring(duration: 0.3)) { drag = 0 }
+                    }
+                }
+        )
     }
 
     private func transportButton(_ symbol: String, label: String, size: CGFloat, action: @escaping () -> Void) -> some View {

@@ -98,10 +98,10 @@ struct PhoneLiveSlide: View {
             ArtworkView(remoteURL: artwork, side: side, glyphScale: 0.3,
                         markURL: StationMark.logoURL(for: entry.station.providerID))
         } else {
-            // Nothing published for what is on: the wordmark's still green,
+            // Nothing published for what is on: the player's moving field,
             // with the station's mark on it.
             ZStack {
-                Image("MineralGround").resizable().scaledToFill()
+                PlayerShaderBackdrop()
                 ArtworkView(
                     side: 120, glyphScale: 0.3,
                     markURL: StationMark.logoURL(for: entry.station.providerID),
