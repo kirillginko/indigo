@@ -61,6 +61,12 @@ nonisolated enum Route: Hashable {
     case crate
     case dig
     case youtubeChannels
+    /// The phone's For You tab: suggestions, one at a time.
+    case forYou
+    /// The phone's Live tab: every station, one at a time.
+    case live
+    /// The phone's Shows tab: every station's shows, and the archives.
+    case shows
 
     var sectionTitle: String {
         switch self {
@@ -113,6 +119,9 @@ nonisolated enum Route: Hashable {
         case .crate: "Crate"
         case .dig: "Dig"
         case .youtubeChannels: "Archives"
+        case .forYou: "For You"
+        case .live: "Live"
+        case .shows: "Shows"
         }
     }
 }

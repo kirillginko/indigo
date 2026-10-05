@@ -87,6 +87,12 @@ final class EmbedAudioEngine: NSObject {
 
         let configuration = WKWebViewConfiguration()
         configuration.mediaTypesRequiringUserActionForPlayback = []
+        #if os(iOS)
+        // An iPhone plays web video full screen unless the web view allows it
+        // inline, whatever the page asks (`playsinline`): a YouTube upload
+        // took over the screen, and closing it stopped the music.
+        configuration.allowsInlineMediaPlayback = true
+        #endif
         configuration.userContentController.add(self, name: Self.bridgeName)
         #if os(macOS)
         configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
@@ -509,6 +515,9 @@ extension EmbedAudioEngine {
               playerVars: {
                 autoplay: autoplay ? 1 : 0, controls: 0, disablekb: 1,
                 modestbranding: 1, rel: 0, playsinline: 1, fs: 0,
+                // Unofficial, and YouTube may ignore it: ask for 720p rather
+                // than leave the first stream to the player's size.
+                vq: 'hd720',
                 enablejsapi: 1, origin: window.location.origin
               },
               events: {

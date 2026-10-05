@@ -169,17 +169,16 @@ struct SyncDiagnosticsView: View {
     }
 }
 
-/// Fits the interface to the screen and puts the panel's button in the
-/// screen's corner. On the iPhone the interface is not laid out yet and can be
-/// wider than the screen; a button attached to it ended up off the edge.
+/// Puts the panel's button in the screen's corner (Debug builds on iOS).
+///
+/// It used to fit the interface to the screen as well -- a GeometryReader and
+/// a clip -- because the iPhone was given the Mac's layout, wider than the
+/// screen. The phone has its own layout now, and the clip held every page to
+/// the safe area: a full-screen slide or player stopped short of the status
+/// bar and the home indicator, in Debug builds only.
 struct ScreenCornerSyncButton: ViewModifier {
     func body(content: Content) -> some View {
-        GeometryReader { screen in
-            content
-                .frame(width: screen.size.width, height: screen.size.height)
-                .clipped()
-                .overlay(alignment: .topTrailing) { SyncDiagnosticsButton() }
-        }
+        content.overlay(alignment: .topTrailing) { SyncDiagnosticsButton() }
     }
 }
 

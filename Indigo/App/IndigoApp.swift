@@ -122,7 +122,7 @@ struct IndigoApp: App {
 
     var body: some Scene {
         WindowGroup(id: IndigoWindow.main) {
-            RootView()
+            AdaptiveRootView()
                 .environment(appState)
                 .environment(player)
                 .environment(nts)

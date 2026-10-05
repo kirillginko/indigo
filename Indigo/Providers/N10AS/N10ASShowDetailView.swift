@@ -22,36 +22,43 @@ struct N10ASShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(N10ASBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let show = browse.show(slug: slug)
         let episodes = browse.episodes(ofShow: slug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: show?.title ?? "Show",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(show, episodes: episodes)
-            ) {
-                if let first = episodes.first {
-                    playButton(first, queue: episodes)
+        Group {
+            if isPhone {
+                phonePage(show, episodes: episodes)
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: show?.title ?? "Show",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(show, episodes: episodes)
+                ) {
+                    if let first = episodes.first {
+                        playButton(first, queue: episodes)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let show {
+                    content(show, episodes: episodes)
+                } else if browse.isLoadingShow(slug) || browse.showsPhase.isLoading {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.showError(slug) ?? "n10.as no longer publishes this show."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let show {
-                content(show, episodes: episodes)
-            } else if browse.isLoadingShow(slug) || browse.showsPhase.isLoading {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.showError(slug) ?? "n10.as no longer publishes this show."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: slug) { await browse.loadShowIfNeeded(slug: slug) }
@@ -235,5 +242,40 @@ struct N10ASShowDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension N10ASShowDetailView {
+    fileprivate func phonePage(_ show: N10ASShow?, episodes: [N10ASEpisode]) -> some View {
+        PhoneShowPage(
+            title: show?.title ?? "Show",
+            station: "n10.as",
+            imageURL: show?.imageURL ?? episodes.first?.artworkURL,
+            markURL: StationMark.logoURL(for: N10ASProvider.providerID),
+            genres: show?.genres ?? [],
+            summary: show?.summary,
+            episodes: episodes.map { phoneEpisode($0, in: episodes) },
+            isLoading: show == nil || browse.isLoadingShow(slug),
+            emptyMessage: browse.showError(slug) ?? "Nothing archived for this show."
+        )
+    }
+
+    private func phoneEpisode(_ episode: N10ASEpisode, in episodes: [N10ASEpisode]) -> PhoneEpisode {
+        PhoneEpisode(
+            id: episode.id,
+            title: episode.title,
+            subtitle: episode.guest,
+            date: episode.broadcastAt,
+            genres: episode.genres,
+            imageURL: episode.artworkURL,
+            isCurrent: N10ASPlayback.isCurrent(episode, in: player),
+            isPlaying: N10ASPlayback.isPlaying(episode, in: player),
+            play: { N10ASPlayback.toggle(episode, within: episodes, using: player) },
+            open: {
+                browse.remember([episode])
+                appState.open(.n10asEpisode(id: episode.id))
+            },
+            crate: AnyView(N10ASCrateButton(episode: episode, compact: true))
+        )
     }
 }

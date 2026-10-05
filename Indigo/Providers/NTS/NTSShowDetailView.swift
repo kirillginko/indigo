@@ -12,11 +12,73 @@ struct NTSShowDetailView: View {
 
     @Environment(AppState.self) private var appState
     @Environment(NTSBrowseStore.self) private var browse
+    @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let episodes = browse.episodes(of: alias)
         let show = browse.knownShow(alias)
 
+        if isPhone {
+            phonePage(show, episodes: episodes)
+                .task(id: alias) { await browse.loadEpisodesIfNeeded(of: alias) }
+        } else {
+            page(show, episodes: episodes)
+        }
+    }
+
+    private func phonePage(_ show: NTSShowSummary?, episodes: NTSBrowseStore.Feed<NTSEpisodeSummary>) -> some View {
+        var loadMore: (@MainActor () async -> Void)?
+        if episodes.hasMore {
+            loadMore = { await browse.loadMoreEpisodes(of: alias) }
+        }
+        return PhoneShowPage(
+            title: show?.name ?? displayAlias,
+            station: show?.location ?? "NTS",
+            imageURL: show?.artworkURL ?? episodes.items.first?.artworkURL,
+            markURL: StationMark.logoURL(for: NTSProvider.providerID),
+            genres: show?.genres ?? [],
+            summary: show?.summary,
+            episodes: episodes.items.map(phoneEpisode),
+            isLoading: episodes.isLoading,
+            emptyMessage: episodes.error ?? "NTS isn't listing any episodes for this show.",
+            loadMore: loadMore
+        )
+    }
+
+    private func phoneEpisode(_ episode: NTSEpisodeSummary) -> PhoneEpisode {
+        let isCurrent = player.isCurrent("nts.episode.\(episode.id)")
+        return PhoneEpisode(
+            id: episode.id,
+            title: episode.name,
+            date: episode.broadcastAt,
+            genres: episode.genres,
+            imageURL: episode.artworkURL,
+            isCurrent: isCurrent,
+            isPlaying: isCurrent && player.isPlaying,
+            play: { play(episode, isCurrent: isCurrent) },
+            open: { appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias)) }
+        )
+    }
+
+    /// The list holds no audio: the episode is read first, as its own page
+    /// would, then played.
+    private func play(_ episode: NTSEpisodeSummary, isCurrent: Bool) {
+        if isCurrent {
+            player.toggle()
+            return
+        }
+        Task {
+            await browse.loadDetailIfNeeded(show: episode.showAlias, episode: episode.episodeAlias)
+            if let item = browse.detail(show: episode.showAlias, episode: episode.episodeAlias)?.mediaItem() {
+                player.playEpisode(item)
+            } else {
+                appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias))
+            }
+        }
+    }
+
+    private func page(_ show: NTSShowSummary?, episodes: NTSBrowseStore.Feed<NTSEpisodeSummary>) -> some View {
         VStack(spacing: 0) {
             PageHeader(
                 title: show?.name ?? displayAlias,

@@ -14,37 +14,44 @@ struct DublabDJDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(DublabBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let dj = browse.dj(slug: slug)
         let run = browse.broadcasts(byDJ: slug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: dj?.name ?? "DJ",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(dj, run: run)
-            ) {
-                if let first = run.first(where: \.isPlayable) {
-                    playButton(first, queue: run)
+        Group {
+            if isPhone {
+                phonePage(dj, run: run)
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: dj?.name ?? "DJ",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(dj, run: run)
+                ) {
+                    if let first = run.first(where: \.isPlayable) {
+                        playButton(first, queue: run)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let dj {
+                    content(dj, run: run)
+                } else if browse.isLoadingDJ(slug) || browse.djsPhase.isLoading {
+                    LoadingPane(label: "Loading DJ")
+                } else {
+                    EmptyStateView(
+                        headline: "DJ unavailable",
+                        message: browse.djError(slug)
+                            ?? "dublab is no longer publishing a page for this DJ."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let dj {
-                content(dj, run: run)
-            } else if browse.isLoadingDJ(slug) || browse.djsPhase.isLoading {
-                LoadingPane(label: "Loading DJ")
-            } else {
-                EmptyStateView(
-                    headline: "DJ unavailable",
-                    message: browse.djError(slug)
-                        ?? "dublab is no longer publishing a page for this DJ."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: slug) {
@@ -177,5 +184,41 @@ struct DublabDJDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension DublabDJDetailView {
+    fileprivate func phonePage(_ dj: DublabDJ?, run: [DublabBroadcast]) -> some View {
+        PhoneShowPage(
+            title: dj?.name ?? "DJ",
+            station: "dublab",
+            imageURL: dj?.artworkURL ?? run.first?.artworkURL,
+            markURL: StationMark.logoURL(for: DublabProvider.providerID),
+            genres: dj?.shows.map(\.title) ?? [],
+            summary: dj?.biography,
+            episodes: run.map { phoneEpisode($0, in: run) },
+            isLoading: dj == nil || browse.isLoadingDJ(slug),
+            emptyMessage: browse.djError(slug) ?? "dublab hasn't archived any broadcasts by this DJ."
+        )
+    }
+
+    private func phoneEpisode(_ broadcast: DublabBroadcast, in run: [DublabBroadcast]) -> PhoneEpisode {
+        PhoneEpisode(
+            id: broadcast.id,
+            title: broadcast.showName ?? broadcast.title,
+            subtitle: broadcast.showName == nil ? nil : broadcast.title,
+            date: broadcast.airedAt,
+            genres: broadcast.genreNames,
+            imageURL: broadcast.artworkURL,
+            isPlayable: broadcast.isPlayable,
+            isCurrent: DublabPlayback.isCurrent(broadcast, in: player),
+            isPlaying: DublabPlayback.isPlaying(broadcast, in: player),
+            play: { DublabPlayback.toggle(broadcast, within: run, using: player) },
+            open: {
+                browse.remember([broadcast])
+                appState.open(.dublabBroadcast(slug: broadcast.slug))
+            },
+            crate: AnyView(DublabCrateButton(broadcast: broadcast, compact: true))
+        )
     }
 }

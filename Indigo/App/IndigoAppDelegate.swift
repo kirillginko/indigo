@@ -3,7 +3,8 @@
 //  Indigo
 //
 //  Registers for remote notifications, which CloudKit needs to tell this
-//  device that another one changed the listener's data.
+//  device that another one changed the listener's data; on iOS, also asks for
+//  an audio session that plays music.
 //
 //  Without it a running Indigo never heard of another device's changes: the
 //  Mac logged "Giving up waiting to register for remote notifications", and
@@ -38,6 +39,7 @@ final class IndigoAppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 #else
+import AVFoundation
 import UIKit
 
 final class IndigoAppDelegate: NSObject, UIApplicationDelegate {
@@ -45,7 +47,23 @@ final class IndigoAppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication, didFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         application.registerForRemoteNotifications()
+        Self.configureAudioSession()
         return true
+    }
+
+    /// iOS gives an app that says nothing the default audio session, which the
+    /// ring/silent switch mutes and which stops when the app leaves the
+    /// screen: radio stations, played by the app's own stream player, were
+    /// silent on an iPhone on silent, while crate items and archives -- web
+    /// players with sessions of their own -- played. Indigo plays music, so it
+    /// asks for playback, as long-form audio; with the `audio` background mode
+    /// in Info.plist it keeps playing with the phone locked.
+    static func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, policy: .longFormAudio)
+        } catch {
+            Trace.note("audio: could not set the playback session (\(error))")
+        }
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
