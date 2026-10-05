@@ -168,7 +168,8 @@ private struct PhoneForYouSlide: View {
                 Spacer(minLength: 0)
                 VStack(spacing: 14) {
                     // What it is and its name, why it is here, and what it
-                    // was reached through, in IDA's boxes.
+                    // was reached through, in IDA's boxes; the button last, at
+                    // the bottom, as on every slide.
                     Button(action: open) {
                         ChipFlow {
                             Chip(text: isShow ? "Radio show" : kindLabel, tone: .lead, uppercase: true)
@@ -201,7 +202,7 @@ private struct PhoneForYouSlide: View {
                         .background(Color(red: 0.36, green: 0.49, blue: 0.36))
                     }
                     .buttonStyle(.plain)
-                    .padding(.top, 4)
+                    .padding(.top, 6)
                 }
                 .padding(.horizontal, 22)
                 .padding(.bottom, insets.bottom + 22)
@@ -237,8 +238,9 @@ private struct PhoneForYouCover: View {
 
     private static let columns = 5
     private static let gap: CGFloat = 6
-    /// Archive channels shown before the card that opens them all.
-    private static let archivesShown = 4
+    /// Archive channels shown before the card that opens them all: with it,
+    /// three rows of five, as many as the stations.
+    private static let archivesShown = 14
 
     var body: some View {
         GeometryReader { proxy in

@@ -102,11 +102,13 @@ struct PhoneLiveSlide: View {
             // with the station's mark on it.
             ZStack {
                 PlayerShaderBackdrop()
+                // In the upper part of the screen, clear of the words below.
                 ArtworkView(
                     side: 120, glyphScale: 0.3,
                     markURL: StationMark.logoURL(for: entry.station.providerID),
                     showsGround: false
                 )
+                .offset(y: -side * 0.2)
             }
         }
     }
@@ -138,8 +140,10 @@ struct PhoneLiveSlide: View {
         }
     }
 
-    /// Only what helps decide whether to listen, in IDA's boxes: where and
-    /// who, what is on, what it sounds like, the button, and what is next.
+    /// Only what helps decide whether to listen, in IDA's boxes, in the order
+    /// every slide keeps: where and who, what is on, what it sounds like, what
+    /// is next on a line of its own, and the button last, always in the same
+    /// place at the bottom.
     private func details(_ show: RadioShow?, _ next: RadioShow?) -> some View {
         // NTS names its show as its host; a host already in the title is said.
         let host = show?.host.flatMap { host in
@@ -163,17 +167,11 @@ struct PhoneLiveSlide: View {
                     ForEach(genres, id: \.self) { Chip(text: $0, size: 12.5) }
                 }
             }
-            playButton
             if let next {
-                ChipFlow {
-                    Chip(text: "Next up", uppercase: true)
-                    Chip(text: next.title, tone: .plain)
-                    if let starts = next.startsAt {
-                        Chip(text: starts.formatted(date: .omitted, time: .shortened), tone: .sheen)
-                    }
-                }
-                .padding(.top, 6)
+                NextUpStrip(title: next.title, time: next.startsAt?.formatted(date: .omitted, time: .shortened))
             }
+            playButton
+                .padding(.top, 6)
         }
     }
 

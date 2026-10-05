@@ -49,6 +49,36 @@ struct Chip: View {
     }
 }
 
+/// What comes on next, on one line however long its title: [NEXT UP], the
+/// title cut short if it must be, and the time, which never drops to a line
+/// of its own.
+struct NextUpStrip: View {
+    let title: String
+    let time: String?
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Chip(text: "Next up", size: 13, uppercase: true)
+                .fixedSize()
+            Text(title)
+                .font(Typeface.mono(13))
+                .tracking(0.3)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .foregroundStyle(Color.white.opacity(0.92))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6.5)
+                .background(Chip.black)
+                .layoutPriority(-1)
+            if let time {
+                Chip(text: time, tone: .sheen, size: 13)
+                    .fixedSize()
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
 /// Boxes laid edge to edge, wrapped onto further lines, each line centred.
 struct ChipFlow: Layout {
     var lineSpacing: CGFloat = 0
