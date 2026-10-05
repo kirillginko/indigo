@@ -227,24 +227,27 @@ struct PhoneEpisodeRow: View {
                 .clipped()
 
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .top, spacing: 8) {
-                    // Playing, the title takes the wordmark's sheen.
-                    Chip(text: episode.title, tone: episode.isCurrent ? .sheen : .plain, size: 13)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    if let date = episode.date {
-                        Text(date.formatted(Self.dateFormat))
-                            .font(Typeface.mono(12))
-                            .foregroundStyle(.white.opacity(0.6))
-                            .monospacedDigit()
-                            .fixedSize()
-                            .padding(.top, 6)
+                // The title and who made it touch, as in the player.
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .top, spacing: 8) {
+                        // Playing, the title takes the wordmark's sheen.
+                        Chip(text: episode.title, tone: episode.isCurrent ? .sheen : .plain, size: 13)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if let date = episode.date {
+                            Text(date.formatted(Self.dateFormat))
+                                .font(Typeface.mono(12))
+                                .foregroundStyle(.white.opacity(0.6))
+                                .monospacedDigit()
+                                .fixedSize()
+                                .padding(.top, 6)
+                        }
                     }
-                }
-                if let subtitle = episode.subtitle, !subtitle.isEmpty {
-                    Chip(text: subtitle, tone: .lead, size: 12)
-                        .lineLimit(1)
+                    if let subtitle = episode.subtitle, !subtitle.isEmpty {
+                        Chip(text: subtitle, tone: .lead, size: 12)
+                            .lineLimit(1)
+                    }
                 }
                 Spacer(minLength: 6)
                 ViewThatFits(in: .horizontal) {

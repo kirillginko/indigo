@@ -309,7 +309,11 @@ private struct PhoneForYouCover: View {
     }
 
     private func allArchivesCard(side: CGFloat) -> some View {
-        Button { appState.select(.youtubeChannels) } label: {
+        // Every archive: the Shows tab, narrowed to them.
+        Button {
+            PhoneFeeds.shared.showsStation = "Archives"
+            appState.select(.shows)
+        } label: {
             ZStack {
                 MineralSheenSurface()
                 Text("ALL")

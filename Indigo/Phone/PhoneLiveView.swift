@@ -199,38 +199,6 @@ struct PhoneLiveSlide: View {
 
 /// The phone's Shows tab: each station's shows, and the archives. A list for
 /// now; one grid across every station comes next.
-struct PhoneShowsView: View {
-    @Environment(AppState.self) private var appState
-
-    var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                PhonePageTitle("Shows")
-                ForEach(ShowsDirectory.entries) { entry in
-                    Button { appState.select(entry.route) } label: {
-                        HStack {
-                            Text(entry.station)
-                                .font(Typeface.mono(14, weight: .medium))
-                            Spacer()
-                            Text(entry.label)
-                                .font(Typeface.mono(12))
-                                .foregroundStyle(Palette.inkFaint)
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(Palette.inkFaint)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 18)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    Rule(color: Palette.outline)
-                }
-            }
-        }
-    }
-}
-
 /// A page's name, centred at the top, as the phone's pages carry it.
 struct PhonePageTitle: View {
     let title: String

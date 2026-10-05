@@ -19,6 +19,9 @@ final class PhoneFeeds {
     var liveID: String?
     /// The suggestion on screen in For You.
     var forYouID: String?
+    /// The station whose shows the Shows tab is showing; nil for the list of
+    /// stations.
+    var showsStation: String?
 
     /// Never freed; a main-actor deinit hop would abort if it were.
     nonisolated deinit {}
