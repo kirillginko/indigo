@@ -58,7 +58,7 @@ struct PhoneLiveSlide: View {
     private var isPlaying: Bool { item.map { player.isCurrent($0.id) && player.isPlaying } ?? false }
 
     var body: some View {
-        LiveShowReader(providerID: entry.station.providerID, stationID: entry.station.id) { show in
+        LiveShowReader(providerID: entry.station.providerID, stationID: entry.station.id) { show, next in
             ZStack {
                 // Square artwork, made as large as the screen's longer side
                 // and cropped at the other: full-bleed, as the station's
@@ -83,7 +83,7 @@ struct PhoneLiveSlide: View {
                         .padding(.top, insets.top + 8)
                         .padding(.horizontal, 16)
                     Spacer(minLength: 0)
-                    details(show)
+                    details(show, next)
                         .padding(.horizontal, 22)
                         .padding(.bottom, insets.bottom + 22)
                 }
@@ -138,41 +138,41 @@ struct PhoneLiveSlide: View {
         }
     }
 
-    /// Only what helps decide whether to listen: what is on, who and what it
-    /// sounds like, and the button.
-    private func details(_ show: RadioShow?) -> some View {
-        VStack(spacing: 14) {
-            Text(show?.title ?? entry.station.strapline)
-                .font(.system(size: 26, weight: .bold))
-                .multilineTextAlignment(.center)
-                .lineLimit(3)
-                .minimumScaleFactor(0.7)
-                .shadow(color: .black.opacity(0.4), radius: 8)
-            chips(show)
-            playButton
-        }
-    }
-
-    /// Who is playing and what it sounds like, as IDA tags them.
-    @ViewBuilder
-    private func chips(_ show: RadioShow?) -> some View {
+    /// Only what helps decide whether to listen, in IDA's boxes: where and
+    /// who, what is on, what it sounds like, the button, and what is next.
+    private func details(_ show: RadioShow?, _ next: RadioShow?) -> some View {
         // NTS names its show as its host; a host already in the title is said.
         let host = show?.host.flatMap { host in
             show?.title.localizedCaseInsensitiveContains(host) == true ? nil : host
-        }
-        let words = ([host].compactMap { $0 } + (show?.genres ?? []))
-            .filter { !$0.isEmpty }
-            .prefix(2)
-        if !words.isEmpty {
-            HStack(spacing: 2) {
-                ForEach(Array(words), id: \.self) { word in
-                    Text(word)
-                        .font(Typeface.mono(12.5))
-                        .lineLimit(1)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 8)
-                        .background(Color.black.opacity(0.72))
+        }.flatMap { $0.isEmpty ? nil : $0 }
+        let city = entry.location.split(separator: ",").first.map(String.init) ?? entry.location
+        let genres = Array((show?.genres ?? []).filter { !$0.isEmpty }.prefix(3))
+        return VStack(spacing: 14) {
+            ChipFlow {
+                Chip(text: city, tone: .lead, uppercase: true)
+                if let host { Chip(text: host) }
+            }
+            // With nothing published, the strapline -- unless it only says the
+            // city again.
+            if let title = show?.title ?? (entry.station.strapline.caseInsensitiveCompare(city) == .orderedSame
+                                            ? nil : entry.station.strapline) {
+                ChipFlow { Chip(text: title, size: 19) }
+            }
+            if !genres.isEmpty {
+                ChipFlow {
+                    ForEach(genres, id: \.self) { Chip(text: $0, size: 12.5) }
                 }
+            }
+            playButton
+            if let next {
+                ChipFlow {
+                    Chip(text: "Next up", uppercase: true)
+                    Chip(text: next.title, tone: .plain)
+                    if let starts = next.startsAt {
+                        Chip(text: starts.formatted(date: .omitted, time: .shortened), tone: .sheen)
+                    }
+                }
+                .padding(.top, 6)
             }
         }
     }

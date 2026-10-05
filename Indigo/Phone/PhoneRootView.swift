@@ -33,7 +33,7 @@ struct PhoneRootView: View {
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .modifier(RootChrome(bottomInset: keyboardUp ? 0 : shellHeight))
+            .modifier(RootChrome(bottomInset: keyboardUp ? 0 : shellHeight, parksPlayerBehind: true))
             // The page's dark ground to the screen's edges, under the status
             // bar and the home indicator too, and light status-bar text over
             // it: the phone is dark throughout.

@@ -103,6 +103,13 @@ private typealias PlatformView = UIView
 private typealias PlatformRepresentable = UIViewRepresentable
 #endif
 
+/// The wordmark's moving light as a surface of its own, for anything else
+/// that wears it -- the phone's sheen chip (`Chip`).
+struct MineralSheenSurface: View {
+    var moving = true
+    var body: some View { MineralSheenLayer(moving: moving) }
+}
+
 /// Two tiles side by side in one image, slid left by one tile and around again.
 private struct MineralSheenLayer: PlatformRepresentable {
     let moving: Bool

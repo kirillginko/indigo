@@ -14,7 +14,20 @@ import SwiftUI
 struct LiveShowReader<Content: View>: View {
     let providerID: String
     let stationID: String
-    @ViewBuilder let content: (RadioShow?) -> Content
+    private let content: (_ now: RadioShow?, _ next: RadioShow?) -> Content
+
+    init(providerID: String, stationID: String, @ViewBuilder content: @escaping (RadioShow?) -> Content) {
+        self.providerID = providerID
+        self.stationID = stationID
+        self.content = { now, _ in content(now) }
+    }
+
+    /// The same, with what comes on after as well.
+    init(providerID: String, stationID: String, @ViewBuilder nowAndNext: @escaping (RadioShow?, RadioShow?) -> Content) {
+        self.providerID = providerID
+        self.stationID = stationID
+        self.content = nowAndNext
+    }
 
     @Environment(NTSProvider.self) private var nts
     @Environment(KioskProvider.self) private var kiosk
@@ -29,7 +42,17 @@ struct LiveShowReader<Content: View>: View {
     @Environment(RovrProvider.self) private var rovr
     @Environment(N10ASProvider.self) private var n10as
 
-    var body: some View { content(show) }
+    var body: some View { content(show, next) }
+
+    /// What comes on after, where the station publishes it as a show.
+    private var next: RadioShow? {
+        switch providerID {
+        case NTSProvider.providerID: nts.state(for: stationID)?.next
+        case KioskProvider.providerID: kiosk.next
+        case LotProvider.providerID: lot.next
+        default: nil
+        }
+    }
 
     private var show: RadioShow? {
         switch providerID {
