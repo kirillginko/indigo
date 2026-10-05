@@ -14,11 +14,56 @@ struct IdaShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(IdaBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let show = browse.show(slug: slug)
         let episodes = browse.episodes(ofShow: slug)
 
+        if isPhone {
+            phonePage(show, episodes: episodes)
+                .task(id: slug) { await browse.loadShowIfNeeded(slug: slug) }
+        } else {
+            page(show, episodes: episodes)
+        }
+    }
+
+    private func phonePage(_ show: IdaShow?, episodes: [IdaEpisode]) -> some View {
+        PhoneShowPage(
+            title: show?.title ?? "Show",
+            station: show?.channel?.city ?? "IDA Radio",
+            host: show?.artist,
+            imageURL: show?.imageURL,
+            markURL: IdaProvider.logoURL,
+            genres: show?.genres ?? [],
+            summary: show?.summary,
+            episodes: episodes.map { episode in
+                PhoneEpisode(
+                    id: episode.id,
+                    title: show?.title ?? episode.title,
+                    subtitle: episode.subtitle,
+                    date: episode.broadcastAt,
+                    genres: episode.genres,
+                    imageURL: episode.thumbnailURL ?? episode.imageURL,
+                    isPlayable: episode.isPlayable,
+                    isCurrent: IdaPlayback.isCurrent(episode, in: player),
+                    isPlaying: IdaPlayback.isPlaying(episode, in: player),
+                    play: { IdaPlayback.toggle(episode, within: episodes, using: player) },
+                    open: {
+                        browse.remember([episode])
+                        appState.open(.idaEpisode(slug: episode.slug))
+                    },
+                    crate: AnyView(IdaCrateButton(episode: episode, compact: true))
+                )
+            },
+            isLoading: show == nil || browse.isLoadingShow(slug),
+            emptyMessage: show == nil
+                ? (browse.showError(slug) ?? "IDA no longer publishes this show.")
+                : "Nothing archived for this show."
+        )
+    }
+
+    private func page(_ show: IdaShow?, episodes: [IdaEpisode]) -> some View {
         VStack(spacing: 0) {
             PageHeader(
                 title: show?.title ?? "Show",

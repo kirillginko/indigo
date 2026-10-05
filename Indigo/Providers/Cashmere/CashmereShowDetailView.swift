@@ -13,36 +13,43 @@ struct CashmereShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(CashmereBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let show = browse.show(slug: slug)
         let episodes = browse.episodes(ofShow: slug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: show?.name ?? "Show",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(show, episodes: episodes)
-            ) {
-                if let first = episodes.first(where: \.isPlayable) {
-                    playButton(first, queue: episodes)
+        Group {
+            if isPhone {
+                phonePage(show, episodes: episodes)
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: show?.name ?? "Show",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(show, episodes: episodes)
+                ) {
+                    if let first = episodes.first(where: \.isPlayable) {
+                        playButton(first, queue: episodes)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let show {
+                    content(show, episodes: episodes)
+                } else if browse.isLoadingShow(slug) || browse.showsPhase.isLoading {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.showError(slug) ?? "Cashmere no longer publishes this show."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let show {
-                content(show, episodes: episodes)
-            } else if browse.isLoadingShow(slug) || browse.showsPhase.isLoading {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.showError(slug) ?? "Cashmere no longer publishes this show."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: slug) {
@@ -172,5 +179,40 @@ struct CashmereShowDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension CashmereShowDetailView {
+    fileprivate func phonePage(_ show: CashmereShow?, episodes: [CashmereEpisode]) -> some View {
+        PhoneShowPage(
+            title: show?.name ?? "Show",
+            station: "Cashmere Radio",
+            imageURL: episodes.first?.artworkURL,
+            markURL: StationMark.logoURL(for: CashmereProvider.providerID),
+            genres: Array(GenreTags.available(in: episodes.flatMap(\.genres)).prefix(4)),
+            summary: episodes.first?.summary,
+            episodes: episodes.map { phoneEpisode($0, in: episodes) },
+            isLoading: show == nil || browse.isLoadingShow(slug),
+            emptyMessage: browse.showError(slug) ?? "Nothing archived for this show."
+        )
+    }
+
+    private func phoneEpisode(_ episode: CashmereEpisode, in episodes: [CashmereEpisode]) -> PhoneEpisode {
+        PhoneEpisode(
+            id: episode.id,
+            title: episode.title,
+            date: episode.airedAt,
+            genres: episode.genres,
+            imageURL: episode.artworkURL,
+            isPlayable: episode.isPlayable,
+            isCurrent: CashmerePlayback.isCurrent(episode, in: player),
+            isPlaying: CashmerePlayback.isPlaying(episode, in: player),
+            play: { CashmerePlayback.toggle(episode, within: episodes, using: player) },
+            open: {
+                browse.remember([episode])
+                appState.open(.cashmereEpisode(slug: episode.slug))
+            },
+            crate: AnyView(CashmereCrateButton(episode: episode, compact: true))
+        )
     }
 }

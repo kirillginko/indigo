@@ -82,6 +82,7 @@ struct PhoneRootView: View {
         .background { IndigoGlassBackground.content.ignoresSafeArea() }
         .preferredColorScheme(.dark)
         .environment(\.colorScheme, .dark)
+        .environment(\.isPhoneLayout, true)
         .animation(.easeOut(duration: 0.2), value: keyboardUp)
         .animation(.spring(duration: 0.35), value: showsNowPlaying)
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in

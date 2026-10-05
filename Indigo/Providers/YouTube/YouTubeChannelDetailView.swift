@@ -17,12 +17,32 @@ struct YouTubeChannelDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(YouTubeChannelStore.self) private var store
     @State private var selectedShelf: UUID?
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let channel = store.channel(id: channelID)
         let shelves = store.shelves(of: channelID)
         let shelf = shelves.first { $0.id == selectedShelf } ?? shelves.first
 
+        Group {
+            if isPhone {
+                ArchivePhonePage(channel: channel, shelves: shelves, shelf: shelf, selectedShelf: $selectedShelf,
+                                 isLoading: store.channelsPhase.isLoading || store.isLoading(channelID))
+            } else {
+                page(channel, shelves: shelves, shelf: shelf)
+            }
+        }
+        .task(id: channelID) { await store.loadChannelIfNeeded(id: channelID) }
+        .task(id: shelf?.id) {
+            if let id = shelf?.id { await store.loadTracksIfNeeded(shelf: id) }
+        }
+    }
+
+    private func page(
+        _ channel: Catalog.RadioShow?,
+        shelves: [Catalog.RadioEpisode],
+        shelf: Catalog.RadioEpisode?
+    ) -> some View {
         VStack(spacing: 0) {
             PageHeader(
                 title: channel?.title ?? "Archive",
@@ -47,10 +67,6 @@ struct YouTubeChannelDetailView: View {
                         .buttonStyle(OutlineButtonStyle())
                 }
             }
-        }
-        .task(id: channelID) { await store.loadChannelIfNeeded(id: channelID) }
-        .task(id: shelf?.id) {
-            if let id = shelf?.id { await store.loadTracksIfNeeded(shelf: id) }
         }
     }
 
@@ -296,5 +312,91 @@ private struct YouTubeVideoRow: View {
         .contentShape(Rectangle())
         .onTapGesture(perform: play)
         .onHover { isHovering = $0 }
+    }
+}
+
+/// An archive on the phone: the show page, its uploads as the episodes, and
+/// its playlists in boxes above them.
+private struct ArchivePhonePage: View {
+    let channel: Catalog.RadioShow?
+    let shelves: [Catalog.RadioEpisode]
+    let shelf: Catalog.RadioEpisode?
+    @Binding var selectedShelf: UUID?
+    let isLoading: Bool
+
+    @Environment(AppState.self) private var appState
+    @Environment(YouTubeChannelStore.self) private var store
+    @Environment(PlaybackCoordinator.self) private var player
+    @Environment(CrateService.self) private var crate
+
+    var body: some View {
+        let _ = crate.revision
+        let tracks = shelf.map { store.tracks[$0.id] ?? [] } ?? []
+        PhoneShowPage(
+            title: channel?.title ?? "Archive",
+            station: "Archive",
+            imageURL: channel?.imageURL.flatMap(URL.init(string:)),
+            summary: channel?.description?.trimmingCharacters(in: .whitespacesAndNewlines),
+            episodes: tracks.map { episode($0, in: tracks) },
+            isLoading: isLoading || shelf.map { store.isLoading($0.id) } ?? false,
+            emptyMessage: shelf.flatMap { store.error($0.id) }
+                ?? (channel == nil ? "Indigo no longer follows this archive." : "Nothing in this list."),
+            accessory: shelves.count > 1 ? AnyView(picker) : nil
+        )
+    }
+
+    private var picker: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 6) {
+                ForEach(shelves) { item in
+                    let selected = item.id == shelf?.id
+                    Button { selectedShelf = item.id } label: {
+                        Chip(text: item.title ?? "Playlist", tone: selected ? .lead : .plain, size: 12, uppercase: true)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+        }
+        .scrollIndicators(.hidden)
+        .background(PhoneShowPage.rowB)
+    }
+
+    private func episode(_ track: Catalog.EpisodeTrack, in tracks: [Catalog.EpisodeTrack]) -> PhoneEpisode {
+        let videoID = YouTubeChannelPlayback.videoID(of: track)
+        let thumbnail = videoID.flatMap(YouTubeChannelPlayback.thumbnail)
+        let address = track.mediaURL.flatMap(URL.init(string:))
+        let isCurrent = videoID.map { player.isCurrent(YouTubeChannelPlayback.mediaID($0)) } ?? false
+        let artist = track.artistName ?? track.rawArtistName
+        let play = { YouTubeChannelPlayback.play(track, in: tracks, channel: "", using: player) }
+        return PhoneEpisode(
+            id: track.id.uuidString,
+            title: track.rawTrackTitle ?? "Untitled",
+            subtitle: artist,
+            imageURL: thumbnail,
+            isPlayable: videoID != nil,
+            isCurrent: isCurrent,
+            isPlaying: isCurrent && player.isPlaying,
+            play: play,
+            // The row opens the artist, as DIG does; the picture plays.
+            open: {
+                if let artist, !artist.isEmpty {
+                    appState.open(.digArtist(mbid: nil, name: artist))
+                } else {
+                    play()
+                }
+            },
+            crate: address.map { url in
+                AnyView(CrateGlyphButton(isCrated: crate.isCrated(listening: url)) {
+                    crate.toggle(
+                        listening: url,
+                        title: track.rawTrackTitle ?? "Untitled",
+                        artist: artist,
+                        artworkURL: thumbnail
+                    )
+                })
+            }
+        )
     }
 }

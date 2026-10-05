@@ -14,36 +14,43 @@ struct LYLShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(LYLBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let show = browse.show(slug: slug)
         let episodes = browse.episodes(ofShow: slug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: show?.title ?? "Show",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(show, episodes: episodes)
-            ) {
-                if let first = episodes.first(where: \.isPlayable) {
-                    playButton(first, queue: episodes)
+        Group {
+            if isPhone {
+                phonePage(show, episodes: episodes)
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: show?.title ?? "Show",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(show, episodes: episodes)
+                ) {
+                    if let first = episodes.first(where: \.isPlayable) {
+                        playButton(first, queue: episodes)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let show {
+                    content(show, episodes: episodes)
+                } else if browse.isLoadingShow(slug) || browse.showsPhase.isLoading {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.showError(slug) ?? "LYL no longer publishes this show."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let show {
-                content(show, episodes: episodes)
-            } else if browse.isLoadingShow(slug) || browse.showsPhase.isLoading {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.showError(slug) ?? "LYL no longer publishes this show."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: slug) {
@@ -190,5 +197,42 @@ struct LYLShowDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension LYLShowDetailView {
+    fileprivate func phonePage(_ show: LYLShow?, episodes: [LYLEpisode]) -> some View {
+        PhoneShowPage(
+            title: show?.title ?? "Show",
+            station: "LYL Radio",
+            host: show?.artists,
+            imageURL: show?.imageURL ?? episodes.first?.imageURL,
+            markURL: StationMark.logoURL(for: LYLProvider.providerID),
+            genres: show?.styles ?? [],
+            summary: show?.summary,
+            episodes: episodes.map { phoneEpisode($0, in: episodes) },
+            isLoading: show == nil || browse.isLoadingShow(slug),
+            emptyMessage: browse.showError(slug) ?? "Nothing archived for this show."
+        )
+    }
+
+    private func phoneEpisode(_ episode: LYLEpisode, in episodes: [LYLEpisode]) -> PhoneEpisode {
+        PhoneEpisode(
+            id: episode.id,
+            title: episode.title,
+            subtitle: episode.artists,
+            date: episode.broadcastAt,
+            genres: episode.styles,
+            imageURL: episode.imageURL,
+            isPlayable: episode.isPlayable,
+            isCurrent: LYLPlayback.isCurrent(episode, in: player),
+            isPlaying: LYLPlayback.isPlaying(episode, in: player),
+            play: { LYLPlayback.toggle(episode, within: episodes, using: player) },
+            open: {
+                browse.remember([episode])
+                appState.open(.lylEpisode(slug: episode.slug))
+            },
+            crate: AnyView(LYLCrateButton(episode: episode, compact: true))
+        )
     }
 }

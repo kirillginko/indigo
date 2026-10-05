@@ -14,37 +14,44 @@ struct LotShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(LotBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let detail = browse.showDetail(slug: showSlug)
         let show = detail?.show ?? browse.show(slug: showSlug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: show?.name ?? "Show",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(detail)
-            ) {
-                if let detail, let first = detail.episodes.first(where: \.isPlayable) {
-                    playButton(first, queue: detail.episodes)
+        Group {
+            if isPhone {
+                phonePage(show, detail: detail)
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: show?.name ?? "Show",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(detail)
+                ) {
+                    if let detail, let first = detail.episodes.first(where: \.isPlayable) {
+                        playButton(first, queue: detail.episodes)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let show {
+                    content(show: show, detail: detail)
+                } else if browse.isLoadingShow(showSlug) || browse.showsPhase.isLoading {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.showError(showSlug)
+                            ?? "The Lot is no longer publishing information for this residency."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let show {
-                content(show: show, detail: detail)
-            } else if browse.isLoadingShow(showSlug) || browse.showsPhase.isLoading {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.showError(showSlug)
-                        ?? "The Lot is no longer publishing information for this residency."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: showSlug) {
@@ -215,5 +222,44 @@ struct LotShowDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension LotShowDetailView {
+    fileprivate func phonePage(_ show: LotShow?, detail: LotShowDetail?) -> some View {
+        let episodes = detail?.episodes ?? []
+        return PhoneShowPage(
+            title: show?.name ?? "Show",
+            station: "The Lot Radio",
+            host: show?.artistLine,
+            imageURL: show?.photoURL ?? episodes.first?.artworkURL,
+            markURL: StationMark.logoURL(for: LotProvider.providerID),
+            genres: show?.genres.map(\.name) ?? [],
+            summary: detail?.summary,
+            episodes: episodes.map { phoneEpisode($0, in: episodes) },
+            isLoading: detail == nil && (browse.isLoadingShow(showSlug) || browse.showsPhase.isLoading),
+            emptyMessage: browse.showError(showSlug) ?? "The Lot hasn't archived any broadcasts of this residency."
+        )
+    }
+
+    private func phoneEpisode(_ episode: LotEpisode, in episodes: [LotEpisode]) -> PhoneEpisode {
+        PhoneEpisode(
+            id: episode.id,
+            title: episode.title,
+            subtitle: episode.artists.map(\.name).joined(separator: ", "),
+            date: episode.airedAt ?? episode.startedAt,
+            genres: episode.genreNames,
+            imageURL: episode.artworkURL ?? episode.imageURL,
+            isPlayable: episode.isPlayable,
+            isCurrent: LotPlayback.isCurrent(episode, in: player),
+            isPlaying: LotPlayback.isPlaying(episode, in: player),
+            play: { LotPlayback.toggle(episode, within: episodes, using: player) },
+            open: {
+                guard let ref = episode.ref else { return }
+                browse.remember([episode])
+                appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
+            },
+            crate: AnyView(LotCrateButton(episode: episode, compact: true))
+        )
     }
 }

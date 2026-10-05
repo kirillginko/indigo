@@ -17,36 +17,43 @@ struct RovrShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(RovrBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let show = browse.show(id: showID)
         let broadcasts = browse.broadcasts(ofShow: showID)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: show?.title ?? "Show",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(show, broadcasts: broadcasts)
-            ) {
-                if let first = broadcasts.first(where: \.isPlayable) {
-                    playButton(first, queue: broadcasts)
+        Group {
+            if isPhone {
+                phonePage(show, broadcasts: broadcasts)
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: show?.title ?? "Show",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(show, broadcasts: broadcasts)
+                ) {
+                    if let first = broadcasts.first(where: \.isPlayable) {
+                        playButton(first, queue: broadcasts)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let show {
+                    content(show, broadcasts: broadcasts)
+                } else if browse.isLoadingShow(showID) || browse.showsPhase.isLoading {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.showError(showID) ?? "ROVR no longer lists this show."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let show {
-                content(show, broadcasts: broadcasts)
-            } else if browse.isLoadingShow(showID) || browse.showsPhase.isLoading {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.showError(showID) ?? "ROVR no longer lists this show."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: showID) {
@@ -211,5 +218,41 @@ struct RovrShowDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension RovrShowDetailView {
+    fileprivate func phonePage(_ show: RovrShow?, broadcasts: [RovrBroadcast]) -> some View {
+        PhoneShowPage(
+            title: show?.title ?? "Show",
+            station: "ROVR",
+            host: show.map { $0.curators.joined(separator: ", ") },
+            imageURL: show?.imageURL ?? broadcasts.first?.imageURL,
+            markURL: StationMark.logoURL(for: RovrProvider.providerID),
+            summary: show?.summary,
+            episodes: broadcasts.map { phoneEpisode($0, in: broadcasts) },
+            isLoading: show == nil || browse.isLoadingShow(showID),
+            emptyMessage: browse.showError(showID) ?? "Nothing archived for this show."
+        )
+    }
+
+    private func phoneEpisode(_ broadcast: RovrBroadcast, in broadcasts: [RovrBroadcast]) -> PhoneEpisode {
+        PhoneEpisode(
+            id: broadcast.id,
+            title: broadcast.title,
+            subtitle: broadcast.curatorName,
+            date: broadcast.broadcastAt,
+            genres: broadcast.tags,
+            imageURL: broadcast.thumbnailURL ?? broadcast.imageURL,
+            isPlayable: broadcast.isPlayable,
+            isCurrent: RovrPlayback.isCurrent(broadcast, in: player),
+            isPlaying: RovrPlayback.isPlaying(broadcast, in: player),
+            play: { RovrPlayback.toggle(broadcast, within: broadcasts, using: player) },
+            open: {
+                browse.remember([broadcast])
+                appState.open(.rovrBroadcast(id: broadcast.documentID))
+            },
+            crate: AnyView(RovrCrateButton(broadcast: broadcast, compact: true))
+        )
     }
 }
