@@ -172,6 +172,7 @@ struct PageContent: View {
                 case .explore: ExploreView()
                 case .crate: CrateView()
                 case .dig: DigView()
+                case .forYou: PhoneForYouView()
                 case .live: PhoneLiveView()
                 case .shows: PhoneShowsView()
                 }

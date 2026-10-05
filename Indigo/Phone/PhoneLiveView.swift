@@ -13,6 +13,7 @@ import SwiftUI
 
 struct PhoneLiveView: View {
     @Environment(AppState.self) private var appState
+    @Bindable private var feeds = PhoneFeeds.shared
 
     var body: some View {
         // Read before the slides spread to the screen's edges, so their
@@ -33,6 +34,9 @@ struct PhoneLiveView: View {
                 }
                 .scrollTargetBehavior(.paging)
                 .scrollIndicators(.hidden)
+                // Kept outside the page, so a return to Live is a return to
+                // the station that was on screen.
+                .scrollPosition(id: $feeds.liveID)
             }
             .ignoresSafeArea()
         }
@@ -118,15 +122,13 @@ private struct PhoneLiveSlide: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Open \(entry.station.name)")
             Spacer()
-            VStack(spacing: 2) {
+            HStack(spacing: 7) {
+                Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 7, height: 7)
                 Text(entry.station.name)
                     .font(.system(size: 16, weight: .semibold))
-                Text(entry.location)
-                    .font(Typeface.mono(10))
-                    .foregroundStyle(.white.opacity(0.75))
             }
             .padding(.horizontal, 18)
-            .padding(.vertical, 8)
+            .padding(.vertical, 12)
             .background(.ultraThinMaterial, in: Capsule())
             .overlay(Capsule().strokeBorder(.white.opacity(0.14)))
             Spacer()
@@ -135,17 +137,12 @@ private struct PhoneLiveSlide: View {
         }
     }
 
+    /// Only what helps decide whether to listen: what is on, who and what it
+    /// sounds like, and the button.
     private func details(_ show: RadioShow?) -> some View {
-        VStack(spacing: 16) {
-            if show != nil {
-                HStack(spacing: 6) {
-                    Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 7, height: 7)
-                    Text(["ON AIR", show?.slot].compactMap { $0 }.joined(separator: "  "))
-                        .microLabel(1.8, size: 10)
-                }
-            }
+        VStack(spacing: 14) {
             Text(show?.title ?? entry.station.strapline)
-                .font(.system(size: 30, weight: .bold))
+                .font(.system(size: 26, weight: .bold))
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
                 .minimumScaleFactor(0.7)
@@ -164,7 +161,7 @@ private struct PhoneLiveSlide: View {
         }
         let words = ([host].compactMap { $0 } + (show?.genres ?? []))
             .filter { !$0.isEmpty }
-            .prefix(3)
+            .prefix(2)
         if !words.isEmpty {
             HStack(spacing: 2) {
                 ForEach(Array(words), id: \.self) { word in

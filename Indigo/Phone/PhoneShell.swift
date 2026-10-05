@@ -15,7 +15,7 @@ enum PhoneTab: CaseIterable, Hashable {
     /// The page the tab opens at.
     var route: Route {
         switch self {
-        case .forYou: .explore
+        case .forYou: .forYou
         case .live: .live
         case .shows: .shows
         case .crate: .crate
@@ -44,7 +44,7 @@ enum PhoneTab: CaseIterable, Hashable {
     /// archives and the like to Shows. Dig belongs to search, not a tab.
     static func of(_ route: Route) -> PhoneTab? {
         switch route {
-        case .explore: .forYou
+        case .explore, .forYou: .forYou
         case .live, .station, .kioskStation, .noodsStation, .lotStation, .dublabStation, .alharaStation,
              .cashmereStation, .lylStation, .idaStation, .radio80000Station, .panikStation, .rovrStation,
              .n10asStation:
