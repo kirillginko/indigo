@@ -64,6 +64,8 @@ struct PhoneRootView: View {
             if videoUp {
                 minimizeButton
                     .zIndex(5)
+                videoControls
+                    .zIndex(5)
             }
         }
         .animation(.easeInOut(duration: 0.25), value: videoUp)
@@ -112,14 +114,41 @@ struct PhoneRootView: View {
     /// The one web view: parked under the page, or the whole screen.
     private func embedLayer(in size: CGSize) -> some View {
         let parked = CGSize(width: max(size.width, 356), height: max(size.width, 356) * 9 / 16)
+        // Up, it stops above the controls: YouTube sets its captions along
+        // the bottom of its frame, and over the whole screen they covered
+        // the seek bar's times.
+        let up = CGSize(width: size.width, height: max(200, size.height - Self.videoControlsHeight))
         return EmbedPlayerSurface(engine: player.embed)
-            .frame(width: videoUp ? size.width : parked.width,
-                   height: videoUp ? size.height : parked.height)
+            .frame(width: videoUp ? up.width : parked.width,
+                   height: videoUp ? up.height : parked.height)
             .position(videoUp
-                      ? CGPoint(x: size.width / 2, y: size.height / 2)
+                      ? CGPoint(x: size.width / 2, y: up.height / 2)
                       : CGPoint(x: size.width / 2, y: size.height - parked.height / 2))
             .allowsHitTesting(false)
             .accessibilityHidden(!videoUp)
+    }
+
+    /// The room kept under the full-screen video for its controls.
+    private static let videoControlsHeight: CGFloat = 150
+
+    /// Along the bottom of the full-screen video: play and pause, and the
+    /// seek bar.
+    private var videoControls: some View {
+        VStack(spacing: 14) {
+            Spacer()
+            Button { player.toggle() } label: {
+                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 60, height: 60)
+                    .background(.ultraThinMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
+            PhoneScrubber()
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 18)
     }
 
     /// Back to the thumbnail; the video plays on. Top left, where the full

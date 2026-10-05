@@ -111,6 +111,7 @@ struct PhoneTabBar: View {
 struct PhoneMiniPlayer: View {
     let open: () -> Void
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(CrateService.self) private var crate
 
     var body: some View {
         if let item = player.current {
@@ -130,9 +131,10 @@ struct PhoneMiniPlayer: View {
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(Chip.black)
-                        Text(NowPlayingSummary.sourceLabel(for: item))
+                        // Who made it, or which station: the source only if
+                        // there is nothing else to say.
+                        Text(Self.secondLine(item, show))
                             .font(Typeface.mono(10))
-                            .tracking(1)
                             .lineLimit(1)
                             .foregroundStyle(Chip.ink)
                             .padding(.horizontal, 6)
@@ -140,6 +142,12 @@ struct PhoneMiniPlayer: View {
                             .background(Chip.green)
                     }
                     Spacer(minLength: 0)
+                    let _ = crate.revision
+                    let crated = crate.isCrated(nowPlaying: item, liveShow: show)
+                    transport(crated ? "checkmark.square.fill" : "plus.square",
+                              label: crated ? "Remove from crate" : "Add to crate", size: 17) {
+                        crate.toggle(nowPlaying: item, liveShow: show)
+                    }
                     transport("backward.fill", label: "Previous", size: 15) { player.previous() }
                     transport(player.isPlaying ? "pause.fill" : "play.fill",
                               label: player.isPlaying ? "Pause" : "Play", size: 20) { player.toggle() }
@@ -158,6 +166,13 @@ struct PhoneMiniPlayer: View {
                 .accessibilityHint("Opens the player")
             }
         }
+    }
+}
+
+extension PhoneMiniPlayer {
+    static func secondLine(_ item: MediaItem, _ show: RadioShow?) -> String {
+        let secondary = NowPlayingLines.secondary(item, show)
+        return secondary.isEmpty ? NowPlayingSummary.sourceLabel(for: item) : secondary
     }
 }
 
@@ -199,6 +214,7 @@ struct PhoneNowPlayingView: View {
     var maximize: () -> Void = {}
     var close: () -> Void = {}
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(CrateService.self) private var crate
     @State private var drag: CGFloat = 0
 
     private var isVideo: Bool { player.embedProvider == .youtube }
@@ -223,9 +239,17 @@ struct PhoneNowPlayingView: View {
                             if !secondary.isEmpty {
                                 ChipFlow { Chip(text: secondary, size: 13) }
                             }
+                            let _ = crate.revision
+                            let crated = crate.isCrated(nowPlaying: item, liveShow: show)
+                            Button { crate.toggle(nowPlaying: item, liveShow: show) } label: {
+                                Chip(text: crated ? "✓ In crate" : "+ Crate",
+                                     tone: crated ? .lead : .plain, size: 13, uppercase: true)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(crated ? "Remove from crate" : "Add to crate")
                         }
                         .padding(.horizontal, 20)
-                        PhoneScrubber()
+                        PhoneScrubber(show: show)
                             .padding(.horizontal, 28)
                         HStack(spacing: 44) {
                             transportButton("backward.fill", label: "Previous", size: 26) { player.previous() }
@@ -313,32 +337,69 @@ struct PhoneNowPlayingView: View {
 }
 
 /// Where in the episode or track the player is, and dragging to move there.
-/// A live stream cannot be moved through, so it says LIVE instead.
+/// A live stream cannot be moved through, but it still has a place: how far
+/// into the show's slot it is, between the slot's times, shown and not
+/// dragged. A station that publishes no times shows a full bar.
 struct PhoneScrubber: View {
+    var show: RadioShow? = nil
     @Environment(PlaybackCoordinator.self) private var player
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+        TimelineView(.periodic(from: .now, by: 0.5)) { context in
             if player.canSeek {
                 VStack(spacing: 6) {
                     HairlineSlider(value: player.progress, enabled: true, thickness: 4) { fraction in
                         player.seek(fraction: fraction)
                     }
+                    times(TimeFormat.clock(player.position), TimeFormat.clock(player.duration))
+                }
+            } else if player.current?.isLive == true {
+                VStack(spacing: 6) {
+                    bar(Self.slotFraction(show, at: context.date))
                     HStack {
-                        Text(TimeFormat.clock(player.position))
+                        Text(show?.startsAt?.formatted(date: .omitted, time: .shortened) ?? "")
                         Spacer()
-                        Text(TimeFormat.clock(player.duration))
+                        HStack(spacing: 5) {
+                            Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 6, height: 6)
+                            Text("LIVE").microLabel(1.8, size: 10)
+                        }
+                        Spacer()
+                        Text(show?.endsAt?.formatted(date: .omitted, time: .shortened) ?? "")
                     }
                     .font(Typeface.mono(11))
                     .foregroundStyle(.white.opacity(0.75))
                     .monospacedDigit()
                 }
-            } else if player.current?.isLive == true {
-                HStack(spacing: 6) {
-                    Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 7, height: 7)
-                    Text("LIVE").microLabel(1.8, size: 11)
-                }
             }
         }
+    }
+
+    /// How far into its slot the show is; a full bar without times.
+    static func slotFraction(_ show: RadioShow?, at date: Date) -> Double {
+        guard let start = show?.startsAt, let end = show?.endsAt, end > start else { return 1 }
+        return min(1, max(0, date.timeIntervalSince(start) / end.timeIntervalSince(start)))
+    }
+
+    private func bar(_ fraction: Double) -> some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                Rectangle().fill(.white.opacity(0.18))
+                Rectangle().fill(.white).frame(width: proxy.size.width * fraction)
+            }
+        }
+        .frame(height: 4)
+        .accessibilityLabel("Live")
+        .accessibilityValue("\(Int(fraction * 100)) percent through the show")
+    }
+
+    private func times(_ left: String, _ right: String) -> some View {
+        HStack {
+            Text(left)
+            Spacer()
+            Text(right)
+        }
+        .font(Typeface.mono(11))
+        .foregroundStyle(.white.opacity(0.75))
+        .monospacedDigit()
     }
 }
