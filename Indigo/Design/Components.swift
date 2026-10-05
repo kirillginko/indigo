@@ -44,7 +44,18 @@ struct MicroLabel: View {
 /// Bordered uppercase pill used for genres, moods and formats.
 struct TagChip: View {
     let text: String
+    @Environment(\.isPhoneLayout) private var isPhone
+
     var body: some View {
+        // On the phone, IDA's box.
+        if isPhone {
+            Chip(text: text, size: 11, uppercase: true).fixedSize()
+        } else {
+            outlined
+        }
+    }
+
+    private var outlined: some View {
         Text(text)
             .microLabel(1.1, size: 9)
             .foregroundStyle(Palette.inkMuted)
@@ -575,9 +586,10 @@ struct FlowLayout: Layout {
 /// A row of tags, each the width of its own word.
 struct TagFlow: View {
     let tags: [String]
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
-        FlowLayout(spacing: 7, lineSpacing: 7) {
+        FlowLayout(spacing: isPhone ? 6 : 7, lineSpacing: isPhone ? 6 : 7) {
             ForEach(tags, id: \.self) { tag in
                 TagChip(text: tag)
             }

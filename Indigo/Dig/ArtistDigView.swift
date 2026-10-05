@@ -17,6 +17,7 @@ struct ArtistDigView: View {
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     @State private var artistScenes: [MusicScene] = []
 
@@ -55,23 +56,37 @@ struct ArtistDigView: View {
         let eraArtists = lanes.eraArtists
 
         VStack(spacing: 0) {
-            PageHeader(
-                title: profile.name,
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(profile)
-            ) {
-                CrateButton(isCrated: isCrated) {
-                    crate.toggle(
-                        dig: .artist, identifier: crateID, providerID: crateProvider,
-                        title: profile.name, subtitle: "Artist", artworkURL: profile.coverURL,
-                        genres: profile.styles + profile.genres
-                    )
+            if !isPhone {
+                PageHeader(
+                    title: profile.name,
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(profile)
+                ) {
+                    CrateButton(isCrated: isCrated) {
+                        crate.toggle(
+                            dig: .artist, identifier: crateID, providerID: crateProvider,
+                            title: profile.name, subtitle: "Artist", artworkURL: profile.coverURL,
+                            genres: profile.styles + profile.genres
+                        )
+                    }
                 }
+                Rule(color: Palette.outline)
             }
-            Rule(color: Palette.outline)
 
             ScrollView {
+              VStack(spacing: 0) {
+                if isPhone {
+                    PhoneDetailHero(
+                        kind: "Artist",
+                        title: profile.name,
+                        subtitle: subtitle(profile).nilIfEmpty,
+                        imageURL: profile.coverURL,
+                        previewURL: profile.previewURL,
+                        genres: uniqueTags(profile),
+                        awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil
+                    )
+                }
                 // Lazy: the sections below the fold cost nothing until they
                 // are scrolled to, so the page is usable while the rest of it
                 // is still being worked out.
@@ -107,51 +122,55 @@ struct ArtistDigView: View {
                     // above the image". Reserving its space answered neither
                     // — the page still had a moving thing on it saying what
                     // the empty portrait underneath already said.
-                    HStack(alignment: .top, spacing: 26) {
-                        // No name set into the square. The header above
-                        // already says who this is, and a portrait that is
-                        // briefly the artist's name in type is a third thing
-                        // between the empty tile and the photograph.
-                        // The small one first, drawn coarsely, then the
-                        // photograph over it. The search that finds an artist
-                        // already carries the thumbnail, so something real is
-                        // there a round trip before the full picture — rather
-                        // than an empty square sitting beside a biography,
-                        // which reads as a load that failed.
-                        ArtworkView(
-                            remoteURL: profile.coverURL,
-                            previewRemoteURL: profile.previewURL,
-                            side: 220, glyphScale: 0.24,
-                            placeholder: .mosaic,
-                            showsGround: false,
-                            awaitingAddress: !hasEnriched && profile.coverURL == nil
-                                && profile.previewURL == nil,
-                            blursWhileLoading: true
-                        )
-                            .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
-                        VStack(alignment: .leading, spacing: 20) {
-                            DigTallies(entries: [
-                                ("Your library", "\(profile.libraryTrackCount)"),
-                                ("Your crate", "\(profile.crateCount)"),
-                                ("Radio", "\(profile.radioAppearances.reduce(0) { $0 + $1.count })")
-                            ])
-                            VStack(alignment: .leading, spacing: 12) {
-                                if let realName = profile.realName, realName != profile.name {
-                                    DigSection(title: "Name") { DigLine(text: realName) }
-                                }
-                                if let biography = profile.biography, !biography.isEmpty {
-                                    DigSection(title: "Profile") {
-                                        Text(biography)
-                                            .font(Typeface.body(12.5))
-                                            .foregroundStyle(Palette.inkMuted)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                            .padding(.top, 5)
+                    if isPhone {
+                        phoneIntro(profile)
+                    } else {
+                        HStack(alignment: .top, spacing: 26) {
+                            // No name set into the square. The header above
+                            // already says who this is, and a portrait that is
+                            // briefly the artist's name in type is a third thing
+                            // between the empty tile and the photograph.
+                            // The small one first, drawn coarsely, then the
+                            // photograph over it. The search that finds an artist
+                            // already carries the thumbnail, so something real is
+                            // there a round trip before the full picture — rather
+                            // than an empty square sitting beside a biography,
+                            // which reads as a load that failed.
+                            ArtworkView(
+                                remoteURL: profile.coverURL,
+                                previewRemoteURL: profile.previewURL,
+                                side: 220, glyphScale: 0.24,
+                                placeholder: .mosaic,
+                                showsGround: false,
+                                awaitingAddress: !hasEnriched && profile.coverURL == nil
+                                    && profile.previewURL == nil,
+                                blursWhileLoading: true
+                            )
+                                .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                            VStack(alignment: .leading, spacing: 20) {
+                                DigTallies(entries: [
+                                    ("Your library", "\(profile.libraryTrackCount)"),
+                                    ("Your crate", "\(profile.crateCount)"),
+                                    ("Radio", "\(profile.radioAppearances.reduce(0) { $0 + $1.count })")
+                                ])
+                                VStack(alignment: .leading, spacing: 12) {
+                                    if let realName = profile.realName, realName != profile.name {
+                                        DigSection(title: "Name") { DigLine(text: realName) }
+                                    }
+                                    if let biography = profile.biography, !biography.isEmpty {
+                                        DigSection(title: "Profile") {
+                                            Text(biography)
+                                                .font(Typeface.body(12.5))
+                                                .foregroundStyle(Palette.inkMuted)
+                                                .fixedSize(horizontal: false, vertical: true)
+                                                .padding(.top, 5)
+                                        }
                                     }
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
                     // Everything under the portrait arrives together.
@@ -371,7 +390,7 @@ struct ArtistDigView: View {
                         showing: Self.shown(profile)
                     ) { appState.open($0) }
                 }
-                .padding(.horizontal, Metrics.gutter)
+                .padding(.horizontal, isPhone ? 16 : Metrics.gutter)
                 .padding(.vertical, 22)
                 // One treatment for the whole page rather than a spinner per
                 // section. See `LoadingVeil`.
@@ -392,8 +411,21 @@ struct ArtistDigView: View {
                 .loadingVeil(
                     !hasEnriched && profile.releases.isEmpty && profile.related.isEmpty
                 )
+              }
             }
             .scrollIndicators(.visible)
+            .ignoresSafeArea(edges: isPhone ? .top : [])
+        }
+        .overlay(alignment: .top) {
+            if isPhone {
+                PhoneDetailTopBar(isCrated: isCrated) {
+                    crate.toggle(
+                        dig: .artist, identifier: crateID, providerID: crateProvider,
+                        title: profile.name, subtitle: "Artist", artworkURL: profile.coverURL,
+                        genres: profile.styles + profile.genres
+                    )
+                }
+            }
         }
         .task(id: dig.revision) {
             // Writes arrive in bursts — the catalogue, then the
@@ -727,6 +759,29 @@ struct ArtistDigView: View {
             ids.insert(MusicNode.release(release.title, discogsID: release.discogsID).id)
         }
         return ids
+    }
+
+    @ViewBuilder
+    /// Under the phone's picture: the counts, the real name, the profile.
+    private func phoneIntro(_ profile: ArtistProfile) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            DigTallies(entries: [
+                ("Your library", "\(profile.libraryTrackCount)"),
+                ("Your crate", "\(profile.crateCount)"),
+                ("Radio", "\(profile.radioAppearances.reduce(0) { $0 + $1.count })")
+            ])
+            if let realName = profile.realName, realName != profile.name {
+                DigSection(title: "Name") { DigLine(text: realName) }
+            }
+            if let biography = profile.biography, !biography.isEmpty {
+                Text(biography)
+                    .font(Typeface.mono(12.5))
+                    .lineSpacing(3)
+                    .foregroundStyle(.white.opacity(0.72))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
