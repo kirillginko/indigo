@@ -13,8 +13,30 @@ struct DigSection<Content: View>: View {
     let title: String
     var trailing: String?
     @ViewBuilder var content: Content
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone {
+            // On the phone, the title in IDA's green box, and no rule.
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center) {
+                    Chip(text: title, tone: .lead, size: 11, uppercase: true)
+                    Spacer(minLength: 8)
+                    if let trailing {
+                        Text(trailing)
+                            .font(Typeface.mono(11))
+                            .foregroundStyle(.white.opacity(0.55))
+                    }
+                }
+                content
+                    .padding(.top, 10)
+            }
+        } else {
+            columnBlock
+        }
+    }
+
+    private var columnBlock: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(title)
@@ -42,8 +64,46 @@ struct DigLine: View {
     var action: (() -> Void)?
 
     @State private var isHovering = false
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone {
+            phoneLine
+        } else {
+            line
+        }
+    }
+
+    /// On the phone: the name in a box, what it counts in a green one beside
+    /// it, touching.
+    @ViewBuilder
+    private var phoneLine: some View {
+        let row = HStack(spacing: 0) {
+            Chip(text: text, size: 13)
+                .lineLimit(2)
+            if let detail, !detail.isEmpty {
+                Chip(text: detail, tone: .lead, size: 11)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            Spacer(minLength: 8)
+            if action != nil {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+        }
+        .padding(.vertical, 3)
+        .contentShape(Rectangle())
+        if let action {
+            Button(action: action) { row }.buttonStyle(.plain)
+        } else {
+            row
+        }
+    }
+
+    @ViewBuilder
+    private var line: some View {
         let row = HStack(spacing: 10) {
             Text(text)
                 .font(Typeface.body(12.5, weight: action == nil ? .regular : .medium))
@@ -81,8 +141,24 @@ struct DigLine: View {
 struct DigLinkGrid: View {
     let items: [String]
     let open: (String) -> Void
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone {
+            // On the phone, the names as boxes, wrapped.
+            FlowLayout(spacing: 6, lineSpacing: 6) {
+                ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                    Button { open(item) } label: { Chip(text: item, size: 13) }
+                        .buttonStyle(.plain)
+                }
+            }
+            .padding(.top, 4)
+        } else {
+            grid
+        }
+    }
+
+    private var grid: some View {
         LazyVGrid(
             columns: [GridItem(.adaptive(minimum: 220), spacing: 10)],
             alignment: .leading,
@@ -206,8 +282,44 @@ struct DigReleaseTile: View {
     let open: () -> Void
 
     @State private var isHovering = false
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone { phoneTile } else { tile }
+    }
+
+    /// On the phone, the sleeve with its title in a box over the bottom, the
+    /// label and year in a green one under it, touching -- the shows grid's
+    /// card.
+    private var phoneTile: some View {
+        Button(action: open) {
+            Color.clear
+                .aspectRatio(1, contentMode: .fit)
+                .overlay {
+                    ArtworkView(remoteURL: release.coverURL, previewRemoteURL: release.previewURL,
+                                glyphScale: 0.22, placeholder: .whiteLabel)
+                }
+                .clipped()
+                .overlay(alignment: .bottomLeading) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Chip(text: release.title, size: 12)
+                            .lineLimit(2)
+                        let line = [release.label, release.year].compactMap { $0 }.joined(separator: " · ")
+                        if !line.isEmpty {
+                            Chip(text: line, tone: .lead, size: 10)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(6)
+                }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(release.title)
+        .accessibilityHint(release.discogsID == nil ? "Find and open release" : "Open release")
+    }
+
+    private var tile: some View {
         Button(action: open) {
             VStack(alignment: .leading, spacing: 9) {
                 ArtworkView(
@@ -269,8 +381,26 @@ struct DigButton: View {
 /// distinguishes DIG from a catalogue browser.
 struct DigTallies: View {
     let entries: [(label: String, value: String)]
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone {
+            // On the phone, each count as a pair of boxes, touching.
+            FlowLayout(spacing: 8, lineSpacing: 8) {
+                ForEach(entries, id: \.label) { entry in
+                    HStack(spacing: 0) {
+                        Chip(text: entry.label, size: 11, uppercase: true)
+                        Chip(text: entry.value, tone: .lead, size: 11)
+                    }
+                    .fixedSize()
+                }
+            }
+        } else {
+            columns
+        }
+    }
+
+    private var columns: some View {
         HStack(alignment: .top, spacing: 26) {
             ForEach(entries, id: \.label) { entry in
                 VStack(alignment: .leading, spacing: 5) {
@@ -364,8 +494,40 @@ struct ListenRow: View {
     let keep: () -> Void
 
     @State private var isHovering = false
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone { phoneRow } else { row }
+    }
+
+    /// On the phone: the green play box, the title in a box (the sheen while
+    /// it plays), its length, and the crate.
+    private var phoneRow: some View {
+        HStack(spacing: 10) {
+            Button(action: play) {
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Chip.ink)
+                    .frame(width: 30, height: 30)
+                    .background(Chip.green)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isPlaying ? "Pause \(title)" : "Play \(title)")
+            Chip(text: title, tone: isCurrent ? .sheen : .plain, size: 13)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if let duration {
+                Text(duration)
+                    .font(Typeface.mono(11))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            CrateGlyphButton(isCrated: isCrated, action: keep)
+        }
+        .padding(.vertical, 5)
+    }
+
+    private var row: some View {
         HStack(spacing: 12) {
             Button(action: play) {
                 HStack(spacing: 12) {
