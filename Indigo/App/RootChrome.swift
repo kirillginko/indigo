@@ -14,25 +14,16 @@ import UniformTypeIdentifiers
 
 struct RootChrome: ViewModifier {
     var bottomInset: CGFloat
-    /// Park the web player behind the page rather than over it. The phone's:
-    /// an iPhone's web view does not take the 2% opacity, and parked at
-    /// 320x180 it showed as a dark block in the corner. Under the page's
-    /// opaque ground it is still in the window, which is all playback needs,
-    /// and the phone has no video panel to bring it out to.
-    var parksPlayerBehind = false
+    /// Whether this layout leaves the web player to the chrome. The phone
+    /// hosts its own (`PhoneRootView`): it parks it under the page and brings
+    /// it over the full player for video, which the chrome cannot.
+    var hostsEmbedPlayer = true
 
     @Environment(LibraryStore.self) private var library
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(DigStore.self) private var dig
     @Environment(CrateService.self) private var crate
     @AppStorage(YouTubeVideoPanel.storageKey) private var showsYouTubeVideo = false
-
-    /// The player's size parked behind the page. YouTube picks its stream for
-    /// the player's size, and on an iPhone its smallest streams carry its
-    /// thinnest audio: parked at a point square, uploads played at their
-    /// worst. 320x180 picks a 360p-class stream. Parked over the page (Mac,
-    /// iPad) it stays a point, so it cannot show.
-    private static let parked = CGSize(width: 320, height: 180)
 
     func body(content: Content) -> some View {
         content
@@ -48,16 +39,8 @@ struct RootChrome: ViewModifier {
             // listener is here for the music. SoundCloud and Mixcloud are audio
             // and have no picture to show. One view either way: the web view
             // cannot be in two places, and moving it keeps whatever is playing.
-            .background(alignment: .bottomTrailing) {
-                if parksPlayerBehind {
-                    EmbedPlayerSurface(engine: player.embed)
-                        .frame(width: Self.parked.width, height: Self.parked.height)
-                        .allowsHitTesting(false)
-                        .accessibilityHidden(true)
-                }
-            }
             .overlay(alignment: .bottomTrailing) {
-                if !parksPlayerBehind {
+                if hostsEmbedPlayer {
                     let showsVideo = player.embedProvider == .youtube && showsYouTubeVideo
                     EmbedPlayerSurface(engine: player.embed)
                         .frame(width: showsVideo ? 356 : 1, height: showsVideo ? 200 : 1)
