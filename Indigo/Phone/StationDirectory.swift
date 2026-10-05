@@ -16,9 +16,10 @@ struct StationEntry: Identifiable, Hashable {
     var id: String { station.id }
 }
 
-/// Builds the directory from the providers in the environment.
+/// Builds the directory from the providers in the environment, and hands
+/// over with it how to play any station in it.
 struct StationDirectory<Content: View>: View {
-    @ViewBuilder let content: ([StationEntry]) -> Content
+    @ViewBuilder let content: ([StationEntry], _ playable: @escaping (StationEntry) -> MediaItem?) -> Content
 
     @Environment(NTSProvider.self) private var nts
     @Environment(KioskProvider.self) private var kiosk
@@ -34,7 +35,28 @@ struct StationDirectory<Content: View>: View {
     @Environment(RovrProvider.self) private var rovr
     @Environment(N10ASProvider.self) private var n10as
 
-    var body: some View { content(entries) }
+    var body: some View { content(entries, item(for:)) }
+
+    /// The live stream of `entry`, as its own station page would play it.
+    private func item(for entry: StationEntry) -> MediaItem? {
+        let id = entry.station.id
+        switch entry.station.providerID {
+        case NTSProvider.providerID: return nts.mediaItem(for: entry.station)
+        case KioskProvider.providerID: return kiosk.mediaItem()
+        case NoodsProvider.providerID: return noods.mediaItem()
+        case LotProvider.providerID: return lot.mediaItem()
+        case DublabProvider.providerID: return dublab.mediaItem()
+        case AlharaProvider.providerID: return alhara.mediaItem(for: id)
+        case CashmereProvider.providerID: return cashmere.mediaItem()
+        case LYLProvider.providerID: return lyl.mediaItem()
+        case IdaProvider.providerID: return ida.mediaItem(for: id)
+        case Radio80000Provider.providerID: return radio80000.mediaItem()
+        case PanikProvider.providerID: return panik.mediaItem()
+        case RovrProvider.providerID: return rovr.mediaItem(for: id)
+        case N10ASProvider.providerID: return n10as.mediaItem()
+        default: return nil
+        }
+    }
 
     private var entries: [StationEntry] {
         func each(_ stations: [RadioStation], _ location: String, _ route: (RadioStation) -> Route) -> [StationEntry] {

@@ -133,14 +133,10 @@ struct PhoneMiniPlayer: View {
                             .lineLimit(1)
                     }
                     Spacer(minLength: 0)
-                    Button { player.toggle() } label: {
-                        Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                            .font(.system(size: 20, weight: .semibold))
-                            .frame(width: 44, height: 44)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
+                    transport("backward.fill", label: "Previous", size: 15) { player.previous() }
+                    transport(player.isPlaying ? "pause.fill" : "play.fill",
+                              label: player.isPlaying ? "Pause" : "Play", size: 20) { player.toggle() }
+                    transport("forward.fill", label: "Next", size: 15) { player.next() }
                 }
                 .padding(.leading, 8)
                 .padding(.trailing, 6)
@@ -155,6 +151,19 @@ struct PhoneMiniPlayer: View {
                 .accessibilityHint("Opens the player")
             }
         }
+    }
+}
+
+private extension PhoneMiniPlayer {
+    func transport(_ symbol: String, label: String, size: CGFloat, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: size, weight: .semibold))
+                .frame(width: 38, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 }
 
