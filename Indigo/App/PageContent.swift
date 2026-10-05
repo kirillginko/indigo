@@ -1,0 +1,186 @@
+//
+//  PageContent.swift
+//  Indigo
+//
+//  The page for the current route, or the detail page on top of it. Both
+//  layouts render this -- the sidebar one on the Mac and iPad, the tabbed one
+//  on a phone -- so a page and every link inside it behave the same in either.
+//
+
+import SwiftUI
+
+struct PageContent: View {
+    @Environment(AppState.self) private var appState
+    @Environment(PlaybackCoordinator.self) private var player
+    @Environment(DigStore.self) private var dig
+
+    var body: some View {
+        ZStack {
+            // Opaque rather than the sidebar's glass: the desktop showing
+            // through behind text made the page harder to read. The same
+            // value backs Crate's pinned day headers, so they stay one
+            // continuous surface with the page.
+            IndigoGlassBackground.content
+            if let detail = appState.detail {
+                Group {
+                switch detail {
+                case .album(let id):
+                    AlbumDetailView(albumID: id)
+                case .artist(let id):
+                    ArtistDetailView(artistID: id)
+                case .ntsShow(let alias):
+                    NTSShowDetailView(alias: alias)
+                case .ntsEpisode(let show, let episode):
+                    NTSEpisodeView(showAlias: show, episodeAlias: episode)
+                case .ntsMixtape(let alias):
+                    NTSMixtapeDetailView(alias: alias)
+                case .kioskMood(let id):
+                    KioskMoodDetailView(moodID: id)
+                case .kioskEpisode(let slug):
+                    KioskEpisodeDetailView(episodeSlug: slug)
+                case .digArtist(let mbid, let name):
+                    ArtistDigView(artistName: name, artistMBID: mbid)
+                case .digLabel(let mbid, let name):
+                    LabelDigView(labelMBID: mbid, labelName: name)
+                case .digDiscogsLabel(let name, let discogsID):
+                    DiscogsLabelDigView(labelName: name, labelDiscogsID: discogsID)
+                case .digRelease(let id, let title):
+                    DigReleaseView(releaseID: id, fallbackTitle: title)
+                case .digReleaseNamed(let title, let artist):
+                    DigReleaseView(releaseID: nil, fallbackTitle: title, artistName: artist)
+                case .digRecording(let identity, let title):
+                    RecordingDigView(identity: identity, fallbackTitle: title)
+                case .digCatalog(let number):
+                    CatalogDigView(number: number)
+                case .digScene(let city, let sound):
+                    SceneDigView(city: city, sound: sound)
+                case .noodsShow(let path):
+                    NoodsShowDetailView(showPath: path)
+                case .noodsResident(let path):
+                    NoodsResidentDetailView(residentPath: path)
+                case .noodsCollection(let path):
+                    NoodsCollectionDetailView(collectionPath: path)
+                case .lotEpisode(let show, let episode):
+                    LotEpisodeDetailView(ref: LotEpisodeRef(show: show, episode: episode))
+                case .lotShow(let slug):
+                    LotShowDetailView(showSlug: slug)
+                case .dublabBroadcast(let slug):
+                    DublabBroadcastDetailView(slug: slug)
+                case .dublabDJ(let slug):
+                    DublabDJDetailView(slug: slug)
+                case .alharaShow(let slug):
+                    AlharaShowDetailView(slug: slug)
+                case .cashmereEpisode(let slug):
+                    CashmereEpisodeDetailView(slug: slug)
+                case .cashmereShow(let slug):
+                    CashmereShowDetailView(slug: slug)
+                case .lylEpisode(let slug):
+                    LYLEpisodeDetailView(slug: slug)
+                case .lylShow(let slug):
+                    LYLShowDetailView(slug: slug)
+                case .idaEpisode(let slug):
+                    IdaEpisodeDetailView(slug: slug)
+                case .idaShow(let slug):
+                    IdaShowDetailView(slug: slug)
+                case .radio80000Episode(let id):
+                    Radio80000EpisodeDetailView(episodeID: id)
+                case .radio80000Show(let slug):
+                    Radio80000ShowDetailView(slug: slug)
+                case .panikEpisode(let id):
+                    PanikEpisodeDetailView(episodeID: id)
+                case .panikShow(let slug):
+                    PanikShowDetailView(slug: slug)
+                case .rovrBroadcast(let id):
+                    RovrBroadcastDetailView(broadcastID: id)
+                case .rovrShow(let id):
+                    RovrShowDetailView(showID: id)
+                case .rovrCurator(let id):
+                    RovrCuratorDetailView(curatorID: id)
+                case .n10asEpisode(let id):
+                    N10ASEpisodeDetailView(episodeID: id)
+                case .n10asShow(let slug):
+                    N10ASShowDetailView(slug: slug)
+                case .youtubeChannel(let id):
+                    YouTubeChannelDetailView(channelID: id)
+                }
+                }
+                // A fresh view per page, rather than SwiftUI reusing the last
+                // one because it happens to be the same type. Reuse is why
+                // artist → artist kept the scroll position of the page you
+                // just left, dropping you halfway down a record you had not
+                // seen — and why a page's own state, like how deep you had
+                // dug, followed you onto the next one.
+                .id(detail)
+                // One place, rather than a call in every dig view: a page
+                // opening is the event, wherever it was opened from.
+                .task(id: detail) { dig.remember(detail, from: appState.previousDetail) }
+                    .task {
+                        // Wired here because both are in scope and neither
+                        // should know how to find the other.
+                        player.onUnplayableRecording = { [weak dig] url in
+                            Task { await dig?.markUnplayable(url) }
+                        }
+                    }
+            } else {
+                switch appState.route {
+                case .tracks: TracksView()
+                case .albums: AlbumsView()
+                case .artists: ArtistsView()
+                case .station(let id): NTSStationView(stationID: id)
+                case .ntsLatest: NTSLatestView()
+                case .ntsShows: NTSShowsView()
+                case .ntsMixtapes: NTSMixtapesView()
+                case .ntsSearch: NTSSearchView()
+                case .kioskStation: KioskStationView()
+                case .kioskMoods: KioskMoodsView()
+                case .kioskShows: KioskShowsView()
+                case .noodsStation: NoodsStationView()
+                case .noodsShows: NoodsShowsView()
+                case .noodsResidents: NoodsResidentsView()
+                case .noodsCollections: NoodsCollectionsView()
+                case .lotStation: LotStationView()
+                case .lotIndex: LotIndexView()
+                case .lotShows: LotShowsView()
+                case .dublabStation: DublabStationView()
+                case .dublabArchive: DublabArchiveView()
+                case .dublabDJs: DublabDJsView()
+                case .alharaStation(let id): AlharaStationView(stationID: id)
+                case .alharaArchive: AlharaArchiveView()
+                case .cashmereStation: CashmereStationView()
+                case .cashmereArchive: CashmereArchiveView()
+                case .cashmereShows: CashmereShowsView()
+                case .lylStation: LYLStationView()
+                case .lylArchive: LYLArchiveView()
+                case .lylShows: LYLShowsView()
+                case .idaStation(let id): IdaStationView(stationID: id)
+                case .idaEpisodes: IdaEpisodesView()
+                case .idaShows: IdaShowsView()
+                case .radio80000Station: Radio80000StationView()
+                case .radio80000Latest: Radio80000LatestView()
+                case .radio80000Shows: Radio80000ShowsView()
+                case .panikStation: PanikStationView()
+                case .panikPodcasts: PanikPodcastsView()
+                case .panikShows: PanikShowsView()
+                case .rovrStation(let id): RovrStationView(stationID: id)
+                case .rovrArchive: RovrArchiveView()
+                case .rovrShows: RovrShowsView()
+                case .rovrCurators: RovrCuratorsView()
+                case .youtubeChannels: YouTubeChannelsView()
+                case .n10asStation: N10ASStationView()
+                case .n10asArchive: N10ASArchiveView()
+                case .n10asShows: N10ASShowsView()
+                case .explore: ExploreView()
+                case .crate: CrateView()
+                case .dig: DigView()
+                case .live: PhoneLiveView()
+                case .shows: PhoneShowsView()
+                }
+            }
+        }
+        // Same dark glass treatment as the sidebar and player bar. Palette
+        // colours all carry a dark-appearance variant in the asset catalog,
+        // so forcing the scheme here is enough to flip every Palette.paper /
+        // Palette.ink use inside content — no per-view edits needed.
+        .environment(\.colorScheme, .dark)
+    }
+}
