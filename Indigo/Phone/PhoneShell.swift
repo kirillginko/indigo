@@ -216,6 +216,8 @@ struct PhoneNowPlayingView: View {
                                 .lineLimit(2)
                         }
                         .padding(.horizontal, 24)
+                        PhoneScrubber()
+                            .padding(.horizontal, 28)
                         HStack(spacing: 44) {
                             transportButton("backward.fill", label: "Previous", size: 26) { player.previous() }
                             transportButton(player.isPlaying ? "pause.fill" : "play.fill",
@@ -243,5 +245,36 @@ struct PhoneNowPlayingView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+    }
+}
+
+/// Where in the episode or track the player is, and dragging to move there.
+/// A live stream cannot be moved through, so it says LIVE instead.
+struct PhoneScrubber: View {
+    @Environment(PlaybackCoordinator.self) private var player
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+            if player.canSeek {
+                VStack(spacing: 6) {
+                    HairlineSlider(value: player.progress, enabled: true, thickness: 4) { fraction in
+                        player.seek(fraction: fraction)
+                    }
+                    HStack {
+                        Text(TimeFormat.clock(player.position))
+                        Spacer()
+                        Text(TimeFormat.clock(player.duration))
+                    }
+                    .font(Typeface.mono(11))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .monospacedDigit()
+                }
+            } else if player.current?.isLive == true {
+                HStack(spacing: 6) {
+                    Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 7, height: 7)
+                    Text("LIVE").microLabel(1.8, size: 11)
+                }
+            }
+        }
     }
 }

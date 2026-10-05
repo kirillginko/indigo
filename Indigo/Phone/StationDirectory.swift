@@ -87,7 +87,10 @@ enum ShowsDirectory {
         var id: Route { route }
     }
 
+    /// The archives first: the radio shows kept on YouTube channels have no
+    /// station to be found under.
     static let entries: [Entry] = [
+        Entry(station: "Archives", label: "YouTube channels", route: .youtubeChannels),
         Entry(station: "NTS", label: "Shows", route: .ntsShows),
         Entry(station: "NTS", label: "Mixtapes", route: .ntsMixtapes),
         Entry(station: "Kiosk Radio", label: "Shows", route: .kioskShows),
@@ -101,7 +104,6 @@ enum ShowsDirectory {
         Entry(station: "Radio 80000", label: "Shows", route: .radio80000Shows),
         Entry(station: "Radio Panik", label: "Shows", route: .panikShows),
         Entry(station: "ROVR", label: "Shows", route: .rovrShows),
-        Entry(station: "n10.as", label: "Shows", route: .n10asShows),
-        Entry(station: "Archives", label: "YouTube channels", route: .youtubeChannels)
+        Entry(station: "n10.as", label: "Shows", route: .n10asShows)
     ]
 }

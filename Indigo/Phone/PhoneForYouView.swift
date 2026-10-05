@@ -8,10 +8,15 @@
 //  kept, with a radio show every third slide; each says in one line why it is
 //  here and in one what it was reached through.
 //
-//  The suggestions are DIG's own (`DigStore.exploreOffers`), refreshed when
-//  the crate changes, as the Mac's For You page refreshes them. A suggestion
-//  is opened, not played: an artist opens its DIG page, a show its page or
-//  latest broadcast.
+//  The feed opens on For You's own moving field, full screen; the suggestions
+//  are swiped up from it. They are DIG's own (`DigStore.exploreOffers`),
+//  refreshed when the crate changes, as the Mac's For You page refreshes
+//  them. A suggestion is opened, not played: an artist opens its DIG page, a
+//  show its page or latest broadcast.
+//
+//  Before anything has been kept there is nothing to suggest from, and a
+//  first look at the app should not be an empty page: the feed is then what
+//  the stations have on now, one show from each, to listen to straight away.
 //
 
 import SwiftUI
@@ -27,36 +32,74 @@ struct PhoneForYouView: View {
     @Environment(N10ASBrowseStore.self) private var n10asBrowse
     @Bindable private var feeds = PhoneFeeds.shared
 
+    /// One screen of the feed.
+    enum Slide: Identifiable {
+        case cover
+        case suggestion(ExploreSuggestion)
+        case onNow(StationEntry)
+
+        var id: String {
+            switch self {
+            case .cover: "cover"
+            case .suggestion(let suggestion): "suggestion." + suggestion.id
+            case .onNow(let entry): "onNow." + entry.id
+            }
+        }
+    }
+
     var body: some View {
         GeometryReader { proxy in
             let insets = proxy.safeAreaInsets
-            let slides = Self.slides(from: dig.exploreOffers)
-            Group {
-                if slides.isEmpty {
-                    empty
-                } else {
-                    ScrollView(.vertical) {
-                        LazyVStack(spacing: 0) {
-                            ForEach(slides) { suggestion in
-                                PhoneForYouSlide(
-                                    suggestion: suggestion,
-                                    portrait: suggestion.node.kind == .artist
-                                        ? dig.portraitURL(for: suggestion.node.title) : nil,
-                                    insets: insets
-                                ) { Task { await open(suggestion.node) } }
-                                .containerRelativeFrame([.horizontal, .vertical])
+            StationDirectory { entries, playable in
+                let suggestions = Self.slides(from: dig.exploreOffers)
+                let slides: [Slide] = [.cover] + (suggestions.isEmpty
+                    ? Self.sampler(entries).map(Slide.onNow)
+                    : suggestions.map(Slide.suggestion))
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(slides) { slide in
+                            Group {
+                                switch slide {
+                                case .cover:
+                                    PhoneForYouCover(insets: insets, hasSuggestions: !suggestions.isEmpty)
+                                case .suggestion(let suggestion):
+                                    PhoneForYouSlide(
+                                        suggestion: suggestion,
+                                        portrait: suggestion.node.kind == .artist
+                                            ? dig.portraitURL(for: suggestion.node.title) : nil,
+                                        insets: insets
+                                    ) { Task { await open(suggestion.node) } }
+                                case .onNow(let entry):
+                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets) {
+                                        appState.select(entry.route)
+                                    }
+                                }
                             }
+                            .containerRelativeFrame([.horizontal, .vertical])
                         }
-                        .scrollTargetLayout()
                     }
-                    .scrollTargetBehavior(.paging)
-                    .scrollIndicators(.hidden)
-                    .scrollPosition(id: $feeds.forYouID)
+                    .scrollTargetLayout()
                 }
+                .scrollTargetBehavior(.paging)
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: $feeds.forYouID)
             }
             .ignoresSafeArea()
         }
         .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
+    }
+
+    /// One show from each station, in an order of its own -- not Live's -- so
+    /// the first look at For You is not the Live tab again.
+    static func sampler(_ entries: [StationEntry]) -> [StationEntry] {
+        var byProvider: [String: StationEntry] = [:]
+        for entry in entries where byProvider[entry.station.providerID] == nil {
+            byProvider[entry.station.providerID] = entry
+        }
+        let firsts = entries.filter { byProvider[$0.station.providerID]?.id == $0.id }
+        // Every other station from the far end, then the rest.
+        return stride(from: firsts.count - 1, through: 0, by: -2).map { firsts[$0] }
+            + stride(from: firsts.count - 2, through: 0, by: -2).map { firsts[$0] }
     }
 
     /// Artists and next steps, a show every third slide, nothing twice.
@@ -84,27 +127,6 @@ struct PhoneForYouView: View {
         case .section(let route): appState.select(route)
         case nil: break
         }
-    }
-
-    private var empty: some View {
-        // The picture behind, clipped, so a filled image cannot widen the
-        // frame the words are centred in.
-        VStack(spacing: 10) {
-            Text("Nothing to suggest yet")
-                .font(.system(size: 22, weight: .bold))
-            Text("Crate a few records, artists or shows, and what they lead to turns up here.")
-                .font(Typeface.mono(12))
-                .foregroundStyle(.white.opacity(0.8))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 36)
-        }
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            Image("MineralGround").resizable().scaledToFill()
-                .overlay(Color.black.opacity(0.35))
-        }
-        .clipped()
     }
 }
 
@@ -209,6 +231,41 @@ private struct PhoneForYouSlide: View {
         case .release: "Release"
         case .recording: "Recording"
         default: "Suggestion"
+        }
+    }
+}
+
+/// The first screen of For You: its moving field, full frame, and the way in.
+private struct PhoneForYouCover: View {
+    let insets: EdgeInsets
+    let hasSuggestions: Bool
+
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                ExploreShaderField(seed: 0, size: proxy.size)
+                LinearGradient(colors: [.clear, .black.opacity(0.55)], startPoint: .center, endPoint: .bottom)
+                VStack(spacing: 12) {
+                    Spacer()
+                    Text("For You")
+                        .font(.system(size: 44, weight: .bold))
+                    Text(hasSuggestions
+                         ? "Artists and shows, from what you keep"
+                         : "Start with what the stations have on now")
+                        .font(Typeface.mono(13))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                    Spacer()
+                    VStack(spacing: 4) {
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("SWIPE UP").microLabel(2, size: 10)
+                    }
+                    .padding(.bottom, insets.bottom + 26)
+                }
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.35), radius: 10)
+            }
         }
     }
 }

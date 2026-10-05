@@ -1156,7 +1156,8 @@ private struct ExploreViewportField: View {
     }
 }
 
-private struct ExploreShaderField: View {
+/// Also the phone's For You cover. See `PhoneForYouView`.
+struct ExploreShaderField: View {
     let seed: Int
     /// The size to fill, from the page's own geometry.
     ///

@@ -43,7 +43,8 @@ struct PhoneLiveView: View {
     }
 }
 
-private struct PhoneLiveSlide: View {
+/// Also For You's slides of what is on now, when there is nothing to suggest.
+struct PhoneLiveSlide: View {
     let entry: StationEntry
     let item: MediaItem?
     let insets: EdgeInsets
