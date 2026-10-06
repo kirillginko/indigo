@@ -83,20 +83,26 @@ final class ArtworkFallbackTests: XCTestCase {
     /// Several stations publish no picture of what is on air. Their own mark
     /// beats an empty square in the one place always in view.
     func testAStationWithNoPictureStillHasAMark() {
-        XCTAssertEqual(StationMark.logoURL(for: LYLProvider.providerID), LYLProvider.logoURL)
-        XCTAssertEqual(StationMark.logoURL(for: CashmereProvider.providerID), CashmereProvider.logoURL)
-        XCTAssertEqual(StationMark.logoURL(for: AlharaProvider.providerID), AlharaProvider.logoURL)
-        XCTAssertEqual(StationMark.logoURL(for: DublabProvider.providerID), DublabProvider.logoURL)
+        // The app's own square logo, bundled, for every station -- NTS, Kiosk
+        // and The Lot included, which publish none.
+        for id in [NTSProvider.providerID, KioskProvider.providerID, LotProvider.providerID,
+                   LYLProvider.providerID, CashmereProvider.providerID, AlharaProvider.providerID,
+                   DublabProvider.providerID, IdaProvider.providerID, Radio80000Provider.providerID,
+                   PanikProvider.providerID, RovrProvider.providerID, N10ASProvider.providerID,
+                   NoodsProvider.providerID] {
+            let url = StationMark.logoURL(for: id)
+            XCTAssertNotNil(url, "\(id) has a logo")
+            XCTAssertTrue(StationMark.isBundled(url), "\(id)'s logo is the bundled one")
+        }
         XCTAssertEqual(StationMark.name(for: LYLProvider.providerID), "LYL")
     }
 
-    /// Stations that do publish artwork must not have it replaced by a logo,
-    /// and neither must a local file.
-    func testStationsWithTheirOwnArtworkAreLeftAlone() {
-        XCTAssertNil(StationMark.logoURL(for: NTSProvider.providerID))
+    /// A logo is only a fallback (ArtworkView draws a station's own picture
+    /// first), and nothing that is not a station has one.
+    func testNothingButAStationHasALogo() {
         XCTAssertNil(StationMark.logoURL(for: Track.sourceID))
         XCTAssertNil(StationMark.logoURL(for: nil))
-        XCTAssertNil(StationMark.name(for: NTSProvider.providerID))
+        XCTAssertFalse(StationMark.isBundled(URL(string: "https://example.test/StationLogo-nts.png")))
     }
 
     /// Some stations publish nothing bigger than a 32-pixel favicon. Blown up
