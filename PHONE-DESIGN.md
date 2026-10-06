@@ -184,10 +184,9 @@ built from a station's broadcast; they use the same `PhoneEpisodeRow`.
 For You shader uncovered and a black ASCII globe across the width
 (`PhoneForYouGlobe`), with IDA boxes pinned about it, kind or city in green
 over the name: the suggestions the Mac's For You has, or before anything is
-kept, every station and one Archives box. Boxes turning round the back stay,
-faint, behind the globe's characters. Under it LIVE NOW, every station as a
-box to play; above the tabs KEEP EXPLORING, on to the suggestions, one a
-screen. The globe turns by hand sideways.
+kept, every station; and always one Archives box. Boxes turning round the
+back stay, faint, behind the globe's characters. Above the tabs KEEP
+EXPLORING, on to the suggestions, one a screen. The globe turns by hand sideways.
 
 **Live slide** — picture full-bleed; top: info (round), station pill;
 bottom, one row each: city · show · genres · `NextUpRows` · PLAY.

@@ -64,7 +64,6 @@ struct PhoneForYouView: View {
                                 case .cover:
                                     PhoneForYouGlobe(
                                         items: globeItems(suggestions: suggestions, entries: entries, playable: playable),
-                                        stations: stationItems(entries, playable: playable),
                                         insets: insets
                                     ) {
                                         guard slides.count > 1 else { return }
@@ -134,20 +133,20 @@ struct PhoneForYouView: View {
         entries: [StationEntry],
         playable: @escaping (StationEntry) -> MediaItem?
     ) -> [GlobeItem] {
+        // Always one box into the archives, wherever the rest come from.
+        let archives = GlobeItem(id: "archives", label: "Archives", title: "Radio on YouTube") {
+            PhoneFeeds.shared.showsStation = "Archives"
+            appState.select(.shows)
+        }
         if !suggestions.isEmpty {
             // All of them, as the Mac's For You shows: up to twenty-four.
-            return suggestions.map { suggestion in
+            return [archives] + suggestions.map { suggestion in
                 GlobeItem(id: suggestion.id, label: Self.kind(of: suggestion.node), title: suggestion.node.title) {
                     Task { await open(suggestion.node) }
                 }
             }
         }
-        let stations = stationItems(entries, playable: playable)
-        let archives = GlobeItem(id: "archives", label: "Archives", title: "Radio on YouTube") {
-            PhoneFeeds.shared.showsStation = "Archives"
-            appState.select(.shows)
-        }
-        return stations + [archives]
+        return stationItems(entries, playable: playable) + [archives]
     }
 
     /// Every station, its city over its short name; tapped, it plays.
