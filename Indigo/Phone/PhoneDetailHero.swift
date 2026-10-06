@@ -168,8 +168,9 @@ struct PhoneBackGlyph: View {
             .foregroundStyle(Chip.ink)
             .frame(width: 46, height: 46)
             .background { MineralSheenSurface() }
-            .clipped()
-            .overlay(Rectangle().strokeBorder(.white.opacity(0.2)))
-            .contentShape(Rectangle())
+            // Round, as the tab bar's search button is.
+            .clipShape(Circle())
+            .overlay(Circle().strokeBorder(.white.opacity(0.2)))
+            .contentShape(Circle())
     }
 }

@@ -132,10 +132,12 @@ struct PhoneLiveSlide: View {
                     .tracking(1.2)
                     .textCase(.uppercase)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 18)
             .frame(height: 46)
-            .background(Chip.black, ignoresSafeAreaEdges: [])
-            .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
+            // Rounded, on the player's moving field, as the mini player is.
+            .background { PlayerShaderBackdrop() }
+            .clipShape(Capsule())
+            .overlay(Capsule().strokeBorder(.white.opacity(0.14)))
             Spacer()
             // Balances the info button, so the station's name sits centred.
             Color.clear.frame(width: 46, height: 46)

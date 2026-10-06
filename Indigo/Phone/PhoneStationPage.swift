@@ -101,10 +101,12 @@ struct PhoneStationPage: View {
                     .tracking(1.2)
                     .textCase(.uppercase)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 18)
             .frame(height: 46)
-            .background(Chip.black, ignoresSafeAreaEdges: [])
-            .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
+            // Rounded, on the player's moving field, as the mini player is.
+            .background { PlayerShaderBackdrop() }
+            .clipShape(Capsule())
+            .overlay(Capsule().strokeBorder(.white.opacity(0.14)))
             Spacer()
             Color.clear.frame(width: 46, height: 46)
         }
@@ -135,22 +137,23 @@ struct PhoneStationPage: View {
                 .buttonStyle(.plain)
             }
             if let slot = show?.slot {
-                HStack(spacing: 0) {
+                ChipFlow {
                     Chip(text: slot, tone: .sheen, size: 12.5)
                     Chip(text: "On now", size: 12.5, uppercase: true)
                 }
+                .frame(maxWidth: .infinity)
             }
             if let next {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack(spacing: 0) {
+                VStack(spacing: 0) {
+                    ChipFlow {
                         if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
                             Chip(text: time, tone: .sheen, size: 12.5)
                         }
                         Chip(text: "Next up", size: 12.5, uppercase: true)
                     }
-                    Chip(text: next.title, size: 15)
-                        .fixedSize(horizontal: false, vertical: true)
+                    ChipFlow { Chip(text: next.title, size: 15) }
                 }
+                .frame(maxWidth: .infinity)
             }
         }
     }
