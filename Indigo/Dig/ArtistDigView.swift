@@ -83,7 +83,7 @@ struct ArtistDigView: View {
                         subtitle: subtitle(profile).nilIfEmpty,
                         imageURL: profile.coverURL,
                         previewURL: profile.previewURL,
-                        genres: uniqueTags(profile),
+                        // The genres have their own section just below.
                         awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil
                     )
                 }

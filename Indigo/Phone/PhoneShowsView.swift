@@ -133,11 +133,24 @@ struct PhoneShowsView: View {
             VStack(spacing: 0) {
                 gridHeader(station)
                 if shown.isEmpty {
-                    Text(isLoading(station.id) ? "Loading shows…" : "No shows yet.")
-                        .font(Typeface.mono(12))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(20)
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text(isLoading(station.id) ? "Loading shows…" : "No shows came back.")
+                            .font(Typeface.mono(12))
+                            .foregroundStyle(.white.opacity(0.6))
+                        if !isLoading(station.id) {
+                            Button {
+                                Task {
+                                    if station.id == "NTS" { await nts.retryShows() }
+                                    await load(station.id)
+                                }
+                            } label: {
+                                Chip(text: "Try again", tone: .lead, size: 12, uppercase: true)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
                 } else {
                     LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(shown) { card($0) }
@@ -294,8 +307,14 @@ struct PhoneShowsView: View {
         station == "NTS" && nts.shows.hasMore
     }
 
-    /// The station's list, once.
+    /// The station's list, once. In a task of its own: begun from the list's
+    /// row, it outlives the row -- picking the station tears the list down,
+    /// and that cancelled NTS's request halfway, leaving its grid empty.
     private func load(_ station: String) async {
+        await Task { await fetch(station) }.value
+    }
+
+    private func fetch(_ station: String) async {
         switch station {
         case "Archives": await archives.loadChannelsIfNeeded()
         case "NTS": await nts.loadShowsIfNeeded()

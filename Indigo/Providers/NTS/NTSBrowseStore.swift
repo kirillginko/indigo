@@ -123,11 +123,22 @@ final class NTSBrowseStore {
             shows.total = page.total
             shows.hasLoadedOnce = true
         } catch is CancellationError {
+        } catch let error as URLError where error.code == .cancelled {
+            // The request was called off, not refused: nothing was learned,
+            // so the next ask asks again. Counted as a failure, the list
+            // was marked loaded with nothing in it and never asked again.
         } catch {
             shows.error = message(for: error)
             shows.hasLoadedOnce = true
         }
         shows.isLoading = false
+    }
+
+    /// Asks for the first page again after it failed.
+    func retryShows() async {
+        guard shows.items.isEmpty, !shows.isLoading else { return }
+        shows = Feed<NTSShowSummary>()
+        await loadMoreShows()
     }
 
     // MARK: One show's episodes

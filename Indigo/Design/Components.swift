@@ -11,9 +11,11 @@ import SwiftUI
 
 struct Rule: View {
     var color: Color = Palette.rule
+    @Environment(\.isPhoneLayout) private var isPhone
+
     var body: some View {
         Rectangle()
-            .fill(color)
+            .fill(isPhone ? Color.white.opacity(0.1) : color)
             .frame(height: Metrics.hairline)
             .accessibilityHidden(true)
     }
