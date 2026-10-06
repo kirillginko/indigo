@@ -164,6 +164,16 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
         return nil
     }
 
+    /// The largest copy held at any size: a stand-in while the size a tile
+    /// wants loads -- the mini player's cover, say, while the full player's
+    /// fetches its larger cut.
+    func anyCachedImage(for url: URL) -> PlatformImage? {
+        for candidate in Self.steps.reversed() {
+            if let image = cache.object(forKey: cacheKey(url, candidate)) { return image }
+        }
+        return nil
+    }
+
     private func remember(_ image: PlatformImage, _ url: URL, _ step: Int) {
         cache.setObject(image, forKey: cacheKey(url, step), cost: Self.cost(of: image))
     }
@@ -395,7 +405,10 @@ struct ArtworkView: View {
 
     private var cachedPreview: PlatformImage? {
         guard let preview = distinctPreviewURL else { return nil }
+        // Any size held will do while the right one loads: the same picture,
+        // smaller, rather than an empty square.
         return RemoteArtworkStore.shared.cachedImage(for: preview, pixels: pixels)
+            ?? RemoteArtworkStore.shared.anyCachedImage(for: preview)
     }
 
     @Environment(\.displayScale) private var displayScale

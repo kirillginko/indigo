@@ -36,6 +36,7 @@ struct PhoneForYouGlobe: View {
 
     /// How far the globe has been turned by hand, in radians.
     @State private var turned: Double = 0
+    @Environment(PlaybackCoordinator.self) private var player
     @GestureState private var turning: Double = 0
 
     /// One turn a minute and a bit, on its own.
@@ -56,7 +57,7 @@ struct PhoneForYouGlobe: View {
                 globe
                 stationBoxes
                 keepExploringBox
-                    .padding(.bottom, insets.bottom + 12)
+                    .padding(.bottom, insets.bottom + 12 + (player.current == nil ? PhoneLayout.miniPlayerRoom : 0))
             }
         }
     }

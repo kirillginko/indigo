@@ -191,6 +191,7 @@ private struct PhoneForYouSlide: View {
     let portrait: URL?
     let insets: EdgeInsets
     let open: () -> Void
+    @Environment(PlaybackCoordinator.self) private var player
 
     private var isShow: Bool { suggestion.node.kind == .broadcast }
     private var picture: URL? { suggestion.node.artworkURL ?? portrait }
@@ -261,7 +262,7 @@ private struct PhoneForYouSlide: View {
                     .padding(.top, 6)
                 }
                 .padding(.horizontal, 22)
-                .padding(.bottom, insets.bottom + 22)
+                .padding(.bottom, insets.bottom + 22 + (player.current == nil ? PhoneLayout.miniPlayerRoom : 0))
             }
         }
         .foregroundStyle(.white)

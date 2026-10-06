@@ -85,7 +85,7 @@ struct PhoneLiveSlide: View {
                     Spacer(minLength: 0)
                     details(show, next)
                         .padding(.horizontal, 22)
-                        .padding(.bottom, insets.bottom + 22)
+                        .padding(.bottom, insets.bottom + 22 + (player.current == nil ? PhoneLayout.miniPlayerRoom : 0))
                 }
             }
             .foregroundStyle(.white)

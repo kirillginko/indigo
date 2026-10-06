@@ -65,7 +65,11 @@ struct PhoneRootView: View {
                 .zIndex(1)
             if showsNowPlaying {
                 PhoneNowPlayingView(maximize: { videoFullScreen = true }) { close() }
-                    .transition(.move(edge: .bottom))
+                    // Down by the whole screen and then some: its ground runs
+                    // up under the status bar, and moved by its own height
+                    // only, that top strip -- close button and all -- was
+                    // left sitting at the bottom of the screen.
+                    .transition(.offset(y: size.height + 160))
                     .zIndex(2)
             }
             if videoUp {
@@ -92,7 +96,10 @@ struct PhoneRootView: View {
         // Full screen, a video turns to landscape; back, the phone stands up.
         .onChange(of: videoUp) { _, up in OrientationLock.allowsLandscape(up) }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
-        .modifier(RootChrome(bottomInset: keyboardUp || showsNowPlaying ? 0 : shellHeight, hostsEmbedPlayer: false))
+        // Not dependent on the full player: changed as it opened and closed,
+        // every page laid itself out again mid-slide, and the player sat at
+        // the bottom of the screen until they were done.
+        .modifier(RootChrome(bottomInset: keyboardUp ? 0 : shellHeight, hostsEmbedPlayer: false))
         // The page's dark ground to the screen's edges, under the status bar
         // and the home indicator too, and light status-bar text over it: the
         // phone is dark throughout.
@@ -103,7 +110,6 @@ struct PhoneRootView: View {
         .environment(\.colorScheme, .dark)
         .environment(\.isPhoneLayout, true)
         .animation(.easeOut(duration: 0.2), value: keyboardUp)
-        .animation(.spring(duration: 0.35), value: showsNowPlaying)
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
             keyboardUp = true
         }
@@ -210,13 +216,18 @@ struct PhoneRootView: View {
         .padding(.top, 12)
     }
 
+    /// Only the player slides; nothing else is animated with it.
     private func close() {
-        showsNowPlaying = false
+        withAnimation(.spring(duration: 0.35)) { showsNowPlaying = false }
+    }
+
+    private func openPlayer() {
+        withAnimation(.spring(duration: 0.35)) { showsNowPlaying = true }
     }
 
     private var shell: some View {
         VStack(spacing: 8) {
-            PhoneMiniPlayer { showsNowPlaying = true }
+            PhoneMiniPlayer { openPlayer() }
             PhoneTabBar(
                 selected: PhoneTab.of(appState.route),
                 searching: appState.route == .dig,

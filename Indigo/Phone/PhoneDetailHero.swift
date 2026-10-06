@@ -143,6 +143,10 @@ enum PhoneLayout {
     /// The phone pages' side margin. Section titles undo it to sit against
     /// the screen's left edge.
     static let margin: CGFloat = 16
+    /// The mini player's height and the gap under it. Full-screen slides
+    /// keep this room at the bottom whether or not it shows, so their play
+    /// button does not jump when something starts playing.
+    static let miniPlayerRoom: CGFloat = 62 + 8
 }
 
 /// A page's side margin: the Mac's gutter, or the phone's narrower one.
