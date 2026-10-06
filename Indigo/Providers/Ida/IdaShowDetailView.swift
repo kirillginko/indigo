@@ -34,7 +34,7 @@ struct IdaShowDetailView: View {
             station: show?.channel?.city ?? "IDA Radio",
             host: show?.artist,
             imageURL: show?.imageURL,
-            markURL: IdaProvider.logoURL,
+            markURL: StationMark.logoURL(for: IdaProvider.providerID),
             genres: show?.genres ?? [],
             summary: show?.summary,
             episodes: episodes.map { episode in
@@ -95,7 +95,7 @@ struct IdaShowDetailView: View {
                     ArtworkView(
                         remoteURL: show.imageURL,
                         side: 300,
-                        markURL: IdaProvider.logoURL,
+                        markURL: StationMark.logoURL(for: IdaProvider.providerID),
                         mark: "IDA Radio"
                     )
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

@@ -84,7 +84,7 @@ struct RovrBroadcastDetailView: View {
             ArtworkView(
                 remoteURL: broadcast.imageURL,
                 side: 300,
-                markURL: RovrProvider.logoURL,
+                markURL: StationMark.logoURL(for: RovrProvider.providerID),
                 mark: "ROVR"
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

@@ -85,7 +85,7 @@ struct CashmereStationView: View {
             ArtworkView(
                 remoteURL: onAirArtwork,
                 side: 300,
-                markURL: CashmereProvider.logoURL,
+                markURL: StationMark.logoURL(for: CashmereProvider.providerID),
                 mark: "Cashmere Radio"
             )
                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

@@ -89,7 +89,7 @@ struct Radio80000EpisodeTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: episode.artworkURL,
-                markURL: Radio80000Provider.logoURL,
+                markURL: StationMark.logoURL(for: Radio80000Provider.providerID),
                 mark: "Radio 80000"
             )
             .overlay(Rectangle().strokeBorder(
@@ -158,7 +158,7 @@ struct Radio80000ShowTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: show.thumbnailURL ?? show.imageURL,
-                markURL: Radio80000Provider.logoURL,
+                markURL: StationMark.logoURL(for: Radio80000Provider.providerID),
                 mark: "Radio 80000"
             )
             .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))

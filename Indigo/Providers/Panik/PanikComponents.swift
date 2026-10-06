@@ -82,7 +82,7 @@ struct PanikEpisodeTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: episode.imageURL,
-                markURL: PanikProvider.logoURL,
+                markURL: StationMark.logoURL(for: PanikProvider.providerID),
                 mark: "Radio Panik"
             )
             .overlay(Rectangle().strokeBorder(
@@ -157,7 +157,7 @@ struct PanikShowTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: show.imageURL,
-                markURL: PanikProvider.logoURL,
+                markURL: StationMark.logoURL(for: PanikProvider.providerID),
                 mark: "Radio Panik"
             )
             .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))

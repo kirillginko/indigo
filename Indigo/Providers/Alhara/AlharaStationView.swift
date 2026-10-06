@@ -87,7 +87,7 @@ struct AlharaStationView: View {
             // that if even the mark cannot be reached.
             ArtworkView(
                 side: 300,
-                markURL: AlharaProvider.logoURL,
+                markURL: StationMark.logoURL(for: AlharaProvider.providerID),
                 mark: station?.name ?? "Radio alHara"
             )
                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

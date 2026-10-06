@@ -91,6 +91,10 @@ The Mac's `Typeface.display` and `body` are not used on phone pages.
   WordPress and YouTube for a larger cut than a list does, with the
   station's own cut as the preview. Never set a row's small cut (a
   `thumbnailURL`) as a hero's picture.
+- **Station logos** are the app's own, bundled in
+  `Resources/StationLogos/StationLogo-<providerID>`, square designs drawn
+  filling their tile. Always reach them through `StationMark.logoURL(for:)`,
+  which prefers the bundled one; never a provider's `logoURL` directly.
 - **No picture**: a show, artist, record or station with no picture, or one
   that failed to load, is the wordmark's moving green on the phone
   (`MineralSheenSurface(lowResolution: true)`, drawn once per size) -- one
@@ -184,7 +188,7 @@ built from a station's broadcast; they use the same `PhoneEpisodeRow`.
 For You shader uncovered and a black ASCII globe across the width
 (`PhoneForYouGlobe`), with IDA boxes pinned about it, kind or city in green
 over the name: the suggestions the Mac's For You has, or before anything is
-kept, every station; and always one Archives box. Boxes turning round the
+kept, every station; and always one DIGITAL ARCHIVES box. Boxes turning round the
 back stay, faint, behind the globe's characters. Above the tabs KEEP
 EXPLORING, on to the suggestions, one a screen. The globe turns by hand sideways.
 

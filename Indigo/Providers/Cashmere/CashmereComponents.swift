@@ -158,7 +158,7 @@ struct CashmereShowTile: View {
         return VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: preview?.artworkURL,
-                markURL: CashmereProvider.logoURL,
+                markURL: StationMark.logoURL(for: CashmereProvider.providerID),
                 mark: "Cashmere Radio"
             )
                 .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))

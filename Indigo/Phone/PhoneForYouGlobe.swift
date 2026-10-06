@@ -19,7 +19,7 @@ import SwiftUI
 /// One box on the globe.
 struct GlobeItem: Identifiable {
     let id: String
-    /// What it is or where, in the green box over its name.
+    /// What it is or where, in the green box over its name; none, no box.
     let label: String
     let title: String
     var isOn = false
@@ -238,7 +238,9 @@ struct PhoneForYouGlobe: View {
         let facing = min(1, max(0, (spot.z + 0.1) / 0.5))
         return Button(action: item.action) {
             VStack(spacing: 0) {
-                Chip(text: item.label, tone: .lead, size: 10, uppercase: true)
+                if !item.label.isEmpty {
+                    Chip(text: item.label, tone: .lead, size: 10, uppercase: true)
+                }
                 Chip(text: item.title, tone: item.isOn ? .sheen : .plain, size: 12)
                     .lineLimit(2)
                     .frame(maxWidth: 150)

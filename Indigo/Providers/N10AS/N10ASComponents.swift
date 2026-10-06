@@ -87,7 +87,7 @@ struct N10ASEpisodeTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: episode.artworkURL,
-                markURL: N10ASProvider.logoURL,
+                markURL: StationMark.logoURL(for: N10ASProvider.providerID),
                 mark: "n10.as"
             )
             .overlay(Rectangle().strokeBorder(
@@ -156,7 +156,7 @@ struct N10ASShowTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: show.imageURL,
-                markURL: N10ASProvider.logoURL,
+                markURL: StationMark.logoURL(for: N10ASProvider.providerID),
                 mark: "n10.as"
             )
             .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))

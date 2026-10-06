@@ -134,7 +134,7 @@ struct PhoneForYouView: View {
         playable: @escaping (StationEntry) -> MediaItem?
     ) -> [GlobeItem] {
         // Always one box into the archives, wherever the rest come from.
-        let archives = GlobeItem(id: "archives", label: "Archives", title: "Radio on YouTube") {
+        let archives = GlobeItem(id: "archives", label: "", title: "Digital Archives") {
             PhoneFeeds.shared.showsStation = "Archives"
             appState.select(.shows)
         }

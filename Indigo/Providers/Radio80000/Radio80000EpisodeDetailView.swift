@@ -80,7 +80,7 @@ struct Radio80000EpisodeDetailView: View {
             ArtworkView(
                 remoteURL: episode.artworkURL,
                 side: 300,
-                markURL: Radio80000Provider.logoURL,
+                markURL: StationMark.logoURL(for: Radio80000Provider.providerID),
                 mark: "Radio 80000"
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

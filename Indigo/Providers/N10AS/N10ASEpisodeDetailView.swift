@@ -85,7 +85,7 @@ struct N10ASEpisodeDetailView: View {
             ArtworkView(
                 remoteURL: episode.artworkURL,
                 side: 300,
-                markURL: N10ASProvider.logoURL,
+                markURL: StationMark.logoURL(for: N10ASProvider.providerID),
                 mark: "n10.as"
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

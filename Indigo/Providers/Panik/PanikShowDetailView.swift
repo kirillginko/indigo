@@ -79,7 +79,7 @@ struct PanikShowDetailView: View {
                     ArtworkView(
                         remoteURL: show.imageURL,
                         side: 300,
-                        markURL: PanikProvider.logoURL,
+                        markURL: StationMark.logoURL(for: PanikProvider.providerID),
                         mark: "Radio Panik"
                     )
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

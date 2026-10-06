@@ -293,7 +293,29 @@ nonisolated struct BroadcastSource {
 /// browse grids and the now-playing summary, and three copies of the answer
 /// is how one of them ends up out of date.
 nonisolated enum StationMark {
+    /// The station's logo: the square one bundled with the app (Resources/
+    /// StationLogos, one per station), else what the station publishes.
     static func logoURL(for providerID: String?) -> URL? {
+        bundledLogo(for: providerID) ?? publishedLogo(for: providerID)
+    }
+
+    /// Whether `url` is one of the bundled logos: a designed square, drawn
+    /// filling its tile rather than inset as a mark.
+    static func isBundled(_ url: URL?) -> Bool {
+        url?.isFileURL == true && url?.lastPathComponent.hasPrefix("StationLogo-") == true
+    }
+
+    static func bundledLogo(for providerID: String?) -> URL? {
+        guard let providerID else { return nil }
+        for ext in ["png", "jpg"] {
+            if let url = Bundle.main.url(forResource: "StationLogo-\(providerID)", withExtension: ext) {
+                return url
+            }
+        }
+        return nil
+    }
+
+    private static func publishedLogo(for providerID: String?) -> URL? {
         switch providerID {
         case AlharaProvider.providerID: AlharaProvider.logoURL
         case DublabProvider.providerID: DublabProvider.logoURL

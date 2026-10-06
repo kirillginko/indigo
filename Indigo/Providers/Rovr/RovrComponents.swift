@@ -87,7 +87,7 @@ struct RovrBroadcastTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: broadcast.thumbnailURL ?? broadcast.imageURL,
-                markURL: RovrProvider.logoURL,
+                markURL: StationMark.logoURL(for: RovrProvider.providerID),
                 mark: "ROVR"
             )
             .overlay(Rectangle().strokeBorder(
@@ -162,7 +162,7 @@ struct RovrShowTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: show.thumbnailURL ?? show.imageURL,
-                markURL: RovrProvider.logoURL,
+                markURL: StationMark.logoURL(for: RovrProvider.providerID),
                 mark: "ROVR"
             )
             .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
@@ -206,7 +206,7 @@ struct RovrCuratorTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: curator.thumbnailURL ?? curator.imageURL,
-                markURL: RovrProvider.logoURL,
+                markURL: StationMark.logoURL(for: RovrProvider.providerID),
                 mark: "ROVR"
             )
             .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))

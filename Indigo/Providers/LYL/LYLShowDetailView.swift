@@ -73,7 +73,7 @@ struct LYLShowDetailView: View {
                     ArtworkView(
                         remoteURL: show.imageURL,
                         side: 300,
-                        markURL: LYLProvider.logoURL,
+                        markURL: StationMark.logoURL(for: LYLProvider.providerID),
                         mark: "LYL Radio"
                     )
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

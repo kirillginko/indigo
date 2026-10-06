@@ -84,7 +84,7 @@ struct DublabStationView: View {
             ArtworkView(
                 remoteURL: onAirArtwork,
                 side: 300,
-                markURL: DublabProvider.logoURL,
+                markURL: StationMark.logoURL(for: DublabProvider.providerID),
                 mark: "dublab"
             )
                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

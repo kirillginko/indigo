@@ -480,6 +480,13 @@ struct ArtworkView: View {
                         .resizable()
                         .interpolation(.none)
                         .aspectRatio(contentMode: .fill)
+                } else if let markImage, StationMark.isBundled(markAddress) {
+                    // The app's own station logos are designed squares,
+                    // background and all: they fill the tile.
+                    Image(platformImage: markImage)
+                        .resizable()
+                        .interpolation(.high)
+                        .aspectRatio(contentMode: .fill)
                 } else if let markImage {
                     GeometryReader { geo in
                         if Self.canCarry(markImage, at: geo.size.width) {
