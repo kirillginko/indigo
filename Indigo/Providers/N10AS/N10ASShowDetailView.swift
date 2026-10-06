@@ -261,21 +261,6 @@ extension N10ASShowDetailView {
     }
 
     private func phoneEpisode(_ episode: N10ASEpisode, in episodes: [N10ASEpisode]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: episode.id,
-            title: episode.title,
-            subtitle: episode.guest,
-            date: episode.broadcastAt,
-            genres: episode.genres,
-            imageURL: episode.artworkURL,
-            isCurrent: N10ASPlayback.isCurrent(episode, in: player),
-            isPlaying: N10ASPlayback.isPlaying(episode, in: player),
-            play: { N10ASPlayback.toggle(episode, within: episodes, using: player) },
-            open: {
-                browse.remember([episode])
-                appState.open(.n10asEpisode(id: episode.id))
-            },
-            crate: AnyView(N10ASCrateButton(episode: episode, compact: true))
-        )
+        PhoneEpisode.n10as(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }

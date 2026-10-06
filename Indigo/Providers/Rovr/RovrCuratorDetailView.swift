@@ -213,12 +213,7 @@ extension RovrCuratorDetailView {
             genres: curator?.showTitles ?? [],
             summary: curator?.about,
             episodes: broadcasts.map { b in
-                PhoneEpisode(id: b.id, title: b.title, subtitle: b.showTitle, date: b.broadcastAt, genres: b.tags,
-                             imageURL: b.thumbnailURL ?? b.imageURL, isPlayable: b.isPlayable,
-                             isCurrent: RovrPlayback.isCurrent(b, in: player), isPlaying: RovrPlayback.isPlaying(b, in: player),
-                             play: { RovrPlayback.toggle(b, within: broadcasts, using: player) },
-                             open: { browse.remember([b]); appState.open(.rovrBroadcast(id: b.documentID)) },
-                             crate: AnyView(RovrCrateButton(broadcast: b, compact: true)))
+                PhoneEpisode.rovr(b, in: broadcasts, browse: browse, PhoneRowContext(player: player, appState: appState))
             },
             isLoading: curator == nil || broadcasts.isEmpty,
             emptyMessage: "ROVR hasn't archived broadcasts by this curator."

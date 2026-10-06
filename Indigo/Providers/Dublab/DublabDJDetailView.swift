@@ -203,22 +203,6 @@ extension DublabDJDetailView {
     }
 
     private func phoneEpisode(_ broadcast: DublabBroadcast, in run: [DublabBroadcast]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: broadcast.id,
-            title: broadcast.showName ?? broadcast.title,
-            subtitle: broadcast.showName == nil ? nil : broadcast.title,
-            date: broadcast.airedAt,
-            genres: broadcast.genreNames,
-            imageURL: broadcast.artworkURL,
-            isPlayable: broadcast.isPlayable,
-            isCurrent: DublabPlayback.isCurrent(broadcast, in: player),
-            isPlaying: DublabPlayback.isPlaying(broadcast, in: player),
-            play: { DublabPlayback.toggle(broadcast, within: run, using: player) },
-            open: {
-                browse.remember([broadcast])
-                appState.open(.dublabBroadcast(slug: broadcast.slug))
-            },
-            crate: AnyView(DublabCrateButton(broadcast: broadcast, compact: true))
-        )
+        PhoneEpisode.dublab(broadcast, in: run, browse: browse, PhoneRowContext(player: player, appState: appState))
     }
 }

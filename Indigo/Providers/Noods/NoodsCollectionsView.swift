@@ -143,11 +143,7 @@ extension NoodsCollectionDetailView {
             markURL: StationMark.logoURL(for: NoodsProvider.providerID),
             summary: collection?.excerpt,
             episodes: shows.map { s in
-                PhoneEpisode(id: s.id, title: s.title, subtitle: s.artist, date: s.airedAt, genres: s.genres,
-                             imageURL: s.artworkURL, isPlayable: s.isPlayable,
-                             isCurrent: NoodsPlayback.isCurrent(s, in: player), isPlaying: NoodsPlayback.isPlaying(s, in: player),
-                             play: { NoodsPlayback.toggle(s, within: shows, using: player) },
-                             open: { appState.open(.noodsShow(path: s.path)) })
+                PhoneEpisode.noods(s, in: shows, PhoneRowContext(player: player, appState: appState))
             },
             isLoading: collection == nil,
             emptyMessage: "Nothing in this collection."

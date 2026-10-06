@@ -243,23 +243,6 @@ extension LotShowDetailView {
     }
 
     private func phoneEpisode(_ episode: LotEpisode, in episodes: [LotEpisode]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: episode.id,
-            title: episode.title,
-            subtitle: episode.artists.map(\.name).joined(separator: ", "),
-            date: episode.airedAt ?? episode.startedAt,
-            genres: episode.genreNames,
-            imageURL: episode.artworkURL ?? episode.imageURL,
-            isPlayable: episode.isPlayable,
-            isCurrent: LotPlayback.isCurrent(episode, in: player),
-            isPlaying: LotPlayback.isPlaying(episode, in: player),
-            play: { LotPlayback.toggle(episode, within: episodes, using: player) },
-            open: {
-                guard let ref = episode.ref else { return }
-                browse.remember([episode])
-                appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
-            },
-            crate: AnyView(LotCrateButton(episode: episode, compact: true))
-        )
+        PhoneEpisode.lot(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }

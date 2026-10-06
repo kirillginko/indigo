@@ -284,12 +284,7 @@ extension IdaEpisodeDetailView {
             } } ?? [],
             tracklistNote: "IDA didn't log a tracklist for this episode.",
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, subtitle: other.subtitle, date: other.broadcastAt,
-                             genres: other.genres, imageURL: other.thumbnailURL ?? other.imageURL,
-                             isPlayable: other.isPlayable, isCurrent: IdaPlayback.isCurrent(other, in: player),
-                             isPlaying: IdaPlayback.isPlaying(other, in: player),
-                             play: { IdaPlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.idaEpisode(slug: other.slug)) })
+                PhoneEpisode.ida(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.showTitle.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(slug) ? nil : (browse.detailError(slug) ?? "IDA no longer publishes this episode.")

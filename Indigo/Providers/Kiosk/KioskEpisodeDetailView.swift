@@ -257,11 +257,7 @@ extension KioskEpisodeDetailView {
             tracklistNote: detail == nil ? nil : "Kiosk didn't publish a tracklist for this show.",
             more: siblings.map { other in
                 let current = player.isCurrent(other.mediaID)
-                return PhoneEpisode(id: other.id, title: other.title, date: other.airedAt, genres: other.genres,
-                             imageURL: other.artworkURL, isPlayable: other.isPlayable,
-                             isCurrent: current, isPlaying: current && player.isPlaying,
-                             play: { KioskPlayback.toggle(other, within: siblings, using: player) },
-                             open: { appState.open(.kioskEpisode(slug: other.slug)) })
+                return PhoneEpisode.kiosk(other, in: siblings, PhoneRowContext(player: player, appState: appState))
             },
             moreTitle: detail?.residencyName.map { "More from \($0)" } ?? "More from Kiosk",
             error: browse.isLoadingEpisodeDetail(episodeSlug) ? nil

@@ -38,23 +38,7 @@ struct IdaShowDetailView: View {
             genres: show?.genres ?? [],
             summary: show?.summary,
             episodes: episodes.map { episode in
-                PhoneEpisode(
-                    id: episode.id,
-                    title: show?.title ?? episode.title,
-                    subtitle: episode.subtitle,
-                    date: episode.broadcastAt,
-                    genres: episode.genres,
-                    imageURL: episode.thumbnailURL ?? episode.imageURL,
-                    isPlayable: episode.isPlayable,
-                    isCurrent: IdaPlayback.isCurrent(episode, in: player),
-                    isPlaying: IdaPlayback.isPlaying(episode, in: player),
-                    play: { IdaPlayback.toggle(episode, within: episodes, using: player) },
-                    open: {
-                        browse.remember([episode])
-                        appState.open(.idaEpisode(slug: episode.slug))
-                    },
-                    crate: AnyView(IdaCrateButton(episode: episode, compact: true))
-                )
+                PhoneEpisode.ida(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             isLoading: show == nil || browse.isLoadingShow(slug),
             emptyMessage: show == nil

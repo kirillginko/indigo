@@ -152,11 +152,7 @@ extension KioskMoodDetailView {
             imageURL: mood?.artworkURL,
             episodes: episodes.map { e in
                 let current = player.isCurrent(e.mediaID)
-                return PhoneEpisode(id: e.id, title: e.title, date: e.airedAt, genres: e.genres, imageURL: e.artworkURL,
-                                    isPlayable: e.isPlayable, isCurrent: current, isPlaying: current && player.isPlaying,
-                                    play: { KioskPlayback.toggle(e, within: episodes, using: player) },
-                                    open: { appState.open(.kioskEpisode(slug: e.slug)) },
-                                    crate: AnyView(KioskCrateButton(episode: e, compact: true)))
+                return PhoneEpisode.kiosk(e, in: episodes, PhoneRowContext(player: player, appState: appState))
             },
             isLoading: mood == nil && browse.moodsPhase.isLoading,
             emptyMessage: "Kiosk is no longer publishing this playlist."

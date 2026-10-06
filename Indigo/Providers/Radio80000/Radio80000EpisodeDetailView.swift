@@ -304,12 +304,7 @@ extension Radio80000EpisodeDetailView {
             } } ?? [],
             tracklistNote: "Radio 80000 didn't publish a tracklist for this episode.",
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, date: other.broadcastAt, genres: other.genres,
-                             imageURL: other.artworkURL, isPlayable: other.isPlayable,
-                             isCurrent: Radio80000Playback.isCurrent(other, in: player),
-                             isPlaying: Radio80000Playback.isPlaying(other, in: player),
-                             play: { Radio80000Playback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.radio80000Episode(id: other.id)) })
+                PhoneEpisode.radio80000(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.showTitle.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(episodeID) ? nil : (browse.detailError(episodeID) ?? "Radio 80000 no longer publishes this episode.")

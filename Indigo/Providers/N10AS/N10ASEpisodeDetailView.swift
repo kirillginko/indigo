@@ -253,12 +253,7 @@ extension N10ASEpisodeDetailView {
             play: { if let episode { N10ASPlayback.toggle(episode, within: [episode], using: player) } },
             crate: episode.map { AnyView(N10ASCrateButton(episode: $0, compact: true)) },
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, subtitle: other.guest, date: other.broadcastAt,
-                             genres: other.genres, imageURL: other.artworkURL,
-                             isCurrent: N10ASPlayback.isCurrent(other, in: player),
-                             isPlaying: N10ASPlayback.isPlaying(other, in: player),
-                             play: { N10ASPlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.n10asEpisode(id: other.id)) })
+                PhoneEpisode.n10as(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.programme.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(episodeID) ? nil : (browse.detailError(episodeID) ?? "n10.as no longer publishes this episode.")

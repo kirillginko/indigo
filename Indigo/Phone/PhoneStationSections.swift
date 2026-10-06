@@ -185,126 +185,62 @@ struct PhoneStationSectionPage: View {
         case .ntsLatest:
             return nts.feed(.recentlyAdded).items.map { e in
                 let current = player.isCurrent("nts.episode.\(e.id)")
-                return PhoneEpisode(
-                    id: e.id, title: e.name, date: e.broadcastAt, genres: e.genres,
-                    imageURL: e.artworkURL, isCurrent: current, isPlaying: current && player.isPlaying,
-                    play: { nts.play(e, isCurrent: current, player: player, appState: appState) },
-                    open: { appState.open(.ntsEpisode(show: e.showAlias, episode: e.episodeAlias)) })
+                return PhoneEpisode.nts(e, browse: nts, PhoneRowContext(player: player, appState: appState))
             }
         case .noodsShows:
             let shows = noods.feed(.featured).items
             return shows.map { s in
-                PhoneEpisode(id: s.id, title: s.title, subtitle: s.artist, date: s.airedAt, genres: s.genres,
-                             imageURL: s.artworkURL, isPlayable: s.isPlayable,
-                             isCurrent: NoodsPlayback.isCurrent(s, in: player), isPlaying: NoodsPlayback.isPlaying(s, in: player),
-                             play: { NoodsPlayback.toggle(s, within: shows, using: player) },
-                             open: { appState.open(.noodsShow(path: s.path)) })
+                PhoneEpisode.noods(s, in: shows, PhoneRowContext(player: player, appState: appState))
             }
         case .lotIndex:
             let list = lot.episodes
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.title, subtitle: e.artists.map(\.name).joined(separator: ", "),
-                             date: e.airedAt ?? e.startedAt, genres: e.genreNames, imageURL: e.artworkURL ?? e.imageURL,
-                             isPlayable: e.isPlayable, isCurrent: LotPlayback.isCurrent(e, in: player),
-                             isPlaying: LotPlayback.isPlaying(e, in: player),
-                             play: { LotPlayback.toggle(e, within: list, using: player) },
-                             open: {
-                                 guard let ref = e.ref else { return }
-                                 lot.remember([e])
-                                 appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
-                             },
-                             crate: AnyView(LotCrateButton(episode: e, compact: true)))
+                PhoneEpisode.lot(e, in: list, browse: lot, PhoneRowContext(player: player, appState: appState))
             }
         case .dublabArchive:
             let list = dublab.broadcasts
             return list.map { b in
-                PhoneEpisode(id: b.id, title: b.showName ?? b.title, subtitle: b.showName == nil ? b.performer : b.title,
-                             date: b.airedAt, genres: b.genreNames, imageURL: b.artworkURL, isPlayable: b.isPlayable,
-                             isCurrent: DublabPlayback.isCurrent(b, in: player), isPlaying: DublabPlayback.isPlaying(b, in: player),
-                             play: { DublabPlayback.toggle(b, within: list, using: player) },
-                             open: { dublab.remember([b]); appState.open(.dublabBroadcast(slug: b.slug)) },
-                             crate: AnyView(DublabCrateButton(broadcast: b, compact: true)))
+                PhoneEpisode.dublab(b, in: list, browse: dublab, PhoneRowContext(player: player, appState: appState))
             }
         case .alharaArchive:
             let list = alhara.shows
             return list.map { s in
-                PhoneEpisode(id: s.id, title: s.title, date: s.publishedAt, genres: s.genres, imageURL: s.artworkURL,
-                             isCurrent: AlharaPlayback.isCurrent(s, in: player), isPlaying: AlharaPlayback.isPlaying(s, in: player),
-                             play: { AlharaPlayback.toggle(s, within: list, using: player) },
-                             open: { alhara.remember([s]); appState.open(.alharaShow(slug: s.slug)) },
-                             crate: AnyView(AlharaCrateButton(show: s, compact: true)))
+                PhoneEpisode.alhara(s, in: list, browse: alhara, PhoneRowContext(player: player, appState: appState))
             }
         case .cashmereArchive:
             let list = cashmere.episodes
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.title, subtitle: e.showName, date: e.airedAt, genres: e.genres,
-                             imageURL: e.artworkURL, isPlayable: e.isPlayable,
-                             isCurrent: CashmerePlayback.isCurrent(e, in: player), isPlaying: CashmerePlayback.isPlaying(e, in: player),
-                             play: { CashmerePlayback.toggle(e, within: list, using: player) },
-                             open: { cashmere.remember([e]); appState.open(.cashmereEpisode(slug: e.slug)) },
-                             crate: AnyView(CashmereCrateButton(episode: e, compact: true)))
+                PhoneEpisode.cashmere(e, in: list, browse: cashmere, PhoneRowContext(player: player, appState: appState))
             }
         case .lylArchive:
             let list = lyl.episodes
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.title, subtitle: e.artists, date: e.broadcastAt, genres: e.styles,
-                             imageURL: e.imageURL, isPlayable: e.isPlayable,
-                             isCurrent: LYLPlayback.isCurrent(e, in: player), isPlaying: LYLPlayback.isPlaying(e, in: player),
-                             play: { LYLPlayback.toggle(e, within: list, using: player) },
-                             open: { lyl.remember([e]); appState.open(.lylEpisode(slug: e.slug)) },
-                             crate: AnyView(LYLCrateButton(episode: e, compact: true)))
+                PhoneEpisode.lyl(e, in: list, browse: lyl, PhoneRowContext(player: player, appState: appState))
             }
         case .idaEpisodes:
             let list = ida.episodes
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.showTitle ?? e.title, subtitle: e.subtitle ?? e.showArtist,
-                             date: e.broadcastAt, genres: e.genres, imageURL: e.thumbnailURL ?? e.imageURL,
-                             isPlayable: e.isPlayable, isCurrent: IdaPlayback.isCurrent(e, in: player),
-                             isPlaying: IdaPlayback.isPlaying(e, in: player),
-                             play: { IdaPlayback.toggle(e, within: list, using: player) },
-                             open: { ida.remember([e]); appState.open(.idaEpisode(slug: e.slug)) },
-                             crate: AnyView(IdaCrateButton(episode: e, compact: true)))
+                PhoneEpisode.ida(e, in: list, browse: ida, PhoneRowContext(player: player, appState: appState))
             }
         case .radio80000Latest:
             let list = radio80000.latest
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.title, subtitle: e.showTitle, date: e.broadcastAt, genres: e.genres,
-                             imageURL: e.artworkURL, isPlayable: e.isPlayable,
-                             isCurrent: Radio80000Playback.isCurrent(e, in: player),
-                             isPlaying: Radio80000Playback.isPlaying(e, in: player),
-                             play: { Radio80000Playback.toggle(e, within: list, using: player) },
-                             open: { radio80000.remember([e]); appState.open(.radio80000Episode(id: e.id)) },
-                             crate: AnyView(Radio80000CrateButton(episode: e, compact: true)))
+                PhoneEpisode.radio80000(e, in: list, browse: radio80000, PhoneRowContext(player: player, appState: appState))
             }
         case .panikPodcasts:
             let list = panik.podcasts
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.title, subtitle: e.showTitle, date: e.publishedAt, imageURL: e.imageURL,
-                             isPlayable: e.isPlayable, isCurrent: PanikPlayback.isCurrent(e, in: player),
-                             isPlaying: PanikPlayback.isPlaying(e, in: player),
-                             play: { PanikPlayback.toggle(e, within: list, using: player) },
-                             open: { panik.remember([e]); appState.open(.panikEpisode(id: e.id)) },
-                             crate: AnyView(PanikCrateButton(episode: e, compact: true)))
+                PhoneEpisode.panik(e, in: list, browse: panik, PhoneRowContext(player: player, appState: appState))
             }
         case .rovrArchive:
             let list = rovr.broadcasts
             return list.map { b in
-                PhoneEpisode(id: b.id, title: b.title, subtitle: b.curatorName, date: b.broadcastAt, genres: b.tags,
-                             imageURL: b.thumbnailURL ?? b.imageURL, isPlayable: b.isPlayable,
-                             isCurrent: RovrPlayback.isCurrent(b, in: player), isPlaying: RovrPlayback.isPlaying(b, in: player),
-                             play: { RovrPlayback.toggle(b, within: list, using: player) },
-                             open: { rovr.remember([b]); appState.open(.rovrBroadcast(id: b.documentID)) },
-                             crate: AnyView(RovrCrateButton(broadcast: b, compact: true)))
+                PhoneEpisode.rovr(b, in: list, browse: rovr, PhoneRowContext(player: player, appState: appState))
             }
         case .n10asArchive:
             let list = n10as.archive
             return list.map { e in
-                PhoneEpisode(id: e.id, title: e.title, subtitle: e.guest ?? e.programme, date: e.broadcastAt,
-                             genres: e.genres, imageURL: e.artworkURL,
-                             isCurrent: N10ASPlayback.isCurrent(e, in: player), isPlaying: N10ASPlayback.isPlaying(e, in: player),
-                             play: { N10ASPlayback.toggle(e, within: list, using: player) },
-                             open: { n10as.remember([e]); appState.open(.n10asEpisode(id: e.id)) },
-                             crate: AnyView(N10ASCrateButton(episode: e, compact: true)))
+                PhoneEpisode.n10as(e, in: list, browse: n10as, PhoneRowContext(player: player, appState: appState))
             }
         default:
             return []

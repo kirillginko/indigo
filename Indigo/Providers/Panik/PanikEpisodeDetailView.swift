@@ -309,12 +309,7 @@ extension PanikEpisodeDetailView {
             } } ?? [],
             tracklistNote: episode.map(emptyNote),
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, date: other.publishedAt,
-                             imageURL: other.imageURL, isPlayable: other.isPlayable,
-                             isCurrent: PanikPlayback.isCurrent(other, in: player),
-                             isPlaying: PanikPlayback.isPlaying(other, in: player),
-                             play: { PanikPlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.panikEpisode(id: other.id)) })
+                PhoneEpisode.panik(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.showTitle.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(episodeID) ? nil : (browse.detailError(episodeID) ?? "Radio Panik no longer publishes this episode.")

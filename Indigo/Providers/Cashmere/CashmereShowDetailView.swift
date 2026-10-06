@@ -198,21 +198,6 @@ extension CashmereShowDetailView {
     }
 
     private func phoneEpisode(_ episode: CashmereEpisode, in episodes: [CashmereEpisode]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: episode.id,
-            title: episode.title,
-            date: episode.airedAt,
-            genres: episode.genres,
-            imageURL: episode.artworkURL,
-            isPlayable: episode.isPlayable,
-            isCurrent: CashmerePlayback.isCurrent(episode, in: player),
-            isPlaying: CashmerePlayback.isPlaying(episode, in: player),
-            play: { CashmerePlayback.toggle(episode, within: episodes, using: player) },
-            open: {
-                browse.remember([episode])
-                appState.open(.cashmereEpisode(slug: episode.slug))
-            },
-            crate: AnyView(CashmereCrateButton(episode: episode, compact: true))
-        )
+        PhoneEpisode.cashmere(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }

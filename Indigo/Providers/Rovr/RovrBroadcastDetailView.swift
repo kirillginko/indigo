@@ -237,12 +237,7 @@ extension RovrBroadcastDetailView {
             play: { if let broadcast { RovrPlayback.toggle(broadcast, within: [broadcast], using: player) } },
             crate: broadcast.map { AnyView(RovrCrateButton(broadcast: $0, compact: true)) },
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, subtitle: other.curatorName, date: other.broadcastAt,
-                             genres: other.tags, imageURL: other.thumbnailURL ?? other.imageURL,
-                             isPlayable: other.isPlayable, isCurrent: RovrPlayback.isCurrent(other, in: player),
-                             isPlaying: RovrPlayback.isPlaying(other, in: player),
-                             play: { RovrPlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.rovrBroadcast(id: other.documentID)) })
+                PhoneEpisode.rovr(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState))
             },
             moreTitle: broadcast?.curatorName.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(broadcastID) ? nil : (browse.detailError(broadcastID) ?? "ROVR no longer publishes this broadcast.")

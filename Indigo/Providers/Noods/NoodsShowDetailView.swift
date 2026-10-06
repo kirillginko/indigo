@@ -233,12 +233,7 @@ extension NoodsShowDetailView {
             } } ?? [],
             tracklistNote: detail == nil ? nil : "Noods didn't publish a tracklist for this show.",
             more: (detail?.similar ?? []).map { other in
-                PhoneEpisode(id: other.id, title: other.title, subtitle: other.artist, date: other.airedAt,
-                             genres: other.genres, imageURL: other.artworkURL, isPlayable: other.isPlayable,
-                             isCurrent: NoodsPlayback.isCurrent(other, in: player),
-                             isPlaying: NoodsPlayback.isPlaying(other, in: player),
-                             play: { NoodsPlayback.toggle(other, within: detail?.similar ?? [], using: player) },
-                             open: { appState.open(.noodsShow(path: other.path)) })
+                PhoneEpisode.noods(other, in: detail?.similar ?? [], PhoneRowContext(player: player, appState: appState))
             },
             moreTitle: "Similar shows",
             error: browse.showError(path: showPath),

@@ -48,17 +48,7 @@ struct NTSShowDetailView: View {
 
     private func phoneEpisode(_ episode: NTSEpisodeSummary) -> PhoneEpisode {
         let isCurrent = player.isCurrent("nts.episode.\(episode.id)")
-        return PhoneEpisode(
-            id: episode.id,
-            title: episode.name,
-            date: episode.broadcastAt,
-            genres: episode.genres,
-            imageURL: episode.artworkURL,
-            isCurrent: isCurrent,
-            isPlaying: isCurrent && player.isPlaying,
-            play: { browse.play(episode, isCurrent: isCurrent, player: player, appState: appState) },
-            open: { appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias)) }
-        )
+        return PhoneEpisode.nts(episode, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 
     private func page(_ show: NTSShowSummary?, episodes: NTSBrowseStore.Feed<NTSEpisodeSummary>) -> some View {

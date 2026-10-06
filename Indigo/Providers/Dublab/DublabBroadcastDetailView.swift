@@ -254,13 +254,7 @@ extension DublabBroadcastDetailView {
             play: { if let broadcast { DublabPlayback.toggle(broadcast, within: [broadcast], using: player) } },
             crate: broadcast.map { AnyView(DublabCrateButton(broadcast: $0, compact: true)) },
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.showName ?? other.title,
-                             subtitle: other.showName == nil ? nil : other.title, date: other.airedAt,
-                             genres: other.genreNames, imageURL: other.artworkURL, isPlayable: other.isPlayable,
-                             isCurrent: DublabPlayback.isCurrent(other, in: player),
-                             isPlaying: DublabPlayback.isPlaying(other, in: player),
-                             play: { DublabPlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.dublabBroadcast(slug: other.slug)) })
+                PhoneEpisode.dublab(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState))
             },
             moreTitle: broadcast?.performer.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingBroadcast(slug) ? nil

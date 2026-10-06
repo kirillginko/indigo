@@ -217,22 +217,6 @@ extension LYLShowDetailView {
     }
 
     private func phoneEpisode(_ episode: LYLEpisode, in episodes: [LYLEpisode]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: episode.id,
-            title: episode.title,
-            subtitle: episode.artists,
-            date: episode.broadcastAt,
-            genres: episode.styles,
-            imageURL: episode.imageURL,
-            isPlayable: episode.isPlayable,
-            isCurrent: LYLPlayback.isCurrent(episode, in: player),
-            isPlaying: LYLPlayback.isPlaying(episode, in: player),
-            play: { LYLPlayback.toggle(episode, within: episodes, using: player) },
-            open: {
-                browse.remember([episode])
-                appState.open(.lylEpisode(slug: episode.slug))
-            },
-            crate: AnyView(LYLCrateButton(episode: episode, compact: true))
-        )
+        PhoneEpisode.lyl(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }
