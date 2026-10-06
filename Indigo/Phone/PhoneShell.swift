@@ -63,64 +63,48 @@ struct PhoneTabBar: View {
     let select: (PhoneTab) -> Void
     let search: () -> Void
 
-    /// Square cells edge to edge, as the player above them is square, each
-    /// an icon over its name: the tabs in four greens, dark to light, and
-    /// Dig on the wordmark's moving sheen. The one you are on has its name in
-    /// a dark box.
+    /// The tab you are on, and search while searching, in IDA's green.
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(PhoneTab.allCases.enumerated()), id: \.element) { index, tab in
-                // Light words on the two deep greens, dark on the light ones.
-                cell(tab.symbol, tab.label, isOn: tab == selected,
-                     ink: index < 2 ? .white.opacity(0.9) : Chip.ink) { select(tab) }
-                    .background(Self.greens[index % Self.greens.count])
+        HStack(spacing: 10) {
+            HStack(spacing: 0) {
+                ForEach(PhoneTab.allCases, id: \.self) { tab in
+                    Button { select(tab) } label: {
+                        Image(systemName: tab.symbol)
+                            .font(.system(size: 21, weight: .semibold))
+                            .foregroundStyle(tab == selected ? Chip.ink : .white)
+                            .frame(maxWidth: .infinity, minHeight: 54)
+                            .background {
+                                if tab == selected {
+                                    Capsule().fill(Chip.green).padding(3)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tab.label)
+                    .accessibilityAddTraits(tab == selected ? .isSelected : [])
+                }
             }
-            // The wordmark's sheen, which always moves: the player's field
-            // stands still, and dark, while nothing plays.
-            cell("magnifyingglass", "Dig", isOn: searching, action: search)
-                .background { MineralSheenSurface() }
-                .clipped()
-        }
-        .overlay(Rectangle().strokeBorder(.white.opacity(0.12)))
-    }
+            .padding(4)
+            .background(.ultraThinMaterial, in: Capsule())
+            .overlay(Capsule().strokeBorder(.white.opacity(0.12), lineWidth: 1))
 
-    /// From the deepest to IDA's own.
-    private static let greens: [Color] = [
-        Color(red: 0.17, green: 0.27, blue: 0.19),
-        Color(red: 0.23, green: 0.35, blue: 0.25),
-        Color(red: 0.29, green: 0.42, blue: 0.30),
-        Chip.green
-    ]
-
-    private func cell(
-        _ symbol: String, _ label: String, isOn: Bool, ink: Color = Chip.ink,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            VStack(spacing: 5) {
-                Image(systemName: symbol)
-                    .font(.system(size: 17, weight: .semibold))
-                    .frame(height: 20)
-                Text(label)
-                    .font(Typeface.mono(9.5))
-                    .tracking(1)
-                    .textCase(.uppercase)
-                    .lineLimit(1)
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 2)
-                    .foregroundStyle(isOn ? .white : ink)
-                    .background(isOn ? Chip.black : .clear)
+            Button(action: search) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 21, weight: .semibold))
+                    .foregroundStyle(searching ? Chip.ink : .white)
+                    .frame(width: 62, height: 62)
+                    .background {
+                        if searching { Circle().fill(Chip.green).padding(3) }
+                    }
+                    .background(.ultraThinMaterial, in: Circle())
+                    .overlay(Circle().strokeBorder(.white.opacity(0.12), lineWidth: 1))
+                    .contentShape(Circle())
             }
-            .foregroundStyle(isOn ? .white : ink)
-            .frame(maxWidth: .infinity, minHeight: 58)
-            .overlay(alignment: .trailing) {
-                Rectangle().fill(.black.opacity(0.25)).frame(width: 1)
-            }
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .accessibilityLabel("Search")
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
-        .accessibilityAddTraits(isOn ? .isSelected : [])
+        .foregroundStyle(.white)
     }
 }
 

@@ -179,7 +179,7 @@ struct PhoneRootView: View {
     }
 
     private var shell: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 8) {
             PhoneMiniPlayer { showsNowPlaying = true }
             PhoneTabBar(
                 selected: PhoneTab.of(appState.route),
