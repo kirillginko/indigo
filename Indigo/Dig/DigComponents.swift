@@ -19,6 +19,8 @@ struct DigSection<Content: View>: View {
         if isPhone {
             // On the phone, the title in IDA's green box, and no rule.
             VStack(alignment: .leading, spacing: 0) {
+                // The title against the screen's left edge, as IDA sets its
+                // labels: the page's own margin is undone for it.
                 HStack(alignment: .center) {
                     Chip(text: title, tone: .lead, size: 11, uppercase: true)
                     Spacer(minLength: 8)
@@ -28,6 +30,7 @@ struct DigSection<Content: View>: View {
                             .foregroundStyle(.white.opacity(0.55))
                     }
                 }
+                .padding(.leading, -PhoneLayout.margin)
                 content
                     .padding(.top, 10)
             }
@@ -78,13 +81,16 @@ struct DigLine: View {
     /// it, touching.
     @ViewBuilder
     private var phoneLine: some View {
+        // The name over its detail, as two blocks touching: side by side, a
+        // long detail squeezed both into ellipses nobody could read.
         let row = HStack(spacing: 0) {
-            Chip(text: text, size: 13)
-                .lineLimit(2)
-            if let detail, !detail.isEmpty {
-                Chip(text: detail, tone: .lead, size: 11)
-                    .lineLimit(1)
-                    .fixedSize()
+            VStack(alignment: .leading, spacing: 0) {
+                Chip(text: text, size: 13)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let detail, !detail.isEmpty {
+                    Chip(text: detail, tone: .lead, size: 11)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 8)
             if action != nil {
@@ -190,8 +196,18 @@ struct ConnectionExplainer: View {
     let open: () -> Void
 
     @State private var isHovering = false
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone {
+            PhoneLinkRow(imageURL: artist.imageURL ?? portrait, title: artist.name,
+                         why: connectionLine, action: open)
+        } else {
+            card
+        }
+    }
+
+    private var card: some View {
         Button(action: open) {
             HStack(alignment: .center, spacing: 11) {
                 Rectangle()
@@ -624,5 +640,45 @@ struct DigSkeleton: View {
         Rectangle()
             .fill(Palette.wash)
             .frame(width: width, height: height)
+    }
+}
+
+/// On the phone, a way out of a DIG page: the picture, the name in a box
+/// over what it is in a green one, touching, why it is here in small type
+/// under them, and a chevron.
+struct PhoneLinkRow: View {
+    var imageURL: URL?
+    let title: String
+    var subtitle: String?
+    var why: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                ArtworkView(remoteURL: imageURL, side: 52, glyphScale: 0.3, placeholder: .mosaic)
+                VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Chip(text: title, size: 13).lineLimit(2)
+                        if let subtitle, !subtitle.isEmpty {
+                            Chip(text: subtitle, tone: .lead, size: 11).lineLimit(1)
+                        }
+                    }
+                    if let why, !why.isEmpty {
+                        Text(why)
+                            .font(Typeface.mono(10.5))
+                            .foregroundStyle(.white.opacity(0.55))
+                            .lineLimit(2)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .padding(.vertical, 6)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }

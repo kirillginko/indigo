@@ -18,11 +18,25 @@ struct NTSEpisodeView: View {
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(CrateService.self) private var crate
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let detail = browse.detail(show: showAlias, episode: episodeAlias)
         let error = browse.detailError(show: showAlias, episode: episodeAlias)
 
+        Group {
+            if isPhone {
+                phonePage(detail, error: error)
+            } else {
+                page(detail, error: error)
+            }
+        }
+        .task(id: episodeAlias) {
+            await browse.loadDetailIfNeeded(show: showAlias, episode: episodeAlias)
+        }
+    }
+
+    private func page(_ detail: NTSEpisodeDetail?, error: String?) -> some View {
         VStack(spacing: 0) {
             PageHeader(
                 title: detail?.summary.name ?? displayAlias,
@@ -52,8 +66,128 @@ struct NTSEpisodeView: View {
                 LoadingPane(label: "Loading tracklist")
             }
         }
-        .task(id: episodeAlias) {
-            await browse.loadDetailIfNeeded(show: showAlias, episode: episodeAlias)
+    }
+
+    // MARK: The phone
+
+    /// The episode as the phone's show pages set one out: its picture the
+    /// width of the screen with its words in boxes, the description, a play
+    /// box, then the tracklist.
+    private func phonePage(_ detail: NTSEpisodeDetail?, error: String?) -> some View {
+        let _ = crate.revision
+        let item = detail?.mediaItem()
+        return ScrollView {
+            VStack(spacing: 0) {
+                PhoneDetailHero(
+                    kind: detail?.summary.location ?? "NTS",
+                    title: detail?.summary.name ?? displayAlias,
+                    subtitle: detail?.summary.broadcastLabel,
+                    imageURL: detail?.summary.artworkURL,
+                    genres: detail.map(tags) ?? [],
+                    awaitingImage: detail == nil
+                )
+                VStack(alignment: .leading, spacing: 18) {
+                    if let detail {
+                        if let summary = detail.summary.summary, !summary.isEmpty {
+                            Text(summary)
+                                .font(Typeface.mono(12.5))
+                                .lineSpacing(3)
+                                .foregroundStyle(.white.opacity(0.72))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        HStack(spacing: 8) {
+                            if let item {
+                                let playing = isPlayingThisEpisode(item)
+                                Button {
+                                    if player.isCurrent(item.id) { player.toggle() } else { player.playEpisode(item) }
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: playing ? "pause.fill" : "play.fill")
+                                            .font(.system(size: 12))
+                                        Text(playing ? "Pause" : "Play episode")
+                                            .font(Typeface.mono(13))
+                                            .tracking(1.2)
+                                            .textCase(.uppercase)
+                                    }
+                                    .foregroundStyle(Chip.ink)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(Chip.green)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            if !detail.summary.showAlias.isEmpty {
+                                Button { appState.open(.ntsShow(alias: detail.summary.showAlias)) } label: {
+                                    Chip(text: "All episodes", size: 13, uppercase: true)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        phoneTracklist(detail)
+                            .task(id: detail.summary.id) {
+                                await dig.resolveBroadcastTracklist(providerID: "nts", showID: detail.summary.id)
+                            }
+                    } else if let error {
+                        Text(error)
+                            .font(Typeface.mono(12))
+                            .foregroundStyle(.white.opacity(0.6))
+                        Button {
+                            Task { await browse.loadDetail(show: showAlias, episode: episodeAlias) }
+                        } label: {
+                            Chip(text: "Try again", tone: .lead, size: 12, uppercase: true)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Text("Loading the tracklist…")
+                            .font(Typeface.mono(12))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .ignoresSafeArea(edges: .top)
+        .overlay(alignment: .top) {
+            if let item {
+                PhoneDetailTopBar(isCrated: crate.contains(broadcast: item.id, providerID: item.sourceID)) {
+                    crate.toggle(nowPlaying: item)
+                }
+            } else {
+                PhoneDetailTopBar()
+            }
+        }
+        .foregroundStyle(.white)
+    }
+
+    @ViewBuilder
+    private func phoneTracklist(_ detail: NTSEpisodeDetail) -> some View {
+        DigSection(
+            title: "Tracklist",
+            trailing: detail.tracklist.isEmpty ? nil : "\(detail.tracklist.count)"
+        ) {
+            if detail.tracklist.isEmpty {
+                Text(detail.summary.isPublished
+                     ? "NTS only publishes tracklists for some shows."
+                     : "Tracklists appear after a show has aired.")
+                    .font(Typeface.mono(12))
+                    .foregroundStyle(.white.opacity(0.6))
+            } else {
+                let timed = detail.tracklist.contains { $0.offsetLabel != nil }
+                let rows = resolvedRows(detail)
+                VStack(spacing: 0) {
+                    ForEach(Array(detail.tracklist.enumerated()), id: \.element.id) { index, entry in
+                        TracklistRow(
+                            index: index + 1,
+                            entry: entry,
+                            detail: detail,
+                            showsTimestamps: timed,
+                            release: rows[entry.id] ?? (nil, nil, nil)
+                        )
+                    }
+                }
+                .padding(.horizontal, -16)
+            }
         }
     }
 
@@ -260,6 +394,7 @@ private struct TracklistRow: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(\.isPhoneLayout) private var isPhone
     @State private var isHovering = false
     @State private var isHoveringTitle = false
 
@@ -269,8 +404,58 @@ private struct TracklistRow: View {
     }
 
     var body: some View {
+        if isPhone { phoneRow } else { row }
+    }
+
+    /// On the phone: the time, the sleeve, the title in a box over the artist
+    /// in a green one, touching -- the title opens the track, the artist
+    /// them -- and the crate.
+    private var phoneRow: some View {
         let _ = crate.revision
-        HStack(spacing: 12) {
+        return HStack(spacing: 10) {
+            Text(marker)
+                .font(Typeface.mono(11))
+                .foregroundStyle(.white.opacity(0.55))
+                .monospacedDigit()
+                .frame(width: 40, alignment: .trailing)
+            ArtworkView(remoteURL: release.artwork, side: 44, glyphScale: 0.3,
+                        placeholder: .whiteLabel, placeholderWhileLoading: true)
+            VStack(alignment: .leading, spacing: 0) {
+                Button {
+                    if let identity = release.identity {
+                        appState.open(.digRecording(identity: identity, title: entry.title))
+                    }
+                } label: {
+                    Chip(text: entry.title, size: 13).lineLimit(2)
+                }
+                .buttonStyle(.plain)
+                .disabled(release.identity == nil)
+                Button {
+                    appState.open(.digArtist(mbid: nil, name: entry.artist))
+                } label: {
+                    Chip(text: entry.artist, tone: .lead, size: 12).lineLimit(1)
+                }
+                .buttonStyle(.plain)
+                .disabled(!ArtistName.isRealArtist(entry.artist))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            CrateGlyphButton(isCrated: crate.isCrated(tracklistEntry: entry, in: detail)) {
+                if let recording = crate.toggle(tracklistEntry: entry, in: detail) {
+                    Task { await dig.enrichCratedRecording(recording) }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(PhoneShowPage.rowGround)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(.white.opacity(0.1)).frame(height: 1)
+        }
+    }
+
+    private var row: some View {
+        let _ = crate.revision
+        return HStack(spacing: 12) {
             Text(marker)
                 .font(Typeface.mono(10))
                 .foregroundStyle(entry.offsetLabel == nil && showsTimestamps

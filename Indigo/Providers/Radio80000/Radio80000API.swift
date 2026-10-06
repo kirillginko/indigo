@@ -218,9 +218,18 @@ nonisolated struct Radio80000API: Sendable {
             resolvingAgainstBaseURL: false
         )
         components?.queryItems = [URLQueryItem(name: "limit", value: "100")]
-        guard let url = components?.url else { return [] }
-        guard let page: MixcloudPageDTO = try? await get(url) else { return [] }
-        return page.data.compactMap {
+        // Mixcloud gives a hundred to a page and a link to the next: followed,
+        // so a show's older episodes are there too.
+        var next = components?.url
+        var found: [MixcloudCloudcastDTO] = []
+        var pages = 0
+        while let url = next, pages < 30 {
+            guard let page: MixcloudPageDTO = try? await get(url) else { break }
+            found += page.data
+            pages += 1
+            next = page.paging?.next.flatMap(URL.init(string:))
+        }
+        return found.compactMap {
             $0.asRadio80000Episode(showSlug: show.slug, showTitle: show.title)
         }
     }

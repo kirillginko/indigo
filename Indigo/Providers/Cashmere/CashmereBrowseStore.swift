@@ -196,12 +196,18 @@ final class CashmereBrowseStore {
         defer { loadingShows.remove(slug) }
 
         do {
-            let page = try await api.fetchEpisodes(first: 100, showSlug: slug)
-            let sorted = page.episodes.sorted {
-                ($0.airedAt ?? .distantPast) > ($1.airedAt ?? .distantPast)
-            }
-            showEpisodes[slug] = sorted
-            remember(sorted)
+            // A hundred to a page; the rest of the run follows the cursor,
+            // shown as it arrives, or the oldest are out of reach.
+            var found: [CashmereEpisode] = []
+            var cursor: String?
+            repeat {
+                let page = try await api.fetchEpisodes(first: 100, after: cursor, showSlug: slug)
+                found += page.episodes
+                let sorted = found.sorted { ($0.airedAt ?? .distantPast) > ($1.airedAt ?? .distantPast) }
+                showEpisodes[slug] = sorted
+                remember(page.episodes)
+                cursor = page.hasMore ? page.cursor : nil
+            } while cursor != nil && found.count < 3000
         } catch is CancellationError {
         } catch {
             showErrors[slug] = message(for: error)

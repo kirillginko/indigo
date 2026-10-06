@@ -20,6 +20,7 @@ struct DigReleaseView: View {
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     /// Filled in if the record turns out to be catalogued after all.
     @State private var resolvedID: Int?
@@ -57,26 +58,39 @@ struct DigReleaseView: View {
         let isCrated = crate.contains(dig: .release, identifier: crateID, providerID: "dig.release.discogs")
 
         VStack(spacing: 0) {
-            PageHeader(
-                title: profile?.title ?? fallbackTitle,
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(profile)
-            ) {
-                CrateButton(isCrated: isCrated) {
-                    crate.toggle(
-                        dig: .release, identifier: crateID, providerID: "dig.release.discogs",
-                        title: profile?.title ?? fallbackTitle,
-                        subtitle: releaseSubtitle(profile), artworkURL: profile?.coverURL,
-                        genres: (profile?.styles ?? []) + (profile?.genres ?? [])
-                    )
+            if !isPhone {
+                PageHeader(
+                    title: profile?.title ?? fallbackTitle,
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(profile)
+                ) {
+                    CrateButton(isCrated: isCrated) {
+                        crate.toggle(
+                            dig: .release, identifier: crateID, providerID: "dig.release.discogs",
+                            title: profile?.title ?? fallbackTitle,
+                            subtitle: releaseSubtitle(profile), artworkURL: profile?.coverURL,
+                            genres: (profile?.styles ?? []) + (profile?.genres ?? [])
+                        )
+                    }
                 }
+                Rule(color: Palette.outline)
             }
-            Rule(color: Palette.outline)
 
             ScrollView {
+              VStack(spacing: 0) {
                 // Lazy, so the tracklist and everything under it cost nothing
                 // until they are scrolled to.
+                if isPhone {
+                    PhoneDetailHero(
+                        kind: "Release",
+                        title: profile?.title ?? fallbackTitle,
+                        subtitle: profile.map { credited($0).joined(separator: ", ") },
+                        imageURL: profile?.coverURL,
+                        previewURL: profile?.previewURL,
+                        awaitingImage: !hasLookedUp && profile?.coverURL == nil && profile?.previewURL == nil
+                    )
+                }
                 LazyVStack(alignment: .leading, spacing: 26) {
                     if profile == nil, !hasLookedUp {
                         DigSkeleton(sections: 2)
@@ -85,7 +99,9 @@ struct DigReleaseView: View {
                         unclaimed
                     }
                     if let profile {
-                        HStack(alignment: .top, spacing: 26) {
+                        (AnyLayout.columns(phone: isPhone, spacing: 26)) {
+                            // On the phone the sleeve is the page's head.
+                            if !isPhone {
                             ArtworkView(remoteURL: profile.coverURL,
                                         previewRemoteURL: profile.previewURL,
                                         side: 240, glyphScale: 0.23,
@@ -94,6 +110,7 @@ struct DigReleaseView: View {
                                             && profile.previewURL == nil,
                                         blursWhileLoading: true)
                                 .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
+                            }
 
                             VStack(alignment: .leading, spacing: 24) {
                                 if !profile.artists.isEmpty {
@@ -153,6 +170,9 @@ struct DigReleaseView: View {
                             DigSection(title: "Tracklist", trailing: "\(profile.tracks.count)") {
                                 VStack(spacing: 0) {
                                     ForEach(profile.tracks) { track in
+                                        if isPhone {
+                                            phoneTrack(track)
+                                        } else {
                                         HStack(spacing: 14) {
                                             Text(track.position.isEmpty ? "—" : track.position)
                                                 .font(Typeface.mono(9.5))
@@ -181,6 +201,7 @@ struct DigReleaseView: View {
                                         }
                                         .padding(.vertical, 7)
                                         Rule(color: Palette.outline.opacity(0.55))
+                                        }
                                     }
                                 }
                             }
@@ -234,7 +255,7 @@ struct DigReleaseView: View {
                         }
                     }
                 }
-                .padding(.horizontal, Metrics.gutter)
+                .padding(.horizontal, isPhone ? 16 : Metrics.gutter)
                 .padding(.vertical, 22)
                 // One treatment for the whole page rather than a bar above it
                 // and a pane inside it. See `LoadingVeil`.
@@ -245,9 +266,18 @@ struct DigReleaseView: View {
                 // with nothing, `unclaimed` is the answer — veiling that would
                 // promise something still coming.
                 .loadingVeil(profile == nil && !hasLookedUp)
+              }
             }
             .scrollIndicators(.visible)
         }
+        .modifier(PhoneDetailChrome(isPhone: isPhone, isCrated: isCrated) {
+            crate.toggle(
+                dig: .release, identifier: crateID, providerID: "dig.release.discogs",
+                title: profile?.title ?? fallbackTitle,
+                subtitle: releaseSubtitle(profile), artworkURL: profile?.coverURL,
+                genres: (profile?.styles ?? []) + (profile?.genres ?? [])
+            )
+        })
         .task(id: fallbackTitle) {
             unclaimedSleeve = DigArtwork(context: dig.context)
                 .release(title: fallbackTitle, artist: credit)
@@ -501,6 +531,31 @@ struct DigReleaseView: View {
     }
 
     /// Styles first, then any genre the styles did not already cover.
+    /// A track on the phone: its position, the title in a box over the
+    /// artist in a green one where the track names its own, and its length.
+    private func phoneTrack(_ track: DigReleaseProfile.TrackLine) -> some View {
+        HStack(spacing: 10) {
+            Text(track.position.isEmpty ? "—" : track.position)
+                .font(Typeface.mono(11))
+                .foregroundStyle(.white.opacity(0.55))
+                .frame(width: 30, alignment: .leading)
+            VStack(alignment: .leading, spacing: 0) {
+                Chip(text: track.title, size: 13)
+                    .lineLimit(2)
+                if let artist = track.artist {
+                    Chip(text: artist, tone: .lead, size: 12).lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if let duration = track.duration {
+                Text(duration)
+                    .font(Typeface.mono(11))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+        }
+        .padding(.vertical, 5)
+    }
+
     private func uniqueTags(_ profile: DigReleaseProfile) -> [String] {
         var seen = Set<String>()
         return (profile.styles + profile.genres).filter {

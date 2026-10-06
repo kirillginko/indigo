@@ -21,6 +21,7 @@ struct RecordingDigView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(\.isPhoneLayout) private var isPhone
 
     @State private var neighbourhood: MusicGraph?
 
@@ -54,23 +55,37 @@ struct RecordingDigView: View {
         let connections = neighbourhood?.connections(from: node) ?? []
 
         VStack(spacing: 0) {
-            PageHeader(
-                title: recording.displayTitle,
-                subtitle: [recording.displayArtist, release.line].compactMap { $0 }.joined(separator: " · ")
-            ) {
-                HStack(spacing: 10) {
-                    if let artist = recording.displayArtist {
-                        DigButton { appState.open(.digArtist(mbid: nil, name: artist)) }
-                    }
-                    CrateButton(isCrated: crate.contains(recording: recording)) {
-                        crate.toggle(recording: recording)
+            if !isPhone {
+                PageHeader(
+                    title: recording.displayTitle,
+                    subtitle: [recording.displayArtist, release.line].compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    HStack(spacing: 10) {
+                        if let artist = recording.displayArtist {
+                            DigButton { appState.open(.digArtist(mbid: nil, name: artist)) }
+                        }
+                        CrateButton(isCrated: crate.contains(recording: recording)) {
+                            crate.toggle(recording: recording)
+                        }
                     }
                 }
+                Rule(color: Palette.outline)
             }
-            Rule(color: Palette.outline)
 
             ScrollView {
+              VStack(spacing: 0) {
+                if isPhone {
+                    PhoneDetailHero(
+                        kind: "Track",
+                        title: recording.displayTitle,
+                        subtitle: recording.displayArtist,
+                        imageURL: release.artwork
+                    )
+                }
                 LazyVStack(alignment: .leading, spacing: 30) {
+                    if isPhone {
+                        phoneIntro(recording, release: release, connections: connections)
+                    } else {
                     HStack(alignment: .top, spacing: 18) {
                         ArtworkView(remoteURL: release.artwork, side: 128, glyphScale: 0.22,
                                     placeholder: .whiteLabel,
@@ -85,6 +100,7 @@ struct RecordingDigView: View {
                             }
                         }
                         Spacer(minLength: 0)
+                    }
                     }
 
                     appearances(recording)
@@ -112,11 +128,46 @@ struct RecordingDigView: View {
 
                     DeepSectionView(origin: node, isReady: neighbourhood != nil) { appState.open($0) }
                 }
-                .padding(.horizontal, Metrics.gutter)
+                .padding(.horizontal, isPhone ? 16 : Metrics.gutter)
                 .padding(.vertical, 22)
+              }
             }
             .scrollIndicators(.visible)
+            .ignoresSafeArea(edges: isPhone ? .top : [])
         }
+        .overlay(alignment: .top) {
+            if isPhone {
+                PhoneDetailTopBar(isCrated: crate.contains(recording: recording)) {
+                    crate.toggle(recording: recording)
+                }
+            }
+        }
+    }
+
+    /// Under the phone's picture: who made it, a way to them, the record it
+    /// is on, the counts, when it was first heard.
+    private func phoneIntro(
+        _ recording: Recording,
+        release: (line: String?, artwork: URL?),
+        connections: [MusicGraph.Connection]
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if let artist = recording.displayArtist {
+                DigLine(text: artist, detail: "Artist") {
+                    appState.open(.digArtist(mbid: nil, name: artist))
+                }
+            }
+            if let line = release.line {
+                DigLine(text: line, detail: "Release")
+            }
+            DigTallies(entries: tallies(recording, connections: connections))
+            if let status = statusLine(recording) {
+                Text(status)
+                    .font(Typeface.mono(11))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: Where it was heard
@@ -222,8 +273,18 @@ private struct AlongsideRow: View {
     let open: () -> Void
 
     @State private var isHovering = false
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
+        if isPhone {
+            PhoneLinkRow(imageURL: connection.to.artworkURL, title: connection.to.title,
+                         subtitle: connection.to.subtitle, why: connection.why?.summary(), action: open)
+        } else {
+            row
+        }
+    }
+
+    private var row: some View {
         Button(action: open) {
             HStack(alignment: .top, spacing: 12) {
                 Text(connection.to.kind.label)

@@ -83,7 +83,7 @@ struct ArtistDigView: View {
                         subtitle: subtitle(profile).nilIfEmpty,
                         imageURL: profile.coverURL,
                         previewURL: profile.previewURL,
-                        genres: uniqueTags(profile),
+                        // The genres have their own section just below.
                         awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil
                     )
                 }
@@ -216,7 +216,7 @@ struct ArtistDigView: View {
                             }
                         }
                     } else if !profile.styles.isEmpty || !profile.genres.isEmpty || !profile.aliases.isEmpty {
-                        HStack(alignment: .top, spacing: 34) {
+                        (AnyLayout.columns(phone: isPhone)) {
                             genresSection(profile)
                             if !profile.aliases.isEmpty {
                                 DigSection(title: "Aliases") {

@@ -182,6 +182,10 @@ final class IdaBrowseStore {
     func isLoadingShow(_ slug: String) -> Bool { loadingShows.contains(slug) }
     func showError(_ slug: String) -> String? { showErrors[slug] }
 
+    /// How far back a show is read: past IDA Folder's 1,299, short of a
+    /// runaway.
+    static let showEpisodeCeiling = 3000
+
     func loadShowIfNeeded(slug: String) async {
         guard showEpisodes[slug] == nil, !loadingShows.contains(slug) else { return }
         loadingShows.insert(slug)
@@ -191,10 +195,20 @@ final class IdaBrowseStore {
         do {
             async let detail = api.fetchShow(slug: slug)
             async let run = api.fetchEpisodes(showSlug: slug)
-            let (show, episodes) = try await (detail, run)
+            let (show, first) = try await (detail, run)
             showDetails[slug] = show
-            showEpisodes[slug] = episodes
-            remember(episodes)
+            showEpisodes[slug] = first.episodes
+            remember(first.episodes)
+            // The rest of the run, a page at a time, shown as it arrives.
+            var episodes = first.episodes
+            let total = min(first.total ?? episodes.count, Self.showEpisodeCeiling)
+            while episodes.count < total {
+                let page = try await api.fetchEpisodes(showSlug: slug, skip: episodes.count)
+                guard !page.episodes.isEmpty else { break }
+                episodes += page.episodes
+                showEpisodes[slug] = episodes
+                remember(page.episodes)
+            }
         } catch is CancellationError {
         } catch {
             if shows.contains(where: { $0.slug == slug }) {

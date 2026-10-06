@@ -14,40 +14,47 @@ struct AlharaShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(AlharaBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let show = browse.show(slug: slug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: show?.title ?? "Radio alHara",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [show?.publishedLabel, "Radio alHara"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.show(slug: slug))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: show?.title ?? "Radio alHara",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [show?.publishedLabel, "Radio alHara"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let show {
+                        HStack(spacing: 10) {
+                            playButton(show)
+                            AlharaCrateButton(show: show)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let show {
-                    HStack(spacing: 10) {
-                        playButton(show)
-                        AlharaCrateButton(show: show)
+                    content(show)
+                } else if browse.isLoadingDetail(slug) {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.detailError(slug)
+                            ?? "This show is no longer published."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let show {
-                content(show)
-            } else if browse.isLoadingDetail(slug) {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.detailError(slug)
-                        ?? "This show is no longer published."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: slug) { await browse.loadDetailIfNeeded(slug: slug) }
@@ -216,5 +223,32 @@ struct AlharaShowDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension AlharaShowDetailView {
+    /// An alHara show is one recording, so on the phone it is an episode page.
+    fileprivate func phonePage(_ show: AlharaShow?) -> some View {
+        PhoneEpisodePage(
+            kind: "Radio alHara",
+            title: show?.title ?? "Radio alHara",
+            imageURL: show?.artworkURL,
+            genres: show?.genres ?? [],
+            summary: show?.summary,
+            facts: [show?.publishedLabel, show?.duration.map { TimeFormat.clock($0) }].compactMap { $0 }.joined(separator: "  ·  "),
+            isLoaded: show != nil,
+            isPlaying: show.map { AlharaPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let show { AlharaPlayback.toggle(show, within: [show], using: player) } },
+            crate: show.map { AnyView(AlharaCrateButton(show: $0, compact: true)) },
+            tracks: show.map { s in s.tracklist.map { track in
+                PhoneTrackLine(id: "\(track.index)", marker: track.offsetLabel ?? "\(track.index)",
+                    title: track.title, artist: track.artist,
+                    crate: AnyView(RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: "alhara", showID: s.slug, showTitle: s.title, airedAt: s.publishedAt,
+                        entryID: "\(track.index)", title: track.title, artist: track.artist, offsetSeconds: track.offset))))
+            } } ?? [],
+            tracklistNote: browse.isLoadingDetail(slug) ? "Loading the tracklist…" : "No tracklist was published for this show.",
+            error: browse.isLoadingDetail(slug) ? nil : (browse.detailError(slug) ?? "This show is no longer published.")
+        )
     }
 }

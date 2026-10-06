@@ -136,7 +136,10 @@ nonisolated struct LYLAPI: Sendable {
     }
 
     /// Every episode of one show, newest first.
-    func fetchEpisodes(showSlug: String, limit: Int = 100) async throws -> [LYLEpisode] {
+    /// Every episode of one show, newest first. The resolver takes no
+    /// offset, only a limit, so the limit is set past the longest run (One
+    /// Off Lyon's 120 in 2026): at 100 its oldest twenty could not be reached.
+    func fetchEpisodes(showSlug: String, limit: Int = 2000) async throws -> [LYLEpisode] {
         struct Payload: Decodable, Sendable { let episodesByShow: [LYLEpisodeDTO]? }
         let payload: Payload = try await run(
             """

@@ -78,6 +78,7 @@ struct DiscogsLabelDigView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let _ = crate.revision
@@ -85,18 +86,25 @@ struct DiscogsLabelDigView: View {
         let crateID = RecordingKey.normalizeArtist(labelName)
         let isCrated = crate.contains(dig: .label, identifier: crateID, providerID: "dig.label.discogs")
         VStack(spacing: 0) {
-            PageHeader(title: labelName, breadcrumb: appState.breadcrumbTitle,
-                       onBack: { appState.popDetail() }, subtitle: "Label") {
-                CrateButton(isCrated: isCrated) {
-                    crate.toggle(
-                        dig: .label, identifier: crateID, providerID: "dig.label.discogs",
-                        title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil,
-                        genres: profile?.styles ?? []
-                    )
+            if !isPhone {
+                PageHeader(title: labelName, breadcrumb: appState.breadcrumbTitle,
+                           onBack: { appState.popDetail() }, subtitle: "Label") {
+                    CrateButton(isCrated: isCrated) {
+                        crate.toggle(
+                            dig: .label, identifier: crateID, providerID: "dig.label.discogs",
+                            title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil,
+                            genres: profile?.styles ?? []
+                        )
+                    }
                 }
+                Rule(color: Palette.outline)
             }
-            Rule(color: Palette.outline)
             ScrollView {
+              VStack(spacing: 0) {
+                if isPhone {
+                    PhoneDetailHero(kind: "Label", title: profile?.name ?? labelName,
+                                    genres: profile?.styles ?? [], awaitingImage: false)
+                }
                 LazyVStack(alignment: .leading, spacing: 26) {
                     if profile == nil { DigSkeleton(hasImage: false, sections: 3) }
                     if let profile {
@@ -131,7 +139,7 @@ struct DiscogsLabelDigView: View {
                                 }
                             }.padding(.top, 14)
                         }
-                        HStack(alignment: .top, spacing: 34) {
+                        (AnyLayout.columns(phone: isPhone)) {
                             DigSection(title: "Artists", trailing: "\(profile.artists.count)") {
                                 ForEach(profile.artists, id: \.self) { artist in
                                     DigLine(text: artist) { appState.open(.digArtist(mbid: nil, name: artist)) }
@@ -157,11 +165,20 @@ struct DiscogsLabelDigView: View {
                         ) { appState.open($0) }
                     }
                 }
-                .padding(.horizontal, Metrics.gutter).padding(.vertical, 22)
+                .padding(.horizontal, isPhone ? 16 : Metrics.gutter).padding(.vertical, 22)
                 // One treatment for the whole page. See `LoadingVeil`.
                 .loadingVeil(profile == nil)
+              }
             }
-        }.task(id: "\(labelName)|\(labelDiscogsID ?? 0)") {
+        }
+        .modifier(PhoneDetailChrome(isPhone: isPhone, isCrated: isCrated) {
+            crate.toggle(
+                dig: .label, identifier: crateID, providerID: "dig.label.discogs",
+                title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil,
+                genres: profile?.styles ?? []
+            )
+        })
+        .task(id: "\(labelName)|\(labelDiscogsID ?? 0)") {
             await dig.enrichDiscogsLabel(named: labelName, discogsID: labelDiscogsID)
         }
     }

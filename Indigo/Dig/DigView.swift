@@ -31,6 +31,7 @@ struct DigView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(\.isPhoneLayout) private var isPhone
 
     // Worked out in a task, not in `body`. Suggestions walk the graph out of
     // every place the listener keeps returning to, and doing that on each
@@ -131,7 +132,7 @@ struct DigView: View {
                 // stopped rather than arriving.
                 if entries.isEmpty {
                     DigSkeleton(hasImage: false, sections: 3)
-                        .padding(.horizontal, Metrics.gutter)
+                        .pageGutter()
                         .padding(.top, 22)
                 }
 
@@ -139,13 +140,28 @@ struct DigView: View {
 
                 memory(shown)
 
-                if !entries.isEmpty {
+                if !entries.isEmpty, isPhone {
+                    // On the phone, the same blocks as every other section.
+                    DigSection(title: "Start from", trailing: "\(entries.count)") {
+                        LazyVStack(spacing: 0) {
+                            ForEach(entries) { entry in
+                                DigLine(text: entry.name, detail: entry.detail) {
+                                    appState.open(.digArtist(mbid: entry.mbid, name: entry.name))
+                                }
+                                Rule()
+                            }
+                        }
+                    }
+                    .pageGutter()
+                    .padding(.top, 26)
+                    .padding(.bottom, 24)
+                } else if !entries.isEmpty {
                     HStack {
                         Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
                         Spacer()
                         Text("\(entries.count)").microLabel(1.2).foregroundStyle(Palette.inkFaint)
                     }
-                    .padding(.horizontal, Metrics.gutter)
+                    .pageGutter()
                     .padding(.top, 8)
                     .padding(.bottom, 9)
                     Rule(color: Palette.outline)
@@ -455,7 +471,7 @@ struct DigView: View {
                     }
                 }
             }
-            .padding(.horizontal, Metrics.gutter)
+            .pageGutter()
             .padding(.top, 22)
             .padding(.bottom, 6)
         }
@@ -490,7 +506,7 @@ struct DigView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, Metrics.gutter)
+                    .pageGutter()
                 }
             }
             .padding(.top, 22)
@@ -671,7 +687,7 @@ private struct DigStartRow: View {
                     .foregroundStyle(isHovering ? Palette.accent : Palette.inkFaint)
             }
             .foregroundStyle(isHovering ? Palette.accent : Palette.ink)
-            .padding(.horizontal, Metrics.gutter)
+            .pageGutter()
             .frame(height: Metrics.rowHeight + 4)
             .background(isHovering ? Palette.wash : Color.clear)
             .contentShape(Rectangle())
@@ -689,18 +705,59 @@ private struct DigShelf: View {
     let picks: [CrateRecommendations.Pick]
     let caption: (CrateRecommendations.Pick) -> String
     let open: (CrateRecommendations.Pick) -> Void
+    @Environment(\.isPhoneLayout) private var isPhone
+    @Environment(DigStore.self) private var dig
 
     var body: some View {
+        if isPhone { grid } else { shelf }
+    }
+
+    /// On the phone, a grid of two that scrolls with the page, as the Shows
+    /// tab's does: square pictures, the name in a box along the bottom.
+    private var grid: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            DigSection(title: title, trailing: "\(picks.count)") { EmptyView() }
+                .pageGutter()
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2), count: 2), spacing: 2) {
+                ForEach(picks) { pick in
+                    Button { open(pick) } label: {
+                        Color.clear
+                            .aspectRatio(1, contentMode: .fit)
+                            .overlay {
+                                GeometryReader { proxy in
+                                    ArtworkView(
+                                        remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                                        side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic
+                                    )
+                                }
+                            }
+                            .clipped()
+                            .overlay(alignment: .bottomLeading) {
+                                Chip(text: pick.node.title, size: 12)
+                                    .lineLimit(2)
+                                    .padding(6)
+                            }
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(pick.node.title)
+                    .accessibilityHint(caption(pick))
+                }
+            }
+        }
+    }
+
+    private var shelf: some View {
         VStack(alignment: .leading, spacing: 0) {
             DigSection(title: title, trailing: "\(picks.count)") { EmptyView() }
-                .padding(.horizontal, Metrics.gutter)
+                .pageGutter()
             ScrollView(.horizontal) {
                 LazyHStack(alignment: .top, spacing: 14) {
                     ForEach(picks) { pick in
                         DigArtistCard(pick: pick, caption: caption(pick)) { open(pick) }
                     }
                 }
-                .padding(.horizontal, Metrics.gutter)
+                .pageGutter()
                 .padding(.bottom, 6)
             }
             .scrollIndicators(.never)

@@ -63,6 +63,7 @@ struct PhoneTabBar: View {
     let select: (PhoneTab) -> Void
     let search: () -> Void
 
+    /// The tab you are on, and search while searching, in IDA's green.
     var body: some View {
         HStack(spacing: 10) {
             HStack(spacing: 0) {
@@ -70,10 +71,11 @@ struct PhoneTabBar: View {
                     Button { select(tab) } label: {
                         Image(systemName: tab.symbol)
                             .font(.system(size: 21, weight: .semibold))
+                            .foregroundStyle(tab == selected ? Chip.ink : .white)
                             .frame(maxWidth: .infinity, minHeight: 54)
                             .background {
                                 if tab == selected {
-                                    Capsule().fill(.white.opacity(0.16)).padding(3)
+                                    Capsule().fill(Chip.green).padding(3)
                                 }
                             }
                             .contentShape(Rectangle())
@@ -90,9 +92,10 @@ struct PhoneTabBar: View {
             Button(action: search) {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 21, weight: .semibold))
+                    .foregroundStyle(searching ? Chip.ink : .white)
                     .frame(width: 62, height: 62)
                     .background {
-                        if searching { Circle().fill(.white.opacity(0.16)).padding(3) }
+                        if searching { Circle().fill(Chip.green).padding(3) }
                     }
                     .background(.ultraThinMaterial, in: Circle())
                     .overlay(Circle().strokeBorder(.white.opacity(0.12), lineWidth: 1))
@@ -124,6 +127,7 @@ struct PhoneMiniPlayer: View {
                         glyphScale: 0.3,
                         markURL: StationMark.logoURL(for: item.sourceID)
                     )
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                     VStack(alignment: .leading, spacing: 0) {
                         Text(NowPlayingLines.primary(item, show))
                             .font(Typeface.mono(12.5, weight: .medium))
@@ -142,25 +146,26 @@ struct PhoneMiniPlayer: View {
                             .background(Chip.green)
                     }
                     Spacer(minLength: 0)
+                    transport("backward.fill", label: "Previous", size: 15) { player.previous() }
+                    transport(player.isPlaying ? "pause.fill" : "play.fill",
+                              label: player.isPlaying ? "Pause" : "Play", size: 20) { player.toggle() }
+                    transport("forward.fill", label: "Next", size: 15) { player.next() }
                     let _ = crate.revision
                     let crated = crate.isCrated(nowPlaying: item, liveShow: show)
                     transport(crated ? "checkmark.square.fill" : "plus.square",
                               label: crated ? "Remove from crate" : "Add to crate", size: 17) {
                         crate.toggle(nowPlaying: item, liveShow: show)
                     }
-                    transport("backward.fill", label: "Previous", size: 15) { player.previous() }
-                    transport(player.isPlaying ? "pause.fill" : "play.fill",
-                              label: player.isPlaying ? "Pause" : "Play", size: 20) { player.toggle() }
-                    transport("forward.fill", label: "Next", size: 15) { player.next() }
                 }
-                .padding(.leading, 7)
-                .padding(.trailing, 6)
-                .frame(height: 60)
+                .padding(.leading, 8)
+                .padding(.trailing, 12)
+                .frame(height: 62)
                 .foregroundStyle(.white)
+                // Softly rounded, of a piece with the tab bar under it.
                 .background { PlayerShaderBackdrop() }
-                .clipped()
-                .overlay(Rectangle().strokeBorder(.white.opacity(0.12)))
-                .contentShape(Rectangle())
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.white.opacity(0.12)))
+                .contentShape(RoundedRectangle(cornerRadius: 12))
                 .onTapGesture(perform: open)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint("Opens the player")
@@ -227,26 +232,30 @@ struct PhoneNowPlayingView: View {
                         Spacer(minLength: 0)
                         picture(item, show)
                         VStack(spacing: 10) {
-                            ChipFlow {
-                                // An upload's source says nothing the
-                                // thumbnail does not.
-                                if !isVideo {
+                            // An upload's source says nothing the thumbnail
+                            // does not.
+                            if !isVideo {
+                                ChipFlow {
                                     Chip(text: NowPlayingSummary.sourceLabel(for: item), tone: .lead, size: 13, uppercase: true)
                                 }
-                                Chip(text: NowPlayingLines.primary(item, show), size: 18)
                             }
-                            let secondary = NowPlayingLines.secondary(item, show)
-                            if !secondary.isEmpty {
-                                ChipFlow { Chip(text: secondary, size: 13) }
-                            }
+                            // The episode's name, and the crate beside it.
                             let _ = crate.revision
                             let crated = crate.isCrated(nowPlaying: item, liveShow: show)
-                            Button { crate.toggle(nowPlaying: item, liveShow: show) } label: {
-                                Chip(text: crated ? "✓ In crate" : "+ Crate",
-                                     tone: crated ? .lead : .plain, size: 13, uppercase: true)
+                            HStack(alignment: .center, spacing: 10) {
+                                Chip(text: NowPlayingLines.primary(item, show), size: 18)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Button { crate.toggle(nowPlaying: item, liveShow: show) } label: {
+                                    Image(systemName: crated ? "checkmark.square.fill" : "plus.square")
+                                        .font(.system(size: 24, weight: .regular))
+                                        .foregroundStyle(crated ? Chip.green : .white)
+                                        .frame(width: 40, height: 40)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(crated ? "Remove from crate" : "Add to crate")
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(crated ? "Remove from crate" : "Add to crate")
                         }
                         .padding(.horizontal, 20)
                         PhoneScrubber(show: show)
@@ -269,7 +278,7 @@ struct PhoneNowPlayingView: View {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 18, weight: .semibold))
                         .frame(width: 46, height: 46)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Chip.black, ignoresSafeAreaEdges: [])
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close the player")
@@ -315,7 +324,7 @@ struct PhoneNowPlayingView: View {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
                         .font(.system(size: 15, weight: .semibold))
                         .frame(width: 40, height: 40)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Chip.black, ignoresSafeAreaEdges: [])
                 }
                 .buttonStyle(.plain)
                 .padding(8)

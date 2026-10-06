@@ -119,8 +119,8 @@ struct PhoneLiveSlide: View {
                 Image(systemName: "info")
                     .font(.system(size: 17, weight: .semibold))
                     .frame(width: 46, height: 46)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(Circle().strokeBorder(.white.opacity(0.14)))
+                    .background(Chip.black, ignoresSafeAreaEdges: [])
+                    .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open \(entry.station.name)")
@@ -128,12 +128,14 @@ struct PhoneLiveSlide: View {
             HStack(spacing: 7) {
                 Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 7, height: 7)
                 Text(entry.station.name)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(Typeface.mono(14))
+                    .tracking(1.2)
+                    .textCase(.uppercase)
             }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(.white.opacity(0.14)))
+            .padding(.horizontal, 16)
+            .frame(height: 46)
+            .background(Chip.black, ignoresSafeAreaEdges: [])
+            .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             Spacer()
             // Balances the info button, so the station's name sits centred.
             Color.clear.frame(width: 46, height: 46)
@@ -144,34 +146,36 @@ struct PhoneLiveSlide: View {
     /// every slide keeps: where and who, what is on, what it sounds like, what
     /// is next on a line of its own, and the button last, always in the same
     /// place at the bottom.
+    /// One row each, the same on every station: where, what is on, its
+    /// genres, when the next show starts, and what it is.
     private func details(_ show: RadioShow?, _ next: RadioShow?) -> some View {
-        // NTS names its show as its host; a host already in the title is said.
-        let host = show?.host.flatMap { host in
-            show?.title.localizedCaseInsensitiveContains(host) == true ? nil : host
-        }.flatMap { $0.isEmpty ? nil : $0 }
         let city = entry.location.split(separator: ",").first.map(String.init) ?? entry.location
         let genres = Array((show?.genres ?? []).filter { !$0.isEmpty }.prefix(3))
-        return VStack(spacing: 14) {
-            ChipFlow {
-                Chip(text: city, tone: .lead, uppercase: true)
-                if let host { Chip(text: host) }
-            }
-            // With nothing published, the strapline -- unless it only says the
-            // city again.
-            if let title = show?.title ?? (entry.station.strapline.caseInsensitiveCompare(city) == .orderedSame
-                                            ? nil : entry.station.strapline) {
+        // With nothing published, the strapline -- unless it only says the
+        // city again.
+        let title = show?.title ?? (entry.station.strapline.caseInsensitiveCompare(city) == .orderedSame
+                                     ? nil : entry.station.strapline)
+        return VStack(spacing: 8) {
+            ChipFlow { Chip(text: city, tone: .lead, size: 13, uppercase: true) }
+            if let title {
                 ChipFlow { Chip(text: title, size: 19) }
             }
             if !genres.isEmpty {
                 ChipFlow {
-                    ForEach(genres, id: \.self) { Chip(text: $0, size: 12.5) }
+                    ForEach(genres, id: \.self) { Chip(text: $0, size: 12.5, uppercase: true) }
                 }
             }
             if let next {
-                NextUpStrip(title: next.title, time: next.startsAt?.formatted(date: .omitted, time: .shortened))
+                ChipFlow {
+                    if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
+                        Chip(text: time, tone: .sheen, size: 12.5)
+                    }
+                    Chip(text: "Next up", size: 12.5, uppercase: true)
+                }
+                ChipFlow { Chip(text: next.title, size: 15) }
             }
             playButton
-                .padding(.top, 6)
+                .padding(.top, 10)
         }
     }
 

@@ -83,7 +83,9 @@ struct PhoneDetailTopBar: View {
 
     var body: some View {
         HStack {
-            circle("chevron.left", label: "Back") { appState.popDetail() }
+            Button { appState.popDetail() } label: { PhoneBackGlyph() }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
             Spacer()
             if let isCrated {
                 circle(isCrated ? "checkmark" : "plus",
@@ -101,10 +103,73 @@ struct PhoneDetailTopBar: View {
             Image(systemName: symbol)
                 .font(.system(size: 18, weight: .semibold))
                 .frame(width: 46, height: 46)
-                .background(.ultraThinMaterial, in: Circle())
-                .overlay(Circle().strokeBorder(.white.opacity(0.14)))
+                .background(Chip.black, ignoresSafeAreaEdges: [])
+                .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+    }
+}
+
+/// A DIG page's chrome on the phone: the page runs up under the status bar,
+/// its picture to the top, and back and crate float over it. Off the phone,
+/// nothing.
+struct PhoneDetailChrome: ViewModifier {
+    let isPhone: Bool
+    var isCrated: Bool?
+    var toggleCrate: () -> Void = {}
+
+    func body(content: Content) -> some View {
+        content
+            .ignoresSafeArea(edges: isPhone ? .top : [])
+            .overlay(alignment: .top) {
+                if isPhone {
+                    PhoneDetailTopBar(isCrated: isCrated, toggleCrate: toggleCrate)
+                }
+            }
+    }
+}
+
+extension AnyLayout {
+    /// Columns side by side, or, on the phone, one under the other.
+    static func columns(phone: Bool, spacing: CGFloat = 34) -> AnyLayout {
+        phone
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 26))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: spacing))
+    }
+}
+
+enum PhoneLayout {
+    /// The phone pages' side margin. Section titles undo it to sit against
+    /// the screen's left edge.
+    static let margin: CGFloat = 16
+}
+
+/// A page's side margin: the Mac's gutter, or the phone's narrower one.
+struct PageGutter: ViewModifier {
+    @Environment(\.isPhoneLayout) private var isPhone
+
+    func body(content: Content) -> some View {
+        content.padding(.horizontal, isPhone ? PhoneLayout.margin : Metrics.gutter)
+    }
+}
+
+extension View {
+    func pageGutter() -> some View { modifier(PageGutter()) }
+}
+
+/// The back button's face: a square of the wordmark's moving sheen with the
+/// chevron on it, as the tab bar's Dig cell is -- the one thing on every page
+/// that is always the same.
+struct PhoneBackGlyph: View {
+    var body: some View {
+        Image(systemName: "chevron.left")
+            .font(.system(size: 18, weight: .bold))
+            .foregroundStyle(Chip.ink)
+            .frame(width: 46, height: 46)
+            .background { MineralSheenSurface() }
+            .clipped()
+            .overlay(Rectangle().strokeBorder(.white.opacity(0.2)))
+            .contentShape(Rectangle())
     }
 }

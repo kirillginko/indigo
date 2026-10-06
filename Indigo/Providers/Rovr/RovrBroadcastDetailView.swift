@@ -17,40 +17,47 @@ struct RovrBroadcastDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(RovrBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let broadcast = browse.broadcast(id: broadcastID)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: broadcast?.title ?? "ROVR",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [broadcast?.broadcastLabel, broadcast?.curatorName ?? "ROVR"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.broadcast(id: broadcastID))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: broadcast?.title ?? "ROVR",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [broadcast?.broadcastLabel, broadcast?.curatorName ?? "ROVR"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let broadcast {
+                        HStack(spacing: 10) {
+                            if broadcast.isPlayable { playButton(broadcast) }
+                            RovrCrateButton(broadcast: broadcast)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let broadcast {
-                    HStack(spacing: 10) {
-                        if broadcast.isPlayable { playButton(broadcast) }
-                        RovrCrateButton(broadcast: broadcast)
+                    content(broadcast)
+                } else if browse.isLoadingDetail(broadcastID) {
+                    LoadingPane(label: "Loading broadcast")
+                } else {
+                    EmptyStateView(
+                        headline: "Broadcast unavailable",
+                        message: browse.detailError(broadcastID)
+                            ?? "ROVR no longer publishes this broadcast."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let broadcast {
-                content(broadcast)
-            } else if browse.isLoadingDetail(broadcastID) {
-                LoadingPane(label: "Loading broadcast")
-            } else {
-                EmptyStateView(
-                    headline: "Broadcast unavailable",
-                    message: browse.detailError(broadcastID)
-                        ?? "ROVR no longer publishes this broadcast."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: broadcastID) {
@@ -209,5 +216,36 @@ struct RovrBroadcastDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension RovrBroadcastDetailView {
+    fileprivate func phonePage(_ broadcast: RovrBroadcast?) -> some View {
+        let siblings = (broadcast?.curatorID.map { browse.broadcasts(byCurator: $0) } ?? []).filter { $0.id != broadcast?.id }
+        return PhoneEpisodePage(
+            kind: "ROVR",
+            title: broadcast?.title ?? "ROVR",
+            subtitle: broadcast?.curatorName,
+            imageURL: broadcast?.imageURL ?? broadcast?.thumbnailURL,
+            genres: broadcast?.tags ?? [],
+            summary: broadcast?.summary,
+            facts: [broadcast?.broadcastLabel, broadcast?.duration.map { TimeFormat.clock($0) }].compactMap { $0 }.joined(separator: "  ·  "),
+            show: broadcast.flatMap { b in b.showID.map { s in (b.showTitle ?? "The show", { appState.open(.rovrShow(id: s)) }) } },
+            isLoaded: broadcast != nil,
+            isPlayable: broadcast?.isPlayable ?? false,
+            isPlaying: broadcast.map { RovrPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let broadcast { RovrPlayback.toggle(broadcast, within: [broadcast], using: player) } },
+            crate: broadcast.map { AnyView(RovrCrateButton(broadcast: $0, compact: true)) },
+            more: siblings.map { other in
+                PhoneEpisode(id: other.id, title: other.title, subtitle: other.curatorName, date: other.broadcastAt,
+                             genres: other.tags, imageURL: other.thumbnailURL ?? other.imageURL,
+                             isPlayable: other.isPlayable, isCurrent: RovrPlayback.isCurrent(other, in: player),
+                             isPlaying: RovrPlayback.isPlaying(other, in: player),
+                             play: { RovrPlayback.toggle(other, within: siblings, using: player) },
+                             open: { browse.remember([other]); appState.open(.rovrBroadcast(id: other.documentID)) })
+            },
+            moreTitle: broadcast?.curatorName.map { "More from \($0)" } ?? "More from the archive",
+            error: browse.isLoadingDetail(broadcastID) ? nil : (browse.detailError(broadcastID) ?? "ROVR no longer publishes this broadcast.")
+        )
     }
 }

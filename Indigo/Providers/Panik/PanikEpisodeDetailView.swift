@@ -18,40 +18,47 @@ struct PanikEpisodeDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(PanikBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let episode = browse.episode(id: episodeID)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: episode?.title ?? "Radio Panik",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [episode?.broadcastLabel, episode?.showTitle ?? "Radio Panik"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.episode(id: episodeID))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: episode?.title ?? "Radio Panik",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [episode?.broadcastLabel, episode?.showTitle ?? "Radio Panik"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let episode {
+                        HStack(spacing: 10) {
+                            if episode.isPlayable { playButton(episode) }
+                            PanikCrateButton(episode: episode)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let episode {
-                    HStack(spacing: 10) {
-                        if episode.isPlayable { playButton(episode) }
-                        PanikCrateButton(episode: episode)
+                    content(episode)
+                } else if browse.isLoadingDetail(episodeID) {
+                    LoadingPane(label: "Loading broadcast")
+                } else {
+                    EmptyStateView(
+                        headline: "Broadcast unavailable",
+                        message: browse.detailError(episodeID)
+                            ?? "Radio Panik no longer publishes this broadcast."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let episode {
-                content(episode)
-            } else if browse.isLoadingDetail(episodeID) {
-                LoadingPane(label: "Loading broadcast")
-            } else {
-                EmptyStateView(
-                    headline: "Broadcast unavailable",
-                    message: browse.detailError(episodeID)
-                        ?? "Radio Panik no longer publishes this broadcast."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: episodeID) {
@@ -275,5 +282,42 @@ struct PanikEpisodeDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension PanikEpisodeDetailView {
+    fileprivate func phonePage(_ episode: PanikEpisode?) -> some View {
+        let siblings = (episode?.showSlug.map { browse.episodes(ofShow: $0) } ?? []).filter { $0.id != episodeID }
+        return PhoneEpisodePage(
+            kind: "Radio Panik",
+            title: episode?.title ?? "Radio Panik",
+            imageURL: episode?.imageURL,
+            summary: episode?.summary,
+            facts: [episode?.broadcastLabel, episode?.duration.map { TimeFormat.clock($0) }].compactMap { $0 }.joined(separator: "  ·  "),
+            show: episode.flatMap { e in e.showSlug.map { s in (e.showTitle ?? "The show", { appState.open(.panikShow(slug: s)) }) } },
+            isLoaded: episode != nil,
+            isPlayable: episode?.isPlayable ?? false,
+            isPlaying: episode.map { PanikPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let episode { PanikPlayback.toggle(episode, within: [episode], using: player) } },
+            crate: episode.map { AnyView(PanikCrateButton(episode: $0, compact: true)) },
+            tracks: episode.map { e in loggedTracks(e).map { track in
+                PhoneTrackLine(id: "\(track.index)", marker: track.time ?? "\(track.index + 1)",
+                    title: track.title, artist: track.artist,
+                    crate: AnyView(RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: PanikProvider.providerID, showID: e.id, showTitle: e.title, airedAt: e.publishedAt,
+                        entryID: "\(track.index)", title: track.title, artist: track.artist, offsetSeconds: nil))))
+            } } ?? [],
+            tracklistNote: episode.map(emptyNote),
+            more: siblings.map { other in
+                PhoneEpisode(id: other.id, title: other.title, date: other.publishedAt,
+                             imageURL: other.imageURL, isPlayable: other.isPlayable,
+                             isCurrent: PanikPlayback.isCurrent(other, in: player),
+                             isPlaying: PanikPlayback.isPlaying(other, in: player),
+                             play: { PanikPlayback.toggle(other, within: siblings, using: player) },
+                             open: { browse.remember([other]); appState.open(.panikEpisode(id: other.id)) })
+            },
+            moreTitle: episode?.showTitle.map { "More from \($0)" } ?? "More from the archive",
+            error: browse.isLoadingDetail(episodeID) ? nil : (browse.detailError(episodeID) ?? "Radio Panik no longer publishes this episode.")
+        )
     }
 }

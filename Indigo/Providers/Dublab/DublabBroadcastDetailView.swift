@@ -14,40 +14,47 @@ struct DublabBroadcastDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(DublabBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let broadcast = browse.broadcast(slug: slug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: broadcast?.title ?? "dublab",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [broadcast?.airedLabel, broadcast?.showName ?? "dublab"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.broadcast(slug: slug))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: broadcast?.title ?? "dublab",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [broadcast?.airedLabel, broadcast?.showName ?? "dublab"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let broadcast {
+                        HStack(spacing: 10) {
+                            if broadcast.isPlayable { playButton(broadcast) }
+                            DublabCrateButton(broadcast: broadcast)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let broadcast {
-                    HStack(spacing: 10) {
-                        if broadcast.isPlayable { playButton(broadcast) }
-                        DublabCrateButton(broadcast: broadcast)
+                    content(broadcast)
+                } else if browse.isLoadingBroadcast(slug) {
+                    LoadingPane(label: "Loading broadcast")
+                } else {
+                    EmptyStateView(
+                        headline: "Broadcast unavailable",
+                        message: browse.broadcastError(slug)
+                            ?? "dublab is no longer publishing information for this broadcast."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let broadcast {
-                content(broadcast)
-            } else if browse.isLoadingBroadcast(slug) {
-                LoadingPane(label: "Loading broadcast")
-            } else {
-                EmptyStateView(
-                    headline: "Broadcast unavailable",
-                    message: browse.broadcastError(slug)
-                        ?? "dublab is no longer publishing information for this broadcast."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: slug) { await browse.loadBroadcastIfNeeded(slug: slug) }
@@ -225,5 +232,39 @@ struct DublabBroadcastDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension DublabBroadcastDetailView {
+    fileprivate func phonePage(_ broadcast: DublabBroadcast?) -> some View {
+        let dj = broadcast?.artistSlugs.first
+        let siblings = (dj.map { browse.broadcasts(byDJ: $0) } ?? []).filter { $0.slug != slug }
+        return PhoneEpisodePage(
+            kind: "dublab",
+            title: broadcast?.showName ?? broadcast?.title ?? "dublab",
+            subtitle: broadcast?.showName == nil ? broadcast?.performer : broadcast?.title,
+            imageURL: broadcast?.artworkURL,
+            genres: broadcast?.genreNames ?? [],
+            summary: broadcast?.showSummary ?? broadcast?.performerSummary,
+            facts: broadcast.map(facts),
+            show: broadcast.flatMap { b in dj.map { s in (b.performer ?? "The DJ", { appState.open(.dublabDJ(slug: s)) }) } },
+            isLoaded: broadcast != nil,
+            isPlayable: broadcast?.isPlayable ?? false,
+            isPlaying: broadcast.map { DublabPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let broadcast { DublabPlayback.toggle(broadcast, within: [broadcast], using: player) } },
+            crate: broadcast.map { AnyView(DublabCrateButton(broadcast: $0, compact: true)) },
+            more: siblings.map { other in
+                PhoneEpisode(id: other.id, title: other.showName ?? other.title,
+                             subtitle: other.showName == nil ? nil : other.title, date: other.airedAt,
+                             genres: other.genreNames, imageURL: other.artworkURL, isPlayable: other.isPlayable,
+                             isCurrent: DublabPlayback.isCurrent(other, in: player),
+                             isPlaying: DublabPlayback.isPlaying(other, in: player),
+                             play: { DublabPlayback.toggle(other, within: siblings, using: player) },
+                             open: { browse.remember([other]); appState.open(.dublabBroadcast(slug: other.slug)) })
+            },
+            moreTitle: broadcast?.performer.map { "More from \($0)" } ?? "More from the archive",
+            error: browse.isLoadingBroadcast(slug) ? nil
+                : (browse.broadcastError(slug) ?? "dublab is no longer publishing information for this broadcast.")
+        )
     }
 }

@@ -16,6 +16,7 @@ struct LabelDigView: View {
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
     @Environment(DigStore.self) private var dig
+    @Environment(\.isPhoneLayout) private var isPhone
 
     /// Held rather than read in `body` — see `ArtistDigView`.
     @State private var profile: LabelProfile?
@@ -27,22 +28,29 @@ struct LabelDigView: View {
         let isCrated = crate.contains(dig: .label, identifier: labelMBID, providerID: "dig.label.mbid")
 
         VStack(spacing: 0) {
-            PageHeader(
-                title: profile?.name ?? labelName,
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(profile)
-            ) {
-                CrateButton(isCrated: isCrated) {
-                    crate.toggle(
-                        dig: .label, identifier: labelMBID, providerID: "dig.label.mbid",
-                        title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil
-                    )
+            if !isPhone {
+                PageHeader(
+                    title: profile?.name ?? labelName,
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(profile)
+                ) {
+                    CrateButton(isCrated: isCrated) {
+                        crate.toggle(
+                            dig: .label, identifier: labelMBID, providerID: "dig.label.mbid",
+                            title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil
+                        )
+                    }
                 }
+                Rule(color: Palette.outline)
             }
-            Rule(color: Palette.outline)
 
             ScrollView {
+              VStack(spacing: 0) {
+                if isPhone {
+                    PhoneDetailHero(kind: "Label", title: profile?.name ?? labelName,
+                                    subtitle: subtitle(profile), awaitingImage: false)
+                }
                 LazyVStack(alignment: .leading, spacing: 26) {
                     // A label profile is returned even when nothing is
                     // cached, so its emptiness is not evidence of anything
@@ -64,7 +72,7 @@ struct LabelDigView: View {
                         // that its records keep turning up in the same shows.
                         LabelRadioSection(labelName: profile.name)
 
-                        HStack(alignment: .top, spacing: 34) {
+                        (AnyLayout.columns(phone: isPhone)) {
                             DigSection(title: "Artists", trailing: "\(profile.artists.count)") {
                                 VStack(alignment: .leading, spacing: 0) {
                                     ForEach(profile.artists.prefix(20)) { artist in
@@ -93,16 +101,23 @@ struct LabelDigView: View {
                         ) { appState.open($0) }
                     }
                 }
-                .padding(.horizontal, Metrics.gutter)
+                .padding(.horizontal, isPhone ? 16 : Metrics.gutter)
                 .padding(.vertical, 22)
                 // One treatment for the whole page. See `LoadingVeil`.
                 // A label profile comes back even when nothing is cached, so
                 // its emptiness only means something once the catalogue has
                 // actually been asked for.
                 .loadingVeil(profile == nil || (!hasEnriched && (profile?.artists.isEmpty ?? true)))
+              }
             }
             .scrollIndicators(.visible)
         }
+        .modifier(PhoneDetailChrome(isPhone: isPhone, isCrated: isCrated) {
+            crate.toggle(
+                dig: .label, identifier: labelMBID, providerID: "dig.label.mbid",
+                title: profile?.name ?? labelName, subtitle: "Label", artworkURL: nil
+            )
+        })
         .task(id: dig.revision) {
             self.profile = await dig.labelProfile(mbid: labelMBID, fallbackName: labelName)
             await readCatalogue()
