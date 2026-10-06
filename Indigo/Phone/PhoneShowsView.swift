@@ -172,9 +172,9 @@ struct PhoneShowsView: View {
     /// each.
     private func sectionRows(_ station: Station) -> some View {
         VStack(spacing: 0) {
-            sectionRow(Self.countNoun(station.id).capitalized) { feeds.showsStation = station.id }
+            sectionRow(Self.countNoun(station.id).capitalized, station: station) { feeds.showsStation = station.id }
             ForEach(sections(of: station)) { section in
-                sectionRow(section.title) {
+                sectionRow(section.title, station: station) {
                     // Back from the section comes here, to the list.
                     feeds.lastStationRoute = .shows
                     appState.select(section.route)
@@ -184,18 +184,30 @@ struct PhoneShowsView: View {
         .transition(.opacity)
     }
 
-    private func sectionRow(_ title: String, action: @escaping () -> Void) -> some View {
+    /// A section under its station: the station's logo, smaller, so each
+    /// row says whose it is; the section's name; a chevron.
+    private func sectionRow(_ title: String, station: Station, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Group {
+                    if let providerID = station.providerID {
+                        ArtworkView(side: 36, glyphScale: 0.3, markURL: StationMark.logoURL(for: providerID))
+                    } else {
+                        MineralSheenSurface()
+                    }
+                }
+                .frame(width: 36, height: 36)
+                .clipped()
                 Chip(text: title, size: 13, uppercase: true)
                 Spacer(minLength: 8)
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.5))
             }
+            // Indented under the station's own logo.
             .padding(.leading, 64 + 12)
             .padding(.trailing, 16)
-            .frame(height: 48)
+            .frame(height: 52)
             .background(Color.black.opacity(0.4))
             .overlay(alignment: .bottom) {
                 Rectangle().fill(.white.opacity(0.08)).frame(height: 1)
