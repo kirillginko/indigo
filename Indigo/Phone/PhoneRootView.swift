@@ -52,7 +52,14 @@ struct PhoneRootView: View {
                 Color.black.ignoresSafeArea()
                     .zIndex(3)
             }
-            embedLayer(in: size)
+            // In an overlay of a view that takes the screen's size, so the
+            // web view -- parked as wide as the screen, or turned with a
+            // video -- can never make the layout wider: after a video was
+            // turned on its side, it kept the landscape width and the whole
+            // phone layout stayed stretched when it stood back up.
+            Color.clear
+                .overlay(alignment: .topLeading) { embedLayer(in: size) }
+                .clipped()
                 .zIndex(videoUp ? 4 : 0)
             page
                 .zIndex(1)

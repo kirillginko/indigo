@@ -92,6 +92,9 @@ The Mac's `Typeface.display` and `body` are not used on phone pages.
   WordPress and YouTube for a larger cut than a list does, with the
   station's own cut as the preview. Never set a row's small cut (a
   `thumbnailURL`) as a hero's picture.
+- **No picture**: a show, artist, record or station with no picture, or one
+  that failed to load, is the player's still green (`MineralGround`) on
+  the phone -- one fallback everywhere, never a blank, a glyph or a mosaic.
 
 ---
 

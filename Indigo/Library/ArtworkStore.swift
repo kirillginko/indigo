@@ -399,6 +399,7 @@ struct ArtworkView: View {
     }
 
     @Environment(\.displayScale) private var displayScale
+    @Environment(\.isPhoneLayout) private var isPhone
     /// The tile's size as laid out, for tiles not given a `side`.
     @State private var measured: CGFloat?
 
@@ -583,7 +584,15 @@ struct ArtworkView: View {
         // The two common cases size themselves, so the overwhelming majority
         // of tiles cost no layout pass at all. Only the text mark — a station
         // with no logo, which is rare — still needs to measure.
-        if blursWhileLoading, isLoading {
+        if isPhone, isSettledEmpty, markAddress == nil, localKey == nil {
+            // On the phone, a show, artist or record with no picture -- or
+            // one that never loaded -- is the player's still green, one
+            // fallback everywhere rather than a mosaic, a glyph or a blank.
+            Image("MineralGround")
+                .resizable()
+                .scaledToFill()
+                .accessibilityHidden(true)
+        } else if blursWhileLoading, isLoading {
             // The mosaic this tile would settle on, out of focus: colour where
             // the picture will be, and the same block, sharpened, if it turns
             // out there is none.
