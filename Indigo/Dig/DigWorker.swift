@@ -209,7 +209,10 @@ actor DigWorker {
         // store — the right Discogs id, and their picture — so asking a
         // search engine to guess again is both a wasted request and the way
         // the video director's photograph got filed under the duo's name.
-        if let resolved = Self.resolvedPortrait(named: name, in: modelContext) {
+        // Unless all it holds is the 150-pixel thumb, which is why this
+        // name was asked for again: then the search, for the cover.
+        if let resolved = Self.resolvedPortrait(named: name, in: modelContext),
+           !DiscogsClient.isSmallCut(resolved) {
             return write(resolved, named: name)
         }
 

@@ -299,7 +299,10 @@ nonisolated struct DiscogsClient: Sendable {
         ])
         guard let match = Self.bestArtistMatch(name: name, results: response.results ?? [])
         else { return nil }
-        return Self.usableImage(match.thumbnail) ?? Self.usableImage(match.coverImage)
+        // The cover (600 pixels), not the thumb (150): the phone draws these
+        // half a screen wide, where the thumb blurred. Its address is signed,
+        // so a size cannot be asked of the thumb.
+        return Self.usableImage(match.coverImage) ?? Self.usableImage(match.thumbnail)
     }
 
     /// What Discogs has under a typed query, in one of the three kinds a dig
@@ -497,8 +500,9 @@ nonisolated struct DiscogsClient: Sendable {
             guard let separator = result.title.range(of: " - ") else { continue }
             let credit = String(result.title[..<separator.lowerBound])
                 .trimmingCharacters(in: .whitespaces)
-            // The small cut. A 38-point row has no use for a 600-pixel sleeve.
-            let thumbnail = result.thumbnail ?? result.coverImage
+            // The cover: these are drawn as half-screen cards on the phone,
+            // where the 150-pixel thumb blurred.
+            let thumbnail = result.coverImage ?? result.thumbnail
             for artist in Self.creditedNames(credit) {
                 let key = RecordingKey.normalizeArtist(artist)
                 guard !key.isEmpty, seen.insert(key).inserted else { continue }
@@ -626,6 +630,11 @@ nonisolated struct DiscogsClient: Sendable {
     /// transparent one-pixel image. Stored and drawn, that is a tile showing
     /// nothing where the placeholder artwork should be, on a record whose own
     /// page fetches a perfectly good cover a moment later.
+    /// Whether an address is Discogs' 150-pixel thumb, too small for a card.
+    nonisolated static func isSmallCut(_ address: String?) -> Bool {
+        address?.contains("/h:150/") == true || address?.contains("/w:150/") == true
+    }
+
     static func usableImage(_ address: String?) -> String? {
         guard let address, !address.isEmpty else { return nil }
         return address.contains("/images/spacer") ? nil : address

@@ -586,11 +586,11 @@ struct ArtworkView: View {
         // with no logo, which is rare — still needs to measure.
         if isPhone, isSettledEmpty, markAddress == nil, localKey == nil {
             // On the phone, a show, artist or record with no picture -- or
-            // one that never loaded -- is the player's still green, one
+            // one that never loaded -- is the wordmark's moving green, one
             // fallback everywhere rather than a mosaic, a glyph or a blank.
-            Image("MineralGround")
-                .resizable()
-                .scaledToFill()
+            // Drawn once per size, at low resolution, so a grid of them
+            // costs one drawing.
+            MineralSheenSurface(lowResolution: true)
                 .accessibilityHidden(true)
         } else if blursWhileLoading, isLoading {
             // The mosaic this tile would settle on, out of focus: colour where

@@ -812,7 +812,8 @@ final class DigStore {
         await onScreenAdoption?.value
         while let next = portraitPriority.first {
             portraitPriority.removeFirst()
-            if isPortraitWanted(next) {
+            if isPortraitWanted(next) || wantsSharperPortrait(next) {
+                sharpened.insert(RecordingKey.normalizeArtist(next))
                 lastWasOnScreen = true
                 return next
             }
@@ -926,6 +927,19 @@ final class DigStore {
     /// own context, and not only to save a fetch a second: the rows are
     /// written on the worker's context now, so this context would not see
     /// them and every name would look unasked-for.
+    /// Names whose small picture has been asked to be replaced this session.
+    @ObservationIgnored private var sharpened: Set<String> = []
+
+    /// Whether a name on screen holds only Discogs' 150-pixel thumb, kept
+    /// from when these were 38-point rows: asked for again, once a session
+    /// and only while on screen, for the cover. Off screen it waits, so the
+    /// request budget goes on what is being looked at.
+    private func wantsSharperPortrait(_ name: String) -> Bool {
+        let key = RecordingKey.normalizeArtist(name)
+        guard !key.isEmpty, !sharpened.contains(key) else { return false }
+        return DiscogsClient.isSmallCut(portraits[key]?.absoluteString)
+    }
+
     private func isPortraitWanted(_ name: String) -> Bool {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return false }

@@ -93,8 +93,11 @@ The Mac's `Typeface.display` and `body` are not used on phone pages.
   station's own cut as the preview. Never set a row's small cut (a
   `thumbnailURL`) as a hero's picture.
 - **No picture**: a show, artist, record or station with no picture, or one
-  that failed to load, is the player's still green (`MineralGround`) on
-  the phone -- one fallback everywhere, never a blank, a glyph or a mosaic.
+  that failed to load, is the wordmark's moving green on the phone
+  (`MineralSheenSurface(lowResolution: true)`, drawn once per size) -- one
+  fallback everywhere, never a blank, a glyph or a mosaic.
+- **Discogs pictures** are the cover (600 px), never the 150 px thumb:
+  their addresses are signed, so the size cannot be asked of the thumb.
 
 ---
 

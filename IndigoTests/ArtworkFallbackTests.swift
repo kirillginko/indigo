@@ -167,8 +167,8 @@ final class ArtworkFallbackTests: XCTestCase {
         let neighbours = DiscogsClient.neighbours(from: results)
 
         XCTAssertEqual(neighbours.map(\.name), ["Stenny"])
-        XCTAssertEqual(neighbours.first?.thumbnailURL, "https://img.test/small.jpg",
-                       "The small cut — a 38-point row has no use for a 600-pixel sleeve")
+        XCTAssertEqual(neighbours.first?.thumbnailURL, "https://img.test/big.jpg",
+                       "The cover — the phone draws neighbours as half-screen cards, where the thumb blurred")
     }
 
     /// Their own portrait when we have dug into them; a record of theirs when
