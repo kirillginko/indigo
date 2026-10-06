@@ -188,7 +188,9 @@ struct PhoneShowsView: View {
     /// row says whose it is; the section's name; a chevron.
     private func sectionRow(_ title: String, station: Station, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            // The logo in the station logos' column, from the left edge; the
+            // name level with the station names.
+            HStack(spacing: 26) {
                 Group {
                     if let providerID = station.providerID {
                         ArtworkView(side: 36, glyphScale: 0.3, markURL: StationMark.logoURL(for: providerID))
@@ -204,8 +206,7 @@ struct PhoneShowsView: View {
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.5))
             }
-            // Indented under the station's own logo.
-            .padding(.leading, 64 + 12)
+            .padding(.leading, (64 - 36) / 2)
             .padding(.trailing, 16)
             .frame(height: 52)
             .background(Color.black.opacity(0.4))
