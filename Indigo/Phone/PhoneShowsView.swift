@@ -39,6 +39,9 @@ struct PhoneShowsView: View {
     @Environment(N10ASBrowseStore.self) private var n10as
     @Environment(DublabBrowseStore.self) private var dublab
     @Environment(CashmereBrowseStore.self) private var cashmere
+    @Environment(KioskBrowseStore.self) private var kiosk
+    @Environment(NoodsBrowseStore.self) private var noods
+    @Environment(AlharaBrowseStore.self) private var alhara
     @State private var feeds = PhoneFeeds.shared
 
     struct Station: Identifiable {
@@ -60,7 +63,12 @@ struct PhoneShowsView: View {
         Station(id: "ROVR", name: "ROVR", providerID: RovrProvider.providerID),
         Station(id: "n10.as", name: "n10.as", providerID: N10ASProvider.providerID),
         Station(id: "dublab", name: "dublab", providerID: DublabProvider.providerID),
-        Station(id: "Cashmere", name: "Cashmere Radio", providerID: CashmereProvider.providerID)
+        Station(id: "Cashmere", name: "Cashmere Radio", providerID: CashmereProvider.providerID),
+        // These three publish an archive of recordings rather than shows, so
+        // their grids are of recordings, newest first, each opening its page.
+        Station(id: "Kiosk", name: "Kiosk Radio", providerID: KioskProvider.providerID),
+        Station(id: "Noods", name: "Noods Radio", providerID: NoodsProvider.providerID),
+        Station(id: "alHara", name: "Radio alHara", providerID: AlharaProvider.providerID)
     ]
 
     private let columns = [GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2)]
@@ -104,7 +112,7 @@ struct PhoneShowsView: View {
                     Chip(text: station.name, size: 14)
                     let count = cards(of: station.id).count
                     if count > 0 {
-                        Chip(text: "\(count)\(hasMore(station.id) ? "+" : "") \(station.id == "dublab" ? "DJs" : "shows")",
+                        Chip(text: "\(count)\(hasMore(station.id) ? "+" : "") \(Self.countNoun(station.id))",
                              tone: .lead, size: 11, uppercase: true)
                     }
                 }
@@ -155,12 +163,12 @@ struct PhoneShowsView: View {
                     LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(shown) { card($0) }
                     }
-                    if station.id == "NTS", nts.shows.hasMore {
+                    if hasMore(station.id) {
                         ProgressView()
                             .tint(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 24)
-                            .task(id: nts.shows.items.count) { await nts.loadMoreShows() }
+                            .task(id: shown.count) { await loadMore(station.id) }
                     }
                 }
             }
@@ -273,6 +281,21 @@ struct PhoneShowsView: View {
                 PhoneShowCard(id: "dublab.\($0.slug)", title: $0.name, station: "dublab", imageURL: $0.artworkURL,
                               markURL: mark(DublabProvider.providerID), page: .dublabDJ(slug: $0.slug))
             }
+        case "Kiosk":
+            return kiosk.library.map {
+                PhoneShowCard(id: "kiosk.\($0.slug)", title: $0.title, station: "Kiosk", imageURL: $0.artworkURL,
+                              markURL: mark(KioskProvider.providerID), page: .kioskEpisode(slug: $0.slug))
+            }
+        case "Noods":
+            return noods.feed(.latest).items.map {
+                PhoneShowCard(id: "noods.\($0.path)", title: $0.title, station: "Noods", imageURL: $0.artworkURL,
+                              markURL: mark(NoodsProvider.providerID), page: .noodsShow(path: $0.path))
+            }
+        case "alHara":
+            return alhara.shows.map {
+                PhoneShowCard(id: "alhara.\($0.slug)", title: $0.title, station: "alHara", imageURL: $0.artworkURL,
+                              markURL: mark(AlharaProvider.providerID), page: .alharaShow(slug: $0.slug))
+            }
         case "Cashmere":
             // Cashmere publishes no picture for a show: its mark stands in.
             return cashmere.shows.map {
@@ -298,13 +321,39 @@ struct PhoneShowsView: View {
         case "ROVR": rovr.showsPhase.isLoading
         case "n10.as": n10as.showsPhase.isLoading
         case "Cashmere": cashmere.showsPhase.isLoading
+        case "Kiosk": kiosk.libraryPhase == .loading
+        case "Noods": noods.feed(.latest).isLoading
+        case "alHara": alhara.phase == .loading
         default: true
         }
     }
 
     /// Whether the station has more shows than it has sent so far.
     private func hasMore(_ station: String) -> Bool {
-        station == "NTS" && nts.shows.hasMore
+        switch station {
+        case "NTS": nts.shows.hasMore
+        case "Noods": noods.feed(.latest).hasMore && !noods.feed(.latest).items.isEmpty
+        case "alHara": alhara.canLoadMore || alhara.isLoadingMore
+        default: false
+        }
+    }
+
+    /// The next page of a station's archive, for those that page it.
+    private func loadMore(_ station: String) async {
+        switch station {
+        case "NTS": await nts.loadMoreShows()
+        case "Noods": await noods.loadMore(.latest)
+        case "alHara": await alhara.loadMore()
+        default: break
+        }
+    }
+
+    private static func countNoun(_ station: String) -> String {
+        switch station {
+        case "dublab": "DJs"
+        case "Kiosk", "Noods", "alHara": "recordings"
+        default: "shows"
+        }
     }
 
     /// The station's list, once. In a task of its own: begun from the list's
@@ -327,6 +376,9 @@ struct PhoneShowsView: View {
         case "n10.as": await n10as.loadShowsIfNeeded()
         case "dublab": await dublab.loadDJsIfNeeded()
         case "Cashmere": await cashmere.loadShowsIfNeeded()
+        case "Kiosk": await kiosk.loadLibraryIfNeeded()
+        case "Noods": await noods.loadFeedIfNeeded(.latest)
+        case "alHara": await alhara.loadIfNeeded()
         default: break
         }
     }

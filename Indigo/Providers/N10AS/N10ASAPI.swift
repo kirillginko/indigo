@@ -215,10 +215,19 @@ nonisolated struct N10ASAPI: Sendable {
             URLQueryItem(name: "type", value: "cloudcast"),
             URLQueryItem(name: "limit", value: "100")
         ]
-        guard let url = components?.url else { return [] }
-        guard let page: MixcloudPageDTO = try? await get(url) else { return [] }
+        // The search gives a hundred to a page; the next pages are followed
+        // too, so a programme's older broadcasts are found as well.
+        var next = components?.url
+        var found: [MixcloudCloudcastDTO] = []
+        var pages = 0
+        while let url = next, pages < 10 {
+            guard let page: MixcloudPageDTO = try? await get(url) else { break }
+            found += page.data
+            pages += 1
+            next = page.paging?.next.flatMap(URL.init(string:))
+        }
 
-        return page.data
+        return found
             .filter { $0.user?.username?.caseInsensitiveCompare(Self.mixcloudAccount) == .orderedSame }
             .compactMap { $0.asN10ASEpisode() }
             .filter { episode in

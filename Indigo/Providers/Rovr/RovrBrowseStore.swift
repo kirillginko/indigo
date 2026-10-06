@@ -204,9 +204,19 @@ final class RovrBrowseStore {
             if show(id: id) == nil {
                 showDetails[id] = try await api.fetchShow(id: id)
             }
-            let page = try await api.fetchArchive(page: 1, pageSize: 50, showID: id)
-            showBroadcasts[id] = page.broadcasts
+            // Every page of the show's run, shown as it arrives: the first
+            // fifty alone left the rest of a long-running show out of reach.
+            var page = try await api.fetchArchive(page: 1, pageSize: 50, showID: id)
+            var broadcasts = page.broadcasts
+            showBroadcasts[id] = broadcasts
             remember(page.broadcasts)
+            while page.page < page.pageCount, page.page < 60 {
+                page = try await api.fetchArchive(page: page.page + 1, pageSize: 50, showID: id)
+                guard !page.broadcasts.isEmpty else { break }
+                broadcasts += page.broadcasts
+                showBroadcasts[id] = broadcasts
+                remember(page.broadcasts)
+            }
         } catch is CancellationError {
         } catch {
             if show(id: id) != nil {

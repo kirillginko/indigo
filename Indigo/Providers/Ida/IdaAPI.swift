@@ -128,16 +128,20 @@ nonisolated struct IdaAPI: Sendable {
         return response.data.compactMap { $0.asEpisode() }
     }
 
-    /// Every episode of one show, newest first.
-    func fetchEpisodes(showSlug: String, limit: Int = 100) async throws -> [IdaEpisode] {
+    /// One page of a show's episodes, newest first, and how many it has in
+    /// all. Strapi gives at most 100 to a page: a show such as IDA Folder
+    /// (1,299 episodes) has to be read a page at a time, or everything past
+    /// its newest hundred is out of reach.
+    func fetchEpisodes(showSlug: String, limit: Int = 100, skip: Int = 0) async throws -> (episodes: [IdaEpisode], total: Int?) {
         var query = [
             URLQueryItem(name: "filters[show][slug][$eq]", value: showSlug),
             URLQueryItem(name: "sort", value: "start:desc"),
-            URLQueryItem(name: "pagination[limit]", value: String(max(1, limit)))
+            URLQueryItem(name: "pagination[limit]", value: String(max(1, limit))),
+            URLQueryItem(name: "pagination[start]", value: String(max(0, skip)))
         ]
         query += Self.episodeRelations()
         let response: IdaListResponse<IdaEpisodeDTO> = try await get("episodes", query: query)
-        return response.data.compactMap { $0.asEpisode() }
+        return (response.data.compactMap { $0.asEpisode() }, response.meta?.pagination?.total)
     }
 
     /// One episode, with the tracklist — which the listings deliberately skip,
