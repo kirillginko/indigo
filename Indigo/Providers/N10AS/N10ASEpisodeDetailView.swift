@@ -21,40 +21,47 @@ struct N10ASEpisodeDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(N10ASBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let episode = browse.episode(id: episodeID)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: episode?.title ?? "n10.as",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [episode?.broadcastLabel, episode?.programme ?? "n10.as"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.episode(id: episodeID))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: episode?.title ?? "n10.as",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [episode?.broadcastLabel, episode?.programme ?? "n10.as"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let episode {
+                        HStack(spacing: 10) {
+                            playButton(episode)
+                            N10ASCrateButton(episode: episode)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let episode {
-                    HStack(spacing: 10) {
-                        playButton(episode)
-                        N10ASCrateButton(episode: episode)
+                    content(episode)
+                } else if browse.isLoadingDetail(episodeID) {
+                    LoadingPane(label: "Loading broadcast")
+                } else {
+                    EmptyStateView(
+                        headline: "Broadcast unavailable",
+                        message: browse.detailError(episodeID)
+                            ?? "n10.as no longer publishes this broadcast."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let episode {
-                content(episode)
-            } else if browse.isLoadingDetail(episodeID) {
-                LoadingPane(label: "Loading broadcast")
-            } else {
-                EmptyStateView(
-                    headline: "Broadcast unavailable",
-                    message: browse.detailError(episodeID)
-                        ?? "n10.as no longer publishes this broadcast."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: episodeID) { await browse.loadDetailIfNeeded(id: episodeID) }
@@ -227,5 +234,34 @@ struct N10ASEpisodeDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension N10ASEpisodeDetailView {
+    fileprivate func phonePage(_ episode: N10ASEpisode?) -> some View {
+        let siblings = episode.map { Array(browse.siblings(of: $0)) } ?? []
+        return PhoneEpisodePage(
+            kind: "n10.as",
+            title: episode?.title ?? "n10.as",
+            subtitle: episode?.guest ?? episode?.programme,
+            imageURL: episode?.artworkURL,
+            genres: episode?.genres ?? [],
+            summary: episode?.summary,
+            facts: [episode?.broadcastLabel, episode?.duration.map { TimeFormat.clock($0) }].compactMap { $0 }.joined(separator: "  ·  "),
+            isLoaded: episode != nil,
+            isPlaying: episode.map { N10ASPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let episode { N10ASPlayback.toggle(episode, within: [episode], using: player) } },
+            crate: episode.map { AnyView(N10ASCrateButton(episode: $0, compact: true)) },
+            more: siblings.map { other in
+                PhoneEpisode(id: other.id, title: other.title, subtitle: other.guest, date: other.broadcastAt,
+                             genres: other.genres, imageURL: other.artworkURL,
+                             isCurrent: N10ASPlayback.isCurrent(other, in: player),
+                             isPlaying: N10ASPlayback.isPlaying(other, in: player),
+                             play: { N10ASPlayback.toggle(other, within: siblings, using: player) },
+                             open: { browse.remember([other]); appState.open(.n10asEpisode(id: other.id)) })
+            },
+            moreTitle: episode?.programme.map { "More from \($0)" } ?? "More from the archive",
+            error: browse.isLoadingDetail(episodeID) ? nil : (browse.detailError(episodeID) ?? "n10.as no longer publishes this episode.")
+        )
     }
 }

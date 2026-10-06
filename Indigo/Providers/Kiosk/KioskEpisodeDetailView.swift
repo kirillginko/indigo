@@ -14,42 +14,49 @@ struct KioskEpisodeDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(KioskBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let detail = browse.episodeDetail(slug: episodeSlug)
         let episode = detail?.episode ?? browse.episode(slug: episodeSlug)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: episode?.title ?? "Kiosk Show",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [episode?.airedLabel, "Kiosk Radio"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
-                if let episode {
-                    HStack(spacing: 10) {
-                        if episode.isPlayable { playButton(episode) }
-                        KioskCrateButton(episode: episode)
+        Group {
+            if isPhone {
+                phonePage(browse.episodeDetail(slug: episodeSlug))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: episode?.title ?? "Kiosk Show",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [episode?.airedLabel, "Kiosk Radio"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let episode {
+                        HStack(spacing: 10) {
+                            if episode.isPlayable { playButton(episode) }
+                            KioskCrateButton(episode: episode)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let detail {
+                    content(detail)
+                } else if browse.isLoadingEpisodeDetail(episodeSlug)
+                            || browse.libraryPhase.isLoading || browse.moodsPhase.isLoading {
+                    LoadingPane(label: "Loading show")
+                } else {
+                    EmptyStateView(
+                        headline: "Show unavailable",
+                        message: browse.episodeDetailError(episodeSlug)
+                            ?? "Kiosk is no longer publishing information for this show."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let detail {
-                content(detail)
-            } else if browse.isLoadingEpisodeDetail(episodeSlug)
-                        || browse.libraryPhase.isLoading || browse.moodsPhase.isLoading {
-                LoadingPane(label: "Loading show")
-            } else {
-                EmptyStateView(
-                    headline: "Show unavailable",
-                    message: browse.episodeDetailError(episodeSlug)
-                        ?? "Kiosk is no longer publishing information for this show."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: episodeSlug) {
@@ -220,5 +227,45 @@ private struct KioskRelatedGrid: View {
             }
         }
         .padding(.horizontal, Metrics.gutter)
+    }
+}
+
+extension KioskEpisodeDetailView {
+    fileprivate func phonePage(_ detail: KioskEpisodeDetail?) -> some View {
+        let episode = detail?.episode ?? browse.episode(slug: episodeSlug)
+        let siblings = detail?.related ?? []
+        let isCurrent = episode.map { player.isCurrent($0.mediaID) } ?? false
+        return PhoneEpisodePage(
+            kind: "Kiosk Radio",
+            title: episode?.title ?? "Kiosk Show",
+            subtitle: detail?.residencyName,
+            imageURL: episode?.artworkURL,
+            genres: episode?.genres ?? [],
+            summary: detail?.description ?? detail?.residencySummary,
+            facts: [episode?.airedLabel, detail?.residencySchedule].compactMap { $0 }.joined(separator: "  ·  "),
+            isLoaded: episode != nil,
+            isPlayable: episode?.isPlayable ?? false,
+            isPlaying: isCurrent && player.isPlaying,
+            play: { if let episode { KioskPlayback.toggle(episode, within: [episode], using: player) } },
+            crate: episode.map { AnyView(KioskCrateButton(episode: $0, compact: true)) },
+            tracks: (detail?.tracklist ?? []).enumerated().map { index, track in
+                PhoneTrackLine.logged(id: "\(index)", marker: "\(index + 1)", line: track,
+                    crate: episode.map { e in AnyView(RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: "kiosk", showID: e.slug, showTitle: e.title, airedAt: e.airedAt,
+                        entryID: "\(index)", title: track, artist: nil, offsetSeconds: nil))) })
+            },
+            tracklistNote: detail == nil ? nil : "Kiosk didn't publish a tracklist for this show.",
+            more: siblings.map { other in
+                let current = player.isCurrent(other.mediaID)
+                return PhoneEpisode(id: other.id, title: other.title, date: other.airedAt, genres: other.genres,
+                             imageURL: other.artworkURL, isPlayable: other.isPlayable,
+                             isCurrent: current, isPlaying: current && player.isPlaying,
+                             play: { KioskPlayback.toggle(other, within: siblings, using: player) },
+                             open: { appState.open(.kioskEpisode(slug: other.slug)) })
+            },
+            moreTitle: detail?.residencyName.map { "More from \($0)" } ?? "More from Kiosk",
+            error: browse.isLoadingEpisodeDetail(episodeSlug) ? nil
+                : (browse.episodeDetailError(episodeSlug) ?? "Kiosk is no longer publishing information for this show.")
+        )
     }
 }

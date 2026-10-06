@@ -16,41 +16,48 @@ struct LotEpisodeDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(LotBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let detail = browse.episodeDetail(ref: ref)
         let episode = detail?.episode ?? browse.episode(ref: ref)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: episode?.title ?? "The Lot Radio",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [episode?.airedLabel, episode?.show?.name ?? "The Lot Radio"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.episodeDetail(ref: ref))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: episode?.title ?? "The Lot Radio",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [episode?.airedLabel, episode?.show?.name ?? "The Lot Radio"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let episode {
+                        HStack(spacing: 10) {
+                            if episode.isPlayable { playButton(episode) }
+                            LotCrateButton(episode: episode)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let episode {
-                    HStack(spacing: 10) {
-                        if episode.isPlayable { playButton(episode) }
-                        LotCrateButton(episode: episode)
+                    content(episode: episode, detail: detail)
+                } else if browse.isLoadingEpisode(ref) {
+                    LoadingPane(label: "Loading broadcast")
+                } else {
+                    EmptyStateView(
+                        headline: "Broadcast unavailable",
+                        message: browse.episodeError(ref)
+                            ?? "The Lot is no longer publishing information for this broadcast."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let episode {
-                content(episode: episode, detail: detail)
-            } else if browse.isLoadingEpisode(ref) {
-                LoadingPane(label: "Loading broadcast")
-            } else {
-                EmptyStateView(
-                    headline: "Broadcast unavailable",
-                    message: browse.episodeError(ref)
-                        ?? "The Lot is no longer publishing information for this broadcast."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: ref) { await browse.loadEpisodeIfNeeded(ref: ref) }
@@ -314,5 +321,50 @@ struct LotEpisodeDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension LotEpisodeDetailView {
+    fileprivate func phonePage(_ detail: LotEpisodeDetail?) -> some View {
+        let episode = detail?.episode ?? browse.episode(ref: ref)
+        let siblings = detail?.related ?? []
+        return PhoneEpisodePage(
+            kind: episode?.location ?? "The Lot Radio",
+            title: episode?.title ?? "The Lot Radio",
+            subtitle: episode?.artists.map(\.name).joined(separator: ", "),
+            imageURL: episode?.imageURL ?? episode?.artworkURL,
+            genres: episode?.genreNames ?? [],
+            summary: detail?.summary,
+            facts: [episode?.airedLabel, episode?.duration.map { TimeFormat.clock($0) }].compactMap { $0 }.joined(separator: "  ·  "),
+            show: episode?.show.map { s in (s.name, { appState.open(.lotShow(slug: s.slug)) }) },
+            isLoaded: episode != nil,
+            isPlayable: episode?.isPlayable ?? false,
+            isPlaying: episode.map { LotPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let episode { LotPlayback.toggle(episode, within: [episode], using: player) } },
+            crate: episode.map { AnyView(LotCrateButton(episode: $0, compact: true)) },
+            tracks: episode.map { e in e.tracklist.map { track in
+                PhoneTrackLine(id: "\(track.index)", marker: track.offset.map { TimeFormat.clock($0) } ?? "\(track.index + 1)",
+                    title: track.title, artist: track.artist,
+                    crate: AnyView(RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: "lot", showID: e.ref?.encoded ?? e.id, showTitle: e.title, airedAt: e.airedAt,
+                        entryID: "\(track.index)", title: track.title, artist: track.artist, offsetSeconds: track.offset))))
+            } } ?? [],
+            tracklistNote: detail == nil ? nil : "The Lot didn't log a tracklist for this broadcast.",
+            more: siblings.map { other in
+                PhoneEpisode(id: other.id, title: other.title, subtitle: other.artists.map(\.name).joined(separator: ", "),
+                             date: other.airedAt ?? other.startedAt, genres: other.genreNames,
+                             imageURL: other.artworkURL ?? other.imageURL, isPlayable: other.isPlayable,
+                             isCurrent: LotPlayback.isCurrent(other, in: player),
+                             isPlaying: LotPlayback.isPlaying(other, in: player),
+                             play: { LotPlayback.toggle(other, within: siblings, using: player) },
+                             open: {
+                                 guard let ref = other.ref else { return }
+                                 browse.remember([other])
+                                 appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
+                             })
+            },
+            moreTitle: episode?.show.map { "More from \($0.name)" } ?? "More from the archive",
+            error: browse.isLoadingEpisode(ref) ? nil : (browse.episodeError(ref) ?? "The Lot is no longer publishing this broadcast.")
+        )
     }
 }

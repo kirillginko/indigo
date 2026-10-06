@@ -16,40 +16,47 @@ struct Radio80000EpisodeDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(Radio80000BrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let episode = browse.episode(id: episodeID)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: episode?.title ?? "Radio 80000",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [episode?.broadcastLabel, episode?.showTitle ?? "Radio 80000"]
-                    .compactMap { $0 }.joined(separator: " · ")
-            ) {
+        Group {
+            if isPhone {
+                phonePage(browse.episode(id: episodeID))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: episode?.title ?? "Radio 80000",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [episode?.broadcastLabel, episode?.showTitle ?? "Radio 80000"]
+                        .compactMap { $0 }.joined(separator: " · ")
+                ) {
+                    if let episode {
+                        HStack(spacing: 10) {
+                            playButton(episode)
+                            Radio80000CrateButton(episode: episode)
+                        }
+                    }
+                }
+                Rule(color: Palette.outline)
+
                 if let episode {
-                    HStack(spacing: 10) {
-                        playButton(episode)
-                        Radio80000CrateButton(episode: episode)
+                    content(episode)
+                } else if browse.isLoadingDetail(episodeID) {
+                    LoadingPane(label: "Loading broadcast")
+                } else {
+                    EmptyStateView(
+                        headline: "Broadcast unavailable",
+                        message: browse.detailError(episodeID)
+                            ?? "Radio 80000 no longer publishes this broadcast."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
                     }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let episode {
-                content(episode)
-            } else if browse.isLoadingDetail(episodeID) {
-                LoadingPane(label: "Loading broadcast")
-            } else {
-                EmptyStateView(
-                    headline: "Broadcast unavailable",
-                    message: browse.detailError(episodeID)
-                        ?? "Radio 80000 no longer publishes this broadcast."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: episodeID) { await browse.loadDetailIfNeeded(id: episodeID) }
@@ -269,5 +276,43 @@ struct Radio80000EpisodeDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension Radio80000EpisodeDetailView {
+    fileprivate func phonePage(_ episode: Radio80000Episode?) -> some View {
+        let siblings = (episode?.showSlug.map { browse.episodes(ofShow: $0) } ?? []).filter { $0.id != episodeID }
+        return PhoneEpisodePage(
+            kind: "Radio 80000",
+            title: episode?.title ?? "Radio 80000",
+            imageURL: episode?.artworkURL,
+            genres: episode?.genres ?? [],
+            summary: episode?.summary,
+            facts: [episode?.broadcastLabel, episode?.duration.map { TimeFormat.clock($0) }].compactMap { $0 }.joined(separator: "  ·  "),
+            show: episode.flatMap { e in e.showSlug.map { s in (e.showTitle ?? "The show", { appState.open(.radio80000Show(slug: s)) }) } },
+            isLoaded: episode != nil,
+            isPlayable: episode?.isPlayable ?? false,
+            isPlaying: episode.map { Radio80000Playback.isPlaying($0, in: player) } ?? false,
+            play: { if let episode { Radio80000Playback.toggle(episode, within: [episode], using: player) } },
+            crate: episode.map { AnyView(Radio80000CrateButton(episode: $0, compact: true)) },
+            tracks: episode.map { e in e.tracks.map { track in
+                PhoneTrackLine(id: "\(track.index)", marker: track.offsetLabel ?? "\(track.index + 1)",
+                    title: track.title, artist: track.artist,
+                    crate: AnyView(RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: Radio80000Provider.providerID, showID: e.id, showTitle: e.title, airedAt: e.broadcastAt,
+                        entryID: "\(track.index)", title: track.title, artist: track.artist, offsetSeconds: track.offset))))
+            } } ?? [],
+            tracklistNote: "Radio 80000 didn't publish a tracklist for this episode.",
+            more: siblings.map { other in
+                PhoneEpisode(id: other.id, title: other.title, date: other.broadcastAt, genres: other.genres,
+                             imageURL: other.artworkURL, isPlayable: other.isPlayable,
+                             isCurrent: Radio80000Playback.isCurrent(other, in: player),
+                             isPlaying: Radio80000Playback.isPlaying(other, in: player),
+                             play: { Radio80000Playback.toggle(other, within: siblings, using: player) },
+                             open: { browse.remember([other]); appState.open(.radio80000Episode(id: other.id)) })
+            },
+            moreTitle: episode?.showTitle.map { "More from \($0)" } ?? "More from the archive",
+            error: browse.isLoadingDetail(episodeID) ? nil : (browse.detailError(episodeID) ?? "Radio 80000 no longer publishes this episode.")
+        )
     }
 }

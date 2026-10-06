@@ -14,35 +14,42 @@ struct NoodsShowDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(NoodsBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
     @Environment(CrateService.self) private var crate
 
     var body: some View {
         let detail = browse.showDetail(path: showPath)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: detail?.show.title ?? NoodsPath.slug(showPath)
-                    .replacingOccurrences(of: "-", with: " ").capitalized,
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(detail)
-            ) {
-                if let resident = detail?.show.residentPath {
-                    Button("Resident") { appState.open(.noodsResident(path: resident)) }
-                        .buttonStyle(OutlineButtonStyle())
+        Group {
+            if isPhone {
+                phonePage(browse.showDetail(path: showPath))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: detail?.show.title ?? NoodsPath.slug(showPath)
+                        .replacingOccurrences(of: "-", with: " ").capitalized,
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(detail)
+                ) {
+                    if let resident = detail?.show.residentPath {
+                        Button("Resident") { appState.open(.noodsResident(path: resident)) }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let detail {
+                    content(detail)
+                } else if let error = browse.showError(path: showPath) {
+                    EmptyStateView(headline: "Couldn't load this show", message: error) {
+                        Button("Try Again") { Task { await browse.loadShowIfNeeded(path: showPath) } }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
+                } else {
+                    LoadingPane(label: "Loading show")
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let detail {
-                content(detail)
-            } else if let error = browse.showError(path: showPath) {
-                EmptyStateView(headline: "Couldn't load this show", message: error) {
-                    Button("Try Again") { Task { await browse.loadShowIfNeeded(path: showPath) } }
-                        .buttonStyle(OutlineButtonStyle())
-                }
-            } else {
-                LoadingPane(label: "Loading show")
             }
         }
         .task(id: showPath) { await browse.loadShowIfNeeded(path: showPath) }
@@ -191,5 +198,51 @@ struct NoodsShowDetailView: View {
                 Rule()
             }
         }
+    }
+}
+
+extension NoodsShowDetailView {
+    /// A Noods show is one recording, so on the phone it is an episode page.
+    fileprivate func phonePage(_ detail: NoodsShowDetail?) -> some View {
+        let _ = crate.revision
+        let show = detail?.show
+        let item = show?.mediaItem()
+        return PhoneEpisodePage(
+            kind: "Noods Radio",
+            title: show?.title ?? NoodsPath.slug(showPath).replacingOccurrences(of: "-", with: " ").capitalized,
+            subtitle: show?.artist,
+            imageURL: show?.artworkURL,
+            genres: show?.genres ?? [],
+            summary: detail?.summary,
+            facts: show?.rawDate,
+            show: show?.residentPath.map { path in ("The resident", { appState.open(.noodsResident(path: path)) }) },
+            isLoaded: detail != nil,
+            isPlayable: show?.isPlayable ?? false,
+            isPlaying: show.map { NoodsPlayback.isPlaying($0, in: player) } ?? false,
+            play: { if let show { NoodsPlayback.toggle(show, within: [show], using: player) } },
+            crate: item.map { item in
+                AnyView(CrateGlyphButton(isCrated: crate.contains(broadcast: item.id, providerID: item.sourceID)) {
+                    crate.toggle(nowPlaying: item)
+                })
+            },
+            tracks: detail.map { d in d.tracklist.enumerated().map { index, entry in
+                PhoneTrackLine.logged(id: "\(index)", marker: "\(index + 1)", line: entry,
+                    crate: AnyView(RadioTracklistCrateButton(item: RadioTracklistItem(
+                        providerID: "noods", showID: d.show.slug, showTitle: d.show.title, airedAt: d.show.airedAt,
+                        entryID: "\(index)", title: entry, artist: nil, offsetSeconds: nil))))
+            } } ?? [],
+            tracklistNote: detail == nil ? nil : "Noods didn't publish a tracklist for this show.",
+            more: (detail?.similar ?? []).map { other in
+                PhoneEpisode(id: other.id, title: other.title, subtitle: other.artist, date: other.airedAt,
+                             genres: other.genres, imageURL: other.artworkURL, isPlayable: other.isPlayable,
+                             isCurrent: NoodsPlayback.isCurrent(other, in: player),
+                             isPlaying: NoodsPlayback.isPlaying(other, in: player),
+                             play: { NoodsPlayback.toggle(other, within: detail?.similar ?? [], using: player) },
+                             open: { appState.open(.noodsShow(path: other.path)) })
+            },
+            moreTitle: "Similar shows",
+            error: browse.showError(path: showPath),
+            retry: { Task { await browse.loadShowIfNeeded(path: showPath) } }
+        )
     }
 }
