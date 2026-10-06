@@ -142,7 +142,7 @@ struct PhoneRootView: View {
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 60, height: 60)
-                    .background(.ultraThinMaterial, in: Circle())
+                    .background(Chip.black)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
@@ -162,7 +162,7 @@ struct PhoneRootView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Chip.black)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Minimise the video")
@@ -179,7 +179,7 @@ struct PhoneRootView: View {
     }
 
     private var shell: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 0) {
             PhoneMiniPlayer { showsNowPlaying = true }
             PhoneTabBar(
                 selected: PhoneTab.of(appState.route),

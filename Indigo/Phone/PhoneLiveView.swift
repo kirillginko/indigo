@@ -119,8 +119,8 @@ struct PhoneLiveSlide: View {
                 Image(systemName: "info")
                     .font(.system(size: 17, weight: .semibold))
                     .frame(width: 46, height: 46)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(Circle().strokeBorder(.white.opacity(0.14)))
+                    .background(Chip.black)
+                    .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open \(entry.station.name)")
@@ -128,12 +128,14 @@ struct PhoneLiveSlide: View {
             HStack(spacing: 7) {
                 Circle().fill(Color(red: 1, green: 0.3, blue: 0.2)).frame(width: 7, height: 7)
                 Text(entry.station.name)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(Typeface.mono(14))
+                    .tracking(1.2)
+                    .textCase(.uppercase)
             }
-            .padding(.horizontal, 18)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(.white.opacity(0.14)))
+            .padding(.horizontal, 16)
+            .frame(height: 46)
+            .background(Chip.black)
+            .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             Spacer()
             // Balances the info button, so the station's name sits centred.
             Color.clear.frame(width: 46, height: 46)

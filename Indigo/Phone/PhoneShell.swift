@@ -63,45 +63,43 @@ struct PhoneTabBar: View {
     let select: (PhoneTab) -> Void
     let search: () -> Void
 
+    /// Square cells edge to edge, as the player above them is square: an
+    /// icon over its name in small capitals, the one you are on in IDA's
+    /// green. Search is the last cell rather than a round button apart.
     var body: some View {
-        HStack(spacing: 10) {
-            HStack(spacing: 0) {
-                ForEach(PhoneTab.allCases, id: \.self) { tab in
-                    Button { select(tab) } label: {
-                        Image(systemName: tab.symbol)
-                            .font(.system(size: 21, weight: .semibold))
-                            .frame(maxWidth: .infinity, minHeight: 54)
-                            .background {
-                                if tab == selected {
-                                    Capsule().fill(.white.opacity(0.16)).padding(3)
-                                }
-                            }
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(tab.label)
-                    .accessibilityAddTraits(tab == selected ? .isSelected : [])
-                }
+        HStack(spacing: 0) {
+            ForEach(PhoneTab.allCases, id: \.self) { tab in
+                cell(tab.symbol, tab.label, isOn: tab == selected) { select(tab) }
             }
-            .padding(4)
-            .background(.ultraThinMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(.white.opacity(0.12), lineWidth: 1))
-
-            Button(action: search) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 21, weight: .semibold))
-                    .frame(width: 62, height: 62)
-                    .background {
-                        if searching { Circle().fill(.white.opacity(0.16)).padding(3) }
-                    }
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(Circle().strokeBorder(.white.opacity(0.12), lineWidth: 1))
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Search")
+            cell("magnifyingglass", "Dig", isOn: searching, action: search)
         }
-        .foregroundStyle(.white)
+        .background(Chip.black)
+        .overlay(Rectangle().strokeBorder(.white.opacity(0.12)))
+    }
+
+    private func cell(_ symbol: String, _ label: String, isOn: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 5) {
+                Image(systemName: symbol)
+                    .font(.system(size: 17, weight: .semibold))
+                    .frame(height: 20)
+                Text(label)
+                    .font(Typeface.mono(9.5))
+                    .tracking(1)
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+            }
+            .foregroundStyle(isOn ? Chip.ink : .white.opacity(0.85))
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(isOn ? Chip.green : .clear)
+            .overlay(alignment: .trailing) {
+                Rectangle().fill(.white.opacity(0.08)).frame(width: 1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+        .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }
 
@@ -269,7 +267,7 @@ struct PhoneNowPlayingView: View {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 18, weight: .semibold))
                         .frame(width: 46, height: 46)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Chip.black)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close the player")
@@ -315,7 +313,7 @@ struct PhoneNowPlayingView: View {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
                         .font(.system(size: 15, weight: .semibold))
                         .frame(width: 40, height: 40)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Chip.black)
                 }
                 .buttonStyle(.plain)
                 .padding(8)

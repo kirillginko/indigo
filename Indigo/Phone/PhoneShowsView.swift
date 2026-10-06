@@ -184,8 +184,8 @@ struct PhoneShowsView: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
                     .frame(width: 46, height: 46)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(Circle().strokeBorder(.white.opacity(0.14)))
+                    .background(Chip.black)
+                    .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             }
             .buttonStyle(.plain)
             .accessibilityLabel("All stations")

@@ -345,21 +345,21 @@ private struct ArchivePhonePage: View {
         )
     }
 
+    /// The playlists as boxes that wrap, rather than a row scrolled sideways:
+    /// on the phone everything scrolls one way.
     private var picker: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 6) {
-                ForEach(shelves) { item in
-                    let selected = item.id == shelf?.id
-                    Button { selectedShelf = item.id } label: {
-                        Chip(text: item.title ?? "Playlist", tone: selected ? .lead : .plain, size: 12, uppercase: true)
-                    }
-                    .buttonStyle(.plain)
+        FlowLayout(spacing: 6, lineSpacing: 6) {
+            ForEach(shelves) { item in
+                let selected = item.id == shelf?.id
+                Button { selectedShelf = item.id } label: {
+                    Chip(text: item.title ?? "Playlist", tone: selected ? .lead : .plain, size: 12, uppercase: true)
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
         }
-        .scrollIndicators(.hidden)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(PhoneShowPage.rowGround)
     }
 

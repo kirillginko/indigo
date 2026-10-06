@@ -689,8 +689,50 @@ private struct DigShelf: View {
     let picks: [CrateRecommendations.Pick]
     let caption: (CrateRecommendations.Pick) -> String
     let open: (CrateRecommendations.Pick) -> Void
+    @Environment(\.isPhoneLayout) private var isPhone
+    @Environment(DigStore.self) private var dig
 
     var body: some View {
+        if isPhone { grid } else { shelf }
+    }
+
+    /// On the phone, a grid that scrolls with the page, as the Shows tab's
+    /// does: square pictures, the name in a box along the bottom, why it is
+    /// here under it.
+    private var grid: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            DigSection(title: title, trailing: "\(picks.count)") { EmptyView() }
+                .padding(.horizontal, 16)
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2), count: 3), spacing: 2) {
+                ForEach(picks) { pick in
+                    Button { open(pick) } label: {
+                        Color.clear
+                            .aspectRatio(1, contentMode: .fit)
+                            .overlay {
+                                GeometryReader { proxy in
+                                    ArtworkView(
+                                        remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                                        side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic
+                                    )
+                                }
+                            }
+                            .clipped()
+                            .overlay(alignment: .bottomLeading) {
+                                Chip(text: pick.node.title, size: 11)
+                                    .lineLimit(2)
+                                    .padding(5)
+                            }
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(pick.node.title)
+                    .accessibilityHint(caption(pick))
+                }
+            }
+        }
+    }
+
+    private var shelf: some View {
         VStack(alignment: .leading, spacing: 0) {
             DigSection(title: title, trailing: "\(picks.count)") { EmptyView() }
                 .padding(.horizontal, Metrics.gutter)
