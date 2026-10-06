@@ -158,11 +158,7 @@ struct PhoneRootView: View {
         VStack {
             HStack {
                 Button { videoFullScreen = false } label: {
-                    Image(systemName: "arrow.down.right.and.arrow.up.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 44, height: 44)
-                        .background(Chip.black, ignoresSafeAreaEdges: [])
+                    PhoneRoundGlyph(symbol: "arrow.down.right.and.arrow.up.left")
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Minimise the video")

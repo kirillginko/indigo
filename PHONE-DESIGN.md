@@ -45,8 +45,9 @@ Labels (kinds, sections, NEXT UP, ON NOW) are in small capitals.
 
 - **Square**: everything you read or open: boxes, pictures, cards, rows,
   the play-episode and play-live boxes.
-- **Round**: everything that moves you around: back and info
-  (`PhoneRoundGlyph`, on the wordmark's sheen), the tab bar and its search
+- **Round**: everything that moves you around: back, info, closing the
+  player and the video's full-screen buttons (`PhoneRoundGlyph`, on the
+  wordmark's sheen), the tab bar and its search
   button, the station name pill at the top, the mini player (small radius).
 
 ## 5. Layout
@@ -64,8 +65,10 @@ Labels (kinds, sections, NEXT UP, ON NOW) are in small capitals.
 
 ## 6. Navigation
 
-- Every station section the Mac lists is reachable on the phone from the
-  station's page (`PhoneStationSection`), and every page those open has a
-  phone layout. A Mac-only page reached on the phone is a bug.
+- Every station section the Mac lists is reachable on the phone, from the
+  Shows tab (each station opens out, an accordion, to its shows and its
+  sections) and from the station's page (`PhoneStationSection`), and every
+  page those open has a phone layout. A Mac-only page reached on the phone
+  is a bug.
 - Back from a station returns to Live at the same station; back from a
   section returns to its station.

@@ -43,6 +43,8 @@ struct PhoneShowsView: View {
     @Environment(NoodsBrowseStore.self) private var noods
     @Environment(AlharaBrowseStore.self) private var alhara
     @State private var feeds = PhoneFeeds.shared
+    /// The stations opened out in the list, showing their sections.
+    @State private var expanded: Set<String> = []
     /// Set, only that station's grid, with no header or scroll of its own:
     /// a station's page ends with it.
     var embeddedStation: String? = nil
@@ -100,15 +102,35 @@ struct PhoneShowsView: View {
                 PhonePageTitle("Shows")
                 ForEach(Self.stations) { station in
                     stationRow(station)
+                    if expanded.contains(station.id) {
+                        sectionRows(station)
+                    }
                 }
             }
         }
         .foregroundStyle(.white)
     }
 
+    /// What a station has besides its shows, as the Mac lists it.
+    private func sections(of station: Station) -> [PhoneStationSection] {
+        station.providerID.map { PhoneStationSection.of(providerID: $0) } ?? []
+    }
+
     /// The station's mark; its name and how many shows, in boxes, touching.
+    /// A station with sections opens out, an accordion, to show them; one
+    /// without goes straight to its shows.
     private func stationRow(_ station: Station) -> some View {
-        Button { feeds.showsStation = station.id } label: {
+        let opens = !sections(of: station).isEmpty
+        let isOpen = expanded.contains(station.id)
+        return Button {
+            if opens {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isOpen { expanded.remove(station.id) } else { expanded.insert(station.id) }
+                }
+            } else {
+                feeds.showsStation = station.id
+            }
+        } label: {
             HStack(spacing: 12) {
                 Group {
                     if let providerID = station.providerID {
@@ -128,9 +150,10 @@ struct PhoneShowsView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: "chevron.right")
+                Image(systemName: opens ? "chevron.down" : "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
+                    .rotationEffect(.degrees(opens && isOpen ? 180 : 0))
                     .padding(.trailing, 16)
             }
             .background(PhoneShowPage.rowGround)
@@ -140,8 +163,46 @@ struct PhoneShowsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(station.name) shows")
+        .accessibilityLabel(opens ? station.name : "\(station.name) shows")
+        .accessibilityHint(opens ? (isOpen ? "Hides its sections" : "Shows its sections") : "")
         .task { await load(station.id) }
+    }
+
+    /// Under an opened station: its shows, then each other section, one row
+    /// each.
+    private func sectionRows(_ station: Station) -> some View {
+        VStack(spacing: 0) {
+            sectionRow(Self.countNoun(station.id).capitalized) { feeds.showsStation = station.id }
+            ForEach(sections(of: station)) { section in
+                sectionRow(section.title) {
+                    // Back from the section comes here, to the list.
+                    feeds.lastStationRoute = .shows
+                    appState.select(section.route)
+                }
+            }
+        }
+        .transition(.opacity)
+    }
+
+    private func sectionRow(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 0) {
+                Chip(text: title, size: 13, uppercase: true)
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .padding(.leading, 64 + 12)
+            .padding(.trailing, 16)
+            .frame(height: 48)
+            .background(Color.black.opacity(0.4))
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(.white.opacity(0.08)).frame(height: 1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: A station's shows
