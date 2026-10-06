@@ -180,7 +180,8 @@ built from a station's broadcast; they use the same `PhoneEpisodeRow`.
 
 ## 8. Page templates
 
-**For You** — first screen: the For You shader uncovered, an ASCII globe
+**For You** — first screen: MINERAL on the moving green over FOR YOU; the
+For You shader uncovered, a black ASCII globe
 turning in it (`PhoneForYouGlobe`), and IDA boxes pinned about its
 surface, kind or city in green over the name: the suggestions the Mac's
 For You has, or before anything is kept, every station (tap to play) and

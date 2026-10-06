@@ -63,8 +63,19 @@ struct PhoneForYouGlobe: View {
                     }
                 }
                 VStack {
-                    ChipFlow { Chip(text: "For you", tone: .lead, size: 12, uppercase: true) }
-                        .padding(.top, insets.top + 12)
+                    // The wordmark on its moving green, over the page's name.
+                    VStack(spacing: 0) {
+                        Text("Mineral")
+                            .font(Typeface.mono(17, weight: .medium))
+                            .tracking(4)
+                            .textCase(.uppercase)
+                            .foregroundStyle(Chip.ink)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 9)
+                            .background { MineralSheenSurface() }
+                        Chip(text: "For you", tone: .plain, size: 12, uppercase: true)
+                    }
+                    .padding(.top, insets.top + 12)
                     Spacer()
                     Image(systemName: "chevron.up")
                         .font(.system(size: 18, weight: .semibold))
@@ -102,9 +113,9 @@ struct PhoneForYouGlobe: View {
         let left = center.x - CGFloat(cols) * Self.cellWidth / 2
         let top = center.y - CGFloat(rows) * Self.cellHeight / 2
         let font = Font.system(size: Self.fontSize, weight: .semibold, design: .monospaced)
-        // A soft dark edge, so the characters hold against the field's
-        // bright bands as well as its dark ones.
-        canvas.addFilter(.shadow(color: .black.opacity(0.55), radius: 1.5))
+        // Black, with a faint light edge so they hold on the field's dark
+        // bands as well as its bright ones.
+        canvas.addFilter(.shadow(color: .white.opacity(0.35), radius: 1))
 
         for row in 0..<rows {
             var line = ""
@@ -118,7 +129,7 @@ struct PhoneForYouGlobe: View {
                 line.append(Self.character(x: Double(x), y: Double(y), z: z, rotation: rotation))
             }
             canvas.draw(
-                Text(line).font(font).foregroundColor(.white.opacity(0.92)),
+                Text(line).font(font).foregroundColor(.black.opacity(0.85)),
                 at: CGPoint(x: left, y: top + CGFloat(row) * Self.cellHeight),
                 anchor: .topLeading
             )

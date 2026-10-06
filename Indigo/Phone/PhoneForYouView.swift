@@ -131,7 +131,8 @@ struct PhoneForYouView: View {
         playable: @escaping (StationEntry) -> MediaItem?
     ) -> [GlobeItem] {
         if !suggestions.isEmpty {
-            return suggestions.prefix(14).map { suggestion in
+            // All of them, as the Mac's For You shows: up to twenty-four.
+            return suggestions.map { suggestion in
                 GlobeItem(id: suggestion.id, label: Self.kind(of: suggestion.node), title: suggestion.node.title) {
                     Task { await open(suggestion.node) }
                 }
