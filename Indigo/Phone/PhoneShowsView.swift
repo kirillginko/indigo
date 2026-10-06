@@ -43,6 +43,9 @@ struct PhoneShowsView: View {
     @Environment(NoodsBrowseStore.self) private var noods
     @Environment(AlharaBrowseStore.self) private var alhara
     @State private var feeds = PhoneFeeds.shared
+    /// Set, only that station's grid, with no header or scroll of its own:
+    /// a station's page ends with it.
+    var embeddedStation: String? = nil
 
     struct Station: Identifiable {
         /// The key the grid is chosen by.
@@ -74,11 +77,19 @@ struct PhoneShowsView: View {
     private let columns = [GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2)]
 
     var body: some View {
-        if let station = Self.stations.first(where: { $0.id == feeds.showsStation }) {
+        if let key = embeddedStation, let station = Self.stations.first(where: { $0.id == key }) {
+            gridContent(station)
+                .task(id: station.id) { await load(station.id) }
+        } else if let station = Self.stations.first(where: { $0.id == feeds.showsStation }) {
             grid(station)
         } else {
             list
         }
+    }
+
+    /// The Shows tab's key for a station's provider, if it has shows.
+    static func key(forProvider providerID: String) -> String? {
+        stations.first { $0.providerID == providerID }?.id
     }
 
     // MARK: The stations
@@ -136,10 +147,19 @@ struct PhoneShowsView: View {
     // MARK: A station's shows
 
     private func grid(_ station: Station) -> some View {
-        let shown = cards(of: station.id)
-        return ScrollView {
+        ScrollView {
             VStack(spacing: 0) {
                 gridHeader(station)
+                gridContent(station)
+            }
+        }
+        .foregroundStyle(.white)
+        .task(id: station.id) { await load(station.id) }
+    }
+
+    private func gridContent(_ station: Station) -> some View {
+        let shown = cards(of: station.id)
+        return VStack(spacing: 0) {
                 if shown.isEmpty {
                     VStack(alignment: .leading, spacing: 14) {
                         Text(isLoading(station.id) ? "Loading shows…" : "No shows came back.")
@@ -171,10 +191,8 @@ struct PhoneShowsView: View {
                             .task(id: shown.count) { await loadMore(station.id) }
                     }
                 }
-            }
         }
         .foregroundStyle(.white)
-        .task(id: station.id) { await load(station.id) }
     }
 
     /// Back to the stations, and the station's name.

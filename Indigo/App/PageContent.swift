@@ -13,6 +13,7 @@ struct PageContent: View {
     @Environment(AppState.self) private var appState
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(DigStore.self) private var dig
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         ZStack {
@@ -122,6 +123,10 @@ struct PageContent: View {
                         }
                     }
             } else {
+                // On the phone a station is one shared page, not its own.
+                if isPhone, appState.route.isStation {
+                    PhoneStationRoute(route: appState.route) { EmptyView() }
+                } else {
                 switch appState.route {
                 case .tracks: TracksView()
                 case .albums: AlbumsView()
@@ -175,6 +180,7 @@ struct PageContent: View {
                 case .forYou: PhoneForYouView()
                 case .live: PhoneLiveView()
                 case .shows: PhoneShowsView()
+                }
                 }
             }
         }
