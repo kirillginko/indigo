@@ -22,6 +22,8 @@ final class PhoneFeeds {
     /// The station whose shows the Shows tab is showing; nil for the list of
     /// stations.
     var showsStation: String?
+    /// The station page last opened, for its sections' back button.
+    var lastStationRoute: Route?
 
     /// Never freed; a main-actor deinit hop would abort if it were.
     nonisolated deinit {}

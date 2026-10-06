@@ -126,6 +126,8 @@ struct PageContent: View {
                 // On the phone a station is one shared page, not its own.
                 if isPhone, appState.route.isStation {
                     PhoneStationRoute(route: appState.route) { EmptyView() }
+                } else if isPhone, PhoneStationSection.routes.contains(appState.route) {
+                    PhoneStationSectionPage(route: appState.route)
                 } else {
                 switch appState.route {
                 case .tracks: TracksView()

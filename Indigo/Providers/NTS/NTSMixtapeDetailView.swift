@@ -14,38 +14,45 @@ struct NTSMixtapeDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(NTSBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     private let creditColumns = [GridItem(.adaptive(minimum: 190), spacing: 0, alignment: .leading)]
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let mixtape = browse.mixtape(alias: alias) {
-                PageHeader(
-                    title: mixtape.title,
-                    breadcrumb: appState.breadcrumbTitle,
-                    onBack: { appState.popDetail() },
-                    subtitle: subtitle(mixtape)
-                ) {
-                    playButton(mixtape)
-                }
-                Rule(color: Palette.outline)
-                content(mixtape)
+        Group {
+            if isPhone {
+                phonePage(browse.mixtape(alias: alias))
             } else {
-                PageHeader(
-                    title: "Mixtape",
-                    breadcrumb: appState.breadcrumbTitle,
-                    onBack: { appState.popDetail() }
-                )
-                Rule(color: Palette.outline)
-                if browse.mixtapes.isLoading {
-                    LoadingPane(label: "Loading mixtape")
+            VStack(spacing: 0) {
+                if let mixtape = browse.mixtape(alias: alias) {
+                    PageHeader(
+                        title: mixtape.title,
+                        breadcrumb: appState.breadcrumbTitle,
+                        onBack: { appState.popDetail() },
+                        subtitle: subtitle(mixtape)
+                    ) {
+                        playButton(mixtape)
+                    }
+                    Rule(color: Palette.outline)
+                    content(mixtape)
                 } else {
-                    EmptyStateView(headline: "Mixtape unavailable",
-                                   message: "NTS isn't listing this channel any more.") {
-                        Button("Back to Mixtapes") { appState.popDetail() }
-                            .buttonStyle(OutlineButtonStyle())
+                    PageHeader(
+                        title: "Mixtape",
+                        breadcrumb: appState.breadcrumbTitle,
+                        onBack: { appState.popDetail() }
+                    )
+                    Rule(color: Palette.outline)
+                    if browse.mixtapes.isLoading {
+                        LoadingPane(label: "Loading mixtape")
+                    } else {
+                        EmptyStateView(headline: "Mixtape unavailable",
+                                       message: "NTS isn't listing this channel any more.") {
+                            Button("Back to Mixtapes") { appState.popDetail() }
+                                .buttonStyle(OutlineButtonStyle())
+                        }
                     }
                 }
+            }
             }
         }
         .task { await browse.loadMixtapesIfNeeded() }
@@ -188,5 +195,60 @@ private struct CreditRow: View {
         .buttonStyle(.plain)
         .disabled(credit.destination == nil)
         .onHover { isHovering = $0 }
+    }
+}
+
+extension NTSMixtapeDetailView {
+    /// A mixtape on the phone: a station that never stops, so its picture,
+    /// what it is, one play box, and the shows that made it.
+    fileprivate func phonePage(_ mixtape: NTSMixtape?) -> some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                PhoneDetailHero(kind: "NTS mixtape", title: mixtape?.title ?? "Mixtape",
+                                subtitle: mixtape?.subtitle, imageURL: mixtape?.artworkURL,
+                                awaitingImage: mixtape == nil)
+                VStack(alignment: .leading, spacing: 22) {
+                    if let mixtape {
+                        Button {
+                            let item = browse.mediaItem(for: mixtape)
+                            if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item) }
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: isPlaying ? "pause.fill" : "play.fill").font(.system(size: 14))
+                                Text(isPlaying ? "Pause" : "Listen")
+                                    .font(Typeface.mono(15)).tracking(1.4).textCase(.uppercase)
+                            }
+                            .foregroundStyle(Chip.ink)
+                            .frame(maxWidth: .infinity).frame(height: 54)
+                            .background(Chip.green)
+                        }
+                        .buttonStyle(.plain)
+                        if let summary = mixtape.summary, !summary.isEmpty {
+                            Text(summary)
+                                .font(Typeface.mono(12.5)).lineSpacing(3)
+                                .foregroundStyle(.white.opacity(0.72))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        if !mixtape.credits.isEmpty {
+                            DigSection(title: "Made from", trailing: "\(mixtape.credits.count)") {
+                                VStack(spacing: 0) {
+                                    ForEach(mixtape.credits) { credit in
+                                        DigLine(text: credit.name, action: credit.destination.map { page in { appState.open(page) } })
+                                        Rule()
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Text(browse.mixtapes.isLoading ? "Loading…" : "NTS isn't listing this channel any more.")
+                            .font(Typeface.mono(12)).foregroundStyle(.white.opacity(0.6))
+                    }
+                }
+                .padding(PhoneLayout.margin)
+            }
+        }
+        .ignoresSafeArea(edges: .top)
+        .overlay(alignment: .top) { PhoneDetailTopBar() }
+        .foregroundStyle(.white)
     }
 }

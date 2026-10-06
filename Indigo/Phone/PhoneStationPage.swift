@@ -71,6 +71,7 @@ struct PhoneStationPage: View {
                     VStack(alignment: .leading, spacing: 22) {
                         nowAndNext(show, next)
                         about(show)
+                        sections
                         shows
                     }
                     .padding(.vertical, 18)
@@ -82,6 +83,7 @@ struct PhoneStationPage: View {
             .overlay(alignment: .top) { topBar }
             .foregroundStyle(.white)
         }
+        .onAppear { PhoneFeeds.shared.lastStationRoute = entry.route }
     }
 
     // MARK: Parts
@@ -144,16 +146,8 @@ struct PhoneStationPage: View {
                 .frame(maxWidth: .infinity)
             }
             if let next {
-                VStack(spacing: 0) {
-                    ChipFlow {
-                        if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
-                            Chip(text: time, tone: .sheen, size: 12.5)
-                        }
-                        Chip(text: "Next up", size: 12.5, uppercase: true)
-                    }
-                    ChipFlow { Chip(text: next.title, size: 15) }
-                }
-                .frame(maxWidth: .infinity)
+                NextUpRows(next: next)
+                    .frame(maxWidth: .infinity)
             }
         }
     }
@@ -179,6 +173,35 @@ struct PhoneStationPage: View {
                         Text(strapline)
                             .font(Typeface.mono(11.5))
                             .foregroundStyle(.white.opacity(0.55))
+                    }
+                }
+            }
+        }
+    }
+
+    /// Everything else the Mac lists under the station, as boxes to open.
+    @ViewBuilder
+    private var sections: some View {
+        let found = PhoneStationSection.of(providerID: entry.station.providerID)
+        if !found.isEmpty {
+            DigSection(title: "Browse") {
+                FlowLayout(spacing: 6, lineSpacing: 6) {
+                    ForEach(found) { section in
+                        Button { appState.select(section.route) } label: {
+                            HStack(spacing: 8) {
+                                Text(section.title)
+                                    .font(Typeface.mono(14))
+                                    .tracking(1.2)
+                                    .textCase(.uppercase)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 11, weight: .semibold))
+                            }
+                            .foregroundStyle(.white.opacity(0.92))
+                            .padding(.horizontal, 14)
+                            .frame(height: 42)
+                            .background(Chip.black)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }

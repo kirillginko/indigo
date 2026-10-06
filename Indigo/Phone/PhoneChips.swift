@@ -49,6 +49,27 @@ struct Chip: View {
     }
 }
 
+/// What comes on next, set out the same everywhere: the time and NEXT UP
+/// as one row of two boxes touching -- they are one statement -- then, as a
+/// row of its own with the ordinary gap, the next show's name. See
+/// PHONE-DESIGN.md.
+struct NextUpRows: View {
+    let next: RadioShow
+    var spacing: CGFloat = 8
+
+    var body: some View {
+        VStack(spacing: spacing) {
+            ChipFlow {
+                if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
+                    Chip(text: time, tone: .sheen, size: 12.5)
+                }
+                Chip(text: "Next up", size: 12.5, uppercase: true)
+            }
+            ChipFlow { Chip(text: next.title, size: 15) }
+        }
+    }
+}
+
 /// Boxes laid edge to edge, wrapped onto further lines, each line centred.
 struct ChipFlow: Layout {
     var lineSpacing: CGFloat = 0

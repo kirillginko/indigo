@@ -105,29 +105,36 @@ struct NoodsResidentDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(NoodsBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let resident = browse.resident(path: residentPath)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: resident?.name ?? NoodsPath.slug(residentPath).replacingOccurrences(of: "-", with: " ").capitalized,
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: [resident?.location, resident?.schedule]
-                    .compactMap { $0 }.joined(separator: " · ")
-            )
-            Rule(color: Palette.outline)
-
-            if let resident {
-                content(resident)
-            } else if let error = browse.residentError(path: residentPath) {
-                EmptyStateView(headline: "Couldn't load this resident", message: error) {
-                    Button("Try Again") { Task { await browse.loadResident(path: residentPath) } }
-                        .buttonStyle(OutlineButtonStyle())
-                }
+        Group {
+            if isPhone {
+                phonePage(browse.resident(path: residentPath))
             } else {
-                LoadingPane(label: "Loading resident")
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: resident?.name ?? NoodsPath.slug(residentPath).replacingOccurrences(of: "-", with: " ").capitalized,
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: [resident?.location, resident?.schedule]
+                        .compactMap { $0 }.joined(separator: " · ")
+                )
+                Rule(color: Palette.outline)
+
+                if let resident {
+                    content(resident)
+                } else if let error = browse.residentError(path: residentPath) {
+                    EmptyStateView(headline: "Couldn't load this resident", message: error) {
+                        Button("Try Again") { Task { await browse.loadResident(path: residentPath) } }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
+                } else {
+                    LoadingPane(label: "Loading resident")
+                }
+            }
             }
         }
         .task(id: residentPath) { await browse.loadResidentIfNeeded(path: residentPath) }
@@ -224,5 +231,35 @@ struct NoodsResidentDetailView: View {
             .padding(.bottom, 26)
         }
         .scrollIndicators(.visible)
+    }
+}
+
+extension NoodsResidentDetailView {
+    fileprivate func phonePage(_ resident: NoodsResident?) -> some View {
+        let shows = resident?.shows ?? []
+        let path = residentPath
+        let store = browse
+        var loadMore: (@MainActor () async -> Void)?
+        if resident?.nextPage != nil {
+            loadMore = { await store.loadMoreResidentShows(path: path) }
+        }
+        return PhoneShowPage(
+            title: resident?.name ?? NoodsPath.slug(residentPath).replacingOccurrences(of: "-", with: " ").capitalized,
+            station: resident?.location ?? "Noods resident",
+            host: resident?.schedule,
+            imageURL: resident?.artworkURL,
+            markURL: StationMark.logoURL(for: NoodsProvider.providerID),
+            summary: resident?.about,
+            episodes: shows.map { s in
+                PhoneEpisode(id: s.id, title: s.title, subtitle: s.artist, date: s.airedAt, genres: s.genres,
+                             imageURL: s.artworkURL, isPlayable: s.isPlayable,
+                             isCurrent: NoodsPlayback.isCurrent(s, in: player), isPlaying: NoodsPlayback.isPlaying(s, in: player),
+                             play: { NoodsPlayback.toggle(s, within: shows, using: player) },
+                             open: { appState.open(.noodsShow(path: s.path)) })
+            },
+            isLoading: resident == nil && browse.residentError(path: residentPath) == nil,
+            emptyMessage: browse.residentError(path: residentPath) ?? "Noods hasn't archived shows by this resident.",
+            loadMore: loadMore
+        )
     }
 }

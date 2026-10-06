@@ -162,8 +162,15 @@ extension View {
 /// chevron on it, as the tab bar's Dig cell is -- the one thing on every page
 /// that is always the same.
 struct PhoneBackGlyph: View {
+    var body: some View { PhoneRoundGlyph(symbol: "chevron.left") }
+}
+
+/// A round button's face on the wordmark's sheen: back, info.
+struct PhoneRoundGlyph: View {
+    let symbol: String
+
     var body: some View {
-        Image(systemName: "chevron.left")
+        Image(systemName: symbol)
             .font(.system(size: 18, weight: .bold))
             .foregroundStyle(Chip.ink)
             .frame(width: 46, height: 46)

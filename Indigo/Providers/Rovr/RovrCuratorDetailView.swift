@@ -16,36 +16,43 @@ struct RovrCuratorDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(RovrBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         let curator = browse.curator(id: curatorID)
         let broadcasts = browse.broadcasts(byCurator: curatorID)
 
-        VStack(spacing: 0) {
-            PageHeader(
-                title: curator?.name ?? "Curator",
-                breadcrumb: appState.breadcrumbTitle,
-                onBack: { appState.popDetail() },
-                subtitle: subtitle(curator, broadcasts: broadcasts)
-            ) {
-                if let first = broadcasts.first(where: \.isPlayable) {
-                    playButton(first, queue: broadcasts)
+        Group {
+            if isPhone {
+                phonePage(browse.curator(id: curatorID), broadcasts: browse.broadcasts(byCurator: curatorID))
+            } else {
+            VStack(spacing: 0) {
+                PageHeader(
+                    title: curator?.name ?? "Curator",
+                    breadcrumb: appState.breadcrumbTitle,
+                    onBack: { appState.popDetail() },
+                    subtitle: subtitle(curator, broadcasts: broadcasts)
+                ) {
+                    if let first = broadcasts.first(where: \.isPlayable) {
+                        playButton(first, queue: broadcasts)
+                    }
+                }
+                Rule(color: Palette.outline)
+
+                if let curator {
+                    content(curator, broadcasts: broadcasts)
+                } else if browse.isLoadingCurator(curatorID) || browse.curatorsPhase.isLoading {
+                    LoadingPane(label: "Loading curator")
+                } else {
+                    EmptyStateView(
+                        headline: "Curator unavailable",
+                        message: browse.curatorError(curatorID) ?? "ROVR no longer lists this curator."
+                    ) {
+                        Button("Back") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
             }
-            Rule(color: Palette.outline)
-
-            if let curator {
-                content(curator, broadcasts: broadcasts)
-            } else if browse.isLoadingCurator(curatorID) || browse.curatorsPhase.isLoading {
-                LoadingPane(label: "Loading curator")
-            } else {
-                EmptyStateView(
-                    headline: "Curator unavailable",
-                    message: browse.curatorError(curatorID) ?? "ROVR no longer lists this curator."
-                ) {
-                    Button("Back") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
-                }
             }
         }
         .task(id: curatorID) {
@@ -192,5 +199,29 @@ struct RovrCuratorDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension RovrCuratorDetailView {
+    fileprivate func phonePage(_ curator: RovrCurator?, broadcasts: [RovrBroadcast]) -> some View {
+        PhoneShowPage(
+            title: curator?.name ?? "Curator",
+            station: "ROVR curator",
+            host: curator?.flag,
+            imageURL: curator?.imageURL ?? curator?.thumbnailURL,
+            markURL: StationMark.logoURL(for: RovrProvider.providerID),
+            genres: curator?.showTitles ?? [],
+            summary: curator?.about,
+            episodes: broadcasts.map { b in
+                PhoneEpisode(id: b.id, title: b.title, subtitle: b.showTitle, date: b.broadcastAt, genres: b.tags,
+                             imageURL: b.thumbnailURL ?? b.imageURL, isPlayable: b.isPlayable,
+                             isCurrent: RovrPlayback.isCurrent(b, in: player), isPlaying: RovrPlayback.isPlaying(b, in: player),
+                             play: { RovrPlayback.toggle(b, within: broadcasts, using: player) },
+                             open: { browse.remember([b]); appState.open(.rovrBroadcast(id: b.documentID)) },
+                             crate: AnyView(RovrCrateButton(broadcast: b, compact: true)))
+            },
+            isLoading: curator == nil || broadcasts.isEmpty,
+            emptyMessage: "ROVR hasn't archived broadcasts by this curator."
+        )
     }
 }

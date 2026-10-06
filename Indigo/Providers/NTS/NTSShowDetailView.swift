@@ -56,26 +56,9 @@ struct NTSShowDetailView: View {
             imageURL: episode.artworkURL,
             isCurrent: isCurrent,
             isPlaying: isCurrent && player.isPlaying,
-            play: { play(episode, isCurrent: isCurrent) },
+            play: { browse.play(episode, isCurrent: isCurrent, player: player, appState: appState) },
             open: { appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias)) }
         )
-    }
-
-    /// The list holds no audio: the episode is read first, as its own page
-    /// would, then played.
-    private func play(_ episode: NTSEpisodeSummary, isCurrent: Bool) {
-        if isCurrent {
-            player.toggle()
-            return
-        }
-        Task {
-            await browse.loadDetailIfNeeded(show: episode.showAlias, episode: episode.episodeAlias)
-            if let item = browse.detail(show: episode.showAlias, episode: episode.episodeAlias)?.mediaItem() {
-                player.playEpisode(item)
-            } else {
-                appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias))
-            }
-        }
     }
 
     private func page(_ show: NTSShowSummary?, episodes: NTSBrowseStore.Feed<NTSEpisodeSummary>) -> some View {

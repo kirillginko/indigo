@@ -14,30 +14,37 @@ struct KioskMoodDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(KioskBrowseStore.self) private var browse
     @Environment(PlaybackCoordinator.self) private var player
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let mood = browse.mood(id: moodID) {
-                PageHeader(
-                    title: mood.title,
-                    breadcrumb: appState.breadcrumbTitle,
-                    onBack: { appState.popDetail() },
-                    subtitle: subtitle(mood)
-                ) {
-                    playAllButton(mood)
-                }
-                Rule(color: Palette.outline)
-                content(mood)
-            } else if browse.moodsPhase.isLoading {
-                LoadingPane(label: "Loading mood")
+        Group {
+            if isPhone {
+                phonePage(browse.mood(id: moodID))
             } else {
-                EmptyStateView(
-                    headline: "Mood unavailable",
-                    message: "Kiosk is no longer publishing this playlist."
-                ) {
-                    Button("Back to Moods") { appState.popDetail() }
-                        .buttonStyle(OutlineButtonStyle())
+            VStack(spacing: 0) {
+                if let mood = browse.mood(id: moodID) {
+                    PageHeader(
+                        title: mood.title,
+                        breadcrumb: appState.breadcrumbTitle,
+                        onBack: { appState.popDetail() },
+                        subtitle: subtitle(mood)
+                    ) {
+                        playAllButton(mood)
+                    }
+                    Rule(color: Palette.outline)
+                    content(mood)
+                } else if browse.moodsPhase.isLoading {
+                    LoadingPane(label: "Loading mood")
+                } else {
+                    EmptyStateView(
+                        headline: "Mood unavailable",
+                        message: "Kiosk is no longer publishing this playlist."
+                    ) {
+                        Button("Back to Moods") { appState.popDetail() }
+                            .buttonStyle(OutlineButtonStyle())
+                    }
                 }
+            }
             }
         }
         .task { await browse.loadMoodsIfNeeded() }
@@ -133,5 +140,26 @@ struct KioskMoodDetailView: View {
             .sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
             .prefix(8)
             .map(\.key)
+    }
+}
+
+extension KioskMoodDetailView {
+    fileprivate func phonePage(_ mood: KioskMood?) -> some View {
+        let episodes = mood?.episodes ?? []
+        return PhoneShowPage(
+            title: mood?.title ?? "Mood",
+            station: "Kiosk mood",
+            imageURL: mood?.artworkURL,
+            episodes: episodes.map { e in
+                let current = player.isCurrent(e.mediaID)
+                return PhoneEpisode(id: e.id, title: e.title, date: e.airedAt, genres: e.genres, imageURL: e.artworkURL,
+                                    isPlayable: e.isPlayable, isCurrent: current, isPlaying: current && player.isPlaying,
+                                    play: { KioskPlayback.toggle(e, within: episodes, using: player) },
+                                    open: { appState.open(.kioskEpisode(slug: e.slug)) },
+                                    crate: AnyView(KioskCrateButton(episode: e, compact: true)))
+            },
+            isLoading: mood == nil && browse.moodsPhase.isLoading,
+            emptyMessage: "Kiosk is no longer publishing this playlist."
+        )
     }
 }
