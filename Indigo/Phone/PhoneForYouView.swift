@@ -64,8 +64,12 @@ struct PhoneForYouView: View {
                                 case .cover:
                                     PhoneForYouGlobe(
                                         items: globeItems(suggestions: suggestions, entries: entries, playable: playable),
+                                        stations: stationItems(entries, playable: playable),
                                         insets: insets
-                                    )
+                                    ) {
+                                        guard slides.count > 1 else { return }
+                                        withAnimation(.easeInOut(duration: 0.4)) { feeds.forYouID = slides[1].id }
+                                    }
                                 case .suggestion(let suggestion):
                                     PhoneForYouSlide(
                                         suggestion: suggestion,
@@ -138,7 +142,17 @@ struct PhoneForYouView: View {
                 }
             }
         }
-        let stations = entries.map { entry in
+        let stations = stationItems(entries, playable: playable)
+        let archives = GlobeItem(id: "archives", label: "Archives", title: "Radio on YouTube") {
+            PhoneFeeds.shared.showsStation = "Archives"
+            appState.select(.shows)
+        }
+        return stations + [archives]
+    }
+
+    /// Every station, its city over its short name; tapped, it plays.
+    private func stationItems(_ entries: [StationEntry], playable: @escaping (StationEntry) -> MediaItem?) -> [GlobeItem] {
+        entries.map { entry in
             let item = playable(entry)
             let city = entry.location.split(separator: ",").first.map(String.init) ?? entry.location
             return GlobeItem(
@@ -149,11 +163,6 @@ struct PhoneForYouView: View {
                 if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item) }
             }
         }
-        let archives = GlobeItem(id: "archives", label: "Archives", title: "Radio on YouTube") {
-            PhoneFeeds.shared.showsStation = "Archives"
-            appState.select(.shows)
-        }
-        return stations + [archives]
     }
 
     static func kind(of node: MusicNode) -> String {

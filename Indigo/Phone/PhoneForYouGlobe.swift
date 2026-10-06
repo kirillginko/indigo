@@ -28,7 +28,11 @@ struct GlobeItem: Identifiable {
 
 struct PhoneForYouGlobe: View {
     let items: [GlobeItem]
+    /// The stations, as boxes under the globe, to start one with a tap.
+    var stations: [GlobeItem] = []
     let insets: EdgeInsets
+    /// On to the suggestions.
+    var keepExploring: () -> Void = {}
 
     /// How far the globe has been turned by hand, in radians.
     @State private var turned: Double = 0
@@ -42,48 +46,64 @@ struct PhoneForYouGlobe: View {
     private static let cellHeight: CGFloat = fontSize * 1.05
 
     var body: some View {
+        ZStack {
+            GeometryReader { proxy in
+                ExploreShaderField(seed: 0, size: proxy.size)
+            }
+            VStack(spacing: 14) {
+                header
+                    .padding(.top, insets.top + 12)
+                globe
+                stationBoxes
+                keepExploringBox
+                    .padding(.bottom, insets.bottom + 12)
+            }
+        }
+    }
+
+    // MARK: Parts
+
+    /// The wordmark on its moving green, over the page's name.
+    private var header: some View {
+        VStack(spacing: 0) {
+            Text("Mineral")
+                .font(Typeface.mono(17, weight: .medium))
+                .tracking(4)
+                .textCase(.uppercase)
+                .foregroundStyle(Chip.ink)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 9)
+                .background { MineralSheenSurface() }
+            Chip(text: "For you", tone: .plain, size: 12, uppercase: true)
+        }
+    }
+
+    /// As big as the room between the header and the stations allows.
+    private var globe: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            let radius = min(size.width * 0.46, (size.height - insets.top - insets.bottom) * 0.3)
-            let center = CGPoint(x: size.width / 2, y: insets.top + (size.height - insets.top - insets.bottom) * 0.46)
-            ZStack {
-                ExploreShaderField(seed: 0, size: size)
-                TimelineView(.animation(minimumInterval: 1.0 / 20)) { context in
-                    let spin = context.date.timeIntervalSinceReferenceDate
-                        .truncatingRemainder(dividingBy: 1 / Self.turnsPerSecond) * Self.turnsPerSecond * 2 * .pi
-                    let rotation = spin + turned + turning
-                    ZStack {
-                        Canvas { canvas, _ in
-                            draw(in: &canvas, center: center, radius: radius, rotation: rotation)
-                        }
-                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                            pinned(item, index: index, count: items.count,
-                                   center: center, radius: radius, rotation: rotation, width: size.width)
-                        }
+            let radius = min(size.width * 0.5, size.height * 0.5)
+            let center = CGPoint(x: size.width / 2, y: size.height / 2)
+            TimelineView(.animation(minimumInterval: 1.0 / 20)) { context in
+                let spin = context.date.timeIntervalSinceReferenceDate
+                    .truncatingRemainder(dividingBy: 1 / Self.turnsPerSecond) * Self.turnsPerSecond * 2 * .pi
+                let rotation = spin + turned + turning
+                let placed = items.enumerated().map { index, item in
+                    (item: item, spot: Self.project(index, of: items.count, rotation: rotation))
+                }
+                ZStack {
+                    // Behind the globe first, then the globe, then in front:
+                    // a box round the back shows faintly through it.
+                    ForEach(placed.filter { $0.spot.z < 0 }, id: \.item.id) { entry in
+                        pinned(entry.item, at: entry.spot, center: center, radius: radius, width: size.width)
+                    }
+                    Canvas { canvas, _ in
+                        draw(in: &canvas, center: center, radius: radius, rotation: rotation)
+                    }
+                    ForEach(placed.filter { $0.spot.z >= 0 }, id: \.item.id) { entry in
+                        pinned(entry.item, at: entry.spot, center: center, radius: radius, width: size.width)
                     }
                 }
-                VStack {
-                    // The wordmark on its moving green, over the page's name.
-                    VStack(spacing: 0) {
-                        Text("Mineral")
-                            .font(Typeface.mono(17, weight: .medium))
-                            .tracking(4)
-                            .textCase(.uppercase)
-                            .foregroundStyle(Chip.ink)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 9)
-                            .background { MineralSheenSurface() }
-                        Chip(text: "For you", tone: .plain, size: 12, uppercase: true)
-                    }
-                    .padding(.top, insets.top + 12)
-                    Spacer()
-                    Image(systemName: "chevron.up")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .padding(.bottom, insets.bottom + 22)
-                        .accessibilityHidden(true)
-                }
-                .allowsHitTesting(false)
             }
             // Sideways only: up and down still page the feed.
             .simultaneousGesture(
@@ -98,6 +118,45 @@ struct PhoneForYouGlobe: View {
                     }
             )
         }
+    }
+
+    /// Every station, a box each: tapped, it plays.
+    @ViewBuilder
+    private var stationBoxes: some View {
+        if !stations.isEmpty {
+            VStack(spacing: 6) {
+                Chip(text: "Live now", tone: .lead, size: 11, uppercase: true)
+                ChipFlow(lineSpacing: 4) {
+                    ForEach(stations) { station in
+                        Button(action: station.action) {
+                            Chip(text: station.title, tone: station.isOn ? .sheen : .plain, size: 12)
+                                .padding(.horizontal, 2)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(station.isOn ? "Pause \(station.title)" : "Play \(station.title)")
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private var keepExploringBox: some View {
+        Button(action: keepExploring) {
+            HStack(spacing: 8) {
+                Text("Keep exploring")
+                    .font(Typeface.mono(13))
+                    .tracking(1.4)
+                    .textCase(.uppercase)
+                Image(systemName: "chevron.up")
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .frame(height: 40)
+            .background(Chip.black)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: The globe
@@ -165,17 +224,19 @@ struct PhoneForYouGlobe: View {
         return (asin(y * 0.8), Double(index) * golden)
     }
 
-    @ViewBuilder
-    private func pinned(_ item: GlobeItem, index: Int, count: Int,
-                        center: CGPoint, radius: CGFloat, rotation: Double, width: CGFloat) -> some View {
-        let spot = Self.place(index, of: count)
+    private struct Spot { let x: Double, y: Double, z: Double }
+
+    private static func project(_ index: Int, of count: Int, rotation: Double) -> Spot {
+        let spot = place(index, of: count)
         let lon = spot.lon + rotation
-        let x = cos(spot.lat) * sin(lon)
-        let y = -sin(spot.lat)
-        let z = cos(spot.lat) * cos(lon)
-        // Gone round the back below 0.05; full in front from 0.4.
-        let facing = min(1, max(0, (z - 0.05) / 0.35))
-        Button(action: item.action) {
+        return Spot(x: cos(spot.lat) * sin(lon), y: -sin(spot.lat), z: cos(spot.lat) * cos(lon))
+    }
+
+    private func pinned(_ item: GlobeItem, at spot: Spot, center: CGPoint, radius: CGFloat, width: CGFloat) -> some View {
+        // Round the back it stays, faint, behind the globe's characters;
+        // full in front from 0.4.
+        let facing = min(1, max(0, (spot.z + 0.1) / 0.5))
+        return Button(action: item.action) {
             VStack(spacing: 0) {
                 Chip(text: item.label, tone: .lead, size: 10, uppercase: true)
                 Chip(text: item.title, tone: item.isOn ? .sheen : .plain, size: 12)
@@ -185,14 +246,14 @@ struct PhoneForYouGlobe: View {
             }
         }
         .buttonStyle(.plain)
-        .scaleEffect(0.82 + 0.26 * z)
-        .opacity(facing)
-        .allowsHitTesting(facing > 0.6)
+        .scaleEffect(0.8 + 0.25 * spot.z)
+        .opacity(0.28 + 0.72 * facing)
+        .allowsHitTesting(spot.z > 0.2)
         // Kept on screen: a box at the globe's edge is half off it otherwise.
-        .position(x: min(max(center.x + CGFloat(x) * radius, 84), width - 84),
-                  y: center.y + CGFloat(y) * radius)
-        .zIndex(z)
-        .accessibilityHidden(facing < 0.6)
+        .position(x: min(max(center.x + CGFloat(spot.x) * radius, 84), width - 84),
+                  y: center.y + CGFloat(spot.y) * radius)
+        .zIndex(spot.z)
+        .accessibilityHidden(spot.z <= 0.2)
         .accessibilityLabel("\(item.title), \(item.label)")
     }
 }
