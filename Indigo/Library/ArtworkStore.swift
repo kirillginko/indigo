@@ -373,8 +373,14 @@ struct ArtworkView: View {
     /// picture. Discogs answers "no image" with a `spacer.gif` that loads
     /// fine and draws nothing, and a dozen paths have carried one here; this
     /// is the one place every tile passes through.
-    private var remote: URL? { Self.usable(remoteURL) }
-    private var preview: URL? { Self.usable(previewRemoteURL) }
+    /// Asked for at the size it is drawn (`ArtworkSizing`); where that is a
+    /// different address, the station's own cut becomes the preview.
+    private var remote: URL? { Self.usable(ArtworkSizing.sharper(remoteURL, pixels: pixels)) }
+    private var preview: URL? {
+        if let given = Self.usable(previewRemoteURL) { return given }
+        let sharper = ArtworkSizing.sharper(remoteURL, pixels: pixels)
+        return sharper == remoteURL ? nil : Self.usable(remoteURL)
+    }
     private var markAddress: URL? { Self.usable(markURL) }
 
     static func usable(_ url: URL?) -> URL? {

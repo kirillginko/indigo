@@ -62,6 +62,14 @@ struct PhoneRootView: View {
                     .zIndex(2)
             }
             if videoUp {
+                // Swiped down anywhere, the video goes back to its thumbnail,
+                // as the full player closes; the web view takes no touches.
+                Color.clear
+                    .contentShape(Rectangle())
+                    .gesture(DragGesture(minimumDistance: 24).onEnded { value in
+                        if value.translation.height > 70 { videoFullScreen = false }
+                    })
+                    .zIndex(4.5)
                 minimizeButton
                     .zIndex(5)
                 videoControls
@@ -192,7 +200,7 @@ struct PhoneRootView: View {
             Spacer()
         }
         .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.top, 12)
     }
 
     private func close() {

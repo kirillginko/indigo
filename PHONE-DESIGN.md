@@ -84,8 +84,14 @@ The Mac's `Typeface.display` and `body` are not used on phone pages.
 - **Edges**: no empty bands. Phone headers keep no room for the Mac's
   window buttons; the status-bar and home-bar strips take the headers'
   shade; the home bar fades; the tab bar sits down in its strip.
-- **Orientation**: the iPhone stays upright. Only a full-screen video turns
-  to landscape, and back when minimised (`OrientationLock`).
+- **Orientation**: the iPhone stays upright. A full-screen video opens
+  upright and turns only if the phone is turned; minimised (the round
+  button, or a swipe down), the phone stands back up (`OrientationLock`).
+- **Sharp pictures**: a picture is asked for at the size it is drawn
+  (`ArtworkSizing`): a full-width hero asks NTS, Mixcloud, Contentful,
+  WordPress and YouTube for a larger cut than a list does, with the
+  station's own cut as the preview. Never set a row's small cut (a
+  `thumbnailURL`) as a hero's picture.
 
 ---
 
