@@ -142,7 +142,7 @@ struct PhoneRootView: View {
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 60, height: 60)
-                    .background(Chip.black)
+                    .background(Chip.black, ignoresSafeAreaEdges: [])
             }
             .buttonStyle(.plain)
             .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
@@ -162,7 +162,7 @@ struct PhoneRootView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
-                        .background(Chip.black)
+                        .background(Chip.black, ignoresSafeAreaEdges: [])
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Minimise the video")

@@ -119,7 +119,7 @@ struct PhoneLiveSlide: View {
                 Image(systemName: "info")
                     .font(.system(size: 17, weight: .semibold))
                     .frame(width: 46, height: 46)
-                    .background(Chip.black)
+                    .background(Chip.black, ignoresSafeAreaEdges: [])
                     .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             }
             .buttonStyle(.plain)
@@ -134,7 +134,7 @@ struct PhoneLiveSlide: View {
             }
             .padding(.horizontal, 16)
             .frame(height: 46)
-            .background(Chip.black)
+            .background(Chip.black, ignoresSafeAreaEdges: [])
             .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
             Spacer()
             // Balances the info button, so the station's name sits centred.

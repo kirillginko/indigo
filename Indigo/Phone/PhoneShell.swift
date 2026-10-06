@@ -63,21 +63,39 @@ struct PhoneTabBar: View {
     let select: (PhoneTab) -> Void
     let search: () -> Void
 
-    /// Square cells edge to edge, as the player above them is square: an
-    /// icon over its name in small capitals, the one you are on in IDA's
-    /// green. Search is the last cell rather than a round button apart.
+    /// Square cells edge to edge, as the player above them is square, each
+    /// an icon over its name: the tabs in four greens, dark to light, and
+    /// Dig on the wordmark's moving sheen. The one you are on has its name in
+    /// a dark box.
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(PhoneTab.allCases, id: \.self) { tab in
-                cell(tab.symbol, tab.label, isOn: tab == selected) { select(tab) }
+            ForEach(Array(PhoneTab.allCases.enumerated()), id: \.element) { index, tab in
+                // Light words on the two deep greens, dark on the light ones.
+                cell(tab.symbol, tab.label, isOn: tab == selected,
+                     ink: index < 2 ? .white.opacity(0.9) : Chip.ink) { select(tab) }
+                    .background(Self.greens[index % Self.greens.count])
             }
+            // The wordmark's sheen, which always moves: the player's field
+            // stands still, and dark, while nothing plays.
             cell("magnifyingglass", "Dig", isOn: searching, action: search)
+                .background { MineralSheenSurface() }
+                .clipped()
         }
-        .background(Chip.black)
         .overlay(Rectangle().strokeBorder(.white.opacity(0.12)))
     }
 
-    private func cell(_ symbol: String, _ label: String, isOn: Bool, action: @escaping () -> Void) -> some View {
+    /// From the deepest to IDA's own.
+    private static let greens: [Color] = [
+        Color(red: 0.17, green: 0.27, blue: 0.19),
+        Color(red: 0.23, green: 0.35, blue: 0.25),
+        Color(red: 0.29, green: 0.42, blue: 0.30),
+        Chip.green
+    ]
+
+    private func cell(
+        _ symbol: String, _ label: String, isOn: Bool, ink: Color = Chip.ink,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             VStack(spacing: 5) {
                 Image(systemName: symbol)
@@ -88,12 +106,15 @@ struct PhoneTabBar: View {
                     .tracking(1)
                     .textCase(.uppercase)
                     .lineLimit(1)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .foregroundStyle(isOn ? .white : ink)
+                    .background(isOn ? Chip.black : .clear)
             }
-            .foregroundStyle(isOn ? Chip.ink : .white.opacity(0.85))
-            .frame(maxWidth: .infinity, minHeight: 56)
-            .background(isOn ? Chip.green : .clear)
+            .foregroundStyle(isOn ? .white : ink)
+            .frame(maxWidth: .infinity, minHeight: 58)
             .overlay(alignment: .trailing) {
-                Rectangle().fill(.white.opacity(0.08)).frame(width: 1)
+                Rectangle().fill(.black.opacity(0.25)).frame(width: 1)
             }
             .contentShape(Rectangle())
         }
@@ -267,7 +288,7 @@ struct PhoneNowPlayingView: View {
                     Image(systemName: "chevron.down")
                         .font(.system(size: 18, weight: .semibold))
                         .frame(width: 46, height: 46)
-                        .background(Chip.black)
+                        .background(Chip.black, ignoresSafeAreaEdges: [])
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close the player")
@@ -313,7 +334,7 @@ struct PhoneNowPlayingView: View {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
                         .font(.system(size: 15, weight: .semibold))
                         .frame(width: 40, height: 40)
-                        .background(Chip.black)
+                        .background(Chip.black, ignoresSafeAreaEdges: [])
                 }
                 .buttonStyle(.plain)
                 .padding(8)

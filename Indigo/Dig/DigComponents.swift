@@ -19,6 +19,8 @@ struct DigSection<Content: View>: View {
         if isPhone {
             // On the phone, the title in IDA's green box, and no rule.
             VStack(alignment: .leading, spacing: 0) {
+                // The title against the screen's left edge, as IDA sets its
+                // labels: the page's own margin is undone for it.
                 HStack(alignment: .center) {
                     Chip(text: title, tone: .lead, size: 11, uppercase: true)
                     Spacer(minLength: 8)
@@ -28,6 +30,7 @@ struct DigSection<Content: View>: View {
                             .foregroundStyle(.white.opacity(0.55))
                     }
                 }
+                .padding(.leading, -PhoneLayout.margin)
                 content
                     .padding(.top, 10)
             }
@@ -78,16 +81,16 @@ struct DigLine: View {
     /// it, touching.
     @ViewBuilder
     private var phoneLine: some View {
+        // The name over its detail, as two blocks touching: side by side, a
+        // long detail squeezed both into ellipses nobody could read.
         let row = HStack(spacing: 0) {
-            Chip(text: text, size: 13)
-                .lineLimit(2)
-                .layoutPriority(1)
-            if let detail, !detail.isEmpty {
-                // Free to shrink: pinned to its full width, a long detail
-                // ("… +3 releases here") made the row, and with it the whole
-                // window, wider than the phone.
-                Chip(text: detail, tone: .lead, size: 11)
-                    .lineLimit(1)
+            VStack(alignment: .leading, spacing: 0) {
+                Chip(text: text, size: 13)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let detail, !detail.isEmpty {
+                    Chip(text: detail, tone: .lead, size: 11)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 8)
             if action != nil {

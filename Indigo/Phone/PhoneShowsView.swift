@@ -181,11 +181,7 @@ struct PhoneShowsView: View {
     private func gridHeader(_ station: Station) -> some View {
         HStack(spacing: 12) {
             Button { feeds.showsStation = nil } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18, weight: .semibold))
-                    .frame(width: 46, height: 46)
-                    .background(Chip.black)
-                    .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
+                PhoneBackGlyph()
             }
             .buttonStyle(.plain)
             .accessibilityLabel("All stations")
