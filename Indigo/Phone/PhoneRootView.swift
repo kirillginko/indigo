@@ -109,6 +109,13 @@ struct PhoneRootView: View {
                 if !keyboardUp {
                     shell
                         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { shellHeight = $0 }
+                        // The home bar's strip under the tabs in the headers'
+                        // shade, as the status bar's is above them.
+                        .background(alignment: .bottom) {
+                            IndigoGlassBackground.header
+                                .frame(height: 0)
+                                .ignoresSafeArea(edges: .bottom)
+                        }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }

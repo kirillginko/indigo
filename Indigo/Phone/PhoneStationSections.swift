@@ -186,7 +186,7 @@ struct PhoneStationSectionPage: View {
             return nts.feed(.recentlyAdded).items.map { e in
                 let current = player.isCurrent("nts.episode.\(e.id)")
                 return PhoneEpisode(
-                    id: e.id, title: e.name, subtitle: e.location, date: e.broadcastAt, genres: e.genres,
+                    id: e.id, title: e.name, date: e.broadcastAt, genres: e.genres,
                     imageURL: e.artworkURL, isCurrent: current, isPlaying: current && player.isPlaying,
                     play: { nts.play(e, isCurrent: current, player: player, appState: appState) },
                     open: { appState.open(.ntsEpisode(show: e.showAlias, episode: e.episodeAlias)) })

@@ -269,7 +269,8 @@ struct PhoneEpisodeRow: View {
                 }
                 Spacer(minLength: 0)
             }
-            .frame(maxHeight: .infinity)
+            // As wide as a date, so the date never runs into the title.
+            .frame(minWidth: episode.date == nil ? 0 : 76, maxHeight: .infinity, alignment: .trailing)
             .overlay(alignment: .topTrailing) {
                 if let date = episode.date {
                     Text(date.formatted(Self.dateFormat))

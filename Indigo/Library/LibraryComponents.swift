@@ -61,7 +61,7 @@ struct PageHeader<Trailing: View>: View {
         .padding(.bottom, isPhone ? 12 : 16)
         // Solid, and a step darker than the page under it. Only the sidebar
         // stays glass.
-        .background(IndigoGlassBackground.header)
+        .background(IndigoGlassBackground.header.ignoresSafeArea(edges: isPhone ? .top : []))
         // The way to the mini player, in the corner of every page's header
         // rather than on the player: the player is for what is playing.
         .overlay(alignment: .topTrailing) {
