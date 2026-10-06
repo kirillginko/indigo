@@ -127,6 +127,7 @@ struct PhoneMiniPlayer: View {
                         glyphScale: 0.3,
                         markURL: StationMark.logoURL(for: item.sourceID)
                     )
+                    .clipShape(Circle())
                     VStack(alignment: .leading, spacing: 0) {
                         Text(NowPlayingLines.primary(item, show))
                             .font(Typeface.mono(12.5, weight: .medium))
@@ -145,25 +146,26 @@ struct PhoneMiniPlayer: View {
                             .background(Chip.green)
                     }
                     Spacer(minLength: 0)
+                    transport("backward.fill", label: "Previous", size: 15) { player.previous() }
+                    transport(player.isPlaying ? "pause.fill" : "play.fill",
+                              label: player.isPlaying ? "Pause" : "Play", size: 20) { player.toggle() }
+                    transport("forward.fill", label: "Next", size: 15) { player.next() }
                     let _ = crate.revision
                     let crated = crate.isCrated(nowPlaying: item, liveShow: show)
                     transport(crated ? "checkmark.square.fill" : "plus.square",
                               label: crated ? "Remove from crate" : "Add to crate", size: 17) {
                         crate.toggle(nowPlaying: item, liveShow: show)
                     }
-                    transport("backward.fill", label: "Previous", size: 15) { player.previous() }
-                    transport(player.isPlaying ? "pause.fill" : "play.fill",
-                              label: player.isPlaying ? "Pause" : "Play", size: 20) { player.toggle() }
-                    transport("forward.fill", label: "Next", size: 15) { player.next() }
                 }
-                .padding(.leading, 7)
-                .padding(.trailing, 6)
-                .frame(height: 60)
+                .padding(.leading, 8)
+                .padding(.trailing, 12)
+                .frame(height: 62)
                 .foregroundStyle(.white)
+                // Rounded as the tab bar under it is.
                 .background { PlayerShaderBackdrop() }
-                .clipped()
-                .overlay(Rectangle().strokeBorder(.white.opacity(0.12)))
-                .contentShape(Rectangle())
+                .clipShape(Capsule())
+                .overlay(Capsule().strokeBorder(.white.opacity(0.12)))
+                .contentShape(Capsule())
                 .onTapGesture(perform: open)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint("Opens the player")
@@ -230,26 +232,30 @@ struct PhoneNowPlayingView: View {
                         Spacer(minLength: 0)
                         picture(item, show)
                         VStack(spacing: 10) {
-                            ChipFlow {
-                                // An upload's source says nothing the
-                                // thumbnail does not.
-                                if !isVideo {
+                            // An upload's source says nothing the thumbnail
+                            // does not.
+                            if !isVideo {
+                                ChipFlow {
                                     Chip(text: NowPlayingSummary.sourceLabel(for: item), tone: .lead, size: 13, uppercase: true)
                                 }
-                                Chip(text: NowPlayingLines.primary(item, show), size: 18)
                             }
-                            let secondary = NowPlayingLines.secondary(item, show)
-                            if !secondary.isEmpty {
-                                ChipFlow { Chip(text: secondary, size: 13) }
-                            }
+                            // The episode's name, and the crate beside it.
                             let _ = crate.revision
                             let crated = crate.isCrated(nowPlaying: item, liveShow: show)
-                            Button { crate.toggle(nowPlaying: item, liveShow: show) } label: {
-                                Chip(text: crated ? "✓ In crate" : "+ Crate",
-                                     tone: crated ? .lead : .plain, size: 13, uppercase: true)
+                            HStack(alignment: .center, spacing: 10) {
+                                Chip(text: NowPlayingLines.primary(item, show), size: 18)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Button { crate.toggle(nowPlaying: item, liveShow: show) } label: {
+                                    Image(systemName: crated ? "checkmark.square.fill" : "plus.square")
+                                        .font(.system(size: 24, weight: .regular))
+                                        .foregroundStyle(crated ? Chip.green : .white)
+                                        .frame(width: 40, height: 40)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(crated ? "Remove from crate" : "Add to crate")
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(crated ? "Remove from crate" : "Add to crate")
                         }
                         .padding(.horizontal, 20)
                         PhoneScrubber(show: show)
