@@ -81,10 +81,13 @@ struct DigLine: View {
         let row = HStack(spacing: 0) {
             Chip(text: text, size: 13)
                 .lineLimit(2)
+                .layoutPriority(1)
             if let detail, !detail.isEmpty {
+                // Free to shrink: pinned to its full width, a long detail
+                // ("… +3 releases here") made the row, and with it the whole
+                // window, wider than the phone.
                 Chip(text: detail, tone: .lead, size: 11)
                     .lineLimit(1)
-                    .fixedSize()
             }
             Spacer(minLength: 8)
             if action != nil {

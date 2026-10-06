@@ -216,7 +216,7 @@ struct ArtistDigView: View {
                             }
                         }
                     } else if !profile.styles.isEmpty || !profile.genres.isEmpty || !profile.aliases.isEmpty {
-                        HStack(alignment: .top, spacing: 34) {
+                        (AnyLayout.columns(phone: isPhone)) {
                             genresSection(profile)
                             if !profile.aliases.isEmpty {
                                 DigSection(title: "Aliases") {

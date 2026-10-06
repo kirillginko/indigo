@@ -108,3 +108,31 @@ struct PhoneDetailTopBar: View {
         .accessibilityLabel(label)
     }
 }
+
+/// A DIG page's chrome on the phone: the page runs up under the status bar,
+/// its picture to the top, and back and crate float over it. Off the phone,
+/// nothing.
+struct PhoneDetailChrome: ViewModifier {
+    let isPhone: Bool
+    var isCrated: Bool?
+    var toggleCrate: () -> Void = {}
+
+    func body(content: Content) -> some View {
+        content
+            .ignoresSafeArea(edges: isPhone ? .top : [])
+            .overlay(alignment: .top) {
+                if isPhone {
+                    PhoneDetailTopBar(isCrated: isCrated, toggleCrate: toggleCrate)
+                }
+            }
+    }
+}
+
+extension AnyLayout {
+    /// Columns side by side, or, on the phone, one under the other.
+    static func columns(phone: Bool, spacing: CGFloat = 34) -> AnyLayout {
+        phone
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 26))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: spacing))
+    }
+}
