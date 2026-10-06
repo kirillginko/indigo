@@ -167,10 +167,10 @@ struct PhoneLiveSlide: View {
             }
             if let next {
                 ChipFlow {
-                    Chip(text: "Next up", size: 12.5, uppercase: true)
                     if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
                         Chip(text: time, tone: .sheen, size: 12.5)
                     }
+                    Chip(text: "Next up", size: 12.5, uppercase: true)
                 }
                 ChipFlow { Chip(text: next.title, size: 15) }
             }
