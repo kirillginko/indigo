@@ -403,6 +403,17 @@ struct ArtworkView: View {
         return RemoteArtworkStore.shared.cachedImage(for: remote, pixels: pixels)
     }
 
+    /// The same picture at whatever size is already held -- under the
+    /// sharper address or the one it was asked by (the mini player's cover,
+    /// say) -- shown while the size this tile wants loads, instead of the
+    /// grey ground.
+    private var cachedStandIn: PlatformImage? {
+        let store = RemoteArtworkStore.shared
+        if let remote, let held = store.anyCachedImage(for: remote) { return held }
+        if let asked = Self.usable(remoteURL), let held = store.anyCachedImage(for: asked) { return held }
+        return nil
+    }
+
     private var cachedPreview: PlatformImage? {
         guard let preview = distinctPreviewURL else { return nil }
         // Any size held will do while the right one loads: the same picture,
@@ -464,7 +475,7 @@ struct ArtworkView: View {
                         .resizable()
                         .interpolation(.medium)
                         .aspectRatio(contentMode: .fill)
-                } else if let full = remoteImage ?? cachedFull {
+                } else if let full = remoteImage ?? cachedFull ?? cachedStandIn {
                     Image(platformImage: full)
                         .resizable()
                         .interpolation(.medium)

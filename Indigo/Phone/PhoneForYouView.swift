@@ -94,6 +94,14 @@ struct PhoneForYouView: View {
             .ignoresSafeArea()
         }
         .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
+        // The suggested artists' portraits, asked for ahead of the rest -- and
+        // a small one already held replaced with the full-size picture.
+        .task(id: dig.exploreOffers.artists.count + dig.exploreOffers.next.count) {
+            let names = Self.slides(from: dig.exploreOffers)
+                .filter { $0.node.kind == .artist }
+                .map(\.node.title)
+            if !names.isEmpty { dig.wantPortraits(for: Array(names.prefix(24))) }
+        }
     }
 
     /// One show from each station, in an order of its own -- not Live's -- so
@@ -194,13 +202,29 @@ private struct PhoneForYouSlide: View {
     @Environment(PlaybackCoordinator.self) private var player
 
     private var isShow: Bool { suggestion.node.kind == .broadcast }
-    private var picture: URL? { suggestion.node.artworkURL ?? portrait }
+    /// An artist's portrait first: it is asked for at full size (and a small
+    /// one replaced while on screen); the node's own picture was saved as
+    /// Discogs' 150-pixel thumb, for rows.
+    private var picture: URL? {
+        suggestion.node.kind == .artist ? (portrait ?? suggestion.node.artworkURL) : suggestion.node.artworkURL
+    }
+
+    /// Discogs' thumb, which cannot be asked for larger: drawn as a square
+    /// over the moving field at a size it holds, not blown up full-screen.
+    private var isSmall: Bool { DiscogsClient.isSmallCut(picture?.absoluteString) }
 
     var body: some View {
         ZStack {
             GeometryReader { proxy in
                 Group {
-                    if let picture {
+                    if let picture, isSmall {
+                        ZStack {
+                            PlayerShaderBackdrop()
+                            ArtworkView(remoteURL: picture, side: min(proxy.size.width * 0.62, 260), glyphScale: 0.3)
+                                .shadow(color: .black.opacity(0.4), radius: 20, y: 10)
+                                .offset(y: -proxy.size.height * 0.16)
+                        }
+                    } else if let picture {
                         ArtworkView(remoteURL: picture, side: max(proxy.size.width, proxy.size.height), glyphScale: 0.3)
                     } else {
                         PlayerShaderBackdrop()
@@ -227,12 +251,13 @@ private struct PhoneForYouSlide: View {
                     // What it is and its name, why it is here, and what it
                     // was reached through, in IDA's boxes; the button last, at
                     // the bottom, as on every slide.
+                    // One row each: what it is, its name, what more it says.
                     Button(action: open) {
-                        ChipFlow {
-                            Chip(text: isShow ? "Radio show" : kindLabel, tone: .lead, uppercase: true)
-                            Chip(text: suggestion.node.title, size: 19)
+                        VStack(spacing: 8) {
+                            ChipFlow { Chip(text: isShow ? "Radio show" : kindLabel, tone: .lead, uppercase: true) }
+                            ChipFlow { Chip(text: suggestion.node.title, size: 19) }
                             if let subtitle = suggestion.node.subtitle, !subtitle.isEmpty {
-                                Chip(text: subtitle, size: 13)
+                                ChipFlow { Chip(text: subtitle, size: 13) }
                             }
                         }
                     }

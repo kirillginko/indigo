@@ -317,7 +317,8 @@ struct PhoneNowPlayingView: View {
             remoteURL: show?.artworkURL ?? item.remoteArtworkURL,
             side: 300,
             glyphScale: 0.3,
-            markURL: StationMark.logoURL(for: item.sourceID)
+            markURL: StationMark.logoURL(for: item.sourceID),
+            showsGround: false
         )
         .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
         .overlay(alignment: .topTrailing) {
