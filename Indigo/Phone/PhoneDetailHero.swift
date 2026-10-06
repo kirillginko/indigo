@@ -53,7 +53,7 @@ struct PhoneDetailHero: View {
                 }
                 if !genres.isEmpty {
                     ChipFlow {
-                        ForEach(genres.prefix(4), id: \.self) { Chip(text: $0, size: 12, uppercase: true) }
+                        ForEach(genres.prefix(4), id: \.self) { Chip.genre($0, size: 12) }
                     }
                 }
             }

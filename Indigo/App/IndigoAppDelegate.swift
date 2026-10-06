@@ -66,12 +66,39 @@ final class IndigoAppDelegate: NSObject, UIApplicationDelegate {
         }
     }
 
+    /// The iPhone stays upright, except while a video is full screen; the
+    /// iPad turns freely. See `OrientationLock`.
+    func application(
+        _ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        UIDevice.current.userInterfaceIdiom == .phone ? OrientationLock.mask : .all
+    }
+
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Trace.note("sync: registered for pushes")
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         Trace.note("sync: could not register for pushes (\(error)); other devices' changes arrive at launch only")
+    }
+}
+
+/// Which ways the iPhone may turn. Upright, so the phone layout is never
+/// laid out sideways (turned, it took two turns to come back, and the larger
+/// phones swapped to the Mac's layout); on its side only for a video full
+/// screen, which turns to landscape on its own.
+@MainActor
+enum OrientationLock {
+    static private(set) var mask: UIInterfaceOrientationMask = .portrait
+
+    static func allowsLandscape(_ landscape: Bool) {
+        mask = landscape ? .landscape : .portrait
+        guard let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene }).first else { return }
+        for window in scene.windows {
+            window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()
+        }
+        scene.requestGeometryUpdate(.iOS(interfaceOrientations: landscape ? .landscapeRight : .portrait))
     }
 }
 #endif

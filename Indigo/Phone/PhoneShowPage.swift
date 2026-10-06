@@ -113,7 +113,7 @@ struct PhoneShowPage: View {
                     ChipFlow { Chip(text: title, size: 20) }
                     if !genres.isEmpty {
                         ChipFlow {
-                            ForEach(genres.prefix(4), id: \.self) { Chip(text: $0, size: 12, uppercase: true) }
+                            ForEach(genres.prefix(4), id: \.self) { Chip.genre($0, size: 12) }
                         }
                     }
                 }
@@ -248,15 +248,10 @@ struct PhoneEpisodeRow: View {
             .frame(maxWidth: .infinity, minHeight: Self.side, alignment: .leading)
 
             // The date at the top right, play and crate under it.
-            VStack(alignment: .trailing, spacing: 0) {
-                if let date = episode.date {
-                    Text(date.formatted(Self.dateFormat))
-                        .font(Typeface.mono(11))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .monospacedDigit()
-                        .fixedSize()
-                }
-                Spacer(minLength: 8)
+            // Play and crate centred in the row's height; the date over them,
+            // at the top right.
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
                 HStack(spacing: 6) {
                 Button(action: episode.play) {
                     Image(systemName: episode.isCurrent && episode.isPlaying ? "pause.fill" : "play.fill")
@@ -271,6 +266,17 @@ struct PhoneEpisodeRow: View {
                 .opacity(episode.isPlayable ? 1 : 0)
                 .accessibilityLabel(episode.isCurrent && episode.isPlaying ? "Pause \(episode.title)" : "Play \(episode.title)")
                 if let crate = episode.crate { crate }
+                }
+                Spacer(minLength: 0)
+            }
+            .frame(maxHeight: .infinity)
+            .overlay(alignment: .topTrailing) {
+                if let date = episode.date {
+                    Text(date.formatted(Self.dateFormat))
+                        .font(Typeface.mono(11))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .monospacedDigit()
+                        .fixedSize()
                 }
             }
             .padding(.leading, 8)
@@ -296,7 +302,7 @@ struct PhoneEpisodeRow: View {
     private func genreBoxes(_ count: Int) -> some View {
         HStack(spacing: 6) {
             ForEach(episode.genres.prefix(count), id: \.self) { genre in
-                Chip(text: genre, size: 11, uppercase: true).fixedSize()
+                Chip.genre(genre).fixedSize()
             }
         }
     }

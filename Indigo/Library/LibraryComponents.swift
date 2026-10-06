@@ -17,6 +17,7 @@ struct PageHeader<Trailing: View>: View {
     var subtitle: String?
     var accessory: AnyView?
     @ViewBuilder var trailing: Trailing
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -54,9 +55,10 @@ struct PageHeader<Trailing: View>: View {
                 accessory.padding(.top, 14)
             }
         }
-        .padding(.horizontal, Metrics.gutter)
-        .padding(.top, Metrics.titleBarInset + 20)
-        .padding(.bottom, 16)
+        .padding(.horizontal, isPhone ? PhoneLayout.margin : Metrics.gutter)
+        // The Mac keeps room for its window buttons; the phone has none.
+        .padding(.top, isPhone ? 6 : Metrics.titleBarInset + 20)
+        .padding(.bottom, isPhone ? 12 : 16)
         // Solid, and a step darker than the page under it. Only the sidebar
         // stays glass.
         .background(IndigoGlassBackground.header)

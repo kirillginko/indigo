@@ -41,6 +41,12 @@ is a separate fact from its time, so it is its own row.
 
 Labels (kinds, sections, NEXT UP, ON NOW) are in small capitals.
 
+**Greens tell neighbours apart.** A genre is always a green box in its own
+shade (`Chip.genre`), chosen from the genre's name, so the same genre is
+the same green everywhere and genres side by side read separately. Down a
+tracklist each line's artist box takes the next green (`Chip.green(at:)`).
+The five greens (`Chip.greens`) are all light enough for the dark ink.
+
 ## 4. Square content, round controls
 
 - **Square**: everything you read or open: boxes, pictures, cards, rows,
@@ -63,7 +69,16 @@ Labels (kinds, sections, NEXT UP, ON NOW) are in small capitals.
 - Text is in boxes centred on the slide for heroes and live slides, and
   left-aligned in lists.
 
-## 6. Navigation
+## 6. Orientation and edges
+
+- The iPhone stays upright. Only a video full screen turns to landscape,
+  on its own, and back when it is minimised (`OrientationLock`).
+- Rows' buttons (play, crate) are centred in the row's height; a date sits
+  at the top right over them.
+- No empty bands: page headers keep no room for the Mac's window buttons
+  on the phone, the home bar fades out, and the tab bar sits in its strip.
+
+## 7. Navigation
 
 - Every station section the Mac lists is reachable on the phone, from the
   Shows tab (each station opens out, an accordion, to its shows and its

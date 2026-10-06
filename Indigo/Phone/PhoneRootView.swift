@@ -74,6 +74,8 @@ struct PhoneRootView: View {
         .onChange(of: player.embedProvider) { _, provider in
             if provider != .youtube { videoFullScreen = false }
         }
+        // Full screen, a video turns to landscape; back, the phone stands up.
+        .onChange(of: videoUp) { _, up in OrientationLock.allowsLandscape(up) }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
         .modifier(RootChrome(bottomInset: keyboardUp || showsNowPlaying ? 0 : shellHeight, hostsEmbedPlayer: false))
         // The page's dark ground to the screen's edges, under the status bar
@@ -81,6 +83,8 @@ struct PhoneRootView: View {
         // phone is dark throughout.
         .background { IndigoGlassBackground.content.ignoresSafeArea() }
         .preferredColorScheme(.dark)
+        // The home bar fades until the screen is touched near it.
+        .persistentSystemOverlays(.hidden)
         .environment(\.colorScheme, .dark)
         .environment(\.isPhoneLayout, true)
         .animation(.easeOut(duration: 0.2), value: keyboardUp)
@@ -118,7 +122,7 @@ struct PhoneRootView: View {
         // Up, it stops above the controls: YouTube sets its captions along
         // the bottom of its frame, and over the whole screen they covered
         // the seek bar's times.
-        let up = CGSize(width: size.width, height: max(200, size.height - Self.videoControlsHeight))
+        let up = CGSize(width: size.width, height: max(200, size.height - controlsHeight))
         return EmbedPlayerSurface(engine: player.embed)
             .frame(width: videoUp ? up.width : parked.width,
                    height: videoUp ? up.height : parked.height)
@@ -129,27 +133,41 @@ struct PhoneRootView: View {
             .accessibilityHidden(!videoUp)
     }
 
-    /// The room kept under the full-screen video for its controls.
-    private static let videoControlsHeight: CGFloat = 150
+    private var isLandscape: Bool { size.width > size.height }
+
+    /// The room kept under the full-screen video for its controls: on its
+    /// side, one slim row, so the picture keeps the height.
+    private var controlsHeight: CGFloat { isLandscape ? 64 : 150 }
 
     /// Along the bottom of the full-screen video: play and pause, and the
-    /// seek bar.
+    /// seek bar -- stacked upright, side by side in landscape.
     private var videoControls: some View {
         VStack(spacing: 14) {
             Spacer()
-            Button { player.toggle() } label: {
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 60, height: 60)
-                    .background(Chip.black, ignoresSafeAreaEdges: [])
+            if isLandscape {
+                HStack(spacing: 18) {
+                    playPause(side: 44)
+                    PhoneScrubber()
+                }
+            } else {
+                playPause(side: 60)
+                PhoneScrubber()
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
-            PhoneScrubber()
         }
         .padding(.horizontal, 24)
-        .padding(.bottom, 18)
+        .padding(.bottom, isLandscape ? 8 : 18)
+    }
+
+    private func playPause(side: CGFloat) -> some View {
+        Button { player.toggle() } label: {
+            Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                .font(.system(size: side * 0.46, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: side, height: side)
+                .background(Chip.black, ignoresSafeAreaEdges: [])
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
     }
 
     /// Back to the thumbnail; the video plays on. Top left, where the full
@@ -186,7 +204,9 @@ struct PhoneRootView: View {
         }
         .padding(.horizontal, 14)
         .padding(.top, 8)
-        .padding(.bottom, 2)
+        // Down into the home bar's strip, which the bar fades out of: kept
+        // clear, it was an empty band under the tabs.
+        .padding(.bottom, -14)
     }
 }
 #endif

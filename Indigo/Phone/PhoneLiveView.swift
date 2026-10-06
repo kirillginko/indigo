@@ -160,7 +160,7 @@ struct PhoneLiveSlide: View {
             }
             if !genres.isEmpty {
                 ChipFlow {
-                    ForEach(genres, id: \.self) { Chip(text: $0, size: 12.5, uppercase: true) }
+                    ForEach(genres, id: \.self) { Chip.genre($0, size: 12.5) }
                 }
             }
             if let next {

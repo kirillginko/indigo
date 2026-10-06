@@ -93,6 +93,18 @@ extension Chip {
     ]
 
     static func green(at index: Int) -> Color { greens[index % greens.count] }
+
+    /// A genre's own green: the same genre is the same shade everywhere it
+    /// appears, and genres side by side are told apart.
+    static func green(for text: String) -> Color {
+        let sum = text.lowercased().unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
+        return green(at: sum)
+    }
+
+    /// A genre, in its green.
+    static func genre(_ text: String, size: CGFloat = 11) -> Chip {
+        Chip(text: text, tone: .lead, size: size, uppercase: true, fill: green(for: text))
+    }
 }
 
 /// Boxes laid edge to edge, wrapped onto further lines, each line centred.

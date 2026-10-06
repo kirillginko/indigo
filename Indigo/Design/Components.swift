@@ -51,7 +51,7 @@ struct TagChip: View {
     var body: some View {
         // On the phone, IDA's box.
         if isPhone {
-            Chip(text: text, size: 11, uppercase: true).fixedSize()
+            Chip.genre(text).fixedSize()
         } else {
             outlined
         }
