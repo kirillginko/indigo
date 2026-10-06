@@ -77,8 +77,7 @@ The Mac's `Typeface.display` and `body` are not used on phone pages.
   sit against the screen's left edge, past the margin.
 - **Rows** are 8 pt apart inside a block; sections 18–26 pt apart.
 - **Grids** are two to a row, 2 pt gutters, square cards, the name in a box
-  along the bottom (Shows grids, Dig shelves, station sections). Only the
-  For You cover keeps its small five-wide station grid.
+  along the bottom (Shows grids, Dig shelves, station sections).
 - **Heroes** are the picture the width of the screen, square, darkened
   towards the bottom, with the words centred over it.
 - **Edges**: no empty bands. Phone headers keep no room for the Mac's
@@ -180,6 +179,14 @@ built from a station's broadcast; they use the same `PhoneEpisodeRow`.
 ---
 
 ## 8. Page templates
+
+**For You** — first screen: the For You shader uncovered, an ASCII globe
+turning in it (`PhoneForYouGlobe`), and IDA boxes pinned about its
+surface, kind or city in green over the name: the suggestions the Mac's
+For You has, or before anything is kept, every station (tap to play) and
+one Archives box. Boxes fade round the back and stay on screen at the
+edges; the globe turns by hand sideways; swiping up goes to the
+suggestions, one a screen.
 
 **Live slide** — picture full-bleed; top: info (round), station pill;
 bottom, one row each: city · show · genres · `NextUpRows` · PLAY.
