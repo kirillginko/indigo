@@ -127,7 +127,7 @@ struct PhoneMiniPlayer: View {
                         glyphScale: 0.3,
                         markURL: StationMark.logoURL(for: item.sourceID)
                     )
-                    .clipShape(Circle())
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                     VStack(alignment: .leading, spacing: 0) {
                         Text(NowPlayingLines.primary(item, show))
                             .font(Typeface.mono(12.5, weight: .medium))
@@ -161,11 +161,11 @@ struct PhoneMiniPlayer: View {
                 .padding(.trailing, 12)
                 .frame(height: 62)
                 .foregroundStyle(.white)
-                // Rounded as the tab bar under it is.
+                // Softly rounded, of a piece with the tab bar under it.
                 .background { PlayerShaderBackdrop() }
-                .clipShape(Capsule())
-                .overlay(Capsule().strokeBorder(.white.opacity(0.12)))
-                .contentShape(Capsule())
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.white.opacity(0.12)))
+                .contentShape(RoundedRectangle(cornerRadius: 12))
                 .onTapGesture(perform: open)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint("Opens the player")
