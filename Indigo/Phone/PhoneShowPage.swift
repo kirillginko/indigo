@@ -225,21 +225,11 @@ struct PhoneEpisodeRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 // The title and who made it touch, as in the player.
                 VStack(alignment: .leading, spacing: 0) {
-                    HStack(alignment: .top, spacing: 8) {
-                        // Playing, the title takes the wordmark's sheen.
-                        Chip(text: episode.title, tone: episode.isCurrent ? .sheen : .plain, size: 13)
-                            .lineLimit(3)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        if let date = episode.date {
-                            Text(date.formatted(Self.dateFormat))
-                                .font(Typeface.mono(12))
-                                .foregroundStyle(.white.opacity(0.6))
-                                .monospacedDigit()
-                                .fixedSize()
-                                .padding(.top, 6)
-                        }
-                    }
+                    // Playing, the title takes the wordmark's sheen. The whole
+                    // width is the title's: the date stands over the buttons.
+                    Chip(text: episode.title, tone: episode.isCurrent ? .sheen : .plain, size: 13)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
                     if let subtitle = episode.subtitle, !subtitle.isEmpty {
                         Chip(text: subtitle, tone: .lead, size: 12)
                             .lineLimit(1)
@@ -257,7 +247,17 @@ struct PhoneEpisodeRow: View {
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, minHeight: Self.side, alignment: .leading)
 
-            HStack(spacing: 6) {
+            // The date at the top right, play and crate under it.
+            VStack(alignment: .trailing, spacing: 0) {
+                if let date = episode.date {
+                    Text(date.formatted(Self.dateFormat))
+                        .font(Typeface.mono(11))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .monospacedDigit()
+                        .fixedSize()
+                }
+                Spacer(minLength: 8)
+                HStack(spacing: 6) {
                 Button(action: episode.play) {
                     Image(systemName: episode.isCurrent && episode.isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 13))
@@ -271,8 +271,11 @@ struct PhoneEpisodeRow: View {
                 .opacity(episode.isPlayable ? 1 : 0)
                 .accessibilityLabel(episode.isCurrent && episode.isPlaying ? "Pause \(episode.title)" : "Play \(episode.title)")
                 if let crate = episode.crate { crate }
+                }
             }
-            .padding(.horizontal, 10)
+            .padding(.leading, 8)
+            .padding(.trailing, 10)
+            .padding(.vertical, 10)
             .frame(minHeight: Self.side)
         }
         .opacity(episode.isPlayable || !episode.fadesUnplayable ? 1 : 0.55)

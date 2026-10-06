@@ -171,7 +171,9 @@ struct DigReleaseView: View {
                                 VStack(spacing: 0) {
                                     ForEach(profile.tracks) { track in
                                         if isPhone {
-                                            phoneTrack(track)
+                                            phoneTrack(track, green: Chip.green(
+                                                at: profile.tracks.firstIndex { $0.id == track.id } ?? 0
+                                            ))
                                         } else {
                                         HStack(spacing: 14) {
                                             Text(track.position.isEmpty ? "—" : track.position)
@@ -533,7 +535,7 @@ struct DigReleaseView: View {
     /// Styles first, then any genre the styles did not already cover.
     /// A track on the phone: its position, the title in a box over the
     /// artist in a green one where the track names its own, and its length.
-    private func phoneTrack(_ track: DigReleaseProfile.TrackLine) -> some View {
+    private func phoneTrack(_ track: DigReleaseProfile.TrackLine, green: Color) -> some View {
         HStack(spacing: 10) {
             Text(track.position.isEmpty ? "—" : track.position)
                 .font(Typeface.mono(11))
@@ -543,7 +545,7 @@ struct DigReleaseView: View {
                 Chip(text: track.title, size: 13)
                     .lineLimit(2)
                 if let artist = track.artist {
-                    Chip(text: artist, tone: .lead, size: 12).lineLimit(1)
+                    Chip(text: artist, tone: .lead, size: 12, fill: green).lineLimit(1)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

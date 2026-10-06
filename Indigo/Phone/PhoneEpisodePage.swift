@@ -170,7 +170,9 @@ struct PhoneEpisodePage: View {
         if !tracks.isEmpty {
             DigSection(title: "Tracklist", trailing: "\(tracks.count)") {
                 VStack(spacing: 0) {
-                    ForEach(tracks) { line($0) }
+                    ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
+                        line(track, green: Chip.green(at: index))
+                    }
                 }
                 .padding(.horizontal, -16)
             }
@@ -183,7 +185,7 @@ struct PhoneEpisodePage: View {
         }
     }
 
-    private func line(_ track: PhoneTrackLine) -> some View {
+    private func line(_ track: PhoneTrackLine, green: Color) -> some View {
         HStack(spacing: 10) {
             if let marker = track.marker {
                 Text(marker)
@@ -198,7 +200,7 @@ struct PhoneEpisodePage: View {
                     .fixedSize(horizontal: false, vertical: true)
                 if let artist = track.artist, !artist.isEmpty {
                     Button { appState.open(.digArtist(mbid: nil, name: artist)) } label: {
-                        Chip(text: artist, tone: .lead, size: 12).lineLimit(1)
+                        Chip(text: artist, tone: .lead, size: 12, fill: green).lineLimit(1)
                     }
                     .buttonStyle(.plain)
                     .disabled(!ArtistName.isRealArtist(artist))

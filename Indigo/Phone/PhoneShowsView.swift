@@ -150,10 +150,10 @@ struct PhoneShowsView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: opens ? "chevron.down" : "chevron.right")
+                Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
-                    .rotationEffect(.degrees(opens && isOpen ? 180 : 0))
+                    .rotationEffect(.degrees(opens && isOpen ? 90 : 0))
                     .padding(.trailing, 16)
             }
             .background(PhoneShowPage.rowGround)

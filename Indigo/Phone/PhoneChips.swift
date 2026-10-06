@@ -24,6 +24,8 @@ struct Chip: View {
     var tone: ChipTone = .plain
     var size: CGFloat = 15
     var uppercase = false
+    /// A shade in place of the tone's own colour, keeping its ink.
+    var fill: Color? = nil
 
     static let green = Color(red: 0.36, green: 0.49, blue: 0.36)
     static let black = Color(red: 0.11, green: 0.13, blue: 0.12)
@@ -41,6 +43,15 @@ struct Chip: View {
 
     @ViewBuilder
     private var background: some View {
+        if let fill {
+            fill
+        } else {
+            toneBackground
+        }
+    }
+
+    @ViewBuilder
+    private var toneBackground: some View {
         switch tone {
         case .lead: Self.green
         case .plain: Self.black
@@ -68,6 +79,20 @@ struct NextUpRows: View {
             ChipFlow { Chip(text: next.title, size: 15) }
         }
     }
+}
+
+extension Chip {
+    /// Greens to step through down a tracklist, one a line, so each line's
+    /// artist reads as its own: all light enough for the dark ink.
+    static let greens: [Color] = [
+        Color(red: 0.36, green: 0.49, blue: 0.36),
+        Color(red: 0.42, green: 0.56, blue: 0.38),
+        Color(red: 0.33, green: 0.52, blue: 0.43),
+        Color(red: 0.47, green: 0.58, blue: 0.42),
+        Color(red: 0.39, green: 0.54, blue: 0.47)
+    ]
+
+    static func green(at index: Int) -> Color { greens[index % greens.count] }
 }
 
 /// Boxes laid edge to edge, wrapped onto further lines, each line centred.
