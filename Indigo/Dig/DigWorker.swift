@@ -274,6 +274,41 @@ actor DigWorker {
         )
     }
 
+    /// The backend's answers, kept by entity between looks and across launches.
+    private var backendCache: BackendKnowledgeCache?
+
+    /// For You as the backend's knowledge would have it, beside the one on
+    /// screen. Asks the backend only for starting points and artists whose
+    /// answers are missing or from an older edge generation; ranks with the
+    /// same pure ranker; never shows anything. See `BackendKnowledge.swift`.
+    func exploreShadow(
+        _ visible: ExploreRun, asOf: Date, turn: Int, now: Date,
+        call: @escaping BackendKnowledgeFetcher.Call = BackendKnowledgeFetcher.live,
+        cacheURL: URL? = BackendKnowledgeCache.fileURL
+    ) async -> ShadowReport {
+        var cache = backendCache ?? BackendKnowledgeCache.load(from: cacheURL)
+        let origins = ExploreRanker.startingPoints(visible.personal)
+        let artists = BackendKnowledgeAdapter.artistsWanted(visible.personal, deviceLocal: visible.knowledge.deviceLocal)
+        let fetch = await BackendKnowledgeFetcher.refresh(&cache, nodes: origins, artists: artists, now: now, call: call)
+        backendCache = cache
+        if fetch.calls > 0 { cache.save(to: cacheURL) }
+
+        let (snapshot, coverage) = Trace.step("explore.shadow") {
+            BackendKnowledgeAdapter.snapshot(
+                personal: visible.personal, deviceLocal: visible.knowledge.deviceLocal, cache: cache, now: now)
+        }
+        let comparison = ShadowComparison.compare(
+            visible: ShadowComparison.ranking(personal: visible.personal, knowledge: visible.knowledge, asOf: asOf, turn: turn),
+            backend: ShadowComparison.ranking(personal: visible.personal, knowledge: snapshot, asOf: asOf, turn: turn),
+            backendKnowledge: snapshot
+        )
+        return ShadowReport(
+            comparison: comparison, coverage: coverage, fetch: fetch,
+            visibleShared: visible.stamp.shared, backendShared: CanonicalDigest.of(snapshot.shared),
+            deviceLocal: visible.stamp.deviceLocal, at: now
+        )
+    }
+
     /// The blocks somebody can act on, ranked from a run. Pure; here only to
     /// stay off the thread that draws.
     func exploreRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {

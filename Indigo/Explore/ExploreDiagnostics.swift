@@ -28,6 +28,8 @@ final class ExploreDiagnostics {
 
     /// The last look this process made.
     private(set) var latest: Entry?
+    /// The last time the backend's For You was set beside it.
+    private(set) var shadow: ShadowReport?
 
     nonisolated struct Entry: Codable, Equatable, Sendable {
         var stamp: ExploreStamp
@@ -83,6 +85,16 @@ final class ExploreDiagnostics {
             .map { "\($0.key)=\(Int($0.value.rounded()))ms" }.joined(separator: " ")
         let sizes = entry.report.bytes.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)B" }.joined(separator: " ")
         Trace.note("explore.stamp \(entry.code) rebuilt=[\(entry.report.rebuilt.joined(separator: ","))] \(parts) \(sizes)")
+    }
+
+    func record(shadow report: ShadowReport) {
+        shadow = report
+        let c = report.comparison
+        let ms = report.fetch.milliseconds.map { "\(Int($0.rounded()))" }.joined(separator: "+")
+        Trace.note("explore.shadow source=\(report.source) top12=\(c.top12Overlap)/12 top20=\(c.top20Overlap)/20 "
+                   + "missing=[\(c.missingKinds.joined(separator: ","))] reworded=\(c.reworded.count) "
+                   + "calls=\(report.fetch.calls) bytes=\(report.fetch.bytes) ms=\(ms) errors=\(report.fetch.errors.count) "
+                   + "stale=\(report.coverage.staleAnswers) generation=\(report.fetch.generation)")
     }
 
     /// Never freed; a main-actor deinit hop would abort if it were.

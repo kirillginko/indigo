@@ -69,6 +69,9 @@ struct SyncDiagnosticsView: View {
                 Section("For You (paste the other device's code)") {
                     forYou
                 }
+                Section("For You shadow: backend knowledge (not shown)") {
+                    shadow
+                }
                 Section("Two-device test") {
                     row("shared artist visits", "\(report.testVisits)")
                     ForEach(report.testComponents, id: \.0) { writer, count in row("  from \(writer.prefix(8))", "\(count)") }
@@ -123,6 +126,48 @@ struct SyncDiagnosticsView: View {
             }
         } else {
             Text("Open For You once to record a look.").foregroundStyle(.secondary)
+        }
+    }
+
+    /// The backend's For You set beside the visible one. See `ShadowReport`.
+    @ViewBuilder private var shadow: some View {
+        if let report = explore.shadow {
+            let c = report.comparison
+            let coverage = report.coverage
+            let found = coverage.startingPoints.values.filter { $0.hasPrefix("found") }.count
+            row("source", "\(report.source) · \(report.fetch.generation.isEmpty ? "cached" : report.fetch.generation)")
+            row("freshness", coverage.staleAnswers == 0 ? "current" : "\(coverage.staleAnswers) stale answers"
+                + (coverage.oldestFetch.map { " · oldest \($0.formatted(.relative(presentation: .named)))" } ?? ""))
+            if !report.fetch.errors.isEmpty {
+                Text("\(report.fetch.errors.count) failed: \(report.fetch.errors.first ?? "")")
+                    .font(.caption).foregroundStyle(.red)
+            }
+            row("top 12 overlap", "\(c.top12Overlap)/12")
+            row("top 20 overlap", "\(c.top20Overlap)/20")
+            row("shows overlap", "\(c.showsOverlap)/\(c.showsCount)")
+            row("direction", c.visibleDirection == c.backendDirection ? "same" : "\(c.visibleDirection) → \(c.backendDirection)")
+            row("starting points known", "\(found)/\(coverage.startingPoints.count)")
+            ForEach(coverage.startingPoints.filter { !$0.value.hasPrefix("found") }.sorted { $0.key < $1.key }, id: \.key) { id, status in
+                row("  \(id.prefix(34))", status)
+            }
+            row("artists", "\(coverage.artistsFound) found · \(coverage.artistsUnknown) unknown · \(coverage.artistsMissing) missing")
+            row("missing route kinds", c.missingKinds.isEmpty ? "none" : c.missingKinds.joined(separator: ", "))
+            row("requests", "\(report.fetch.calls) · \(ByteCountFormatter.string(fromByteCount: Int64(report.fetch.bytes), countStyle: .file)) · "
+                + report.fetch.milliseconds.map { "\(Int($0.rounded()))ms" }.joined(separator: " + "))
+            row("kept answers", "\(report.fetch.nodesKept) points · \(report.fetch.artistsKept) artists")
+            row("shared digest", report.visibleShared == report.backendShared ? "same" : "differs")
+            ForEach(c.reworded.prefix(5), id: \.id) { change in
+                VStack(alignment: .leading) {
+                    Text(change.id).font(.caption.monospaced())
+                    Text("\(change.visible) → \(change.backend)").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            ForEach(c.moves.prefix(20), id: \.id) { move in
+                row(move.title, "\(move.visible.map { "#\($0)" } ?? "–") → \(move.backend.map { "#\($0)" } ?? "–")")
+            }
+        } else {
+            Text(ExploreShadow.isEnabled ? "Waiting for For You's next look." : "Shadow is off in this build.")
+                .foregroundStyle(.secondary)
         }
     }
 

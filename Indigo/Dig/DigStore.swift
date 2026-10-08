@@ -1172,6 +1172,10 @@ final class DigStore {
     @ObservationIgnored private var offersStamp: ExploreStamp?
     @ObservationIgnored private var offersCoreStamp: ExploreStamp?
     @ObservationIgnored private var offersTask: Task<Void, Never>?
+    @ObservationIgnored private var shadowTask: Task<Void, Never>?
+    /// What the last shadow look was made for, so the same visible answer in
+    /// the same backend generation is not compared twice.
+    @ObservationIgnored private var shadowKey: String?
 
     /// Looks again, and works the answer out again only if what it would be
     /// worked out from has changed.
@@ -1237,9 +1241,28 @@ final class DigStore {
             ExploreDiagnostics.shared.record(ExploreDiagnostics.Entry(
                 stamp: full.stamp, ranked: ExploreDiagnostics.Entry.ranked(self.exploreOffers), report: report
             ))
+            self.shadow(full, asOf: asOf, turn: period, now: now)
         }
         offersTask = task
         await task.value
+    }
+
+    /// The backend's For You beside the visible one, in the background: never
+    /// waited on, never shown, reported to `ExploreDiagnostics`. Skipped when
+    /// the visible answer and the backend's edge generation are both what the
+    /// last comparison was made for, unless that one failed.
+    private func shadow(_ visible: ExploreRun, asOf: Date, turn: Int, now: Date) {
+        guard ExploreShadow.isEnabled else { return }
+        let key = "\(CanonicalDigest.of(visible.stamp))|\(BackendKnowledgeCache.generation(at: now))"
+        let lastFailed = !(ExploreDiagnostics.shared.shadow?.fetch.errors.isEmpty ?? true)
+        guard key != shadowKey || lastFailed else { return }
+        shadowKey = key
+        shadowTask?.cancel()
+        shadowTask = Task { [worker] in
+            let report = await worker.exploreShadow(visible, asOf: asOf, turn: turn, now: now)
+            guard !Task.isCancelled else { return }
+            ExploreDiagnostics.shared.record(shadow: report)
+        }
     }
 
     /// Works EXPLORE's answer out again, for when what it was built from has
