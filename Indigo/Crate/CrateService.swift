@@ -14,7 +14,13 @@ import SwiftData
 final class CrateService {
     /// Bumped on every change so views observing the service re-read their
     /// @Query results and the button flips to CRATED without a round trip.
-    private(set) var revision = 0
+    ///
+    /// Every change, including another device's: a save here moves it, and so
+    /// does an import that touched the crate. It used to move on local saves
+    /// alone, so a record crated on the Mac reached the phone's store and
+    /// nothing that read the crate looked again. See `UserDataImports`.
+    var revision: Int { savedRevision &+ UserDataImports.shared.crateRevision }
+    private var savedRevision = 0
     var notice: String?
 
     /// Shares the app's main context deliberately: a crated recording has to
@@ -580,7 +586,7 @@ final class CrateService {
     func save() {
         do {
             try context.save()
-            revision &+= 1
+            savedRevision &+= 1
         } catch {
             // The crate is the one thing in the app that isn't a rebuildable
             // cache, so a failed write is worth telling the listener about.

@@ -1179,10 +1179,20 @@ final class DigStore {
         exploreOffers = kept.offers
         hasExploreOffers = true
         hasExploreDirection = kept.offers.movingToward != nil
-        offersCrateRevision = kept.crateRevision
+        offersInputs = kept.inputs
         offersBuiltAt = kept.builtAt
     }
-    @ObservationIgnored private var offersCrateRevision = -1
+    /// What the answer on screen was worked out from. Nil until there is one,
+    /// and for an answer kept before inputs were: either is worked out again.
+    @ObservationIgnored private var offersInputs: ExploreInputs?
+    /// `UserDataImports.exploreRevision` when the answer was asked for.
+    ///
+    /// The inputs are counts and dates, and an import can change a row without
+    /// moving either -- tags filled in on a crated record by the other device.
+    /// The observer knows it happened, so that is believed too. Starts at
+    /// nought with the process, as the imports' revision does, so a kept
+    /// answer is not rebuilt for an import nobody has made.
+    @ObservationIgnored private var offersImportRevision = 0
     @ObservationIgnored private var offersBuiltAt = Date.distantPast
     @ObservationIgnored private var offersTask: Task<Void, Never>?
 
@@ -1195,44 +1205,39 @@ final class DigStore {
     /// changes what should be suggested.
     @ObservationIgnored private static let offersLifetime: TimeInterval = 15 * 60
 
-    /// Recomputes when the crate has changed, when there is nothing yet, or
-    /// when the answer has simply been standing a while. Otherwise does
-    /// nothing at all — a set of recommendations that rearranges itself while
-    /// somebody is reading it is worse than one that is a quarter of an hour
-    /// out of date.
-    /// Works EXPLORE's answer out again, for when what it was built from has
-    /// changed without the crate moving — a show gaining its picture, say.
+    /// Recomputes when what the answer was worked out from has changed --
+    /// here or on another device -- when there is nothing yet, or when the
+    /// answer has simply been standing a while. Otherwise does nothing at
+    /// all: a set of recommendations that rearranges itself while somebody is
+    /// reading it is worse than one that is a quarter of an hour out of date.
     ///
-    /// Offers are kept for fifteen minutes and persisted across launches, so a
-    /// correction that lands in the store otherwise goes unseen: the page has
-    /// its answer and nothing asks for another.
-    ///
-    /// It rebuilds rather than merely marking the answer stale. Staleness is
-    /// only consulted when somebody asks, and nobody asks while the page is
-    /// already open — which is exactly when this is called. The persisted copy
-    /// is deliberately left alone until the new one is ready: it is what the
-    /// next launch draws before anything is recomputed, and clearing it traded
-    /// a page with a stale picture for a page with nothing on it.
-    func invalidateExploreOffers() async {
-        offersBuiltAt = .distantPast
-        await refreshExploreOffers(crateRevision: offersCrateRevision)
-    }
-
-    func refreshExploreOffers(crateRevision: Int) async {
+    /// The inputs used to be the crate's revision, which moved only when this
+    /// process saved. A record crated on the other device, or a launch after
+    /// one, left the old answer standing until it expired.
+    func refreshExploreOffers() async {
+        let imports = UserDataImports.shared.exploreRevision
         let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
-        guard offersCrateRevision != crateRevision || exploreOffers.isEmpty || isStale
-        else { return }
+        if !exploreOffers.isEmpty, !isStale, imports == offersImportRevision, let built = offersInputs {
+            // Asked of the worker, which reads its own context: a few indexed
+            // queries, but not on the thread that draws.
+            guard await worker.exploreInputs() != built else { return }
+        }
         offersTask?.cancel()
         let asked = revision
         let task = Task { [weak self] in
             guard let self else { return }
             self.settle()
+            // Read before the answer, so that a row written while it is being
+            // worked out makes the next look see a difference rather than hide
+            // inside an answer stamped after it.
+            let inputs = await self.worker.exploreInputs()
             // The blocks somebody can act on, published as soon as they are
             // known. Working out a direction reads every place in the
             // catalogue, and the page was making its headline wait behind it.
             let found = await self.worker.exploreRecommendations(generation: asked)
             guard !Task.isCancelled else { return }
-            self.offersCrateRevision = crateRevision
+            self.offersInputs = inputs
+            self.offersImportRevision = imports
             self.offersBuiltAt = Date()
             self.exploreOffers = found
             self.hasExploreOffers = true
@@ -1248,10 +1253,28 @@ final class DigStore {
             self.hasExploreDirection = true
             // Written down only once both halves are in, so a launch never
             // restores an answer that is missing its direction.
-            self.offersStore.save(withScene, crateRevision: crateRevision)
+            self.offersStore.save(withScene, inputs: inputs)
         }
         offersTask = task
         await task.value
+    }
+
+    /// Works EXPLORE's answer out again, for when what it was built from has
+    /// changed without the crate moving — a show gaining its picture, say.
+    ///
+    /// Offers are kept for fifteen minutes and persisted across launches, so a
+    /// correction that lands in the store otherwise goes unseen: the page has
+    /// its answer and nothing asks for another.
+    ///
+    /// It rebuilds rather than merely marking the answer stale. Staleness is
+    /// only consulted when somebody asks, and nobody asks while the page is
+    /// already open — which is exactly when this is called. The persisted copy
+    /// is deliberately left alone until the new one is ready: it is what the
+    /// next launch draws before anything is recomputed, and clearing it traded
+    /// a page with a stale picture for a page with nothing on it.
+    func invalidateExploreOffers() async {
+        offersBuiltAt = .distantPast
+        await refreshExploreOffers()
     }
 
     /// Everything next to something, of any kind — the step DIG takes.

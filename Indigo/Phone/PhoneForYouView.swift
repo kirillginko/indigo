@@ -93,7 +93,10 @@ struct PhoneForYouView: View {
             }
             .ignoresSafeArea()
         }
-        .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
+        // Asked again when the crate moves, and when another device changed
+        // something the offers are worked out from; the store decides
+        // whether that is a rebuild. See `DigStore.refreshExploreOffers`.
+        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) { await dig.refreshExploreOffers() }
         // The suggested artists' portraits, asked for ahead of the rest -- and
         // a small one already held replaced with the full-size picture.
         .task(id: dig.exploreOffers.artists.count + dig.exploreOffers.next.count) {

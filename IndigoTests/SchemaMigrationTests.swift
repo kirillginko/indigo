@@ -102,10 +102,11 @@ final class SchemaMigrationTests: XCTestCase {
         offers.movingToward = ExploreOffers.SceneOffer(
             city: "New York", title: "NEW YORK", sound: "JAZZ", size: "19 artists"
         )
-        store.save(offers, crateRevision: 7)
+        let inputs = ExploreInputs(crateCount: 7, crateNewest: nil, eventCount: 0, eventNewest: nil, haunts: [])
+        store.save(offers, inputs: inputs)
 
         let read = try XCTUnwrap(store.load())
-        XCTAssertEqual(read.crateRevision, 7)
+        XCTAssertEqual(read.inputs, inputs)
         XCTAssertEqual(read.offers.next.first?.node.title, "Tirzah")
         XCTAssertEqual(read.offers.next.first?.corroboration, 2)
         XCTAssertEqual(read.offers.movingToward?.sound, "JAZZ")

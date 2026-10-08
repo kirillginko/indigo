@@ -86,7 +86,10 @@ struct ExploreView: View {
         // the crate rather than on the graph: enrichment moves the graph
         // several times a second and almost none of it changes what should be
         // suggested.
-        .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
+        // Asked again when the crate moves, and when another device changed
+        // something the offers are worked out from; the store decides
+        // whether that is a rebuild. See `DigStore.refreshExploreOffers`.
+        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) { await dig.refreshExploreOffers() }
     }
 
     private func header(_ kept: [CrateItem]) -> some View {

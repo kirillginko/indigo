@@ -28,8 +28,10 @@ nonisolated final class ExploreOffersRecord {
     @Attribute(.unique) var id: String
     var payload: Data
     var builtAt: Date
-    /// What the crate looked like when this was worked out, so a stale answer
-    /// can be told from a current one without unpacking it.
+    /// No longer read. It held the crate's in-process revision, which starts
+    /// again at nought every launch and so said nothing about a record written
+    /// by another one; what an answer was worked out from is now kept in the
+    /// payload as `ExploreInputs`. Left in place rather than migrated away.
     var crateRevision: Int
 
     init(payload: Data, builtAt: Date = Date(), crateRevision: Int) {
@@ -42,6 +44,40 @@ nonisolated final class ExploreOffersRecord {
     static let key = "explore.offers"
 }
 
+/// What an answer was worked out from, in the few numbers that move when it
+/// changes: the synced rows EXPLORE reads, counted, with their newest date --
+/// and the dig history's starting points, which change by count rather than by
+/// row.
+///
+/// Read from the store rather than from anything this process remembers, so
+/// it means the same after a relaunch and after another device's import as it
+/// does after a local save. A fold rather than a table walk: two counts, two
+/// one-row fetches and the dozen haunts the engine itself starts from.
+nonisolated struct ExploreInputs: Codable, Equatable, Sendable {
+    var crateCount: Int
+    var crateNewest: Date?
+    var eventCount: Int
+    var eventNewest: Date?
+    /// `nodeID×visits`, in the order the engine reads them.
+    var haunts: [String]
+
+    static func read(context: ModelContext) -> ExploreInputs {
+        var crate = FetchDescriptor<CrateItem>(sortBy: [SortDescriptor(\.addedAt, order: .reverse)])
+        crate.fetchLimit = 1
+        var events = FetchDescriptor<ListeningEvent>(sortBy: [SortDescriptor(\.at, order: .reverse)])
+        events.fetchLimit = 1
+        return ExploreInputs(
+            crateCount: (try? context.fetchCount(FetchDescriptor<CrateItem>())) ?? -1,
+            crateNewest: (try? context.fetch(crate))?.first?.addedAt,
+            eventCount: (try? context.fetchCount(FetchDescriptor<ListeningEvent>())) ?? -1,
+            eventNewest: (try? context.fetch(events))?.first?.at,
+            haunts: DigHistory(context: context)
+                .haunts(kinds: ExploreSuggestionEngine.hauntKinds, limit: ExploreSuggestionEngine.hauntLimit)
+                .map { "\($0.nodeID)×\($0.visits)" }
+        )
+    }
+}
+
 nonisolated struct ExploreOffersStore {
     let context: ModelContext
 
@@ -49,22 +85,32 @@ nonisolated struct ExploreOffersStore {
         self.context = context
     }
 
-    /// What was shown last time, if anything, and when.
-    func load() -> (offers: ExploreOffers, builtAt: Date, crateRevision: Int)? {
+    /// The payload: the answer and what it was worked out from. An answer
+    /// written before the inputs were kept has none, and is redrawn and then
+    /// worked out again.
+    private struct Kept: Codable {
+        let inputs: ExploreInputs
+        let offers: ExploreOffers
+    }
+
+    /// What was shown last time, if anything, when, and from what.
+    func load() -> (offers: ExploreOffers, builtAt: Date, inputs: ExploreInputs?)? {
         var descriptor = FetchDescriptor<ExploreOffersRecord>(
             predicate: #Predicate { $0.id == "explore.offers" }
         )
         descriptor.fetchLimit = 1
-        guard let record = (try? context.fetch(descriptor))?.first,
-              let offers = try? JSONDecoder().decode(ExploreOffers.self, from: record.payload)
-        else { return nil }
-        return (offers, record.builtAt, record.crateRevision)
+        guard let record = (try? context.fetch(descriptor))?.first else { return nil }
+        if let kept = try? JSONDecoder().decode(Kept.self, from: record.payload) {
+            return (kept.offers, record.builtAt, kept.inputs)
+        }
+        guard let offers = try? JSONDecoder().decode(ExploreOffers.self, from: record.payload) else { return nil }
+        return (offers, record.builtAt, nil)
     }
 
     /// Writes the answer down. Failure is silent and harmless: the next launch
     /// simply works it out again, which is what it did before this existed.
-    func save(_ offers: ExploreOffers, crateRevision: Int) {
-        guard let payload = try? JSONEncoder().encode(offers) else { return }
+    func save(_ offers: ExploreOffers, inputs: ExploreInputs) {
+        guard let payload = try? JSONEncoder().encode(Kept(inputs: inputs, offers: offers)) else { return }
         var descriptor = FetchDescriptor<ExploreOffersRecord>(
             predicate: #Predicate { $0.id == "explore.offers" }
         )
@@ -72,9 +118,8 @@ nonisolated struct ExploreOffersStore {
         if let existing = (try? context.fetch(descriptor))?.first {
             existing.payload = payload
             existing.builtAt = Date()
-            existing.crateRevision = crateRevision
         } else {
-            context.insert(ExploreOffersRecord(payload: payload, crateRevision: crateRevision))
+            context.insert(ExploreOffersRecord(payload: payload, crateRevision: 0))
         }
         try? context.save()
     }

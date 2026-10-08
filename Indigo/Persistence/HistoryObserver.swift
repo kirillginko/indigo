@@ -55,6 +55,13 @@ struct HistoryObserver {
     /// a build newer than this one. Nothing in that pass is merged; see
     /// `SyncGeneration`.
     var onNewerGeneration: ((Int) -> Void)? = nil
+    /// Told which synced models another writer inserted, changed or removed
+    /// rows of, once a pass has merged them -- for what is worked out from
+    /// those rows and kept, such as EXPLORE's offers. Removals count: a record
+    /// taken out of the crate on another device changes what to suggest as
+    /// much as one put in. A pass with no place to resume from cannot say, and
+    /// names every synced model.
+    var onForeignChange: ((Set<String>) -> Void)? = nil
 
     init(context: ModelContext, defaults: UserDefaults = .standard, ownAuthor: String? = nil) {
         self.context = context
@@ -99,6 +106,7 @@ struct HistoryObserver {
         // So the identifiers are only ever used to *fetch*, which returns the
         // rows that are still there and nothing else.
         var changed: [String: Set<PersistentIdentifier>] = [:]
+        var touched = Set<String>()
         var reached = positions ?? [:]
         var pass = Pass(hadToken: true, transactions: transactions.count)
         let userData = storeIdentity
@@ -112,6 +120,9 @@ struct HistoryObserver {
                 switch change {
                 case .insert(let insert): changed[insert.changedPersistentIdentifier.entityName, default: []].insert(insert.changedPersistentIdentifier)
                 case .update(let update): changed[update.changedPersistentIdentifier.entityName, default: []].insert(update.changedPersistentIdentifier)
+                // Named only: the row is gone, and its identifier is never
+                // fetched or read.
+                case .delete(let delete): touched.insert(delete.changedPersistentIdentifier.entityName)
                 default: continue
                 }
             }
@@ -167,6 +178,8 @@ struct HistoryObserver {
         onPass?(pass)
 
         store(reached)
+        touched.formUnion(changed.keys)
+        if !touched.isEmpty { onForeignChange?(touched) }
         return report
     }
 
@@ -206,6 +219,7 @@ struct HistoryObserver {
         pass.merged = report.crateMerged + report.eventsMerged + report.visitsMerged + report.stepsMerged + report.countersMerged
         onPass?(pass)
         store(now)
+        onForeignChange?(IndigoSchemaCurrent.userDataModelNames)
         return report
     }
 
@@ -233,6 +247,7 @@ struct HistoryObserver {
             for (store, position) in Self.positions(of: transaction.token) { reached[store] = max(reached[store] ?? 0, position) }
         }
         store(reached)
+        onForeignChange?(IndigoSchemaCurrent.userDataModelNames)
         return report
     }
 

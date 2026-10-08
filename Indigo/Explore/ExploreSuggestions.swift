@@ -115,6 +115,11 @@ nonisolated struct ExploreSuggestionEngine {
     /// walk, so this is the knob that decides what the whole thing costs.
     static let origins = 12
 
+    /// The dig history's share of the starting points. `ExploreInputs` reads
+    /// the same list, so an answer is known to be out of date when it moves.
+    static let hauntKinds: Set<MusicNodeKind> = [.artist, .label, .broadcast]
+    static let hauntLimit = 12
+
     /// Everything the page needs, in one walk.
     func offers(next: Int = 12, shows: Int = 6, artists: Int = 6) -> ExploreOffers {
         let taste = TasteProfile.collected(context: context)
@@ -435,7 +440,7 @@ nonisolated struct ExploreSuggestionEngine {
             note(entry.node, weight: 0.5 + 0.5 * min(1, entry.weight / max(0.001, loudest)))
         }
         for visit in DigHistory(context: context).haunts(
-            kinds: [.artist, .label, .broadcast], limit: 12
+            kinds: Self.hauntKinds, limit: Self.hauntLimit
         ) {
             note(visit.node, weight: 0.6)
         }

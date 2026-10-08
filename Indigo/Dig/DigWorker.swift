@@ -134,6 +134,12 @@ actor DigWorker {
     /// The blocks somebody can act on. Answered first, and separately from
     /// the direction below, so the page's headline does not wait a second on
     /// a slower claim about where its reader is going.
+    /// What an answer would be worked out from now. Reads the store, not the
+    /// graph, so it does not wait on a generation. See `ExploreInputs`.
+    func exploreInputs() -> ExploreInputs {
+        Trace.step("explore.inputs") { ExploreInputs.read(context: modelContext) }
+    }
+
     func exploreRecommendations(generation: Int) -> ExploreOffers {
         refresh(generation)
         return Trace.step("explore.suggest") {
