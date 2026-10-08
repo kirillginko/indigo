@@ -47,26 +47,30 @@ final class ExploreRefreshTests: XCTestCase {
 
     // MARK: The inputs
 
+    /// The digest of the listener's rows, as the stamp holds it.
+    private func personal() -> String {
+        CanonicalDigest.of(PersonalInputs.read(context: context, asOf: ExplorePeriod.asOf(ExplorePeriod.containing(Self.now))))
+    }
+
     func testTheInputsMoveWhenTheCrateGainsOrLosesARecord() throws {
         crate("a", added: 100)
         try context.save()
-        let before = ExploreInputs.read(context: context, now: Self.now)
+        let before = personal()
 
         crate("b", added: 50)
         try context.save()
-        let added = ExploreInputs.read(context: context, now: Self.now)
-        XCTAssertNotEqual(added, before, "an older record still changes the crate")
+        XCTAssertNotEqual(personal(), before, "an older record still changes the crate")
 
         for item in try context.fetch(FetchDescriptor<CrateItem>()) where item.showID == "b" { context.delete(item) }
         try context.save()
-        XCTAssertEqual(ExploreInputs.read(context: context, now: Self.now), before)
+        XCTAssertEqual(personal(), before)
     }
 
     func testTheInputsMoveWithTheListeningLog() throws {
-        let before = ExploreInputs.read(context: context, now: Self.now)
-        context.insert(ListeningEvent(node: .artist("Laurel Halo"), action: .played, at: Date(), seconds: 300, completion: 1, tags: [], source: nil))
+        let before = personal()
+        context.insert(ListeningEvent(node: .artist("Laurel Halo"), action: .played, at: Self.now, seconds: 300, completion: 1, tags: [], source: nil))
         try context.save()
-        XCTAssertNotEqual(ExploreInputs.read(context: context, now: Self.now), before)
+        XCTAssertNotEqual(personal(), before)
     }
 
     /// A visit merged in from the other device changes how often somewhere
@@ -76,44 +80,60 @@ final class ExploreRefreshTests: XCTestCase {
         visit.visits = 2
         context.insert(visit)
         try context.save()
-        let before = ExploreInputs.read(context: context, now: Self.now)
+        let before = personal()
 
         visit.visits = 5
         try context.save()
-        XCTAssertNotEqual(ExploreInputs.read(context: context, now: Self.now), before)
+        XCTAssertNotEqual(personal(), before)
+    }
+
+    /// An edit that moves no count and no date -- the other device filling in
+    /// a crated record's tags -- is a change too. Counting rows could not see
+    /// it; the digest is of what the rows say.
+    func testTheInputsMoveWhenACratedRecordIsEdited() throws {
+        crate("a", added: 100)
+        try context.save()
+        let before = personal()
+
+        let item = try XCTUnwrap(context.fetch(FetchDescriptor<CrateItem>()).first)
+        item.genreTagsRaw = "dub"
+        try context.save()
+        XCTAssertNotEqual(personal(), before)
     }
 
     /// The cache is written to all session long. None of it is an input.
     func testTheInputsIgnoreTheCache() throws {
         crate("a", added: 100)
         try context.save()
-        let before = ExploreInputs.read(context: context, now: Self.now)
+        let before = personal()
 
         context.insert(ExploreOffersRecord(payload: Data(), crateRevision: 0))
+        context.insert(DiscogsArtist(nameKey: "someone", discogsID: 9, name: "Someone"))
         try context.save()
-        XCTAssertEqual(ExploreInputs.read(context: context, now: Self.now), before)
+        XCTAssertEqual(personal(), before)
     }
 
     /// Kept beside the answer, so a launch can tell whether the answer it
     /// redraws is still the one it would work out.
-    func testAKeptAnswerCarriesItsInputs() throws {
-        crate("a", added: 100)
-        try context.save()
-        let inputs = ExploreInputs.read(context: context, now: Self.now)
-        ExploreOffersStore(context: context).save(ExploreOffers(), inputs: inputs)
+    func testAKeptAnswerCarriesItsStamps() throws {
+        let stamp = ExploreStamp(format: 1, period: 20_000, personal: "p", shared: "s", deviceLocal: "d")
+        let core = ExploreStamp(format: 1, period: 20_000, personal: "p", shared: "c", deviceLocal: "d")
+        ExploreOffersStore(context: context).save(ExploreOffers(), stamp: stamp, core: core)
 
-        XCTAssertEqual(ExploreOffersStore(context: context).load()?.inputs, inputs)
+        let kept = try XCTUnwrap(ExploreOffersStore(context: context).load())
+        XCTAssertEqual(kept.stamp, stamp)
+        XCTAssertEqual(kept.core, core)
     }
 
-    /// An answer kept before the inputs were has none, and is worked out
+    /// An answer kept before the stamps were has none, and is worked out
     /// again rather than trusted.
-    func testAnAnswerKeptWithoutInputsIsStillRead() throws {
+    func testAnAnswerKeptWithoutStampsIsStillRead() throws {
         let payload = try JSONEncoder().encode(ExploreOffers())
         context.insert(ExploreOffersRecord(payload: payload, crateRevision: 4))
         try context.save()
 
         let kept = try XCTUnwrap(ExploreOffersStore(context: context).load())
-        XCTAssertNil(kept.inputs)
+        XCTAssertNil(kept.stamp)
     }
 
     // MARK: The imports

@@ -22,6 +22,9 @@ struct SyncDiagnosticsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var report = Report()
     @State private var account = "…"
+    /// The other device's For You code, pasted in.
+    @State private var otherCode = ""
+    private var explore = ExploreDiagnostics.shared
 
     /// The shared things both devices act on, so their actions meet.
     static let testArtist = MusicNode.artist("\(TwoDeviceSyncRunner.marker) shared artist")
@@ -63,6 +66,9 @@ struct SyncDiagnosticsView: View {
                         row("writer \(writer.prefix(8))", "\(count)")
                     }
                 }
+                Section("For You (paste the other device's code)") {
+                    forYou
+                }
                 Section("Two-device test") {
                     row("shared artist visits", "\(report.testVisits)")
                     ForEach(report.testComponents, id: \.0) { writer, count in row("  from \(writer.prefix(8))", "\(count)") }
@@ -87,6 +93,37 @@ struct SyncDiagnosticsView: View {
         #if os(macOS)
         .frame(minWidth: 460, minHeight: 640)
         #endif
+    }
+
+    /// What this device's last look at For You was worked out from, and the
+    /// same for another device's, part by part. See `ExploreDiagnostics`.
+    @ViewBuilder private var forYou: some View {
+        if let entry = explore.latest {
+            Text(entry.code).font(.caption.monospaced()).textSelection(.enabled)
+            TextField("Other device's code", text: $otherCode)
+                .font(.caption.monospaced())
+                .autocorrectionDisabled()
+            if let rows = ExploreDiagnostics.compare(entry.code, otherCode) {
+                ForEach(rows, id: \.input) { compared in
+                    HStack {
+                        Text(compared.input)
+                        Spacer()
+                        Text(compared.matches ? "Match" : "Differ")
+                            .monospaced()
+                            .foregroundStyle(compared.matches ? Color.secondary : Color.red)
+                    }
+                }
+            }
+            row("rebuilt", entry.report.rebuilt.isEmpty ? "nothing" : entry.report.rebuilt.joined(separator: ", "))
+            ForEach(entry.report.bytes.sorted { $0.key < $1.key }, id: \.key) { part, bytes in
+                row("\(part) size", ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file))
+            }
+            ForEach(entry.report.counts.sorted { $0.key < $1.key }, id: \.key) { part, count in
+                row(part, "\(count)")
+            }
+        } else {
+            Text("Open For You once to record a look.").foregroundStyle(.secondary)
+        }
     }
 
     private func row(_ label: String, _ value: String) -> some View {

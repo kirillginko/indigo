@@ -1163,87 +1163,80 @@ final class DigStore {
         exploreOffers = kept.offers
         hasExploreOffers = true
         hasExploreDirection = kept.offers.movingToward != nil
-        offersInputs = kept.inputs
-        offersBuiltAt = kept.builtAt
+        offersStamp = kept.stamp
+        offersCoreStamp = kept.core
     }
-    /// What the answer on screen was worked out from. Nil until there is one,
-    /// and for an answer kept before inputs were: either is worked out again.
-    @ObservationIgnored private var offersInputs: ExploreInputs?
-    /// `UserDataImports.exploreRevision` when the answer was asked for.
-    ///
-    /// The inputs are counts and dates, and an import can change a row without
-    /// moving either -- tags filled in on a crated record by the other device.
-    /// The observer knows it happened, so that is believed too. Starts at
-    /// nought with the process, as the imports' revision does, so a kept
-    /// answer is not rebuilt for an import nobody has made.
-    @ObservationIgnored private var offersImportRevision = 0
-    @ObservationIgnored private var offersBuiltAt = Date.distantPast
+    /// What the answer on screen was worked out from: all of it, and its first
+    /// half (everything but the direction). Nil until there is one, and for an
+    /// answer kept before stamps were: either is worked out again.
+    @ObservationIgnored private var offersStamp: ExploreStamp?
+    @ObservationIgnored private var offersCoreStamp: ExploreStamp?
     @ObservationIgnored private var offersTask: Task<Void, Never>?
 
-    /// How long an answer stands before it is worth asking again.
+    /// Looks again, and works the answer out again only if what it would be
+    /// worked out from has changed.
     ///
-    /// Not tied to `revision`, which is what this used to key on. Enrichment
-    /// bumps that several times a second while it works, so keying on it meant
-    /// the block was rebuilt on every visit and the cards moved under the
-    /// cursor a moment after the page opened. Almost none of those writes
-    /// changes what should be suggested.
-    @ObservationIgnored private static let offersLifetime: TimeInterval = 15 * 60
-
-    /// Recomputes when what the answer was worked out from has changed --
-    /// here or on another device -- when there is nothing yet, or when the
-    /// answer has simply been standing a while. Otherwise does nothing at
-    /// all: a set of recommendations that rearranges itself while somebody is
-    /// reading it is worse than one that is a quarter of an hour out of date.
+    /// Called when the page appears, when the crate moves and when another
+    /// device's import lands. Each time the listener's rows are read and
+    /// digested, and the knowledge around them is taken from the worker --
+    /// kept there, and worked out again only for a new starting point or once
+    /// it has stood a quarter of an hour (`DigWorker.knowledgeLifetime`), so
+    /// enrichment writing several times a second does not move the cards
+    /// under the reader. If the stamp is the one on screen, nothing is ranked
+    /// at all; a play, a crate change or a new day is a new stamp.
     ///
-    /// The inputs used to be the crate's revision, which moved only when this
-    /// process saved. A record crated on the other device, or a launch after
-    /// one, left the old answer standing until it expired.
-    func refreshExploreOffers() async {
-        let imports = UserDataImports.shared.exploreRevision
-        let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
-        if !exploreOffers.isEmpty, !isStale, imports == offersImportRevision, let built = offersInputs {
-            // Asked of the worker, which reads its own context: a few indexed
-            // queries, but not on the thread that draws.
-            guard await worker.exploreInputs() != built else { return }
-        }
+    /// `rebuildKnowledge` throws the kept knowledge away first.
+    func refreshExploreOffers(rebuildKnowledge: Bool = false) async {
         offersTask?.cancel()
         let asked = revision
+        let now = Date()
+        let period = ExplorePeriod.containing(now)
+        let asOf = ExplorePeriod.asOf(period)
         let task = Task { [weak self] in
             guard let self else { return }
             self.settle()
-            // Read before the answer, so that a row written while it is being
-            // worked out makes the next look see a difference rather than hide
-            // inside an answer stamped after it.
-            let inputs = await self.worker.exploreInputs()
             // The blocks somebody can act on, published as soon as they are
             // known. Working out a direction reads every place in the
             // catalogue, and the page was making its headline wait behind it.
-            let found = await self.worker.exploreRecommendations(generation: asked, asOf: inputs.asOf)
-            guard !Task.isCancelled else { return }
-            self.offersInputs = inputs
-            self.offersImportRevision = imports
-            self.offersBuiltAt = Date()
-            self.exploreOffers = found
-            self.hasExploreOffers = true
-
-            // Then the slower half, folded into what is already on screen.
-            //
-            // Which of the places they could be heading into is shown moves
-            // on with the period, so a collection that changes slowly is not
-            // told the same thing forever. It used to move on with a counter
-            // in this device's defaults, once a recomputation -- so the Mac
-            // and the phone named different places from the same rows.
-            let direction = await self.worker.exploreDirection(
-                generation: asked, turn: inputs.period, asOf: inputs.asOf
+            let core = await self.worker.exploreRun(
+                asOf: asOf, period: period, generation: asked, scenes: false, rebuild: rebuildKnowledge, now: now
             )
             guard !Task.isCancelled else { return }
-            var withScene = self.exploreOffers
-            withScene.movingToward = direction
-            self.exploreOffers = withScene
-            self.hasExploreDirection = true
-            // Written down only once both halves are in, so a launch never
-            // restores an answer that is missing its direction.
-            self.offersStore.save(withScene, inputs: inputs)
+            if core.stamp != self.offersCoreStamp || !self.hasExploreOffers || self.exploreOffers.isEmpty {
+                let found = await self.worker.exploreRecommendations(core, asOf: asOf)
+                guard !Task.isCancelled else { return }
+                self.offersCoreStamp = core.stamp
+                self.exploreOffers = found
+                self.hasExploreOffers = true
+            }
+
+            // Then the slower half, folded into what is already on screen.
+            let full = await self.worker.exploreRun(
+                asOf: asOf, period: period, generation: asked, scenes: true, rebuild: false, now: now,
+                personal: core.personal
+            )
+            guard !Task.isCancelled else { return }
+            if full.stamp != self.offersStamp || !self.hasExploreDirection {
+                // Which of the places they could be heading into is named
+                // moves on with the period, so every device names the same
+                // place on the same day and the next day names the next one.
+                let direction = await self.worker.exploreDirection(full, asOf: asOf, turn: period)
+                guard !Task.isCancelled else { return }
+                var withScene = self.exploreOffers
+                withScene.movingToward = direction
+                self.exploreOffers = withScene
+                self.hasExploreDirection = true
+                self.offersStamp = full.stamp
+                // Written down only once both halves are in, so a launch never
+                // restores an answer that is missing its direction.
+                self.offersStore.save(withScene, stamp: full.stamp, core: core.stamp)
+            }
+            var report = full.report
+            report.rebuilt = core.report.rebuilt + full.report.rebuilt
+            report.milliseconds.merge(core.report.milliseconds, uniquingKeysWith: +)
+            ExploreDiagnostics.shared.record(ExploreDiagnostics.Entry(
+                stamp: full.stamp, ranked: ExploreDiagnostics.Entry.ranked(self.exploreOffers), report: report
+            ))
         }
         offersTask = task
         await task.value
@@ -1252,19 +1245,12 @@ final class DigStore {
     /// Works EXPLORE's answer out again, for when what it was built from has
     /// changed without the crate moving — a show gaining its picture, say.
     ///
-    /// Offers are kept for fifteen minutes and persisted across launches, so a
-    /// correction that lands in the store otherwise goes unseen: the page has
-    /// its answer and nothing asks for another.
-    ///
-    /// It rebuilds rather than merely marking the answer stale. Staleness is
-    /// only consulted when somebody asks, and nobody asks while the page is
-    /// already open — which is exactly when this is called. The persisted copy
-    /// is deliberately left alone until the new one is ready: it is what the
-    /// next launch draws before anything is recomputed, and clearing it traded
-    /// a page with a stale picture for a page with nothing on it.
+    /// Knowledge is kept for a quarter of an hour, so a correction that lands
+    /// in the store otherwise goes unseen: the page has its answer and nothing
+    /// asks for another. The persisted copy is left alone until the new one is
+    /// ready: it is what the next launch draws before anything is recomputed.
     func invalidateExploreOffers() async {
-        offersBuiltAt = .distantPast
-        await refreshExploreOffers()
+        await refreshExploreOffers(rebuildKnowledge: true)
     }
 
     /// Everything next to something, of any kind — the step DIG takes.

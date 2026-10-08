@@ -125,158 +125,65 @@ nonisolated struct ExploreSuggestionEngine {
     /// walk, so this is the knob that decides what the whole thing costs.
     static let origins = 12
 
-    /// The dig history's share of the starting points. `ExploreInputs` reads
-    /// the same list, so an answer is known to be out of date when it moves.
+    /// The dig history's share of the starting points, as `PersonalInputs`
+    /// reads it.
     static let hauntKinds: Set<MusicNodeKind> = [.artist, .label, .broadcast]
     static let hauntLimit = 12
 
-    /// Everything the page needs, in one walk.
+    /// Everything the page needs, worked out from this store.
     ///
     /// `asOf` is the moment listening is weighed from -- how far back a play
     /// was is the one thing here that depends on when it is asked. It is
     /// passed in, never read off the clock, so the same rows give the same
-    /// answer whenever and wherever they are worked out. See `ExploreInputs`.
+    /// answer whenever and wherever they are worked out.
+    ///
+    /// The work is three steps: the listener's rows (`PersonalInputs`), what
+    /// is known around them (`LocalKnowledgeAdapter`), and the ranking
+    /// (`ExploreRanker`), which reads nothing but those two. EXPLORE itself
+    /// runs them separately on the worker, so it can tell which one changed;
+    /// this is the same thing for a caller that only wants the answer.
     func offers(next: Int = 12, shows: Int = 6, artists: Int = 6, asOf: Date) -> ExploreOffers {
-        let taste = TasteProfile.collected(context: context, now: asOf)
-        var offers = recommendations(next: next, shows: shows, artists: artists, taste: taste, asOf: asOf)
-        offers.movingToward = direction(taste: taste, asOf: asOf)
-        return offers
+        let (personal, knowledge) = inputs(asOf: asOf, scenes: true)
+        return ExploreRanker.offers(personal: personal, knowledge: knowledge, asOf: asOf,
+                                    next: next, shows: shows, artists: artists)
     }
 
     /// The blocks somebody can act on: where to go next, shows, more artists.
-    ///
-    /// Split from the direction on purpose, and the split is the reason this
-    /// method exists at all. Working out where somebody is heading means
-    /// assembling every place in the catalogue — around a second on a real
-    /// collection — and the page was making its own headline wait behind it.
-    /// What a reader came for arrives first now; the slower claim follows.
     func recommendations(
         next: Int = 12, shows: Int = 6, artists: Int = 6, taste: TasteProfile? = nil, asOf: Date
     ) -> ExploreOffers {
-        let taste = taste ?? TasteProfile.collected(context: context, now: asOf)
-        let all = suggestions(limit: next + artists + shows, taste: taste, asOf: asOf)
-        var offers = ExploreOffers()
-        offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
-        let rest = all.filter { $0.node.kind != .broadcast }
-        offers.next = Array(rest.prefix(next))
-        let taken = Set(offers.next.map(\.id))
-        offers.artists = Array(
-            rest.filter { $0.node.kind == .artist && !taken.contains($0.id) }.prefix(artists)
+        let (personal, knowledge) = inputs(asOf: asOf, scenes: false)
+        return ExploreRanker.recommendations(
+            personal: personal, knowledge: knowledge,
+            taste: taste ?? ExploreRanker.taste(personal: personal, knowledge: knowledge, asOf: asOf),
+            next: next, shows: shows, artists: artists
         )
-        return offers
     }
 
     /// Where this listener is heading, which is the slow half.
     func direction(taste: TasteProfile? = nil, asOf: Date) -> ExploreOffers.SceneOffer? {
-        let taste = taste ?? TasteProfile.collected(context: context, now: asOf)
-        guard let scene = SceneEngine(context: context).movingToward(taste: taste)
-        else { return nil }
-        return ExploreOffers.SceneOffer(
-            city: scene.city, title: scene.title,
-            sound: scene.soundLabel, size: scene.sizeLine
+        let (personal, knowledge) = inputs(asOf: asOf, scenes: true)
+        return ExploreRanker.direction(
+            personal: personal, knowledge: knowledge,
+            taste: taste ?? ExploreRanker.taste(personal: personal, knowledge: knowledge, asOf: asOf),
+            turn: nil
         )
     }
 
     /// Everywhere worth going, best first.
-    ///
-    /// `taste` is passed in rather than built here because the caller needs it
-    /// too, and collecting it reads the crate, the log and the whole artist
-    /// cache — twice over is a fifth of a second spent proving the same thing.
     func suggestions(limit: Int = 12, taste: TasteProfile? = nil, asOf: Date) -> [ExploreSuggestion] {
-        let taste = taste ?? TasteProfile.collected(context: context, now: asOf)
-        let known = knownGround()
-        guard !known.isEmpty else { return [] }
-
-        let graph = GraphStore(context: context)
-        let log = ListeningLog(context: context)
-        let seen = Set(known.map(\.node.id))
-
-        var best: [String: ExploreSuggestion] = [:]
-        // How many different things they keep reach the same place. Two
-        // separate routes to somebody is a much better argument than one, and
-        // without it a dozen collaborator edges of identical weight tie and
-        // fall back on alphabetical order — which is how a real collection
-        // produced a list beginning Aksak Maboul, Blue Foundation, Blue
-        // Iverson, Bottlesmoker.
-        var reach: [String: Set<String>] = [:]
-        for origin in known.prefix(Self.origins) {
-            for connection in graph.neighbors(of: origin.node).byDestination {
-                let node = connection.node
-                // Nowhere to land is not a suggestion. A node with no page is
-                // a row that looks like a link and does nothing.
-                guard node.destination != nil else { continue }
-                guard !seen.contains(node.id) else { continue }
-                guard !log.hasEncountered(node) else { continue }
-
-                // The best *route*, which is not the same as the best-evidenced
-                // edge. See `worth(_:)`.
-                // Equal routes are told apart by what they say, not by which
-                // the walk listed first: the route is the reason printed and
-                // the kind the block spreads across.
-                guard let route = connection.edges
-                    .map({ (edge: $0, value: $0.weight * Self.worth($0)) })
-                    .filter({ $0.value > 0 })
-                    .min(by: { $0.value != $1.value ? $0.value > $1.value : MusicEdge.precedes($0.edge, $1.edge) })
-                else { continue }
-
-                reach[node.id, default: []].insert(origin.node.id)
-                let score = route.value * origin.weight
-                // The origins are walked in a fixed order, strongest first,
-                // so a tie keeps the stronger origin's route.
-                if let existing = best[node.id], existing.score >= score { continue }
-                best[node.id] = ExploreSuggestion(
-                    node: node,
-                    reason: route.edge.reason,
-                    via: origin.node.title,
-                    kind: route.edge.kind,
-                    corroboration: 1,
-                    score: score
-                )
-            }
-        }
-        // Applied after the walk, when every route to a place is known.
-        for (id, origins) in reach where origins.count > 1 {
-            guard let found = best[id] else { continue }
-            best[id] = ExploreSuggestion(
-                node: found.node, reason: found.reason, via: found.via, kind: found.kind,
-                corroboration: origins.count,
-                score: found.score * (1 + 0.22 * Double(origins.count - 1))
-            )
-        }
-        // Shows judged on their tracklists, which the graph cannot reach.
-        //
-        // An edge to a broadcast exists only where an artist's records are in
-        // the local store *and* carry an appearance — five of those across a
-        // whole crate, while the appearance log held eighteen complete
-        // tracklists nobody was reading. See `ShowSuggestionEngine`.
-        let fromTracklists = ShowSuggestionEngine(context: context).suggestions(
-            taste: taste,
-            known: seen,
-            keptArtistKeys: Set(known.compactMap {
-                $0.node.kind == .artist ? $0.node.key : nil
-            })
-        )
-        for suggestion in fromTracklists {
-            guard let existing = best[suggestion.id] else {
-                best[suggestion.id] = suggestion
-                continue
-            }
-            // Found both ways. Keep whichever score is better evidenced, and
-            // the tracklist's sentence either way: "Played Aphex Twin, who you
-            // keep" says something, and the graph's "Played on NTS / 239EF"
-            // only repeats the name already printed on the card.
-            best[suggestion.id] = ExploreSuggestion(
-                node: suggestion.node, reason: suggestion.reason, via: suggestion.via,
-                kind: suggestion.kind,
-                corroboration: max(existing.corroboration, suggestion.corroboration),
-                score: max(existing.score, suggestion.score)
-            )
-        }
-
-        return Self.spread(
-            best.values.sorted(by: ExploreSuggestion.ranksAhead),
+        let (personal, knowledge) = inputs(asOf: asOf, scenes: false)
+        return ExploreRanker.suggestions(
+            personal: personal, knowledge: knowledge,
+            taste: taste ?? ExploreRanker.taste(personal: personal, knowledge: knowledge, asOf: asOf),
             limit: limit
         )
+    }
+
+    private func inputs(asOf: Date, scenes: Bool) -> (PersonalInputs, KnowledgeSnapshot) {
+        let personal = PersonalInputs.read(context: context, asOf: asOf)
+        let adapter = LocalKnowledgeAdapter(context: context)
+        return (personal, adapter.snapshot(for: personal, scenes: scenes))
     }
 
     /// At most this many suggestions from any one starting point.
@@ -305,7 +212,7 @@ nonisolated struct ExploreSuggestionEngine {
     /// the score would have said the evidence was better than it is.
     static let showFloor = 3
 
-    private static func spread(
+    static func spread(
         _ ranked: [ExploreSuggestion], limit: Int
     ) -> [ExploreSuggestion] {
         var kept: [ExploreSuggestion] = []
@@ -426,58 +333,6 @@ nonisolated struct ExploreSuggestionEngine {
         case .sameScene, .sameCity, .sameEra: 0.25
         case .sameUserTrail: 0.4
         case .manualRelation: 0.8
-        }
-    }
-
-    /// What this listener already has, strongest first — the places a walk is
-    /// worth starting from.
-    ///
-    /// Three sources, deliberately not averaged: keeping something, listening
-    /// to it, and going back to its page are different claims, and the
-    /// strongest is the honest reading. Somebody who crated a record once and
-    /// never played it still knows it.
-    private func knownGround() -> [(node: MusicNode, weight: Double)] {
-        var found: [String: (node: MusicNode, weight: Double)] = [:]
-
-        // The strongest claim on a node, and on a tie the better-identified
-        // spelling of it: the origin's title is printed as "via", and which
-        // spelling arrived first was the order of three different reads.
-        func note(_ node: MusicNode, weight: Double) {
-            guard !node.key.isEmpty else { return }
-            if let existing = found[node.id] {
-                if existing.weight > weight { return }
-                if existing.weight == weight {
-                    found[node.id] = (MusicNode.preferred(existing.node, node), weight)
-                    return
-                }
-            }
-            found[node.id] = (node, weight)
-        }
-
-        // The newest sixty, and on the same moment by what they are rather
-        // than by where the store filed them.
-        let kept = CrateService(context: context).items().sorted {
-            if $0.addedAt != $1.addedAt { return $0.addedAt > $1.addedAt }
-            return ($0.node?.id ?? "") < ($1.node?.id ?? "")
-        }
-        for item in kept.prefix(60) {
-            guard let node = item.node else { continue }
-            note(node, weight: 0.8)
-        }
-        let log = ListeningLog(context: context)
-        let met = log.recent(limit: 80)
-        let loudest = met.map(\.weight).max() ?? 1
-        for entry in met where entry.weight > 0 {
-            note(entry.node, weight: 0.5 + 0.5 * min(1, entry.weight / max(0.001, loudest)))
-        }
-        for visit in DigHistory(context: context).haunts(
-            kinds: Self.hauntKinds, limit: Self.hauntLimit
-        ) {
-            note(visit.node, weight: 0.6)
-        }
-
-        return found.values.sorted {
-            $0.weight == $1.weight ? $0.node.id < $1.node.id : $0.weight > $1.weight
         }
     }
 }

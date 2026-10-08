@@ -122,46 +122,178 @@ actor DigWorker {
         return scenes ?? SceneEngine(context: modelContext)
     }
 
-    /// What EXPLORE should offer that is not already in the crate.
+    // MARK: - For You
+
+    /// What For You's knowledge is kept for between looks, part by part.
     ///
-    /// Here rather than on the store's own context for the ordinary reason: it
-    /// reads the crate, the listening log and the dig history, then walks the
-    /// graph out of a dozen nodes. Measured cold on a real library that is a
-    /// couple of seconds, which on the main actor is a page that hangs on the
-    /// way in.
+    /// Each part is worked out again only when what it is about changes, or
+    /// when it has stood for `knowledgeLifetime`. A play or a new record in
+    /// the crate changes the listener's rows, not what is known about music:
+    /// the neighbourhoods are kept for every starting point that is still a
+    /// starting point, and only a new one is walked. The lifetime is the
+    /// quarter of an hour the kept answer used to stand for -- enrichment
+    /// writes several times a second, and an answer rebuilt for each would
+    /// move under the reader.
+    private struct ExploreKnowledgeCache {
+        var since: Date?
+        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+        var shows: [ShowProfile]?
+        var tagKeys: Set<String>?
+        var tags: [String: [String]] = [:]
+        var scenes: SceneCatalogue?
+        var library: [String: Int]?
+    }
+    private var exploreCache = ExploreKnowledgeCache()
+    /// Moves whenever a part of the kept knowledge is worked out again, so a
+    /// look whose knowledge is all kept reuses its digest instead of encoding
+    /// a megabyte to arrive at the same string.
+    private var knowledgeVersion = 0
+    private var lastKnowledgeDigests: (key: KnowledgeDigestKey, shared: (digest: String, bytes: Int), local: (digest: String, bytes: Int))?
+    private struct KnowledgeDigestKey: Equatable {
+        let version: Int
+        let origins: [MusicNode]
+        let scenes: Bool
+    }
+    private var lastPersonal: (inputs: PersonalInputs, digest: String, bytes: Int)?
+    static let knowledgeLifetime: TimeInterval = 15 * 60
+
+    /// The listener's rows and the knowledge around them, digested.
     ///
-    /// Plain values cross back, as with everything here.
-    /// The blocks somebody can act on. Answered first, and separately from
-    /// the direction below, so the page's headline does not wait a second on
-    /// a slower claim about where its reader is going.
-    /// What an answer would be worked out from now. Reads the store, not the
-    /// graph, so it does not wait on a generation. See `ExploreInputs`.
-    func exploreInputs() -> ExploreInputs {
-        Trace.step("explore.inputs") { ExploreInputs.read(context: modelContext) }
+    /// `now` decides only whether kept knowledge has expired; the answer is
+    /// worked out for `asOf`. `scenes` asks for the slow half as well.
+    /// `rebuild` throws everything kept away first, for a correction that
+    /// landed in the store (see `DigStore.invalidateExploreOffers`).
+    /// `personal` is the rows a first half already read, so the second half
+    /// of one look is about the same rows.
+    func exploreRun(
+        asOf: Date, period: Int, generation asked: Int, scenes withScenes: Bool, rebuild: Bool, now: Date,
+        personal known: PersonalInputs? = nil
+    ) -> ExploreRun {
+        refresh(asked)
+        var report = ExploreBuildReport()
+        func timed<T>(_ part: String, _ work: () -> T) -> T {
+            let started = ContinuousClock.now
+            let value = Trace.step("explore.build", part) { work() }
+            let spent = ContinuousClock.now - started
+            report.milliseconds[part, default: 0] += Double(spent.components.attoseconds) / 1e15
+                + Double(spent.components.seconds) * 1_000
+            return value
+        }
+
+        let personal = known ?? timed("personal") { PersonalInputs.read(context: modelContext, asOf: asOf) }
+        if rebuild || exploreCache.since.map({ now.timeIntervalSince($0) > Self.knowledgeLifetime }) ?? true {
+            exploreCache = ExploreKnowledgeCache(since: now)
+            knowledgeVersion &+= 1
+        }
+        let adapter = LocalKnowledgeAdapter(
+            context: modelContext, graph: graph ?? GraphStore(context: modelContext), scenes: sceneEngine(asked)
+        )
+
+        let origins = ExploreRanker.startingPoints(personal)
+        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+        var fresh = 0
+        for origin in origins {
+            if let kept = exploreCache.walked[origin] {
+                walked[origin] = kept
+            } else {
+                let found = timed("neighbourhoods") { adapter.neighbourhood(of: origin) }
+                exploreCache.walked[origin] = found
+                walked[origin] = found
+                fresh += 1
+            }
+        }
+        if fresh > 0 {
+            report.rebuilt.append("neighbourhoods \(fresh)/\(origins.count)")
+            knowledgeVersion &+= 1
+        }
+        if exploreCache.shows == nil {
+            exploreCache.shows = timed("shows") { adapter.shows() }
+            report.rebuilt.append("shows")
+            knowledgeVersion &+= 1
+        }
+        let keys = personal.tasteArtistKeys
+        if exploreCache.tagKeys != keys {
+            exploreCache.tags = timed("artistTags") { LocalKnowledgeAdapter.artistTags(for: keys, in: modelContext) }
+            exploreCache.tagKeys = keys
+            report.rebuilt.append("artistTags")
+            knowledgeVersion &+= 1
+        }
+        if exploreCache.library == nil {
+            exploreCache.library = timed("library") { adapter.libraryCounts() }
+            report.rebuilt.append("library")
+            knowledgeVersion &+= 1
+        }
+        if withScenes, exploreCache.scenes == nil {
+            exploreCache.scenes = timed("scenes") { adapter.sceneCatalogue() }
+            report.rebuilt.append("scenes")
+            knowledgeVersion &+= 1
+        }
+
+        let knowledge = timed("assemble") {
+            LocalKnowledgeAdapter.assemble(
+                origins: origins, walked: walked, shows: exploreCache.shows ?? [],
+                artistTags: exploreCache.tags, scenes: withScenes ? exploreCache.scenes : nil,
+                libraryCounts: exploreCache.library ?? [:]
+            )
+        }
+        // The rows' digest is kept with the rows: the second half of a look
+        // asks again with the same ones.
+        let personalDigest: (digest: String, bytes: Int)
+        if let last = lastPersonal, last.inputs == personal {
+            personalDigest = (last.digest, last.bytes)
+        } else {
+            personalDigest = timed("digest") { CanonicalDigest.digestAndSize(of: personal) }
+            lastPersonal = (personal, personalDigest.digest, personalDigest.bytes)
+        }
+        let digestKey = KnowledgeDigestKey(version: knowledgeVersion, origins: origins, scenes: withScenes)
+        let shared: (digest: String, bytes: Int)
+        let local: (digest: String, bytes: Int)
+        if let last = lastKnowledgeDigests, last.key == digestKey {
+            (shared, local) = (last.shared, last.local)
+        } else {
+            shared = timed("digest") { CanonicalDigest.digestAndSize(of: knowledge.shared) }
+            local = timed("digest") { CanonicalDigest.digestAndSize(of: knowledge.deviceLocal) }
+            lastKnowledgeDigests = (digestKey, shared, local)
+        }
+        report.bytes = ["personal": personalDigest.bytes, "shared": shared.bytes, "deviceLocal": local.bytes]
+        report.counts = [
+            "startingPoints": origins.count,
+            "edges": knowledge.shared.neighbourhoods.reduce(0) { $0 + $1.edges.count },
+            "deviceLocalEdges": knowledge.deviceLocal.neighbourhoods.reduce(0) { $0 + $1.edges.count },
+            "nodes": knowledge.shared.nodes.count,
+            "shows": knowledge.shared.shows.count,
+            "sceneCities": knowledge.shared.scenes?.cities.count ?? 0,
+        ]
+        return ExploreRun(
+            personal: personal, knowledge: knowledge,
+            stamp: ExploreStamp(
+                format: knowledge.format, period: period, personal: personalDigest.digest,
+                shared: shared.digest, deviceLocal: local.digest
+            ),
+            report: report
+        )
     }
 
-    func exploreRecommendations(generation: Int, asOf: Date) -> ExploreOffers {
-        refresh(generation)
-        return Trace.step("explore.suggest") {
-            ExploreSuggestionEngine(context: modelContext).recommendations(asOf: asOf)
+    /// The blocks somebody can act on, ranked from a run. Pure; here only to
+    /// stay off the thread that draws.
+    func exploreRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
+        Trace.step("explore.rank") {
+            ExploreRanker.recommendations(
+                personal: run.personal, knowledge: run.knowledge,
+                taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf)
+            )
         }
     }
 
-    /// And where they are heading, which means assembling every place in the
-    /// catalogue. Uses the engine this actor already holds rather than
-    /// building a second set of the same caches.
-    /// `turn` moves along the list of places somebody could be said to be
-    /// heading into, so a collection that changes slowly is not told the same
-    /// thing forever. Costs nothing: they are all worked out either way.
-    func exploreDirection(generation: Int, turn: Int, asOf: Date) -> ExploreOffers.SceneOffer? {
-        let scenes = sceneEngine(generation)
-        return Trace.step("explore.direction") {
-            let taste = TasteProfile.collected(context: modelContext, now: asOf)
-            guard let scene = SceneEngine.pickDirection(scenes.directions(taste: taste), turn: turn)
-            else { return nil }
-            return ExploreOffers.SceneOffer(
-                city: scene.city, title: scene.title,
-                sound: scene.soundLabel, size: scene.sizeLine
+    /// And where they are heading. `turn` moves along the list of places
+    /// somebody could be said to be heading into -- EXPLORE passes its period,
+    /// so every device names the same place on the same day.
+    func exploreDirection(_ run: ExploreRun, asOf: Date, turn: Int) -> ExploreOffers.SceneOffer? {
+        Trace.step("explore.direction") {
+            ExploreRanker.direction(
+                personal: run.personal, knowledge: run.knowledge,
+                taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf),
+                turn: turn
             )
         }
     }

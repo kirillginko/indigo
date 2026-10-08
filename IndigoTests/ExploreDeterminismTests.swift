@@ -279,19 +279,19 @@ final class ExploreDeterminismTests: XCTestCase {
         let morning = Date(timeIntervalSince1970: 1_790_000_000 - 1_790_000_000.truncatingRemainder(dividingBy: 86_400) + 60)
         let evening = morning.addingTimeInterval(23 * 60 * 60)
         let tomorrow = morning.addingTimeInterval(24 * 60 * 60)
-        XCTAssertEqual(ExploreInputs.period(containing: morning), ExploreInputs.period(containing: evening))
-        XCTAssertNotEqual(ExploreInputs.period(containing: morning), ExploreInputs.period(containing: tomorrow))
+        XCTAssertEqual(ExplorePeriod.containing(morning), ExplorePeriod.containing(evening))
+        XCTAssertNotEqual(ExplorePeriod.containing(morning), ExplorePeriod.containing(tomorrow))
 
         // `asOf` is the end of the day, so nothing played in it is in its
         // future, and it is the same however late in the day it is asked.
-        let context = ModelContext(try! ModelContainer(
-            for: Persistence.schema,
-            configurations: ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)))
-        let early = ExploreInputs.read(context: context, now: morning)
-        let late = ExploreInputs.read(context: context, now: evening)
-        XCTAssertEqual(early, late)
-        XCTAssertEqual(early.asOf, morning.addingTimeInterval(24 * 60 * 60 - 60))
-        XCTAssertNotEqual(ExploreInputs.read(context: context, now: tomorrow), early)
+        XCTAssertEqual(ExplorePeriod.asOf(ExplorePeriod.containing(morning)), morning.addingTimeInterval(24 * 60 * 60 - 60))
+        XCTAssertEqual(ExplorePeriod.asOf(ExplorePeriod.containing(evening)), ExplorePeriod.asOf(ExplorePeriod.containing(morning)))
+
+        // And the day is part of the stamp, so a new one is a new answer.
+        let one = ExploreStamp(period: ExplorePeriod.containing(morning), personal: .empty, knowledge: .empty)
+        let two = ExploreStamp(period: ExplorePeriod.containing(tomorrow), personal: .empty, knowledge: .empty)
+        XCTAssertNotEqual(one, two)
+        XCTAssertEqual(one.personal, two.personal)
     }
 
     /// Plays are weighed from `asOf`, not from the moment of asking.
@@ -384,7 +384,7 @@ final class ExploreDeterminismTests: XCTestCase {
              "\(scene.crateCount)/\(scene.libraryTrackCount)/\(scene.radioAppearances)"]
                 .joined(separator: " | ")
         }
-        let period = ExploreInputs.period(containing: Self.asOf)
+        let period = ExplorePeriod.containing(Self.asOf)
         let picked = (period..<(period + 7)).map {
             "day \($0 - period): " + (SceneEngine.pickDirection(found, turn: $0)?.id ?? "-")
         }
