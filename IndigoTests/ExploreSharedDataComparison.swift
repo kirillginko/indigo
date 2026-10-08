@@ -49,6 +49,49 @@ final class ExploreSharedDataComparison: XCTestCase {
         }
         out.append("")
 
+        // Corroboration depth: for each of the visible top twenty, how many
+        // distinct starting points reach it on a route worth something, and
+        // by which kinds of route.
+        out.append("CORROBORATION DEPTH (visible top 20)")
+        let sets = ExploreRanker.edgeSets(local)
+        for (index, s) in baseline.all.prefix(20).enumerated() {
+            let weak: Set<RelationshipKind> = [.sharedStyle, .sameEra, .sameScene, .sameCity]
+            var origins = Set<String>()
+            var strongOrigins = Set<String>()
+            var kinds = Set<String>()
+            for origin in ExploreRanker.startingPoints(personal) {
+                for connection in (sets[origin] ?? EdgeSet()).byDestination where connection.node.id == s.id {
+                    let worth = connection.edges.filter { $0.weight * ExploreSuggestionEngine.worth($0) > 0 }
+                    if !worth.isEmpty { origins.insert(origin.title) }
+                    if worth.contains(where: { !weak.contains($0.kind) }) { strongOrigins.insert(origin.title) }
+                    for edge in worth { kinds.insert(edge.kind.rawValue) }
+                }
+            }
+            out.append("\(index + 1). \(s.node.title): \(origins.count) starting points, \(strongOrigins.count) by a strong route [\(strongOrigins.sorted().joined(separator: ", "))], kinds [\(kinds.sorted().joined(separator: ", "))]")
+        }
+        out.append("")
+
+        // How broad styles are in this device's catalogue, and how many style
+        // peers each artist starting point gets.
+        let context = ModelContext(container)
+        let artists = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
+        var share: [String: Int] = [:]
+        for artist in artists { for style in Set(artist.styles) { share[style, default: 0] += 1 } }
+        let withStyles = artists.filter { !$0.styles.isEmpty }.count
+        out.append("STYLES: \(artists.count) cached artists, \(withStyles) with styles, \(share.count) distinct styles, "
+                   + "mean \(String(format: "%.1f", Double(artists.map { Set($0.styles).count }.reduce(0, +)) / Double(max(1, artists.count)))) per artist")
+        out.append("  broadest: " + share.sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }.prefix(12)
+            .map { "\($0.key) \($0.value) (\(100 * $0.value / max(1, artists.count))%)" }.joined(separator: ", "))
+        out.append("  styles on <=3 artists: \(share.values.filter { $0 <= 3 }.count) of \(share.count)")
+        for origin in ExploreRanker.startingPoints(personal) where origin.kind == .artist {
+            let edges = local.shared.neighbourhoods.first { local.shared.nodes[$0.origin] == origin }?.edges ?? []
+            let style = edges.filter { $0.kind == .sharedStyle }
+            let era = edges.filter { $0.kind == .sameEra }
+            let label = edges.filter { $0.kind == .sharedLabel }
+            out.append("  \(origin.title): \(edges.count) edges, style \(style.count), era \(era.count), label \(label.count)")
+        }
+        out.append("")
+
         // The backend's own snapshot is compared by ExploreShadowMeasurement,
         // through the code the app runs.
 
