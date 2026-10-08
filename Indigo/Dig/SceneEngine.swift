@@ -317,6 +317,14 @@ nonisolated struct SceneEngine {
         directions(taste: taste).first
     }
 
+    /// Which of the directions to name on a turn. EXPLORE's turn is its
+    /// evaluation period, so every device names the same place on the same
+    /// day, and the next day names the next one.
+    nonisolated static func pickDirection(_ found: [MusicScene], turn: Int) -> MusicScene? {
+        guard !found.isEmpty else { return nil }
+        return found[((turn % found.count) + found.count) % found.count]
+    }
+
     /// Every scene this listener could be said to be heading into, best first.
     ///
     /// Plural because the singular was always the same answer. Scoring already

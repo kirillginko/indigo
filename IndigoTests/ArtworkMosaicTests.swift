@@ -10,6 +10,9 @@
 //  screenshot — so it is worth a test rather than a comment.
 //
 
+// Reads pixels through AppKit, so it runs on the Mac only; without the
+// guard the whole test target would not build for an iOS simulator.
+#if canImport(AppKit)
 import XCTest
 import SwiftUI
 @testable import Indigo
@@ -174,3 +177,4 @@ final class ArtworkViewPlaceholderTests: XCTestCase {
         )
     }
 }
+#endif

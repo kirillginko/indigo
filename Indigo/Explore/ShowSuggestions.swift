@@ -50,7 +50,7 @@ nonisolated struct ShowSuggestionEngine {
         let styles = artistStyles()
 
         var found: [ExploreSuggestion] = []
-        for show in shows.values {
+        for show in shows.values.sorted(by: { $0.key < $1.key }) {
             var node = MusicNode.broadcast(
                 providerID: show.providerID, showID: show.showID, title: show.title
             )
@@ -62,8 +62,9 @@ nonisolated struct ShowSuggestionEngine {
             let familiar = show.artists
                 .filter { keptArtistKeys.contains(RecordingKey.normalizeArtist($0)) }
                 .sorted()
-            // And what the rest of the hour sounded like.
-            let tags = show.artists.flatMap { styles[RecordingKey.normalizeArtist($0)] ?? [] }
+            // And what the rest of the hour sounded like, read by name: the
+            // artists are a set, and a set's order is the process's.
+            let tags = show.artists.sorted().flatMap { styles[RecordingKey.normalizeArtist($0)] ?? [] }
             let affinity = taste.affinity(for: tags)
 
             // Deliberately not a sum. Three artists you keep is a reason on its
@@ -83,7 +84,7 @@ nonisolated struct ShowSuggestionEngine {
             ))
         }
         return found
-            .sorted { $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score }
+            .sorted(by: ExploreSuggestion.ranksAhead)
             .prefix(limit)
             .map { $0 }
     }
@@ -106,7 +107,7 @@ nonisolated struct ShowSuggestionEngine {
         // than everything the hour touched.
         let matched = ListeningLog.foldTags(tags)
             .filter { taste[$0] > 0 }
-            .sorted { taste[$0] > taste[$1] }
+            .sorted { taste[$0] == taste[$1] ? $0 < $1 : taste[$0] > taste[$1] }
             .prefix(3)
         guard !matched.isEmpty else { return "Close to what you listen to" }
         return "\(matched.map(\.capitalized).joined(separator: ", ")) — what you listen to"
@@ -118,6 +119,8 @@ nonisolated struct ShowSuggestionEngine {
         let providerID: String
         let showID: String
         var title: String
+        /// Where it is filed: provider and show.
+        var key: String { "\(providerID)|\(showID)" }
         var artists: Set<String> = []
         /// The first picture any of these appearances carried. A show has one
         /// cover however many tracks were logged off it.
@@ -125,22 +128,36 @@ nonisolated struct ShowSuggestionEngine {
     }
 
     /// Every broadcast Indigo has a tracklist for, and who was on it.
+    ///
+    /// A show's name and picture are whatever its appearances say, chosen by
+    /// what they say: the first by name and by address. They were the first
+    /// appearance read, which is the order the store filed them in -- not the
+    /// same on two devices holding the same tracklist -- and a show whose
+    /// first appearance had no title kept the station's name even when a
+    /// later one had the show's.
     func tracklists() -> [String: Tracklist] {
         var byShow: [String: Tracklist] = [:]
+        var titles: [String: String] = [:]
         for appearance in (try? context.fetch(FetchDescriptor<MediaAppearance>())) ?? [] {
             guard let showID = appearance.showID, !showID.isEmpty else { continue }
             let key = "\(appearance.providerID)|\(showID)"
             var entry = byShow[key] ?? Tracklist(
                 providerID: appearance.providerID, showID: showID,
-                title: appearance.showTitle ?? BroadcastSource.label(for: appearance.providerID)
+                title: BroadcastSource.label(for: appearance.providerID)
             )
             if let name = appearance.recording?.artistName, !name.isEmpty {
                 entry.artists.insert(name)
             }
-            if entry.title.isEmpty, let title = appearance.showTitle { entry.title = title }
-            if entry.artworkURL == nil { entry.artworkURL = appearance.artworkURL }
+            if let title = appearance.showTitle, !title.isEmpty {
+                titles[key] = titles[key].map { min($0, title) } ?? title
+            }
+            if let artwork = appearance.artworkURL,
+               entry.artworkURL.map({ artwork.absoluteString < $0.absoluteString }) ?? true {
+                entry.artworkURL = artwork
+            }
             byShow[key] = entry
         }
+        for (key, title) in titles { byShow[key]?.title = title }
         // A show nobody could name a single track from says nothing about
         // itself, and guessing from its title is not evidence.
         return byShow.filter { !$0.value.artists.isEmpty }

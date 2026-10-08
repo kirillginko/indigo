@@ -52,7 +52,7 @@ final class ExploreSuggestionTests: XCTestCase {
 
     private func suggestions() -> [ExploreSuggestion] {
         try? context.save()
-        return ExploreSuggestionEngine(context: context).suggestions()
+        return ExploreSuggestionEngine(context: context).suggestions(asOf: Date())
     }
 
     // MARK: The point of it
@@ -298,7 +298,7 @@ final class ExploreSuggestionTests: XCTestCase {
         crate(artist: "Dean Blunt")
         try? context.save()
 
-        let offers = ExploreSuggestionEngine(context: context).offers()
+        let offers = ExploreSuggestionEngine(context: context).offers(asOf: Date())
         let next = Set(offers.next.map(\.id))
         let alsoInArtists = offers.artists.filter { next.contains($0.id) }
         // The same face in two blocks is a page that has run out of things to
@@ -319,7 +319,7 @@ final class ExploreSuggestionTests: XCTestCase {
         crate(artist: "Dean Blunt")
         try? context.save()
 
-        let offers = ExploreSuggestionEngine(context: context).offers()
+        let offers = ExploreSuggestionEngine(context: context).offers(asOf: Date())
         XCTAssertTrue(offers.shows.allSatisfy { $0.node.kind == .broadcast })
         XCTAssertFalse(offers.next.contains { $0.node.kind == .broadcast })
         XCTAssertFalse(offers.shows.isEmpty)
@@ -384,7 +384,7 @@ final class ExploreSuggestionTests: XCTestCase {
         try? context.save()
 
         XCTAssertLessThanOrEqual(
-            ExploreSuggestionEngine(context: context).suggestions(limit: 12).count, 12
+            ExploreSuggestionEngine(context: context).suggestions(limit: 12, asOf: Date()).count, 12
         )
     }
 }

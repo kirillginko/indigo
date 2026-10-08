@@ -14,6 +14,8 @@ import SwiftData
 
 @MainActor
 final class ExploreRefreshTests: XCTestCase {
+    /// One moment for every read, so no test straddles midnight UTC.
+    private static let now = Date(timeIntervalSince1970: 1_790_000_000)
     private var directory: URL!
     private var container: ModelContainer!
     private var context: ModelContext!
@@ -48,23 +50,23 @@ final class ExploreRefreshTests: XCTestCase {
     func testTheInputsMoveWhenTheCrateGainsOrLosesARecord() throws {
         crate("a", added: 100)
         try context.save()
-        let before = ExploreInputs.read(context: context)
+        let before = ExploreInputs.read(context: context, now: Self.now)
 
         crate("b", added: 50)
         try context.save()
-        let added = ExploreInputs.read(context: context)
+        let added = ExploreInputs.read(context: context, now: Self.now)
         XCTAssertNotEqual(added, before, "an older record still changes the crate")
 
         for item in try context.fetch(FetchDescriptor<CrateItem>()) where item.showID == "b" { context.delete(item) }
         try context.save()
-        XCTAssertEqual(ExploreInputs.read(context: context), before)
+        XCTAssertEqual(ExploreInputs.read(context: context, now: Self.now), before)
     }
 
     func testTheInputsMoveWithTheListeningLog() throws {
-        let before = ExploreInputs.read(context: context)
+        let before = ExploreInputs.read(context: context, now: Self.now)
         context.insert(ListeningEvent(node: .artist("Laurel Halo"), action: .played, at: Date(), seconds: 300, completion: 1, tags: [], source: nil))
         try context.save()
-        XCTAssertNotEqual(ExploreInputs.read(context: context), before)
+        XCTAssertNotEqual(ExploreInputs.read(context: context, now: Self.now), before)
     }
 
     /// A visit merged in from the other device changes how often somewhere
@@ -74,22 +76,22 @@ final class ExploreRefreshTests: XCTestCase {
         visit.visits = 2
         context.insert(visit)
         try context.save()
-        let before = ExploreInputs.read(context: context)
+        let before = ExploreInputs.read(context: context, now: Self.now)
 
         visit.visits = 5
         try context.save()
-        XCTAssertNotEqual(ExploreInputs.read(context: context), before)
+        XCTAssertNotEqual(ExploreInputs.read(context: context, now: Self.now), before)
     }
 
     /// The cache is written to all session long. None of it is an input.
     func testTheInputsIgnoreTheCache() throws {
         crate("a", added: 100)
         try context.save()
-        let before = ExploreInputs.read(context: context)
+        let before = ExploreInputs.read(context: context, now: Self.now)
 
         context.insert(ExploreOffersRecord(payload: Data(), crateRevision: 0))
         try context.save()
-        XCTAssertEqual(ExploreInputs.read(context: context), before)
+        XCTAssertEqual(ExploreInputs.read(context: context, now: Self.now), before)
     }
 
     /// Kept beside the answer, so a launch can tell whether the answer it
@@ -97,7 +99,7 @@ final class ExploreRefreshTests: XCTestCase {
     func testAKeptAnswerCarriesItsInputs() throws {
         crate("a", added: 100)
         try context.save()
-        let inputs = ExploreInputs.read(context: context)
+        let inputs = ExploreInputs.read(context: context, now: Self.now)
         ExploreOffersStore(context: context).save(ExploreOffers(), inputs: inputs)
 
         XCTAssertEqual(ExploreOffersStore(context: context).load()?.inputs, inputs)

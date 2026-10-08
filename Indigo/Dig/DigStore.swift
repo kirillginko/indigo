@@ -1156,22 +1156,6 @@ final class DigStore {
     private(set) var hasExploreDirection = false
     @ObservationIgnored private lazy var offersStore = ExploreOffersStore(context: context)
 
-    /// Which of the places somebody could be heading into to show next.
-    ///
-    /// Kept in defaults rather than in the store: it is a note about what was
-    /// last put on screen, not a fact about their music, and it should not be
-    /// worth a schema migration. Advanced once per recomputation — which is
-    /// about once a launch — so the page says something different each time
-    /// without any of it being worked out twice.
-    @ObservationIgnored static let directionTurnKey = "explore.direction.turn"
-
-    private static func nextDirectionTurn() -> Int {
-        let defaults = UserDefaults.standard
-        let turn = defaults.integer(forKey: directionTurnKey)
-        defaults.set(turn &+ 1, forKey: directionTurnKey)
-        return turn
-    }
-
     /// Reads back what was shown last time, so a launch opens on the page it
     /// closed on rather than on an empty one. Called once, from the app.
     func restoreExploreOffers() {
@@ -1234,7 +1218,7 @@ final class DigStore {
             // The blocks somebody can act on, published as soon as they are
             // known. Working out a direction reads every place in the
             // catalogue, and the page was making its headline wait behind it.
-            let found = await self.worker.exploreRecommendations(generation: asked)
+            let found = await self.worker.exploreRecommendations(generation: asked, asOf: inputs.asOf)
             guard !Task.isCancelled else { return }
             self.offersInputs = inputs
             self.offersImportRevision = imports
@@ -1243,8 +1227,14 @@ final class DigStore {
             self.hasExploreOffers = true
 
             // Then the slower half, folded into what is already on screen.
+            //
+            // Which of the places they could be heading into is shown moves
+            // on with the period, so a collection that changes slowly is not
+            // told the same thing forever. It used to move on with a counter
+            // in this device's defaults, once a recomputation -- so the Mac
+            // and the phone named different places from the same rows.
             let direction = await self.worker.exploreDirection(
-                generation: asked, turn: Self.nextDirectionTurn()
+                generation: asked, turn: inputs.period, asOf: inputs.asOf
             )
             guard !Task.isCancelled else { return }
             var withScene = self.exploreOffers

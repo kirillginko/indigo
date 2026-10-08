@@ -6,6 +6,9 @@
 //  is genuinely no picture.
 //
 
+// Draws with AppKit, so it runs on the Mac only; without the guard the whole
+// test target would not build for an iOS simulator.
+#if canImport(AppKit)
 import XCTest
 import SwiftData
 import AppKit
@@ -279,3 +282,4 @@ final class MissingArtworkTests: XCTestCase {
         XCTAssertEqual(line.label, "sferic")
     }
 }
+#endif

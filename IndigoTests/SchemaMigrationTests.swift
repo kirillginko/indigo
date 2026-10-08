@@ -102,7 +102,7 @@ final class SchemaMigrationTests: XCTestCase {
         offers.movingToward = ExploreOffers.SceneOffer(
             city: "New York", title: "NEW YORK", sound: "JAZZ", size: "19 artists"
         )
-        let inputs = ExploreInputs(crateCount: 7, crateNewest: nil, eventCount: 0, eventNewest: nil, haunts: [])
+        let inputs = ExploreInputs(crateCount: 7, crateNewest: nil, eventCount: 0, eventNewest: nil, haunts: [], period: 20_000)
         store.save(offers, inputs: inputs)
 
         let read = try XCTUnwrap(store.load())

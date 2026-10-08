@@ -152,7 +152,7 @@ nonisolated struct ListeningLog {
     /// Everything met, most recently first, one row per thing.
     func recent(limit: Int = 12) -> [Encountered] {
         Self.gather(all())
-            .sorted { $0.lastAt > $1.lastAt }
+            .sorted { $0.lastAt == $1.lastAt ? $0.id < $1.id : $0.lastAt > $1.lastAt }
             .prefix(limit)
             .map { $0 }
     }
@@ -243,9 +243,14 @@ nonisolated struct ListeningLog {
     /// Done in Swift rather than by the store because SwiftData has no group
     /// clause, and because the alternative — a fetch per node — is what turns
     /// a summary into a hundred round trips.
+    /// Folded in a fixed order -- by time, then by id, both of which travel
+    /// with an event between devices -- because a sum of doubles depends on
+    /// the order it is added in, and the store hands rows back in the order
+    /// it filed them, which is not the same on two machines.
     static func gather(_ events: [ListeningEvent]) -> [Encountered] {
         var byNode: [String: (node: MusicNode, count: Int, weight: Double, first: Date, last: Date, seconds: Double)] = [:]
-        for event in events {
+        let ordered = events.sorted { $0.at == $1.at ? $0.id.uuidString < $1.id.uuidString : $0.at < $1.at }
+        for event in ordered {
             let weight = event.weight
             guard var existing = byNode[event.nodeID] else {
                 byNode[event.nodeID] = (event.node, 1, weight, event.at, event.at, event.seconds)
@@ -258,7 +263,7 @@ nonisolated struct ListeningLog {
             existing.seconds += event.seconds
             // The best-identified spelling wins: a node met by name first and
             // by MBID later should end up knowing both.
-            if existing.node.mbid == nil, event.mbid != nil { existing.node = event.node }
+            existing.node = MusicNode.preferred(existing.node, event.node)
             byNode[event.nodeID] = existing
         }
         return byNode.values.map {

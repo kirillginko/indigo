@@ -41,6 +41,16 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable, Codable {
 
     var id: String { node.id }
 
+    /// Best first: score, then name, then id. Two things of one name -- an
+    /// artist and the label named after them -- used to tie, and came out in
+    /// whatever order a dictionary held them, which also decided which of the
+    /// two the page's one-per-name rule kept.
+    static func ranksAhead(_ left: ExploreSuggestion, _ right: ExploreSuggestion) -> Bool {
+        if left.score != right.score { return left.score > right.score }
+        if left.node.title != right.node.title { return left.node.title < right.node.title }
+        return left.id < right.id
+    }
+
     /// How far outside charted territory this sits, 0…1.
     ///
     /// EXPLORE draws a map, and on a map position is an argument. Until now
@@ -121,10 +131,15 @@ nonisolated struct ExploreSuggestionEngine {
     static let hauntLimit = 12
 
     /// Everything the page needs, in one walk.
-    func offers(next: Int = 12, shows: Int = 6, artists: Int = 6) -> ExploreOffers {
-        let taste = TasteProfile.collected(context: context)
-        var offers = recommendations(next: next, shows: shows, artists: artists, taste: taste)
-        offers.movingToward = direction(taste: taste)
+    ///
+    /// `asOf` is the moment listening is weighed from -- how far back a play
+    /// was is the one thing here that depends on when it is asked. It is
+    /// passed in, never read off the clock, so the same rows give the same
+    /// answer whenever and wherever they are worked out. See `ExploreInputs`.
+    func offers(next: Int = 12, shows: Int = 6, artists: Int = 6, asOf: Date) -> ExploreOffers {
+        let taste = TasteProfile.collected(context: context, now: asOf)
+        var offers = recommendations(next: next, shows: shows, artists: artists, taste: taste, asOf: asOf)
+        offers.movingToward = direction(taste: taste, asOf: asOf)
         return offers
     }
 
@@ -136,10 +151,10 @@ nonisolated struct ExploreSuggestionEngine {
     /// collection — and the page was making its own headline wait behind it.
     /// What a reader came for arrives first now; the slower claim follows.
     func recommendations(
-        next: Int = 12, shows: Int = 6, artists: Int = 6, taste: TasteProfile? = nil
+        next: Int = 12, shows: Int = 6, artists: Int = 6, taste: TasteProfile? = nil, asOf: Date
     ) -> ExploreOffers {
-        let taste = taste ?? TasteProfile.collected(context: context)
-        let all = suggestions(limit: next + artists + shows, taste: taste)
+        let taste = taste ?? TasteProfile.collected(context: context, now: asOf)
+        let all = suggestions(limit: next + artists + shows, taste: taste, asOf: asOf)
         var offers = ExploreOffers()
         offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
         let rest = all.filter { $0.node.kind != .broadcast }
@@ -152,8 +167,8 @@ nonisolated struct ExploreSuggestionEngine {
     }
 
     /// Where this listener is heading, which is the slow half.
-    func direction(taste: TasteProfile? = nil) -> ExploreOffers.SceneOffer? {
-        let taste = taste ?? TasteProfile.collected(context: context)
+    func direction(taste: TasteProfile? = nil, asOf: Date) -> ExploreOffers.SceneOffer? {
+        let taste = taste ?? TasteProfile.collected(context: context, now: asOf)
         guard let scene = SceneEngine(context: context).movingToward(taste: taste)
         else { return nil }
         return ExploreOffers.SceneOffer(
@@ -167,8 +182,8 @@ nonisolated struct ExploreSuggestionEngine {
     /// `taste` is passed in rather than built here because the caller needs it
     /// too, and collecting it reads the crate, the log and the whole artist
     /// cache — twice over is a fifth of a second spent proving the same thing.
-    func suggestions(limit: Int = 12, taste: TasteProfile? = nil) -> [ExploreSuggestion] {
-        let taste = taste ?? TasteProfile.collected(context: context)
+    func suggestions(limit: Int = 12, taste: TasteProfile? = nil, asOf: Date) -> [ExploreSuggestion] {
+        let taste = taste ?? TasteProfile.collected(context: context, now: asOf)
         let known = knownGround()
         guard !known.isEmpty else { return [] }
 
@@ -195,14 +210,19 @@ nonisolated struct ExploreSuggestionEngine {
 
                 // The best *route*, which is not the same as the best-evidenced
                 // edge. See `worth(_:)`.
+                // Equal routes are told apart by what they say, not by which
+                // the walk listed first: the route is the reason printed and
+                // the kind the block spreads across.
                 guard let route = connection.edges
                     .map({ (edge: $0, value: $0.weight * Self.worth($0)) })
                     .filter({ $0.value > 0 })
-                    .max(by: { $0.value < $1.value })
+                    .min(by: { $0.value != $1.value ? $0.value > $1.value : MusicEdge.precedes($0.edge, $1.edge) })
                 else { continue }
 
                 reach[node.id, default: []].insert(origin.node.id)
                 let score = route.value * origin.weight
+                // The origins are walked in a fixed order, strongest first,
+                // so a tie keeps the stronger origin's route.
                 if let existing = best[node.id], existing.score >= score { continue }
                 best[node.id] = ExploreSuggestion(
                     node: node,
@@ -254,9 +274,7 @@ nonisolated struct ExploreSuggestionEngine {
         }
 
         return Self.spread(
-            best.values.sorted {
-                $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score
-            },
+            best.values.sorted(by: ExploreSuggestion.ranksAhead),
             limit: limit
         )
     }
@@ -339,9 +357,7 @@ nonisolated struct ExploreSuggestionEngine {
         fill(origins: true, kinds: true)
         fill(origins: false, kinds: true)
         fill(origins: false, kinds: false)
-        return kept.sorted {
-            $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score
-        }
+        return kept.sorted(by: ExploreSuggestion.ranksAhead)
     }
 
     /// How much a kind of connection is worth *going down*, which is a
@@ -423,13 +439,28 @@ nonisolated struct ExploreSuggestionEngine {
     private func knownGround() -> [(node: MusicNode, weight: Double)] {
         var found: [String: (node: MusicNode, weight: Double)] = [:]
 
+        // The strongest claim on a node, and on a tie the better-identified
+        // spelling of it: the origin's title is printed as "via", and which
+        // spelling arrived first was the order of three different reads.
         func note(_ node: MusicNode, weight: Double) {
             guard !node.key.isEmpty else { return }
-            if let existing = found[node.id], existing.weight >= weight { return }
+            if let existing = found[node.id] {
+                if existing.weight > weight { return }
+                if existing.weight == weight {
+                    found[node.id] = (MusicNode.preferred(existing.node, node), weight)
+                    return
+                }
+            }
             found[node.id] = (node, weight)
         }
 
-        for item in CrateService(context: context).items().prefix(60) {
+        // The newest sixty, and on the same moment by what they are rather
+        // than by where the store filed them.
+        let kept = CrateService(context: context).items().sorted {
+            if $0.addedAt != $1.addedAt { return $0.addedAt > $1.addedAt }
+            return ($0.node?.id ?? "") < ($1.node?.id ?? "")
+        }
+        for item in kept.prefix(60) {
             guard let node = item.node else { continue }
             note(node, weight: 0.8)
         }

@@ -7,6 +7,9 @@
 //  -- the answer "there is no picture" -- must not flash up first.
 //
 
+// Reads pixels through AppKit, so it runs on the Mac only; without the
+// guard the whole test target would not build for an iOS simulator.
+#if canImport(AppKit)
 import XCTest
 import SwiftUI
 @testable import Indigo
@@ -49,3 +52,4 @@ final class ArtworkLoadingTests: XCTestCase {
         XCTAssertNotEqual(centre.0, centre.1, "The loading field is not the white label")
     }
 }
+#endif

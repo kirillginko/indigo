@@ -47,7 +47,15 @@ nonisolated final class ExploreOffersRecord {
 /// What an answer was worked out from, in the few numbers that move when it
 /// changes: the synced rows EXPLORE reads, counted, with their newest date --
 /// and the dig history's starting points, which change by count rather than by
-/// row.
+/// row -- and the period it was worked out for.
+///
+/// The period is a UTC day. Listening is weighed by how long ago it was, so an
+/// answer depends on *when* as well as on the rows; measured from the clock,
+/// two devices working out the same rows a minute apart weighed every play a
+/// little differently. Measured from the end of the day instead (`asOf`), the
+/// same rows give the same answer all day on every device, and the next day
+/// is a change of input like any other, so the answer is worked out again.
+/// The clock decides only which day it is.
 ///
 /// Read from the store rather than from anything this process remembers, so
 /// it means the same after a relaunch and after another device's import as it
@@ -60,8 +68,19 @@ nonisolated struct ExploreInputs: Codable, Equatable, Sendable {
     var eventNewest: Date?
     /// `nodeID×visits`, in the order the engine reads them.
     var haunts: [String]
+    /// Days since 1970, UTC.
+    var period: Int
 
-    static func read(context: ModelContext) -> ExploreInputs {
+    static let periodLength: TimeInterval = 24 * 60 * 60
+
+    static func period(containing moment: Date) -> Int {
+        Int((moment.timeIntervalSince1970 / periodLength).rounded(.down))
+    }
+
+    /// The end of the period: no play inside it is in its future.
+    var asOf: Date { Date(timeIntervalSince1970: Double(period + 1) * Self.periodLength) }
+
+    static func read(context: ModelContext, now: Date = Date()) -> ExploreInputs {
         var crate = FetchDescriptor<CrateItem>(sortBy: [SortDescriptor(\.addedAt, order: .reverse)])
         crate.fetchLimit = 1
         var events = FetchDescriptor<ListeningEvent>(sortBy: [SortDescriptor(\.at, order: .reverse)])
@@ -73,7 +92,8 @@ nonisolated struct ExploreInputs: Codable, Equatable, Sendable {
             eventNewest: (try? context.fetch(events))?.first?.at,
             haunts: DigHistory(context: context)
                 .haunts(kinds: ExploreSuggestionEngine.hauntKinds, limit: ExploreSuggestionEngine.hauntLimit)
-                .map { "\($0.nodeID)×\($0.visits)" }
+                .map { "\($0.nodeID)×\($0.visits)" },
+            period: period(containing: now)
         )
     }
 }

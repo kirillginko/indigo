@@ -92,6 +92,39 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
         id.firstIndex(of: ":").map { String(id[..<$0]) }
     }
 
+    // MARK: Choosing between spellings
+
+    /// Which of two spellings of the same node speaks for both.
+    ///
+    /// One node is often reached several times -- by a label roster that knows
+    /// its MBID, by a credit that knows only its name -- and something has to
+    /// be drawn. It used to be whichever arrived first, and arrival followed
+    /// dictionary order, which Swift seeds differently in every process: the
+    /// same data gave a card with a picture on one launch and without on the
+    /// next, and a different page behind it. The better-identified spelling
+    /// wins (an MBID, a Discogs id, a picture), and the rest is decided by
+    /// what the spellings say, never by where they were stored -- so two
+    /// devices holding the same facts draw the same node.
+    static func isPreferred(_ left: MusicNode, over right: MusicNode) -> Bool {
+        left.preferenceKey.lexicographicallyPrecedes(right.preferenceKey)
+    }
+
+    static func preferred(_ left: MusicNode, _ right: MusicNode) -> MusicNode {
+        isPreferred(right, over: left) ? right : left
+    }
+
+    /// Everything a spelling carries, best-identified first.
+    private var preferenceKey: [String] {
+        [
+            mbid == nil ? "1" : "0",
+            discogsID == nil ? "1" : "0",
+            artworkURL == nil ? "1" : "0",
+            id, title, subtitle ?? "", mbid ?? "",
+            discogsID.map { String($0) } ?? "",
+            providerID ?? "", handle ?? "", artworkURL?.absoluteString ?? ""
+        ]
+    }
+
     // MARK: Constructors
 
     static func artist(_ name: String, mbid: String? = nil, discogsID: Int? = nil) -> MusicNode {

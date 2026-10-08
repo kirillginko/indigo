@@ -403,7 +403,15 @@ nonisolated struct GraphStore {
         var labels: [String: String?] = [:]
         for recording in caches.recordings(byArtistKey: node.key) {
             guard let metadata = caches.metadata[recording.id], let name = metadata.labelName else { continue }
-            labels[name] = metadata.labelMBID
+            // Several recordings can name one label, not all with its MBID.
+            // The last one read used to decide, and so did the page the label
+            // opened; any MBID beats none, and the lowest of two beats order.
+            let mbid = metadata.labelMBID
+            switch (labels[name] ?? nil, mbid) {
+            case (nil, _): labels[name] = mbid
+            case (let held?, let new?) where new < held: labels[name] = new
+            default: break
+            }
             if let catalog = metadata.catalogNumber, !catalog.isEmpty {
                 edges.insert(MusicEdge(
                     from: node, to: .catalogNumber(catalog), kind: .appearsOnRelease,
@@ -609,7 +617,9 @@ nonisolated struct GraphStore {
             ) {
                 let sharedLabel = subject.sharedLabel(with: peer)
                 let sharedStyles = subject.styleKeys.intersection(peer.styleKeys)
-                let sharedStyle = subject.style(forKey: sharedStyles.first)
+                // The first by key rather than `first` of a set, which is a
+                // different style -- and so a different reason -- per process.
+                let sharedStyle = subject.style(forKey: sharedStyles.min())
 
                 if let sharedLabel {
                     link(peer.name, .sharedLabel, .discogs, "Both release on \(sharedLabel)",
@@ -678,8 +688,10 @@ nonisolated struct GraphStore {
             for appearance in recording.appearances {
                 guard let showID = appearance.showID,
                       let title = subjectShows["\(appearance.providerID)|\(showID)"] else { continue }
+                // The show a lone shared broadcast is named after is the first
+                // by title, not the first read.
                 let existing = shared[peer]
-                shared[peer] = (existing?.title ?? title, (existing?.count ?? 0) + 1)
+                shared[peer] = (existing.map { min($0.title, title) } ?? title, (existing?.count ?? 0) + 1)
             }
         }
         for (peer, evidence) in shared {
@@ -1364,9 +1376,11 @@ private nonisolated struct Caches {
             })
         }
 
+        /// The first label the two share, by key. It is named in the edge's
+        /// reason, and taken out of a dictionary it named a different label
+        /// in every process.
         func sharedLabel(with peer: Shape) -> String? {
-            for (key, spelling) in labels where peer.labels[key] != nil { return spelling }
-            return nil
+            labels.keys.sorted().first { peer.labels[$0] != nil }.flatMap { labels[$0] }
         }
 
         func style(forKey key: String?) -> String? { key.flatMap { styles[$0] } }
