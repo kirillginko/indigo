@@ -6,7 +6,7 @@ import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { DISCOGS_API, pacedCacheFetch } from "./discogs.ts";
 import { getObject, putObject, r2Config } from "./r2.ts";
 import { reserveR2 } from "./release_cache.ts";
-import type { KnowledgeDeps } from "./knowledge.ts";
+import { knowledgeCacheControl, type KnowledgeDeps } from "./knowledge.ts";
 
 const CHUNK = 200;
 
@@ -32,7 +32,7 @@ export function liveKnowledgeDeps(supabase: SupabaseClient, token: string | unde
       return { status: response.status, body: await response.json() };
     },
     getObject: (key) => getObject(r2, key),
-    putObject: (key, body) => putObject(r2, key, body),
+    putObject: (key, body) => putObject(r2, key, body, "application/json", knowledgeCacheControl(key)),
     reserve: (writes, bytes) => reserveR2(supabase, writes, bytes),
     async cachedReleases(ids) {
       const found = new Set<number>();

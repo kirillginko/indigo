@@ -91,11 +91,13 @@ function client(config: R2Config): AwsClient {
 /// rarely changes.
 const CACHE_CONTROL = "public, max-age=3600";
 
-export async function putObject(config: R2Config, key: string, body: string, contentType = "application/json"): Promise<void> {
+export async function putObject(
+  config: R2Config, key: string, body: string, contentType = "application/json", cacheControl = CACHE_CONTROL,
+): Promise<void> {
   const response = await client(config).fetch(objectURL(config, key), {
     method: "PUT",
     body,
-    headers: { "Content-Type": contentType, "Cache-Control": CACHE_CONTROL },
+    headers: { "Content-Type": contentType, "Cache-Control": cacheControl },
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) {

@@ -60,6 +60,16 @@ export const PILOT_ARTISTS = new Set([
   306157, // Burial: four pages of entries, for the bounded pagination test
 ]);
 
+/// How long a reader may keep an object. A digest-addressed object never
+/// changes, so it is kept for good; a reference or a discovery state is
+/// rewritten in place, and an hour's cache (the bucket's default) served a
+/// device the bundle from before a rebuild.
+export function knowledgeCacheControl(key: string): string {
+  return /^knowledge\/v1\/(pages|discographies|bundles)\//.test(key)
+    ? "public, max-age=31536000, immutable"
+    : "public, max-age=60";
+}
+
 export interface KnowledgeDeps {
   fetchPage(discogsID: number, page: number, perPage: number): Promise<{ status: number; body?: unknown }>;
   getObject(key: string): Promise<string | null>;

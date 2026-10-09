@@ -11,7 +11,7 @@ import type { BundleInput, DiscogsReleaseDoc, ShelfEntry } from "./artist_bundle
 import { MAX_PAGES, PAGES_PER_JOB } from "./discography.ts";
 import {
   ArtistJob, ArtistRef, artistRefKey, buildArtistBundle, DiscographyRef, discographyRefKey, discoverDiscography, KnowledgeDeps,
-  MISSING_DOCUMENTS_BUDGET, releaseDocumentKey, settleBatches,
+  knowledgeCacheControl, MISSING_DOCUMENTS_BUDGET, releaseDocumentKey, settleBatches,
 } from "./knowledge.ts";
 
 const KATE = { discogsID: 5302639, name: "Kate NV", identity: "backend" as const };
@@ -266,4 +266,11 @@ Deno.test("nothing outside the pilot is discovered or built", async () => {
   await assertRejects(() => discoverDiscography(world.deps(), { discogsID: 2576890, name: "Mica Levi", identity: "backend" }));
   await assertRejects(() => buildArtistBundle(world.deps(), { discogsID: 2576890, name: "Mica Levi", identity: "backend" }));
   assertEquals(world.fetched.length, 0);
+});
+
+Deno.test("references are revalidated within a minute; addressed objects are kept for good", () => {
+  assertEquals(knowledgeCacheControl("knowledge/v1/refs/artists/2419343.json"), "public, max-age=60");
+  assertEquals(knowledgeCacheControl("knowledge/v1/state/discovery/306157.json"), "public, max-age=60");
+  assertEquals(knowledgeCacheControl("knowledge/v1/bundles/e4/e4c2.json"), "public, max-age=31536000, immutable");
+  assertEquals(knowledgeCacheControl("knowledge/v1/pages/aa/aa.json"), "public, max-age=31536000, immutable");
 });
