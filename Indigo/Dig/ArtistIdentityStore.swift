@@ -185,3 +185,38 @@ nonisolated struct ArtistPageIdentity: Equatable, Sendable {
         )
     }
 }
+
+/// Who each release credits, by Discogs id, as its source document says.
+nonisolated struct ReleaseCreditStore {
+    let context: ModelContext
+
+    /// Where a release document came from, for its credits' provenance.
+    static func source(discogsRelease id: Int) -> String { "discogs:releases/\(id)" }
+    static func source(storedRelease id: Int) -> String { "r2:releases/\(id).json" }
+
+    /// Replaces a release's credits with what this document says.
+    ///
+    /// All of them or none: a document without its artists block is an
+    /// incomplete answer and leaves what an earlier one said exactly as it was.
+    @discardableResult
+    func replace(releaseID: Int, from detail: DiscogsReleaseDetail, source: String, at date: Date = Date()) -> Bool {
+        guard releaseID > 0, let credits = ReleaseCredit.credits(in: detail) else { return false }
+        if let held = record(releaseID) {
+            held.replace(with: credits, source: source, at: date)
+        } else {
+            context.insert(ReleaseCreditRecord(releaseDiscogsID: releaseID, credits: credits, source: source, fetchedAt: date))
+        }
+        return true
+    }
+
+    /// The release's credits, or nil when none have been kept for it.
+    func credits(releaseID: Int) -> [ReleaseCredit]? { record(releaseID)?.credits }
+
+    func provenance(releaseID: Int) -> String? { record(releaseID)?.source }
+
+    private func record(_ id: Int) -> ReleaseCreditRecord? {
+        var descriptor = FetchDescriptor<ReleaseCreditRecord>(predicate: #Predicate { $0.releaseDiscogsID == id })
+        descriptor.fetchLimit = 1
+        return try? context.fetch(descriptor).first
+    }
+}

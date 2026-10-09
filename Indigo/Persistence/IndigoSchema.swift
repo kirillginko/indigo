@@ -726,14 +726,14 @@ nonisolated enum IndigoSchemaV7: VersionedSchema {
     }
 }
 
-/// V7 and two new local models: the evidence artist identity is decided from
-/// (see `ArtistIdentityRecords.swift`). Caches, so they live in the local
+/// V7 and three new local models: the evidence artist identity is decided
+/// from, and who each release credits by id (see `ArtistIdentityRecords.swift`). Caches, so they live in the local
 /// store and are never synced. Nothing in V7 changes, so V7 is pinned.
 nonisolated enum IndigoSchemaV8: VersionedSchema {
     static let versionIdentifier = Schema.Version(8, 0, 0)
 
     static var models: [any PersistentModel.Type] {
-        IndigoSchemaV7.models + [DiscogsIdentityRecord.self, ArtistSpellingRecord.self]
+        IndigoSchemaV7.models + [DiscogsIdentityRecord.self, ArtistSpellingRecord.self, ReleaseCreditRecord.self]
     }
 
     static let userDataModelNames: Set<String> = IndigoSchemaV7.userDataModelNames

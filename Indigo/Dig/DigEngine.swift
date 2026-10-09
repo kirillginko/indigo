@@ -182,6 +182,21 @@ nonisolated struct DigReleaseProfile: Sendable {
     /// transport through YouTube's official player.
     let listen: [ListenLine]
     let related: [RelatedArtist]
+    /// Who the record is by, as it credits them and with the entry each credit
+    /// names. The tracks' artists when the record is credited to nobody.
+    var artistCredits: [CreditedArtist] = []
+
+    /// One artist as a record credits them.
+    nonisolated struct CreditedArtist: Hashable, Sendable {
+        /// The name to open them under: their filing name without its marks.
+        let name: String
+        /// The spelling the record used, which is what the page shows.
+        let creditedAs: String
+        /// The entry the credit names, when it names one.
+        let discogsID: Int?
+
+        var page: DetailPage { .digArtist(mbid: nil, name: name, discogsID: discogsID) }
+    }
 
     /// The biggest picture there is, or the small one rather than nothing.
     var coverURL: URL? { imageURL ?? thumbnailURL }
@@ -214,7 +229,15 @@ nonisolated struct DigReleaseProfile: Sendable {
             let role: String
             /// Which tracks, when it was not the whole record.
             let tracks: String?
+            /// The entry this credit names, and the name it is filed under,
+            /// when the record's own document was kept with its ids.
+            var discogsID: Int? = nil
+            var filingName: String? = nil
             var id: String { "\(name)|\(role)|\(tracks ?? "")" }
+
+            /// Where the credit opens: by the entry it names when there is one,
+            /// otherwise by the name as credited.
+            var page: DetailPage { .digArtist(mbid: nil, name: filingName ?? name, discogsID: discogsID) }
 
             /// "Mastered By", or "Mastered By · A1 to A4".
             var detail: String {
@@ -698,6 +721,32 @@ nonisolated struct DigEngine {
     /// separate line rather than a merged one, because "Producer, Bass" is
     /// what the record says and joining them would be Indigo's summary of it.
     /// What is merged is an exact repeat, which Discogs does emit.
+    /// The credits, grouped by what was done, from the kept document when
+    /// there is one: release-wide credits and each track's own, every
+    /// appearance kept — one person producing two tracks and mixing a third is
+    /// three lines — each carrying the entry it names.
+    static func creditGroups(
+        from record: DiscogsReleaseRecord, identities: [ReleaseCredit]?
+    ) -> [DigReleaseProfile.CreditGroup] {
+        guard let identities else { return creditGroups(from: record) }
+        var byKind: [CreditRole.Kind: [DigReleaseProfile.CreditGroup.Person]] = [:]
+        var seen = Set<String>()
+        for credit in identities where credit.category == .credit || (credit.category == .track && !credit.role.isEmpty) {
+            guard let kind = CreditRole.kind(of: credit.role),
+                  let role = CreditRole.display(credit.role) else { continue }
+            let name = DiscogsClient.withoutDisambiguator(credit.creditedName)
+            guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, ArtistName.isRealArtist(name) else { continue }
+            var person = DigReleaseProfile.CreditGroup.Person(name: name, role: role, tracks: credit.tracks.nonEmpty)
+            person.discogsID = credit.discogsID
+            person.filingName = credit.name
+            guard seen.insert("\(kind.rawValue)|\(person.id)|\(credit.discogsID ?? 0)").inserted else { continue }
+            byKind[kind, default: []].append(person)
+        }
+        return byKind
+            .map { DigReleaseProfile.CreditGroup(kind: $0.key, people: $0.value) }
+            .sorted { $0.kind.rank < $1.kind.rank }
+    }
+
     static func creditGroups(from record: DiscogsReleaseRecord) -> [DigReleaseProfile.CreditGroup] {
         var byKind: [CreditRole.Kind: [DigReleaseProfile.CreditGroup.Person]] = [:]
         var seen = Set<String>()
@@ -774,7 +823,8 @@ nonisolated struct DigEngine {
                 artist: index < record.trackArtists.count ? record.trackArtists[index].nonEmpty : nil
             )
         }
-        let credits = Self.creditGroups(from: record)
+        let identities = ReleaseCreditStore(context: context).credits(releaseID: id)
+        let credits = Self.creditGroups(from: record, identities: identities)
         var relatedByName: [String: RelatedArtist] = [:]
         for artist in record.credits {
             for peer in relatedArtists(to: artist) {
@@ -786,7 +836,7 @@ nonisolated struct DigEngine {
         let artwork = DigArtwork(context: context).release(
             title: record.title, artist: record.credits.first { ArtistName.isRealArtist($0) }
         )
-        return DigReleaseProfile(
+        var profile = DigReleaseProfile(
             id: id, title: record.title, year: record.year, artists: record.credits,
             labels: labels, genres: record.genres, styles: record.styles,
             imageURL: record.imageURL ?? artwork.full,
@@ -798,6 +848,43 @@ nonisolated struct DigEngine {
                 $0.weight == $1.weight ? $0.name < $1.name : $0.weight > $1.weight
             }
         )
+        profile.artistCredits = Self.headlineArtists(from: record, identities: identities)
+        return profile
+    }
+
+    /// Who a record is by, with ids where its document was kept with them.
+    ///
+    /// The headline artists, or the tracks' artists when the record is
+    /// credited to nobody — each once, in the order the record gives them,
+    /// told apart by the entry they name rather than by how they read.
+    static func headlineArtists(
+        from record: DiscogsReleaseRecord, identities: [ReleaseCredit]?
+    ) -> [DigReleaseProfile.CreditedArtist] {
+        guard let identities else {
+            let named = record.credits.filter { ArtistName.isRealArtist($0) }
+            let names = named.isEmpty ? record.trackArtists.filter { ArtistName.isRealArtist($0) } : named
+            var seen = Set<String>()
+            return names
+                .filter { seen.insert(RecordingKey.normalizeArtist($0)).inserted }
+                .map { DigReleaseProfile.CreditedArtist(name: $0, creditedAs: $0, discogsID: nil) }
+        }
+        func credited(_ rows: [ReleaseCredit]) -> [DigReleaseProfile.CreditedArtist] {
+            var seen = Set<String>()
+            return rows.compactMap { credit in
+                let name = credit.name
+                guard ArtistName.isRealArtist(name) else { return nil }
+                let key = credit.discogsID.map { "id:\($0)" } ?? "name:\(RecordingKey.normalizeArtist(name))"
+                guard seen.insert(key).inserted else { return nil }
+                return DigReleaseProfile.CreditedArtist(
+                    name: name,
+                    creditedAs: DiscogsClient.withoutDisambiguator(credit.creditedName),
+                    discogsID: credit.discogsID
+                )
+            }
+        }
+        let headline = credited(identities.filter { $0.category == .artist })
+        guard headline.isEmpty else { return headline }
+        return credited(identities.filter { $0.category == .track && $0.role.isEmpty })
     }
 
     /// The spec's RELATED list. Every entry has to survive the question

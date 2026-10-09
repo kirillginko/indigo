@@ -85,7 +85,7 @@ struct DigReleaseView: View {
                     PhoneDetailHero(
                         kind: "Release",
                         title: profile?.title ?? fallbackTitle,
-                        subtitle: profile.map { credited($0).joined(separator: ", ") },
+                        subtitle: profile.map { $0.artistCredits.map(\.creditedAs).joined(separator: ", ") },
                         imageURL: profile?.coverURL,
                         previewURL: profile?.previewURL,
                         awaitingImage: !hasLookedUp && profile?.coverURL == nil && profile?.previewURL == nil
@@ -113,12 +113,14 @@ struct DigReleaseView: View {
                             }
 
                             VStack(alignment: .leading, spacing: 24) {
-                                if !profile.artists.isEmpty {
+                                if !profile.artistCredits.isEmpty {
                                     DigSection(title: "Artists") {
                                         VStack(alignment: .leading, spacing: 0) {
-                                            ForEach(credited(profile), id: \.self) { artist in
-                                                DigLine(text: artist) {
-                                                    appState.open(.digArtist(mbid: nil, name: artist))
+                                            // Shown as the record credits them;
+                                            // opened by the entry the credit names.
+                                            ForEach(profile.artistCredits, id: \.self) { artist in
+                                                DigLine(text: artist.creditedAs) {
+                                                    appState.open(artist.page)
                                                 }
                                             }
                                         }
@@ -299,6 +301,9 @@ struct DigReleaseView: View {
             guard let identifier else { return }
             self.profile = await dig.releaseProfile(id: identifier)
             await dig.enrichRelease(id: identifier)
+            // A record cached before its credits kept their ids gets them from
+            // the document R2 holds for it; one read, and only when missing.
+            await dig.backfillReleaseCredits(id: identifier)
             self.profile = await dig.releaseProfile(id: identifier)
             hasLookedUp = true
             // Asked before the list is offered, so nothing that will refuse
@@ -356,7 +361,7 @@ struct DigReleaseView: View {
                             .padding(.bottom, 4)
                         ForEach(group.people) { person in
                             DigLine(text: person.name, detail: person.detail) {
-                                appState.open(.digArtist(mbid: nil, name: person.name))
+                                appState.open(person.page)
                             }
                         }
                     }
@@ -416,23 +421,6 @@ struct DigReleaseView: View {
         }
         let index = profile.listen.firstIndex { $0.id == line.id } ?? 0
         player.play(items, startingAt: index)
-    }
-
-    /// Who is actually on the record.
-    ///
-    /// A compilation is credited to "Various", which is nobody — so the names
-    /// worth offering are the ones on the tracks. That is what a compilation
-    /// *is*: the place several artists appear together, and the reason it is
-    /// worth digging into at all.
-    private func credited(_ profile: DigReleaseProfile) -> [String] {
-        let stated = profile.artists.filter { ArtistName.isRealArtist($0) }
-        guard stated.isEmpty else { return stated }
-
-        var seen = Set<String>()
-        return profile.tracks
-            .compactMap(\.artist)
-            .filter { ArtistName.isRealArtist($0)
-                && seen.insert(RecordingKey.normalizeArtist($0)).inserted }
     }
 
     /// What can be said about a record no catalogue has an entry for.

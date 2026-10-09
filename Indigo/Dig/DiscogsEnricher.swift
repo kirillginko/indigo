@@ -309,7 +309,9 @@ nonisolated struct DiscogsEnricher {
         // this release was described by somebody else's request and Discogs is
         // never asked at all — and a warm read out of Postgres is quicker than
         // asking it would have been.
-        if let detail = await catalog.release(id: id) { return store(detail, id: id) }
+        if let detail = await catalog.release(id: id) {
+            return store(detail, id: id, source: ReleaseCreditStore.source(storedRelease: id))
+        }
         // A miss, so the page waits on Discogs directly rather than on the
         // backend's round trip to it. The shared copy is filled in behind us.
         let detail = try await client.release(id: id)
@@ -322,12 +324,19 @@ nonisolated struct DiscogsEnricher {
     /// Split from `release(id:)` so a caller can fetch several at once —
     /// which is network-bound and parallel — and then write them one at a
     /// time, which is what a single ModelContext requires.
+    ///
+    /// `source` is where the document came from, kept with its credits.
     @discardableResult
-    func store(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
-        Trace.step("enrich.release", String(id)) { writeRelease(detail, id: id) }
+    func store(_ detail: DiscogsReleaseDetail, id: Int, source: String? = nil) -> DiscogsReleaseRecord {
+        Trace.step("enrich.release", String(id)) {
+            writeRelease(detail, id: id, source: source ?? ReleaseCreditStore.source(discogsRelease: id))
+        }
     }
 
-    private func writeRelease(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
+    private func writeRelease(_ detail: DiscogsReleaseDetail, id: Int, source: String) -> DiscogsReleaseRecord {
+        // Who it credits, by id, beside the names written below — which stay
+        // exactly as they were, because everything else reads them.
+        ReleaseCreditStore(context: context).replace(releaseID: id, from: detail, source: source)
         let record = cachedRelease(id: id) ?? {
             let value = DiscogsReleaseRecord(discogsID: id, title: detail.title)
             context.insert(value)

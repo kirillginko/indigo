@@ -170,3 +170,144 @@ nonisolated final class ArtistSpellingRecord {
     /// after a month — never sooner, so a page does not pay for it twice.
     var isStale: Bool { Date().timeIntervalSince(checkedAt) > 30 * 24 * 60 * 60 }
 }
+
+// MARK: - Credits
+
+/// One appearance of an artist on a release, exactly as its document states it.
+///
+/// Kept per appearance: the same person producing two tracks and mixing a
+/// third is three credits, not one person, and none of them is merged with
+/// another on the strength of a shared id.
+nonisolated struct ReleaseCredit: Hashable, Sendable {
+    nonisolated enum Category: String, Hashable, Sendable {
+        /// Who the release is by.
+        case artist
+        /// Who else worked on the release as a whole.
+        case credit
+        /// Who is on one track, or worked on it.
+        case track
+    }
+
+    let category: Category
+    /// Position among the document's entries of this category, from zero.
+    let order: Int
+    /// The spelling the record used: its `anv` when it has one, else the name.
+    let creditedName: String
+    /// The name Discogs files them under, disambiguator and all: "Hype Williams (2)".
+    let filingName: String
+    /// Nil when the document named nobody Discogs has an entry for.
+    let discogsID: Int?
+    /// The job as written — "Producer, Mixed By" — empty for headline artists.
+    let role: String
+    /// Which tracks: the credit's own `tracks`, or the track's position.
+    let tracks: String
+
+    /// The name to open them under: their filing name without its marks.
+    var name: String { DiscogsClient.withoutDisambiguator(filingName) }
+
+    /// Every artist a release document names, in document order. Nil when the
+    /// document has no artists block at all — an incomplete answer, which must
+    /// not replace what an earlier, complete one said.
+    static func credits(in detail: DiscogsReleaseDetail) -> [ReleaseCredit]? {
+        guard let headline = detail.artists else { return nil }
+        func make(_ category: Category, _ order: Int, id: Int?, name: String?, anv: String?, role: String?, tracks: String?) -> ReleaseCredit? {
+            guard let filing = name?.trimmingCharacters(in: .whitespacesAndNewlines), !filing.isEmpty else { return nil }
+            let variation = anv?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return ReleaseCredit(
+                category: category, order: order,
+                creditedName: (variation?.isEmpty == false ? variation! : filing),
+                filingName: filing,
+                discogsID: id.flatMap { $0 > 0 ? $0 : nil },
+                role: role?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "",
+                tracks: tracks?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            )
+        }
+        var credits: [ReleaseCredit] = []
+        for (order, artist) in headline.enumerated() {
+            if let credit = make(.artist, order, id: artist.id, name: artist.name, anv: artist.anv, role: nil, tracks: nil) {
+                credits.append(credit)
+            }
+        }
+        for (order, extra) in (detail.extraartists ?? []).enumerated() {
+            if let credit = make(.credit, order, id: extra.id, name: extra.name, anv: extra.anv, role: extra.role, tracks: extra.tracks) {
+                credits.append(credit)
+            }
+        }
+        var order = 0
+        for line in detail.tracklist ?? [] {
+            let position = line.position ?? ""
+            for artist in line.artists ?? [] {
+                if let credit = make(.track, order, id: artist.id, name: artist.name, anv: artist.anv, role: nil, tracks: position) {
+                    credits.append(credit)
+                    order += 1
+                }
+            }
+            for extra in line.extraartists ?? [] {
+                if let credit = make(.track, order, id: extra.id, name: extra.name, anv: extra.anv, role: extra.role, tracks: position) {
+                    credits.append(credit)
+                    order += 1
+                }
+            }
+        }
+        return credits
+    }
+}
+
+/// Who a release credits, with their Discogs ids, for one release.
+///
+/// One row per release, its credits in parallel arrays, so a refreshed
+/// document replaces them in a single write. Kept beside `DiscogsReleaseRecord`
+/// rather than in it: that model is in every schema version, and its name
+/// lists are what everything else still reads.
+@Model
+nonisolated final class ReleaseCreditRecord {
+    @Attribute(.unique) var releaseDiscogsID: Int
+    var categories: [String]
+    var orders: [Int]
+    var creditedNames: [String]
+    var filingNames: [String]
+    /// Zero where the document named nobody with an entry.
+    var artistDiscogsIDs: [Int]
+    var roles: [String]
+    var tracks: [String]
+    /// The document these came from: "discogs:releases/123" or
+    /// "r2:releases/123.json".
+    var source: String
+    var fetchedAt: Date
+
+    init(releaseDiscogsID: Int, credits: [ReleaseCredit], source: String, fetchedAt: Date = Date()) {
+        self.releaseDiscogsID = releaseDiscogsID
+        categories = []; orders = []; creditedNames = []; filingNames = []
+        artistDiscogsIDs = []; roles = []; tracks = []
+        self.source = source
+        self.fetchedAt = fetchedAt
+        replace(with: credits, source: source, at: fetchedAt)
+    }
+
+    /// Every credit at once, so the row is never half old and half new.
+    func replace(with credits: [ReleaseCredit], source: String, at date: Date = Date()) {
+        categories = credits.map(\.category.rawValue)
+        orders = credits.map(\.order)
+        creditedNames = credits.map(\.creditedName)
+        filingNames = credits.map(\.filingName)
+        artistDiscogsIDs = credits.map { $0.discogsID ?? 0 }
+        roles = credits.map(\.role)
+        tracks = credits.map(\.tracks)
+        self.source = source
+        fetchedAt = date
+    }
+
+    var credits: [ReleaseCredit] {
+        let count = [categories.count, orders.count, creditedNames.count, filingNames.count,
+                     artistDiscogsIDs.count, roles.count, tracks.count].min() ?? 0
+        return (0..<count).compactMap { index in
+            guard let category = ReleaseCredit.Category(rawValue: categories[index]) else { return nil }
+            return ReleaseCredit(
+                category: category, order: orders[index],
+                creditedName: creditedNames[index], filingName: filingNames[index],
+                discogsID: artistDiscogsIDs[index] > 0 ? artistDiscogsIDs[index] : nil,
+                role: roles[index], tracks: tracks[index]
+            )
+        }
+    }
+}

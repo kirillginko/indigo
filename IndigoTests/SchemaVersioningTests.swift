@@ -36,7 +36,7 @@ final class SchemaVersioningTests: XCTestCase {
 
     func testEveryModelTheAppStoresIsInTheVersionedSchema() {
         let names = Set(IndigoSchemaCurrent.models.map { String(describing: $0) })
-        XCTAssertEqual(names.count, 22)
+        XCTAssertEqual(names.count, 23)
         for model in ["CrateItem", "ListeningEvent", "DigVisit", "DigStep", "Recording"] {
             XCTAssertTrue(names.contains(model), "\(model) missing from SchemaV1")
         }

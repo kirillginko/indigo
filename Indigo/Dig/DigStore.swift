@@ -255,6 +255,73 @@ final class DigStore {
             ?? rows.max { $0.releaseTitles.count < $1.releaseTitles.count }
     }
 
+    /// What reading a release's stored document from R2 found.
+    nonisolated enum StoredReleaseRead: Sendable {
+        case document(DiscogsReleaseDetail)
+        /// R2 holds no document for it: nobody has cached this release.
+        case missing
+        /// The read failed, or what came back would not read as a release.
+        /// Not a finding about the release — asked again next time.
+        case unavailable
+    }
+
+    /// How a release's stored document is read. Replaced in tests.
+    @ObservationIgnored var readStoredRelease: @Sendable (Int) async -> StoredReleaseRead = DigStore.readStoredReleaseFromR2
+
+    /// The public R2 copy of a release document, read directly: one GET, no
+    /// Discogs budget. Never from a test process, which injects its own.
+    nonisolated static func readStoredReleaseFromR2(_ id: Int) async -> StoredReleaseRead {
+        guard !Persistence.isRunningTests,
+              let url = MetadataRepository.storedObjectURL(forPath: MetadataRepository.releasePath(id: String(id)))
+        else { return .unavailable }
+        do {
+            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url, timeoutInterval: 10))
+            guard let http = response as? HTTPURLResponse else { return .unavailable }
+            if http.statusCode == 404 { return .missing }
+            guard http.statusCode == 200,
+                  let detail = try? JSONDecoder().decode(DiscogsReleaseDetail.self, from: data)
+            else { return .unavailable }
+            return .document(detail)
+        } catch {
+            return .unavailable
+        }
+    }
+
+    /// Releases whose stored document is missing, or says nothing of who is
+    /// on it, as found this session — so a page does not ask again.
+    @ObservationIgnored private var storedReleasesWithoutCredits: Set<Int> = []
+
+    /// Gives a release DIG already holds its credits by id, from the document
+    /// R2 keeps for it.
+    ///
+    /// A release cached before credits were kept has its names and none of
+    /// their ids, and is fresh for weeks, so nothing re-reads it. Its document
+    /// is very likely in R2 — three in four were — and reading that is one
+    /// public request with no Discogs budget. A missing document is remembered
+    /// for the session; a failed read is not, and is asked again next time.
+    /// Nothing is ever cleared: credits already held are never read again here.
+    func backfillReleaseCredits(id: Int) async {
+        let store = ReleaseCreditStore(context: context)
+        guard id > 0, store.credits(releaseID: id) == nil,
+              !storedReleasesWithoutCredits.contains(id),
+              discogsEnricher.cachedRelease(id: id) != nil
+        else { return }
+        switch await readStoredRelease(id) {
+        case .document(let detail):
+            guard store.credits(releaseID: id) == nil else { return }
+            if store.replace(releaseID: id, from: detail, source: ReleaseCreditStore.source(storedRelease: id)) {
+                saveContext()
+                announceChange()
+            } else {
+                storedReleasesWithoutCredits.insert(id)
+            }
+        case .missing:
+            storedReleasesWithoutCredits.insert(id)
+        case .unavailable:
+            break
+        }
+    }
+
     /// Entries whose identity could not be read this session. Not stored: a
     /// refusal is not a finding, and the next session asks again.
     @ObservationIgnored private var factsUnavailable: Set<Int> = []
@@ -682,7 +749,10 @@ final class DigStore {
 
         guard !Task.isCancelled, !fetched.isEmpty else { return }
         for (identifier, detail) in fetched {
-            discogsEnricher.store(detail, id: identifier)
+            discogsEnricher.store(
+                detail, id: identifier,
+                source: shared[identifier] != nil ? ReleaseCreditStore.source(storedRelease: identifier) : nil
+            )
         }
         // Once per batch. Each bump invalidates the cached profile, so bumping
         // per release rebuilt the whole graph two dozen times — and bumping

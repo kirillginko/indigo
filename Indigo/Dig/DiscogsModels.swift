@@ -95,6 +95,9 @@ nonisolated struct DiscogsNeighbour: Sendable, Hashable {
 nonisolated struct DiscogsArtistReference: Decodable, Sendable {
     let id: Int?
     let name: String?
+    /// The spelling this record credited them under, when it differs from
+    /// their filing name — "Prefuse73" on a record by Prefuse 73.
+    var anv: String? = nil
 }
 
 nonisolated struct DiscogsLabelReference: Decodable, Sendable {
@@ -228,6 +231,8 @@ nonisolated struct DiscogsTrackLine: Decodable, Sendable {
     /// each track names who is actually on it. That is the whole point of a
     /// compilation and was being thrown away.
     let artists: [DiscogsArtistReference]?
+    /// Credits for this track alone: who produced or remixed it.
+    var extraartists: [DiscogsCredit]? = nil
 
     /// Who is on this track, when the record itself is credited to nobody.
     ///
