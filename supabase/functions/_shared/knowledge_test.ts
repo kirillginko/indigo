@@ -263,7 +263,7 @@ Deno.test("another pressing already in R2 is read, and its credits reach the bun
 
 Deno.test("nothing outside the pilot is discovered or built", async () => {
   const world = fixtureWorld(kateNV, 50);
-  await assertRejects(() => discoverDiscography(world.deps(), { discogsID: 306157, name: "Burial", identity: "backend" }));
-  await assertRejects(() => buildArtistBundle(world.deps(), { discogsID: 306157, name: "Burial", identity: "backend" }));
+  await assertRejects(() => discoverDiscography(world.deps(), { discogsID: 2576890, name: "Mica Levi", identity: "backend" }));
+  await assertRejects(() => buildArtistBundle(world.deps(), { discogsID: 2576890, name: "Mica Levi", identity: "backend" }));
   assertEquals(world.fetched.length, 0);
 });

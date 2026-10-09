@@ -57,6 +57,7 @@ export const PILOT_ARTISTS = new Set([
   2419343, // Dean Blunt
   1874027, // Hype Williams (identity from a device's cache)
   5302639, // Kate NV
+  306157, // Burial: four pages of entries, for the bounded pagination test
 ]);
 
 export interface KnowledgeDeps {
