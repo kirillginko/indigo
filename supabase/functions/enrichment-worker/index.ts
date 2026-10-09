@@ -26,6 +26,7 @@ import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
 import { buildArtistBundle, discoverDiscography, readArtistJob, settleBatches } from "../_shared/knowledge.ts";
 import { liveKnowledgeDeps } from "../_shared/knowledge_live.ts";
+import { linkDiscogsIdentity, liveIdentityDeps } from "../_shared/identity.ts";
 import {
   moveInlinePayloadsToR2,
   moveReleasePayloadsToR2,
@@ -434,6 +435,16 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
         liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload),
       );
       console.log("knowledge_discovery", job.dedupe_key, JSON.stringify(result).slice(0, 600));
+      return;
+    }
+
+    case "link_discogs_identity": {
+      // One catalogue row's Discogs pages, as MusicBrainz records them
+      // (identity.ts). Pilot rows only.
+      const artistID = String(job.payload?.artist_id ?? "");
+      const mbid = String(job.payload?.mbid ?? "");
+      const result = await linkDiscogsIdentity(liveIdentityDeps(supabase), { artistID, mbid });
+      console.log("identity_link", artistID, JSON.stringify(result));
       return;
     }
 
