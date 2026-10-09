@@ -100,6 +100,34 @@ export interface BundleInput {
   artist: { discogsID: number; name: string };
   shelf?: { total?: number; releases?: ShelfEntry[] } | null;
   releases: DiscogsReleaseDoc[];
+  /// Which release speaks for each master, when the caller knows (the
+  /// discography's main release). Otherwise the releases the shelf names
+  /// do, and then the lowest release id.
+  preferred?: number[];
+  /// Where the documents came from, written into the bundle as given.
+  source?: BundleSource;
+}
+
+/// What a bundle was built from: the discography snapshot, how complete it
+/// was, and how many of its releases had documents.
+export interface BundleSource {
+  /// "backend" when Indigo's catalogue names the artist's Discogs id;
+  /// "device-cache" when a device's own enrichment supplied it.
+  identity: "backend" | "device-cache";
+  discography: string | null;
+  complete: boolean;
+  truncated: boolean;
+  totalReported: number | null;
+  pagesReported: number | null;
+  pagesFetched: number;
+  entries: number;
+  representativeReleases: number;
+  documentsRead: number;
+  documentsMissing: number;
+  documentsTruncated: number;
+  /// Documents read for other pressings of the records, from releases the
+  /// catalogue already files under the artist.
+  otherPressingsRead?: number;
 }
 
 // MARK: - The bundle
@@ -124,6 +152,9 @@ export interface Bundle {
     documents: number;
     used: number;
     duplicates: number;
+    /// Documents that are other pressings of a record already counted: read,
+    /// and combined into that record, never counted as records of their own.
+    pressings: number;
     unrelated: number;
     malformed: number;
     shelfWithoutDocument: number;
@@ -132,7 +163,8 @@ export interface Bundle {
     ownWithoutYear: number;
     creditsDropped: number;
   };
-  releases: { id: number; title: string; year: number | null; relation: Relation; compilation: boolean }[];
+  releases: { id: number; masterID: number | null; title: string; year: number | null; relation: Relation; compilation: boolean }[];
+  source?: BundleSource;
   styles: { name: string; releases: number }[];
   genres: { name: string; releases: number }[];
   /// Styles of records the artist is on but that are not theirs -- a track
@@ -266,7 +298,7 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
     shelfEntries: input.shelf?.releases?.length ?? 0,
     shelfTotal: typeof input.shelf?.total === "number" ? input.shelf.total : null,
     documents: input.releases.length,
-    used: 0, duplicates: 0, unrelated: 0, malformed: 0, shelfWithoutDocument: 0,
+    used: 0, duplicates: 0, pressings: 0, unrelated: 0, malformed: 0, shelfWithoutDocument: 0,
     ownWithoutStyles: 0, ownWithoutLabels: 0, ownWithoutYear: 0, creditsDropped: 0,
   };
 
@@ -299,6 +331,31 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
     if (!byID.has(id)) coverage.shelfWithoutDocument += 1;
   }
 
+  // One record per master. Pressings of the same record are one record --
+  // its collaborators made it once -- but they do not all say the same
+  // thing: one pressing lists the producer, another only the label. So every
+  // pressing is read, and what they say is combined under one record and
+  // counted once. The record is named by the release the shelf names (its
+  // main release), else the lowest id, so arrival order cannot choose.
+  const preferred = new Set(input.preferred ?? [...shelfRoles.keys(), ...shelfArtist.keys()]);
+  const recordOf = new Map<number, number>();
+  const pressingsOf = new Map<number, number[]>();
+  for (const id of [...byID.keys()].sort((a, b) => a - b)) {
+    const master = byID.get(id)!.master_id;
+    if (typeof master === "number" && master > 0) {
+      const group = pressingsOf.get(master) ?? [];
+      group.push(id);
+      pressingsOf.set(master, group);
+    } else {
+      recordOf.set(id, id);
+    }
+  }
+  for (const group of pressingsOf.values()) {
+    const record = group.find((id) => preferred.has(id)) ?? group[0];
+    for (const id of group) recordOf.set(id, record);
+    coverage.pressings += group.length - 1;
+  }
+
   const releases: Bundle["releases"] = [];
   const styles = new Map<string, number>();
   const genres = new Map<string, number>();
@@ -320,6 +377,15 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
     collaborators.set(key, entry);
   }
 
+  // What each document says about the artist.
+  interface Seen {
+    doc: DiscogsReleaseDoc;
+    relation: Relation;
+    compilation: boolean;
+    roles: Set<string>;
+    otherMains: PersonRef[];
+  }
+  const records = new Map<number, Seen[]>();
   for (const id of [...byID.keys()].sort((a, b) => a - b)) {
     const doc = byID.get(id)!;
     const mains = (doc.artists ?? []).filter((a) => typeof a.id === "number");
@@ -329,7 +395,6 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
       ...(doc.extraartists ?? []),
       ...(doc.tracklist ?? []).flatMap((t) => t.extraartists ?? []),
     ].filter((p) => p.id === me);
-    const compilation = isCompilation(doc);
     const otherMains = mains.map(ref).filter((p): p is PersonRef => p !== null && p.discogsID !== me);
 
     let relation: Relation;
@@ -347,22 +412,42 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
     for (const credit of creditsOfMine) {
       for (const role of splitRoles(credit.role)) if (creditKind(role) !== null) roles.add(role);
     }
+    const record = recordOf.get(id) ?? id;
+    const seen = records.get(record) ?? [];
+    seen.push({ doc, relation, compilation: isCompilation(doc), roles, otherMains });
+    records.set(record, seen);
+  }
+
+  // Each record once, from everything its pressings say.
+  const STRENGTH: Record<Relation, number> = { joint: 0, main: 1, track: 2, credit: 3 };
+  const validYear = (year: number | undefined) => typeof year === "number" && year > 1900 && year < 2200;
+  for (const record of [...records.keys()].sort((a, b) => a - b)) {
+    const seen = records.get(record)!;
+    const relation = seen.map((s) => s.relation).sort((a, b) => STRENGTH[a] - STRENGTH[b])[0];
+    const compilation = seen.some((s) => s.compilation);
+    const named = seen.find((s) => s.doc.id === record)?.doc ?? seen[0].doc;
+    const pressingYears = seen.map((s) => s.doc.year).filter(validYear) as number[];
     releases.push({
-      id, title: (doc.title ?? "").trim(), year: typeof doc.year === "number" && doc.year > 0 ? doc.year : null,
+      id: record,
+      masterID: typeof named.master_id === "number" && named.master_id > 0 ? named.master_id : null,
+      title: (named.title ?? "").trim(),
+      year: pressingYears.length ? Math.min(...pressingYears) : null,
       relation, compilation,
     });
+    const otherMains = new Map<string, PersonRef>();
+    for (const s of seen) for (const p of s.otherMains) otherMains.set(identity(p), mergeRef(otherMains.get(identity(p)) ?? p, p));
 
     if (relation === "main" || relation === "joint") {
-      // What the artist's own records say about them.
-      const docStyles = [...new Set(doc.styles ?? [])];
-      if (docStyles.length === 0) coverage.ownWithoutStyles += 1;
-      for (const style of docStyles) styles.set(style, (styles.get(style) ?? 0) + 1);
-      for (const genre of new Set(doc.genres ?? [])) genres.set(genre, (genres.get(genre) ?? 0) + 1);
-      if (typeof doc.year === "number" && doc.year > 1900 && doc.year < 2200) years.push(doc.year);
+      // What the artist's own records say about them, once a record.
+      const recordStyles = new Set(seen.flatMap((s) => s.doc.styles ?? []));
+      if (recordStyles.size === 0) coverage.ownWithoutStyles += 1;
+      for (const style of recordStyles) styles.set(style, (styles.get(style) ?? 0) + 1);
+      for (const genre of new Set(seen.flatMap((s) => s.doc.genres ?? []))) genres.set(genre, (genres.get(genre) ?? 0) + 1);
+      if (pressingYears.length) years.push(Math.min(...pressingYears));
       else coverage.ownWithoutYear += 1;
 
       const seenHere = new Set<string>();
-      for (const label of doc.labels ?? []) {
+      for (const label of seen.flatMap((s) => s.doc.labels ?? [])) {
         const name = (label.name ?? "").trim();
         if (!name) continue;
         // By Discogs id; a label with none is only ever itself.
@@ -381,30 +466,32 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
       if (seenHere.size === 0) coverage.ownWithoutLabels += 1;
 
       // Made with: the others named alongside.
-      for (const other of otherMains) addCollaborator(other, "joint", id);
+      for (const other of otherMains.values()) addCollaborator(other, "joint", record);
 
-      // Credited on it: a job, with where on the record.
-      const jobs: { person: DiscogsPerson; tracks: string }[] = [
-        ...(doc.extraartists ?? []).map((person) => ({ person, tracks: (person.tracks ?? "").trim() })),
-        ...(doc.tracklist ?? []).flatMap((track) =>
-          (track.extraartists ?? []).map((person) => ({ person, tracks: (track.position ?? "").trim() }))
-        ),
-      ];
-      for (const { person, tracks } of jobs) {
-        if (person.id === me) continue;
-        const who = ref(person);
-        if (!who) continue;
-        for (const role of splitRoles(person.role)) {
-          if (creditKind(role) === null) { coverage.creditsDropped += 1; continue; }
-          const key = identity(who);
-          const entry = credited.get(key) ?? { artist: who, roles: new Map() };
-          entry.artist = mergeRef(entry.artist, who);
-          const onRelease = entry.roles.get(role) ?? new Map<number, Set<string>>();
-          const where = onRelease.get(id) ?? new Set<string>();
-          if (tracks) for (const t of tracks.split(",").map((t) => t.trim()).filter(Boolean)) where.add(t);
-          onRelease.set(id, where);
-          entry.roles.set(role, onRelease);
-          credited.set(key, entry);
+      // Credited on it: a job, with where on the record -- from every pressing.
+      for (const { doc } of seen) {
+        const jobs: { person: DiscogsPerson; tracks: string }[] = [
+          ...(doc.extraartists ?? []).map((person) => ({ person, tracks: (person.tracks ?? "").trim() })),
+          ...(doc.tracklist ?? []).flatMap((track) =>
+            (track.extraartists ?? []).map((person) => ({ person, tracks: (track.position ?? "").trim() }))
+          ),
+        ];
+        for (const { person, tracks } of jobs) {
+          if (person.id === me) continue;
+          const who = ref(person);
+          if (!who) continue;
+          for (const role of splitRoles(person.role)) {
+            if (creditKind(role) === null) { coverage.creditsDropped += 1; continue; }
+            const key = identity(who);
+            const entry = credited.get(key) ?? { artist: who, roles: new Map() };
+            entry.artist = mergeRef(entry.artist, who);
+            const onRelease = entry.roles.get(role) ?? new Map<number, Set<string>>();
+            const where = onRelease.get(record) ?? new Set<string>();
+            if (tracks) for (const t of tracks.split(",").map((t) => t.trim()).filter(Boolean)) where.add(t);
+            onRelease.set(record, where);
+            entry.roles.set(role, onRelease);
+            credited.set(key, entry);
+          }
         }
       }
     } else if (!compilation) {
@@ -412,10 +499,13 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
       // did on it. A compilation's main artist is everybody, which is nobody;
       // and a record the artist is only credited on for something
       // non-musical is not one they made with anybody.
-      if (relation === "track") roles.add("TrackAppearance");
+      const roles = new Set(seen.flatMap((s) => [...s.roles]));
+      if (seen.some((s) => s.relation === "track")) roles.add("TrackAppearance");
       if (roles.size === 0) { coverage.creditsDropped += 1; continue; }
-      for (const style of new Set(doc.styles ?? [])) stylesAround.set(style, (stylesAround.get(style) ?? 0) + 1);
-      for (const other of otherMains) for (const role of roles) addCollaborator(other, role, id);
+      for (const style of new Set(seen.flatMap((s) => s.doc.styles ?? []))) {
+        stylesAround.set(style, (stylesAround.get(style) ?? 0) + 1);
+      }
+      for (const other of otherMains.values()) for (const role of roles) addCollaborator(other, role, record);
     }
   }
 
@@ -447,6 +537,7 @@ export function deriveArtistBundle(input: BundleInput): Bundle {
     format: BUNDLE_FORMAT,
     artist: { discogsID: me, name: input.artist.name, nameKey: normalizeName(withoutDisambiguator(input.artist.name)) },
     coverage,
+    ...(input.source ? { source: input.source } : {}),
     releases,
     styles: sortedCounts(styles),
     genres: sortedCounts(genres),

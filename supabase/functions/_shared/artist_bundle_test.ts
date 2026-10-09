@@ -65,6 +65,7 @@ Deno.test("every fixture becomes a bounded bundle that uses every related docume
     assertEquals(bundle.format, "indigo.artist-knowledge/1");
     assertEquals(bundle.artist.discogsID, id);
     assertEquals(bundle.coverage.used + bundle.coverage.unrelated + bundle.coverage.malformed, input.releases.length);
+    assertEquals(bundle.releases.length, bundle.coverage.used - bundle.coverage.pressings, "one record per master");
     const text = canonicalJSON(bundle);
     assert(text.length < 32_000, `${bundle.artist.name}: ${text.length} bytes`);
     assert(await gzipSize(text) < 6_000, `${bundle.artist.name} compresses`);
@@ -166,7 +167,14 @@ Deno.test("a credit on the artist's own record is a credit, not a collaboration"
   const mica = tirzah.credits.find((c) => c.artist.discogsID === MICA_LEVI)!;
   const produced = mica.roles.find((r) => r.role === "Producer")!;
   assertEquals(produced.kind, "production");
-  assert(produced.releases.length >= 5);
+  // Two records, however many pressings of each carry the credit: one master
+  // is one record. ("Micachu", her other Discogs name, produced Devotion --
+  // the alias gap, reported rather than guessed.)
+  const titles = produced.releases.map((r) => tirzah.releases.find((x) => x.id === r.id)?.title ?? "");
+  assertEquals(titles.length, 2);
+  assert(titles.some((t) => t === "Colourgrade"));
+  assert(titles.some((t) => t.startsWith("Trip9love")));
+  assert(tirzah.coverage.pressings > 0);
 
   const burial = deriveArtistBundle(await fixture(BURIAL));
   const goz = burial.credits.find((c) => c.artist.name === "Jason Goz")!;

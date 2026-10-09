@@ -24,6 +24,8 @@ import {
 } from "../_shared/discogs.ts";
 import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
+import { buildArtistBundle, discoverDiscography, readArtistJob, settleBatches } from "../_shared/knowledge.ts";
+import { liveKnowledgeDeps } from "../_shared/knowledge_live.ts";
 import {
   moveInlinePayloadsToR2,
   moveReleasePayloadsToR2,
@@ -90,7 +92,7 @@ Deno.serve(async (req: Request) => {
   // a gateway log line, and the plan's log allowance is 1 GB a month. Flushed
   // early when a batch runs long, so a worker killed mid-batch loses at most
   // FLUSH_AFTER_MS of finished work to the 15-minute reclaim (0030).
-  const pending: PendingWrites = { records: [], completions: [] };
+  const pending: PendingWrites = { records: [], completions: [], notifies: [] };
   let lastFlush = Date.now();
 
   // One at a time. These are all upstream fetches against one station, and a
@@ -122,6 +124,7 @@ Deno.serve(async (req: Request) => {
   }
   results.push(...await flush(supabase, pending));
   await release(supabase, unstarted);
+  await settle(supabase, pending);
 
   return json({ claimed: jobs.length, released: unstarted.length, results });
 });
@@ -173,6 +176,22 @@ interface Completion {
 interface PendingWrites {
   records: TrackReleaseRow[];
   completions: Completion[];
+  /// Batches of release documents a discovery queued, cached in this run.
+  notifies: Record<string, unknown>[];
+}
+
+/// Queues the builds whose document batches this run finished. Logged, not
+/// thrown: the releases are cached either way, and the next discovery or
+/// build picks them up.
+async function settle(supabase: SupabaseClient, pending: PendingWrites): Promise<void> {
+  if (pending.notifies.length === 0) return;
+  try {
+    const queued = await settleBatches(liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), pending.notifies);
+    if (queued.length) console.log("knowledge_builds_queued", queued.join(","));
+  } catch (cause) {
+    console.error("knowledge_settle_failed", String(cause).slice(0, 300));
+  }
+  pending.notifies = [];
 }
 
 /// Writes what the batch has found, then marks its jobs done or failed, in
@@ -402,6 +421,27 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       // throttle or an outage throws instead, and the queue's backoff brings
       // it round again.
       await cacheDiscogsRelease(supabase, releaseID, Deno.env.get("DISCOGS_TOKEN"));
+      // Queued by a discography discovery: remembered, and settled once this
+      // run's finished jobs are written back (see settleBatches).
+      if (job.payload?.notify) pending.notifies.push(job.payload.notify as Record<string, unknown>);
+      return;
+    }
+
+    case "discover_discography": {
+      // An artist's whole discography, a few pages a job (knowledge.ts).
+      // Pilot artists only, for now.
+      const result = await discoverDiscography(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload),
+      );
+      console.log("knowledge_discovery", job.dedupe_key, JSON.stringify(result).slice(0, 600));
+      return;
+    }
+
+    case "build_artist_bundle": {
+      const result = await buildArtistBundle(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload),
+      );
+      console.log("knowledge_build", job.dedupe_key, JSON.stringify(result).slice(0, 600));
       return;
     }
 
