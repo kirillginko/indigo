@@ -69,7 +69,7 @@ final class ExploreShadowMeasurement: XCTestCase {
         let coverage = report.coverage
         var lines = [
             "source \(report.source), generation \(f.generation.isEmpty ? "(nothing asked)" : f.generation), stale answers \(coverage.staleAnswers)",
-            "calls \(f.calls), \(f.bytes) bytes, ms [\(f.milliseconds.map { String(Int($0.rounded())) }.joined(separator: ", "))], errors \(f.errors.count) \(f.errors.joined(separator: " | "))",
+            "calls \(f.calls), \(f.bytes) bytes, ms [\(f.milliseconds.map { String(Int($0.rounded())) }.joined(separator: ", "))], errors \(f.errors.count) \(f.errors.joined(separator: " | ")), retries \(f.retries)",
             "asked: \(f.nodesAsked) starting points, \(f.artistsAsked) artists; kept: \(f.nodesKept) points, \(f.artistsKept) artists",
             "starting points: " + coverage.startingPoints.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: "; "),
             "artists: \(coverage.artistsFound) found, \(coverage.artistsUnknown) unknown, \(coverage.artistsMissing) missing",

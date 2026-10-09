@@ -153,6 +153,8 @@ nonisolated struct BackendFetchReport: Codable, Sendable, Equatable {
     var bytes = 0
     var milliseconds: [Double] = []
     var errors: [String] = []
+    /// Calls asked again after a statement timeout.
+    var retries = 0
     var nodesAsked = 0
     var artistsAsked = 0
     var nodesKept = 0
@@ -162,9 +164,14 @@ nonisolated struct BackendFetchReport: Codable, Sendable, Equatable {
 }
 
 nonisolated enum BackendKnowledgeFetcher {
-    /// The function's bounds (0072). A larger ask is split; every answer is
-    /// about one entity, so splitting changes nothing about what is answered.
-    static let nodesPerCall = 12
+    /// Within the function's bounds (0072: twelve nodes, fifty artists). A
+    /// larger ask is split; every answer is about one entity, so splitting
+    /// changes nothing about what is answered. Six nodes rather than the
+    /// twelve allowed: since identities (0073) a starting artist reaches its
+    /// Discogs rows too, and twelve in one statement ran past anon's
+    /// three-second timeout on a cold first call, where two calls of six each
+    /// have the whole timeout to themselves.
+    static let nodesPerCall = 6
     static let artistsPerCall = 50
 
     struct Params: Encodable, Sendable {
@@ -230,7 +237,17 @@ nonisolated enum BackendKnowledgeFetcher {
             )
             let started = ContinuousClock.now
             do {
-                let data = try await call(params)
+                let data: Data
+                do {
+                    data = try await call(params)
+                } catch where String(describing: error).contains("57014") {
+                    // A statement timeout. The first call after the database
+                    // has been idle reads its pages from disk and can run past
+                    // anon's three seconds; the same call straight after is
+                    // warm. Once, and counted -- anything else is a gap.
+                    report.retries += 1
+                    data = try await call(params)
+                }
                 let spent = ContinuousClock.now - started
                 report.calls += 1
                 report.bytes += data.count

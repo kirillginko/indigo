@@ -169,6 +169,33 @@ final class BackendKnowledgeTests: XCTestCase {
     }
 
     /// An answer from an older generation is used, and said to be stale.
+    func testAStatementTimeoutIsAskedOnceMoreAndCounted() async {
+        let backend = FakeBackend()
+        var failures = 1
+        let flaky: BackendKnowledgeFetcher.Call = { params in
+            if failures > 0 {
+                failures -= 1
+                throw NSError(domain: "PostgrestError", code: 0, userInfo: [NSLocalizedDescriptionKey: "57014 statement timeout"])
+            }
+            return try await backend.call(params)
+        }
+        var cache = BackendKnowledgeCache()
+        let nodes = [MusicNode.artist("Artist 0")]
+        let report = await BackendKnowledgeFetcher.refresh(&cache, nodes: nodes, artists: [], now: now, call: flaky)
+        XCTAssertEqual(report.retries, 1)
+        XCTAssertEqual(report.errors, [])
+        XCTAssertEqual(cache.nodes.count, 1)
+
+        // Anything else is a gap, not a retry.
+        let offline = FakeBackend()
+        offline.fail = true
+        var empty = BackendKnowledgeCache()
+        let failed = await BackendKnowledgeFetcher.refresh(&empty, nodes: nodes, artists: [], now: now, call: offline.call)
+        XCTAssertEqual(failed.retries, 0)
+        XCTAssertEqual(offline.calls.count, 1)
+        XCTAssertEqual(failed.errors.count, 1)
+    }
+
     func testAStaleAnswerIsUsedAndSaidToBeStale() async throws {
         let (personal, local) = try personal()
         let backend = FakeBackend()

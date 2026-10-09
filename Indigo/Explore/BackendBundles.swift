@@ -174,7 +174,12 @@ nonisolated enum BundleFetcher {
     @Sendable static func live(_ key: String) async throws -> (status: Int, data: Data?) {
         guard let host = SupabaseConfiguration.catalogCacheHost, !host.contains("/"),
               let url = URL(string: "https://\(host)/\(key)") else { throw URLError(.badURL) }
-        let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url, timeoutInterval: 10))
+        // A reference is rewritten in place and an hour's local cache kept the
+        // one from before a rebuild; a bundle is addressed and kept for good.
+        let policy: URLRequest.CachePolicy = key.hasPrefix("knowledge/v1/refs/")
+            ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy
+        let (data, response) = try await URLSession.shared.data(
+            for: URLRequest(url: url, cachePolicy: policy, timeoutInterval: 10))
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         return (status, status == 200 ? data : nil)
     }
