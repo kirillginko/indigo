@@ -15,7 +15,7 @@
 import { assert, assertEquals, assertNotEquals } from "jsr:@std/assert@1";
 import {
   bundleDigest, bundleKey, BundleInput, canonicalJSON, creditKind, deriveArtistBundle,
-  isPlaceholderLabel, withoutDisambiguator,
+  isPlaceholderLabel, splitRoles, withoutDisambiguator,
 } from "./artist_bundle.ts";
 
 import leeGamble from "./testdata/artist_bundle/1274911.json" with { type: "json" };
@@ -273,4 +273,11 @@ Deno.test("credit roles mean what they mean in the app (CreditRole.kind)", () =>
   assertEquals(creditKind("Design"), null);
   assertEquals(creditKind("Photography By"), null);
   assertEquals(creditKind("Lacquer Cut By"), null);
+});
+
+Deno.test("a comma inside brackets is part of the role", () => {
+  assertEquals(splitRoles("Producer [Contribution, Additional], Mixed By"), ["Producer [Contribution, Additional]", "Mixed By"]);
+  assertEquals(splitRoles("Featuring [Ft, Uncredited]"), ["Featuring [Ft, Uncredited]"]);
+  assertEquals(splitRoles("Mixed By, mixed by, Producer"), ["Mixed By", "Producer"]);
+  assertEquals(splitRoles("Vocals (Backing, Lead)"), ["Vocals (Backing, Lead)"]);
 });

@@ -248,9 +248,27 @@ const SHELF_ROLES = new Set(["Appearance", "TrackAppearance", "Remix", "Producer
 /// "Mixed By, Producer" as its two roles, each trimmed, and one spelling per
 /// role whatever its case ("Mixed by" is "Mixed By"). The first spelling in
 /// byte order is the one kept, so no input order can change it.
-function splitRoles(role: string | undefined): string[] {
+///
+/// A comma inside brackets is part of the role, not a separator: Discogs
+/// writes "Producer [Contribution, Additional]" as one job, and splitting it
+/// there left "Producer [Contribution" on the record.
+export function splitRoles(role: string | undefined): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const character of role ?? "") {
+    if (character === "[" || character === "(") depth += 1;
+    if ((character === "]" || character === ")") && depth > 0) depth -= 1;
+    if (character === "," && depth === 0) {
+      parts.push(current);
+      current = "";
+    } else {
+      current += character;
+    }
+  }
+  parts.push(current);
   const found = new Map<string, string>();
-  for (const part of (role ?? "").split(",")) {
+  for (const part of parts) {
     const trimmed = part.trim();
     if (!trimmed) continue;
     const key = trimmed.toLowerCase();
