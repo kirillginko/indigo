@@ -70,7 +70,7 @@ final class CloudKitCompatibilityTests: XCTestCase {
         XCTAssertEqual(Set(user), IndigoSchemaCurrent.userDataModelNames)
         XCTAssertEqual(user.count + local.count, all.count)
         XCTAssertTrue(Set(user).isDisjoint(with: Set(local)))
-        XCTAssertEqual(local.count, 15)
+        XCTAssertEqual(local.count, 17)
     }
 
     func testTheModelsThatStayOnTheDeviceAreNotHeldToIt() throws {

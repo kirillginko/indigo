@@ -115,6 +115,6 @@ final class SplitContainerTests: XCTestCase {
         XCTAssertEqual(user, IndigoSchemaCurrent.userDataModelNames)
         XCTAssertEqual(local, Set(IndigoSchemaCurrent.localModels.map { String(describing: $0) }))
         XCTAssertTrue(user.isDisjoint(with: local))
-        XCTAssertEqual(local.count, 15)
+        XCTAssertEqual(local.count, 17)
     }
 }

@@ -132,6 +132,26 @@ final class DigStore {
     private var engine: DigEngine { DigEngine(context: context) }
     private var enricher: MusicBrainzEnricher { MusicBrainzEnricher(context: context, client: client) }
     private var discogsEnricher: DiscogsEnricher { DiscogsEnricher(context: context, client: discogsClient) }
+    var identityStore: ArtistIdentityStore { ArtistIdentityStore(context: context) }
+
+    /// Which artist a page means, and every spelling it should read under.
+    ///
+    /// Evidence first (`ArtistIdentityResolver`). Failing that, the record
+    /// this page already shows: if DIG filed the name's catalogue entry under
+    /// exactly this name, the spellings verified for that entry belong on its
+    /// page too — "Prefuse 73" gathers "Prefuse73". Only under exactly this
+    /// name: older rows in that table were filed by looser matching, and one
+    /// filed under another spelling ("walton", holding Rik Walton) must never
+    /// become a reason to open somebody else.
+    func artistResolution(_ reference: ArtistReference) -> ArtistResolution {
+        let resolved = identityStore.resolve(reference)
+        guard !resolved.isVerified else { return resolved }
+        guard let shown = discogsEnricher.cachedArtist(named: reference.name), shown.discogsID > 0,
+              ArtistSpelling.filingKey(shown.name) == ArtistSpelling.key(reference.name)
+        else { return resolved }
+        let filed = ArtistReference(name: reference.name, mbid: reference.mbid, discogsID: shown.discogsID)
+        return identityStore.resolve(filed).asFiledRecord()
+    }
 
     // MARK: - Profiles
 
@@ -2016,6 +2036,9 @@ final class DigStore {
 
         let described = try await detail
         discogsEnricher.artistDetail(named: name, head: head, detail: described)
+        // Who the entry says it is — its credited spellings and aliases —
+        // kept apart from the description, as evidence. See `ArtistIdentityStore`.
+        identityStore.record(DiscogsIdentityFacts(detail: described))
         announceChange()
 
         let releases: DiscogsArtistReleases
@@ -2064,25 +2087,40 @@ final class DigStore {
                 // falls past all of them to MusicBrainz below, and that fall
                 // was the whole of an eight-second page with nothing in the
                 // trace to show for it.
-                let head = try await Trace.stage("dig.head", name) {
-                    try await discogsClient.artistHead(named: name)
+                let lookup = try await Trace.stage("dig.head", name) {
+                    try await discogsClient.artistLookup(named: name)
                 }
+                let head = lookup.head
+                // A spelling Discogs credits to somebody filed under another
+                // name is that somebody. The evidence is kept, and their
+                // record is kept under the name they are filed as — the page
+                // then resolves onward to it rather than holding a second copy
+                // under the spelling. See `ArtistIdentityResolver`.
+                if let check = lookup.spelling {
+                    identityStore.record(check)
+                }
+                let filed = lookup.isCreditedSpelling
+                    ? head.map { DiscogsClient.withoutDisambiguator($0.title) } ?? name
+                    : name
                 if let head {
-                    discogsEnricher.artistIdentity(named: name, head: head)
+                    discogsEnricher.artistIdentity(named: filed, head: head)
+                }
+                if lookup.spelling != nil || head != nil {
                     saveContext()
                     announceChange()
                 }
 
                 let described = try await Trace.stage("dig.describe", name) { () -> DiscogsArtist? in
                     guard let head else { return nil }
-                    return try await describeArtist(named: name, head: head)
+                    return try await describeArtist(named: filed, head: head)
                 }
                 if let artist = described {
                     saveContext()
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
                     forgetGraph(for: .artist(name))
-                    backfillLocalGenres(artistName: name, genres: artist.styles + artist.genres)
+                    if filed != name { forgetGraph(for: .artist(filed)) }
+                    backfillLocalGenres(artistName: filed, genres: artist.styles + artist.genres)
                     announceChange()
                     isEnriching = false
                     let previews = artist.releaseThumbnailURLStrings.compactMap(URL.init(string:))

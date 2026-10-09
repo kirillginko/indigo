@@ -59,6 +59,29 @@ nonisolated enum DiscogsConfiguration {
     }
 }
 
+/// What looking an artist up by name found, and on what evidence.
+nonisolated struct DiscogsArtistLookup: Sendable {
+    let head: DiscogsSearchResult?
+    /// Present when nobody was filed under the name and a spelling check ran.
+    let spelling: DiscogsSpellingCheck?
+
+    /// Whether the head is somebody filed under another name, found because
+    /// their records were credited under this one.
+    var isCreditedSpelling: Bool {
+        if case .variation? = spelling?.verdict { return head != nil }
+        return false
+    }
+}
+
+/// A completed spelling check: the verdict, and the entries it read to reach it.
+nonisolated struct DiscogsSpellingCheck: Sendable {
+    let spelling: String
+    let verdict: SpellingVerdict
+    let resultCount: Int
+    let results: [DiscogsSearchResult]
+    let facts: [DiscogsIdentityFacts]
+}
+
 nonisolated struct DiscogsClient: Sendable {
     private let transport: DiscogsTransport
     private let suppliedToken: String?
@@ -133,14 +156,74 @@ nonisolated struct DiscogsClient: Sendable {
     /// the bundle is a second round trip, and waiting for it before drawing
     /// anything meant the portrait arrived twice as late as it had to.
     func artistHead(named name: String) async throws -> DiscogsSearchResult? {
+        try await artistLookup(named: name).head
+    }
+
+    /// The search that finds them, and the evidence for it when the name was a
+    /// spelling rather than what they are filed under.
+    ///
+    /// Asked for "Prefuse73", Discogs' search returns Prefuse 73 first — and
+    /// the match below, which compares filing names, rightly refuses it:
+    /// "prefuse73" and "prefuse 73" are not the same string, and folding them
+    /// together is how "Arp" would become A.R.P. So the page opened with
+    /// nothing on it. What makes Prefuse 73 the answer is that his entry lists
+    /// "Prefuse73" as a spelling his records were credited under, and that
+    /// nobody is filed under it — which `spellingCheck` establishes, or fails
+    /// to, from a search that returned every match it has.
+    func artistLookup(named name: String) async throws -> DiscogsArtistLookup {
         let search: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "q", value: name),
             URLQueryItem(name: "type", value: "artist"),
             URLQueryItem(name: "per_page", value: "5")
         ])
         let candidates = Self.artistMatches(name: name, results: search.results ?? [])
-        guard candidates.count > 1 else { return candidates.first }
-        return try await Self.whicheverMakesRecords(candidates, using: self) ?? candidates.first
+        if candidates.count == 1 { return DiscogsArtistLookup(head: candidates[0], spelling: nil) }
+        if candidates.count > 1 {
+            let head = try await Self.whicheverMakesRecords(candidates, using: self) ?? candidates.first
+            return DiscogsArtistLookup(head: head, spelling: nil)
+        }
+        guard let check = await spellingCheck(name) else { return DiscogsArtistLookup(head: nil, spelling: nil) }
+        guard case .variation(let id) = check.verdict, let head = check.results.first(where: { $0.id == id }) else {
+            return DiscogsArtistLookup(head: nil, spelling: check)
+        }
+        return DiscogsArtistLookup(head: head, spelling: check)
+    }
+
+    /// Whether exactly one Discogs entry answers to a spelling, or nil when
+    /// that could not be established.
+    ///
+    /// Nil is the answer to every kind of not knowing: a search that failed,
+    /// one with more matches than it returned, more candidates than are worth
+    /// reading, or a candidate whose entry would not load. None of those is
+    /// evidence that nobody else answers to the name, and the caller stores
+    /// nothing for them. See `SpellingCheck.verdict`.
+    func spellingCheck(_ spelling: String) async -> DiscogsSpellingCheck? {
+        let response: DiscogsSearchResponse
+        do {
+            response = try await get("database/search", query: [
+                URLQueryItem(name: "q", value: spelling),
+                URLQueryItem(name: "type", value: "artist"),
+                URLQueryItem(name: "per_page", value: String(SpellingCheck.pageSize))
+            ])
+        } catch {
+            return nil
+        }
+        let results = response.results ?? []
+        guard let total = response.pagination?.items, total <= results.count else { return nil }
+        guard let candidates = SpellingCheck.candidates(for: spelling, in: results) else { return nil }
+
+        var facts: [Int: DiscogsIdentityFacts] = [:]
+        for id in candidates {
+            guard let detail = try? await artistDetail(id: id) else { return nil }
+            facts[id] = DiscogsIdentityFacts(detail: detail)
+        }
+        guard let verdict = SpellingCheck.verdict(
+            spelling: spelling, results: results, complete: true, details: facts
+        ) else { return nil }
+        return DiscogsSpellingCheck(
+            spelling: spelling, verdict: verdict, resultCount: total,
+            results: results, facts: facts.keys.sorted().compactMap { facts[$0] }
+        )
     }
 
     /// Which of several people with one name is the one who makes the records.

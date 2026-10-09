@@ -165,6 +165,11 @@ nonisolated enum IdentityBasis: String, Hashable, Sendable {
     /// A complete search found exactly one artist credited under this spelling,
     /// and nobody filed under it.
     case nameVariation
+    /// Nothing above, but the catalogue record DIG already shows for this name
+    /// is filed under exactly this name. Strong enough to gather the spellings
+    /// verified for that record onto its page; never strong enough to send a
+    /// reference anywhere else.
+    case filedRecord
 }
 
 /// What a complete Discogs artist search for one spelling established.
@@ -295,7 +300,17 @@ nonisolated struct ArtistResolution: Hashable, Sendable {
     /// Whether the reference should open under a different name than it came
     /// with — a verified spelling of somebody filed otherwise.
     var isRedirect: Bool {
-        isVerified && ArtistSpelling.key(reference.name) != ArtistSpelling.key(canonicalName)
+        isVerified && basis != .filedRecord
+            && ArtistSpelling.key(reference.name) != ArtistSpelling.key(canonicalName)
+    }
+
+    /// The same resolution, on weaker grounds. See `IdentityBasis.filedRecord`.
+    func asFiledRecord() -> ArtistResolution {
+        ArtistResolution(
+            reference: reference, identity: identity, basis: .filedRecord,
+            canonicalName: canonicalName, equivalentNames: equivalentNames,
+            possibleMatches: possibleMatches
+        )
     }
 }
 
