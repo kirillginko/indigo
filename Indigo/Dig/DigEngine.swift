@@ -323,7 +323,10 @@ nonisolated struct DigEngine {
 
     // MARK: - Artist
 
-    func artistProfile(name: String, mbid: String?) -> ArtistProfile {
+    /// - Parameter alsoCreditedAs: other spellings verified to be this artist
+    ///   (see `ArtistIdentityResolver`). What was credited under them is read
+    ///   onto this page as well; each record keeps the credit it was filed with.
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = []) -> ArtistProfile {
         // Everything below reads the graph's fold — the recordings credited
         // to this artist, their catalogue entries, the library and crate
         // counts, the neighbourhood. Assembled once here rather than by
@@ -336,13 +339,15 @@ nonisolated struct DigEngine {
         let cached = mbid.flatMap { enricher.cachedArtist($0) } ?? cachedArtist(named: name)
         let cachedDiscogs = DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: name)
         let discogs = cachedDiscogs?.isFresh == true ? cachedDiscogs : nil
-        let byArtist = recordings(byArtist: name)
+        let spellings = Self.otherSpellings(alsoCreditedAs, besides: name)
+        let byArtist = Self.unique(([name] + spellings).flatMap { recordings(byArtist: $0) }, by: \.id)
         let entries = byArtist.compactMap { metadata(for: $0.id) }
 
         // Bandcamp is a first-class source here, not a postscript. A great
         // deal of this music is on it and in no catalogue at all, so its tags
         // and its imprints belong beside the ones Discogs knows.
-        let bandcampReleases = BandcampEnricher(context: context).cachedReleases(forArtist: name)
+        let bandcamp = BandcampEnricher(context: context)
+        let bandcampReleases = ([name] + spellings).flatMap { bandcamp.cachedReleases(forArtist: $0) }
         let places = PlaceIndex(context: context)
         let bandcampTags = bandcampReleases
             .flatMap { places.split(keywords: $0.keywords).tags }
@@ -419,7 +424,10 @@ nonisolated struct DigEngine {
         // is Palm Pictures. A page for a lo-fi duo listed a film distributor
         // because the only thing that knew to exclude videos was reading a
         // different endpoint. See `ReleaseFormat`.
-        let credited = graph.releases(creditedTo: RecordingKey.normalizeArtist(name))
+        let credited = Self.unique(
+            ([name] + spellings).flatMap { graph.releases(creditedTo: RecordingKey.normalizeArtist($0)) },
+            by: \.discogsID
+        )
             .filter { !$0.isVideo }
         var labelIdentities: [String: Int] = [:]
         for record in credited {
@@ -502,7 +510,11 @@ nonisolated struct DigEngine {
             descriptor.fetchLimit = 1
             return (try? context.fetch(descriptor))?.first?.imageURL
         }()
-        let resolvedReleases = graph.releases(creditedTo: artistKey)
+        let resolvedReleases = Self.unique(
+            graph.releases(creditedTo: artistKey)
+                + spellings.flatMap { graph.releases(creditedTo: RecordingKey.normalizeArtist($0)) },
+            by: \.discogsID
+        )
         let resolvedByTitle = Dictionary(
             resolvedReleases.map { (Self.releaseKey($0.title), $0) },
             uniquingKeysWith: { first, _ in first }
@@ -852,6 +864,17 @@ nonisolated struct DigEngine {
     }
 
     // MARK: - Local evidence
+
+    /// The spellings worth reading besides the page's own name, once each.
+    static func otherSpellings(_ spellings: [String], besides name: String) -> [String] {
+        var seen: Set<String> = [RecordingKey.normalizeArtist(name)]
+        return spellings.filter { seen.insert(RecordingKey.normalizeArtist($0)).inserted }
+    }
+
+    static func unique<Element, Key: Hashable>(_ elements: [Element], by key: KeyPath<Element, Key>) -> [Element] {
+        var seen = Set<Key>()
+        return elements.filter { seen.insert($0[keyPath: key]).inserted }
+    }
 
     /// Everything credited to an artist.
     ///

@@ -119,3 +119,43 @@ nonisolated struct ArtistIdentityStore {
         return try? context.fetch(descriptor).first
     }
 }
+
+/// What an artist page opens: the identity a reference resolved to, the name
+/// and identifiers the page is built from, and how it got there.
+nonisolated struct ArtistPageIdentity: Equatable, Sendable {
+    /// A richer alias's description, shown on a sparse page and attributed.
+    nonisolated struct Borrowed: Equatable, Sendable {
+        let name: String
+        let discogsID: Int
+        let biography: String?
+    }
+
+    let reference: ArtistReference
+    let resolution: ArtistResolution
+    /// What the page is called and read under.
+    let name: String
+    let mbid: String?
+    let discogsID: Int?
+    /// Every spelling verified to be the artist the page shows.
+    let alsoCreditedAs: [String]
+    /// Set when the page opened a richer alias in place of one with no record
+    /// of its own: the name the listener came from.
+    let cameFrom: String?
+    let borrowed: Borrowed?
+
+    /// The spelling the listener asked for, when the page is filed otherwise.
+    var arrivedAs: String? {
+        guard cameFrom == nil, resolution.isRedirect else { return nil }
+        return reference.name
+    }
+
+    /// Identifies the page, so a change of identity is a different page.
+    var pageID: String { "\(discogsID.map { "discogs:\($0)" } ?? resolution.identity.rawValue)|\(ArtistSpelling.key(name))" }
+
+    func borrowing(_ borrowed: Borrowed) -> ArtistPageIdentity {
+        ArtistPageIdentity(
+            reference: reference, resolution: resolution, name: name, mbid: mbid,
+            discogsID: discogsID, alsoCreditedAs: alsoCreditedAs, cameFrom: cameFrom, borrowed: borrowed
+        )
+    }
+}

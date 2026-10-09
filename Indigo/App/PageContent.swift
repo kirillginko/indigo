@@ -39,8 +39,8 @@ struct PageContent: View {
                     KioskMoodDetailView(moodID: id)
                 case .kioskEpisode(let slug):
                     KioskEpisodeDetailView(episodeSlug: slug)
-                case .digArtist(let mbid, let name):
-                    ArtistDigView(artistName: name, artistMBID: mbid)
+                case .digArtist(let mbid, let name, let discogsID):
+                    ArtistPageRoute(reference: ArtistReference(name: name, mbid: mbid, discogsID: discogsID))
                 case .digLabel(let mbid, let name):
                     LabelDigView(labelMBID: mbid, labelName: name)
                 case .digDiscogsLabel(let name, let discogsID):

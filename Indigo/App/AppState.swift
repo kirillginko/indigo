@@ -134,7 +134,10 @@ nonisolated enum DetailPage: Hashable {
     case ntsMixtape(alias: String)
     case kioskMood(id: String)
     case kioskEpisode(slug: String)
-    case digArtist(mbid: String?, name: String)
+    /// An artist, by whatever the caller knows of them. The ids are carried
+    /// through so the page opens the artist the caller meant rather than
+    /// searching the name again; see `ArtistPageRoute`.
+    case digArtist(mbid: String?, name: String, discogsID: Int? = nil)
     case digLabel(mbid: String, name: String)
     /// A label Discogs knows by name, and — where a record told us — by
     /// identity. The id is what separates two labels sharing a name; see

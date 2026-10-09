@@ -268,7 +268,7 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     var destination: DetailPage? {
         switch kind {
         case .artist:
-            return .digArtist(mbid: mbid, name: title)
+            return .digArtist(mbid: mbid, name: title, discogsID: discogsID)
         case .label:
             if let mbid, !mbid.isEmpty { return .digLabel(mbid: mbid, name: title) }
             return .digDiscogsLabel(name: title, discogsID: discogsID)

@@ -153,6 +153,83 @@ final class DigStore {
         return identityStore.resolve(filed).asFiledRecord()
     }
 
+    /// What an artist page opens, decided once per revision.
+    ///
+    /// Read from `body`, so it is kept: the answer only changes when something
+    /// is written, and every write moves `revision`.
+    func artistPage(_ reference: ArtistReference) -> ArtistPageIdentity {
+        if let held = pages[reference], held.revision == revision { return held.page }
+        let page = describePage(reference)
+        pages[reference] = (revision, page)
+        return page
+    }
+
+    @ObservationIgnored private var pages: [ArtistReference: (revision: Int, page: ArtistPageIdentity)] = [:]
+
+    private func describePage(_ reference: ArtistReference) -> ArtistPageIdentity {
+        let resolution = artistResolution(reference)
+        let opened = ArtistPageIdentity(
+            reference: reference, resolution: resolution,
+            name: resolution.canonicalName, mbid: reference.mbid,
+            discogsID: resolution.identity.discogsID,
+            alsoCreditedAs: resolution.equivalentNames, cameFrom: nil, borrowed: nil
+        )
+        guard let id = resolution.identity.discogsID, let facts = identityStore.facts(id) else { return opened }
+
+        var completeness: [Int: ProfileCompleteness] = [:]
+        var described: [Int: DiscogsArtist] = [:]
+        for candidate in [id] + facts.aliases.map(\.id) {
+            guard let record = describedRecord(candidate) else { continue }
+            described[candidate] = record
+            completeness[candidate] = Self.completeness(of: record)
+        }
+        let evidence = ArtistIdentityEvidence(facts: [facts])
+        let choice = PreferredProfileResolver(evidence: evidence, completeness: completeness)
+            .choice(for: resolution.identity)
+
+        switch choice.mode {
+        case .own:
+            return opened
+        case .ownWithFallback(let related):
+            guard let relatedID = related.discogsID, let record = described[relatedID] else { return opened }
+            let name = facts.aliases.first { $0.id == relatedID }.map { DiscogsClient.withoutDisambiguator($0.name) } ?? record.name
+            return opened.borrowing(ArtistPageIdentity.Borrowed(
+                name: name, discogsID: relatedID, biography: record.biography?.nilIfEmpty))
+        case .openRelated(let related):
+            guard let relatedID = related.discogsID, let record = described[relatedID] else { return opened }
+            let name = facts.aliases.first { $0.id == relatedID }.map { DiscogsClient.withoutDisambiguator($0.name) } ?? record.name
+            return ArtistPageIdentity(
+                reference: reference, resolution: resolution,
+                name: name, mbid: nil, discogsID: relatedID,
+                alsoCreditedAs: [name] + identityStore.creditedSpellings(of: relatedID),
+                cameFrom: resolution.canonicalName, borrowed: nil
+            )
+        }
+    }
+
+    /// The description DIG holds for a Discogs entry, if it has read one —
+    /// preferring the row filed under the entry's own name.
+    private func describedRecord(_ discogsID: Int) -> DiscogsArtist? {
+        var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.discogsID == discogsID })
+        descriptor.fetchLimit = 4
+        let rows = (try? context.fetch(descriptor)) ?? []
+        let filedName = identityStore.facts(discogsID).map { ArtistSpelling.filingKey($0.name) }
+        return rows.first { row in filedName.map { ArtistSpelling.filingKey(row.name) == $0 } ?? false }
+            ?? rows.max { $0.releaseTitles.count < $1.releaseTitles.count }
+    }
+
+    static func completeness(of record: DiscogsArtist) -> ProfileCompleteness {
+        ProfileCompleteness(
+            releases: record.releaseTitles.count,
+            credits: record.collaboratorNames.count,
+            hasBiography: !(record.biography ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+            hasArtwork: record.imageURL != nil || record.thumbnailURL != nil,
+            styles: record.styles.count,
+            labels: record.labelNames.count,
+            links: record.externalURLStrings.count
+        )
+    }
+
     // MARK: - Profiles
 
     /// The Dig landing page, as it was last drawn.
@@ -201,8 +278,9 @@ final class DigStore {
     /// land between two callers.
     func bumpRevisionForTesting() { revision &+= 1 }
 
-    func artistProfile(name: String, mbid: String?) async -> ArtistProfile {
-        let key = Self.artistKey(name: name, mbid: mbid)
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = []) async -> ArtistProfile {
+        let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
+        let key = Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings)
         let asked = revision
         if let fresh = profiles.fresh(key, revision: asked) { return fresh }
 
@@ -219,7 +297,7 @@ final class DigStore {
         // so it is what the line has to show.
         let running = Task { [worker] in
             await Trace.stage("graph.walk", key) {
-                await worker.artistProfile(name: name, mbid: mbid, generation: asked)
+                await worker.artistProfile(name: name, mbid: mbid, alsoCreditedAs: spellings, generation: asked)
             }
         }
         walking[key] = running
@@ -235,12 +313,15 @@ final class DigStore {
     /// the instant it comes back, rather than flashing a loading bar while it
     /// rebuilds something the listener was looking at seconds ago. The fresh
     /// version replaces it a moment later.
-    func cachedArtistProfile(name: String, mbid: String?) -> ArtistProfile? {
-        profiles.any(Self.artistKey(name: name, mbid: mbid))
+    func cachedArtistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = []) -> ArtistProfile? {
+        let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
+        return profiles.any(Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings))
     }
 
-    private static func artistKey(name: String, mbid: String?) -> String {
-        "\(mbid ?? "-")|\(RecordingKey.normalizeArtist(name))"
+    private static func artistKey(name: String, mbid: String?, alsoCreditedAs: [String] = []) -> String {
+        let base = "\(mbid ?? "-")|\(RecordingKey.normalizeArtist(name))"
+        guard !alsoCreditedAs.isEmpty else { return base }
+        return base + "|" + alsoCreditedAs.map(RecordingKey.normalizeArtist).sorted().joined(separator: "+")
     }
 
     @ObservationIgnored private var labels = DigCache<LabelProfile>()
@@ -1079,8 +1160,12 @@ final class DigStore {
     /// are not part of the music graph.
     func node(for page: DetailPage) -> MusicNode? {
         switch page {
-        case .digArtist(let mbid, let name):
-            return .artist(name, mbid: mbid)
+        case .digArtist(let mbid, let name, let discogsID):
+            // Remembered as the artist the page opens, so a visit to a spelling
+            // counts toward the artist it is. Visits made before were kept
+            // under the spelling, and still are.
+            let page = artistPage(ArtistReference(name: name, mbid: mbid, discogsID: discogsID))
+            return .artist(page.name, mbid: page.mbid, discogsID: page.discogsID)
         case .digLabel(let mbid, let name):
             return .label(name, mbid: mbid)
         case .digDiscogsLabel(let name, _):
@@ -1913,7 +1998,10 @@ final class DigStore {
     /// catalogued recording to work back from. Only then, and only for a
     /// couple of recordings, is a label looked up, because a label is what
     /// RELATED is built from and nothing else on the page needs one.
-    func enrichArtist(name: String, mbid: String?) async {
+    ///
+    /// `discogsID` is the entry the caller already knows the artist by: they
+    /// are described by that id, never by searching the name again.
+    func enrichArtist(name: String, mbid: String?, discogsID: Int? = nil) async {
         // A number for the whole of it, to hold the parts against.
         //
         // This target is built with `SWIFT_APPROACHABLE_CONCURRENCY`, so a
@@ -1923,7 +2011,7 @@ final class DigStore {
         // pieces that were named are measured. If this total is far larger
         // than the pieces inside it, the difference is where to look next.
         await Trace.stage("dig.enrich", name) {
-            await inForeground { await digArtist(name: name, mbid: mbid) }
+            await inForeground { await digArtist(name: name, mbid: mbid, discogsID: discogsID) }
         }
     }
 
@@ -2014,8 +2102,10 @@ final class DigStore {
     /// settles the context before it asks the worker anything, so saving here
     /// would be a second save on the main thread for the same rows.
     private func describeArtist(named name: String, head: DiscogsSearchResult) async throws -> DiscogsArtist? {
-        if let fresh = discogsEnricher.freshArtist(named: name) { return fresh }
         guard let id = head.id else { return nil }
+        // Only the entry asked for. A row filed under this name for another id
+        // is a namesake, and returning it would describe the wrong artist.
+        if let fresh = discogsEnricher.freshArtist(named: name), fresh.discogsID == id { return fresh }
         let client = discogsClient
 
         // The shelf, out of Indigo's cache where somebody has already paid for
@@ -2060,7 +2150,7 @@ final class DigStore {
         ))
     }
 
-    private func digArtist(name: String, mbid: String?) async {
+    private func digArtist(name: String, mbid: String?, discogsID: Int? = nil) async {
         let key = "artist:\(mbid ?? name)"
         let discogsKey = "discogs:artist:\(RecordingKey.normalizeArtist(name))"
         // A notice belongs to the page that produced it. Cleared before the
@@ -2087,8 +2177,16 @@ final class DigStore {
                 // falls past all of them to MusicBrainz below, and that fall
                 // was the whole of an eight-second page with nothing in the
                 // trace to show for it.
-                let lookup = try await Trace.stage("dig.head", name) {
-                    try await discogsClient.artistLookup(named: name)
+                let lookup: DiscogsArtistLookup
+                if let discogsID {
+                    lookup = DiscogsArtistLookup(head: DiscogsSearchResult(
+                        id: discogsID, title: name, coverImage: nil, thumbnail: nil,
+                        genre: nil, style: nil, label: nil, year: nil
+                    ), spelling: nil)
+                } else {
+                    lookup = try await Trace.stage("dig.head", name) {
+                        try await discogsClient.artistLookup(named: name)
+                    }
                 }
                 let head = lookup.head
                 // A spelling Discogs credits to somebody filed under another
