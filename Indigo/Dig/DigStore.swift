@@ -196,14 +196,22 @@ final class DigStore {
         )
         guard let id = resolution.identity.discogsID, let facts = identityStore.facts(id) else { return opened }
 
+        // What is known of each record: DIG's own description of it when it has
+        // one, and otherwise the summary an alias read left. Neither is a
+        // record nobody has read, which stays unknown.
         var completeness: [Int: ProfileCompleteness] = [:]
         var described: [Int: DiscogsArtist] = [:]
+        var aliasFacts: [DiscogsIdentityFacts] = []
         for candidate in [id] + facts.aliases.map(\.id) {
-            guard let record = describedRecord(candidate) else { continue }
-            described[candidate] = record
-            completeness[candidate] = Self.completeness(of: record)
+            if candidate != id, let found = identityStore.facts(candidate) { aliasFacts.append(found) }
+            if let record = describedRecord(candidate) {
+                described[candidate] = record
+                completeness[candidate] = Self.completeness(of: record)
+            } else if let summary = identityStore.summary(candidate) {
+                completeness[candidate] = summary
+            }
         }
-        let evidence = ArtistIdentityEvidence(facts: [facts])
+        let evidence = ArtistIdentityEvidence(facts: [facts] + aliasFacts)
         let choice = PreferredProfileResolver(evidence: evidence, completeness: completeness)
             .choice(for: resolution.identity)
 
@@ -211,13 +219,16 @@ final class DigStore {
         case .own:
             return opened
         case .ownWithFallback(let related):
-            guard let relatedID = related.discogsID, let record = described[relatedID] else { return opened }
-            let name = facts.aliases.first { $0.id == relatedID }.map { DiscogsClient.withoutDisambiguator($0.name) } ?? record.name
+            guard let relatedID = related.discogsID,
+                  let name = aliasName(relatedID, in: facts, described: described[relatedID]) else { return opened }
+            // Only what DIG has described can be borrowed; a summary says how
+            // much there is, not what it says.
+            guard let biography = described[relatedID]?.biography?.nilIfEmpty else { return opened }
             return opened.borrowing(ArtistPageIdentity.Borrowed(
-                name: name, discogsID: relatedID, biography: record.biography?.nilIfEmpty))
+                name: name, discogsID: relatedID, biography: biography))
         case .openRelated(let related):
-            guard let relatedID = related.discogsID, let record = described[relatedID] else { return opened }
-            let name = facts.aliases.first { $0.id == relatedID }.map { DiscogsClient.withoutDisambiguator($0.name) } ?? record.name
+            guard let relatedID = related.discogsID,
+                  let name = aliasName(relatedID, in: facts, described: described[relatedID]) else { return opened }
             return ArtistPageIdentity(
                 reference: reference, resolution: resolution,
                 name: name, mbid: nil, discogsID: relatedID,
@@ -225,6 +236,12 @@ final class DigStore {
                 cameFrom: resolution.canonicalName, borrowed: nil, titlePending: false
             )
         }
+    }
+
+    private func aliasName(_ id: Int, in facts: DiscogsIdentityFacts, described: DiscogsArtist?) -> String? {
+        facts.aliases.first { $0.id == id }.map { DiscogsClient.withoutDisambiguator($0.name) }
+            ?? identityStore.facts(id)?.canonicalName
+            ?? described?.name
     }
 
     /// The description DIG holds for a Discogs entry, if it has read one —
@@ -236,6 +253,61 @@ final class DigStore {
         let filedName = identityStore.facts(discogsID).map { ArtistSpelling.filingKey($0.name) }
         return rows.first { row in filedName.map { ArtistSpelling.filingKey(row.name) == $0 } ?? false }
             ?? rows.max { $0.releaseTitles.count < $1.releaseTitles.count }
+    }
+
+    /// Aliases whose entry would not load this session, so a page does not
+    /// ask again on every visit. Not stored: a refusal is not a finding.
+    @ObservationIgnored private var unreadAliases: Set<Int> = []
+    /// Alias reads spent on each empty entry this session. The limit is per
+    /// entry, not per visit: coming back to the page spends nothing more.
+    @ObservationIgnored private var aliasReads: [Int: Int] = [:]
+
+    /// How many aliases an empty entry may read, and so how many requests it
+    /// may spend: an entry and the size of a shelf each.
+    static let aliasReadLimit = 3
+
+    /// Reads enough of an empty entry's aliases to tell which is richest.
+    ///
+    /// An alias whose own record is empty opens its richest alias instead
+    /// (`PreferredProfileResolver`), but only one DIG knows something about.
+    /// This finds out for aliases nobody has opened: each alias's entry —
+    /// which also says whether it lists the empty one back — and the size of
+    /// its shelf. At most `aliasReadLimit` aliases, two requests each, in the
+    /// order Discogs lists them, skipping any already known; through the
+    /// backend's cache, and only while the budget has room.
+    ///
+    /// An alias that does not list the empty one back is not read further. A
+    /// shelf that would not answer is kept as a failed read, never as an empty
+    /// one, and an entry that would not load is not kept at all.
+    func discoverRicherAlias(of subjectID: Int) async {
+        guard discogsClient.isConfigured, let subject = identityStore.facts(subjectID) else { return }
+        var read = 0
+        defer { aliasReads[subjectID, default: 0] += read }
+        let allowance = Self.aliasReadLimit - aliasReads[subjectID, default: 0]
+        for alias in subject.aliases where alias.id != subjectID {
+            guard read < allowance else { break }
+            if describedRecord(alias.id) != nil { continue }
+            if !identityStore.summaryIsDue(alias.id) { continue }
+            if unreadAliases.contains(alias.id) { continue }
+            guard await discogsClient.hasRoom(for: .background), !Task.isCancelled else { break }
+            read += 1
+
+            guard let detail = try? await discogsClient.artistDetail(id: alias.id) else {
+                unreadAliases.insert(alias.id)
+                continue
+            }
+            let facts = DiscogsIdentityFacts(detail: detail)
+            guard facts.aliases.contains(where: { $0.id == subjectID }) else {
+                identityStore.record(facts)
+                continue
+            }
+            let count = try? await discogsClient.artistReleaseCount(id: alias.id)
+            identityStore.recordSummary(of: detail, releaseCount: count ?? nil)
+        }
+        if read > 0 {
+            saveContext()
+            announceChange()
+        }
     }
 
     static func completeness(of record: DiscogsArtist) -> ProfileCompleteness {
@@ -2316,6 +2388,11 @@ final class DigStore {
                 }
                 if let artist = described {
                     saveContext()
+                    // Nothing on this record: find out which of its aliases has
+                    // something, so the page can open that one instead.
+                    if Self.completeness(of: artist).isEmpty, artist.discogsID > 0 {
+                        await discoverRicherAlias(of: artist.discogsID)
+                    }
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
                     forgetGraph(for: .artist(name))

@@ -358,6 +358,14 @@ nonisolated struct DiscogsClient: Sendable {
         try await get(Self.shelfPath(id: id), query: Self.shelfQuery)
     }
 
+    /// How many releases Discogs files under an entry, in one small request.
+    /// Nil when the answer did not say — which is not zero.
+    func artistReleaseCount(id: Int) async throws -> Int? {
+        let shelf: DiscogsArtistReleases = try await get(
+            Self.shelfPath(id: id), query: [URLQueryItem(name: "per_page", value: "1")])
+        return shelf.pagination?.items
+    }
+
     /// The sleeves the shelf does not carry.
     func artistCatalogue(named name: String) async throws -> [DiscogsSearchResult] {
         let response: DiscogsSearchResponse = try await get("database/search", query: [

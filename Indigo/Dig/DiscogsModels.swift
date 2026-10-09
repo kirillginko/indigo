@@ -182,6 +182,8 @@ nonisolated struct DiscogsArtistRelease: Decodable, Sendable {
 
 nonisolated struct DiscogsArtistReleases: Decodable, Sendable {
     let releases: [DiscogsArtistRelease]?
+    /// How many there are in all; read when only the size of a shelf is wanted.
+    var pagination: DiscogsPagination? = nil
 }
 
 /// One record in a label's own catalogue.

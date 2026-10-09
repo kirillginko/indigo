@@ -521,10 +521,16 @@ nonisolated struct PreferredProfileResolver: Sendable {
     ///
     /// Aliases only. A group the subject played in is somebody else's
     /// discography as well as theirs, so it is related, never preferred.
+    ///
+    /// Verified both ways: each entry must list the other as an alias. A link
+    /// only one side makes is a claim, and an alias whose own entry has not
+    /// been read cannot be checked, so neither is preferred.
     private func richestAlias(of id: Int, beating own: ProfileCompleteness) -> Int? {
         guard let facts = evidence.facts[id] else { return nil }
         let known = facts.aliases.compactMap { link -> (id: Int, score: Int)? in
-            guard link.id != id, let found = completeness[link.id], !found.isEmpty else { return nil }
+            guard link.id != id,
+                  evidence.facts[link.id]?.aliases.contains(where: { $0.id == id }) == true,
+                  let found = completeness[link.id], !found.isEmpty else { return nil }
             return (link.id, found.score)
         }
         let best = known.filter { $0.score > own.score }

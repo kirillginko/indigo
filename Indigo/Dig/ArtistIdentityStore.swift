@@ -48,6 +48,29 @@ nonisolated struct ArtistIdentityStore {
         }
     }
 
+    /// Keeps how much an entry's own record says. `releaseCount` nil is a read
+    /// that did not complete, kept as such.
+    func recordSummary(of detail: DiscogsArtistDetail, releaseCount: Int?, at date: Date = Date()) {
+        record(DiscogsIdentityFacts(detail: detail), at: date)
+        guard let held = identityRecord(detail.id) else { return }
+        held.summaryHasBiography = !(detail.profile ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        held.summaryImageCount = detail.images?.count ?? 0
+        held.summaryLinkCount = detail.urls?.count ?? 0
+        if let releaseCount {
+            held.summaryReleaseCount = releaseCount
+            held.summaryStateRaw = "read"
+        } else {
+            held.summaryStateRaw = "failed"
+        }
+        held.summaryCheckedAt = date
+    }
+
+    /// What an entry's summary establishes, if it was read.
+    func summary(_ discogsID: Int) -> ProfileCompleteness? { identityRecord(discogsID)?.summary }
+
+    /// Whether an entry's summary is worth asking for.
+    func summaryIsDue(_ discogsID: Int) -> Bool { identityRecord(discogsID)?.summaryIsDue ?? true }
+
     // MARK: Reading
 
     /// A spelling that a fresh, complete check has settled. A stale one is

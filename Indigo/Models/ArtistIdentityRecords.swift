@@ -38,6 +38,18 @@ nonisolated final class DiscogsIdentityRecord {
     var source: String
     var fetchedAt: Date
 
+    /// How much this entry's own record says, read for an empty alias that
+    /// needed a richer one (see `DigStore.discoverRicherAlias`). "unknown"
+    /// until asked; "read" once both its entry and the size of its shelf
+    /// answered; "failed" when the shelf would not. Only "read" is evidence —
+    /// a failed read is never taken for an empty record.
+    var summaryStateRaw: String = "unknown"
+    var summaryReleaseCount: Int = 0
+    var summaryHasBiography: Bool = false
+    var summaryImageCount: Int = 0
+    var summaryLinkCount: Int = 0
+    var summaryCheckedAt: Date? = nil
+
     init(facts: DiscogsIdentityFacts, fetchedAt: Date = Date()) {
         discogsID = facts.id
         name = facts.name
@@ -64,6 +76,29 @@ nonisolated final class DiscogsIdentityRecord {
         memberIDs = facts.members.map(\.id)
         memberNames = facts.members.map(\.name)
         fetchedAt = date
+    }
+
+    /// What the summary establishes, or nil when it establishes nothing.
+    var summary: ProfileCompleteness? {
+        guard summaryStateRaw == "read" else { return nil }
+        return ProfileCompleteness(
+            releases: summaryReleaseCount,
+            hasBiography: summaryHasBiography,
+            hasArtwork: summaryImageCount > 0,
+            links: summaryLinkCount
+        )
+    }
+
+    /// Whether the summary is worth asking for again: never read, failed more
+    /// than a day ago, or read more than a month ago.
+    var summaryIsDue: Bool {
+        guard let checked = summaryCheckedAt else { return true }
+        let age = Date().timeIntervalSince(checked)
+        switch summaryStateRaw {
+        case "read": return age > 30 * 24 * 60 * 60
+        case "failed": return age > 24 * 60 * 60
+        default: return true
+        }
     }
 
     var facts: DiscogsIdentityFacts {

@@ -307,11 +307,40 @@ final class PreferredProfileResolverTests: XCTestCase {
         let resolver = PreferredProfileResolver(
             evidence: ArtistIdentityEvidence(facts: [
                 facts(10, "Subject", aliases: [(30, "B"), (20, "A")]),
-                facts(20, "A"), facts(30, "B")
+                facts(20, "A", aliases: [(10, "Subject")]), facts(30, "B", aliases: [(10, "Subject")])
             ]),
             completeness: [10: empty, 20: pianoOverlord, 30: pianoOverlord]
         )
         XCTAssertEqual(resolver.choice(for: .discogs(10)).mode, .openRelated(.discogs(20)))
+    }
+
+    /// The richer entry is preferred on everything it says, not on its shelf
+    /// alone: forty records and nothing else lose to thirty with a biography,
+    /// a picture and labels.
+    func testPreferenceWeighsTheWholeRecord() {
+        let resolver = PreferredProfileResolver(
+            evidence: ArtistIdentityEvidence(facts: [
+                facts(10, "Subject", aliases: [(20, "Shelf"), (30, "Whole")]),
+                facts(20, "Shelf", aliases: [(10, "Subject")]), facts(30, "Whole", aliases: [(10, "Subject")])
+            ]),
+            completeness: [
+                10: empty,
+                20: ProfileCompleteness(releases: 40),
+                30: ProfileCompleteness(releases: 30, hasBiography: true, hasArtwork: true, styles: 6, labels: 8)
+            ]
+        )
+        XCTAssertEqual(resolver.choice(for: .discogs(10)).mode, .openRelated(.discogs(30)))
+    }
+
+    /// A link only one side makes is not an alias to open in its place.
+    func testAOneSidedAliasIsNeverPreferred() {
+        let resolver = PreferredProfileResolver(
+            evidence: ArtistIdentityEvidence(facts: [
+                facts(10, "Subject", aliases: [(20, "Claims")]), facts(20, "Claims")
+            ]),
+            completeness: [10: empty, 20: prefuse]
+        )
+        XCTAssertEqual(resolver.choice(for: .discogs(10)).mode, .own)
     }
 
     /// A group is somebody else's discography as well. Mica Levi's bands are
