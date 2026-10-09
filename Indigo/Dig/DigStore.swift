@@ -255,6 +255,32 @@ final class DigStore {
             ?? rows.max { $0.releaseTitles.count < $1.releaseTitles.count }
     }
 
+    /// Entries whose identity could not be read this session. Not stored: a
+    /// refusal is not a finding, and the next session asks again.
+    @ObservationIgnored private var factsUnavailable: Set<Int> = []
+
+    /// Makes sure an entry DIG has described also has its identity evidence.
+    ///
+    /// A record cached before that evidence was kept holds the entry's id but
+    /// not its credited spellings or its aliases' ids, and nothing it does hold
+    /// can stand in for them — alias names without ids are only names. So the
+    /// entry is read once: one request, answered from the backend's cache when
+    /// anybody has asked before, and only when no evidence is held. Offline,
+    /// nothing is kept and the page is exactly what it was.
+    func ensureIdentityFacts(for discogsID: Int) async {
+        guard discogsID > 0, discogsClient.isConfigured,
+              identityStore.facts(discogsID) == nil,
+              !factsUnavailable.contains(discogsID)
+        else { return }
+        guard let detail = try? await discogsClient.artistDetail(id: discogsID) else {
+            factsUnavailable.insert(discogsID)
+            return
+        }
+        identityStore.record(DiscogsIdentityFacts(detail: detail))
+        saveContext()
+        announceChange()
+    }
+
     /// Aliases whose entry would not load this session, so a page does not
     /// ask again on every visit. Not stored: a refusal is not a finding.
     @ObservationIgnored private var unreadAliases: Set<Int> = []
@@ -2388,6 +2414,10 @@ final class DigStore {
                 }
                 if let artist = described {
                     saveContext()
+                    // A record described before identity evidence was kept is
+                    // fresh for a day and is not read again — so read who it
+                    // is now, rather than wait for the day to pass.
+                    await ensureIdentityFacts(for: artist.discogsID)
                     // Nothing on this record: find out which of its aliases has
                     // something, so the page can open that one instead.
                     if Self.completeness(of: artist).isEmpty, artist.discogsID > 0 {
