@@ -12,6 +12,99 @@ import XCTest
 import SwiftData
 @testable import Indigo
 
+/// Answers by the longest route the address contains; `failing` refuses all.
+private struct NavigationTransport: DiscogsTransport {
+    struct Refused: Error {}
+    let routes: [String: String]
+    var failing = false
+
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        if failing { throw Refused() }
+        let url = request.url?.absoluteString ?? ""
+        let route = routes.keys.filter(url.contains).max { $0.count < $1.count }
+        let body = route.flatMap { routes[$0] } ?? "{}"
+        return (Data(body.utf8), HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!)
+    }
+}
+
+private func prefuseNavigationRoutes() -> [String: String] {
+    [
+        "q=Prefuse73&type=artist&per_page=5": #"{"results":[{"id":3722,"title":"Prefuse 73"}]}"#,
+        "q=Prefuse73&type=artist&per_page=50": #"{"pagination":{"items":1,"pages":1},"results":[{"id":3722,"title":"Prefuse 73"}]}"#,
+        "artists/3722": ArtistIdentityFixtures.entries[3722]!,
+        "artists/3722/releases": #"{"releases":[{"id":1,"title":"Vocal Studies","role":"Main","type":"release"}]}"#,
+        "type=release": #"{"results":[]}"#
+    ]
+}
+
+/// The first open of a name nothing identifies yet. The title must not show
+/// a name the page is about to replace: it holds a placeholder until the
+/// catalogue has answered, whatever the answer.
+@MainActor
+final class ArtistFirstLoadTests: XCTestCase {
+    private var container: ModelContainer!
+    private var context: ModelContext!
+
+    override func setUpWithError() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+    }
+
+    override func tearDown() {
+        context = nil
+        container = nil
+    }
+
+    private func store(_ transport: NavigationTransport) -> DigStore {
+        DigStore(context: context, discogsClient: DiscogsClient(transport: transport, token: "t"))
+    }
+
+    func testTheTitleWaitsAndThenIsTheArtist() async {
+        let store = store(NavigationTransport(routes: prefuseNavigationRoutes()))
+        let reference = ArtistReference(name: "Prefuse73")
+
+        XCTAssertTrue(store.artistPage(reference).titlePending, "Not \"Prefuse73\" for a second and then a different name")
+
+        await store.enrichArtist(name: "Prefuse73", mbid: nil)
+        store.bumpRevisionForTesting()
+        let settled = store.artistPage(reference)
+
+        XCTAssertFalse(settled.titlePending)
+        XCTAssertEqual(settled.name, "Prefuse 73")
+    }
+
+    func testANameNobodyAnswersToSettlesAsItself() async {
+        let store = store(NavigationTransport(routes: ["type=artist": #"{"pagination":{"items":0},"results":[]}"#]))
+        let reference = ArtistReference(name: "Somebody Unfiled")
+
+        await store.enrichArtist(name: "Somebody Unfiled", mbid: nil)
+        store.bumpRevisionForTesting()
+        let settled = store.artistPage(reference)
+
+        XCTAssertFalse(settled.titlePending)
+        XCTAssertEqual(settled.name, "Somebody Unfiled")
+    }
+
+    func testAFailedLookupStillSettlesTheTitle() async {
+        var transport = NavigationTransport(routes: [:])
+        transport.failing = true
+        let store = store(transport)
+        let reference = ArtistReference(name: "Prefuse73")
+
+        await store.enrichArtist(name: "Prefuse73", mbid: nil)
+        store.bumpRevisionForTesting()
+
+        XCTAssertFalse(store.artistPage(reference).titlePending, "Offline is an answer for the title: the name it was opened with")
+        XCTAssertEqual(store.artistPage(reference).name, "Prefuse73")
+    }
+
+    func testAReferenceThatCarriesAnIDNeverWaits() {
+        let store = store(NavigationTransport(routes: [:]))
+        XCTAssertFalse(store.artistPage(ArtistReference(name: "Prefuse 73", discogsID: 3722)).titlePending)
+    }
+}
+
 @MainActor
 final class ArtistNavigationTests: XCTestCase {
     private var container: ModelContainer!

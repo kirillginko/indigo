@@ -142,6 +142,8 @@ nonisolated struct ArtistPageIdentity: Equatable, Sendable {
     /// of its own: the name the listener came from.
     let cameFrom: String?
     let borrowed: Borrowed?
+    /// Whether the name is still being resolved; see `PageHeader.titlePending`.
+    var titlePending = false
 
     /// The spelling the listener asked for, when the page is filed otherwise.
     var arrivedAs: String? {
@@ -155,7 +157,8 @@ nonisolated struct ArtistPageIdentity: Equatable, Sendable {
     func borrowing(_ borrowed: Borrowed) -> ArtistPageIdentity {
         ArtistPageIdentity(
             reference: reference, resolution: resolution, name: name, mbid: mbid,
-            discogsID: discogsID, alsoCreditedAs: alsoCreditedAs, cameFrom: cameFrom, borrowed: borrowed
+            discogsID: discogsID, alsoCreditedAs: alsoCreditedAs, cameFrom: cameFrom, borrowed: borrowed,
+            titlePending: titlePending
         )
     }
 }

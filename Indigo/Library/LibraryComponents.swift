@@ -16,6 +16,10 @@ struct PageHeader<Trailing: View>: View {
     var onBack: (() -> Void)?
     var subtitle: String?
     var accessory: AnyView?
+    /// Whether the title is not known yet — an artist page whose name is still
+    /// being resolved. Drawn as a placeholder of the same size, so the header
+    /// neither shows a name it is about to replace nor jumps when it lands.
+    var titlePending = false
     @ViewBuilder var trailing: Trailing
     @Environment(\.isPhoneLayout) private var isPhone
 
@@ -42,6 +46,9 @@ struct PageHeader<Trailing: View>: View {
                         .tracking(-0.8)
                         .foregroundStyle(Palette.ink)
                         .lineLimit(2)
+                        .redacted(reason: titlePending ? .placeholder : [])
+                        .opacity(titlePending ? 0.35 : 1)
+                        .accessibilityLabel(titlePending ? "Loading" : title)
                     if let subtitle {
                         Text(subtitle)
                             .font(Typeface.mono(10.5))

@@ -166,13 +166,33 @@ final class DigStore {
 
     @ObservationIgnored private var pages: [ArtistReference: (revision: Int, page: ArtistPageIdentity)] = [:]
 
+    /// Names whose catalogue lookup has answered this session — found
+    /// somebody, found nobody, or failed. Until then a name that nothing
+    /// identifies may be about to become somebody else's page.
+    @ObservationIgnored private var answeredIdentities: Set<String> = []
+
+    private func answeredIdentity(_ name: String) {
+        guard answeredIdentities.insert(RecordingKey.normalizeArtist(name)).inserted else { return }
+        announceChange()
+    }
+
+    /// Whether a page's name is not settled yet: nothing identifies it, the
+    /// catalogue could still answer, and has not. The page then draws its
+    /// title as a placeholder rather than a name it may be about to replace.
+    private func isTitlePending(_ reference: ArtistReference, _ resolution: ArtistResolution) -> Bool {
+        guard !resolution.isVerified, reference.mbid == nil, reference.discogsID == nil,
+              discogsClient.isConfigured else { return false }
+        return !answeredIdentities.contains(RecordingKey.normalizeArtist(reference.name))
+    }
+
     private func describePage(_ reference: ArtistReference) -> ArtistPageIdentity {
         let resolution = artistResolution(reference)
         let opened = ArtistPageIdentity(
             reference: reference, resolution: resolution,
             name: resolution.canonicalName, mbid: reference.mbid,
             discogsID: resolution.identity.discogsID,
-            alsoCreditedAs: resolution.equivalentNames, cameFrom: nil, borrowed: nil
+            alsoCreditedAs: resolution.equivalentNames, cameFrom: nil, borrowed: nil,
+            titlePending: isTitlePending(reference, resolution)
         )
         guard let id = resolution.identity.discogsID, let facts = identityStore.facts(id) else { return opened }
 
@@ -202,7 +222,7 @@ final class DigStore {
                 reference: reference, resolution: resolution,
                 name: name, mbid: nil, discogsID: relatedID,
                 alsoCreditedAs: [name] + identityStore.creditedSpellings(of: relatedID),
-                cameFrom: resolution.canonicalName, borrowed: nil
+                cameFrom: resolution.canonicalName, borrowed: nil, titlePending: false
             )
         }
     }
@@ -2160,6 +2180,7 @@ final class DigStore {
         // Discogs is the foreground path: it returns the complete artist
         // bundle concurrently and is not held behind MusicBrainz's global
         // one-request-per-second gate.
+        if !discogsClient.isConfigured { answeredIdentity(name) }
         if discogsClient.isConfigured, !attempted.contains(discogsKey) {
             attempted.insert(discogsKey)
             isEnriching = true
@@ -2189,6 +2210,7 @@ final class DigStore {
                     }
                 }
                 let head = lookup.head
+                answeredIdentity(name)
                 // A spelling Discogs credits to somebody filed under another
                 // name is that somebody. The evidence is kept, and their
                 // record is kept under the name they are filed as — the page
@@ -2249,6 +2271,7 @@ final class DigStore {
                 return
             } catch {
                 attempted.remove(discogsKey)
+                answeredIdentity(name)
                 // Catalogue enrichment is an implementation detail. The page
                 // keeps its local/MusicBrainz data if the developer service is
                 // unavailable; listeners never manage provider credentials.

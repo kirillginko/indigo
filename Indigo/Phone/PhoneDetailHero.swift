@@ -23,6 +23,8 @@ struct PhoneDetailHero: View {
     /// Whether the picture is still being looked for: the square stays dark
     /// rather than drawing the stand-in.
     var awaitingImage = false
+    /// See `PageHeader.titlePending`.
+    var titlePending = false
 
     @State private var width: CGFloat = 393
 
@@ -47,7 +49,10 @@ struct PhoneDetailHero: View {
                 ChipFlow { Chip(text: kind, tone: .lead, size: 13, uppercase: true) }
                 VStack(spacing: 0) {
                     ChipFlow { Chip(text: title, size: 20) }
-                    if let subtitle, !subtitle.isEmpty, subtitle != title {
+                        .redacted(reason: titlePending ? .placeholder : [])
+                        .opacity(titlePending ? 0.35 : 1)
+                        .accessibilityLabel(titlePending ? "Loading" : title)
+                    if !titlePending, let subtitle, !subtitle.isEmpty, subtitle != title {
                         ChipFlow { Chip(text: subtitle, tone: .lead, size: 13) }
                     }
                 }

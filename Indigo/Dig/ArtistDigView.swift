@@ -31,7 +31,8 @@ struct ArtistPageRoute: View {
             alsoCreditedAs: page.alsoCreditedAs,
             arrivedAs: page.arrivedAs,
             cameFrom: page.cameFrom,
-            borrowed: page.borrowed
+            borrowed: page.borrowed,
+            titlePending: page.titlePending
         )
         .id(page.pageID)
     }
@@ -50,6 +51,8 @@ struct ArtistDigView: View {
     var cameFrom: String? = nil
     /// A richer alias's description, for a page with little of its own.
     var borrowed: ArtistPageIdentity.Borrowed? = nil
+    /// The name may be about to change; the header holds a placeholder.
+    var titlePending = false
 
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
@@ -99,7 +102,8 @@ struct ArtistDigView: View {
                     title: profile.name,
                     breadcrumb: appState.breadcrumbTitle,
                     onBack: { appState.popDetail() },
-                    subtitle: subtitle(profile)
+                    subtitle: titlePending ? nil : subtitle(profile),
+                    titlePending: titlePending
                 ) {
                     CrateButton(isCrated: isCrated) {
                         crate.toggle(
@@ -122,7 +126,8 @@ struct ArtistDigView: View {
                         imageURL: profile.coverURL,
                         previewURL: profile.previewURL,
                         // The genres have their own section just below.
-                        awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil
+                        awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil,
+                        titlePending: titlePending
                     )
                 }
                 // Lazy: the sections below the fold cost nothing until they
