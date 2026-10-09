@@ -608,7 +608,9 @@ extension DigSearchResult {
                     title: name,
                     detail: nil,
                     artworkURL: artwork,
-                    destination: .digArtist(mbid: nil, name: name)
+                    // By the entry that was found, not its name searched again:
+                    // "Anika (9)" shown as "Anika" is one particular Anika.
+                    destination: .digArtist(mbid: nil, name: name, discogsID: result.id)
                 )
 
             case .label:
