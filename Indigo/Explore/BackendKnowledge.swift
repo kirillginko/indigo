@@ -43,6 +43,28 @@ nonisolated struct BackendNodeAnswer: Codable, Sendable, Equatable {
     /// (a kind it does not walk, such as a station).
     let status: String
     let edges: [BackendEdge]
+    /// The Discogs artists the backend takes this starting point to be
+    /// (format 2, 0073): by name, by MBID through MusicBrainz's own links, or
+    /// by the Discogs id it was asked with. Nil in an answer from before.
+    var identities: [BackendIdentity]? = nil
+}
+
+nonisolated struct BackendIdentity: Codable, Sendable, Equatable {
+    let discogsID: String
+    /// `discogs` (the row's own id) or `musicbrainz` (MusicBrainz links them).
+    let via: String
+    /// Whether the catalogue holds that Discogs artist's data.
+    let catalogued: Bool
+}
+
+extension BackendNodeAnswer {
+    /// Every Discogs id the backend names for it -- the artist's other names
+    /// included, which a bundle must not offer back as somebody new.
+    var discogsIDs: Set<Int> { Set((identities ?? []).compactMap { Int($0.discogsID) }) }
+    /// The ones whose knowledge exists, lowest first: where a bundle can be.
+    var cataloguedDiscogsIDs: [Int] {
+        Array(Set((identities ?? []).filter(\.catalogued).compactMap { Int($0.discogsID) })).sorted()
+    }
 }
 
 nonisolated struct BackendEdge: Codable, Sendable, Equatable {
@@ -67,6 +89,7 @@ nonisolated struct BackendArtistAnswer: Codable, Sendable, Equatable {
     let episodes: [BackendEpisode]
     let rosters: [BackendRoster]
     let genres: [String]
+    var identities: [BackendIdentity]? = nil
 }
 
 nonisolated struct BackendEpisode: Codable, Sendable, Equatable {
@@ -151,6 +174,10 @@ nonisolated enum BackendKnowledgeFetcher {
             let key: String
             let provider: String
             let handle: String
+            /// What the row knows of its identity, so the backend can find it
+            /// by id rather than by name (0073). Left out when unknown.
+            var mbid: String? = nil
+            var discogsID: String? = nil
         }
         let pNodes: [Node]
         let pArtists: [String]
@@ -196,7 +223,8 @@ nonisolated enum BackendKnowledgeFetcher {
             let params = Params(
                 pNodes: batchNodes.map {
                     Params.Node(id: $0.id, kind: $0.kind.rawValue, key: $0.key,
-                                provider: $0.providerID ?? "", handle: $0.handle ?? "")
+                                provider: $0.providerID ?? "", handle: $0.handle ?? "",
+                                mbid: $0.mbid, discogsID: $0.discogsID.map(String.init))
                 },
                 pArtists: batchArtists
             )
@@ -273,6 +301,28 @@ nonisolated enum BackendKnowledgeAdapter {
         personal: PersonalInputs, deviceLocal: DeviceLocalKnowledge,
         cache: BackendKnowledgeCache, now: Date
     ) -> (KnowledgeSnapshot, BackendCoverage) {
+        let (snapshot, coverage, _) = snapshot(personal: personal, deviceLocal: deviceLocal, cache: cache, now: now, bundles: nil)
+        return (snapshot, coverage)
+    }
+
+    /// How much of R2's artist knowledge a snapshot is built with, so each
+    /// part's contribution can be measured on its own.
+    nonisolated enum BundleUse: String, Codable, Sendable, CaseIterable {
+        /// The SQL answer alone.
+        case sqlOnly
+        /// And the bundles' credits, collaborations and labels, as edges.
+        case relationships
+        /// And their styles and genres, as the starting artist's tags --
+        /// what the taste profile reads. Never as peers.
+        case relationshipsAndStyles
+    }
+
+    /// The same, with the starting artists' bundles read as well (`use`), and
+    /// how each requested bundle stood.
+    static func snapshot(
+        personal: PersonalInputs, deviceLocal: DeviceLocalKnowledge,
+        cache: BackendKnowledgeCache, now: Date, bundles: BundleCache?, use: BundleUse = .relationships
+    ) -> (KnowledgeSnapshot, BackendCoverage, [BundleStatus]) {
         let current = BackendKnowledgeCache.generation(at: now)
         var coverage = BackendCoverage()
         func noteFetch(_ date: Date, _ generation: String) {
@@ -282,6 +332,8 @@ nonisolated enum BackendKnowledgeAdapter {
 
         let origins = ExploreRanker.startingPoints(personal)
         var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+        var statuses: [BundleStatus] = []
+        var bundleTags: [String: [String]] = [:]
         for origin in origins {
             guard let kept = cache.nodes[origin.id] else {
                 coverage.startingPoints[origin.id] = "missing"
@@ -293,6 +345,12 @@ nonisolated enum BackendKnowledgeAdapter {
             var set = EdgeSet()
             for found in kept.answer.edges {
                 if let edge = edge(found, from: origin) { set.insert(edge) }
+            }
+            if let bundles, origin.kind == .artist {
+                statuses += self.bundles(
+                    for: origin, answer: kept.answer, cache: bundles, generation: current,
+                    use: use, into: &set, tags: &bundleTags
+                )
             }
             walked[origin] = .init(shared: set.all, deviceLocal: [])
         }
@@ -323,13 +381,44 @@ nonisolated enum BackendKnowledgeAdapter {
             }
             for roster in entry.answer.rosters { rosters.append((key, roster)) }
         }
+        for (key, more) in bundleTags where personal.tasteArtistKeys.contains(key) {
+            tags[key] = Array(Set((tags[key] ?? []) + more)).sorted()
+        }
 
         var snapshot = LocalKnowledgeAdapter.assemble(
             origins: origins, walked: walked, shows: Array(shows.values), artistTags: tags,
             scenes: catalogue(rosters), libraryCounts: [:]
         )
         snapshot.deviceLocal = deviceLocal
-        return (snapshot, coverage)
+        return (snapshot, coverage, statuses)
+    }
+
+    /// A starting artist's bundles, added to its neighbourhood -- one for each
+    /// Discogs artist the backend says it is and holds data for. Only what is
+    /// published: an artist without a bundle is reported, not filled in.
+    private static func bundles(
+        for origin: MusicNode, answer: BackendNodeAnswer, cache: BundleCache, generation: String,
+        use: BundleUse, into set: inout EdgeSet, tags: inout [String: [String]]
+    ) -> [BundleStatus] {
+        let ids = answer.cataloguedDiscogsIDs
+        guard !ids.isEmpty else {
+            return [BundleStatus(
+                node: origin.id, discogsID: nil, status: "no-identity",
+                detail: answer.identities == nil ? "answer predates identities" : "no catalogued Discogs artist (\(answer.status))"
+            )]
+        }
+        let sqlTargets = Set(set.all.filter { $0.to.kind == .label }.map(\.to.id))
+        return ids.map { id in
+            let kept = cache.refs[String(id)]
+            let status = BundleEdges.status(node: origin.id, discogsID: id, kept: kept, cache: cache, generation: generation)
+            guard use != .sqlOnly, let ref = kept?.ref, let bundle = cache.bundles[ref.digest] else { return status }
+            set.insert(contentsOf: BundleEdges.edges(
+                from: origin, bundle: bundle, ownIdentities: answer.discogsIDs, sqlTargets: sqlTargets))
+            if use == .relationshipsAndStyles {
+                tags[origin.key] = Array(Set((tags[origin.key] ?? []) + BundleEdges.tags(bundle))).sorted()
+            }
+            return status
+        }
     }
 
     /// One backend edge as the app would have drawn it, cleaned by the app's
@@ -348,11 +437,11 @@ nonisolated enum BackendKnowledgeAdapter {
         case "artist":
             let name = DiscogsClient.withoutDisambiguator(target.name)
             guard ArtistName.isRealArtist(name) else { return nil }
-            return .artist(name)
+            return .artist(name, discogsID: target.discogsID.flatMap(Int.init))
         case "label":
             let name = DiscogsClient.withoutDisambiguator(target.name)
             guard LabelName.isRealLabel(name), !LabelName.isOwnName(name, artist: origin.title) else { return nil }
-            return .label(name)
+            return .label(name, discogsID: target.discogsID.flatMap(Int.init))
         case "release":
             return .release(target.name, discogsID: target.discogsID.flatMap(Int.init), year: target.year.map(String.init))
         case "broadcast":
@@ -471,10 +560,65 @@ nonisolated struct ShadowComparison: Codable, Sendable, Equatable {
     }
 }
 
+/// One stage of the backend's knowledge against the visible ranking: the
+/// SQL answer alone, then with R2's bundles, so each part's contribution is
+/// its own number. No stage has to match the visible list -- the local
+/// ranking leans on broad styles, and a better-evidenced list may differ.
+nonisolated struct ShadowStage: Codable, Sendable, Equatable {
+    var use: BackendKnowledgeAdapter.BundleUse = .sqlOnly
+    var top12Overlap = 0
+    var top20Overlap = 0
+    var missingKinds: [String] = []
+    var reworded = 0
+    /// How the backend's top twenty is reached, by kind.
+    var top20Kinds: [String: Int] = [:]
+    var depth = CorroborationDepth.Summary()
+    /// How many of the visible top twenty this knowledge reaches at all, on a
+    /// route worth taking. The difference between this and the overlap is
+    /// ranking: known, but placed lower.
+    var visibleReached = 0
+    /// Every edge out of the starting points.
+    var edges = 0
+    var top20: [String] = []
+    var comparison = ShadowComparison()
+
+    static func measure(
+        _ use: BackendKnowledgeAdapter.BundleUse, visible: ExploreRun, knowledge: KnowledgeSnapshot,
+        visibleRanking: (next: [ExploreSuggestion], all: [ExploreSuggestion], shows: [String], direction: String),
+        asOf: Date, turn: Int
+    ) -> ShadowStage {
+        let ranking = ShadowComparison.ranking(personal: visible.personal, knowledge: knowledge, asOf: asOf, turn: turn)
+        let comparison = ShadowComparison.compare(visible: visibleRanking, backend: ranking, backendKnowledge: knowledge)
+        let top = Array(ranking.all.prefix(20))
+        var stage = ShadowStage()
+        stage.use = use
+        stage.top12Overlap = comparison.top12Overlap
+        stage.top20Overlap = comparison.top20Overlap
+        stage.missingKinds = comparison.missingKinds
+        stage.reworded = comparison.reworded.count
+        stage.top20Kinds = Dictionary(top.map { ($0.kind.rawValue, 1) }, uniquingKeysWith: +)
+        stage.depth = .init(CorroborationDepth.of(top.map(\.id), personal: visible.personal, knowledge: knowledge))
+        stage.visibleReached = CorroborationDepth.of(
+            visibleRanking.all.prefix(20).map(\.id), personal: visible.personal, knowledge: knowledge
+        ).filter { $0.startingPoints > 0 }.count
+        stage.edges = knowledge.shared.neighbourhoods.map(\.edges.count).reduce(0, +)
+        stage.top20 = comparison.backendTop
+        stage.comparison = comparison
+        return stage
+    }
+}
+
 /// Everything one shadow look found, for the diagnostics.
 nonisolated struct ShadowReport: Codable, Sendable, Equatable {
     var source = "backend"
+    /// The backend with its bundles' relationships -- the `.relationships`
+    /// stage, which is what the backend would show.
     var comparison = ShadowComparison()
+    var stages: [ShadowStage] = []
+    /// The visible top twenty's own depth, for reading the stages beside.
+    var visibleDepth = CorroborationDepth.Summary()
+    var bundles: [BundleStatus] = []
+    var bundleFetch = BundleFetcher.Report()
     var coverage = BackendCoverage()
     var fetch = BackendFetchReport()
     var visibleShared = ""

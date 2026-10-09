@@ -144,6 +144,25 @@ struct SyncDiagnosticsView: View {
             }
             row("top 12 overlap", "\(c.top12Overlap)/12")
             row("top 20 overlap", "\(c.top20Overlap)/20")
+            row("visible depth", report.visibleDepth.line)
+            ForEach(report.stages, id: \.use) { stage in
+                VStack(alignment: .leading) {
+                    row(stage.use.rawValue, "\(stage.top12Overlap)/12 · \(stage.top20Overlap)/20 · reaches \(stage.visibleReached)/20")
+                    Text(stage.depth.line + (stage.missingKinds.isEmpty ? "" : " · lacks " + stage.missingKinds.joined(separator: ", ")))
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            row("bundles", "\(report.bundleFetch.reads) reads · "
+                + ByteCountFormatter.string(fromByteCount: Int64(report.bundleFetch.bytes), countStyle: .file)
+                + (report.bundleFetch.errors.isEmpty ? "" : " · \(report.bundleFetch.errors.count) failed"))
+            ForEach(Array(report.bundles.enumerated()), id: \.offset) { _, bundle in
+                VStack(alignment: .leading) {
+                    row("  \(bundle.node.prefix(28))\(bundle.discogsID.map { " #\($0)" } ?? "")", bundle.status)
+                    if bundle.status != "no-identity" {
+                        Text(bundle.detail).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
             row("shows overlap", "\(c.showsOverlap)/\(c.showsCount)")
             row("direction", c.visibleDirection == c.backendDirection ? "same" : "\(c.visibleDirection) → \(c.backendDirection)")
             row("starting points known", "\(found)/\(coverage.startingPoints.count)")

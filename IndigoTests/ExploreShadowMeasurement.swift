@@ -27,13 +27,18 @@ final class ExploreShadowMeasurement: XCTestCase {
         let period = ExplorePeriod.containing(now)
         let asOf = ExplorePeriod.asOf(period)
         let cacheURL = FileManager.default.temporaryDirectory.appendingPathComponent("shadow-cache-\(UUID().uuidString).json")
-        defer { try? FileManager.default.removeItem(at: cacheURL) }
+        let bundleURL = FileManager.default.temporaryDirectory.appendingPathComponent("shadow-bundles-\(UUID().uuidString).json")
+        defer {
+            try? FileManager.default.removeItem(at: cacheURL)
+            try? FileManager.default.removeItem(at: bundleURL)
+        }
         var out: [String] = []
 
         func look(_ label: String) async -> ShadowReport {
             let visible = await worker.exploreRun(asOf: asOf, period: period, generation: 0, scenes: true, rebuild: false, now: now)
             let started = ContinuousClock.now
-            let report = await worker.exploreShadow(visible, asOf: asOf, turn: period, now: now, cacheURL: cacheURL)
+            let report = await worker.exploreShadow(visible, asOf: asOf, turn: period, now: now,
+                                                    cacheURL: cacheURL, bundleURL: bundleURL)
             out.append("== \(label): \(ContinuousClock.now - started) wall")
             out += describe(report)
             return report
@@ -64,7 +69,7 @@ final class ExploreShadowMeasurement: XCTestCase {
         let coverage = report.coverage
         var lines = [
             "source \(report.source), generation \(f.generation.isEmpty ? "(nothing asked)" : f.generation), stale answers \(coverage.staleAnswers)",
-            "calls \(f.calls), \(f.bytes) bytes, ms [\(f.milliseconds.map { String(Int($0.rounded())) }.joined(separator: ", "))], errors \(f.errors.count)",
+            "calls \(f.calls), \(f.bytes) bytes, ms [\(f.milliseconds.map { String(Int($0.rounded())) }.joined(separator: ", "))], errors \(f.errors.count) \(f.errors.joined(separator: " | "))",
             "asked: \(f.nodesAsked) starting points, \(f.artistsAsked) artists; kept: \(f.nodesKept) points, \(f.artistsKept) artists",
             "starting points: " + coverage.startingPoints.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: "; "),
             "artists: \(coverage.artistsFound) found, \(coverage.artistsUnknown) unknown, \(coverage.artistsMissing) missing",
@@ -75,6 +80,20 @@ final class ExploreShadowMeasurement: XCTestCase {
             "reworded (\(c.reworded.count)):",
         ]
         lines += c.reworded.prefix(10).map { "  \($0.id): \($0.visible) → \($0.backend)" }
+        let b = report.bundleFetch
+        lines.append("bundles: \(b.reads) reads, \(b.bytes) bytes, errors [\(b.errors.joined(separator: "; "))]")
+        lines += report.bundles.map { "  \($0.node) #\($0.discogsID.map(String.init) ?? "-"): \($0.status) — \($0.detail)" }
+        lines.append("visible depth (top 20): \(report.visibleDepth.line)")
+        lines.append("STAGES")
+        for stage in report.stages {
+            lines.append("  \(stage.use.rawValue): top 12 \(stage.top12Overlap)/12, top 20 \(stage.top20Overlap)/20, reaches \(stage.visibleReached)/20 of visible, "
+                + "\(stage.edges) edges, reworded \(stage.reworded), missing kinds [\(stage.missingKinds.joined(separator: ", "))]")
+            lines.append("    depth \(stage.depth.line)")
+            lines.append("    top 20 kinds " + stage.top20Kinds.sorted { $0.key < $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", "))
+            lines += stage.top20.enumerated().map { "    \($0 + 1). \($1)" }
+            lines.append("    reworded vs visible:")
+            lines += stage.comparison.reworded.prefix(12).map { "      \($0.id): \($0.visible) → \($0.backend)" }
+        }
         lines.append("backend top 20:")
         lines += c.backendTop.enumerated().map { "  \($0 + 1). \($1)" }
         lines.append("visible top 20:")
