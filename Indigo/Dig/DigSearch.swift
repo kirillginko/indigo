@@ -89,12 +89,64 @@ nonisolated struct DigSearchResult: Sendable, Hashable, Identifiable {
 
     /// What two rows have to agree on to be the same thing. A record and an
     /// artist may share a name — *Pool* is both — so the kind is part of it.
+    /// The artist this row was verified to be (`ArtistIdentity.rawValue`), when
+    /// anything verified it: the Discogs entry a result came from, or the
+    /// evidence `DigStore.resolvingIdentities` found. Never a folded name.
+    var identity: String? = nil
+    /// The spelling the row matched, when it is shown under the name the
+    /// artist is filed as — "Prefuse 73", also credited as "Prefuse73".
+    var alsoCreditedAs: String? = nil
+
     var matchKey: String { "\(kind.rawValue)|\(RecordingKey.normalize(title))" }
+
+    /// What makes two rows the same row.
+    ///
+    /// Artists with an identity are one row exactly when the identity is the
+    /// same: two spellings of Prefuse 73 are one row, and "Anika" and
+    /// "Anika (9)" — two entries Discogs keeps apart — are two however alike
+    /// they read. A row with no identity is only a name, and is one row with
+    /// another only when the two open the same page; it never joins an
+    /// identity on the strength of its spelling.
+    var mergeKey: String {
+        if kind == .artist, let identity { return "\(kind.rawValue)|id|\(identity)" }
+        return matchKey
+    }
 
     var id: String { "\(origin.rawValue)|\(matchKey)|\(detail ?? "")" }
 }
 
 /// The three answers, kept apart until the page merges them.
+extension DigSearchResult {
+    /// This row with a later row for the same thing folded in.
+    func folding(_ other: DigSearchResult) -> DigSearchResult {
+        let opensByID: Bool = {
+            if case .digArtist(_, _, let id) = destination { return id != nil }
+            return false
+        }()
+        let otherOpensByID: Bool = {
+            if case .digArtist(_, _, let id) = other.destination { return id != nil }
+            return false
+        }()
+        // The title of whichever member is filed under it: a row that matched
+        // a spelling carries it as `alsoCreditedAs`, so the other is the name.
+        let filed = (alsoCreditedAs == nil || other.alsoCreditedAs != nil) ? self : other
+        let spellings = [alsoCreditedAs, other.alsoCreditedAs, title, other.title]
+            .compactMap { $0 }
+            .filter { ArtistSpelling.key($0) != ArtistSpelling.key(filed.title) }
+        var folded = DigSearchResult(
+            kind: kind,
+            origin: min(origin, other.origin),
+            title: filed.title,
+            detail: detail ?? other.detail,
+            artworkURL: artworkURL ?? other.artworkURL,
+            destination: (!opensByID && otherOpensByID) ? other.destination : destination
+        )
+        folded.identity = identity ?? other.identity
+        folded.alsoCreditedAs = spellings.first
+        return folded
+    }
+}
+
 nonisolated struct DigSearchResults: Sendable, Hashable {
     var yours: [DigSearchResult] = []
     var catalogue: [DigSearchResult] = []
@@ -117,9 +169,26 @@ nonisolated struct DigSearchResults: Sendable, Hashable {
     /// The listener's own copy wins every tie: a row that says "14 in library"
     /// is more use than the same name marked "Discogs", and showing both is
     /// showing the same artist twice.
+    /// Every row once, in the order the sources were asked.
+    ///
+    /// A row the same as an earlier one is folded into it where the earlier one
+    /// stands, so nothing unrelated moves. The folded row keeps the earliest
+    /// source's place and label, opens by whichever member carried an id, and
+    /// is titled as the artist is filed, with the spelling that matched kept
+    /// beside it.
     var merged: [DigSearchResult] {
-        var seen = Set<String>()
-        return (yours + catalogue + discogs).filter { seen.insert($0.matchKey).inserted }
+        var order: [String] = []
+        var rows: [String: DigSearchResult] = [:]
+        for row in yours + catalogue + discogs {
+            let key = row.mergeKey
+            if let held = rows[key] {
+                rows[key] = held.folding(row)
+            } else {
+                rows[key] = row
+                order.append(key)
+            }
+        }
+        return order.compactMap { rows[$0] }
     }
 
     func merged(scope: DigSearchScope) -> [DigSearchResult] {
@@ -602,16 +671,20 @@ extension DigSearchResult {
             case .artist:
                 let name = DiscogsClient.withoutDisambiguator(result.title)
                 guard ArtistName.isRealArtist(name), !name.isEmpty else { return nil }
-                return DigSearchResult(
+                var row = DigSearchResult(
                     kind: .artist,
                     origin: .discogs,
                     title: name,
-                    detail: nil,
+                    // Namesakes read alike once their marks are gone, so the
+                    // entry's own filing name tells them apart.
+                    detail: result.title.range(of: #"\(\d+\)"#, options: .regularExpression) == nil ? nil : result.title,
                     artworkURL: artwork,
                     // By the entry that was found, not its name searched again:
                     // "Anika (9)" shown as "Anika" is one particular Anika.
                     destination: .digArtist(mbid: nil, name: name, discogsID: result.id)
                 )
+                row.identity = result.id.map { ArtistIdentity.discogs($0).rawValue }
+                return row
 
             case .label:
                 let name = DiscogsClient.withoutDisambiguator(result.title)

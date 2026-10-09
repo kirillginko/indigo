@@ -1465,6 +1465,7 @@ final class DigStore {
             // unanswered queries* rather than the number of listeners, which
             // is the only version of this that survives more people using it.
             let catalogue = await catalogueSearch(query, limit: limit)
+            await checkAnsweringSpelling(in: catalogue, query: query)
             if DigSearchResult.answers(catalogue, query: query) {
                 return DigSearchResults(yours: [], catalogue: catalogue, discogs: [])
             }
@@ -1493,6 +1494,85 @@ final class DigStore {
         // session, however quiet Discogs had since become.
         if !found.discogsRefused { searches.store(found, key: key, revision: 0) }
         return found
+    }
+
+    /// Search rows with what identity evidence says about each artist.
+    ///
+    /// A row the evidence verifies carries that identity, so it joins the other
+    /// rows for the same artist and no others. One that is a credited spelling
+    /// of somebody filed otherwise is shown under their name, opens their page
+    /// by id, and keeps the spelling it matched. A row nothing verifies is left
+    /// exactly as it was.
+    func resolvingIdentities(_ rows: [DigSearchResult]) -> [DigSearchResult] {
+        rows.map { row in
+            guard row.kind == .artist, row.identity == nil,
+                  case .digArtist(let mbid, let name, let discogsID) = row.destination else { return row }
+            let resolution = artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID))
+            guard resolution.isVerified else { return row }
+            var resolved = row
+            resolved.identity = resolution.identity.rawValue
+            guard let id = resolution.identity.discogsID else { return resolved }
+            if resolution.isRedirect {
+                resolved = DigSearchResult(
+                    kind: row.kind, origin: row.origin, title: resolution.canonicalName,
+                    detail: row.detail, artworkURL: row.artworkURL,
+                    destination: .digArtist(mbid: mbid, name: resolution.canonicalName, discogsID: id)
+                )
+                resolved.identity = resolution.identity.rawValue
+                resolved.alsoCreditedAs = row.title
+            } else if discogsID == nil {
+                resolved = DigSearchResult(
+                    kind: row.kind, origin: row.origin, title: row.title,
+                    detail: row.detail, artworkURL: row.artworkURL,
+                    destination: .digArtist(mbid: mbid, name: name, discogsID: id)
+                )
+                resolved.identity = resolution.identity.rawValue
+            }
+            return resolved
+        }
+    }
+
+    func resolvingIdentities(_ results: DigSearchResults) -> DigSearchResults {
+        DigSearchResults(
+            yours: resolvingIdentities(results.yours),
+            catalogue: resolvingIdentities(results.catalogue),
+            discogs: resolvingIdentities(results.discogs),
+            discogsRefused: results.discogsRefused
+        )
+    }
+
+    /// Spellings a search has checked this session, found or not, so typing
+    /// the same name again costs nothing.
+    @ObservationIgnored private var searchedSpellings: Set<String> = []
+
+    /// Checks the one artist row that answers the query, when nothing has
+    /// established who it is: "Prefuse73" in the catalogue is a row filed under
+    /// the spelling, and only Discogs can say it is Prefuse 73.
+    ///
+    /// Bounded to that row, to once per spelling per session, and to a budget
+    /// with room: one search and at most three entries, through the backend's
+    /// cache. A check that does not complete is not recorded and changes
+    /// nothing; see `DiscogsClient.spellingCheck`.
+    func checkAnsweringSpelling(in rows: [DigSearchResult], query: String) async {
+        let key = RecordingKey.normalize(query)
+        guard discogsClient.isConfigured, !key.isEmpty,
+              let row = rows.first(where: { row in
+                  guard row.kind == .artist, row.identity == nil,
+                        case .digArtist(nil, _, nil) = row.destination else { return false }
+                  return DigSearchIndex.tier(of: RecordingKey.normalize(row.title), matching: key) == 0
+              }),
+              case .digArtist(_, let name, _) = row.destination
+        else { return }
+        guard !artistResolution(ArtistReference(name: name)).isVerified,
+              identityStore.needsCheck(name),
+              !searchedSpellings.contains(ArtistSpelling.key(name)),
+              await discogsClient.canSearch()
+        else { return }
+        searchedSpellings.insert(ArtistSpelling.key(name))
+        guard let check = await discogsClient.spellingCheck(name) else { return }
+        identityStore.record(check)
+        saveContext()
+        announceChange()
     }
 
     private func catalogueSearch(_ query: String, limit: Int) async -> [DigSearchResult] {
