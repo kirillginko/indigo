@@ -46,6 +46,16 @@ nonisolated struct DiscogsFormat: Decodable, Sendable {
 
 nonisolated struct DiscogsSearchResponse: Decodable, Sendable {
     let results: [DiscogsSearchResult]?
+    /// How many matches there are in all. Read by the spelling check, which may
+    /// only conclude that nobody else answers to a name from a search that
+    /// returned every match it has. Absent from older cached answers, which
+    /// therefore never count as complete.
+    var pagination: DiscogsPagination? = nil
+}
+
+nonisolated struct DiscogsPagination: Decodable, Sendable {
+    let items: Int?
+    let pages: Int?
 }
 
 nonisolated struct DiscogsSearchResult: Decodable, Sendable {
@@ -115,6 +125,9 @@ nonisolated struct DiscogsArtistDetail: Decodable, Sendable {
     let aliases: [DiscogsArtistReference]?
     let members: [DiscogsArtistReference]?
     let groups: [DiscogsArtistReference]?
+    /// The spellings this entry's records were credited under — "Prefuse73"
+    /// for Prefuse 73. See `DiscogsIdentityFacts`.
+    var namevariations: [String]? = nil
 }
 
 nonisolated struct DiscogsArtistRelease: Decodable, Sendable {
