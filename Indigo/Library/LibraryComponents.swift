@@ -50,9 +50,13 @@ struct PageHeader<Trailing: View>: View {
                         .opacity(titlePending ? 0.35 : 1)
                         .accessibilityLabel(titlePending ? "Loading" : title)
                     if let subtitle {
+                        // Kept while the title is pending, and hidden with it,
+                        // so the header is the same height before and after.
                         Text(subtitle)
                             .font(Typeface.mono(10.5))
                             .foregroundStyle(Palette.inkMuted)
+                            .redacted(reason: titlePending ? .placeholder : [])
+                            .opacity(titlePending ? 0 : 1)
                     }
                 }
                 Spacer(minLength: 12)

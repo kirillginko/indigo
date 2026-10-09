@@ -102,7 +102,7 @@ struct ArtistDigView: View {
                     title: profile.name,
                     breadcrumb: appState.breadcrumbTitle,
                     onBack: { appState.popDetail() },
-                    subtitle: titlePending ? nil : subtitle(profile),
+                    subtitle: subtitle(profile),
                     titlePending: titlePending
                 ) {
                     CrateButton(isCrated: isCrated) {
