@@ -82,6 +82,9 @@ nonisolated struct GraphIdentityKey: Hashable, Comparable, Sendable, CustomStrin
 nonisolated enum EvidenceClass: Int, Comparable, Sendable, CaseIterable {
     /// A release's own credit names this spelling with this entry.
     case directCredit
+    /// A verified entry lists this spelling, with this id, as its alias,
+    /// group or member — only ever attached to an edge from that entry.
+    case entryLink
     /// A complete check found exactly one entry answering to this spelling.
     case verifiedSpelling
     /// MusicBrainz links the reference's MBID to this entry.
@@ -104,6 +107,7 @@ nonisolated enum EvidenceClass: Int, Comparable, Sendable, CaseIterable {
     init(_ identity: ArtistNodeIdentity) {
         switch identity.provenance {
         case .credit: self = .directCredit
+        case .entryLink: self = .entryLink
         case .resolver:
             switch identity.basis {
             case .nameVariation?, .canonicalName?: self = .verifiedSpelling

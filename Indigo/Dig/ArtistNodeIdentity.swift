@@ -32,6 +32,9 @@ nonisolated struct ArtistNodeIdentity: Hashable, Sendable {
     nonisolated enum Provenance: String, Hashable, Sendable {
         /// A release's own credit names this spelling with this entry.
         case credit
+        /// A Discogs entry lists this spelling, with this id, as its alias,
+        /// group or member.
+        case entryLink
         /// Identity evidence: an explicit id, a MusicBrainz link, a verified
         /// spelling (see `IdentityBasis`).
         case resolver
@@ -60,7 +63,7 @@ nonisolated struct ArtistNodeIdentity: Hashable, Sendable {
     var entryName: String? = nil
 
     /// Whether the identity rests on something that identifies the artist.
-    var isVerified: Bool { provenance == .credit || provenance == .resolver || provenance == .filedRecord }
+    var isVerified: Bool { provenance == .credit || provenance == .entryLink || provenance == .resolver || provenance == .filedRecord }
 }
 
 /// Identifies graph nodes from the evidence DIG holds. The one place the graph
@@ -96,6 +99,19 @@ final class ArtistNodeIdentifier {
 
     private var entryNames: [Int: String] = [:]
 
+    /// Every name an entry lists for another, with its id, folded: aliases,
+    /// groups and members.
+    private lazy var linkedKeys: [Int: Set<String>] = {
+        var keys: [Int: Set<String>] = [:]
+        for record in (try? store.context.fetch(FetchDescriptor<DiscogsIdentityRecord>())) ?? [] {
+            let facts = record.facts
+            for link in facts.aliases + facts.groups + facts.members {
+                keys[link.id, default: []].insert(RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(link.name)))
+            }
+        }
+        return keys
+    }()
+
     func identify(_ node: MusicNode) -> ArtistNodeIdentity {
         precondition(node.kind == .artist, "Only artist nodes have an artist identity")
         let key = node.key
@@ -124,6 +140,10 @@ final class ArtistNodeIdentifier {
         if creditsSupport(carried, for: key) {
             return ArtistNodeIdentity(identity: .discogs(carried), provenance: .credit, carriedDiscogsID: carried,
                                       entryName: entryNames[carried])
+        }
+        if linkedKeys[carried]?.contains(key) == true {
+            return ArtistNodeIdentity(identity: .discogs(carried), provenance: .entryLink, carriedDiscogsID: carried,
+                                      entryName: store.identityStore.facts(carried)?.canonicalName)
         }
         if store.identityStore.facts(carried).map({ RecordingKey.normalizeArtist($0.canonicalName) == key }) == true {
             return ArtistNodeIdentity(identity: .discogs(carried), provenance: .consistentRecord, carriedDiscogsID: carried)

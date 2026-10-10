@@ -243,10 +243,94 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
             let moved = zip(baseline, shadow).enumerated().filter { $0.element.0 != $0.element.1 }.map { "#\($0.offset + 1) \($0.element.0) → \($0.element.1)" }
             out.append("  positions that differ: \(moved.count)")
             moved.prefix(12).forEach { out.append("    \($0)") }
+            func listing(_ offers: ExploreOffers) -> [String] {
+                (offers.next + offers.artists + offers.shows).enumerated().map { index, suggestion in
+                    "#\(index + 1) \(String(format: "%.4f", suggestion.score)) \(suggestion.node.title) [\(suggestion.node.id)] via \(suggestion.via) \(suggestion.kind)"
+                }
+            }
+            out.append("  before, in full:")
+            listing(offersBefore).forEach { out.append("    \($0)") }
+            out.append("  shadow, in full:")
+            listing(withPolicy).forEach { out.append("    \($0)") }
             return shadow
         }
         _ = canonicalReport("today's edges", sets)
         _ = canonicalReport("credit ids on credit edges (Step 3)", creditSets)
+
+        // 5. The final shadow: walked through ShadowGraph exactly as a visible
+        // switch would walk it, compared with today's answer.
+        out.append("")
+        out.append("== final shadow (ShadowGraph) vs today ==")
+        let shadowGraph = ShadowGraph(context: context, store: store)
+        let finalPersonal = shadowGraph.canonicalizer.canonical(personal)
+        let finalOrigins = ExploreRanker.startingPoints(finalPersonal)
+        var finalWalked: [MusicNode: [MusicEdge]] = [:]
+        for origin in finalOrigins { finalWalked[origin] = shadowGraph.neighbors(of: origin) }
+        for node in Set(finalWalked.values.flatMap { $0.map(\.to) }).sorted(by: { $0.id < $1.id }) where node.kind == .artist {
+            _ = shadowGraph.canonicalizer.placement(of: node)
+        }
+        let finalPlacements = shadowGraph.canonicalizer.placements
+        let finalOwners = shadowGraph.canonicalizer.ownersByLegacyKey
+        var finalLegacies: [GraphIdentityKey: Set<String>] = [:]
+        for placement in finalPlacements where placement.key.isVerified {
+            finalLegacies[placement.key, default: []].insert(placement.reference.key)
+        }
+        let reached = Set(finalWalked.values.flatMap { $0.map(\.to) }.filter { $0.kind == .artist })
+        out.append("artist nodes reached from the starting points: \(reached.filter { GraphIdentityKey(nodeKey: $0.key) != nil }.count) verified, \(reached.filter { GraphIdentityKey(nodeKey: $0.key) == nil }.count) unresolved")
+        out.append("merges: \(finalLegacies.filter { $0.value.count > 1 }.count)")
+        finalLegacies.filter { $0.value.count > 1 }.sorted { $0.key < $1.key }.forEach { out.append("  \($0.key): \($0.value.sorted().joined(separator: " | "))") }
+        out.append("namesake collisions: \(finalOwners.filter { $0.value.count > 1 }.count)")
+        let todayDestinations = Set(sets.values.flatMap { $0.all.map(\.to.id) })
+        let changed = reached.filter { GraphIdentityKey(nodeKey: $0.key) != nil }.count
+        out.append("destinations now an identity: \(changed) (of \(todayDestinations.count) destinations today)")
+
+        func assemble(_ walked: [MusicNode: [MusicEdge]]) -> KnowledgeSnapshot {
+            var split: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+            for (origin, edges) in walked {
+                split[origin] = LocalKnowledgeAdapter.Walked(
+                    shared: edges.filter { $0.source != .library }, deviceLocal: edges.filter { $0.source == .library })
+            }
+            return LocalKnowledgeAdapter.assemble(origins: finalOrigins, walked: split, shows: before.shared.shows,
+                                                  artistTags: before.shared.artistTags, scenes: nil, libraryCounts: [:])
+        }
+        let history = finalPersonal.crate.compactMap(\.node) + finalPersonal.met.map(\.node) + finalPersonal.haunts.map(\.node)
+        let known = KnownArtistPolicy.alsoKnown(history: history, owners: finalOwners, namesOf: shadowGraph.canonicalizer.legacyKeys(of:))
+        let finalOffers = ExploreRanker.offers(personal: finalPersonal, knowledge: assemble(finalWalked), asOf: asOf, alsoKnown: known)
+        let finalUnguarded = ExploreRanker.offers(personal: finalPersonal, knowledge: assemble(finalWalked), asOf: asOf)
+        func ids(_ offers: ExploreOffers) -> [String] { (offers.next + offers.artists + offers.shows).map(\.node.id) }
+        let todays = (offersBefore.next + offersBefore.artists + offersBefore.shows).map { shadowGraph.canonicalizer.canonical($0.node).id }
+        let finals = ids(finalOffers)
+        out.append("known artists excluded under identity keys: \(ids(finalUnguarded).filter { !finals.contains($0) })")
+        out.append("For You: today \(todays.count), final \(finals.count); top 6 identical: \(Array(todays.prefix(6)) == Array(finals.prefix(6)))")
+        out.append("  lost: \(todays.filter { !finals.contains($0) })")
+        out.append("  gained: \(finals.filter { !todays.contains($0) })")
+        func listing(_ offers: ExploreOffers) -> [String] {
+            (offers.next + offers.artists + offers.shows).enumerated().map { index, suggestion in
+                "#\(index + 1) \(String(format: "%.4f", suggestion.score)) \(suggestion.node.title) [\(suggestion.node.id)]"
+            }
+        }
+        let todayList = listing(offersBefore), finalList = listing(finalOffers)
+        out.append("  side by side (today | final):")
+        for index in 0..<max(todayList.count, finalList.count) {
+            let left = index < todayList.count ? todayList[index] : "", right = index < finalList.count ? finalList[index] : ""
+            out.append("    \(left)  |  \(right)")
+        }
+
+        // For decision only, not a proposal of scoring policy: routes to a name
+        // with exactly one verified owner folded into that owner.
+        var folded: [MusicNode: [MusicEdge]] = [:]
+        for (origin, edges) in finalWalked {
+            folded[origin] = edges.map { edge in
+                guard edge.to.kind == .artist, GraphIdentityKey(nodeKey: edge.to.key) == nil,
+                      let only = finalOwners[edge.to.key], only.count == 1, let owner = only.first else { return edge }
+                let target = MusicNode(kind: .artist, key: owner.nodeKey, title: edge.to.title)
+                return MusicEdge(from: edge.from, to: target, kind: edge.kind, source: edge.source,
+                                 reason: edge.reason, confidence: edge.confidence, occurrences: edge.occurrences)
+            }
+        }
+        let foldedOffers = ExploreRanker.offers(personal: finalPersonal, knowledge: assemble(folded), asOf: asOf, alsoKnown: known)
+        out.append("  [decision only] with single-owner name routes folded: top 6 identical \(Array(todays.prefix(6)) == Array(ids(foldedOffers).prefix(6))); scores:")
+        listing(foldedOffers).forEach { out.append("    \($0)") }
 
         let text = out.joined(separator: "\n") + "\n"
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
