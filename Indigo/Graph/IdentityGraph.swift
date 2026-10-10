@@ -92,7 +92,6 @@ nonisolated final class IdentityGraph {
     let canonicalizer: GraphCanonicalizer
     private let identityStore: ArtistIdentityStore
     private let scope: CreditEdgeScope
-    private var walked: [MusicNode: IdentityNeighbourhood] = [:]
 
     init(context: ModelContext, graph: GraphStore? = nil) {
         self.context = context
@@ -120,9 +119,15 @@ nonisolated final class IdentityGraph {
     }
 
     /// One step out from a node, under identity keys, with the names behind
-    /// each destination. Kept for the life of this graph — a generation.
+    /// each destination.
+    ///
+    /// Worked out on every call, as `GraphStore.neighbors` is: the stored
+    /// edges under it are filled in while a page loads — label and style peers
+    /// land after the profile — and a neighbourhood kept from the first ask
+    /// left DEEP with nothing but what the page already showed. Who each node
+    /// is (the canonicalizer's placements) is kept for the generation; that
+    /// only changes with a write, and every write starts another.
     func neighbourhood(of node: MusicNode) -> IdentityNeighbourhood {
-        if let held = walked[node] { return held }
         let canonical = canonicalizer.canonical(node)
         let entry = GraphIdentityKey(nodeKey: canonical.key).flatMap { $0.namespace == .discogs ? Int($0.value) : nil }
         // Itself, under every id it could arrive as: a page DIG opened as an
@@ -145,9 +150,7 @@ nonisolated final class IdentityGraph {
             guard let id = identity.discogsID, GraphIdentityKey(nodeKey: identity.key) != nil else { continue }
             keys[identity.id, default: []].formUnion(names(of: id, title: identity.title).map(RecordingKey.normalizeArtist))
         }
-        let found = collapsingSamePage(IdentityNeighbourhood(origin: canonical, edges: set, keys: keys))
-        walked[node] = found
-        return found
+        return collapsingSamePage(IdentityNeighbourhood(origin: canonical, edges: set, keys: keys))
     }
 
     /// The names an identity node is walked under, from stored evidence alone,

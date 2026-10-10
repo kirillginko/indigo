@@ -321,6 +321,25 @@ final class VisibleExploreIdentityTests: XCTestCase {
         XCTAssertEqual(try context.fetch(FetchDescriptor<CrateItem>()).map(\.displayTitle), ["Prefuse73"])
     }
 
+    /// A page is walked before its catalogue arrives, then again once it has.
+    /// The second walk — same generation, same engine — must see what arrived:
+    /// kept from the first, DEEP had only what the page already showed.
+    func testAWalkSeesEdgesWrittenAfterTheFirstAsk() throws {
+        let engine = DeepEngine(context: context)
+        let origin = MusicNode.artist("Dean Blunt", discogsID: 2419343)
+        XCTAssertTrue(engine.results(from: origin).isEmpty, "Nothing known yet")
+
+        // The catalogue arrives, and another walk stores the edges it makes —
+        // as the page's enrichment does while the first engine is still alive.
+        try store(blackMetal, 3)
+        file("Dean Blunt", 2419343, releases: [(3, "Black Metal")])
+        try context.save()
+        GraphStore.forget(origin, in: context)
+        XCTAssertFalse(GraphStore(context: context).neighbors(of: origin).isEmpty)
+
+        XCTAssertFalse(engine.results(from: origin).isEmpty, "What arrived is walked")
+    }
+
     // MARK: Determinism
 
     func testTheSameRowsInAnyOrder() throws {
