@@ -740,8 +740,12 @@ nonisolated struct GraphStore {
         }
         for artist in caches.discogsArtists
         where artist.labelNames.contains(where: { RecordingKey.normalize($0) == node.key }) {
+            // The record's id only when it is filed under its own name. One
+            // filed under another spelling came from looser matching, and its
+            // id says nothing about who that name is; see `ArtistNodeIdentity`.
             edges.insert(MusicEdge(
-                from: node, to: .artist(artist.name, discogsID: artist.discogsID),
+                from: node,
+                to: .artist(artist.name, discogsID: artist.isFiledUnderItsOwnName() ? artist.discogsID : nil),
                 kind: .sharedLabel, source: .discogs, reason: "Releases on \(node.title)",
                 confidence: RelationshipKind.sharedLabel.baseConfidence
             ))
