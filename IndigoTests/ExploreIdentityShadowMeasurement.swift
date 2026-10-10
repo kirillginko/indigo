@@ -179,7 +179,8 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         gainedIDs.prefix(10).forEach { out.append("  \($0)") }
         out.append("edge sources: \(strongEdges) catalogue (Discogs/MusicBrainz), \(weakEdges) radio/library/Bandcamp/scene/other")
 
-        // 3. What For You would offer instead.
+        // 3. What For You would offer with credit ids on its edges (a preview of
+        // Step 3; the canonical graph is measured on its own below).
         var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
         for origin in origins {
             let edges = shadowSets[origin]?.all ?? []
@@ -196,6 +197,110 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         out.append("  disappeared: \(was.filter { !now.contains($0) })")
         out.append("  appeared: \(now.filter { !was.contains($0) })")
         out.append("  same order: \(was == now)")
+
+        // 4. The identity-keyed graph (Step 2): on today's edges, and on the
+        // edges as Step 3 would give them (credit ids on credit links).
+        func canonicalReport(_ title: String, _ sets: [MusicNode: EdgeSet]) {
+        out.append("")
+        out.append("== canonical graph (shadow): \(title) ==")
+        let graph = GraphCanonicalizer(identify: identifier.identify)
+        let artistNodes = Set(sets.values.flatMap { $0.all.flatMap { [$0.from, $0.to] } }.filter { $0.kind == .artist }).union(artistNodes)
+        let personalNodes = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
+        for node in artistNodes.sorted(by: { $0.id < $1.id }) + personalNodes.filter({ $0.kind == .artist }) {
+            _ = graph.placement(of: node)
+        }
+        let placements = graph.placements
+        var byClass: [EvidenceClass: Int] = [:]
+        for placement in placements { byClass[placement.evidence, default: 0] += 1 }
+        let placedKeys = Set(placements.map(\.key))
+        out.append("placements: \(placements.count) references -> \(placedKeys.filter(\.isVerified).count) verified identity nodes, \(placedKeys.filter { !$0.isVerified }.count) unresolved name nodes")
+        out.append("  by evidence: " + EvidenceClass.allCases.map { "\($0) \(byClass[$0] ?? 0)" }.joined(separator: ", "))
+        var legaciesByKey: [GraphIdentityKey: Set<String>] = [:]
+        var keysByLegacy: [String: Set<GraphIdentityKey>] = [:]
+        for placement in placements {
+            legaciesByKey[placement.key, default: []].insert(placement.reference.key)
+            keysByLegacy[placement.reference.key, default: []].insert(placement.key)
+        }
+        let canonicalMerges = legaciesByKey.filter { $0.key.isVerified && $0.value.count > 1 }
+        let owners = graph.ownersByLegacyKey
+        let namesakeSplits = owners.filter { $0.value.count > 1 }
+        let overlaps = keysByLegacy.filter { legacy, keys in keys.contains { !$0.isVerified } && (owners[legacy]?.count ?? 0) == 1 }
+        out.append("merges: \(canonicalMerges.count)")
+        for (key, legacies) in canonicalMerges.sorted(by: { $0.key < $1.key }) { out.append("  \(key): \(legacies.sorted().joined(separator: " | "))") }
+        out.append("namesake splits (one name, several verified entries): \(namesakeSplits.count)")
+        for (legacy, keys) in namesakeSplits.sorted(by: { $0.key < $1.key }) { out.append("  \(legacy): \(keys.sorted().map(\.description).joined(separator: ", "))") }
+        out.append("names reached both verified and unresolved (linked by name, not merged): \(overlaps.count)")
+        out.append("  e.g. " + overlaps.keys.sorted().prefix(8).joined(separator: ", "))
+        let ambiguous = personalNodes.filter { node in
+            node.kind == .artist && GraphIdentityKey(nodeKey: graph.canonical(node).key) == nil
+                && (keysByLegacy[node.key]?.contains { $0.isVerified } ?? false)
+        }
+        out.append("history references kept on their name though a verified identity shares it: \(ambiguous.count)")
+        ambiguous.prefix(10).forEach { out.append("  \($0.title)") }
+
+        var edgesIn = 0, edgesOut = 0, selfLoops = 0, retargeted = 0
+        var canonicalSets: [MusicNode: [MusicEdge]] = [:]
+        for (origin, set) in sets.sorted(by: { $0.key.id < $1.key.id }) {
+            let all = set.all
+            edgesIn += all.count
+            for edge in all {
+                let canonical = graph.canonical(edge)
+                if canonical.from.id == canonical.to.id { selfLoops += 1 }
+                if edge.to.kind == .artist, GraphIdentityKey(nodeKey: canonical.to.key) != nil { retargeted += 1 }
+            }
+            let folded = graph.canonical(all)
+            edgesOut += folded.count
+            let canonicalOrigin = graph.canonical(origin)
+            canonicalSets[canonicalOrigin, default: []] += folded
+        }
+        out.append("edges: \(edgesIn) -> \(edgesOut); duplicates folded \(edgesIn - edgesOut - selfLoops), self-loops dropped \(selfLoops)")
+        out.append("edge destinations moved onto an identity key: \(retargeted)")
+
+        let canonicalPersonal = graph.canonical(personal)
+        let canonicalOrigins = ExploreRanker.startingPoints(canonicalPersonal)
+        var canonicalWalked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+        for origin in canonicalOrigins {
+            let edges = graph.canonical(canonicalSets[origin] ?? [])
+            canonicalWalked[origin] = LocalKnowledgeAdapter.Walked(
+                shared: edges.filter { $0.source != .library }, deviceLocal: edges.filter { $0.source == .library })
+        }
+        let canonicalKnowledge = LocalKnowledgeAdapter.assemble(
+            origins: canonicalOrigins, walked: canonicalWalked, shows: before.shared.shows,
+            artistTags: before.shared.artistTags, scenes: nil, libraryCounts: [:])
+        // Read the way a visible switch must: an artist the listener knows by
+        // name is known under every identity that name was placed under. Given
+        // to the ranker as encounters of weight nothing — excluded from what is
+        // offered, never a starting point — so its own rules do the rest.
+        let knownNames = Set((canonicalPersonal.crate.compactMap(\.node) + canonicalPersonal.met.map(\.node)
+            + canonicalPersonal.haunts.map(\.node)).filter { $0.kind == .artist }.map(\.key))
+        let nameOwners = graph.ownersByLegacyKey
+        var linkedPersonal = canonicalPersonal
+        let linked: [GraphIdentityKey] = knownNames.sorted().flatMap { name in (nameOwners[name] ?? []).sorted() }
+        linkedPersonal.met += linked.map { key in
+            PersonalInputs.Met(node: MusicNode(kind: .artist, key: key.nodeKey, title: key.value),
+                               weight: 0, lastAt: .distantPast)
+        }
+        let canonicalOffers = ExploreRanker.offers(personal: linkedPersonal, knowledge: canonicalKnowledge, asOf: asOf)
+        func ranked(_ offers: ExploreOffers, through map: (MusicNode) -> MusicNode) -> [String] {
+            (offers.next + offers.artists + offers.shows).map { map($0.node).id }
+        }
+        let baseline = ranked(offersBefore, through: graph.canonical)
+        let shadow = ranked(canonicalOffers, through: { $0 })
+        out.append("identities known by name, not offered back: \(linked.count)")
+        out.append("starting points: \(origins.count) -> \(canonicalOrigins.count)")
+        out.append("For You candidates: before \(baseline.count), shadow \(shadow.count)")
+        out.append("  lost: \(baseline.filter { !shadow.contains($0) })")
+        out.append("  gained: \(shadow.filter { !baseline.contains($0) })")
+        let topBefore = Array(baseline.prefix(6)), topShadow = Array(shadow.prefix(6))
+        out.append("  top 6 identical: \(topBefore == topShadow)")
+        if topBefore != topShadow {
+            out.append("    before: \(topBefore)")
+            out.append("    shadow: \(topShadow)")
+        }
+
+        }
+        canonicalReport("today's edges", sets)
+        canonicalReport("with credit ids (Step 3 preview)", shadowSets)
 
         let text = out.joined(separator: "\n") + "\n"
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

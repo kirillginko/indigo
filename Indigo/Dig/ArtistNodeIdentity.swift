@@ -37,6 +37,10 @@ nonisolated struct ArtistNodeIdentity: Hashable, Sendable {
         case resolver
         /// A cached record filed under exactly this name.
         case filedRecord
+        /// The id the node carried belongs to an entry filed under this name —
+        /// consistent, but namesakes share filing names, so not proof that this
+        /// node is that entry.
+        case consistentRecord
         /// An id the node carried that nothing above supports.
         case inferred
         /// No entry at all: the artist is their name.
@@ -49,6 +53,8 @@ nonisolated struct ArtistNodeIdentity: Hashable, Sendable {
     let provenance: Provenance
     /// The id the node carried, whatever it rested on.
     let carriedDiscogsID: Int?
+    /// What the identity evidence rested on, when it decided.
+    var basis: IdentityBasis? = nil
 
     /// Whether the identity rests on something that identifies the artist.
     var isVerified: Bool { provenance == .credit || provenance == .resolver || provenance == .filedRecord }
@@ -90,27 +96,35 @@ final class ArtistNodeIdentifier {
         let resolution = store.artistResolution(ArtistReference(name: name, mbid: node.mbid))
         let resolved: ArtistIdentityState? = resolution.isVerified
             ? ArtistIdentityState(identity: resolution.identity,
-                                  provenance: resolution.basis == .filedRecord ? .filedRecord : .resolver)
+                                  provenance: resolution.basis == .filedRecord ? .filedRecord : .resolver,
+                                  basis: resolution.basis)
             : nil
 
         guard let carried = node.discogsID else {
             return ArtistNodeIdentity(
                 identity: resolved?.identity ?? .name(name),
                 provenance: resolved?.provenance ?? .nameOnly,
-                carriedDiscogsID: nil
+                carriedDiscogsID: nil, basis: resolved?.basis
             )
         }
         // Verified evidence decides; an id the node carried never overrides it.
-        if let resolved, resolved.identity.discogsID != nil {
-            return ArtistNodeIdentity(identity: resolved.identity, provenance: resolved.provenance, carriedDiscogsID: carried)
+        if let resolved, resolved.identity.discogsID != nil, resolved.provenance != .filedRecord {
+            return ArtistNodeIdentity(identity: resolved.identity, provenance: resolved.provenance,
+                                      carriedDiscogsID: carried, basis: resolved.basis)
         }
         if creditsSupport(carried, for: key) {
             return ArtistNodeIdentity(identity: .discogs(carried), provenance: .credit, carriedDiscogsID: carried)
         }
         if store.identityStore.facts(carried).map({ RecordingKey.normalizeArtist($0.canonicalName) == key }) == true {
-            return ArtistNodeIdentity(identity: .discogs(carried), provenance: .resolver, carriedDiscogsID: carried)
+            return ArtistNodeIdentity(identity: .discogs(carried), provenance: .consistentRecord, carriedDiscogsID: carried)
         }
-        return ArtistNodeIdentity(identity: resolved?.identity ?? .name(name), provenance: .inferred, carriedDiscogsID: carried)
+        if let resolved {
+            // Only the record filed under the name, which says less than the
+            // id did — keep the record's answer, as filed, not as proof.
+            return ArtistNodeIdentity(identity: resolved.identity, provenance: resolved.provenance,
+                                      carriedDiscogsID: carried, basis: resolved.basis)
+        }
+        return ArtistNodeIdentity(identity: .name(name), provenance: .inferred, carriedDiscogsID: carried)
     }
 
     /// Whether any kept credit names this spelling with this entry.
@@ -121,6 +135,7 @@ final class ArtistNodeIdentifier {
     private struct ArtistIdentityState {
         let identity: ArtistIdentity
         let provenance: ArtistNodeIdentity.Provenance
+        let basis: IdentityBasis?
     }
 }
 
