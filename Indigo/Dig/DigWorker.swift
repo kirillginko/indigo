@@ -553,8 +553,8 @@ actor DigWorker {
         }
     }
 
-    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], generation: Int) -> ArtistProfile {
-        engine(generation).artistProfile(name: name, mbid: mbid, alsoCreditedAs: alsoCreditedAs)
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil, generation: Int) -> ArtistProfile {
+        engine(generation).artistProfile(name: name, mbid: mbid, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
     }
 
     func releaseProfile(id: Int, generation: Int) -> DigReleaseProfile? {

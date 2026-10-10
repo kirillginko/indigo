@@ -60,6 +60,9 @@ nonisolated struct ArtistProfile: Sendable {
         let imageURL: URL?
         let thumbnailURL: URL?
         let label: String?
+        /// Why it is on the page, kept for whatever weighs evidence and never
+        /// shown. Nil for lines no attribution was decided for.
+        var attribution: ReleaseAttribution? = nil
 
         // The two halves of a sleeve, and what to do when only one arrived.
         //
@@ -349,7 +352,10 @@ nonisolated struct DigEngine {
     /// - Parameter alsoCreditedAs: other spellings verified to be this artist
     ///   (see `ArtistIdentityResolver`). What was credited under them is read
     ///   onto this page as well; each record keeps the credit it was filed with.
-    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = []) -> ArtistProfile {
+    /// - Parameter discogsID: the artist's Discogs entry, when the page knows
+    ///   it. Decides which releases filed under the name are theirs; see
+    ///   `ReleaseAttribution`.
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) -> ArtistProfile {
         // Everything below reads the graph's fold — the recordings credited
         // to this artist, their catalogue entries, the library and crate
         // counts, the neighbourhood. Assembled once here rather than by
@@ -362,6 +368,13 @@ nonisolated struct DigEngine {
         let cached = mbid.flatMap { enricher.cachedArtist($0) } ?? cachedArtist(named: name)
         let cachedDiscogs = DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: name)
         let discogs = cachedDiscogs?.isFresh == true ? cachedDiscogs : nil
+        // Whose page this is, by entry: the one it was opened by, or the record
+        // DIG holds filed under exactly this name — never one filed under
+        // another spelling, which older rows can be.
+        let subjectID = discogsID ?? cachedDiscogs.flatMap { record in
+            record.discogsID > 0 && ArtistSpelling.filingKey(record.name) == ArtistSpelling.key(name)
+                ? record.discogsID : nil
+        }
         let spellings = Self.otherSpellings(alsoCreditedAs, besides: name)
         let byArtist = Self.unique(([name] + spellings).flatMap { recordings(byArtist: $0) }, by: \.id)
         let entries = byArtist.compactMap { metadata(for: $0.id) }
@@ -447,10 +460,19 @@ nonisolated struct DigEngine {
         // is Palm Pictures. A page for a lo-fi duo listed a film distributor
         // because the only thing that knew to exclude videos was reading a
         // different endpoint. See `ReleaseFormat`.
-        let credited = Self.unique(
+        // Every release filed under one of the page's names, each decided once:
+        // somebody else's, by the entries its credits name, is not this
+        // artist's — and leaves both the labels and the discography.
+        let underName = Self.unique(
             ([name] + spellings).flatMap { graph.releases(creditedTo: RecordingKey.normalizeArtist($0)) },
             by: \.discogsID
         )
+        let attributions = Self.attributions(
+            of: underName.map(\.discogsID), subjectID: subjectID,
+            subjectKeys: Set(([name] + spellings).map(RecordingKey.normalizeArtist)), context: context
+        )
+        let credited = underName
+            .filter { attributions[$0.discogsID]?.isShown ?? true }
             .filter { !$0.isVideo }
         var labelIdentities: [String: Int] = [:]
         for record in credited {
@@ -533,11 +555,8 @@ nonisolated struct DigEngine {
             descriptor.fetchLimit = 1
             return (try? context.fetch(descriptor))?.first?.imageURL
         }()
-        let resolvedReleases = Self.unique(
-            graph.releases(creditedTo: artistKey)
-                + spellings.flatMap { graph.releases(creditedTo: RecordingKey.normalizeArtist($0)) },
-            by: \.discogsID
-        )
+        let resolvedReleases = underName.filter { attributions[$0.discogsID]?.isShown ?? true }
+        Trace.step("page.attribution", Self.attributionSummary(name: name, attributions: attributions)) {}
         let resolvedByTitle = Dictionary(
             resolvedReleases.map { (Self.releaseKey($0.title), $0) },
             uniquingKeysWith: { first, _ in first }
@@ -608,7 +627,7 @@ nonisolated struct DigEngine {
         // listing threw all of those away, so a page could show twenty-five
         // things to listen to and no records to show for them.
         let resolvedLines = resolvedReleases.map { record in
-            ArtistProfile.ReleaseLine(
+            var line = ArtistProfile.ReleaseLine(
                 title: record.title,
                 year: record.year.map(String.init),
                 discogsID: record.discogsID,
@@ -616,6 +635,8 @@ nonisolated struct DigEngine {
                 thumbnailURL: record.thumbnailURL,
                 label: record.labelNames.first { LabelName.isRealLabel($0) }
             )
+            line.attribution = attributions[record.discogsID]
+            return line
         }
 
         // Records only the artist published, folded into the same list.
@@ -650,7 +671,18 @@ nonisolated struct DigEngine {
         // here and full on the record's own page.
         var merged: [String: ArtistProfile.ReleaseLine] = [:]
         var order: [String] = []
-        for line in discogsReleases + mbReleases + resolvedLines + bandcampOnly {
+        // Each source's lines with how they came to be here: the artist's own
+        // shelf is theirs by id; MusicBrainz and Bandcamp lines are names.
+        func attributed(_ lines: [ArtistProfile.ReleaseLine], _ attribution: ReleaseAttribution) -> [ArtistProfile.ReleaseLine] {
+            lines.map { line in
+                var line = line
+                line.attribution = line.attribution ?? attribution
+                return line
+            }
+        }
+        let sources = attributed(discogsReleases, .shelf) + attributed(mbReleases, .namesOnly)
+            + resolvedLines + attributed(bandcampOnly, .namesOnly)
+        for line in sources {
             let key = Self.releaseKey(line.title)
             guard let existing = merged[key] else {
                 merged[key] = line
@@ -660,7 +692,7 @@ nonisolated struct DigEngine {
             // Whichever half actually says something. A blank string is not
             // an answer, and letting one win means a record shows no year
             // because the first source to mention it left the field empty.
-            merged[key] = ArtistProfile.ReleaseLine(
+            var folded = ArtistProfile.ReleaseLine(
                 title: existing.title,
                 year: existing.year?.nonEmpty ?? line.year?.nonEmpty,
                 discogsID: existing.discogsID ?? line.discogsID,
@@ -668,6 +700,10 @@ nonisolated struct DigEngine {
                 thumbnailURL: existing.thumbnailURL ?? line.thumbnailURL,
                 label: existing.label?.nonEmpty ?? line.label?.nonEmpty
             )
+            // The strongest reason any of its sources had.
+            folded.attribution = [existing.attribution, line.attribution].compactMap { $0 }
+                .max { $0.confidence < $1.confidence }
+            merged[key] = folded
         }
         let releases = order.compactMap { merged[$0] }
             .sorted { lhs, rhs in
@@ -951,6 +987,28 @@ nonisolated struct DigEngine {
     }
 
     // MARK: - Local evidence
+
+    /// The attribution of each release, from the credits kept for them, read
+    /// in one fetch.
+    static func attributions(
+        of releaseIDs: [Int], subjectID: Int?, subjectKeys: Set<String>, context: ModelContext
+    ) -> [Int: ReleaseAttribution] {
+        guard !releaseIDs.isEmpty else { return [:] }
+        let ids = releaseIDs
+        let rows = (try? context.fetch(FetchDescriptor<ReleaseCreditRecord>(
+            predicate: #Predicate { ids.contains($0.releaseDiscogsID) }
+        ))) ?? []
+        let credits = Dictionary(rows.map { ($0.releaseDiscogsID, $0.credits) }, uniquingKeysWith: { first, _ in first })
+        return Dictionary(uniqueKeysWithValues: Set(releaseIDs).map { id in
+            (id, ReleaseAttribution.decide(subjectID: subjectID, subjectKeys: subjectKeys, credits: credits[id]))
+        })
+    }
+
+    /// One line for the trace: how a page's releases were decided.
+    static func attributionSummary(name: String, attributions: [Int: ReleaseAttribution]) -> String {
+        let counts = Dictionary(grouping: attributions.values, by: \.verdict).mapValues(\.count)
+        return "\(name)|verified=\(counts[.verified] ?? 0)|names=\(counts[.nameOnly] ?? 0)|excluded=\(counts[.otherArtist] ?? 0)"
+    }
 
     /// The spellings worth reading besides the page's own name, once each.
     static func otherSpellings(_ spellings: [String], besides name: String) -> [String] {

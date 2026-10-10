@@ -82,7 +82,7 @@ struct ArtistDigView: View {
         // recomputed. Coming back to a page you were reading seconds ago
         // should not put a loading bar in front of it.
         let profile = profile
-            ?? dig.cachedArtistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs)
+            ?? dig.cachedArtistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
             ?? ArtistProfile.placeholder(name: artistName, mbid: artistMBID)
         let crateProvider = profile.mbid == nil ? "dig.artist.name" : "dig.artist.mbid"
         let crateID = profile.mbid ?? RecordingKey.normalizeArtist(profile.name)
@@ -606,7 +606,7 @@ struct ArtistDigView: View {
     }
 
     private func readProfile() async {
-        let found = await dig.artistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs)
+        let found = await dig.artistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
         profile = found
         // What a listener can see after this read: whether the profile has
         // arrived, and whether the veil has lifted. The first line with each

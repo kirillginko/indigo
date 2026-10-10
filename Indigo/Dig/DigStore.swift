@@ -463,9 +463,9 @@ final class DigStore {
     /// land between two callers.
     func bumpRevisionForTesting() { revision &+= 1 }
 
-    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = []) async -> ArtistProfile {
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) async -> ArtistProfile {
         let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
-        let key = Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings)
+        let key = Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID)
         let asked = revision
         if let fresh = profiles.fresh(key, revision: asked) { return fresh }
 
@@ -482,7 +482,7 @@ final class DigStore {
         // so it is what the line has to show.
         let running = Task { [worker] in
             await Trace.stage("graph.walk", key) {
-                await worker.artistProfile(name: name, mbid: mbid, alsoCreditedAs: spellings, generation: asked)
+                await worker.artistProfile(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID, generation: asked)
             }
         }
         walking[key] = running
@@ -498,13 +498,13 @@ final class DigStore {
     /// the instant it comes back, rather than flashing a loading bar while it
     /// rebuilds something the listener was looking at seconds ago. The fresh
     /// version replaces it a moment later.
-    func cachedArtistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = []) -> ArtistProfile? {
+    func cachedArtistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) -> ArtistProfile? {
         let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
-        return profiles.any(Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings))
+        return profiles.any(Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID))
     }
 
-    private static func artistKey(name: String, mbid: String?, alsoCreditedAs: [String] = []) -> String {
-        let base = "\(mbid ?? "-")|\(RecordingKey.normalizeArtist(name))"
+    private static func artistKey(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) -> String {
+        let base = "\(mbid ?? "-")|\(discogsID.map(String.init) ?? "-")|\(RecordingKey.normalizeArtist(name))"
         guard !alsoCreditedAs.isEmpty else { return base }
         return base + "|" + alsoCreditedAs.map(RecordingKey.normalizeArtist).sorted().joined(separator: "+")
     }
