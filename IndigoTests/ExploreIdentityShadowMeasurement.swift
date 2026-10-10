@@ -67,8 +67,10 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
             return record
         }
         var releaseIDs = Set((before.shared.nodes + before.deviceLocal.nodes).compactMap { $0.kind == .release ? $0.discogsID : nil })
+        // Exactly the releases the production scope reads for each origin.
+        let fetchScope = CreditEdgeScope(context: context, graph: GraphStore(context: context))
         for origin in origins where origin.kind == .artist {
-            releaseIDs.formUnion(filed(origin)?.releaseDiscogsIDs.filter { $0 > 0 } ?? [])
+            releaseIDs.formUnion(fetchScope.releases(of: origin))
         }
         let wanted = Array(releaseIDs.sorted().prefix(800))
         let fetched = await Self.storedReleases(wanted)
@@ -127,180 +129,124 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         out.append("lookalike groups needing a spelling check (not merged): \(candidates.count)")
         for (_, keys) in candidates.sorted(by: { $0.key < $1.key }).prefix(15) { out.append("  \(keys.sorted().joined(separator: " | "))") }
 
-        // 2. Relationships the credits would exclude, and paths that would change.
+        // 2. Release edges ReleaseAttribution gives to somebody else.
         var excluded: [String] = []
-        var gainedIDs: [String] = []
-        var redirected: [String] = []
-        var shadowSets: [MusicNode: EdgeSet] = [:]
-        var weakEdges = 0, strongEdges = 0
-        for (origin, set) in sets {
-            let subject = origin.kind == .artist ? (origin.discogsID ?? filed(origin)?.discogsID) : nil
-            let keys: Set<String> = [RecordingKey.normalizeArtist(origin.title)]
-            // The origin's own releases' credits, by credited spelling.
-            var creditIDs: [String: ReleaseCredit] = [:]
-            if origin.kind == .artist {
-                for id in filed(origin)?.releaseDiscogsIDs ?? [] {
-                    for credit in credits.credits(releaseID: id) ?? [] where credit.discogsID != nil {
-                        creditIDs[RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(credit.creditedName))] = credit
-                    }
-                }
+        for (origin, set) in sets where origin.kind == .artist {
+            let subject = origin.discogsID ?? filed(origin)?.discogsID
+            for edge in set.all where edge.to.kind == .release {
+                guard let releaseID = edge.to.discogsID else { continue }
+                let decided = ReleaseAttribution.decide(subjectID: subject, subjectKeys: [origin.key],
+                                                        credits: credits.credits(releaseID: releaseID))
+                if !decided.isShown { excluded.append("\(origin.title) → \(edge.to.title) [\(decided.evidence)]") }
             }
-            var kept = EdgeSet()
-            for edge in set.all {
-                var edge = edge
-                if origin.kind == .artist, edge.to.kind == .release, let releaseID = edge.to.discogsID {
-                    let decided = ReleaseAttribution.decide(subjectID: subject, subjectKeys: keys, credits: credits.credits(releaseID: releaseID))
-                    if !decided.isShown {
-                        excluded.append("\(origin.title) → \(edge.to.title) [\(decided.evidence)]")
-                        continue
-                    }
-                }
-                if edge.to.kind == .artist, edge.to.discogsID == nil,
-                   edge.kind == .producer || edge.kind == .personnel,
-                   let credit = creditIDs[RecordingKey.normalizeArtist(edge.to.title)], let id = credit.discogsID {
-                    let target = MusicNode.artist(credit.name, discogsID: id)
-                    if target.key != edge.to.key { redirected.append("\(origin.title): \(edge.to.title) → \(credit.name) (discogs:\(id))") }
-                    else { gainedIDs.append("\(origin.title): \(edge.to.title) gains discogs:\(id)") }
-                    edge = MusicEdge(from: edge.from, to: target, kind: edge.kind, source: edge.source,
-                                     reason: edge.reason, confidence: edge.confidence, occurrences: edge.occurrences)
-                }
-                switch edge.source {
-                case .discogs, .musicBrainz: strongEdges += 1
-                default: weakEdges += 1
-                }
-                kept.insert(edge)
-            }
-            shadowSets[origin] = kept
         }
-        out.append("relationships excluded as another artist's: \(excluded.count)")
-        excluded.prefix(25).forEach { out.append("  \($0)") }
-        out.append("credit paths gaining a Discogs id: \(gainedIDs.count); redirected to another destination: \(redirected.count)")
-        redirected.prefix(25).forEach { out.append("  \($0)") }
-        gainedIDs.prefix(10).forEach { out.append("  \($0)") }
-        out.append("edge sources: \(strongEdges) catalogue (Discogs/MusicBrainz), \(weakEdges) radio/library/Bandcamp/scene/other")
+        out.append("relationships another artist's credits would exclude: \(excluded.count)")
+        excluded.prefix(15).forEach { out.append("  \($0)") }
 
-        // 3. What For You would offer with credit ids on its edges (a preview of
-        // Step 3; the canonical graph is measured on its own below).
-        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
-        for origin in origins {
-            let edges = shadowSets[origin]?.all ?? []
-            walked[origin] = LocalKnowledgeAdapter.Walked(
-                shared: edges.filter { $0.source != .library }, deviceLocal: edges.filter { $0.source == .library })
-        }
-        let after = LocalKnowledgeAdapter.assemble(
-            origins: origins, walked: walked, shows: before.shared.shows, artistTags: before.shared.artistTags,
-            scenes: nil, libraryCounts: [:])
-        let offersAfter = ExploreRanker.offers(personal: personal, knowledge: after, asOf: asOf)
-        func ids(_ offers: ExploreOffers) -> [String] { (offers.next + offers.artists + offers.shows).map { $0.node.title } }
-        let was = ids(offersBefore), now = ids(offersAfter)
-        out.append("For You offers: before \(was.count), after \(now.count)")
-        out.append("  disappeared: \(was.filter { !now.contains($0) })")
-        out.append("  appeared: \(now.filter { !was.contains($0) })")
-        out.append("  same order: \(was == now)")
-
-        // 4. The identity-keyed graph (Step 2): on today's edges, and on the
-        // edges as Step 3 would give them (credit ids on credit links).
-        func canonicalReport(_ title: String, _ sets: [MusicNode: EdgeSet]) {
-        out.append("")
-        out.append("== canonical graph (shadow): \(title) ==")
-        let graph = GraphCanonicalizer(identify: identifier.identify)
-        let artistNodes = Set(sets.values.flatMap { $0.all.flatMap { [$0.from, $0.to] } }.filter { $0.kind == .artist }).union(artistNodes)
-        let personalNodes = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
-        for node in artistNodes.sorted(by: { $0.id < $1.id }) + personalNodes.filter({ $0.kind == .artist }) {
-            _ = graph.placement(of: node)
-        }
-        let placements = graph.placements
-        var byClass: [EvidenceClass: Int] = [:]
-        for placement in placements { byClass[placement.evidence, default: 0] += 1 }
-        let placedKeys = Set(placements.map(\.key))
-        out.append("placements: \(placements.count) references -> \(placedKeys.filter(\.isVerified).count) verified identity nodes, \(placedKeys.filter { !$0.isVerified }.count) unresolved name nodes")
-        out.append("  by evidence: " + EvidenceClass.allCases.map { "\($0) \(byClass[$0] ?? 0)" }.joined(separator: ", "))
-        var legaciesByKey: [GraphIdentityKey: Set<String>] = [:]
-        var keysByLegacy: [String: Set<GraphIdentityKey>] = [:]
-        for placement in placements {
-            legaciesByKey[placement.key, default: []].insert(placement.reference.key)
-            keysByLegacy[placement.reference.key, default: []].insert(placement.key)
-        }
-        let canonicalMerges = legaciesByKey.filter { $0.key.isVerified && $0.value.count > 1 }
-        let owners = graph.ownersByLegacyKey
-        let namesakeSplits = owners.filter { $0.value.count > 1 }
-        let overlaps = keysByLegacy.filter { legacy, keys in keys.contains { !$0.isVerified } && (owners[legacy]?.count ?? 0) == 1 }
-        out.append("merges: \(canonicalMerges.count)")
-        for (key, legacies) in canonicalMerges.sorted(by: { $0.key < $1.key }) { out.append("  \(key): \(legacies.sorted().joined(separator: " | "))") }
-        out.append("namesake splits (one name, several verified entries): \(namesakeSplits.count)")
-        for (legacy, keys) in namesakeSplits.sorted(by: { $0.key < $1.key }) { out.append("  \(legacy): \(keys.sorted().map(\.description).joined(separator: ", "))") }
-        out.append("names reached both verified and unresolved (linked by name, not merged): \(overlaps.count)")
-        out.append("  e.g. " + overlaps.keys.sorted().prefix(8).joined(separator: ", "))
-        let ambiguous = personalNodes.filter { node in
-            node.kind == .artist && GraphIdentityKey(nodeKey: graph.canonical(node).key) == nil
-                && (keysByLegacy[node.key]?.contains { $0.isVerified } ?? false)
-        }
-        out.append("history references kept on their name though a verified identity shares it: \(ambiguous.count)")
-        ambiguous.prefix(10).forEach { out.append("  \($0.title)") }
-
-        var edgesIn = 0, edgesOut = 0, selfLoops = 0, retargeted = 0
-        var canonicalSets: [MusicNode: [MusicEdge]] = [:]
+        // 3. Credit ids on credit edges (Step 3), from the production scope.
+        let scope = CreditEdgeScope(context: context, graph: GraphStore(context: context))
+        var creditSets: [MusicNode: EdgeSet] = [:]
+        var corrected: [String] = []
+        var gained = 0, creditEdges = 0, ambiguousSpellings = 0
         for (origin, set) in sets.sorted(by: { $0.key.id < $1.key.id }) {
-            let all = set.all
-            edgesIn += all.count
-            for edge in all {
-                let canonical = graph.canonical(edge)
-                if canonical.from.id == canonical.to.id { selfLoops += 1 }
-                if edge.to.kind == .artist, GraphIdentityKey(nodeKey: canonical.to.key) != nil { retargeted += 1 }
+            let entries = CreditEdgeIdentity.entries(in: scope.credits(behind: origin))
+            let attached = CreditEdgeIdentity.attach(set.all, entries: entries)
+            var kept = EdgeSet()
+            for (before, after) in zip(set.all, attached) {
+                if before.kind.isCreditBacked, before.to.kind == .artist { creditEdges += 1 }
+                if before.to.discogsID == nil, let id = after.to.discogsID {
+                    gained += 1
+                    let entry = entries[before.to.key]?.name ?? ""
+                    if RecordingKey.normalizeArtist(entry) != before.to.key {
+                        corrected.append("\(origin.title): \(before.to.title) → \(entry) (discogs:\(id), \(before.kind))")
+                    }
+                } else if before.kind.isCreditBacked, before.to.kind == .artist, before.to.discogsID == nil {
+                    // A spelling credits in scope name with two entries.
+                    let credited = scope.credits(behind: origin).filter {
+                        RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator($0.creditedName)) == before.to.key
+                    }
+                    if Set(credited.compactMap(\.discogsID)).count > 1 { ambiguousSpellings += 1 }
+                }
+                kept.insert(after)
             }
-            let folded = graph.canonical(all)
-            edgesOut += folded.count
-            let canonicalOrigin = graph.canonical(origin)
-            canonicalSets[canonicalOrigin, default: []] += folded
+            creditSets[origin] = kept
         }
-        out.append("edges: \(edgesIn) -> \(edgesOut); duplicates folded \(edgesIn - edgesOut - selfLoops), self-loops dropped \(selfLoops)")
-        out.append("edge destinations moved onto an identity key: \(retargeted)")
+        out.append("credit edges to artists: \(creditEdges); gaining a Discogs id: \(gained); reaching a differently named entry: \(corrected.count); left on their name, spelling names several entries: \(ambiguousSpellings)")
+        corrected.prefix(25).forEach { out.append("  \($0)") }
 
-        let canonicalPersonal = graph.canonical(personal)
-        let canonicalOrigins = ExploreRanker.startingPoints(canonicalPersonal)
-        var canonicalWalked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
-        for origin in canonicalOrigins {
-            let edges = graph.canonical(canonicalSets[origin] ?? [])
-            canonicalWalked[origin] = LocalKnowledgeAdapter.Walked(
-                shared: edges.filter { $0.source != .library }, deviceLocal: edges.filter { $0.source == .library })
-        }
-        let canonicalKnowledge = LocalKnowledgeAdapter.assemble(
-            origins: canonicalOrigins, walked: canonicalWalked, shows: before.shared.shows,
-            artistTags: before.shared.artistTags, scenes: nil, libraryCounts: [:])
-        // Read the way a visible switch must: an artist the listener knows by
-        // name is known under every identity that name was placed under. Given
-        // to the ranker as encounters of weight nothing — excluded from what is
-        // offered, never a starting point — so its own rules do the rest.
-        let knownNames = Set((canonicalPersonal.crate.compactMap(\.node) + canonicalPersonal.met.map(\.node)
-            + canonicalPersonal.haunts.map(\.node)).filter { $0.kind == .artist }.map(\.key))
-        let nameOwners = graph.ownersByLegacyKey
-        var linkedPersonal = canonicalPersonal
-        let linked: [GraphIdentityKey] = knownNames.sorted().flatMap { name in (nameOwners[name] ?? []).sorted() }
-        linkedPersonal.met += linked.map { key in
-            PersonalInputs.Met(node: MusicNode(kind: .artist, key: key.nodeKey, title: key.value),
-                               weight: 0, lastAt: .distantPast)
-        }
-        let canonicalOffers = ExploreRanker.offers(personal: linkedPersonal, knowledge: canonicalKnowledge, asOf: asOf)
-        func ranked(_ offers: ExploreOffers, through map: (MusicNode) -> MusicNode) -> [String] {
-            (offers.next + offers.artists + offers.shows).map { map($0.node).id }
-        }
-        let baseline = ranked(offersBefore, through: graph.canonical)
-        let shadow = ranked(canonicalOffers, through: { $0 })
-        out.append("identities known by name, not offered back: \(linked.count)")
-        out.append("starting points: \(origins.count) -> \(canonicalOrigins.count)")
-        out.append("For You candidates: before \(baseline.count), shadow \(shadow.count)")
-        out.append("  lost: \(baseline.filter { !shadow.contains($0) })")
-        out.append("  gained: \(shadow.filter { !baseline.contains($0) })")
-        let topBefore = Array(baseline.prefix(6)), topShadow = Array(shadow.prefix(6))
-        out.append("  top 6 identical: \(topBefore == topShadow)")
-        if topBefore != topShadow {
-            out.append("    before: \(topBefore)")
-            out.append("    shadow: \(topShadow)")
-        }
+        // 4. The identity-keyed graph, on today's edges and on the credit edges.
+        func canonicalReport(_ title: String, _ sets: [MusicNode: EdgeSet]) -> [String] {
+            out.append("")
+            out.append("== canonical graph (shadow): \(title) ==")
+            let graph = GraphCanonicalizer(identify: identifier.identify)
+            let nodes = Set(sets.values.flatMap { $0.all.flatMap { [$0.from, $0.to] } }.filter { $0.kind == .artist }).union(artistNodes)
+            let personalNodes = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
+            for node in nodes.sorted(by: { $0.id < $1.id }) + personalNodes.filter({ $0.kind == .artist }) {
+                _ = graph.placement(of: node)
+            }
+            let placements = graph.placements
+            var byClass: [EvidenceClass: Int] = [:]
+            for placement in placements { byClass[placement.evidence, default: 0] += 1 }
+            let keys = Set(placements.map(\.key))
+            out.append("nodes: \(keys.filter(\.isVerified).count) verified identities, \(keys.filter { !$0.isVerified }.count) unresolved names (from \(placements.count) references)")
+            out.append("  evidence: " + EvidenceClass.allCases.map { "\($0) \(byClass[$0] ?? 0)" }.joined(separator: ", "))
+            var legacies: [GraphIdentityKey: Set<String>] = [:]
+            var keysByLegacy: [String: Set<GraphIdentityKey>] = [:]
+            for placement in placements {
+                legacies[placement.key, default: []].insert(placement.reference.key)
+                keysByLegacy[placement.reference.key, default: []].insert(placement.key)
+            }
+            let owners = graph.ownersByLegacyKey
+            let merges = legacies.filter { $0.key.isVerified && $0.value.count > 1 }
+            let collisions = owners.filter { $0.value.count > 1 }
+            out.append("merges (one identity, several names): \(merges.count)")
+            merges.sorted { $0.key < $1.key }.forEach { out.append("  \($0.key): \($0.value.sorted().joined(separator: " | "))") }
+            out.append("namesake collisions (one name, several verified identities): \(collisions.count)")
+            collisions.sorted { $0.key < $1.key }.forEach { out.append("  \($0.key): \($0.value.sorted().map(\.description).joined(separator: ", "))") }
+            let overlaps = keysByLegacy.filter { legacy, keys in keys.contains { !$0.isVerified } && owners[legacy]?.count == 1 }
+            out.append("names reached both verified and unresolved (linked, not merged): \(overlaps.count)")
 
+            var edgesIn = 0, edgesOut = 0, loops = 0
+            var canonicalSets: [MusicNode: [MusicEdge]] = [:]
+            for (origin, set) in sets.sorted(by: { $0.key.id < $1.key.id }) {
+                edgesIn += set.all.count
+                for edge in set.all { let c = graph.canonical(edge); if c.from.id == c.to.id { loops += 1 } }
+                let folded = graph.canonical(set.all)
+                edgesOut += folded.count
+                canonicalSets[graph.canonical(origin), default: []] += folded
+            }
+            out.append("edges: \(edgesIn) -> \(edgesOut); duplicates folded \(edgesIn - edgesOut - loops), self-loops \(loops)")
+
+            let canonicalPersonal = graph.canonical(personal)
+            let canonicalOrigins = ExploreRanker.startingPoints(canonicalPersonal)
+            var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+            for origin in canonicalOrigins {
+                let edges = graph.canonical(canonicalSets[origin] ?? [])
+                walked[origin] = LocalKnowledgeAdapter.Walked(
+                    shared: edges.filter { $0.source != .library }, deviceLocal: edges.filter { $0.source == .library })
+            }
+            let knowledge = LocalKnowledgeAdapter.assemble(
+                origins: canonicalOrigins, walked: walked, shows: before.shared.shows,
+                artistTags: before.shared.artistTags, scenes: nil, libraryCounts: [:])
+            let history = canonicalPersonal.crate.compactMap(\.node) + canonicalPersonal.met.map(\.node) + canonicalPersonal.haunts.map(\.node)
+            let alsoKnown = KnownArtistPolicy.alsoKnown(history: history, owners: owners, namesOf: graph.legacyKeys(of:))
+            let withPolicy = ExploreRanker.offers(personal: canonicalPersonal, knowledge: knowledge, asOf: asOf, alsoKnown: alsoKnown)
+            let withoutPolicy = ExploreRanker.offers(personal: canonicalPersonal, knowledge: knowledge, asOf: asOf)
+            func ranked(_ offers: ExploreOffers) -> [String] { (offers.next + offers.artists + offers.shows).map(\.node.id) }
+            let baseline = (offersBefore.next + offersBefore.artists + offersBefore.shows).map { graph.canonical($0.node).id }
+            let shadow = ranked(withPolicy), unguarded = ranked(withoutPolicy)
+            out.append("known-artist policy: \(alsoKnown.count) ids known beyond the history; it keeps out \(unguarded.filter { !shadow.contains($0) })")
+            out.append("For You: before \(baseline.count), shadow \(shadow.count)")
+            out.append("  lost: \(baseline.filter { !shadow.contains($0) })")
+            out.append("  gained: \(shadow.filter { !baseline.contains($0) })")
+            out.append("  top 6 identical: \(Array(baseline.prefix(6)) == Array(shadow.prefix(6)))")
+            let moved = zip(baseline, shadow).enumerated().filter { $0.element.0 != $0.element.1 }.map { "#\($0.offset + 1) \($0.element.0) → \($0.element.1)" }
+            out.append("  positions that differ: \(moved.count)")
+            moved.prefix(12).forEach { out.append("    \($0)") }
+            return shadow
         }
-        canonicalReport("today's edges", sets)
-        canonicalReport("with credit ids (Step 3 preview)", shadowSets)
+        _ = canonicalReport("today's edges", sets)
+        _ = canonicalReport("credit ids on credit edges (Step 3)", creditSets)
 
         let text = out.joined(separator: "\n") + "\n"
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

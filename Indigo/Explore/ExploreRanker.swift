@@ -21,13 +21,16 @@ import Foundation
 nonisolated enum ExploreRanker {
     /// Offers for the page. `turn` picks which direction is named (EXPLORE
     /// passes its period); nil names the first.
+    /// `alsoKnown` is node ids the listener is known to have beyond their own
+    /// rows — see `KnownArtistPolicy`. Empty, the answer is exactly as before.
     static func offers(
         personal: PersonalInputs, knowledge: KnowledgeSnapshot, asOf: Date,
-        next: Int = 12, shows: Int = 6, artists: Int = 6, turn: Int? = nil
+        next: Int = 12, shows: Int = 6, artists: Int = 6, turn: Int? = nil,
+        alsoKnown: Set<String> = []
     ) -> ExploreOffers {
         let taste = Self.taste(personal: personal, knowledge: knowledge, asOf: asOf)
         var offers = recommendations(personal: personal, knowledge: knowledge, taste: taste,
-                                     next: next, shows: shows, artists: artists)
+                                     next: next, shows: shows, artists: artists, alsoKnown: alsoKnown)
         offers.movingToward = direction(personal: personal, knowledge: knowledge, taste: taste, turn: turn)
         return offers
     }
@@ -35,10 +38,10 @@ nonisolated enum ExploreRanker {
     /// The blocks somebody can act on: where to go next, shows, more artists.
     static func recommendations(
         personal: PersonalInputs, knowledge: KnowledgeSnapshot, taste: TasteProfile,
-        next: Int = 12, shows: Int = 6, artists: Int = 6
+        next: Int = 12, shows: Int = 6, artists: Int = 6, alsoKnown: Set<String> = []
     ) -> ExploreOffers {
         let all = suggestions(personal: personal, knowledge: knowledge, taste: taste,
-                              limit: next + artists + shows)
+                              limit: next + artists + shows, alsoKnown: alsoKnown)
         var offers = ExploreOffers()
         offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
         let rest = all.filter { $0.node.kind != .broadcast }
@@ -119,13 +122,16 @@ nonisolated enum ExploreRanker {
 
     /// Everywhere worth going, best first.
     static func suggestions(
-        personal: PersonalInputs, knowledge: KnowledgeSnapshot, taste: TasteProfile, limit: Int = 12
+        personal: PersonalInputs, knowledge: KnowledgeSnapshot, taste: TasteProfile, limit: Int = 12,
+        alsoKnown: Set<String> = []
     ) -> [ExploreSuggestion] {
         let known = knownGround(personal)
         guard !known.isEmpty else { return [] }
 
         let seen = Set(known.map(\.node.id))
-        let encountered = Set(personal.met.map(\.node.id))
+        // Excluded before anything is ranked or cut, never after: what is not
+        // offered leaves room for the next candidate.
+        let encountered = Set(personal.met.map(\.node.id)).union(alsoKnown)
         let neighbourhoods = edgeSets(knowledge)
 
         var best: [String: ExploreSuggestion] = [:]

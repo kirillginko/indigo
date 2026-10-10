@@ -130,6 +130,8 @@ nonisolated struct CanonicalArtist: Hashable, Sendable {
     /// Where the node's identity resolution pointed, whether or not it was
     /// strong enough to place it.
     let resolvedIdentity: ArtistIdentity
+    /// The entry's own name, when the evidence gave one.
+    var entryName: String? = nil
 }
 
 /// Canonicalizes graph nodes, edges and references in memory.
@@ -158,7 +160,8 @@ nonisolated final class GraphCanonicalizer: @unchecked Sendable {
         } else {
             key = .name(node.key)
         }
-        let placement = CanonicalArtist(key: key, reference: node, evidence: evidence, resolvedIdentity: found.identity)
+        let placement = CanonicalArtist(key: key, reference: node, evidence: evidence, resolvedIdentity: found.identity,
+                                        entryName: key.isVerified ? found.entryName : nil)
         placed[node] = placement
         return placement
     }
@@ -167,7 +170,9 @@ nonisolated final class GraphCanonicalizer: @unchecked Sendable {
     /// canonical, come back unchanged.
     func canonical(_ node: MusicNode) -> MusicNode {
         guard let placement = placement(of: node) else { return node }
-        var canonical = MusicNode(kind: .artist, key: placement.key.nodeKey, title: node.title)
+        // An identity node is called what its entry is called; the spelling
+        // that reached it is the placement's reference.
+        var canonical = MusicNode(kind: .artist, key: placement.key.nodeKey, title: placement.entryName ?? node.title)
         canonical.subtitle = node.subtitle
         canonical.mbid = placement.key.namespace == .mbid ? placement.key.value : node.mbid
         canonical.discogsID = placement.key.namespace == .discogs ? Int(placement.key.value) : nil
@@ -252,5 +257,49 @@ nonisolated final class GraphCanonicalizer: @unchecked Sendable {
     private static func mbid(of identity: ArtistIdentity) -> String? {
         guard identity.rawValue.hasPrefix("mbid:") else { return nil }
         return String(identity.rawValue.dropFirst("mbid:".count))
+    }
+}
+
+/// Which artists the listener already knows, under identity keys.
+///
+/// Their rows say who they know, often only by name. Under identity keys an
+/// artist they keep as "Dean Blunt" can be reached as `discogs:2419343`, and
+/// must not be offered back to them as a discovery. But a name is not an
+/// identity, and the rule has to be safe for namesakes:
+///
+/// - a verified identity in their history is known, and so is each name it
+///   was reached under where it is that name's only verified owner;
+/// - a name in their history makes known the one verified identity that name
+///   belongs to — and none at all when verified namesakes share it, because
+///   keeping one Hype Williams says nothing about the other.
+///
+/// The result only ever excludes candidates. It never places a node, and a
+/// name link is never identity evidence.
+nonisolated enum KnownArtistPolicy {
+    /// Node ids to treat as known, beyond the nodes in the history itself.
+    ///
+    /// - Parameters:
+    ///   - history: the listener's artist nodes, canonicalized.
+    ///   - owners: each folded name's verified owners
+    ///     (`GraphCanonicalizer.ownersByLegacyKey`).
+    ///   - namesOf: the folded names an identity was reached under
+    ///     (`GraphCanonicalizer.legacyKeys(of:)`).
+    static func alsoKnown(
+        history: [MusicNode],
+        owners: [String: Set<GraphIdentityKey>],
+        namesOf: (MusicNode) -> Set<String>
+    ) -> Set<String> {
+        var known = Set<String>()
+        for node in history where node.kind == .artist {
+            if let identity = GraphIdentityKey(nodeKey: node.key) {
+                known.insert(identity.nodeID)
+                for name in namesOf(node) where owners[name] == [identity] {
+                    known.insert(MusicNode.canonicalID(kindRaw: MusicNodeKind.artist.rawValue, key: name))
+                }
+            } else if let only = owners[node.key], only.count == 1, let owner = only.first {
+                known.insert(owner.nodeID)
+            }
+        }
+        return known
     }
 }
