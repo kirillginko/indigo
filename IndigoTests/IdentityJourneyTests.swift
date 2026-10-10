@@ -95,7 +95,7 @@ final class IdentityJourneyTests: XCTestCase {
     func testTheJourneyKeepsEachArtistOneNode() throws {
         let (container, context, show) = try populated()
         _ = container
-        let shadow = ShadowGraph(context: context)
+        let shadow = IdentityGraph(context: context)
 
         // Radio show → artist.
         let fromShow = shadow.neighbors(of: show)
@@ -145,7 +145,7 @@ final class IdentityJourneyTests: XCTestCase {
     func testNamesakesStaySeparateOnTheJourney() throws {
         let (container, context, _) = try populated()
         _ = container
-        let shadow = ShadowGraph(context: context)
+        let shadow = IdentityGraph(context: context)
 
         let duo = try XCTUnwrap(shadow.neighbors(of: .release("One Nation", discogsID: 1)).first { $0.to.kind == .artist }).to
         let director = try XCTUnwrap(shadow.neighbors(of: .release("Belly", discogsID: 2)).first { $0.to.kind == .artist }).to
@@ -158,7 +158,7 @@ final class IdentityJourneyTests: XCTestCase {
     func testTheJourneyIsTheSameInAnyOrderAndTwice() throws {
         let (container, context, show) = try populated()
         _ = container
-        func walk(_ shadow: ShadowGraph, _ start: MusicNode) -> [String] {
+        func walk(_ shadow: IdentityGraph, _ start: MusicNode) -> [String] {
             var seen: [String] = []
             var frontier = [start]
             for _ in 0..<3 {
@@ -168,8 +168,8 @@ final class IdentityJourneyTests: XCTestCase {
             }
             return seen.sorted()
         }
-        let first = walk(ShadowGraph(context: context), show)
-        let again = ShadowGraph(context: context)
+        let first = walk(IdentityGraph(context: context), show)
+        let again = IdentityGraph(context: context)
         _ = again.neighbors(of: .artist("Scott Herren"))   // a different first question
         XCTAssertEqual(walk(again, show), first)
         XCTAssertEqual(walk(again, show), first, "And asked twice")
@@ -178,7 +178,7 @@ final class IdentityJourneyTests: XCTestCase {
     func testHistoryIsReadNotRewritten() throws {
         let (container, context, _) = try populated()
         _ = container
-        let shadow = ShadowGraph(context: context)
+        let shadow = IdentityGraph(context: context)
         let personal = PersonalInputs(
             crate: [], plays: [],
             met: [PersonalInputs.Met(node: .artist("Prefuse73"), weight: 1, lastAt: Date(timeIntervalSince1970: 0)),
@@ -214,7 +214,7 @@ final class IdentityJourneyTests: XCTestCase {
         await store.enrichRelease(id: 6947405)
         try context.save()
 
-        let shadow = ShadowGraph(context: context, store: store)
+        let shadow = IdentityGraph(context: context)
         let fromShow = shadow.neighbors(of: show)
         let prefuse = try XCTUnwrap(edge(fromShow, to: "Prefuse 73") ?? edge(fromShow, to: "Prefuse73")).to
         XCTAssertEqual(prefuse.id, "artist:discogs:3722")

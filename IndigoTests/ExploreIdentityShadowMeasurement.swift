@@ -26,6 +26,103 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
     private var support: URL { StoreLayout.standard.directory }
     private var folder: URL { support.appendingPathComponent("audit/explore-identity", isDirectory: true) }
 
+    /// DIG's graph as the listener sees it — DEEP and RELATED — on today's
+    /// code (the name-keyed walk) and on the identity graph, for the listener's
+    /// own artists and the ones these tests name.
+    private func visibleComparison(_ label: String, context: ModelContext, origins starting: [MusicNode]) -> [String] {
+        var out = ["", "== visible Explore (\(label)) =="]
+        let store = DigStore(context: context)
+        let named = ["Prefuse 73", "Prefuse73", "Scott Herren", "Piano Overlord", "Hype Williams", "Dean Blunt",
+                     "Joanne Robertson", "Attilio Novellino", "Ciro Vitiello"]
+        var names = starting.filter { $0.kind == .artist }.map(\.title)
+        let filedKeys = Set(((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []).map(\.nameKey))
+        names += named.filter { filedKeys.contains(RecordingKey.normalizeArtist($0)) }
+        var seen = Set<String>()
+        names = names.filter { seen.insert(RecordingKey.normalizeArtist($0)).inserted }
+
+        var totals = (before: 0, after: 0, merged: 0, split: 0, lost: 0, byEntry: 0, duplicateTitles: 0, reordered: 0)
+        var details: [String] = []
+        var unexplainedSwaps = 0
+        for name in names {
+            let page = store.artistPage(ArtistReference(name: name))
+            let today = GraphStore(context: context)
+            let identity = IdentityGraph(context: context)
+            let origin = MusicNode.artist(page.name, discogsID: page.discogsID)
+            // DEEP: every destination one step out.
+            let beforeRows = today.neighbors(of: .artist(page.name)).byDestination.map(\.node)
+            let walked = identity.neighbourhood(of: origin)
+            let afterRows = walked.edges.byDestination.map(\.node)
+            let afterKeys = Dictionary(uniqueKeysWithValues: afterRows.map { ($0.id, walked.knownIDs(of: $0)) })
+            var merged: [String] = [], split: [String] = [], lost: [String] = []
+            for row in afterRows where (afterKeys[row.id] ?? []).count > 1 {
+                let covered = beforeRows.filter { (afterKeys[row.id] ?? []).contains($0.id) }
+                if covered.count > 1 { merged.append("\(row.title) [\(row.id)] ← \(covered.map(\.title).sorted())") }
+            }
+            for row in beforeRows {
+                let holders = afterRows.filter { (afterKeys[$0.id] ?? [$0.id]).contains(row.id) }
+                if holders.isEmpty { lost.append("\(row.title) [\(row.id)]") }
+                if holders.count > 1 { split.append("\(row.title) → \(holders.map(\.id).sorted())") }
+            }
+            var titles: [String: Int] = [:]
+            for row in afterRows where row.kind == .artist { titles[row.title, default: 0] += 1 }
+            let duplicates = titles.filter { $0.value > 1 }.keys.sorted()
+            let byEntry = afterRows.filter { $0.kind == .artist && GraphIdentityKey(nodeKey: $0.key) != nil }.count
+
+            // RELATED: today's list and the page's, in the order they are shown,
+            // matched by node — a merged row stands for every name behind it.
+            let relatedBefore = today.relatedArtists(to: .artist(page.name)).map(\.node)
+            let relatedAfter = DigEngine(context: context).relatedArtists(to: page.name, discogsID: page.discogsID)
+            let family = today.aliasKeys(of: .artist(page.name))
+            let afterNodes = walked.edges.byDestination.map(\.node).filter { node in
+                node.kind == .artist && (walked.keys[node.id] ?? [node.key]).isDisjoint(with: family)
+            }
+            var rank: [String: Int] = [:]
+            for (index, node) in afterNodes.enumerated() {
+                for id in walked.knownIDs(of: node) where rank[id] == nil { rank[id] = index }
+            }
+            // Each swap explained, or not: a row whose title or confidence the
+            // identity changed moves; anything else moving is unexpected.
+            let beforeByID = Dictionary(today.relatedArtists(to: .artist(page.name)).map { ($0.node.id, $0) }, uniquingKeysWith: { a, _ in a })
+            let afterByIndex = walked.edges.byDestination.filter { node in
+                node.node.kind == .artist && (walked.keys[node.node.id] ?? [node.node.key]).isDisjoint(with: family)
+            }
+            func changed(_ before: MusicNode) -> Bool {
+                guard let index = rank[before.id], let old = beforeByID[before.id] else { return true }
+                let new = afterByIndex[index]
+                return new.node.title != old.node.title || abs(new.confidence - old.confidence) > 1e-9
+            }
+            let commonNodes = relatedBefore.filter { rank[$0.id] != nil }
+            let common = commonNodes.map { rank[$0.id]! }
+            var reordered = 0, unexplained: [String] = []
+            for i in common.indices {
+                for j in common.indices where j > i && common[i] > common[j] {
+                    reordered += 1
+                    if !changed(commonNodes[i]) && !changed(commonNodes[j]) {
+                        unexplained.append("\(commonNodes[i].title) / \(commonNodes[j].title)")
+                    }
+                }
+            }
+            unexplainedSwaps += unexplained.count
+            unexplained.prefix(5).forEach { details.append("    unexplained swap: \($0)") }
+            XCTAssertEqual(afterNodes.count, relatedAfter.count, "The audit reads RELATED as the page does")
+
+            totals.before += beforeRows.count; totals.after += afterRows.count
+            totals.merged += merged.count; totals.split += split.count; totals.lost += lost.count
+            totals.byEntry += byEntry; totals.duplicateTitles += duplicates.count; totals.reordered += reordered
+            details.append("  \(name) → page \(page.name) [\(page.discogsID.map { "discogs:\($0)" } ?? "name")]: DEEP \(beforeRows.count) → \(afterRows.count) rows, \(byEntry) by entry; RELATED \(relatedBefore.count) → \(relatedAfter.count), \(reordered) pairs swapped")
+            merged.forEach { details.append("    merged: \($0)") }
+            split.forEach { details.append("    split: \($0)") }
+            lost.prefix(10).forEach { details.append("    lost: \($0)") }
+            duplicates.forEach { details.append("    same title twice: \($0)") }
+            for row in relatedAfter where row.discogsID != nil && named.contains(row.name) {
+                details.append("    RELATED \(row.name) opens discogs:\(row.discogsID!) — \(row.reasons.map(\.kind.rawValue).sorted())")
+            }
+        }
+        out.append("pages: \(names.count); DEEP rows \(totals.before) → \(totals.after); by entry \(totals.byEntry); merged \(totals.merged); split \(totals.split); lost \(totals.lost); same title twice \(totals.duplicateTitles); RELATED pairs swapped \(totals.reordered), of them not explained by a re-titled or merged row \(unexplainedSwaps)")
+        out.append("names waiting for a uniqueness check: \(IdentityChecks.shared.take(1000))")
+        return out + details
+    }
+
     func testShadowIdentityOnThisMacsStores() async throws {
         try XCTSkipUnless(FileManager.default.fileExists(atPath: folder.appendingPathComponent("RUN").path),
                           "Create audit/explore-identity/RUN to measure.")
@@ -57,6 +154,8 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         let artistNodes = Set((before.shared.nodes + before.deviceLocal.nodes).filter { $0.kind == .artist })
         out.append("starting points: \(origins.count) (\(origins.filter { $0.kind == .artist }.count) artists)")
         out.append("snapshot: \(before.shared.nodes.count) shared nodes, \(artistNodes.count) artist nodes, \(sets.values.reduce(0) { $0 + $1.all.count }) edges")
+
+        out += visibleComparison("the store's own evidence, as on this device today", context: context, origins: origins)
 
         // Evidence: kept credits for every release the snapshot names and every
         // release on a starting artist's own shelf, from R2.
@@ -257,11 +356,11 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         _ = canonicalReport("today's edges", sets)
         _ = canonicalReport("credit ids on credit edges (Step 3)", creditSets)
 
-        // 5. The final shadow: walked through ShadowGraph exactly as a visible
+        // 5. The final shadow: walked through IdentityGraph exactly as a visible
         // switch would walk it, compared with today's answer.
         out.append("")
-        out.append("== final shadow (ShadowGraph) vs today ==")
-        let shadowGraph = ShadowGraph(context: context, store: store)
+        out.append("== final shadow (IdentityGraph) vs today ==")
+        let shadowGraph = IdentityGraph(context: context)
         let finalPersonal = shadowGraph.canonicalizer.canonical(personal)
         let finalOrigins = ExploreRanker.startingPoints(finalPersonal)
         var finalWalked: [MusicNode: [MusicEdge]] = [:]
@@ -331,6 +430,8 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         let foldedOffers = ExploreRanker.offers(personal: finalPersonal, knowledge: assemble(folded), asOf: asOf, alsoKnown: known)
         out.append("  [decision only] with single-owner name routes folded: top 6 identical \(Array(todays.prefix(6)) == Array(ids(foldedOffers).prefix(6))); scores:")
         listing(foldedOffers).forEach { out.append("    \($0)") }
+
+        out += visibleComparison("with R2 credits", context: context, origins: origins)
 
         let text = out.joined(separator: "\n") + "\n"
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

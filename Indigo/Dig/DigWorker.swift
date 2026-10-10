@@ -79,8 +79,12 @@ actor DigWorker {
         // when nothing has been inserted since. See `Caches.rowCounts`.
         let next = GraphStore(context: modelContext, inheriting: graph)
         graph = next
-        engine = DigEngine(context: modelContext, graph: next)
-        deep = DeepEngine(context: modelContext, graph: next)
+        // One identity graph over it for both, so an artist is placed once a
+        // generation whichever block asks first. New evidence is a write, so
+        // it arrives with the next generation.
+        let identity = IdentityGraph(context: modelContext, graph: next)
+        engine = DigEngine(context: modelContext, graph: next, identity: identity)
+        deep = DeepEngine(context: modelContext, graph: next, identity: identity)
         scenes = SceneEngine(context: modelContext, inheriting: scenes)
         // The index is deliberately *not* discarded here any more.
         //

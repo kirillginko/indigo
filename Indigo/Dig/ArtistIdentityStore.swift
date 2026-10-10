@@ -17,6 +17,9 @@ import SwiftData
 
 nonisolated struct ArtistIdentityStore {
     let context: ModelContext
+    /// The evidence tables read once, for a reader that asks about hundreds of
+    /// names in one go (`IdentityGraph`). Without one, each question is a fetch.
+    var fold: IdentityEvidenceFold? = nil
 
     // MARK: Writing
 
@@ -76,7 +79,8 @@ nonisolated struct ArtistIdentityStore {
     /// A spelling that a fresh, complete check has settled. A stale one is
     /// still evidence, but worth asking again; see `needsCheck`.
     func verdict(for spelling: String) -> SpellingVerdict? {
-        spellingRecord(ArtistSpelling.key(spelling))?.verdict
+        if let fold { return fold.verdicts[ArtistSpelling.key(spelling)] }
+        return spellingRecord(ArtistSpelling.key(spelling))?.verdict
     }
 
     /// Whether a spelling has no settled verdict, or one old enough to ask again.
@@ -85,10 +89,14 @@ nonisolated struct ArtistIdentityStore {
         return held.isStale
     }
 
-    func facts(_ discogsID: Int) -> DiscogsIdentityFacts? { identityRecord(discogsID)?.facts }
+    func facts(_ discogsID: Int) -> DiscogsIdentityFacts? {
+        if let fold { return fold.facts[discogsID] }
+        return identityRecord(discogsID)?.facts
+    }
 
     /// Every spelling a check settled on this entry.
     func creditedSpellings(of discogsID: Int) -> [String] {
+        if let fold { return fold.spellings[discogsID] ?? [] }
         let records = (try? context.fetch(FetchDescriptor<ArtistSpellingRecord>())) ?? []
         return records
             .filter { $0.verdict == .variation(discogsID) }
@@ -125,6 +133,32 @@ nonisolated struct ArtistIdentityStore {
 
     func resolve(_ reference: ArtistReference) -> ArtistResolution {
         ArtistIdentityResolver(evidence: evidence(for: reference)).resolve(reference)
+    }
+
+    /// Which artist a page means, and every spelling it should read under.
+    ///
+    /// Evidence first (`ArtistIdentityResolver`). Failing that, the record
+    /// DIG shows: if DIG filed the name's catalogue entry under exactly this
+    /// name, the spellings verified for that entry belong on its page too —
+    /// "Prefuse 73" gathers "Prefuse73". Only under exactly this name: older
+    /// rows in that table were filed by looser matching, and one filed under
+    /// another spelling ("walton", holding Rik Walton) must never become a
+    /// reason to open somebody else.
+    func artistResolution(_ reference: ArtistReference) -> ArtistResolution {
+        let resolved = resolve(reference)
+        guard !resolved.isVerified else { return resolved }
+        guard let shown = filedRecord(named: reference.name),
+              shown.discogsID > 0,
+              ArtistSpelling.filingKey(shown.name) == ArtistSpelling.key(reference.name)
+        else { return resolved }
+        let filed = ArtistReference(name: reference.name, mbid: reference.mbid, discogsID: shown.discogsID)
+        return resolve(filed).asFiledRecord()
+    }
+
+    /// The record DIG filed under a name.
+    func filedRecord(named name: String) -> DiscogsArtist? {
+        if let fold { return fold.filed(name) }
+        return DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: name)
     }
 
     // MARK: -
@@ -219,4 +253,36 @@ nonisolated struct ReleaseCreditStore {
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
     }
+}
+
+/// The identity evidence read once: every settled spelling and every entry's
+/// facts — small tables — and DIG's filed records through a fold somebody has
+/// already made (`GraphStore`). Answers exactly what `ArtistIdentityStore`
+/// answers by fetching, for as long as nothing is written; a reader keeps one
+/// for a generation, and every write starts another.
+nonisolated final class IdentityEvidenceFold {
+    let verdicts: [String: SpellingVerdict]
+    let spellings: [Int: [String]]
+    let facts: [Int: DiscogsIdentityFacts]
+    let filed: (String) -> DiscogsArtist?
+
+    init(context: ModelContext, filed: @escaping (String) -> DiscogsArtist?) {
+        var verdicts: [String: SpellingVerdict] = [:]
+        var spellings: [Int: [String]] = [:]
+        for record in (try? context.fetch(FetchDescriptor<ArtistSpellingRecord>())) ?? [] {
+            guard let verdict = record.verdict else { continue }
+            verdicts[record.spellingKey] = verdict
+            if case .variation(let id) = verdict { spellings[id, default: []].append(record.spelling) }
+        }
+        self.verdicts = verdicts
+        self.spellings = spellings.mapValues { $0.sorted() }
+        var facts: [Int: DiscogsIdentityFacts] = [:]
+        for record in (try? context.fetch(FetchDescriptor<DiscogsIdentityRecord>())) ?? [] {
+            facts[record.discogsID] = record.facts
+        }
+        self.facts = facts
+        self.filed = filed
+    }
+
+    deinit {}
 }

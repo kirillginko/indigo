@@ -2,9 +2,9 @@
 //  CreditEdgeIdentity.swift
 //  Indigo
 //
-//  The Discogs entries behind the graph's credit edges. Shadow only: the
-//  graph's own edges are unchanged; this gives a copy of them the ids the
-//  release documents carried.
+//  The Discogs entries behind the graph's credit edges. The stored edges are
+//  unchanged; this gives the copy a walk reads the ids the release documents
+//  carried (see `IdentityGraph`).
 //
 //  A producer, personnel, collaborator or same-release edge exists because a
 //  release credited somebody, and the kept credits (`ReleaseCreditRecord`)
@@ -75,8 +75,7 @@ nonisolated enum CreditEdgeIdentity {
 }
 
 /// Reads the scope for a node out of the store.
-@MainActor
-struct CreditEdgeScope {
+nonisolated struct CreditEdgeScope {
     let context: ModelContext
     let graph: GraphStore
 

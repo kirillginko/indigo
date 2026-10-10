@@ -19,9 +19,9 @@
 //  name. Anything else is inferred: kept, because navigation still uses it,
 //  but never taken for identity, and never over what verified evidence says.
 //
-//  Nothing here is stored on the node or shown anywhere. Graph keys stay the
-//  folded names they are — synced visits, steps and stored edges hold them —
-//  and this is read alongside them.
+//  Nothing here is stored. Stored graph keys stay the folded names they are —
+//  synced visits, steps and stored edges hold them — and this is read over
+//  them when the graph is walked (`IdentityGraph`).
 //
 
 import Foundation
@@ -67,23 +67,34 @@ nonisolated struct ArtistNodeIdentity: Hashable, Sendable {
 }
 
 /// Identifies graph nodes from the evidence DIG holds. The one place the graph
-/// asks who a node is; it reuses `DigStore.artistResolution` rather than
-/// deciding anything of its own.
-@MainActor
-final class ArtistNodeIdentifier {
-    let store: DigStore
+/// asks who a node is; it reuses `ArtistIdentityStore.artistResolution` — the
+/// answer DIG's pages open by — rather than deciding anything of its own.
+///
+/// Not main-actor: the graph is walked on `DigWorker`. One identifier serves
+/// one context, on whichever actor owns it.
+nonisolated final class ArtistNodeIdentifier {
+    let context: ModelContext
+    private let identityStore: ArtistIdentityStore
 
-    init(store: DigStore) { self.store = store }
+    /// - Parameter identityStore: where the evidence is read; by default,
+    ///   fetched per question. A walk over hundreds of nodes passes one with a
+    ///   fold (`IdentityEvidenceFold`).
+    init(context: ModelContext, identityStore: ArtistIdentityStore? = nil) {
+        self.context = context
+        self.identityStore = identityStore ?? ArtistIdentityStore(context: context)
+    }
+
+    @MainActor convenience init(store: DigStore) { self.init(context: store.context) }
 
     // Explicit, so releasing one under XCTest does not abort the host; see
     // the note on `DigStore`'s deinit.
-    nonisolated deinit {}
+    deinit {}
 
     /// Every spelling a kept credit names each entry under, folded. Read once:
     /// a graph asks about hundreds of nodes.
     private lazy var creditedKeys: [Int: Set<String>] = {
         var keys: [Int: Set<String>] = [:]
-        for record in (try? store.context.fetch(FetchDescriptor<ReleaseCreditRecord>())) ?? [] {
+        for record in (try? context.fetch(FetchDescriptor<ReleaseCreditRecord>())) ?? [] {
             for credit in record.credits {
                 guard let id = credit.discogsID else { continue }
                 keys[id, default: []].insert(RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(credit.creditedName)))
@@ -103,8 +114,9 @@ final class ArtistNodeIdentifier {
     /// groups and members.
     private lazy var linkedKeys: [Int: Set<String>] = {
         var keys: [Int: Set<String>] = [:]
-        for record in (try? store.context.fetch(FetchDescriptor<DiscogsIdentityRecord>())) ?? [] {
-            let facts = record.facts
+        let every = identityStore.fold.map { Array($0.facts.values) }
+            ?? ((try? context.fetch(FetchDescriptor<DiscogsIdentityRecord>())) ?? []).map(\.facts)
+        for facts in every {
             for link in facts.aliases + facts.groups + facts.members {
                 keys[link.id, default: []].insert(RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(link.name)))
             }
@@ -118,24 +130,27 @@ final class ArtistNodeIdentifier {
         // The name the node stands for. A title that folds to something else
         // is a label put on it by a record that may not be this artist's.
         let name = RecordingKey.normalizeArtist(node.title) == key ? node.title : key
-        let resolution = store.artistResolution(ArtistReference(name: name, mbid: node.mbid))
+        let resolution = identityStore.artistResolution(ArtistReference(name: name, mbid: node.mbid))
+        // A verified spelling is called what its entry is called, as a credit
+        // is: one artist reached as "Prefuse73" and as "Prefuse 73" is one row,
+        // and which spelling arrived first must not name it.
         let resolved: ArtistIdentityState? = resolution.isVerified
             ? ArtistIdentityState(identity: resolution.identity,
                                   provenance: resolution.basis == .filedRecord ? .filedRecord : .resolver,
-                                  basis: resolution.basis)
+                                  basis: resolution.basis, entryName: resolution.canonicalName)
             : nil
 
         guard let carried = node.discogsID else {
             return ArtistNodeIdentity(
                 identity: resolved?.identity ?? .name(name),
                 provenance: resolved?.provenance ?? .nameOnly,
-                carriedDiscogsID: nil, basis: resolved?.basis
+                carriedDiscogsID: nil, basis: resolved?.basis, entryName: resolved?.entryName
             )
         }
         // Verified evidence decides; an id the node carried never overrides it.
         if let resolved, resolved.identity.discogsID != nil, resolved.provenance != .filedRecord {
             return ArtistNodeIdentity(identity: resolved.identity, provenance: resolved.provenance,
-                                      carriedDiscogsID: carried, basis: resolved.basis)
+                                      carriedDiscogsID: carried, basis: resolved.basis, entryName: resolved.entryName)
         }
         if creditsSupport(carried, for: key) {
             return ArtistNodeIdentity(identity: .discogs(carried), provenance: .credit, carriedDiscogsID: carried,
@@ -143,9 +158,9 @@ final class ArtistNodeIdentifier {
         }
         if linkedKeys[carried]?.contains(key) == true {
             return ArtistNodeIdentity(identity: .discogs(carried), provenance: .entryLink, carriedDiscogsID: carried,
-                                      entryName: store.identityStore.facts(carried)?.canonicalName)
+                                      entryName: identityStore.facts(carried)?.canonicalName)
         }
-        if store.identityStore.facts(carried).map({ RecordingKey.normalizeArtist($0.canonicalName) == key }) == true {
+        if identityStore.facts(carried).map({ RecordingKey.normalizeArtist($0.canonicalName) == key }) == true {
             return ArtistNodeIdentity(identity: .discogs(carried), provenance: .consistentRecord, carriedDiscogsID: carried)
         }
         if let resolved {
@@ -166,6 +181,7 @@ final class ArtistNodeIdentifier {
         let identity: ArtistIdentity
         let provenance: ArtistNodeIdentity.Provenance
         let basis: IdentityBasis?
+        let entryName: String
     }
 }
 

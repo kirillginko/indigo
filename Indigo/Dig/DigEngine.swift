@@ -285,6 +285,7 @@ nonisolated struct DigEngine {
 
     private final class GraphBox {
         var store: GraphStore?
+        var identity: IdentityGraph?
         /// MusicBrainz artists by normalized name, folded once for this engine.
         ///
         /// `cachedArtistNamed` fetches the whole `Artist` table and scans it,
@@ -342,9 +343,19 @@ nonisolated struct DigEngine {
     /// Assembling a `GraphStore`'s caches reads several whole tables. Each
     /// engine built its own, so a page that asks for a profile and a descent
     /// paid for the same tables twice.
-    init(context: ModelContext, graph: GraphStore? = nil) {
+    init(context: ModelContext, graph: GraphStore? = nil, identity: IdentityGraph? = nil) {
         self.context = context
-        shared.store = graph
+        shared.store = graph ?? identity?.graph
+        shared.identity = identity
+    }
+
+    /// The graph under identity keys, over the same store: what RELATED and
+    /// a page's connections walk. See `IdentityGraph`.
+    private var identity: IdentityGraph {
+        if let existing = shared.identity { return existing }
+        let fresh = IdentityGraph(context: context, graph: graph)
+        shared.identity = fresh
+        return fresh
     }
 
     // MARK: - Artist
@@ -742,7 +753,7 @@ nonisolated struct DigEngine {
             },
             releases: releases,
             labels: labels,
-            related: relatedArtists(to: name),
+            related: relatedArtists(to: name, discogsID: discogsID),
             libraryTrackCount: libraryTrackCount(artist: name),
             crateCount: crateCount(artist: name),
             radioAppearances: appearanceLines(for: byArtist),
@@ -930,18 +941,31 @@ nonisolated struct DigEngine {
     /// which quietly meant DIG could only ever relate an artist to another
     /// artist: a label, a broadcast or a white label had nowhere to be put.
     /// This stays as the shape the existing pages read.
-    func relatedArtists(to name: String) -> [RelatedArtist] {
-        graph.relatedArtists(to: .artist(name))
+    ///
+    /// Walked under identity keys: a verified artist is one row however they
+    /// were credited, and opens their own entry. The alias branch is left out
+    /// as before — by every name behind a row, since an alias reached under
+    /// its entry is still family.
+    func relatedArtists(to name: String, discogsID: Int? = nil) -> [RelatedArtist] {
+        let origin = MusicNode.artist(name, discogsID: discogsID)
+        let walked = identity.neighbourhood(of: origin)
+        let family = graph.aliasKeys(of: origin)
+        return walked.edges.byDestination
+            .filter { candidate in
+                candidate.node.kind == .artist
+                    && (walked.keys[candidate.node.id] ?? [candidate.node.key]).isDisjoint(with: family)
+            }
             .map { RelatedArtist(name: $0.node.title, mbid: $0.node.mbid,
                                  reasons: $0.edges.map(\.relationship),
-                                 imageURL: $0.node.artworkURL) }
+                                 imageURL: $0.node.artworkURL, discogsID: $0.node.discogsID) }
     }
 
     /// Everything next to something, of any kind — the step DEEP takes.
     func connections(from node: MusicNode) -> [MusicGraph.Connection] {
         var graph = MusicGraph()
-        graph.absorb(self.graph.neighbors(of: node).all)
-        return graph.connections(from: node)
+        let walked = identity.neighbourhood(of: node)
+        graph.absorb(walked.edges.all)
+        return graph.connections(from: walked.origin)
     }
 
     private static func decade(_ year: String) -> Int? {

@@ -429,7 +429,7 @@ struct ArtistDigView: View {
                         artistName: profile.name, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
 
                     DeepSectionView(
-                        origin: .artist(profile.name, mbid: profile.mbid),
+                        origin: .artist(profile.name, mbid: profile.mbid, discogsID: discogsID),
                         isReady: hasEnriched,
                         initial: nil,
                         showing: Self.shown(profile)
@@ -797,7 +797,11 @@ struct ArtistDigView: View {
     /// and the aliases are on the page for the same reason.
     private static func shown(_ profile: ArtistProfile) -> Set<String> {
         var ids: Set<String> = []
-        for artist in profile.related { ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id) }
+        for artist in profile.related {
+            ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id)
+            // And by entry: DEEP walks the same identities RELATED does.
+            if let id = artist.discogsID { ids.insert(GraphIdentityKey.discogs(id).nodeID) }
+        }
         for alias in profile.aliases { ids.insert(MusicNode.artist(alias).id) }
         for label in profile.labels { ids.insert(MusicNode.label(label.name, mbid: label.mbid).id) }
         for release in profile.releases {
@@ -941,7 +945,7 @@ struct ArtistDigView: View {
                             artist: peer,
                             portrait: dig.portraitURL(for: peer.name)
                         ) {
-                            appState.open(.digArtist(mbid: peer.mbid, name: peer.name))
+                            appState.open(.digArtist(mbid: peer.mbid, name: peer.name, discogsID: peer.discogsID))
                         }
                     }
                 }

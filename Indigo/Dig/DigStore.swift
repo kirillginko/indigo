@@ -135,22 +135,10 @@ final class DigStore {
     var identityStore: ArtistIdentityStore { ArtistIdentityStore(context: context) }
 
     /// Which artist a page means, and every spelling it should read under.
-    ///
-    /// Evidence first (`ArtistIdentityResolver`). Failing that, the record
-    /// this page already shows: if DIG filed the name's catalogue entry under
-    /// exactly this name, the spellings verified for that entry belong on its
-    /// page too — "Prefuse 73" gathers "Prefuse73". Only under exactly this
-    /// name: older rows in that table were filed by looser matching, and one
-    /// filed under another spelling ("walton", holding Rik Walton) must never
-    /// become a reason to open somebody else.
+    /// Decided by `ArtistIdentityStore.artistResolution`, which the graph's
+    /// identity layer reads off the main actor too: one answer for both.
     func artistResolution(_ reference: ArtistReference) -> ArtistResolution {
-        let resolved = identityStore.resolve(reference)
-        guard !resolved.isVerified else { return resolved }
-        guard let shown = discogsEnricher.cachedArtist(named: reference.name), shown.discogsID > 0,
-              ArtistSpelling.filingKey(shown.name) == ArtistSpelling.key(reference.name)
-        else { return resolved }
-        let filed = ArtistReference(name: reference.name, mbid: reference.mbid, discogsID: shown.discogsID)
-        return identityStore.resolve(filed).asFiledRecord()
+        identityStore.artistResolution(reference)
     }
 
     /// What an artist page opens, decided once per revision.
@@ -489,6 +477,7 @@ final class DigStore {
         let profile = await running.value
         walking[key] = nil
         profiles.store(profile, key: key, revision: asked)
+        Task { await settleGraphNames() }
         return profile
     }
 
@@ -1403,6 +1392,7 @@ final class DigStore {
             from: origin, at: level, generation: asked, showing: showing
         )
         descents.store(found, key: key, revision: asked)
+        Task { await settleGraphNames() }
         return found
     }
 
@@ -1741,6 +1731,33 @@ final class DigStore {
         identityStore.record(check)
         saveContext()
         announceChange()
+    }
+
+    /// Off in the unit-test host, whose pages are opened by tests with the
+    /// real client: a test reading a profile must not search Discogs.
+    @ObservationIgnored var settlesGraphNames = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
+
+    /// Asks Discogs about names the graph could not place (`IdentityChecks`):
+    /// each was shown as the one verified entry beside it, but one owner in
+    /// what this device has seen is not proof that nobody else answers to the
+    /// name. A complete check that names the entry places the name there, and
+    /// its routes count toward that artist from the next walk on; one that
+    /// finds the name shared gives it its own row back.
+    ///
+    /// Two a walk, once per spelling per session, and only with room in the
+    /// budget: one search and at most three entries each, through the backend's
+    /// cache. A check that does not complete records nothing.
+    func settleGraphNames() async {
+        guard settlesGraphNames, discogsClient.isConfigured else { return }
+        for _ in 0..<2 {
+            guard await discogsClient.canSearch(), let name = IdentityChecks.shared.take(1).first else { return }
+            let key = ArtistSpelling.key(name)
+            guard identityStore.needsCheck(name), searchedSpellings.insert(key).inserted else { continue }
+            guard let check = await discogsClient.spellingCheck(name) else { continue }
+            identityStore.record(check)
+            saveContext()
+            announceChange()
+        }
     }
 
     private func catalogueSearch(_ query: String, limit: Int) async -> [DigSearchResult] {

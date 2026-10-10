@@ -347,10 +347,22 @@ nonisolated struct GraphStore {
         // The alias branch is not the peer list. Traumprinz is not a good way
         // to broaden out from Traumprinz, however strongly the two are
         // connected — that is what the aliases section is for.
-        let family = caches.aliasKeys(of: node.title, context: context)
+        let family = aliasKeys(of: node)
         return neighbors(of: node).byDestination.filter {
             $0.node.kind == .artist && !family.contains($0.node.key)
         }
+    }
+
+    /// The record DIG filed under a name, from the fold this graph reads
+    /// anyway — the same row `DiscogsEnricher.cachedArtist(named:)` fetches.
+    func cachedDiscogsArtist(named name: String) -> DiscogsArtist? {
+        caches.discogsArtist(RecordingKey.normalizeArtist(name))
+    }
+
+    /// The folded names in an artist's alias family, which RELATED leaves to
+    /// the aliases section.
+    func aliasKeys(of node: MusicNode) -> Set<String> {
+        caches.aliasKeys(of: node.title, context: context)
     }
 
     // MARK: - Artist

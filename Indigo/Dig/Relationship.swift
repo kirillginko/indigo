@@ -94,8 +94,13 @@ nonisolated struct RelatedArtist: Identifiable, Hashable, Sendable {
     /// The artist's portrait, when a catalogue we have already read supplied
     /// one. A row of names is a list; a row of faces is a shelf.
     var imageURL: URL?
+    /// The Discogs entry, when the evidence names one (see `IdentityGraph`):
+    /// the page opens by it, so a credit that said "Blunt" opens Dean Blunt.
+    var discogsID: Int? = nil
 
-    var id: String { mbid ?? name }
+    /// Namesakes share a name and nothing else here, so an entry is part of
+    /// who the row is.
+    var id: String { discogsID.map { "discogs:\($0)" } ?? mbid ?? name }
 
     /// Strongest evidence first, so the list is ordered by how well Indigo can
     /// justify it rather than alphabetically.
