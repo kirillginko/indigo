@@ -44,8 +44,7 @@ nonisolated enum SQLiteFiles {
         }
         try? fileManager.removeItem(at: destination)
 
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(copy.path, &db, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK, let db else {
+        guard let db = open(copy.path, SQLITE_OPEN_READWRITE) else {
             throw Failure(description: "cannot open the copy of \(name)")
         }
         defer { sqlite3_close(db) }
@@ -56,8 +55,7 @@ nonisolated enum SQLiteFiles {
     /// Writes any log still pending into the main file and removes the sidecar
     /// files, so that the store can be moved as one file.
     static func checkpoint(_ url: URL) throws {
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK, let db else {
+        guard let db = open(url.path, SQLITE_OPEN_READWRITE) else {
             throw Failure(description: "cannot open \(url.lastPathComponent)")
         }
         defer { sqlite3_close(db) }
@@ -67,8 +65,7 @@ nonisolated enum SQLiteFiles {
 
     /// Rows in a table, or nil if there is no such table.
     static func count(_ table: String, in url: URL) -> Int? {
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else { return nil }
+        guard let db = open(url.path, SQLITE_OPEN_READONLY) else { return nil }
         defer { sqlite3_close(db) }
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, "SELECT count(*) FROM \(table)", -1, &statement, nil) == SQLITE_OK else { return nil }
@@ -80,8 +77,7 @@ nonisolated enum SQLiteFiles {
     /// nil if there is no store, no such table, or no value.
     static func integer(_ query: String, in url: URL) -> Int? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db else { return nil }
+        guard let db = open(url.path, SQLITE_OPEN_READONLY) else { return nil }
         defer { sqlite3_close(db) }
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, query, -1, &statement, nil) == SQLITE_OK else { return nil }
@@ -94,13 +90,26 @@ nonisolated enum SQLiteFiles {
     /// is built from, to drop rows of the listener's own that it inherited and
     /// must not keep.
     static func empty(_ tables: [String], in url: URL) throws {
-        var db: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &db, SQLITE_OPEN_READWRITE, nil) == SQLITE_OK, let db else {
+        guard let db = open(url.path, SQLITE_OPEN_READWRITE) else {
             throw Failure(description: "cannot open \(url.lastPathComponent)")
         }
         defer { sqlite3_close(db) }
         for table in tables { try run(db, "DELETE FROM \(table)") }
         try run(db, "VACUUM")
+    }
+
+    /// A connection that waits for a lock rather than failing on it. Core Data
+    /// checkpoints a store as it closes it, and a read that meets that
+    /// checkpoint without waiting reads as "no such value": a newer build's
+    /// generation went unseen that way.
+    private static func open(_ path: String, _ flags: Int32) -> OpaquePointer? {
+        var db: OpaquePointer?
+        guard sqlite3_open_v2(path, &db, flags, nil) == SQLITE_OK, let db else {
+            sqlite3_close(db)
+            return nil
+        }
+        sqlite3_busy_timeout(db, 5_000)
+        return db
     }
 
     private static func run(_ db: OpaquePointer, _ sql: String) throws {
