@@ -105,6 +105,17 @@ nonisolated struct MusicNode: Identifiable, Hashable, Sendable, Codable {
     /// wins (an MBID, a Discogs id, a picture), and the rest is decided by
     /// what the spellings say, never by where they were stored -- so two
     /// devices holding the same facts draw the same node.
+    /// Where the node sorts when nothing else separates it from another.
+    ///
+    /// Its id, for every node there has ever been. An artist under an identity
+    /// key (`discogs:…`, see `GraphIdentityKey`) sorts where the name it shows
+    /// would, with its id only to separate namesakes — so moving an artist
+    /// from their name to their entry does not move them in any list.
+    var presentationKey: String {
+        guard kind == .artist, key.contains(":") else { return id }
+        return Self.canonicalID(kindRaw: kind.rawValue, key: RecordingKey.normalizeArtist(title)) + "\u{1}" + id
+    }
+
     static func isPreferred(_ left: MusicNode, over right: MusicNode) -> Bool {
         left.preferenceKey.lexicographicallyPrecedes(right.preferenceKey)
     }

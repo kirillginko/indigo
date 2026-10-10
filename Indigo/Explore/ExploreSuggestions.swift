@@ -48,7 +48,7 @@ nonisolated struct ExploreSuggestion: Identifiable, Sendable, Codable {
     static func ranksAhead(_ left: ExploreSuggestion, _ right: ExploreSuggestion) -> Bool {
         if left.score != right.score { return left.score > right.score }
         if left.node.title != right.node.title { return left.node.title < right.node.title }
-        return left.id < right.id
+        return left.node.presentationKey < right.node.presentationKey
     }
 
     /// How far outside charted territory this sits, 0…1.

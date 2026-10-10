@@ -100,7 +100,7 @@ nonisolated enum ExploreRanker {
         }
 
         return found.values.sorted {
-            $0.weight == $1.weight ? $0.node.id < $1.node.id : $0.weight > $1.weight
+            $0.weight == $1.weight ? $0.node.presentationKey < $1.node.presentationKey : $0.weight > $1.weight
         }
     }
 
@@ -114,7 +114,7 @@ nonisolated enum ExploreRanker {
     /// What was met most recently, as `ListeningLog.recent` orders it.
     static func recent(_ personal: PersonalInputs, limit: Int) -> [PersonalInputs.Met] {
         Array(personal.met
-            .sorted { $0.lastAt == $1.lastAt ? $0.node.id < $1.node.id : $0.lastAt > $1.lastAt }
+            .sorted { $0.lastAt == $1.lastAt ? $0.node.presentationKey < $1.node.presentationKey : $0.lastAt > $1.lastAt }
             .prefix(limit))
     }
 
