@@ -154,6 +154,17 @@ final class CrateService {
         return digMembership.contains(Self.digKey(kind, identifier, providerID))
     }
 
+    /// The first of several keys one thing is kept under, if any is kept.
+    ///
+    /// An artist page answers to more than one: crated before MusicBrainz
+    /// answered, an artist is kept by name; afterwards the page asks by MBID,
+    /// and asking only that said a crated artist was not crated. Each row
+    /// stays under the key it was written with.
+    func keptKey(dig kind: CrateItemKind, among keys: [(identifier: String, providerID: String)])
+        -> (identifier: String, providerID: String)? {
+        keys.first { contains(dig: kind, identifier: $0.identifier, providerID: $0.providerID) }
+    }
+
     /// Remembered per address, because a Listen list asks about a dozen of
     /// them on every redraw and each one was two fetches.
     func rememberListening(_ url: URL, isCrated: Bool) {

@@ -84,9 +84,14 @@ struct ArtistDigView: View {
         let profile = profile
             ?? dig.cachedArtistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
             ?? ArtistProfile.placeholder(name: artistName, mbid: artistMBID)
-        let crateProvider = profile.mbid == nil ? "dig.artist.name" : "dig.artist.mbid"
-        let crateID = profile.mbid ?? RecordingKey.normalizeArtist(profile.name)
-        let isCrated = crate.contains(dig: .artist, identifier: crateID, providerID: crateProvider)
+        // Kept under its MBID when there is one, and otherwise by name — so
+        // an artist crated before MusicBrainz answered is kept by name. Every
+        // key the page answers to counts; a new row takes the first.
+        let crateKeys = Self.crateKeys(profile, opened: artistName, alsoCreditedAs: alsoCreditedAs)
+        let kept = crate.keptKey(dig: .artist, among: crateKeys)
+        let crateProvider = (kept ?? crateKeys[0]).providerID
+        let crateID = (kept ?? crateKeys[0]).identifier
+        let isCrated = kept != nil
         let collaborators = lanes.collaborators
         let producers = lanes.producers
         let personnel = lanes.personnel
@@ -795,6 +800,20 @@ struct ArtistDigView: View {
     /// a second copy of it, and the descent began by asking somebody to press
     /// past what they had just scrolled through. The labels, the discography
     /// and the aliases are on the page for the same reason.
+    /// The crate keys this page answers to, the one a new row takes first.
+    static func crateKeys(_ profile: ArtistProfile, opened: String, alsoCreditedAs: [String])
+        -> [(identifier: String, providerID: String)] {
+        var keys: [(identifier: String, providerID: String)] = []
+        if let mbid = profile.mbid { keys.append((mbid, "dig.artist.mbid")) }
+        var names = Set<String>()
+        for name in [profile.name, opened] + alsoCreditedAs {
+            let key = RecordingKey.normalizeArtist(name)
+            guard !key.isEmpty, names.insert(key).inserted else { continue }
+            keys.append((key, "dig.artist.name"))
+        }
+        return keys.isEmpty ? [(RecordingKey.normalizeArtist(profile.name), "dig.artist.name")] : keys
+    }
+
     private static func shown(_ profile: ArtistProfile) -> Set<String> {
         var ids: Set<String> = []
         for artist in profile.related {
