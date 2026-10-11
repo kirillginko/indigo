@@ -151,8 +151,7 @@ actor DigWorker {
         var walked: [MusicNode: (walk: IdentityNeighbourhood, evidence: String, generation: Int)] = [:]
         /// The last look's one-artist-one-candidate pass and known artists,
         /// for the same generation, starting points and rows.
-        var identityPass: (generation: Int, origins: [MusicNode], rows: PersonalInputs,
-                           collapsed: [IdentityNeighbourhood], known: (alsoKnown: Set<String>, digest: String))?
+        var identityPass: IdentityPass?
         var shows: [ShowProfile]?
         var tagKeys: Set<String>?
         var tags: [String: [String]] = [:]
@@ -160,6 +159,20 @@ actor DigWorker {
         var library: [String: Int]?
     }
     private var exploreCache = ExploreKnowledgeCache()
+
+    /// One look's identity work, kept for the next look in the same
+    /// generation with the same starting points and rows: the walks made one
+    /// artist one candidate, who the listener knows, the edges split for the
+    /// snapshot and the counts the diagnostics print. Re-splitting a dozen
+    /// walks of hundreds of edges on every look was most of a warm look.
+    private struct IdentityPass {
+        let generation: Int
+        let origins: [MusicNode]
+        let rows: PersonalInputs
+        let walked: [MusicNode: LocalKnowledgeAdapter.Walked]
+        let known: (alsoKnown: Set<String>, digest: String)
+        let counts: [String: Int]
+    }
     /// Moves whenever a part of the kept knowledge is worked out again, so a
     /// look whose knowledge is all kept reuses its digest instead of encoding
     /// a megabyte to arrive at the same string.
@@ -184,7 +197,7 @@ actor DigWorker {
     func exploreRun(
         asOf: Date, period: Int, generation asked: Int, scenes withScenes: Bool, rebuild: Bool, now: Date,
         personal known: PersonalInputs? = nil
-    ) -> ExploreRun {
+    ) async -> ExploreRun {
         refresh(asked)
         var report = ExploreBuildReport()
         func timed<T>(_ part: String, _ work: () -> T) -> T {
@@ -232,6 +245,11 @@ actor DigWorker {
             walks.append(walk)
             evidence.append("\(origin.id) \(digest)")
             fresh += 1
+            // Between starting points, whatever DIG has asked of this actor
+            // goes first: a page being opened should not wait behind a whole
+            // cold For You. This run holds its own graph and identity layer,
+            // so a newer generation arriving meanwhile cannot mix into it.
+            await Task.yield()
         }
         if fresh > 0 {
             report.rebuilt.append("neighbourhoods \(fresh)/\(origins.count)")
@@ -240,20 +258,39 @@ actor DigWorker {
         }
         // One artist, one candidate, across every starting point; and who the
         // listener knows. Kept while nothing under them has moved.
-        let collapsed: [IdentityNeighbourhood]
-        let knownArtists: (alsoKnown: Set<String>, digest: String)
-        if fresh == 0, let pass = exploreCache.identityPass, pass.generation == asked,
-           pass.origins == origins, pass.rows == rows {
-            (collapsed, knownArtists) = (pass.collapsed, pass.known)
+        let pass: IdentityPass
+        if fresh == 0, let kept = exploreCache.identityPass, kept.generation == asked,
+           kept.origins == origins, kept.rows == rows {
+            pass = kept
         } else {
-            collapsed = timed("identity.collapse") { identity.collapsing(walks) }
-            knownArtists = timed("identity.known") {
+            let collapsed = timed("identity.collapse") { identity.collapsing(walks) }
+            let known = timed("identity.known") {
                 Self.knownArtists(rows: rows, personal: personal, walks: collapsed, identity: identity)
             }
-            exploreCache.identityPass = (asked, origins, rows, collapsed, knownArtists)
+            var split: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+            var destinations = Set<String>()
+            var merged = Set<String>()
+            timed("identity.split") {
+                for (origin, walk) in zip(origins, collapsed) {
+                    // Sorted once here and kept: the snapshot sorts each
+                    // neighbourhood on every look, which is nearly free on
+                    // edges already in order and costly on edges that are not.
+                    let edges = walk.edges.all
+                    split[origin] = LocalKnowledgeAdapter.split(edges)
+                    for edge in edges where edge.to.kind == .artist { destinations.insert(edge.to.id) }
+                    for (id, names) in walk.keys where names.count > 1 && id.hasPrefix("artist:discogs:") { merged.insert(id) }
+                }
+            }
+            let verified = destinations.filter { $0.hasPrefix("artist:discogs:") || $0.hasPrefix("artist:mbid:") }.count
+            pass = IdentityPass(
+                generation: asked, origins: origins, rows: rows, walked: split, known: known,
+                counts: ["identityVerified": verified, "identityUnresolved": destinations.count - verified,
+                         "identityMerged": merged.count, "identityKnown": known.alsoKnown.count])
+            exploreCache.identityPass = pass
         }
-        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
-        for (origin, walk) in zip(origins, collapsed) { walked[origin] = LocalKnowledgeAdapter.split(walk.edges.all) }
+        let walked = pass.walked
+        let knownArtists = pass.known
+        for (phase, ms) in identity.takePhases() { report.milliseconds[phase, default: 0] += ms }
         if exploreCache.shows == nil {
             exploreCache.shows = timed("shows") { adapter.shows() }
             report.rebuilt.append("shows")
@@ -304,19 +341,14 @@ actor DigWorker {
             lastKnowledgeDigests = (digestKey, shared, local)
         }
         report.bytes = ["personal": personalDigest.bytes, "shared": shared.bytes, "deviceLocal": local.bytes]
-        let destinations = Set(collapsed.flatMap { $0.edges.all.map(\.to) }).filter { $0.kind == .artist }
-        report.counts = [
-            "identityVerified": destinations.filter { GraphIdentityKey(nodeKey: $0.key) != nil }.count,
-            "identityUnresolved": destinations.filter { GraphIdentityKey(nodeKey: $0.key) == nil }.count,
-            "identityMerged": Set(collapsed.flatMap { $0.keys.filter { $0.value.count > 1 && $0.key.hasPrefix("artist:discogs:") }.map(\.key) }).count,
-            "identityKnown": knownArtists.alsoKnown.count,
-            "startingPoints": origins.count,
-            "edges": knowledge.shared.neighbourhoods.reduce(0) { $0 + $1.edges.count },
-            "deviceLocalEdges": knowledge.deviceLocal.neighbourhoods.reduce(0) { $0 + $1.edges.count },
-            "nodes": knowledge.shared.nodes.count,
-            "shows": knowledge.shared.shows.count,
-            "sceneCities": knowledge.shared.scenes?.cities.count ?? 0,
-        ]
+        var counts = pass.counts
+        counts["startingPoints"] = origins.count
+        counts["edges"] = knowledge.shared.neighbourhoods.reduce(0) { $0 + $1.edges.count }
+        counts["deviceLocalEdges"] = knowledge.deviceLocal.neighbourhoods.reduce(0) { $0 + $1.edges.count }
+        counts["nodes"] = knowledge.shared.nodes.count
+        counts["shows"] = knowledge.shared.shows.count
+        counts["sceneCities"] = knowledge.shared.scenes?.cities.count ?? 0
+        report.counts = counts
         var stamp = ExploreStamp(
             format: knowledge.format, period: period, personal: personalDigest.digest,
             shared: shared.digest, deviceLocal: local.digest

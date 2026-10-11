@@ -271,21 +271,32 @@ nonisolated final class IdentityEvidenceFold {
     /// when there is none to ask.
     let filed: (String) -> DiscogsArtist??
     private var byKey: [String: DiscogsArtist]?
+    private var fetched: [String: DiscogsArtist?] = [:]
+    /// Below this many names, one fetch each; past it, every record at once.
+    private static let fetchedAlone = 64
 
-    /// From the assembled fold when there is one, and otherwise from one
-    /// fetch of every filed record's name and id — never what assembles the
-    /// graph's six tables (a second on a real store, which a walk of stored
-    /// edges never needs), and never a fetch per name (three seconds of For
-    /// You's walks on the same store).
+    /// From the assembled fold when there is one. Otherwise a few names are
+    /// fetched one at a time — the twelve artists of a listener's history
+    /// cost a second when they read five thousand records to place them — and
+    /// past a few dozen, every filed record's name and id in one fetch: a walk
+    /// asks about hundreds, and a fetch apiece was three seconds of For You's
+    /// walks on a real store. Never what assembles the graph's six tables.
     func filedRecord(named name: String, in context: ModelContext) -> DiscogsArtist? {
         if let assembled = filed(name) { return assembled }
+        let key = RecordingKey.normalizeArtist(name)
         if byKey == nil {
+            if let held = fetched[key] { return held }
+            if fetched.count < Self.fetchedAlone {
+                let found = DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: name)
+                fetched[key] = found
+                return found
+            }
             var descriptor = FetchDescriptor<DiscogsArtist>()
             descriptor.propertiesToFetch = [\.nameKey, \.discogsID, \.name]
             byKey = Dictionary(((try? context.fetch(descriptor)) ?? []).map { ($0.nameKey, $0) },
                                uniquingKeysWith: { first, _ in first })
         }
-        return byKey?[RecordingKey.normalizeArtist(name)]
+        return byKey?[key]
     }
 
     init(context: ModelContext, filed: @escaping (String) -> DiscogsArtist??) {

@@ -78,6 +78,10 @@ nonisolated enum CreditEdgeIdentity {
 nonisolated struct CreditEdgeScope {
     let context: ModelContext
     let graph: GraphStore
+    /// Where DIG's records and the kept credits are read: a store with a fold
+    /// when the caller walks many nodes (`IdentityGraph`), and by fetching
+    /// otherwise. The same answers either way.
+    var identityStore: ArtistIdentityStore? = nil
 
     /// The credits behind a node's credit edges, or none.
     func credits(behind node: MusicNode) -> [ReleaseCredit] {
@@ -95,16 +99,21 @@ nonisolated struct CreditEdgeScope {
     /// The releases that are this artist's.
     func releases(of node: MusicNode) -> [Int] {
         var ids: [Int] = []
-        let enricher = DiscogsEnricher(context: context, client: DiscogsClient())
-        let identityStore = ArtistIdentityStore(context: context)
-        let filed = enricher.cachedArtist(named: node.title)
+        let identityStore = identityStore ?? ArtistIdentityStore(context: context)
+        let filed = identityStore.filedRecord(named: node.title)
             .flatMap { $0.isFiledUnderItsOwnName(identityStore: identityStore) && RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator($0.name)) == node.key ? $0 : nil }
         ids += filed?.releaseDiscogsIDs.filter { $0 > 0 } ?? []
-        let underName = graph.releases(creditedTo: node.key).map(\.discogsID)
-        let attributions = DigEngine.attributions(
-            of: underName, subjectID: node.discogsID ?? filed?.discogsID,
-            subjectKeys: [node.key], context: context)
-        ids += underName.filter { attributions[$0]?.isShown ?? true }
+        let underName = graph.releaseIDs(creditedTo: node.key)
+        let subjectID = node.discogsID ?? filed?.discogsID
+        if let fold = identityStore.fold {
+            ids += underName.filter {
+                ReleaseAttribution.decide(subjectID: subjectID, subjectKeys: [node.key], credits: fold.credits[$0]).isShown
+            }
+        } else {
+            let attributions = DigEngine.attributions(
+                of: underName, subjectID: subjectID, subjectKeys: [node.key], context: context)
+            ids += underName.filter { attributions[$0]?.isShown ?? true }
+        }
         var seen = Set<Int>()
         return ids.filter { seen.insert($0).inserted }
     }

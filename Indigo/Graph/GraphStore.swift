@@ -52,6 +52,19 @@ nonisolated struct GraphStore {
         /// Whether the tables this store holds were built from an offer or
         /// read from nothing. Only a test reads it. See `builtFromInheritedTables`.
         var builtFromInherited = false
+        /// Release ids by every folded name their credits carry, read alone.
+        /// See `releaseIDs(creditedTo:)`.
+        var creditedReleases: CreditedReleases?
+        /// The last generation's, offered to this one as `inherited` is.
+        var inheritedCreditedReleases: CreditedReleases?
+    }
+
+    /// Release ids by credited name, and what the read saw: how many records
+    /// there were and when it began.
+    private struct CreditedReleases {
+        let byCredit: [String: [Int]]
+        let count: Int
+        let readAt: Date
     }
 
     init(context: ModelContext, inheriting previous: GraphStore? = nil) {
@@ -68,6 +81,7 @@ nonisolated struct GraphStore {
         // 1425ms. Holding the offer open until somebody takes it keeps the
         // chain intact across the generations nobody walked.
         box.inherited = previous?.box.caches ?? previous?.box.inherited
+        box.inheritedCreditedReleases = previous?.box.creditedReleases ?? previous?.box.inheritedCreditedReleases
     }
 
     /// Whether this store's tables came from the last generation's.
@@ -145,6 +159,53 @@ nonisolated struct GraphStore {
 
     /// Every record an artist is credited on, from the fold rather than from
     /// a scan of the whole table. See `Caches`.
+    /// The ids of every record credited to a name — what
+    /// `releases(creditedTo:)` answers, without the records.
+    ///
+    /// From the tables when this store has them or was offered the last
+    /// generation's, which is cheap. Otherwise from one read of the release
+    /// table alone, its credit names folded the way the tables fold them: the
+    /// six tables cost 1.7s to read from cold on a real store, and the
+    /// identity graph asks this of every artist it walks — For You's first look
+    /// paid all of it to learn which credits to read.
+    func releaseIDs(creditedTo key: String) -> [Int] {
+        if box.caches != nil || box.inherited != nil {
+            return caches.releases(creditedTo: key).map(\.discogsID)
+        }
+        if box.creditedReleases == nil, let offered = box.inheritedCreditedReleases {
+            // Handed on while the table is as it was read: the same number of
+            // records, none written since (with the overlap the tables allow,
+            // for a record stamped before the read and saved after it).
+            let since = offered.readAt.addingTimeInterval(-5)
+            let count = (try? context.fetchCount(FetchDescriptor<DiscogsReleaseRecord>())) ?? -1
+            let newer = (try? context.fetchCount(FetchDescriptor<DiscogsReleaseRecord>(
+                predicate: #Predicate { $0.fetchedAt > since }))) ?? -1
+            if count == offered.count, newer == 0 { box.creditedReleases = offered }
+        }
+        if box.creditedReleases == nil {
+            box.creditedReleases = Trace.step("t.creditedReleaseIDs") {
+                // Whole rows: SwiftData cannot fetch an array attribute alone.
+                let readAt = Date()
+                var byCredit: [String: [Int]] = [:]
+                var folded: [String: String] = [:]
+                let releases = (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
+                for release in releases {
+                    for raw in release.credits where !raw.isEmpty {
+                        let key: String
+                        if let known = folded[raw] { key = known } else {
+                            key = RecordingKey.normalizeArtist(raw)
+                            folded[raw] = key
+                        }
+                        guard !key.isEmpty else { continue }
+                        byCredit[key, default: []].append(release.discogsID)
+                    }
+                }
+                return CreditedReleases(byCredit: byCredit, count: releases.count, readAt: readAt)
+            }
+        }
+        return box.creditedReleases?.byCredit[key] ?? []
+    }
+
     func releases(creditedTo key: String) -> [DiscogsReleaseRecord] {
         caches.releases(creditedTo: key)
     }

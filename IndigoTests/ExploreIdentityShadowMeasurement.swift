@@ -147,6 +147,17 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         func ms(_ report: ExploreBuildReport) -> String {
             report.milliseconds.sorted { $0.key < $1.key }.map { "\($0.key)=\(Int($0.value.rounded()))" }.joined(separator: " ")
         }
+        func elapsed(_ work: () -> Void) -> Int {
+            let started = ContinuousClock.now
+            work()
+            let spent = ContinuousClock.now - started
+            return Int(Double(spent.components.seconds) * 1000 + Double(spent.components.attoseconds) / 1e15)
+        }
+        // The graph's tables alone, cold.
+        out.append("cost (ms): graph table assembly, cold, \(elapsed { GraphStore(context: ModelContext(container)).prepare() })")
+        // Today's walks alone: stored edges per starting point, cold.
+        let walkGraph = GraphStore(context: ModelContext(container))
+        out.append("cost (ms): today's walks (stored edges), cold, \(elapsed { for origin in ExploreRanker.startingPoints(rows) { _ = walkGraph.neighbors(of: origin) } })")
         // Today's path, cold, on a context of its own: the baseline.
         let baselineStarted = ContinuousClock.now
         _ = LocalKnowledgeAdapter(context: ModelContext(container)).snapshot(for: rows, scenes: false)

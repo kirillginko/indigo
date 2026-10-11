@@ -110,6 +110,22 @@ nonisolated final class IdentityGraph {
     private let identityStore: ArtistIdentityStore
     private let identifier: ArtistNodeIdentifier
     private let scope: CreditEdgeScope
+    /// Where walks have spent their time, by phase, since this graph was made
+    /// or `takePhases()` last asked. For You's build report reads it.
+    private var phases: [String: Duration] = [:]
+
+    private func measure<T>(_ phase: String, _ work: () -> T) -> T {
+        let started = ContinuousClock.now
+        let value = work()
+        phases[phase, default: .zero] += ContinuousClock.now - started
+        return value
+    }
+
+    /// The time spent per phase, in milliseconds, and a fresh start.
+    func takePhases() -> [String: Double] {
+        defer { phases = [:] }
+        return phases.mapValues { Double($0.components.seconds) * 1_000 + Double($0.components.attoseconds) / 1e15 }
+    }
 
     init(context: ModelContext, graph: GraphStore? = nil) {
         self.context = context
@@ -124,7 +140,7 @@ nonisolated final class IdentityGraph {
         let identifier = ArtistNodeIdentifier(context: context, identityStore: identityStore)
         self.identifier = identifier
         canonicalizer = GraphCanonicalizer(identify: identifier.identify)
-        scope = CreditEdgeScope(context: context, graph: graph)
+        scope = CreditEdgeScope(context: context, graph: graph, identityStore: identityStore)
     }
 
     deinit {}
@@ -159,10 +175,10 @@ nonisolated final class IdentityGraph {
         var dependencies = IdentityDependencies()
         if node.kind == .artist { dependencies.names.insert(node.key) }
         dependencies.entries.formUnion([node.discogsID, entry].compactMap { $0 })
-        for reference in references(of: canonical, reached: node) {
+        for reference in measure("walk.references", { references(of: canonical, reached: node) }) {
             if reference.kind == .artist { dependencies.names.insert(reference.key) }
             for raw in edges(from: reference, entry: entry, reading: &dependencies).sorted(by: MusicEdge.precedes) {
-                let edge = canonicalizer.canonical(raw)
+                let edge = measure("walk.canonical") { canonicalizer.canonical(raw) }
                 if raw.to.kind == .artist {
                     dependencies.names.insert(raw.to.key)
                     dependencies.entries.formUnion([raw.to.discogsID, edge.to.discogsID].compactMap { $0 })
@@ -175,9 +191,9 @@ nonisolated final class IdentityGraph {
         }
         for identity in set.all.map(\.to) where identity.kind == .artist {
             guard let id = identity.discogsID, GraphIdentityKey(nodeKey: identity.key) != nil else { continue }
-            keys[identity.id, default: []].formUnion(names(of: id, title: identity.title).map(RecordingKey.normalizeArtist))
+            keys[identity.id, default: []].formUnion(measure("walk.names") { names(of: id, title: identity.title) }.map(RecordingKey.normalizeArtist))
         }
-        var found = collapsing([IdentityNeighbourhood(origin: canonical, edges: set, keys: keys)])[0]
+        var found = measure("walk.collapse") { collapsing([IdentityNeighbourhood(origin: canonical, edges: set, keys: keys)])[0] }
         found.dependencies = dependencies
         return found
     }
@@ -254,28 +270,30 @@ nonisolated final class IdentityGraph {
     /// identity being walked, when it is one: its own alias list gives alias
     /// edges their ids, and a release its namesake's credits claim is not its.
     private func edges(from reference: MusicNode, entry: Int?, reading dependencies: inout IdentityDependencies) -> [MusicEdge] {
-        var edges = graph.neighbors(of: reference).all
+        var edges = measure("walk.graph") { graph.neighbors(of: reference).all }
         // The releases behind its credit edges, worked out once, and their
         // credits from the fold rather than a fetch apiece.
         let behind: [Int]
         switch reference.kind {
         case .release: behind = [reference.discogsID].compactMap { $0 }
-        case .artist: behind = scope.releases(of: reference)
+        case .artist: behind = measure("walk.scope") { scope.releases(of: reference) }
         default: behind = []
         }
         dependencies.releases.formUnion(behind)
-        edges = CreditEdgeIdentity.attach(edges, entries: CreditEdgeIdentity.entries(in: behind.flatMap { credits($0) ?? [] }))
+        edges = measure("walk.credits") {
+            CreditEdgeIdentity.attach(edges, entries: CreditEdgeIdentity.entries(in: behind.flatMap { credits($0) ?? [] }))
+        }
         guard reference.kind == .artist, let id = entry else { return edges }
         if let facts = identityStore.facts(id) {
             edges = AliasEdgeIdentity.attach(edges, entries: AliasEdgeIdentity.entries(of: facts))
         }
         dependencies.releases.formUnion(edges.compactMap { $0.to.kind == .release ? $0.to.discogsID : nil })
-        return edges.filter { edge in
+        return measure("walk.attribution") { edges.filter { edge in
             guard edge.to.kind == .release, let releaseID = edge.to.discogsID else { return true }
             return ReleaseAttribution.decide(
                 subjectID: id, subjectKeys: [reference.key], credits: credits(releaseID)
             ).isShown
-        }
+        } }
     }
 
     /// A name row beside the one verified entry that name belongs to here is
@@ -298,10 +316,19 @@ nonisolated final class IdentityGraph {
                 for name in names { owners[name, default: []].insert(id) }
             }
         }
+        // Nothing verified here, nothing to fold into.
+        guard !owners.isEmpty else { return walks }
         var dropped: Set<String> = []
-        let names = Set(walks.flatMap { $0.edges.all.map(\.to) })
-            .filter { $0.kind == .artist && GraphIdentityKey(nodeKey: $0.key) == nil }
-        for node in names.sorted(by: { $0.id < $1.id }) {
+        // Every spelling a name row arrived under, as before: only those a
+        // verified entry here answers to can be folded, so only they are read.
+        var names: [String: Set<MusicNode>] = [:]
+        for walk in walks {
+            for edge in walk.edges.edges.values where edge.to.kind == .artist && owners[edge.to.key] != nil
+                && GraphIdentityKey(nodeKey: edge.to.key) == nil {
+                names[edge.to.id, default: []].insert(edge.to)
+            }
+        }
+        for node in names.keys.sorted().flatMap({ (names[$0] ?? []).sorted { $0.title < $1.title } }) {
             guard let owner = owners[node.key], owner.count == 1, let identityID = owner.first,
                   identityStore.verdict(for: node.title) == nil else { continue }
             if let page = identityStore.artistResolution(ArtistReference(name: node.title)).identity.discogsID,
