@@ -445,3 +445,278 @@ quality beyond evidence — whether the backend's label- and radio-heavy top
 20 is *better* music for this listener is a judgement the numbers above
 cannot make.
 
+
+## 9. Phase 2 design: immutable knowledge generations (proposal, 2026-10-12)
+
+*For review before any publisher code. Pilot-sized; nothing global.*
+
+### 9.1 What a generation is
+
+One generation per UTC day: **every answer in it computed from one Postgres
+snapshot**, materialised into immutable R2 objects, and named by a manifest
+that is itself immutable. Postgres is read once per generation; after that,
+the generation never depends on Postgres again, so a published generation is
+reproducible for as long as it is retained, whatever the tables do.
+
+**One snapshot, no new tables.** The worker reaches Postgres through
+PostgREST, where every call is its own transaction — so a generation built
+from many `explore_knowledge` calls over minutes would mix database states,
+and the edge rebuild (every third hour at :23) or radio ingest could land
+between two of them. The cut is therefore **one SQL statement**: a new
+service-role-only function, `knowledge_cut(p_batches jsonb)`, declared `STABLE`
+`LANGUAGE sql`, that applies `explore_knowledge` to every batch of the demand
+set inside one query. `STABLE` functions called from a query see that query's
+snapshot, so every answer — and the `generation` id each reports — comes
+from the same database state. It also returns `pg_current_snapshot()` and the
+statement's start time as the generation's source watermark. No table is
+added; the function is read-only and not callable by `anon`.
+
+If the pilot's demand set ever outgrows one statement's comfortable runtime,
+the fallback is a direct Postgres connection holding one `REPEATABLE READ
+READ ONLY` transaction across calls — same guarantee, more moving parts.
+
+**Bundles are pinned by digest.** Artist bundles are built independently and
+their `refs/artists/<id>.json` move at any time. The manifest records the
+bundle *digest* each starting artist had when the cut read its reference, so
+the generation names immutable objects only.
+
+### 9.2 R2 layout
+
+Alongside the existing `knowledge/v1/` objects (pages, discographies,
+bundles, refs), under `knowledge/v1/generations/`:
+
+| Key | Mutable | Cache-Control | What |
+|---|---|---|---|
+| `objects/<aa>/<sha256>.json` | never | immutable, 1 year | one entity's answer (§9.4) |
+| `identity/<aa>/<sha256>.json` | never | immutable, 1 year | the generation's identity snapshot (§9.5) |
+| `manifests/<aa>/<sha256>.json` | never | immutable, 1 year | a manifest (§9.3) |
+| `days/<YYYY-MM-DD>.json` | write-once | immutable | `{date, manifest, publishedAt}` |
+| `current.json` | yes | 60 s | the retained, complete generations, newest first |
+
+Every object is content-addressed: an entity answer unchanged since yesterday
+is the same digest and is not written again. `days/<date>.json` is written
+with `If-None-Match: *` (R2 supports conditional PUT), so a day is published at
+most once and can never be overwritten.
+
+### 9.3 Manifest schema (`indigo.knowledge-generation/1`)
+
+General, not For You–specific: entities, their identities, and their
+relationships with provenance. Ranking stays on the device.
+
+```json
+{
+  "format": "indigo.knowledge-generation/1",
+  "id": "kg-2026-10-12",
+  "date": "2026-10-12",
+  "previous": "<manifest sha256 of the last published generation, or null>",
+  "source": {
+    "cutAt": "2026-10-12T00:41:07Z",
+    "snapshot": "<pg_current_snapshot() text>",
+    "edgesGeneration": "edges-165911",
+    "statementMs": 8421,
+    "bundleRefsReadAt": "2026-10-12T00:41:20Z"
+  },
+  "demand": { "digest": "<sha256 of the sorted demand set>", "nodes": 34, "artists": 312 },
+  "identity": "<sha256 of the identity snapshot object>",
+  "nodes": {
+    "artist:hype williams": {
+      "status": "found",
+      "answer": "<object sha256>",
+      "coverage": { "edges": 241, "kinds": { "sharedLabel": 120, "playedInShow": 31 },
+                    "targetsWithDiscogsID": 180, "targetsByName": 61 },
+      "bundles": [
+        { "discogsID": 1874027, "digest": "<bundle sha256>", "status": "partial", "read": 71, "of": 84 },
+        { "discogsID": 398459, "status": "missing" }
+      ]
+    },
+    "broadcast:nts|guests": { "status": "unsupported" },
+    "artist:somebody new": { "status": "deferred" }
+  },
+  "artists": {
+    "dean blunt": { "status": "found", "answer": "<object sha256>",
+                    "coverage": { "episodes": 12, "genres": 7, "rosters": 2 } }
+  },
+  "summary": {
+    "complete": true,
+    "nodes": { "found": 30, "unknown": 2, "unsupported": 2, "failed": 0 },
+    "artists": { "found": 300, "unknown": 12, "failed": 0 },
+    "bundles": { "complete": 20, "partial": 3, "missing": 4, "noIdentity": 1 },
+    "shows": 410, "sceneRosters": 38
+  }
+}
+```
+
+**Statuses** are explicit and closed: `found`, `unknown` (the backend has no
+such entity), `unsupported` (a kind it does not walk), `deferred` (not in the
+demand set this generation — see §9.7), `failed` (could not be computed).
+Partial knowledge (a partial bundle, a neighbourhood with name-only targets)
+is `found` with its coverage numbers, never silently filled in.
+
+**Complete** means: every demanded entity has a terminal status (`found`,
+`unknown`, `unsupported`) and every object the manifest names was written,
+read back and verified by digest. A generation with any `failed` entity is not
+complete and is not published.
+
+### 9.4 Entity answers and relationship provenance
+
+An entity answer is `explore_knowledge`'s answer for that one node or artist
+(format 3), with every relationship target carrying how it is identified:
+
+```json
+{ "kind": "artist", "name": "Dean Blunt", "key": "dean blunt",
+  "discogsID": 2419343, "idEvidence": "discogs-document" }
+```
+
+| `idEvidence` | Meaning | Places an identity on the device? |
+|---|---|---|
+| `discogs-document` | the row was created from a Discogs document under this id | yes (an external id) |
+| `musicbrainz-link` | MusicBrainz links the row to this Discogs id (`musicbrainz_discogs`) | yes |
+| `credit` | a release credit names this entry (bundles) | yes |
+| `adopted-by-name` | the row was first filed by name (radio) and later took this Discogs id because it was the only row with that folded name | no — kept, marked consistent, never placed |
+| absent | no Discogs id | no — the target stays name-only |
+
+The publisher never derives an id from a name; it only carries ids the
+catalogue holds, with the evidence above. `adopted-by-name` exists because the
+worker's `resolveEntity` adopts a uniquely named row when a Discogs id arrives
+(that is how radio artists gained ids); `external_ids` does not record which
+rows that happened to. The pilot classifies them without a new table: a row
+holding both an `nts` and a `discogs` external id was adopted; a `discogs`-only
+row came from a Discogs document. The pilot reports how many targets fall
+into each class before the client trusts any of them.
+
+Restoring ids on SQL artist targets is Phase 1's top priority (§8). They were
+dropped in 0074 because looking them up per call cost 1,400 lookups and the
+statement timeout; here they are looked up once per generation, by the
+service role, without anon's timeout.
+
+Aliases stay distinct: an `aliasOrProject`/`sameAlias` edge keeps both
+entities, each with its own id and evidence. Unresolved name-only targets stay
+name-only.
+
+### 9.5 Identity snapshot
+
+One object per generation, scoped to the demand set's entities and their
+candidate identities (decision 4): for each name key the generation touches,
+the Discogs entries with evidence (`discogs-document`, `musicbrainz-link`,
+`credit`), explicit **namesake markers** where more than one entry answers to
+the same name, and alias/group/member links between entries. Derived only
+from catalogue rows, `external_ids` and pinned bundles — never from any
+device's cache. The device's canonicalizer reads it as backend identity
+evidence (the Phase 1 rule), so a new device has verified identities without
+opening pages.
+
+### 9.6 Atomic publication and rollback
+
+The daily job (worker cron, 00:40 UTC, after the 00:23 edge rebuild):
+
+1. **Demand**: read the demand set (§9.7), sort it, digest it.
+2. **Cut**: one `knowledge_cut` statement; read the starting artists' bundle
+   refs and pin their digests.
+3. **Write objects**: each answer and the identity snapshot under its digest,
+   skipping digests that already exist (a HEAD, Class B). Every write
+   reserves budget through `r2_reserve` first; a refused reservation aborts.
+4. **Verify**: read every written object back and check its digest.
+5. **Manifest**: write it under its digest; read back; verify.
+6. **Publish**: write `days/<date>.json` with `If-None-Match: *`. This is the
+   commit point. A second run the same day finds it and stops.
+7. **Advertise**: rewrite `current.json` with the new day first and the
+   previous six complete days after it.
+
+**Failure before step 6** leaves nothing visible: clients keep using the last
+generation in `current.json`; orphaned objects are collected by retention.
+**Rollback after publication** never deletes or rewrites anything: a bad
+generation is withdrawn by rewriting `current.json` without it (listed under
+`withdrawn`, with a reason). Clients that pinned it move to the newest listed
+generation at their next look; `days/<date>.json` stays for audit. No day is
+ever republished; a corrected generation waits for the next day.
+
+### 9.7 Demand sets and missing demand
+
+**Pilot demand set**: fixed and committed — the starting points and the
+artists their rows name, from this Mac's Development and Production rows
+(the iPhone's are the same synced rows), plus the existing
+`PILOT_ARTISTS`. About 35 nodes and 320 artists.
+
+**After the pilot** (proposal, not built in Phase 2): devices note what they
+asked for through a SECURITY DEFINER RPC that enqueues deduplicated
+`knowledge_demand` rows in the existing `enrichment_jobs` table (dedupe key:
+entity + UTC date; no new table; entity keys only, no user or device id);
+the cut reads the last seven days of them. Because demand derives from synced
+personal data, two devices with the same rows ask for the same entities.
+
+**Missing demand** (the newly installed iPhone asking for a neighbourhood that
+was not in yesterday's cut): **deferred**, as you proposed. In the pinned
+generation that entity is `deferred` (or absent, which the client reads as
+`deferred`); For You's shared ranked blocks treat it as a starting point with
+no neighbourhood, identically on every device holding that generation; the
+demand note makes the next generation include it. Never served from an older
+generation (that would mix generations) and never fetched live into a shared
+ranking. DIG keeps discovering immediately with live and local knowledge,
+outside the generation.
+
+### 9.8 Client pinning and offline
+
+- Read `current.json`; choose the newest listed generation whose date is ≤
+  the device's UTC date. Fetch its manifest by digest and verify.
+- Fetch only the objects for this device's own entities (its starting points
+  and the artists its rows name), each by digest, verified; keep them in an
+  on-disk content-addressed cache with the manifest.
+- Rank from one manifest only. If a needed object cannot be fetched, the
+  generation is unusable on this device: use the last fully fetched
+  generation — whole — and say so in diagnostics. Never mix objects across
+  manifests.
+- Offline: the last pinned generation and its objects, indefinitely; on
+  return after more than seven days, move to the newest listed generation.
+- The FY stamp gains the manifest digest, so two devices' codes say whether
+  they ranked from the same generation.
+- Shadow only in Phase 2: none of this changes the visible For You.
+
+### 9.9 Retention
+
+Seven complete generations in `current.json`. A weekly sweep lists
+`generations/manifests/`, computes the set of objects referenced by every
+manifest named in `current.json` and by every `days/` entry younger than
+nine days (two days' grace for devices mid-fetch), and deletes generation
+objects outside it. It never deletes anything outside `generations/` —
+bundles, pages and discographies belong to the existing pipeline, which
+never deletes content-addressed objects either. Deletions are logged with
+the manifest set that justified them.
+
+### 9.10 Estimated cost (pilot)
+
+From Phase 1's measured sizes (646–721 KB for 12 nodes + ~150 artists):
+
+| | Per generation | Per month |
+|---|---|---|
+| Objects written (new digests only) | ≤ ~360 (≈ 350 answers + identity + manifest + day; fewer when unchanged) | ≤ ~11,000 Class A — 1.1% of the free million, 1.4% of the 800k cap |
+| Bytes written | ≈ 1.5–2.5 MB | ≈ 60 MB |
+| Retained storage | ≈ 7 × 2 MB, less after dedupe | ≈ 15 MB of the 8 GB cap |
+| Device reads | 1 `current.json` + 1 manifest + ~30 objects per new generation | trivial against 10M Class B |
+| Publication time | one statement (to measure; estimated 5–20 s) + ~360 PUTs and GETs at 8-way concurrency | — |
+
+All of this is to be measured in the pilot (§9.11) rather than trusted.
+
+### 9.11 Pilot plan (each step its own commit)
+
+1. **Provenance count**: how many catalogue artist rows hold `discogs`-only,
+   `nts`+`discogs`, `musicbrainz_discogs` ids; how many SQL edge targets
+   would carry an id under each `idEvidence`. Read-only queries.
+2. **`knowledge_cut`** (migration, service role only, read-only) and its
+   test against the pilot demand set: one snapshot, answers byte-equal to
+   `explore_knowledge` from the same snapshot, statement time measured.
+3. **Publisher** (worker, `generations.ts`, pure core plus R2 deps, like
+   `knowledge.ts`): steps 1–7, dry-run mode that writes nothing, tests for
+   every failure point (abort before commit leaves `current.json` unchanged;
+   a second publish the same day is a no-op; a corrupt object fails
+   verification).
+4. **One real publication** for the pilot demand set; benchmarks: statement
+   time, object count and sizes, PUT/GET counts and latency, publication
+   time, budget reserved.
+5. **Client** (shadow): pin, fetch, verify, cache, fall back; FY stamp with
+   the manifest digest; the Phase 1 measurement re-run on the pinned
+   generation, and on two copies to show byte-identical answers hours apart.
+6. **Retention sweep** in dry-run against the first week's generations.
+
+Out of Phase 2: backend-authoritative For You, a global style index, a
+catalogue-wide backfill, any new table, and changes to the visible For You,
+DIG, Explore, weights, CloudKit or goldens.
