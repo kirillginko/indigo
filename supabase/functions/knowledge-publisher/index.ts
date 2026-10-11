@@ -6,15 +6,24 @@
 // published generation and finishes advertising it; it never publishes a day
 // twice.
 //
-// Only the service role may ask: the gateway checks the key is the project's,
-// and the function checks it is the service role's by calling a function only
-// the service role can (r2_budget). The publishable key reaches the gateway
-// and stops here.
+// Only the holder of KNOWLEDGE_PUBLISH_TOKEN may ask: a random token set as a
+// function secret and kept in Vault (`indigo_publisher_token`), so the one
+// manual trigger is a SQL statement run by the database owner and nobody
+// handles a key. The worker's Vault key will not do: it is the app's
+// publishable key, which every copy of the app holds.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import pilot from "../_shared/testdata/pilot_demand_v1.json" with { type: "json" };
 import { type Demand, publishGeneration } from "../_shared/generations.ts";
 import { liveGenerationDeps } from "../_shared/generations_live.ts";
+
+/// Equal, without stopping at the first difference.
+function sameText(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -23,10 +32,9 @@ function json(body: unknown, status = 200): Response {
 Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const url = Deno.env.get("SUPABASE_URL")!;
-  const key = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-  const caller = createClient(url, key, { auth: { persistSession: false } });
-  const { error: denied } = await caller.rpc("r2_budget");
-  if (denied) return json({ error: "forbidden" }, 403);
+  const token = Deno.env.get("KNOWLEDGE_PUBLISH_TOKEN") ?? "";
+  const presented = req.headers.get("x-publish-token") ?? "";
+  if (token.length < 32 || !sameText(presented, token)) return json({ error: "forbidden" }, 403);
 
   let body: Record<string, unknown> = {};
   try {
