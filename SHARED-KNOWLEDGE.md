@@ -720,3 +720,96 @@ All of this is to be measured in the pilot (§9.11) rather than trusted.
 Out of Phase 2: backend-authoritative For You, a global style index, a
 catalogue-wide backfill, any new table, and changes to the visible For You,
 DIG, Explore, weights, CloudKit or goldens.
+
+## 10. Phase 2 pilot: provenance audit and the consistent cut (2026-10-12)
+
+Decisions recorded: `knowledge_cut` approved (read-only, publishing worker /
+service role only, no tables); 00:40 UTC, publishing only with proof that
+the 00:23 rebuild succeeded; the fixed pilot demand set, frozen with its
+digest. Results below are read-only measurements on the live database; no
+function has been created yet.
+
+### 10.1 Pilot demand set (frozen)
+
+`supabase/functions/_shared/testdata/pilot_demand_v1.json`, sha256
+`4058f30adc6862e7f1312cc2653605935c0598b1a97570e8ce14083984bad57d`: **24
+nodes** (16 artists, 5 broadcasts, 2 stations, 1 recording) and **163
+artists** — smaller than the ~35/320 estimated, because the Development and
+Production starting points overlap. Built from the rows as kept
+(`PilotDemandExport`), with these cases added and labelled: Prefuse73 /
+Prefuse 73 (verified spelling), Hype Williams (namesakes), Anika / Annika
+Henderson and Mica Levi / Micachu (aliases), Duenn (lookalike), Attilio
+Novellino (radio name and credit), Dean Blunt and Joanne Robertson (known
+artists), and a name nobody files (unknown). Stations and a recording cover
+`unsupported`.
+
+### 10.2 Identity provenance
+
+Catalogue-wide artist rows (118,561):
+
+| Identity on the row | Rows | Share |
+|---|---|---|
+| Discogs only — created from Discogs documents | 22,521 | 19% |
+| Discogs and NTS — a radio name joined to a Discogs entry by name | 5,587 | 5% |
+| MusicBrainz → Discogs link | 2 | 0% |
+| NTS only — a radio name | 90,452 | 76% |
+
+`music_relationships` holds **only radio relationships** (202,752 artist
+`radio_neighbor` edges, 173,802 `played_by`); label peers come from the
+releases Discogs documents describe. So a target's id evidence depends on the
+route as well as the row:
+
+| Route to the target (pilot starting artists) | Targets | Id from a Discogs document | Discogs id on a radio-named row | No id |
+|---|---|---|---|---|
+| Label roster (Discogs releases) | 7,503 | 3,433 | 3,806 | 264 |
+| Radio neighbour | 144 | 4 | 47 | 93 |
+
+**Rule for the cut.** A target reached through Discogs data carries its row's
+Discogs id as `discogs-document`: the release document names that artist by
+id, whatever name the row was also filed under (96.5% of label-roster
+targets). A target reached through radio is a radio name; any Discogs id its
+row holds was joined to it by name, so it is carried as `adopted-by-name` and
+never placed. One more case to report rather than resolve: the catalogue has
+two rows filed as "speedy j".
+
+### 10.3 The consistent cut, measured
+
+The whole pilot demand set as **one statement** — `explore_knowledge` applied
+to all four batches (12+12 nodes, 50+50+50+13 artists) inside a single
+`SELECT`, which is exactly `knowledge_cut`'s body. Run read-only through the
+CLI; nothing created.
+
+| | Cold (first run) | Warm |
+|---|---|---|
+| Wall time incl. CLI connection | 12.9 s | 2.8–3.1 s |
+| Database execution | — | 589 ms (planning 0.3 ms) |
+| Buffers | — | 69,213 hit, 0 read, 0 temp |
+| Answer size | 949,612 bytes | same |
+| Edge generations seen | one (`edges-165903`) | one |
+
+`service_role` has no statement timeout (anon 3 s, authenticated 8 s), so
+the cut needs no timeout change; the cold first run's extra seconds are disk
+reads, once a day, of pages the warm run then holds. The single-statement cut
+is practical for the pilot; the `REPEATABLE READ` fallback is not needed.
+
+### 10.4 Proof the 00:23 rebuild completed
+
+The `generation` id in today's answers is **computed from the clock**
+(`edges-` ‖ ⌊(now − 23 min) / 3 h⌋), not from the rebuild, so it proves
+nothing. The rebuild is pg_cron job 6, `select public.rebuild_radio_dig_edges()`
+— one statement, so it commits as one transaction and a snapshot sees all of
+it or none. Its last ten runs all `succeeded` in 16.3–18.8 s. `knowledge_cut`
+will therefore, inside its own statement, require a `cron.job_run_details` row
+for job 6 started at or after today's 00:23 UTC with status `succeeded` and
+`end_time` before the statement began; otherwise it returns no answers and the
+publisher skips the day. The manifest records that run's id and end time as
+the edges watermark in place of the clock-derived label.
+
+### 10.5 What this means for the publisher
+
+- Size: one generation of the pilot is ~950 KB of answers; split per entity
+  (≈190 objects) and content-addressed, a day with few changes writes far
+  fewer.
+- Database load: one warm-cache statement under a second, once a day.
+- Next, if approved: the `knowledge_cut` migration (with the rebuild proof and
+  target id evidence), then the publisher with its dry-run mode.
