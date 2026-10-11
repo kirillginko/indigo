@@ -40,12 +40,18 @@ final class ExploreDiagnostics {
 
         var rankedDigest: String { CanonicalDigest.of(ranked) }
 
-        /// `FY<format>.<day>.<personal>.<shared>.<device>.<ranked>`, each
-        /// digest cut to twelve characters: short enough to read out, long
+        /// `FY<format>.<day>.<personal>.<shared>.<device>.<identity>.<known>.<ranked>`,
+        /// each digest cut to twelve characters: short enough to read out, long
         /// enough that two different inputs never share one in practice.
+        ///
+        /// The identity parts say whether two devices placed the same artists
+        /// on the same evidence, apart from what they know about the music:
+        /// the same shared digest with a different identity one means one
+        /// device has verified an artist the other has not yet.
         var code: String {
             ["FY\(stamp.format)", "\(stamp.period)", Self.cut(stamp.personal), Self.cut(stamp.shared),
-             Self.cut(stamp.deviceLocal), Self.cut(rankedDigest)].joined(separator: ".")
+             Self.cut(stamp.deviceLocal), Self.cut(stamp.identity ?? "-"), Self.cut(stamp.known ?? "-"),
+             Self.cut(rankedDigest)].joined(separator: ".")
         }
 
         static func cut(_ digest: String) -> String { String(digest.prefix(12)) }
@@ -70,12 +76,22 @@ final class ExploreDiagnostics {
     }
 
     /// Two codes side by side, part by part. Nil when either is not a code.
+    /// A code from a build before identity has six parts; its identity parts
+    /// read as "—".
     nonisolated static func compare(_ here: String, _ there: String) -> [Row]? {
-        let mine = here.split(separator: ".").map(String.init)
-        let theirs = there.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ".").map(String.init)
-        guard mine.count == 6, theirs.count == 6, mine[0].hasPrefix("FY"), theirs[0].hasPrefix("FY") else { return nil }
+        func parts(_ code: String) -> [String]? {
+            let parts = code.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ".").map(String.init)
+            guard parts.first?.hasPrefix("FY") == true else { return nil }
+            switch parts.count {
+            case 8: return parts
+            case 6: return Array(parts[0..<5]) + ["—", "—", parts[5]]
+            default: return nil
+            }
+        }
+        guard let mine = parts(here), let theirs = parts(there) else { return nil }
         let names = ["Format", "Evaluation day", "Personal digest", "Shared knowledge digest",
-                     "Device-local digest", "Ranked recommendation IDs"]
+                     "Device-local digest", "Identity evidence digest", "Known artists digest",
+                     "Ranked recommendation IDs"]
         return names.indices.map { Row(input: names[$0], here: mine[$0], there: theirs[$0]) }
     }
 
@@ -84,7 +100,9 @@ final class ExploreDiagnostics {
         let parts = entry.report.milliseconds.sorted { $0.key < $1.key }
             .map { "\($0.key)=\(Int($0.value.rounded()))ms" }.joined(separator: " ")
         let sizes = entry.report.bytes.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)B" }.joined(separator: " ")
-        Trace.note("explore.stamp \(entry.code) rebuilt=[\(entry.report.rebuilt.joined(separator: ","))] \(parts) \(sizes)")
+        let identity = entry.report.counts.filter { $0.key.hasPrefix("identity") }.sorted { $0.key < $1.key }
+            .map { "\($0.key)=\($0.value)" }.joined(separator: " ")
+        Trace.note("explore.stamp \(entry.code) rebuilt=[\(entry.report.rebuilt.joined(separator: ","))] \(parts) \(sizes) \(identity)")
     }
 
     func record(shadow report: ShadowReport) {

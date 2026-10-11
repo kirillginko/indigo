@@ -123,6 +123,70 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         return out + details
     }
 
+    /// For You as the app now builds it (`DigWorker`, on the identity graph)
+    /// beside today's name-keyed answer from the same store: membership, the
+    /// expected re-keying, scores, order, exclusions — and the same answer
+    /// from a second worker.
+    private func forYouComparison(_ label: String, container: ModelContainer, context: ModelContext) async -> [String] {
+        var out = ["", "== For You activation (\(label)) =="]
+        let asOf = ExplorePeriod.asOf(ExplorePeriod.containing(Date()))
+        let period = ExplorePeriod.containing(asOf)
+        let rows = PersonalInputs.read(context: context, asOf: asOf)
+        let today = ExploreRanker.offers(personal: rows, knowledge: LocalKnowledgeAdapter(context: context).snapshot(for: rows, scenes: false), asOf: asOf)
+        let todayList = today.next + today.artists + today.shows
+
+        func build(_ generation: Int) async -> (ExploreRun, [ExploreSuggestion], ExploreRun) {
+            let worker = DigWorker(modelContainer: container)
+            let run = await worker.exploreRun(asOf: asOf, period: period, generation: generation, scenes: false, rebuild: true, now: Date())
+            let offers = await worker.exploreRecommendations(run, asOf: asOf)
+            let warm = await worker.exploreRun(asOf: asOf, period: period, generation: generation, scenes: false, rebuild: false, now: Date())
+            return (run, offers.next + offers.artists + offers.shows, warm)
+        }
+        let (run, list, warm) = await build(0)
+        let (again, againList, _) = await build(9)
+        func ms(_ report: ExploreBuildReport) -> String {
+            report.milliseconds.sorted { $0.key < $1.key }.map { "\($0.key)=\(Int($0.value.rounded()))" }.joined(separator: " ")
+        }
+        // Today's path, cold, on a context of its own: the baseline.
+        let baselineStarted = ContinuousClock.now
+        _ = LocalKnowledgeAdapter(context: ModelContext(container)).snapshot(for: rows, scenes: false)
+        let baseline = ContinuousClock.now - baselineStarted
+        out.append("cost (ms): today's snapshot, cold, \(Int(Double(baseline.components.seconds) * 1000 + Double(baseline.components.attoseconds) / 1e15))")
+        out.append("cost (ms, on the worker): cold \(ms(run.report)); warm look \(ms(warm.report)), rebuilt \(warm.report.rebuilt)")
+
+        // Each of today's candidates paired with the one reached by the same
+        // route — the same starting point, the same stated reason — which is
+        // what a re-keyed candidate is.
+        var pairs: [(today: ExploreSuggestion, now: ExploreSuggestion)] = []
+        var unpairedToday: [ExploreSuggestion] = []
+        var taken = Set<String>()
+        for old in todayList {
+            if let same = list.first(where: { !taken.contains($0.id) && ($0.node.id == old.node.id
+                || ($0.via == old.via && $0.reason == old.reason && $0.node.kind == old.node.kind)) }) {
+                pairs.append((old, same)); taken.insert(same.id)
+            } else { unpairedToday.append(old) }
+        }
+        let unpairedNow = list.filter { !taken.contains($0.id) }
+        out.append("today \(todayList.count), identity \(list.count); same candidates: \(unpairedToday.isEmpty && unpairedNow.isEmpty)")
+        out.append("  re-keyed: \(pairs.filter { $0.today.node.id != $0.now.node.id }.map { "\($0.today.node.title) → \($0.now.node.title) [\($0.now.node.id)]" })")
+        out.append("  only today: \(unpairedToday.map(\.node.id))")
+        out.append("  only identity: \(unpairedNow.map(\.node.id))")
+        out.append("  scores changed: \(pairs.filter { abs($0.today.score - $0.now.score) > 1e-9 }.map { "\($0.now.node.title) \(String(format: "%.4f", $0.today.score)) → \(String(format: "%.4f", $0.now.score))" })")
+        let mapped = todayList.compactMap { old in pairs.first { $0.today.id == old.id }?.now.id }
+        out.append("  order identical after re-keying: \(mapped == list.map(\.id))")
+        out.append("  known under identity (kept out): \(run.alsoKnown.sorted())")
+        out.append("  deterministic: stamp \(run.stamp == again.stamp), offers \(againList.map(\.id) == list.map(\.id)), scores \(againList.map(\.score.bitPattern) == list.map(\.score.bitPattern))")
+        out.append("  stamp: format \(run.stamp.format) identity \(run.stamp.identity?.prefix(12) ?? "-") known \(run.stamp.known?.prefix(12) ?? "-")")
+        out.append("  counts: " + run.report.counts.filter { $0.key.hasPrefix("identity") }.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " "))
+        out.append("  side by side (today | identity):")
+        for index in 0..<max(todayList.count, list.count) {
+            let left = index < todayList.count ? "#\(index + 1) \(String(format: "%.4f", todayList[index].score)) \(todayList[index].node.title) [\(todayList[index].node.id)]" : ""
+            let right = index < list.count ? "#\(index + 1) \(String(format: "%.4f", list[index].score)) \(list[index].node.title) [\(list[index].node.id)]" : ""
+            out.append("    \(left)  |  \(right)")
+        }
+        return out
+    }
+
     func testShadowIdentityOnThisMacsStores() async throws {
         try XCTSkipUnless(FileManager.default.fileExists(atPath: folder.appendingPathComponent("RUN").path),
                           "Create audit/explore-identity/RUN to measure.")
@@ -156,6 +220,7 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         out.append("snapshot: \(before.shared.nodes.count) shared nodes, \(artistNodes.count) artist nodes, \(sets.values.reduce(0) { $0 + $1.all.count }) edges")
 
         out += visibleComparison("the store's own evidence, as on this device today", context: context, origins: origins)
+        out += await forYouComparison("the store's own evidence", container: container, context: context)
 
         // Evidence: kept credits for every release the snapshot names and every
         // release on a starting artist's own shelf, from R2.
@@ -432,6 +497,7 @@ final class ExploreIdentityShadowMeasurement: XCTestCase {
         listing(foldedOffers).forEach { out.append("    \($0)") }
 
         out += visibleComparison("with R2 credits", context: context, origins: origins)
+        out += await forYouComparison("with R2 credits", container: container, context: context)
 
         let text = out.joined(separator: "\n") + "\n"
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

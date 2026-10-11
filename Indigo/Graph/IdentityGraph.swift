@@ -78,6 +78,8 @@ nonisolated struct IdentityNeighbourhood: Sendable {
     /// Every folded name behind each destination, by its id: the keys the
     /// listener's own rows and the page's other blocks know it by.
     let keys: [String: Set<String>]
+    /// What the walk's identities rested on (`IdentityGraph.evidenceDigest`).
+    var dependencies = IdentityDependencies()
 
     /// The ids a destination is known by: its own, and one per name behind it.
     func knownIDs(of node: MusicNode) -> Set<String> {
@@ -86,11 +88,27 @@ nonisolated struct IdentityNeighbourhood: Sendable {
     }
 }
 
+/// The evidence one walk's identities rested on: the folded names it placed,
+/// the entries it placed them under or read, and the releases whose credits it
+/// read. A walk is worth keeping exactly as long as these say the same.
+nonisolated struct IdentityDependencies: Hashable, Sendable {
+    var names: Set<String> = []
+    var entries: Set<Int> = []
+    var releases: Set<Int> = []
+
+    mutating func formUnion(_ other: IdentityDependencies) {
+        names.formUnion(other.names)
+        entries.formUnion(other.entries)
+        releases.formUnion(other.releases)
+    }
+}
+
 nonisolated final class IdentityGraph {
     let graph: GraphStore
     let context: ModelContext
     let canonicalizer: GraphCanonicalizer
     private let identityStore: ArtistIdentityStore
+    private let identifier: ArtistNodeIdentifier
     private let scope: CreditEdgeScope
 
     init(context: ModelContext, graph: GraphStore? = nil) {
@@ -101,10 +119,11 @@ nonisolated final class IdentityGraph {
         // artist one step out, and a fetch per question was most of its cost.
         let identityStore = ArtistIdentityStore(
             context: context,
-            fold: IdentityEvidenceFold(context: context, filed: { graph.cachedDiscogsArtist(named: $0) }))
+            fold: IdentityEvidenceFold(context: context, filed: { graph.assembledDiscogsArtist(named: $0) }))
         self.identityStore = identityStore
-        canonicalizer = GraphCanonicalizer(
-            identify: ArtistNodeIdentifier(context: context, identityStore: identityStore).identify)
+        let identifier = ArtistNodeIdentifier(context: context, identityStore: identityStore)
+        self.identifier = identifier
+        canonicalizer = GraphCanonicalizer(identify: identifier.identify)
         scope = CreditEdgeScope(context: context, graph: graph)
     }
 
@@ -137,9 +156,17 @@ nonisolated final class IdentityGraph {
 
         var set = EdgeSet()
         var keys: [String: Set<String>] = [:]
+        var dependencies = IdentityDependencies()
+        if node.kind == .artist { dependencies.names.insert(node.key) }
+        dependencies.entries.formUnion([node.discogsID, entry].compactMap { $0 })
         for reference in references(of: canonical, reached: node) {
-            for raw in edges(from: reference, entry: entry).sorted(by: MusicEdge.precedes) {
+            if reference.kind == .artist { dependencies.names.insert(reference.key) }
+            for raw in edges(from: reference, entry: entry, reading: &dependencies).sorted(by: MusicEdge.precedes) {
                 let edge = canonicalizer.canonical(raw)
+                if raw.to.kind == .artist {
+                    dependencies.names.insert(raw.to.key)
+                    dependencies.entries.formUnion([raw.to.discogsID, edge.to.discogsID].compactMap { $0 })
+                }
                 guard !own.contains(edge.to.id) else { continue }
                 set.insert(MusicEdge(from: canonical, to: edge.to, kind: edge.kind, source: edge.source,
                                      reason: edge.reason, confidence: edge.confidence, occurrences: edge.occurrences))
@@ -150,7 +177,41 @@ nonisolated final class IdentityGraph {
             guard let id = identity.discogsID, GraphIdentityKey(nodeKey: identity.key) != nil else { continue }
             keys[identity.id, default: []].formUnion(names(of: id, title: identity.title).map(RecordingKey.normalizeArtist))
         }
-        return collapsingSamePage(IdentityNeighbourhood(origin: canonical, edges: set, keys: keys))
+        var found = collapsing([IdentityNeighbourhood(origin: canonical, edges: set, keys: keys)])[0]
+        found.dependencies = dependencies
+        return found
+    }
+
+    /// A release's kept credits, from the fold.
+    private func credits(_ releaseID: Int) -> [ReleaseCredit]? {
+        identityStore.fold.map { $0.credits[releaseID] } ?? ReleaseCreditStore(context: context).credits(releaseID: releaseID)
+    }
+
+    /// A digest of the evidence a walk rested on, by content: every name's
+    /// verdict, DIG's record under it and what else ties it to an entry; every
+    /// entry's facts and settled spellings; every release's credits. Missing
+    /// evidence is written as such, so a removal changes it as a correction
+    /// does; evidence about anything else does not touch it.
+    func evidenceDigest(of dependencies: IdentityDependencies) -> String {
+        var lines: [String] = []
+        for name in dependencies.names.sorted() {
+            let verdict = identityStore.verdict(for: name).map { String(describing: $0) } ?? "none"
+            let filed = identityStore.filedRecord(named: name).map { "\($0.discogsID) \($0.name)" } ?? "none"
+            lines.append("name \(name) | \(verdict) | \(filed) | \(identifier.support(for: name).joined(separator: ","))")
+        }
+        for id in dependencies.entries.sorted() {
+            guard let facts = identityStore.facts(id) else { lines.append("entry \(id) | none"); continue }
+            let links = (facts.aliases.map { "a\($0.id)" } + facts.groups.map { "g\($0.id)" } + facts.members.map { "m\($0.id)" })
+            lines.append("entry \(id) | \(facts.name) | \(facts.nameVariations.sorted().joined(separator: ",")) | "
+                         + "\(links.sorted().joined(separator: ",")) | \(identityStore.creditedSpellings(of: id).joined(separator: ","))")
+        }
+        for id in dependencies.releases.sorted() {
+            lines.append("release \(id) | " + (credits(id).map { list in
+                list.map { "\($0.category.rawValue) \($0.order) \($0.creditedName)/\($0.filingName) \($0.discogsID.map(String.init) ?? "-") \($0.role) \($0.tracks)" }
+                    .joined(separator: "; ")
+            } ?? "none"))
+        }
+        return CanonicalDigest.of(lines)
     }
 
     /// The names an identity node is walked under, from stored evidence alone,
@@ -192,18 +253,27 @@ nonisolated final class IdentityGraph {
     /// A reference's edges with every id the evidence supports. `entry` is the
     /// identity being walked, when it is one: its own alias list gives alias
     /// edges their ids, and a release its namesake's credits claim is not its.
-    private func edges(from reference: MusicNode, entry: Int?) -> [MusicEdge] {
+    private func edges(from reference: MusicNode, entry: Int?, reading dependencies: inout IdentityDependencies) -> [MusicEdge] {
         var edges = graph.neighbors(of: reference).all
-        edges = CreditEdgeIdentity.attach(edges, entries: CreditEdgeIdentity.entries(in: scope.credits(behind: reference)))
+        // The releases behind its credit edges, worked out once, and their
+        // credits from the fold rather than a fetch apiece.
+        let behind: [Int]
+        switch reference.kind {
+        case .release: behind = [reference.discogsID].compactMap { $0 }
+        case .artist: behind = scope.releases(of: reference)
+        default: behind = []
+        }
+        dependencies.releases.formUnion(behind)
+        edges = CreditEdgeIdentity.attach(edges, entries: CreditEdgeIdentity.entries(in: behind.flatMap { credits($0) ?? [] }))
         guard reference.kind == .artist, let id = entry else { return edges }
         if let facts = identityStore.facts(id) {
             edges = AliasEdgeIdentity.attach(edges, entries: AliasEdgeIdentity.entries(of: facts))
         }
+        dependencies.releases.formUnion(edges.compactMap { $0.to.kind == .release ? $0.to.discogsID : nil })
         return edges.filter { edge in
             guard edge.to.kind == .release, let releaseID = edge.to.discogsID else { return true }
             return ReleaseAttribution.decide(
-                subjectID: id, subjectKeys: [reference.key],
-                credits: ReleaseCreditStore(context: context).credits(releaseID: releaseID)
+                subjectID: id, subjectKeys: [reference.key], credits: credits(releaseID)
             ).isShown
         }
     }
@@ -217,13 +287,21 @@ nonisolated final class IdentityGraph {
     /// Both rows stay when anything says the name is somebody else's: two
     /// verified owners here (namesakes), DIG's page for the name being another
     /// entry, or a completed check that found the name shared or unowned.
-    private func collapsingSamePage(_ found: IdentityNeighbourhood) -> IdentityNeighbourhood {
+    ///
+    /// "Here" is every neighbourhood passed: a page passes its own, For You
+    /// passes all of its starting points', so one artist is one candidate
+    /// across them.
+    func collapsing(_ walks: [IdentityNeighbourhood]) -> [IdentityNeighbourhood] {
         var owners: [String: Set<String>] = [:]
-        for (id, names) in found.keys where GraphIdentityKey(nodeKey: String(id.dropFirst("artist:".count))) != nil {
-            for name in names { owners[name, default: []].insert(id) }
+        for walk in walks {
+            for (id, names) in walk.keys where GraphIdentityKey(nodeKey: String(id.dropFirst("artist:".count))) != nil {
+                for name in names { owners[name, default: []].insert(id) }
+            }
         }
         var dropped: Set<String> = []
-        for node in Set(found.edges.all.map(\.to)) where node.kind == .artist && GraphIdentityKey(nodeKey: node.key) == nil {
+        let names = Set(walks.flatMap { $0.edges.all.map(\.to) })
+            .filter { $0.kind == .artist && GraphIdentityKey(nodeKey: $0.key) == nil }
+        for node in names.sorted(by: { $0.id < $1.id }) {
             guard let owner = owners[node.key], owner.count == 1, let identityID = owner.first,
                   identityStore.verdict(for: node.title) == nil else { continue }
             if let page = identityStore.artistResolution(ArtistReference(name: node.title)).identity.discogsID,
@@ -231,11 +309,15 @@ nonisolated final class IdentityGraph {
             dropped.insert(node.id)
             IdentityChecks.shared.note(node.title)
         }
-        guard !dropped.isEmpty else { return found }
-        var edges = EdgeSet()
-        for edge in found.edges.all where !dropped.contains(edge.to.id) { edges.insert(edge) }
-        return IdentityNeighbourhood(origin: found.origin, edges: edges,
-                                     keys: found.keys.filter { !dropped.contains($0.key) })
+        guard !dropped.isEmpty else { return walks }
+        return walks.map { walk in
+            var edges = EdgeSet()
+            for edge in walk.edges.all where !dropped.contains(edge.to.id) { edges.insert(edge) }
+            var kept = IdentityNeighbourhood(origin: walk.origin, edges: edges,
+                                             keys: walk.keys.filter { !dropped.contains($0.key) })
+            kept.dependencies = walk.dependencies
+            return kept
+        }
     }
 }
 

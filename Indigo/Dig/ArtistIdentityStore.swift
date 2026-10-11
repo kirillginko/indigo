@@ -157,7 +157,7 @@ nonisolated struct ArtistIdentityStore {
 
     /// The record DIG filed under a name.
     func filedRecord(named name: String) -> DiscogsArtist? {
-        if let fold { return fold.filed(name) }
+        if let fold { return fold.filedRecord(named: name, in: context) }
         return DiscogsEnricher(context: context, client: DiscogsClient()).cachedArtist(named: name)
     }
 
@@ -255,18 +255,40 @@ nonisolated struct ReleaseCreditStore {
     }
 }
 
-/// The identity evidence read once: every settled spelling and every entry's
-/// facts — small tables — and DIG's filed records through a fold somebody has
-/// already made (`GraphStore`). Answers exactly what `ArtistIdentityStore`
-/// answers by fetching, for as long as nothing is written; a reader keeps one
-/// for a generation, and every write starts another.
+/// The identity evidence read once: every settled spelling, every entry's
+/// facts and every release's credits — small tables — and DIG's filed records
+/// through a fold somebody has already made (`GraphStore`), or one at a time
+/// when nobody has. Answers exactly what `ArtistIdentityStore` answers by
+/// fetching, for as long as nothing is written; a reader keeps one for a
+/// generation, and every write starts another.
 nonisolated final class IdentityEvidenceFold {
     let verdicts: [String: SpellingVerdict]
     let spellings: [Int: [String]]
     let facts: [Int: DiscogsIdentityFacts]
-    let filed: (String) -> DiscogsArtist?
+    /// Every release's kept credits, by release id.
+    let credits: [Int: [ReleaseCredit]]
+    /// DIG's filed record under a name from a fold already assembled, or nil
+    /// when there is none to ask.
+    let filed: (String) -> DiscogsArtist??
+    private var byKey: [String: DiscogsArtist]?
 
-    init(context: ModelContext, filed: @escaping (String) -> DiscogsArtist?) {
+    /// From the assembled fold when there is one, and otherwise from one
+    /// fetch of every filed record's name and id — never what assembles the
+    /// graph's six tables (a second on a real store, which a walk of stored
+    /// edges never needs), and never a fetch per name (three seconds of For
+    /// You's walks on the same store).
+    func filedRecord(named name: String, in context: ModelContext) -> DiscogsArtist? {
+        if let assembled = filed(name) { return assembled }
+        if byKey == nil {
+            var descriptor = FetchDescriptor<DiscogsArtist>()
+            descriptor.propertiesToFetch = [\.nameKey, \.discogsID, \.name]
+            byKey = Dictionary(((try? context.fetch(descriptor)) ?? []).map { ($0.nameKey, $0) },
+                               uniquingKeysWith: { first, _ in first })
+        }
+        return byKey?[RecordingKey.normalizeArtist(name)]
+    }
+
+    init(context: ModelContext, filed: @escaping (String) -> DiscogsArtist??) {
         var verdicts: [String: SpellingVerdict] = [:]
         var spellings: [Int: [String]] = [:]
         for record in (try? context.fetch(FetchDescriptor<ArtistSpellingRecord>())) ?? [] {
@@ -281,6 +303,11 @@ nonisolated final class IdentityEvidenceFold {
             facts[record.discogsID] = record.facts
         }
         self.facts = facts
+        var credits: [Int: [ReleaseCredit]] = [:]
+        for record in (try? context.fetch(FetchDescriptor<ReleaseCreditRecord>())) ?? [] {
+            credits[record.releaseDiscogsID] = record.credits
+        }
+        self.credits = credits
         self.filed = filed
     }
 

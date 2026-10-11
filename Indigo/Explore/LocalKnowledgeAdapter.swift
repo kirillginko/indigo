@@ -42,8 +42,13 @@ nonisolated struct LocalKnowledgeAdapter {
     }
 
     func neighbourhood(of origin: MusicNode) -> Walked {
+        Self.split(graph.neighbors(of: origin).all)
+    }
+
+    /// Edges sorted into the shared part and this device's own.
+    static func split(_ edges: [MusicEdge]) -> Walked {
         var walked = Walked(shared: [], deviceLocal: [])
-        for edge in graph.neighbors(of: origin).all {
+        for edge in edges {
             switch edge.source {
             case .library: walked.deviceLocal.append(edge)
             // The listener's own rows, restated as an edge. See the header.

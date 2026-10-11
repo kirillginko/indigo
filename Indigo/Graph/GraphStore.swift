@@ -353,10 +353,13 @@ nonisolated struct GraphStore {
         }
     }
 
-    /// The record DIG filed under a name, from the fold this graph reads
-    /// anyway — the same row `DiscogsEnricher.cachedArtist(named:)` fetches.
-    func cachedDiscogsArtist(named name: String) -> DiscogsArtist? {
-        caches.discogsArtist(RecordingKey.normalizeArtist(name))
+    /// The record DIG filed under a name, from this graph's fold when it has
+    /// been assembled — the same row `DiscogsEnricher.cachedArtist(named:)`
+    /// fetches. Nil (not "no record") when it has not: asking must never be
+    /// what assembles six tables. See `IdentityEvidenceFold`.
+    func assembledDiscogsArtist(named name: String) -> DiscogsArtist?? {
+        guard let caches = assembledCaches else { return nil }
+        return .some(caches.discogsArtist(RecordingKey.normalizeArtist(name)))
     }
 
     /// The folded names in an artist's alias family, which RELATED leaves to

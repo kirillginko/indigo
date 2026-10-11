@@ -124,6 +124,19 @@ nonisolated final class ArtistNodeIdentifier {
         return keys
     }()
 
+    /// Which entries the evidence ties to a folded name, beyond its own
+    /// verdict: credits that use the spelling with an id, and entries that
+    /// list it as an alias, group or member. Sorted; what a placement of that
+    /// name can rest on, so a digest of it changes when the answer could.
+    func support(for key: String) -> [String] { supportByKey[key] ?? [] }
+
+    private lazy var supportByKey: [String: [String]] = {
+        var found: [String: [String]] = [:]
+        for (id, keys) in creditedKeys { for key in keys { found[key, default: []].append("credit:\(id)") } }
+        for (id, keys) in linkedKeys { for key in keys { found[key, default: []].append("link:\(id)") } }
+        return found.mapValues { $0.sorted() }
+    }()
+
     func identify(_ node: MusicNode) -> ArtistNodeIdentity {
         precondition(node.kind == .artist, "Only artist nodes have an artist identity")
         let key = node.key

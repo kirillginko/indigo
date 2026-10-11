@@ -56,6 +56,9 @@ actor DigWorker {
     /// Rebuilding that for each of them was most of the time it took to open
     /// anything.
     private var graph: GraphStore?
+    /// The graph under identity keys, for this generation: DIG's pages and
+    /// For You read the same one.
+    private var identity: IdentityGraph?
     private var engine: DigEngine?
     private var deep: DeepEngine?
     private var scenes: SceneEngine?
@@ -83,6 +86,7 @@ actor DigWorker {
         // generation whichever block asks first. New evidence is a write, so
         // it arrives with the next generation.
         let identity = IdentityGraph(context: modelContext, graph: next)
+        self.identity = identity
         engine = DigEngine(context: modelContext, graph: next, identity: identity)
         deep = DeepEngine(context: modelContext, graph: next, identity: identity)
         scenes = SceneEngine(context: modelContext, inheriting: scenes)
@@ -140,7 +144,15 @@ actor DigWorker {
     /// move under the reader.
     private struct ExploreKnowledgeCache {
         var since: Date?
-        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+        /// Each starting point's walk under identity keys, the digest of the
+        /// evidence it rested on, and the generation that digest was last
+        /// confirmed in. Evidence only changes with a write, and every write
+        /// is a new generation, so within one nothing needs confirming again.
+        var walked: [MusicNode: (walk: IdentityNeighbourhood, evidence: String, generation: Int)] = [:]
+        /// The last look's one-artist-one-candidate pass and known artists,
+        /// for the same generation, starting points and rows.
+        var identityPass: (generation: Int, origins: [MusicNode], rows: PersonalInputs,
+                           collapsed: [IdentityNeighbourhood], known: (alsoKnown: Set<String>, digest: String))?
         var shows: [ShowProfile]?
         var tagKeys: Set<String>?
         var tags: [String: [String]] = [:]
@@ -167,8 +179,8 @@ actor DigWorker {
     /// worked out for `asOf`. `scenes` asks for the slow half as well.
     /// `rebuild` throws everything kept away first, for a correction that
     /// landed in the store (see `DigStore.invalidateExploreOffers`).
-    /// `personal` is the rows a first half already read, so the second half
-    /// of one look is about the same rows.
+    /// `personal` is the rows a first half already read (`ExploreRun.rows`,
+    /// as kept), so the second half of one look is about the same rows.
     func exploreRun(
         asOf: Date, period: Int, generation asked: Int, scenes withScenes: Bool, rebuild: Bool, now: Date,
         personal known: PersonalInputs? = nil
@@ -184,7 +196,11 @@ actor DigWorker {
             return value
         }
 
-        let personal = known ?? timed("personal") { PersonalInputs.read(context: modelContext, asOf: asOf) }
+        let identity = self.identity ?? IdentityGraph(context: modelContext, graph: graph ?? GraphStore(context: modelContext))
+        // The listener's rows as they are kept, and read under identity: the
+        // rows are not touched (see `GraphCanonicalizer.canonical(_:)`).
+        let rows = known ?? timed("personal") { PersonalInputs.read(context: modelContext, asOf: asOf) }
+        let personal = timed("identity.history") { identity.canonicalizer.canonical(rows) }
         if rebuild || exploreCache.since.map({ now.timeIntervalSince($0) > Self.knowledgeLifetime }) ?? true {
             exploreCache = ExploreKnowledgeCache(since: now)
             knowledgeVersion &+= 1
@@ -194,22 +210,50 @@ actor DigWorker {
         )
 
         let origins = ExploreRanker.startingPoints(personal)
-        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
-        var fresh = 0
+        // A walk is kept while the evidence it rested on says the same: a
+        // check or credit about anything else leaves it alone, and a
+        // correction, a new credit or a removal under it walks it again.
+        var walks: [IdentityNeighbourhood] = []
+        var evidence: [String] = []
+        var fresh = 0, moved = 0
         for origin in origins {
-            if let kept = exploreCache.walked[origin] {
-                walked[origin] = kept
-            } else {
-                let found = timed("neighbourhoods") { adapter.neighbourhood(of: origin) }
-                exploreCache.walked[origin] = found
-                walked[origin] = found
-                fresh += 1
+            if let kept = exploreCache.walked[origin],
+               kept.generation == asked
+                || timed("identity.evidence") { identity.evidenceDigest(of: kept.walk.dependencies) } == kept.evidence {
+                exploreCache.walked[origin]?.generation = asked
+                walks.append(kept.walk)
+                evidence.append("\(origin.id) \(kept.evidence)")
+                continue
             }
+            if exploreCache.walked[origin] != nil { moved += 1 }
+            let walk = timed("neighbourhoods") { identity.neighbourhood(of: origin) }
+            let digest = timed("identity.evidence") { identity.evidenceDigest(of: walk.dependencies) }
+            exploreCache.walked[origin] = (walk, digest, asked)
+            walks.append(walk)
+            evidence.append("\(origin.id) \(digest)")
+            fresh += 1
         }
         if fresh > 0 {
             report.rebuilt.append("neighbourhoods \(fresh)/\(origins.count)")
+            if moved > 0 { report.rebuilt.append("identity \(moved)") }
             knowledgeVersion &+= 1
         }
+        // One artist, one candidate, across every starting point; and who the
+        // listener knows. Kept while nothing under them has moved.
+        let collapsed: [IdentityNeighbourhood]
+        let knownArtists: (alsoKnown: Set<String>, digest: String)
+        if fresh == 0, let pass = exploreCache.identityPass, pass.generation == asked,
+           pass.origins == origins, pass.rows == rows {
+            (collapsed, knownArtists) = (pass.collapsed, pass.known)
+        } else {
+            collapsed = timed("identity.collapse") { identity.collapsing(walks) }
+            knownArtists = timed("identity.known") {
+                Self.knownArtists(rows: rows, personal: personal, walks: collapsed, identity: identity)
+            }
+            exploreCache.identityPass = (asked, origins, rows, collapsed, knownArtists)
+        }
+        var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+        for (origin, walk) in zip(origins, collapsed) { walked[origin] = LocalKnowledgeAdapter.split(walk.edges.all) }
         if exploreCache.shows == nil {
             exploreCache.shows = timed("shows") { adapter.shows() }
             report.rebuilt.append("shows")
@@ -260,7 +304,12 @@ actor DigWorker {
             lastKnowledgeDigests = (digestKey, shared, local)
         }
         report.bytes = ["personal": personalDigest.bytes, "shared": shared.bytes, "deviceLocal": local.bytes]
+        let destinations = Set(collapsed.flatMap { $0.edges.all.map(\.to) }).filter { $0.kind == .artist }
         report.counts = [
+            "identityVerified": destinations.filter { GraphIdentityKey(nodeKey: $0.key) != nil }.count,
+            "identityUnresolved": destinations.filter { GraphIdentityKey(nodeKey: $0.key) == nil }.count,
+            "identityMerged": Set(collapsed.flatMap { $0.keys.filter { $0.value.count > 1 && $0.key.hasPrefix("artist:discogs:") }.map(\.key) }).count,
+            "identityKnown": knownArtists.alsoKnown.count,
             "startingPoints": origins.count,
             "edges": knowledge.shared.neighbourhoods.reduce(0) { $0 + $1.edges.count },
             "deviceLocalEdges": knowledge.deviceLocal.neighbourhoods.reduce(0) { $0 + $1.edges.count },
@@ -268,14 +317,48 @@ actor DigWorker {
             "shows": knowledge.shared.shows.count,
             "sceneCities": knowledge.shared.scenes?.cities.count ?? 0,
         ]
-        return ExploreRun(
-            personal: personal, knowledge: knowledge,
-            stamp: ExploreStamp(
-                format: knowledge.format, period: period, personal: personalDigest.digest,
-                shared: shared.digest, deviceLocal: local.digest
-            ),
-            report: report
+        var stamp = ExploreStamp(
+            format: knowledge.format, period: period, personal: personalDigest.digest,
+            shared: shared.digest, deviceLocal: local.digest
         )
+        stamp.identity = CanonicalDigest.of(evidence.sorted())
+        stamp.known = knownArtists.digest
+        return ExploreRun(personal: personal, knowledge: knowledge, stamp: stamp, report: report,
+                          alsoKnown: knownArtists.alsoKnown, rows: rows)
+    }
+
+    /// Who the listener already knows under identity, and a digest of it.
+    ///
+    /// A name links to the one verified artist that answers to it among the
+    /// walks and the history — never to one of several namesakes, and never
+    /// by sharing a name alone (`KnownArtistPolicy`). Worked out from content,
+    /// so the same rows and walks give the same answer whatever was asked
+    /// first.
+    static func knownArtists(
+        rows: PersonalInputs, personal: PersonalInputs, walks: [IdentityNeighbourhood], identity: IdentityGraph
+    ) -> (alsoKnown: Set<String>, digest: String) {
+        var owners: [String: Set<GraphIdentityKey>] = [:]
+        var names: [String: Set<String>] = [:]
+        for walk in walks {
+            for (id, keys) in walk.keys {
+                guard let key = GraphIdentityKey(nodeKey: String(id.dropFirst("artist:".count))) else { continue }
+                for name in keys { owners[name, default: []].insert(key) }
+                names[id, default: []].formUnion(keys)
+            }
+        }
+        let kept = rows.crate.compactMap(\.node) + rows.met.map(\.node) + rows.haunts.map(\.node)
+        var mapping: [String] = []
+        for node in kept where node.kind == .artist {
+            guard let placement = identity.canonicalizer.placement(of: node) else { continue }
+            mapping.append("\(node.id) \(placement.key.nodeID)")
+            guard placement.key.isVerified else { continue }
+            owners[node.key, default: []].insert(placement.key)
+            names[placement.key.nodeID, default: []].insert(node.key)
+        }
+        let history = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
+        let alsoKnown = KnownArtistPolicy.alsoKnown(
+            history: history, owners: owners, namesOf: { names[$0.id] ?? [$0.key] })
+        return (alsoKnown, CanonicalDigest.of(mapping.sorted() + ["known"] + alsoKnown.sorted()))
     }
 
     /// The backend's answers, kept by entity between looks and across launches.
@@ -341,7 +424,8 @@ actor DigWorker {
         Trace.step("explore.rank") {
             ExploreRanker.recommendations(
                 personal: run.personal, knowledge: run.knowledge,
-                taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf)
+                taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf),
+                alsoKnown: run.alsoKnown
             )
         }
     }

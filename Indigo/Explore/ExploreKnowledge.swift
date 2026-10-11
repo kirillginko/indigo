@@ -135,7 +135,11 @@ nonisolated struct PersonalInputs: Codable, Equatable, Sendable {
 nonisolated struct KnowledgeSnapshot: Codable, Equatable, Sendable {
     /// The shape of this and the rules it was built by. Changing either
     /// changes every digest.
-    static let currentFormat = 1
+    ///
+    /// 2: artists are keyed by who they are (`IdentityGraph`) — a verified
+    ///    artist by their Discogs entry, everyone else by name as before — and
+    ///    the listener's history is read the same way.
+    static let currentFormat = 2
 
     var format = KnowledgeSnapshot.currentFormat
     var shared: SharedKnowledge
@@ -263,6 +267,14 @@ nonisolated struct ExploreStamp: Codable, Equatable, Sendable {
     var personal: String
     var shared: String
     var deviceLocal: String
+    /// The identity evidence the walks rested on, by content (see
+    /// `IdentityGraph.evidenceDigest`). When it moves, the graph was rebuilt.
+    /// Nil in a stamp written before artists had identities.
+    var identity: String? = nil
+    /// Who the listener already knows, under identity: what their history
+    /// maps to and which artists that keeps out. When only this moves, the
+    /// same knowledge was ranked again.
+    var known: String? = nil
 
     init(period: Int, personal: PersonalInputs, knowledge: KnowledgeSnapshot) {
         self.init(
@@ -286,6 +298,12 @@ nonisolated struct ExploreRun: Sendable {
     let knowledge: KnowledgeSnapshot
     let stamp: ExploreStamp
     let report: ExploreBuildReport
+    /// Artists the listener knows beyond their own rows' keys — see
+    /// `KnownArtistPolicy`. Kept out before anything is cut.
+    var alsoKnown: Set<String> = []
+    /// The rows as kept, before they were read under identity: what the
+    /// second half of a look is handed, so it reads them the same way.
+    var rows: PersonalInputs = .empty
 }
 
 /// What building a look's inputs did: which parts were worked out rather than

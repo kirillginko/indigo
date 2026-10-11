@@ -237,12 +237,23 @@ final class ExploreSnapshotTests: XCTestCase {
     // MARK: The comparison
 
     func testTwoCodesAreComparedPartByPart() {
-        let here = "FY1.20369.aaaaaaaaaaaa.bbbbbbbbbbbb.cccccccccccc.dddddddddddd"
-        let there = "FY1.20369.aaaaaaaaaaaa.eeeeeeeeeeee.cccccccccccc.ffffffffffff"
+        let here = "FY2.20369.aaaaaaaaaaaa.bbbbbbbbbbbb.cccccccccccc.iiiiiiiiiiii.kkkkkkkkkkkk.dddddddddddd"
+        let there = "FY2.20369.aaaaaaaaaaaa.bbbbbbbbbbbb.cccccccccccc.jjjjjjjjjjjj.kkkkkkkkkkkk.ffffffffffff"
         let rows = ExploreDiagnostics.compare(here, there)
         XCTAssertEqual(rows?.map(\.input), ["Format", "Evaluation day", "Personal digest", "Shared knowledge digest",
-                                           "Device-local digest", "Ranked recommendation IDs"])
-        XCTAssertEqual(rows?.map(\.matches), [true, true, true, false, true, false])
+                                           "Device-local digest", "Identity evidence digest", "Known artists digest",
+                                           "Ranked recommendation IDs"])
+        XCTAssertEqual(rows?.map(\.matches), [true, true, true, true, true, false, true, false],
+                       "Same knowledge, different identity evidence: one device verified an artist the other has not")
         XCTAssertNil(ExploreDiagnostics.compare(here, "not a code"))
+    }
+
+    /// A device still on the build before identity reads as such.
+    func testACodeFromBeforeIdentityIsComparedToo() {
+        let old = "FY1.20369.aaaaaaaaaaaa.bbbbbbbbbbbb.cccccccccccc.dddddddddddd"
+        let new = "FY2.20369.aaaaaaaaaaaa.bbbbbbbbbbbb.cccccccccccc.iiiiiiiiiiii.kkkkkkkkkkkk.dddddddddddd"
+        let rows = try? XCTUnwrap(ExploreDiagnostics.compare(new, old))
+        XCTAssertEqual(rows?.map(\.there), ["FY1", "20369", "aaaaaaaaaaaa", "bbbbbbbbbbbb", "cccccccccccc", "—", "—", "dddddddddddd"])
+        XCTAssertEqual(rows?.first?.matches, false, "The format says which build each is on")
     }
 }

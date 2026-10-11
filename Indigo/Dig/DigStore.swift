@@ -1500,7 +1500,7 @@ final class DigStore {
             // Then the slower half, folded into what is already on screen.
             let full = await self.worker.exploreRun(
                 asOf: asOf, period: period, generation: asked, scenes: true, rebuild: false, now: now,
-                personal: core.personal
+                personal: core.rows
             )
             guard !Task.isCancelled else { return }
             if full.stamp != self.offersStamp || !self.hasExploreDirection {
