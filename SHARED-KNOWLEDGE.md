@@ -900,3 +900,61 @@ reviewed; pushed. Then, on live:
   the cut's text includes `rowID`, so ties among same-named edges fall
   differently. Same set; order within ties is not part of the contract.
 
+## 13. Publisher, dry run only (2026-10-11)
+
+`supabase/functions/_shared/generations.ts`: `cutProblems` (refuses a cut
+that is not `ok`, not today, not the frozen digest, without an in-slot
+00:23 proof that finished before the statement, missing or adding an entity,
+or with a status outside the closed set); `planGeneration` (pure: one
+content-addressed object per found answer, the identity snapshot, the
+manifest of §9.3, the day pointer and `current.json` with seven kept and
+`withdrawn` carried); `dryRunGeneration`, whose dependencies are the cut, R2
+GET/HEAD and a clock — there is no write method to call. Tests
+(`generations_test.ts`, 11): refusals, determinism and digests, explicit
+statuses, evidence kept apart (`discogs-document` placeable,
+`adopted-by-name` and name-only not), Speedy J as namesakes, bundle pinning
+(complete / partial / missing / no identity), retention order, already-present
+objects not counted as writes, a refused cut reading nothing, a published day
+reported and untouched, and a proxy failing the test if anything but a read is
+reached for.
+
+`Scripts/knowledge-generation-dry-run.sh`: the cut through the linked CLI,
+`r2_budget()`, then R2 read through the public host only (deno's network
+permission is that host; no R2 credentials). **Nothing was written**: R2's
+monthly write count was 2,056 before and after, and `current.json`, the day
+pointer and the manifest all answer 404.
+
+**Live, 2026-10-11 23:19 UTC** (proof run 88841, snapshot `2778392:2778392:`):
+
+| | |
+|---|---|
+| Generation | 1.35 MB: answers 1.13 MB, identity snapshot 188 KB (the largest object), manifest 32 KB, pointers 0.4 KB |
+| Content-addressed objects | 170 (168 answers — 16 nodes, 152 artists; no duplicates — identity, manifest) + 2 pointers |
+| Already in R2 | 0 (nothing published yet) |
+| A publication would write | 172 Class A, 1.35 MB; read 359 Class B (existence checks, read-backs, refs, pointers) |
+| This dry run read | 17 GET + 177 HEAD, 0 PUT |
+| Budget | 2,056 of 800,000 this month → 2,228 after; 0.65% of the cap a month at daily worst case |
+| Bundles (16 starting artists) | 5 complete, 1 partial (Hype Williams 1874027, 71/84), 10 missing, 1 with no identity (`prefuse73`); the 6 pinned bundle objects all present |
+| Time | cut 13.3 s wall through the CLI (connection included), plan 51 ms, reads 3.2 s (median 56 ms); publication estimated 19 s |
+| Month, worst case | 5,160 Class A, 10,770 Class B, 9.4 MB retained — $0 (free allowances: 1M A, 10M B, 10 GB) |
+
+What it shows:
+
+- **Every starting point has a terminal status**; none is `failed`.
+- **Bundle coverage is the gap**: 10 of 16 starting identities have no
+  bundle, including both Speedy J entries, Prefuse 73 (3722), Duenn, Joanne
+  Robertson, Mica Levi and Micachu. Publishing would say so (`missing`),
+  never fill it in; building those bundles is Phase 3.
+- **The identity snapshot** is 14% of the generation and every device needs
+  all of it; at pilot size that is fine, and it is the first thing to split
+  if demand grows.
+- **Two identities for Anika** (1982320 from the device-cache pilot, 3999072
+  from the catalogue) and two for Hype Williams are reported as they are, one
+  bundle entry each.
+
+Not done, as instructed: no manifest, no `current.json`, no day pointer, no
+generation object written; no daily schedule; no change to For You, DIG,
+Explore, CloudKit or weights. Next (2C, needs approval): the writing half —
+reserve, write, read back and verify, then the conditional day pointer, then
+`current.json` — and one real publication.
+
