@@ -18,7 +18,7 @@
 //   days/<YYYY-MM-DD>.json         write-once: the day's manifest
 //   current.json                   the retained generations, newest first
 
-import { canonicalJSON } from "./artist_bundle.ts";
+import { bundleKey, canonicalJSON } from "./artist_bundle.ts";
 import { artistRefKey, KNOWLEDGE_ROOT, sha256 } from "./knowledge.ts";
 
 export const GENERATIONS_ROOT = `${KNOWLEDGE_ROOT}/generations`;
@@ -231,7 +231,7 @@ export function identitySnapshot(cut: Cut): JSONObject {
   };
   const starting: Record<string, JSONObject[]> = {};
   for (const [id, answer] of Object.entries(cut.nodes ?? {})) {
-    const seeds = (answer.seeds as JSONObject[] | undefined) ?? [];
+    const seeds = (normalizeAnswer(answer).seeds as JSONObject[] | undefined) ?? [];
     if (seeds.length) starting[id] = seeds;
     for (const seed of seeds) {
       note(seed.rowID, seed.name, seed.discogsID, null);
@@ -244,7 +244,6 @@ export function identitySnapshot(cut: Cut): JSONObject {
       if (to.sharedName === true) flag(to.name, to.rowID);
     }
   }
-  const byText = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
   return {
     format: IDENTITY_FORMAT,
     rows: [...rows.values()].sort((a, b) => byText(a.rowID, b.rowID)).map((row) => {
@@ -261,6 +260,42 @@ export function identitySnapshot(cut: Cut): JSONObject {
       .map(([name, ids]) => ({ name, rowIDs: [...ids].sort(byText) })),
     starting,
   };
+}
+
+const byText = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+const text = (v: unknown) => (v == null ? "" : String(v));
+
+/// The order a relationship is listed in, by what it says: its kind, then
+/// who it reaches and how that one is identified, then why and how strongly.
+/// The whole edge, canonically, breaks any remaining tie -- never the order
+/// a serializer happened to write its keys in.
+export function compareEdges(a: JSONObject, b: JSONObject): number {
+  const ta = (a.to ?? {}) as JSONObject, tb = (b.to ?? {}) as JSONObject;
+  const keys: [unknown, unknown, "text" | "desc"][] = [
+    [a.kind, b.kind, "text"], [ta.kind, tb.kind, "text"], [ta.name, tb.name, "text"],
+    [ta.rowID, tb.rowID, "text"], [ta.discogsID, tb.discogsID, "text"], [ta.providerID, tb.providerID, "text"],
+    [ta.handle, tb.handle, "text"], [ta.year, tb.year, "text"], [a.confidence, b.confidence, "desc"],
+    [a.occurrences, b.occurrences, "desc"], [a.reason, b.reason, "text"],
+  ];
+  for (const [x, y, how] of keys) {
+    const order = how === "desc" ? Number(y ?? 0) - Number(x ?? 0) : byText(text(x), text(y));
+    if (order !== 0) return order;
+  }
+  return byText(canonicalJSON(a), canonicalJSON(b));
+}
+
+/// An answer with every list the SQL aggregates without a stated order in a
+/// deterministic one: edges semantically, identities and seeds canonically.
+/// Nothing is added, dropped or rewritten.
+export function normalizeAnswer(answer: JSONObject): JSONObject {
+  const out: JSONObject = { ...answer };
+  if (Array.isArray(answer.edges)) out.edges = [...answer.edges as JSONObject[]].sort(compareEdges);
+  for (const list of ["identities", "seeds"]) {
+    if (Array.isArray(answer[list])) {
+      out[list] = [...answer[list] as unknown[]].sort((x, y) => byText(canonicalJSON(x), canonicalJSON(y)));
+    }
+  }
+  return out;
 }
 
 async function addressed(kind: PlannedObject["kind"], value: unknown, key: (d: string) => string): Promise<PlannedObject> {
@@ -286,7 +321,7 @@ export async function planGeneration(input: PlanInput): Promise<GenerationPlan> 
     bundles: { complete: 0, partial: 0, missing: 0, noIdentity: 0 },
   };
   for (const id of Object.keys(cut.nodes ?? {}).sort()) {
-    const answer = cut.nodes![id];
+    const answer = normalizeAnswer(cut.nodes![id]);
     const status = String(answer.status);
     summary.nodes[status] = (summary.nodes[status] ?? 0) + 1;
     if (status !== "found") { nodes[id] = { status }; continue; }
@@ -303,7 +338,7 @@ export async function planGeneration(input: PlanInput): Promise<GenerationPlan> 
   }
   const artists: Record<string, JSONObject> = {};
   for (const key of Object.keys(cut.artists ?? {}).sort()) {
-    const answer = cut.artists![key];
+    const answer = normalizeAnswer(cut.artists![key]);
     const status = String(answer.status);
     summary.artists[status] = (summary.artists[status] ?? 0) + 1;
     if (status !== "found") { artists[key] = { status }; continue; }
@@ -330,11 +365,17 @@ export async function planGeneration(input: PlanInput): Promise<GenerationPlan> 
     identity: identity.digest,
     nodes,
     artists,
-    summary: {
-      // Every demanded entity terminal; whether every object was written and
-      // verified is the publication's to say, not the plan's.
-      terminal: summary.nodes.failed === 0 && summary.artists.failed === 0,
-      ...summary,
+    // Musical coverage: what the generation knows, missing and partial
+    // included. Says nothing about whether it was published properly.
+    summary,
+    // Publication completeness: a manifest is written only after every
+    // object below it was written or found, read back and its digest
+    // checked, and every pinned bundle checked the same way. One that could
+    // not be is never written, so a manifest that exists is complete.
+    publication: {
+      complete: true,
+      objects: objects.size,
+      bundlesPinned: bundles.filter((b) => b.digest).length,
     },
   };
   const manifestObject = keep(await addressed("manifest", manifest, manifestKey));
@@ -553,5 +594,284 @@ export async function dryRunGeneration(
         `${CONCURRENCY} at a time`,
       ],
     },
+  };
+}
+
+// MARK: - Publication
+
+/// R2 as publication needs it: reads with their version, writes that only
+/// create, and a replace that only replaces the version read.
+export interface GenerationStore {
+  get(key: string): Promise<{ body: string; etag: string } | null>;
+  /// Writes only if nothing is at the key; "exists" otherwise, untouched.
+  create(key: string, body: string, cacheControl: string): Promise<"created" | "exists">;
+  /// Writes only over the version read (`etag`), or only where nothing is
+  /// (`null`); "conflict" when the object moved meanwhile, untouched.
+  replace(key: string, body: string, etag: string | null, cacheControl: string): Promise<"replaced" | "conflict">;
+  /// Reserves R2 writes in the budget, or throws.
+  reserve(writes: number, bytes: number): Promise<void>;
+}
+
+export interface PublishDeps extends GenerationStore {
+  cut(day: string): Promise<{ cut: Cut; ms: number }>;
+  now(): Date;
+}
+
+/// Content-addressed objects and day pointers never change; the list does.
+export function generationCacheControl(key: string): string {
+  return key === CURRENT_KEY ? "public, max-age=60" : "public, max-age=31536000, immutable";
+}
+
+export class PublicationError extends Error {
+  constructor(public step: string, message: string) {
+    super(`${step}: ${message}`);
+  }
+}
+
+export interface PublicationUsage {
+  gets: number;
+  creates: number;
+  replaces: number;
+  bytesWritten: number;
+  reserved: number;
+  /// Objects found already there and verified, so not written again.
+  reused: number;
+}
+
+export interface PublicationReport {
+  date: string;
+  status: "published" | "resumed" | "already-published" | "refused" | "conflict";
+  manifest?: string;
+  problems: string[];
+  steps: { step: string; ms: number; detail?: string }[];
+  usage: PublicationUsage;
+  objects?: { written: number; reused: number; verified: number; bytes: number };
+  conditionalWrites?: "enforced";
+  current?: { generations: { date: string; manifest: string }[]; withdrawn: unknown[] };
+  summary?: unknown;
+}
+
+function counted(deps: PublishDeps, usage: PublicationUsage): PublishDeps {
+  return {
+    ...deps,
+    get: (key) => { usage.gets += 1; return deps.get(key); },
+    create: async (key, body, cc) => {
+      const result = await deps.create(key, body, cc);
+      usage.creates += 1;
+      if (result === "created") usage.bytesWritten += new TextEncoder().encode(body).length;
+      return result;
+    },
+    replace: async (key, body, etag, cc) => {
+      const result = await deps.replace(key, body, etag, cc);
+      usage.replaces += 1;
+      if (result === "replaced") usage.bytesWritten += new TextEncoder().encode(body).length;
+      return result;
+    },
+    reserve: (writes, bytes) => { usage.reserved += writes; return deps.reserve(writes, bytes); },
+  };
+}
+
+/// What is at a key, against the digest it must have.
+async function inspect(deps: GenerationStore, key: string, digest: string): Promise<"absent" | "verified" | "corrupt"> {
+  const held = await deps.get(key);
+  if (held === null) return "absent";
+  return (await sha256(held.body)) === digest ? "verified" : "corrupt";
+}
+
+/// Every object present and verified: reused when it is there and right,
+/// created when it is not, read back after. A wrong object at a digest's key
+/// stops publication -- it is never overwritten or worked around.
+async function ensureObjects(
+  deps: GenerationStore, objects: { key: string; digest: string; body: string }[], usage: PublicationUsage, step: string,
+): Promise<{ written: number; reused: number }> {
+  const states = await inParallel(objects, (o) => inspect(deps, o.key, o.digest));
+  const corrupt = objects.filter((_, i) => states[i] === "corrupt");
+  if (corrupt.length) throw new PublicationError(step, `${corrupt.length} object(s) do not match their digest, first ${corrupt[0].key}`);
+  const missing = objects.filter((_, i) => states[i] === "absent");
+  usage.reused += objects.length - missing.length;
+  if (missing.length) {
+    await deps.reserve(missing.length, missing.reduce((n, o) => n + new TextEncoder().encode(o.body).length, 0));
+  }
+  await inParallel(missing, async (o) => {
+    // "exists": another run wrote it meanwhile; the read-back decides.
+    await deps.create(o.key, o.body, generationCacheControl(o.key));
+    const back = await inspect(deps, o.key, o.digest);
+    if (back !== "verified") throw new PublicationError(step, `${o.key} read back ${back}`);
+  });
+  return { written: missing.length, reused: objects.length - missing.length };
+}
+
+/// The objects a manifest names, each with the digest it must have: answers,
+/// the identity snapshot, and the pinned bundles.
+export function referencedObjects(manifest: JSONObject): { key: string; digest: string; kind: string }[] {
+  const out: { key: string; digest: string; kind: string }[] = [];
+  for (const kind of ["nodes", "artists"] as const) {
+    for (const entry of Object.values((manifest[kind] ?? {}) as Record<string, JSONObject>)) {
+      if (typeof entry.answer === "string") out.push({ key: answerKey(entry.answer), digest: entry.answer, kind: "answer" });
+      for (const b of (entry.bundles as JSONObject[] | undefined) ?? []) {
+        if (typeof b.digest === "string") out.push({ key: bundleKey(b.digest), digest: b.digest, kind: "bundle" });
+      }
+    }
+  }
+  if (typeof manifest.identity === "string") out.push({ key: identityKey(manifest.identity), digest: manifest.identity, kind: "identity" });
+  const seen = new Set<string>();
+  return out.filter((o) => (seen.has(o.key) ? false : (seen.add(o.key), true)));
+}
+
+/// Reads a manifest and everything it names, checking every digest.
+async function verifyGeneration(deps: GenerationStore, manifestDigest: string, step: string): Promise<JSONObject> {
+  const held = await deps.get(manifestKey(manifestDigest));
+  if (held === null) throw new PublicationError(step, `manifest ${manifestDigest} is missing`);
+  if ((await sha256(held.body)) !== manifestDigest) throw new PublicationError(step, `manifest ${manifestDigest} does not match its digest`);
+  const manifest = JSON.parse(held.body) as JSONObject;
+  const objects = referencedObjects(manifest);
+  const states = await inParallel(objects, (o) => inspect(deps, o.key, o.digest));
+  const bad = objects.filter((_, i) => states[i] !== "verified");
+  if (bad.length) throw new PublicationError(step, `${bad.length} referenced object(s) missing or wrong, first ${bad[0].key}`);
+  return manifest;
+}
+
+interface CurrentList {
+  generations: { date: string; manifest: string }[];
+  withdrawn: { date: string }[];
+  [field: string]: unknown;
+}
+
+/// Puts the day first in current.json, keeping the six newest others, every
+/// withdrawal and any field it does not know -- replacing only the version it
+/// read, and reading again when someone else got there first.
+async function advertise(deps: PublishDeps, date: string, manifest: string): Promise<CurrentList> {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const held = await deps.get(CURRENT_KEY);
+    const list: CurrentList = held
+      ? JSON.parse(held.body)
+      : { format: CURRENT_FORMAT, generations: [], withdrawn: [] };
+    list.generations ??= [];
+    list.withdrawn ??= [];
+    if (list.withdrawn.some((w) => w.date === date)) {
+      throw new PublicationError("advertise", `${date} was withdrawn; it is not listed again`);
+    }
+    const listed = list.generations.find((g) => g.date === date);
+    if (listed && listed.manifest !== manifest) {
+      throw new PublicationError("advertise", `current.json lists ${date} as ${listed.manifest}, not ${manifest}`);
+    }
+    if (listed) return list;
+    const next: CurrentList = {
+      ...list,
+      format: CURRENT_FORMAT,
+      updatedAt: deps.now().toISOString(),
+      generations: [{ date, manifest }, ...list.generations.filter((g) => g.date !== date)]
+        .sort((a, b) => byText(b.date, a.date)).slice(0, RETAINED_GENERATIONS),
+      withdrawn: list.withdrawn,
+    };
+    const body = canonicalJSON(next);
+    await deps.reserve(1, new TextEncoder().encode(body).length);
+    if (await deps.replace(CURRENT_KEY, body, held?.etag ?? null, generationCacheControl(CURRENT_KEY)) === "conflict") continue;
+    const back = await deps.get(CURRENT_KEY);
+    if (back === null || (await sha256(back.body)) !== (await sha256(body))) {
+      // Replaced, then changed again by somebody else: read it and decide afresh.
+      continue;
+    }
+    return next;
+  }
+  throw new PublicationError("advertise", "current.json kept changing; gave up after 5 attempts");
+}
+
+/// §9.6, once. The day pointer is the commit point: before it, a failure
+/// leaves nothing anybody reads; after it, a retry verifies what the day
+/// names and finishes advertising it. Never overwrites a day, never writes a
+/// manifest before everything under it is verified, never lists a day in
+/// current.json before its pointer exists.
+export async function publishGeneration(base: PublishDeps, demand: Demand): Promise<PublicationReport> {
+  const usage: PublicationUsage = { gets: 0, creates: 0, replaces: 0, bytesWritten: 0, reserved: 0, reused: 0 };
+  const deps = counted(base, usage);
+  const date = deps.now().toISOString().slice(0, 10);
+  const report: PublicationReport = { date, status: "published", problems: [], steps: [], usage };
+  const step = async <T>(name: string, work: () => Promise<T>, detail?: (t: T) => string): Promise<T> => {
+    const t = performance.now();
+    const result = await work();
+    report.steps.push({ step: name, ms: Math.round(performance.now() - t), detail: detail?.(result) });
+    return result;
+  };
+
+  // A day already committed: verify it whole, then finish advertising it.
+  const day = await step("read-day", () => deps.get(dayKey(date)));
+  if (day) {
+    const pointer = JSON.parse(day.body) as { manifest: string };
+    const manifest = await step("verify-published", () => verifyGeneration(deps, pointer.manifest, "verify-published"));
+    const before = usage.replaces;
+    const current = await step("advertise", () => advertise(deps, date, pointer.manifest));
+    return {
+      ...report, status: usage.replaces > before ? "resumed" : "already-published", manifest: pointer.manifest,
+      current: { generations: current.generations, withdrawn: current.withdrawn }, summary: manifest.summary,
+    };
+  }
+
+  const { cut, ms: cutMs } = await step("cut", () => deps.cut(date), (r) => `${r.ms} ms`);
+  const problems = cutProblems(cut, date, demand);
+  if (problems.length) return { ...report, status: "refused", problems };
+
+  const current = await step("read-current", () => deps.get(CURRENT_KEY));
+  const wanted = [...new Set([...bundleIDs(cut).values()].flat())].sort();
+  const bundleRefs = new Map<string, BundleRef | null>();
+  await step("read-bundle-refs", () => inParallel(wanted, async (id) => {
+    const held = await deps.get(artistRefKey(Number(id)));
+    bundleRefs.set(id, held ? JSON.parse(held.body) as BundleRef : null);
+  }));
+  const plan = await step("plan", () => planGeneration({
+    cut, demand, bundleRefs, current: current ? JSON.parse(current.body) : null,
+    publishedAt: deps.now().toISOString(), cutMs,
+  }));
+
+  // Pinned bundles: the object each reference named, as it named it.
+  const pinned = plan.bundles.filter((b) => b.digest);
+  await step("verify-bundles", async () => {
+    const states = await inParallel(pinned, (b) => inspect(deps, bundleKey(b.digest!), b.digest!));
+    const bad = pinned.filter((_, i) => states[i] !== "verified");
+    if (bad.length) throw new PublicationError("verify-bundles", `bundle ${bad[0].discogsID} (${bad[0].digest}) is ${states[pinned.indexOf(bad[0])]}`);
+  }, () => `${pinned.length} pinned`);
+
+  const content = plan.addressed.filter((o) => o.kind !== "manifest");
+  const manifestObject = plan.addressed.find((o) => o.kind === "manifest")!;
+  const written = await step("write-objects", () => ensureObjects(deps, content, usage, "write-objects"),
+    (r) => `${r.written} written, ${r.reused} reused`);
+  const wroteManifest = await step("write-manifest", () => ensureObjects(deps, [manifestObject], usage, "write-manifest"));
+  await step("verify-manifest", () => verifyGeneration(deps, plan.manifestDigest, "verify-manifest"));
+
+  // The write-once guarantee rests on R2 refusing a create over an existing
+  // object. Asked of the manifest, now there, with its own bytes: harmless
+  // whichever way R2 answers, and it must answer "exists".
+  const probe = await step("probe-conditional-write", () => deps.create(manifestObject.key, manifestObject.body, generationCacheControl(manifestObject.key)));
+  if (probe !== "exists") throw new PublicationError("probe-conditional-write", "R2 accepted a create over an existing object; day pointers would not be write-once");
+
+  // The commit point.
+  const pointer = plan.pointers.find((p) => p.kind === "day")!;
+  await deps.reserve(1, pointer.bytes);
+  const created = await step("write-day", () => deps.create(pointer.key, pointer.body, generationCacheControl(pointer.key)));
+  const held = await deps.get(pointer.key);
+  if (held === null) throw new PublicationError("write-day", `${pointer.key} did not read back`);
+  const named = (JSON.parse(held.body) as { manifest: string }).manifest;
+  if (named !== plan.manifestDigest) {
+    return {
+      ...report, status: "conflict", manifest: named,
+      problems: [`${date} was published meanwhile as ${named}; ${plan.manifestDigest} is not published and nothing was overwritten`],
+    };
+  }
+  if (created === "created" && (await sha256(held.body)) !== pointer.digest) {
+    throw new PublicationError("write-day", `${pointer.key} did not read back as written`);
+  }
+
+  const list = await step("advertise", () => advertise(deps, date, plan.manifestDigest));
+  return {
+    ...report,
+    status: "published",
+    manifest: plan.manifestDigest,
+    objects: {
+      written: written.written + wroteManifest.written, reused: written.reused + wroteManifest.reused,
+      verified: plan.addressed.length + pinned.length, bytes: plan.addressed.reduce((n, o) => n + o.bytes, 0),
+    },
+    conditionalWrites: "enforced",
+    current: { generations: list.generations, withdrawn: list.withdrawn },
+    summary: plan.manifest.summary,
   };
 }

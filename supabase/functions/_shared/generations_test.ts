@@ -7,9 +7,11 @@
 import { assert, assertEquals, assertNotEquals } from "jsr:@std/assert@1";
 import pilot from "./testdata/pilot_demand_v1.json" with { type: "json" };
 import { artistRefKey } from "./knowledge.ts";
+import { bundleKey } from "./artist_bundle.ts";
 import {
-  bundleIDs, CURRENT_KEY, Cut, cutProblems, dayKey, Demand, dryRunGeneration, GenerationReadDeps, identitySnapshot,
-  PILOT_DEMAND_DIGEST, planGeneration,
+  bundleIDs, compareEdges, CURRENT_KEY, Cut, cutProblems, dayKey, Demand, dryRunGeneration, GenerationReadDeps,
+  identitySnapshot, manifestKey, normalizeAnswer, PILOT_DEMAND_DIGEST, planGeneration, publishGeneration,
+  PublishDeps, referencedObjects,
 } from "./generations.ts";
 
 const DAY = "2026-10-12";
@@ -241,3 +243,284 @@ Deno.test("a day already published is reported, not overwritten", async () => {
   assertEquals(report.problems, [`${dayKey(DAY)} exists: ${DAY} is published already`]);
   assertEquals(world.r2.get(dayKey(DAY)), "{}");
 });
+
+// MARK: - Publication
+
+async function digestOf(text: string): Promise<string> {
+  return [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)))]
+    .map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+
+/// R2 in memory, with ETags and conditional writes, and places to break it.
+class Bucket {
+  objects = new Map<string, { body: string; etag: string }>();
+  version = 0;
+  cuts = 0;
+  reserved = 0;
+  cut: Cut = makeCut();
+  clock = new Date(`${DAY}T00:41:00Z`);
+  /// Called before each create/replace; may throw (an interruption) or
+  /// change the bucket (a concurrent writer).
+  beforeWrite: ((key: string, body: string) => void) | null = null;
+  /// Rewrites what a create stores (a corrupting write).
+  mangle: ((key: string, body: string) => string) | null = null;
+  refuseBudget = false;
+
+  put(key: string, body: string) { this.objects.set(key, { body, etag: `"v${++this.version}"` }); }
+
+  deps(): PublishDeps {
+    return {
+      cut: () => { this.cuts += 1; return Promise.resolve({ cut: this.cut, ms: 900 }); },
+      now: () => this.clock,
+      get: (key) => Promise.resolve(this.objects.get(key) ?? null),
+      create: (key, body) => {
+        this.beforeWrite?.(key, body);
+        if (this.objects.has(key)) return Promise.resolve("exists" as const);
+        this.put(key, this.mangle ? this.mangle(key, body) : body);
+        return Promise.resolve("created" as const);
+      },
+      replace: (key, body, etag) => {
+        this.beforeWrite?.(key, body);
+        const held = this.objects.get(key);
+        if ((etag === null && held) || (etag !== null && held?.etag !== etag)) return Promise.resolve("conflict" as const);
+        this.put(key, body);
+        return Promise.resolve("replaced" as const);
+      },
+      reserve: (writes) => {
+        if (this.refuseBudget) return Promise.reject(new Error("r2 budget refused"));
+        this.reserved += writes;
+        return Promise.resolve();
+      },
+    };
+  }
+
+  keys(prefix: string) { return [...this.objects.keys()].filter((k) => k.includes(prefix)); }
+}
+
+/// Every object a published generation names is there and right.
+async function assertWhole(bucket: Bucket, manifest: string) {
+  const held = bucket.objects.get(manifestKey(manifest))!;
+  assertEquals(await digestOf(held.body), manifest);
+  for (const o of referencedObjects(JSON.parse(held.body))) {
+    assertEquals(await digestOf(bucket.objects.get(o.key)!.body), o.digest, o.key);
+  }
+}
+
+Deno.test("edges are ordered by what they say, not by how they were serialized", () => {
+  const edges = (makeCut().nodes!["artist:dean blunt"].edges as Record<string, unknown>[]);
+  const reversed = { status: "found", edges: [...edges].reverse(), identities: [] };
+  assertEquals(normalizeAnswer(reversed), normalizeAnswer({ status: "found", edges, identities: [] }));
+  // Keys in another order are the same edge, in the same place.
+  const shuffled = edges.map((e) => Object.fromEntries(Object.entries(e).reverse()));
+  assertEquals((normalizeAnswer({ edges: shuffled }).edges as unknown[]).map((e) => JSON.stringify(e, Object.keys(e as object).sort())),
+    (normalizeAnswer({ edges }).edges as unknown[]).map((e) => JSON.stringify(e, Object.keys(e as object).sort())));
+  // Nothing dropped; same-named targets ordered by row.
+  const twins = [
+    { kind: "sharedLabel", confidence: 0.8, reason: "x", to: { kind: "artist", name: "Speedy J", rowID: "row-b" } },
+    { kind: "sharedLabel", confidence: 0.8, reason: "x", to: { kind: "artist", name: "Speedy J", rowID: "row-a" } },
+  ];
+  assertEquals([...twins].sort(compareEdges).map((e) => e.to.rowID), ["row-a", "row-b"]);
+  assertEquals(normalizeAnswer({ edges: twins }).edges, [twins[1], twins[0]]);
+});
+
+Deno.test("shuffled SQL output publishes the same answers", async () => {
+  const a = await planGeneration({ cut: makeCut(), demand, bundleRefs: new Map(), current: null, publishedAt: "", cutMs: 0 });
+  const shuffledCut = makeCut();
+  for (const answer of Object.values(shuffledCut.nodes!)) (answer.edges as unknown[]).reverse();
+  const b = await planGeneration({ cut: shuffledCut, demand, bundleRefs: new Map(), current: null, publishedAt: "", cutMs: 0 });
+  assertEquals(a.manifestDigest, b.manifestDigest);
+});
+
+Deno.test("a publication writes everything, verified, in order, and lists the day", async () => {
+  const bucket = new Bucket();
+  const order: string[] = [];
+  bucket.beforeWrite = (key) => order.push(key);
+  const report = await publishGeneration(bucket.deps(), demand);
+  assertEquals(report.status, "published");
+  assertEquals(report.conditionalWrites, "enforced");
+  await assertWhole(bucket, report.manifest!);
+  // Objects, then the manifest (and the probe), then the day, then the list.
+  const manifestAt = order.indexOf(manifestKey(report.manifest!));
+  assert(order.slice(0, manifestAt).every((k) => k.includes("/objects/") || k.includes("/identity/")));
+  assertEquals(order.slice(-2), [dayKey(DAY), CURRENT_KEY]);
+  const current = JSON.parse(bucket.objects.get(CURRENT_KEY)!.body);
+  assertEquals(current.generations, [{ date: DAY, manifest: report.manifest }]);
+  assertEquals(JSON.parse(bucket.objects.get(dayKey(DAY))!.body).manifest, report.manifest);
+  const manifest = JSON.parse(bucket.objects.get(manifestKey(report.manifest!))!.body);
+  assertEquals(manifest.publication.complete, true);
+  // Coverage stays apart from completeness: no bundles at all is still complete.
+  assertEquals(manifest.summary.bundles, { complete: 0, partial: 0, missing: 3, noIdentity: 13 });
+});
+
+Deno.test("publishing twice is a no-op the second time", async () => {
+  const bucket = new Bucket();
+  const first = await publishGeneration(bucket.deps(), demand);
+  const before = new Map(bucket.objects);
+  const second = await publishGeneration(bucket.deps(), demand);
+  assertEquals(second.status, "already-published");
+  assertEquals(second.manifest, first.manifest);
+  assertEquals(bucket.objects, before);
+  assertEquals(bucket.cuts, 1);
+  assertEquals(second.usage.creates + second.usage.replaces, 0);
+});
+
+Deno.test("an interrupted object write leaves nothing visible, and a retry reuses what landed", async () => {
+  const bucket = new Bucket();
+  let writes = 0;
+  bucket.beforeWrite = (key) => { if (key.includes("/objects/") && ++writes === 40) throw new Error("connection reset"); };
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "connection reset");
+  assertEquals(bucket.keys("/manifests/"), []);
+  assertEquals(bucket.keys("/days/"), []);
+  assert(!bucket.objects.has(CURRENT_KEY));
+  const landed = bucket.keys("/objects/").length;
+  assert(landed >= 32 && landed < 177, `${landed}`);
+
+  bucket.beforeWrite = null;
+  const retry = await publishGeneration(bucket.deps(), demand);
+  assertEquals(retry.status, "published");
+  assertEquals(retry.objects!.reused, landed);
+  assertEquals(bucket.keys("/objects/").length, 177);
+  await assertWhole(bucket, retry.manifest!);
+});
+
+Deno.test("a corrupt object already at a digest's key blocks publication", async () => {
+  const bucket = new Bucket();
+  const plan = await planGeneration({ cut: bucket.cut, demand, bundleRefs: new Map(), current: null, publishedAt: "", cutMs: 0 });
+  const victim = plan.addressed.find((o) => o.kind === "artist")!;
+  bucket.put(victim.key, victim.body.replace("Ambient", "Ambiant"));
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "do not match their digest");
+  assertEquals(bucket.objects.get(victim.key)!.body.includes("Ambiant"), true);
+  assertEquals(bucket.keys("/manifests/"), []);
+  assertEquals(bucket.keys("/days/"), []);
+});
+
+Deno.test("a write that reads back wrong blocks publication", async () => {
+  const bucket = new Bucket();
+  bucket.mangle = (key, body) => key.includes("/objects/") ? body + " " : body;
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "read back corrupt");
+  assertEquals(bucket.keys("/days/"), []);
+});
+
+Deno.test("a manifest that fails verification is never committed", async () => {
+  const bucket = new Bucket();
+  bucket.mangle = (key, body) => key.includes("/manifests/") ? body.replace('"complete":true', '"complete":false') : body;
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "write-manifest");
+  assertEquals(bucket.keys("/days/"), []);
+  assert(!bucket.objects.has(CURRENT_KEY));
+});
+
+Deno.test("a pinned bundle that is not what its reference says blocks publication", async () => {
+  const bucket = new Bucket();
+  const digest = "d".repeat(64);
+  bucket.put(artistRefKey(2419343), JSON.stringify({ digest, key: bundleKey(digest), source: { complete: true } }));
+  bucket.put(bundleKey(digest), "{}");
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "bundle 2419343");
+  assertEquals(bucket.keys("/manifests/"), []);
+});
+
+Deno.test("missing and partial bundles are recorded and published", async () => {
+  const bucket = new Bucket();
+  const body = '{"bundle":"dean"}', digest = await digestOf(body);
+  bucket.put(artistRefKey(2419343), JSON.stringify({ digest, key: bundleKey(digest), source: { complete: false, documentsRead: 3, representativeReleases: 9 } }));
+  bucket.put(bundleKey(digest), body);
+  const report = await publishGeneration(bucket.deps(), demand);
+  assertEquals(report.status, "published");
+  const manifest = JSON.parse(bucket.objects.get(manifestKey(report.manifest!))!.body);
+  assertEquals(manifest.nodes["artist:dean blunt"].bundles, [{ discogsID: 2419343, status: "partial", digest, read: 3, of: 9 }]);
+  assertEquals(manifest.nodes["artist:speedy j"].bundles.map((b: { status: string }) => b.status), ["missing", "missing"]);
+  assert(referencedObjects(manifest).some((o) => o.key === bundleKey(digest)));
+});
+
+Deno.test("a day published meanwhile is never overwritten", async () => {
+  const bucket = new Bucket();
+  const theirs = JSON.stringify({ format: "indigo.knowledge-day/1", date: DAY, manifest: "f".repeat(64), publishedAt: "x" });
+  bucket.beforeWrite = (key) => { if (key === dayKey(DAY) && !bucket.objects.has(key)) bucket.put(key, theirs); };
+  const report = await publishGeneration(bucket.deps(), demand);
+  assertEquals(report.status, "conflict");
+  assertEquals(bucket.objects.get(dayKey(DAY))!.body, theirs);
+  assert(!bucket.objects.has(CURRENT_KEY));
+});
+
+Deno.test("a day that names a broken generation is not advertised", async () => {
+  const bucket = new Bucket();
+  bucket.put(dayKey(DAY), JSON.stringify({ manifest: "f".repeat(64) }));
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "verify-published");
+  assert(!bucket.objects.has(CURRENT_KEY));
+  assertEquals(bucket.cuts, 0);
+});
+
+Deno.test("an interrupted current.json update is finished by the retry, once", async () => {
+  const bucket = new Bucket();
+  bucket.put(CURRENT_KEY, JSON.stringify({ format: "indigo.knowledge-current/1", generations: [{ date: "2026-10-11", manifest: "a".repeat(64) }],
+    withdrawn: [{ date: "2026-10-09", reason: "bad edges" }], note: "kept" }));
+  bucket.beforeWrite = (key) => { if (key === CURRENT_KEY) throw new Error("worker killed"); };
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "worker killed");
+  assert(bucket.objects.has(dayKey(DAY)));
+  assertEquals(JSON.parse(bucket.objects.get(CURRENT_KEY)!.body).generations.length, 1);
+
+  bucket.beforeWrite = null;
+  const retry = await publishGeneration(bucket.deps(), demand);
+  assertEquals(retry.status, "resumed");
+  assertEquals(bucket.cuts, 1);
+  const current = JSON.parse(bucket.objects.get(CURRENT_KEY)!.body);
+  assertEquals(current.generations.map((g: { date: string }) => g.date), [DAY, "2026-10-11"]);
+  assertEquals(current.withdrawn, [{ date: "2026-10-09", reason: "bad edges" }]);
+  assertEquals(current.note, "kept");
+  assertEquals((await publishGeneration(bucket.deps(), demand)).status, "already-published");
+});
+
+Deno.test("a concurrent current.json change is merged, not lost", async () => {
+  const bucket = new Bucket();
+  bucket.put(CURRENT_KEY, JSON.stringify({ generations: [], withdrawn: [] }));
+  let once = true;
+  bucket.beforeWrite = (key) => {
+    if (key === CURRENT_KEY && once) {
+      once = false;
+      bucket.put(CURRENT_KEY, JSON.stringify({ generations: [], withdrawn: [{ date: "2026-10-10", reason: "revoked meanwhile" }] }));
+    }
+  };
+  const report = await publishGeneration(bucket.deps(), demand);
+  assertEquals(report.status, "published");
+  const current = JSON.parse(bucket.objects.get(CURRENT_KEY)!.body);
+  assertEquals(current.withdrawn, [{ date: "2026-10-10", reason: "revoked meanwhile" }]);
+  assertEquals(current.generations[0].date, DAY);
+});
+
+Deno.test("a withdrawn day is not listed again", async () => {
+  const bucket = new Bucket();
+  bucket.put(CURRENT_KEY, JSON.stringify({ generations: [], withdrawn: [{ date: DAY, reason: "test" }] }));
+  await assertRejectsWith(publishGeneration(bucket.deps(), demand), "was withdrawn");
+  assertEquals(JSON.parse(bucket.objects.get(CURRENT_KEY)!.body).generations, []);
+});
+
+Deno.test("a refused cut or a refused budget writes nothing", async () => {
+  const refused = new Bucket();
+  refused.cut = makeCut({ status: "refused", reason: "no-completed-rebuild-today", nodes: null, artists: null });
+  assertEquals((await publishGeneration(refused.deps(), demand)).status, "refused");
+  assertEquals(refused.objects.size, 0);
+  const broke = new Bucket();
+  broke.refuseBudget = true;
+  await assertRejectsWith(publishGeneration(broke.deps(), demand), "budget refused");
+  assertEquals(broke.objects.size, 0);
+});
+
+Deno.test("an R2 that ignores create-only is caught before the day is written", async () => {
+  const bucket = new Bucket();
+  const deps = bucket.deps();
+  const lax: PublishDeps = { ...deps, create: (key, body) => { bucket.put(key, body); return Promise.resolve("created"); } };
+  await assertRejectsWith(publishGeneration(lax, demand), "probe-conditional-write");
+  assertEquals(bucket.keys("/days/"), []);
+});
+
+async function assertRejectsWith(promise: Promise<unknown>, text: string) {
+  try {
+    await promise;
+  } catch (error) {
+    assert(String(error).includes(text), `expected "${text}", got ${error}`);
+    return;
+  }
+  throw new Error(`expected a rejection with "${text}"`);
+}
+
+
+

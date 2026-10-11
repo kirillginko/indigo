@@ -123,3 +123,44 @@ export async function getObject(config: R2Config, key: string): Promise<string |
   if (!response.ok) throw new Error(`r2 get ${key} answered ${response.status}`);
   return await response.text();
 }
+
+/// An object's text and its ETag, or null for one that is not there.
+export async function getObjectTagged(config: R2Config, key: string): Promise<{ body: string; etag: string } | null> {
+  const response = await client(config).fetch(objectURL(config, key), {
+    method: "GET",
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (response.status === 404) {
+    await response.body?.cancel();
+    return null;
+  }
+  if (!response.ok) throw new Error(`r2 get ${key} answered ${response.status}`);
+  const etag = response.headers.get("etag") ?? "";
+  return { body: await response.text(), etag };
+}
+
+/// A conditional write: `ifNoneMatch: "*"` creates only, `ifMatch` replaces
+/// only the version read. "precondition-failed" when R2 refused it (412) --
+/// the object is not what the caller assumed, and nothing was written.
+export async function putObjectConditional(
+  config: R2Config, key: string, body: string,
+  condition: { ifNoneMatch: "*" } | { ifMatch: string },
+  cacheControl = CACHE_CONTROL, contentType = "application/json",
+): Promise<"written" | "precondition-failed"> {
+  const headers: Record<string, string> = { "Content-Type": contentType, "Cache-Control": cacheControl };
+  if ("ifNoneMatch" in condition) headers["If-None-Match"] = condition.ifNoneMatch;
+  else headers["If-Match"] = condition.ifMatch;
+  const response = await client(config).fetch(objectURL(config, key), {
+    method: "PUT", body, headers, signal: AbortSignal.timeout(30_000),
+  });
+  if (response.status === 412) {
+    await response.body?.cancel();
+    return "precondition-failed";
+  }
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 200);
+    throw new Error(`r2 put ${key} answered ${response.status}: ${detail}`);
+  }
+  await response.body?.cancel();
+  return "written";
+}
