@@ -813,3 +813,57 @@ the edges watermark in place of the clock-derived label.
 - Database load: one warm-cache statement under a second, once a day.
 - Next, if approved: the `knowledge_cut` migration (with the rebuild proof and
   target id evidence), then the publisher with its dry-run mode.
+
+## 11. `knowledge_cut` migration review (2026-10-12) — not deployed
+
+**Migration history.** Live had 0070 and 0071, applied from
+`trim-the-database-under-500mb` (6db3f36) and missing here. Both files were
+brought over unchanged (81d492a) after checking them against the
+statements `supabase_migrations.schema_migrations` recorded (identical,
+ignoring comments and whitespace). `supabase migration list --linked`: no
+mismatches through 0074. `supabase db push --linked --dry-run`: would apply
+**only `0075_knowledge_cut.sql`**. Not pushed.
+
+**What 0075 adds** (no tables, nothing written):
+
+- `knowledge_answers(p_nodes, p_artists)` — 0074's query, STABLE, security
+  invoker. Artist targets add `rowID`, a Discogs id with `idEvidence`
+  (`discogs-document` through a Discogs release document; `adopted-by-name`
+  through radio; `name-matched` through a release with no Discogs id;
+  `several-ids` never seen) and `sharedName` when two rows under one starting
+  point share a name. Each node lists its `seeds` (row, routes, Discogs id)
+  and `ambiguousName` when its name matched more than one row — explore's walk
+  combines them; that is kept and said, not silent. Format 3. With those
+  fields removed, its answer equals `explore_knowledge`'s.
+- `knowledge_cut(p_day, p_demand)` — one `LANGUAGE sql STABLE SECURITY DEFINER`
+  statement: refuses (`not-today`, `not-the-frozen-demand-set` by jsonb digest
+  `5754856d…c88e0`, `out-of-bounds` beyond 48 nodes / 400 artists,
+  `no-completed-rebuild-today`) before answering anything; otherwise batches
+  the demand set (12 nodes / 50 artists) through `knowledge_answers` inside
+  the same statement and returns the answers with `statementAt`,
+  `pg_current_snapshot()`, the demand digest, and `rebuild.proof` (today's
+  00:23 run: jobid, runid, start, end — succeeded, in its slot, ended before
+  the statement) and `rebuild.latest` (the newest finished rebuild the
+  snapshot includes).
+- Privileges: both revoked from PUBLIC, `anon` and `authenticated` by name;
+  `service_role` only; not in `app_callable_functions()`.
+
+**Tested** in a throwaway Postgres 17 (`Scripts/test-migrations.sh`, every
+migration then every smoke test; exit 0), `knowledge_cut_smoke.sql`:
+privileges (anon, authenticated, PUBLIC cannot; service_role can; not on the
+app list); refusal with no run, an unfinished run, yesterday's run, another
+day, another demand set; a cut with today's run (24 nodes, 163 artists, 4
+batches, proof recorded); explicit `unknown` and `unsupported`; a
+Discogs-backed peer carrying its id as `discogs-document`, a peer through an
+uncatalogued release `name-matched`, a radio neighbour `adopted-by-name`, two
+"Speedy J" rows as two flagged targets and as an `ambiguousName` starting
+point; and equality with `explore_knowledge` without the new fields. The
+pg_cron stub gained `runid` and `end_time` to match pg_cron.
+
+**Measured on live, read-only** (the function body run as one SELECT with
+the pilot set; nothing created): 1.19 MB; artist targets 2,559 —
+`discogs-document` 1,903 (74%), `adopted-by-name` 133, `name-matched` 32, no
+id 491; one ambiguous starting point (`speedy j`, 2 rows). 73,764 buffer
+hits, no disk reads, no temp; execution 1.2–7.6 s across runs for identical
+buffer work (the free tier's shared CPU, with drains every five minutes),
+against 0.6–2.0 s for 0074's answers alone.

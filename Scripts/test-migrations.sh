@@ -127,3 +127,5 @@ run -f "$ROOT/supabase/tests/release_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/merge_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/prune_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/offload_smoke.sql" | sed 's/^/    /'
+run -v demand="$(cat "$ROOT/supabase/functions/_shared/testdata/pilot_demand_v1.json")" \
+    -f "$ROOT/supabase/tests/knowledge_cut_smoke.sql" | sed 's/^/    /'
