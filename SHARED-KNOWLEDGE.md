@@ -1,7 +1,8 @@
 # Shared knowledge for For You — architecture audit and plan
 
 *2026-10-11. Supersedes the plan behind the first backend shadow comparison
-(0072, October 8). Nothing here has been started.*
+(0072, October 8). Decisions recorded 2026-10-11 (§6). Nothing here has been
+started; Phase 1 begins after the real-Mac For You check.*
 
 **Objective.** When the Mac and the iPhone hold the same synced personal data
 and the same shared knowledge generation, For You ranks the same
@@ -109,6 +110,15 @@ not "know the same things".
 
 ## 3. Target
 
+**One design rule above the rest: the generation describes music, not For
+You.** It holds entities (artists, labels, releases, broadcasts, shows),
+their verified identities, and their relationships with kind, source and the
+record each rests on — in the vocabulary DIG's graph already uses. For You is
+its first reader, not its shape: the same generation should later serve
+personalized mixes, curated playlists, discovery journeys and Bandcamp or
+SoundCloud exploration without being rebuilt. Anything specific to one
+algorithm (scores, cut-offs, which blocks exist) stays on the device.
+
 ```
 For You  =  rank( personal(CloudKit),  knowledge(G),  identity(G),  day )
 ```
@@ -117,10 +127,19 @@ where **G is one immutable shared knowledge generation** both devices can
 name and fetch, and nothing in `knowledge(G)` or `identity(G)` depends on
 the device.
 
-- **A generation manifest** in R2, immutable, under its digest: the edge
-  generation it was cut from, the identity snapshot it carries, the bundle
-  references current at that moment, and the format. A small, mutable
-  pointer names the current manifest.
+- **One generation per UTC day, published atomically**: a manifest in R2,
+  immutable, under its digest — the edge generation it was cut from, the
+  identity snapshot it carries, the bundle references current at that
+  moment, and the format. Objects are written first and the manifest last, so
+  a device can never see a generation with parts missing. A small, mutable
+  pointer per day names that day's manifest; both devices select the same
+  complete generation when one exists, never the newest mutable data.
+- **Retention: seven daily generations.** Every object is content-addressed,
+  so a bundle or answer unchanged between days is stored once and shared by
+  every manifest that names it. An object is removed only when no retained
+  manifest references it. A device returning after more than seven days
+  moves to the current day's generation and says so in its diagnostics; it
+  never ranks from a mix of an old manifest and new objects.
 - **Per-entity answers inside the generation**, immutable: what
   `explore_knowledge` answers today for a starting point or an artist, cut
   once per generation and published under digests — so a device can ask for
@@ -131,16 +150,24 @@ the device.
   explicit namesake markers for names more than one entry answers to. For
   You's canonicalizer reads this instead of the device's own evidence.
   DIG's pages can keep using local evidence on top.
+- **Identity scope from shared inputs only**: the snapshot covers the
+  recommendation neighbourhoods that were asked for and the candidate
+  identities inside them. What is asked for is derived from the synced
+  personal data (the starting points) and the generation itself — never
+  from what a device happens to have cached, so two devices asking for the
+  same starting points get the same identities.
 - **Pinning**: For You ranks only from one generation at a time; the stamp
   names it. A device that has not got all of G's answers for its starting
   points either fetches them or keeps showing the last complete answer —
   it never mixes generations or fills from local caches.
-- **Day-stable choice of generation**: both devices use the latest
-  generation published before the start of the evaluation day (UTC), so
-  devices that open For You hours apart still agree for that day.
-- **Device-local knowledge** stays out of the ranked blocks (decision
-  needed, §6). "Back in your library" stays local and unranked against the
-  rest.
+- **Day-stable choice of generation**: both devices use that UTC day's
+  generation, so devices that open For You hours apart still agree for the
+  day. Before the day's generation is complete, both keep the previous
+  day's.
+- **Device-local knowledge stays out of the shared ranked blocks.** Library
+  relationships remain in DIG; "Back in your library" stays local and
+  unranked against the rest. A library-specific discovery section may come
+  later, as its own block.
 - **Stamp** gains the generation id; a cross-device test asserts: equal
   `personal` + equal generation ⇒ equal `ranked`.
 
@@ -152,38 +179,69 @@ weights.
 ### Phase 1 — Identity-aware shadow parity (app only; no backend change)
 
 Put the backend's answers through the same identity layer the visible For
-You uses, and measure the gap on both devices.
+You uses, and measure where the shared knowledge stands. No generation
+publishing, no backend change, no change to the visible For You.
 
-1. Canonicalize backend answers with the backend's own identities (format 2
-   lists them per node) and the same `GraphCanonicalizer` rules; build the
-   snapshot with the same one-artist-one-candidate pass and known-artist
-   policy.
-2. Shadow report per stage: SQL only; SQL + bundles; by route kind; by
-   identity (verified / unresolved / alias); coverage (answers found,
-   unknown, partial bundles).
-3. FY-style code for the shadow, so the Mac's and iPhone's shadow codes can be
-   compared exactly like the visible ones.
-4. Run on the Production copy (offline audit) and live on Mac and iPhone.
+1. Rank three ways through the identity-aware path, from the same personal
+   data and the same day: **SQL only**, **SQL + R2 bundles**, and the
+   **current visible** (local) knowledge.
+2. Canonicalize backend answers with the backend's own identities (format 2
+   lists them per node) under the same `GraphCanonicalizer` rules; the same
+   one-artist-one-candidate pass and known-artist policy.
+3. Report, for each pair: ranked overlap; candidate reach (how many of each
+   side's candidates the other can reach at all); missing relationship
+   categories; identity coverage (verified, unresolved, alias, namesake);
+   known-artist exclusions.
+4. Attribute every difference to **source knowledge** (an edge or entity one
+   side has and the other lacks) or **identity evidence** (the same edges,
+   placed differently), by re-running each side's knowledge under the other
+   side's identities.
+5. Measure response sizes, query timing per call, cache reuse across looks
+   and generations, and partial failures (unknown entities, missing or
+   partial bundles, timeouts).
+6. An FY-style code for the shadow, so the Mac's and iPhone's shadow codes
+   compare like the visible ones.
+7. Run on the Production copy (offline audit) and live on the Mac; on the
+   iPhone when its simulator has network.
 
-*Exit*: a categorized list of every top-20 difference between local and
-backend knowledge on this Mac, and identical shadow codes on Mac and iPhone
-whenever their shadow generations match.
+*Exit*: no threshold against the local engine. Phase 1 reports, for the
+backend knowledge: cross-device determinism (identical shadow codes when
+inputs match), identity correctness (no false merges, namesakes apart),
+relationship coverage by kind, recommendation quality and diversity (what is
+offered, by how many independent routes, across how many kinds), explanation
+accuracy (each reason rests on a real record), offline behaviour, and
+performance. Those decide what Phases 2 and 3 must improve.
 
 ### Phase 2 — Generation pinning, in shadow (worker + R2; no new tables)
 
-1. The worker cuts each edge generation into an immutable manifest plus
-   per-entity answers in R2 **for the entities devices ask about** — answers
-   are written on demand when first asked for in a generation and kept
-   (budgeted through `reserveR2`, no global backfill).
-2. Day-stable generation choice in the client; the shadow fetches by
+1. **Cut once a day, for a demand set, published atomically.** The worker
+   computes the day's per-entity answers in one pass from one database
+   snapshot, for the *demand set*: every entity devices asked about in the
+   retained week, plus the candidate identities one step out of them. It
+   writes the objects (content-addressed, unchanged ones not rewritten,
+   budgeted through `reserveR2`), then the manifest, then the day's pointer.
+   Nothing is computed into a generation after it is published — computing
+   later would read newer tables, and the generation would depend on which
+   device asked first.
+2. **The demand set comes from shared inputs.** Devices ask for entities
+   derived from synced personal data (the starting points), so two devices
+   with the same data ask for the same ones. A starting point new today
+   joins tomorrow's set; until then both devices treat it alike — present in
+   the inputs, absent from the generation — and the diagnostics count it.
+   Where the demand set is recorded without a new table (an R2 object per
+   day, or the existing job queue) is a Phase 2 design question.
+3. Day-stable generation choice in the client; the shadow fetches by
    generation and never mixes two.
-3. Identity snapshot v0 published with the manifest, built from what the
+4. Identity snapshot v0 published inside the manifest, built from what the
    backend already holds: `external_ids` (including `musicbrainz_discogs`),
    Discogs ids on artist rows, and bundles' credit ids — scoped to the
-   entities in answers, not the whole catalogue.
+   demand set's neighbourhoods and candidate identities, not the catalogue.
+5. Retention: seven manifests; an object is deleted only when no retained
+   manifest references it.
 
 *Exit*: two devices fetching the same day's generation hours apart get
-byte-identical answers and the same shadow ranking.
+byte-identical answers and the same shadow ranking; a device offline for
+over a week returns to a retained generation cleanly.
 
 ### Phase 3 — Close the knowledge gap (worker; bundles; still shadow)
 
@@ -195,9 +253,11 @@ byte-identical answers and the same shadow ranking.
 3. Coverage rule written down and tested: what an absent bundle or answer
    means for ranking, identically on every device.
 
-*Exit*: backend shadow top-20 overlap with the visible For You on this Mac at
-an agreed threshold, every remaining difference explained (coverage,
-identity, or a route the device had from browsing).
+*Exit*: on the same dimensions as Phase 1 — determinism across devices,
+identity correctness, coverage by relationship kind, quality, diversity,
+explanation accuracy, offline behaviour, performance — the shared knowledge
+is at least as good as the local engine's, with every remaining difference
+explained. Overlap with the local engine is reported but is not a target.
 
 ### Phase 4 — Backend-authoritative For You (behind a switch)
 
@@ -230,20 +290,35 @@ See §5.
 | DIG's graph, `IdentityGraph`, local identity evidence, DEEP/RELATED | **Keep** | pages need depth, radio and the listener's library; may later read bundles and the identity snapshot too |
 | Release-credit backfill for DIG pages (`backfillReleaseCredits`) | **Candidate** | bundles carry the same credits for artists that have one |
 
-## 6. Decisions needed
+## 6. Decisions (2026-10-11)
 
-1. **Device-local library in ranking.** Identical recommendations require
-   the ranked blocks to ignore the library (D6), or to accept that they
-   differ by exactly the library. Recommendation: rank from shared knowledge
-   only; keep "Back in your library" as its own block.
-2. **Generation choice.** Day-stable (latest before the UTC day starts) vs
-   newest available. Day-stable is what makes devices agree; newest is
-   fresher.
-3. **Retention.** How many generations' manifests and answers R2 keeps
-   (offline devices, devices that fell behind) within the free-tier budget.
-4. **Identity snapshot scope.** Entities in answers only (cheap, grows with
-   use) vs a catalogue-wide snapshot (a backfill; out of scope now).
-5. **Threshold for Phase 4** (shadow overlap and explained differences).
+1. **Library out of the shared ranked blocks.** Device-local library
+   relationships do not influence For You's shared ranked blocks; they stay
+   available in DIG. A library-specific discovery section may be considered
+   later.
+2. **One immutable generation per UTC day, published atomically.** Both
+   devices select the same complete generation when one is available, never
+   the newest mutable data.
+3. **Seven daily generations retained**, content-addressed so unchanged
+   objects are stored once; referenced objects are preserved; devices
+   returning after a long time offline move to a retained generation
+   cleanly.
+4. **Identity scoped to the requested neighbourhoods and their candidate
+   identities**, derived from shared inputs only — never from what a device
+   has cached.
+5. **No overlap threshold against the local engine.** Evaluate cross-device
+   determinism, identity correctness, relationship coverage, recommendation
+   quality, diversity, explanation accuracy, offline behaviour and
+   performance.
+6. **General, not For You–specific.** The generation describes entities,
+   identities and relationships with provenance, so later features (mixes,
+   playlists, discovery journeys, Bandcamp/SoundCloud exploration) can read
+   it without new infrastructure (§3).
+
+Still open: where the demand set is recorded without a new table (Phase 2);
+the exact on-device fallback for a device that has never fetched any
+generation (Phase 4); and whether DIG's pages also read the identity
+snapshot.
 
 ## 7. Constraints carried forward
 
