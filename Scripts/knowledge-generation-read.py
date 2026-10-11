@@ -13,7 +13,9 @@ root = "knowledge/v1/generations"
 read, problems = [], []
 
 def fetch(key):
-    with urllib.request.urlopen(f"https://{host}/{key}") as response:
+    # Cloudflare refuses Python's default user agent (403).
+    request = urllib.request.Request(f"https://{host}/{key}", headers={"User-Agent": "indigo-generation-reader/1"})
+    with urllib.request.urlopen(request) as response:
         data = response.read()
     os.makedirs(os.path.join(out, os.path.dirname(key)), exist_ok=True)
     with open(os.path.join(out, key), "wb") as f:
