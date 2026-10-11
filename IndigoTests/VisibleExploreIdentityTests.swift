@@ -179,6 +179,16 @@ final class VisibleExploreIdentityTests: XCTestCase {
         XCTAssertEqual(related.filter { $0.name == "Dean Blunt" }.map(\.discogsID), [2419343])
     }
 
+    /// Crated long ago under the tracklist's spelling; reached now as his
+    /// entry. DEEP still counts it.
+    func testAHistoricalCrateRowUnderASpellingCountsOnTheIdentityRow() throws {
+        let show = try populated()
+        crate("Prefuse73")
+        let prefuse = try XCTUnwrap(deep(show).first { $0.node.discogsID == 3722 })
+        XCTAssertEqual(prefuse.signals.crateCount, 1)
+        XCTAssertEqual(try context.fetch(FetchDescriptor<CrateItem>()).map(\.displayTitle), ["Prefuse73"], "Not rewritten")
+    }
+
     /// What a page already shows is matched under every name behind a row.
     func testAnArtistThePageShowsByNameIsNotRepeated() throws {
         try populated()
