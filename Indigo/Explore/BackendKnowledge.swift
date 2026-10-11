@@ -604,7 +604,9 @@ nonisolated struct ShadowStage: Codable, Sendable, Equatable {
         visibleRanking: (next: [ExploreSuggestion], all: [ExploreSuggestion], shows: [String], direction: String),
         asOf: Date, turn: Int
     ) -> ShadowStage {
-        let ranking = ShadowComparison.ranking(personal: visible.personal, knowledge: knowledge, asOf: asOf, turn: turn)
+        // The backend's knowledge is keyed by name, as the rows are kept; the
+        // identity-aware comparison is the Phase 1 measurement's.
+        let ranking = ShadowComparison.ranking(personal: visible.rows, knowledge: knowledge, asOf: asOf, turn: turn)
         let comparison = ShadowComparison.compare(visible: visibleRanking, backend: ranking, backendKnowledge: knowledge)
         let top = Array(ranking.all.prefix(20))
         var stage = ShadowStage()
@@ -614,9 +616,9 @@ nonisolated struct ShadowStage: Codable, Sendable, Equatable {
         stage.missingKinds = comparison.missingKinds
         stage.reworded = comparison.reworded.count
         stage.top20Kinds = Dictionary(top.map { ($0.kind.rawValue, 1) }, uniquingKeysWith: +)
-        stage.depth = .init(CorroborationDepth.of(top.map(\.id), personal: visible.personal, knowledge: knowledge))
+        stage.depth = .init(CorroborationDepth.of(top.map(\.id), personal: visible.rows, knowledge: knowledge))
         stage.visibleReached = CorroborationDepth.of(
-            visibleRanking.all.prefix(20).map(\.id), personal: visible.personal, knowledge: knowledge
+            visibleRanking.all.prefix(20).map(\.id), personal: visible.rows, knowledge: knowledge
         ).filter { $0.startingPoints > 0 }.count
         stage.edges = knowledge.shared.neighbourhoods.map(\.edges.count).reduce(0, +)
         stage.top20 = comparison.backendTop

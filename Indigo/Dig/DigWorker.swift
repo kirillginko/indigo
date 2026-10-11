@@ -409,8 +409,14 @@ actor DigWorker {
         bundleURL: URL? = BundleCache.fileURL
     ) async -> ShadowReport {
         var cache = backendCache ?? BackendKnowledgeCache.load(from: cacheURL)
-        let origins = ExploreRanker.startingPoints(visible.personal)
-        let artists = BackendKnowledgeAdapter.artistsWanted(visible.personal, deviceLocal: visible.knowledge.deviceLocal)
+        // The rows as kept, not as this device's identity evidence reads them:
+        // the backend places artists by its own evidence, and an
+        // identity-keyed starting point ("discogs:3722") is not a name it can
+        // look up. And only artists the rows name — never ones only this
+        // device's library knows, so what is asked is the same on every device.
+        let rows = visible.rows
+        let origins = ExploreRanker.startingPoints(rows)
+        let artists = BackendKnowledgeAdapter.artistsWanted(rows, deviceLocal: .empty)
         let fetch = await BackendKnowledgeFetcher.refresh(&cache, nodes: origins, artists: artists, now: now, call: call)
         backendCache = cache
         if fetch.calls > 0 { cache.save(to: cacheURL) }
@@ -434,7 +440,7 @@ actor DigWorker {
                 visibleRanking.all.prefix(20).map(\.id), personal: visible.personal, knowledge: visible.knowledge))
             for use in BackendKnowledgeAdapter.BundleUse.allCases {
                 let (snapshot, coverage, statuses) = BackendKnowledgeAdapter.snapshot(
-                    personal: visible.personal, deviceLocal: visible.knowledge.deviceLocal,
+                    personal: rows, deviceLocal: visible.knowledge.deviceLocal,
                     cache: cache, now: now, bundles: bundles, use: use)
                 let stage = ShadowStage.measure(use, visible: visible, knowledge: snapshot,
                                                 visibleRanking: visibleRanking, asOf: asOf, turn: turn)

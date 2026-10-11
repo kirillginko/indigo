@@ -331,3 +331,117 @@ snapshot.
   bulk import path must stamp local write time.
 - CloudKit records are never rewritten for identity; history is read under
   identity.
+
+## 8. Phase 1 results (2026-10-11)
+
+Measured by `IdentityParityMeasurement` (opt-in,
+`TEST_RUNNER_INDIGO_MEASURE_PARITY=1`) on copies of this Mac's Development
+and Production stores against the live backend (edge generation
+`edges-165903`). Every variant starts from the same synced rows and the same
+evaluation day (20737) and goes through the same identity-aware ranker and
+known-artist policy. Identity is varied separately from knowledge:
+*device* (this Mac's evidence) and *backend* (a MusicBrainz link for a
+starting point, a credit's Discogs id for anyone a bundle names; never a
+row matched by name).
+
+### Overlap with the visible For You (top 20)
+
+| Knowledge · identity | Development | Production copy |
+|---|---|---|
+| local shared part (library removed) · device | 20/20 | 20/20 |
+| local shared part · backend | 20/20 | 20/20 |
+| SQL only · backend | 0/20 | 1/20 |
+| SQL + bundles · backend | 0/20 | 1/20 |
+| SQL + bundles + styles · backend | 0/20 | 1/20 |
+| SQL + bundles · device | 1/20 | 2/20 |
+
+Top 12: 0/12 for every backend variant on both stores.
+
+### Why they disagree
+
+Visible top 20 against SQL + bundles (backend identity):
+
+| Cause | Development | Production |
+|---|---|---|
+| Knowledge — no route at all | 7 (all label peers) | 8 (all label peers) |
+| Selection — reached, ranked lower (#59 … #706) | 13 | 11 |
+| Identity | 0 | 0 |
+
+The backend's top 20 against the visible: 19 of 20 (Development) and 18 of
+19 (Production) are knowledge the local engine does not have — radio shows
+(the backend holds 364 show profiles; this Mac's appearance log 31) and the
+peers of labels this Mac never walked (FACT Magazine, World Music, Hyperdub).
+
+### What the measurements say
+
+1. **The two engines rest on different knowledge, not different identities.**
+   Local knowledge ranks identically under either identity source. The
+   disagreement is about which labels' rosters, which radio and which
+   credits each side holds.
+2. **Unresolved SQL artist edges split routes under verified identity.**
+   Since 0074 the backend's SQL edges carry no artist Discogs ids. Under
+   backend identity a bundle's credit reaches an artist as their entry while
+   SQL reaches them by name; the two do not add up, and producer and
+   collaborator routes fall out of the top 20 (top 20 kinds:
+   `playedInShow 6, sharedLabel 14`). Counting single-owner name routes
+   toward their entry — what ids on SQL edges would do — restores them
+   (`collaborator 3–4, producer 2, personnel 0–1`). This is the largest
+   identity effect measured, and it is a knowledge-format gap, not a reason
+   to trust names.
+3. **The backend's explanations are better evidenced.** Every top-20 reason
+   names a record, label or show (20/20 against the visible 15–16/20);
+   corroboration by two or more strong starting points is 14–18 of 20
+   against the visible 1–2. The visible engine's depth is mostly broad label
+   peers counted from several starting points.
+4. **Identity coverage comes from bundles.** Backend identity verifies
+   249–366 artists one step out (all from bundle credits), the device 0 on
+   this collection. Starting points themselves are rarely verified: one has
+   a MusicBrainz link. No namesake collisions. Known artists kept out: 14–17
+   under backend identity, 0 under the device's.
+5. **No alias relationships reach For You from the backend** (0 alias edges
+   in any backend variant): bundles do not carry an artist's aliases, groups
+   or members.
+6. **No scene direction from the backend** (`-` in every backend variant):
+   rosters do not make a scene catalogue the ranker can use. The visible
+   direction also moves with the library (Manchester HIP HOP with it, Berlin
+   DUB without), so decision 1 applies to direction too.
+7. **Shows never overlap** (0 of 4–6): the backend's show knowledge is far
+   larger and differently built (episode genres) than the local appearance
+   log.
+8. **Coverage and failures.** Starting points the backend knows: 8 of 12
+   (Development), 7 of 12 (Production); the rest unknown (broadcasts,
+   stations) or unsupported. Bundles: complete 4–5, partial 1 (Hype Williams
+   71/84 documents), missing 1–4. Artists: 140–143 found, 8 unknown.
+9. **Performance.** Cold: 3–4 calls, 646–721 KB, 0.3–4.6 s per call; one
+   statement timeout retried on Development's first call. Bundles: 13–14
+   reads, 104–138 KB. Warm, same generation: 0 calls and 0 reads — full
+   reuse.
+
+### Priorities for Phases 2 and 3
+
+1. **Identity on every relationship target (Phase 2, with the identity
+   snapshot).** Restore Discogs ids on SQL artist targets, and publish them
+   per generation rather than looked up per call (the reason 0074 dropped
+   them). Biggest measured effect; prerequisite for verified identity to help
+   rather than split routes.
+2. **Bundles for starting points and their candidates (Phase 3).** Missing
+   and partial bundles are where credit routes vanish; build them for the
+   demand set.
+3. **Aliases, groups and members in bundles (Phase 3).** None reach For
+   You from the backend today.
+4. **Scenes and shows from the generation (Phase 3).** No backend direction;
+   show knowledge is large but unmatched with the local log. Decide which is
+   authoritative for show recommendations before comparing further.
+5. **Starting-point identity (Phase 2).** Most starting points are reached
+   by name only; the snapshot should carry the MusicBrainz and credit
+   evidence that places them, so known-artist exclusion does not depend on
+   bundles happening to name the listener's artists.
+6. **Immutable generations (Phase 2).** Needed for cross-device determinism;
+   Phase 1 could not test it across devices (the iPhone simulator has no
+   network), and one cold call hit the statement timeout.
+
+Not measured yet: the iPhone (simulator without network), and recommendation
+quality beyond evidence — whether the backend's label- and radio-heavy top
+20 is *better* music for this listener is a judgement the numbers above
+cannot make.
+
