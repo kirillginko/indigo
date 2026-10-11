@@ -814,7 +814,7 @@ the edges watermark in place of the clock-derived label.
 - Next, if approved: the `knowledge_cut` migration (with the rebuild proof and
   target id evidence), then the publisher with its dry-run mode.
 
-## 11. `knowledge_cut` migration review (2026-10-12) — not deployed
+## 11. `knowledge_cut` migration review (2026-10-12) — deployed 2026-10-11 (§12)
 
 **Migration history.** Live had 0070 and 0071, applied from
 `trim-the-database-under-500mb` (6db3f36) and missing here. Both files were
@@ -867,3 +867,36 @@ id 491; one ambiguous starting point (`speedy j`, 2 rows). 73,764 buffer
 hits, no disk reads, no temp; execution 1.2–7.6 s across runs for identical
 buffer work (the free tier's shared CPU, with drains every five minutes),
 against 0.6–2.0 s for 0074's answers alone.
+
+## 12. 0075 deployed and verified (2026-10-11, 23:10 UTC)
+
+`supabase db push --linked --dry-run` listed only `0075_knowledge_cut.sql`, as
+reviewed; pushed. Then, on live:
+
+- **Migration history**: `supabase migration list --linked` has no
+  mismatches; 0075 is the newest and the only one applied.
+- **Signatures and privileges**: `knowledge_answers(p_nodes jsonb, p_artists
+  text[])`, plpgsql, STABLE, security invoker; `knowledge_cut(p_day date,
+  p_demand jsonb)`, sql, STABLE, security definer with its `search_path` set.
+  Both owned by `postgres`; EXECUTE for `service_role` only. PUBLIC, `anon` and
+  `authenticated` have none, by `has_function_privilege` and by calling them
+  under each role ("permission denied"). Neither is in
+  `app_callable_functions()`.
+- **explore_knowledge unchanged**: its live source equals 0074's (whitespace
+  aside), and `anon` still calls it (format 2).
+- **Live cut** (today, the frozen pilot set, `knowledge_cut` as postgres; also
+  run inside a read-only transaction, where it answers the same):
+  `status ok`; rebuild proof = run 88841 (job 6, 00:23:00.11 → 00:23:18.90,
+  succeeded), latest = run 91252 (21:23); demand digest `5754856d…c88e0`; 24
+  nodes (16 found, 5 unknown, 3 unsupported — `station:n10as` unsupported,
+  `artist:zzz nobody files this name` unknown); 163 artists (152 found, 11
+  unknown); 4 batches; artist targets `discogs-document` 1,903,
+  `adopted-by-name` 133, `name-matched` 32; `artist:speedy j`
+  `ambiguousName: true` with two seeds (Discogs 316464 and 823), each listed
+  with its routes. Yesterday's date is refused (`not-today`).
+- **Equality**: `explore_knowledge` on the same four batches, stripped of the
+  new fields, equals the cut for all 24 nodes and 163 artists. Edge order
+  differs for one node (Dean Blunt): both sort edges by their JSON text, and
+  the cut's text includes `rowID`, so ties among same-named edges fall
+  differently. Same set; order within ties is not part of the contract.
+
