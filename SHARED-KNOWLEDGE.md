@@ -1313,3 +1313,88 @@ coverage — Phase 3 items 2 and 3 — not more starting-point bundles.
 
 Full output: `supabase/diagnostics/identity-audit/bundle-coverage-2026-10-12.json`.
 
+## 18. Identity corrections: Hype Williams and Prefuse73 (2026-10-12, 0076)
+
+Approved: remove the director's Discogs 398459 from the Hype Williams radio
+row, reaching the duo (1874027) only through its MusicBrainz link; map the
+radio spelling `prefuse73` to 3722 on its Discogs name-variation and
+MusicBrainz-alias evidence; keep original names and provenance.
+
+**Impact audit first** (read-only,
+`supabase/diagnostics/identity-audit/corrections-impact.sql`):
+
+- The radio row 5dbab0e3 ("Hype Williams", NTS key, MBID fdd6ea04): 19
+  radio appearances, 53 radio edges, 3 of the duo's records with no Discogs
+  ids — all the duo's. Its links: `nts`, `musicbrainz_discogs` 1874027
+  (2026-10-09) and `discogs` 398459 (created 2026-10-10 19:03, moved
+  2026-10-11 04:23). The duo's own row 8c74e06d keeps `discogs` 1874027.
+- The radio row cc290916 ("Prefuse73", NTS key only): 2 appearances, 6 radio
+  edges, one release (Vocal Studies and Uprock Narratives, Warp). Prefuse 73's
+  row 36133fd1 holds `discogs` 3722; no row held `musicbrainz_discogs` 3722.
+- Across the catalogue, exactly one row has a Discogs id contradicting its
+  own MusicBrainz link: the Hype Williams radio row.
+
+**How the director got there.** Not the Discogs adoption path (it refuses a
+row carrying any non-NTS identity), but the nightly split-half merge
+(`merge_split_artists`, 04:23 UTC; 0028). `split_artist_halves` paired a
+"name-only" radio row — meaning *no `discogs` key* — with the one same-named
+row holding a Discogs id. A Discogs search on 10-10 had filed a row for the
+director under "Hype Williams"; that night the merge folded it into the radio
+row, which counted as name-only despite its MusicBrainz link to someone else.
+
+**0076**:
+
+1. `split_artist_halves`: a radio row with a MusicBrainz-recorded Discogs id
+   pairs only with the row holding that same id. Before applying, no pending
+   pair was affected.
+2. Deletes `discogs` 398459 from row 5dbab0e3, keyed by both ids and only
+   while the contradicting `musicbrainz_discogs` 1874027 link is there.
+3. Adds `musicbrainz_discogs` 3722 to row cc290916 (source: the MusicBrainz
+   artist fc61dd75, whose alias list has "Prefuse73"; Discogs lists
+   "Prefuse73" among 3722's name variations), only while the row is that
+   radio name with no other identity and 3722 is still Prefuse 73's row
+   with that MBID. Filed as MusicBrainz-recorded identities are, so the cut
+   reaches the catalogue row through it, as the Hype Williams radio row
+   reaches the duo.
+
+Every write is keyed by exact ids and guarded by its evidence; on any other
+database it does nothing, and a second run changes nothing.
+
+**Tested** before any live write (`identity_corrections_smoke.sql`, the live
+rows' ids, rolled back): before, the radio row answers as the director as
+well; after, `hype williams` identifies only as 1874027 via MusicBrainz and
+reaches the duo's label peers, with its NTS name kept; `prefuse73` identifies
+as 3722 via MusicBrainz and reaches Prefuse 73's label peers; `prefuse 73`
+and Speedy J's answers are byte-identical to before; a second application
+changes nothing; a director row filed again under "hype williams" is not a
+split half, while a plain name-only pair and a pair whose MusicBrainz link
+agrees still are. The whole migration suite, the merge smoke test included,
+passes.
+
+**Live** (pushed after a dry run naming only 0076):
+
+| Starting point | Identities before → after | Edges |
+|---|---|---|
+| hype williams | 398459 discogs, 1874027 musicbrainz → 1874027 musicbrainz (catalogued) | 403 → 403 (the director's row had no releases) |
+| prefuse73 | none → 3722 musicbrainz (catalogued) | 99 → 409; now Prefuse 73's labels, records and radio |
+| prefuse 73 | unchanged | unchanged |
+| speedy j | unchanged (two namesakes, `ambiguousName`) | unchanged |
+
+No row holds 398459 any more; no split pair is pending. The October 11
+generation is unchanged; these identities enter the next one.
+
+**Found, reported, not changed** (outside the two approved corrections, and
+visible in DIG):
+
+- The Hype Williams radio row's **portrait is the director's** (Discogs image
+  `A-398459`, fetched 2026-09-11). `fetchArtistPortrait` searches Discogs by
+  name and takes the first result whose name matches with the "(2)"
+  stripped; "Hype Williams" and "Hype Williams (2)" both match.
+- The same path gave **121 artists a portrait of a different Discogs artist**
+  than their own id (Nirvana, Logic, Danny Brown, Om, Asa, Firefly, …), out
+  of 7,653 artist portraits checkable against an id; 31,371 portraits are on
+  rows with no Discogs identity and cannot be checked.
+- Proposed: pick the search result by the row's Discogs id (or its
+  MusicBrainz-recorded one), refuse when several namesakes match and the row
+  has none, and re-fetch the 121.
+
