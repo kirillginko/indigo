@@ -406,7 +406,9 @@ actor DigWorker {
         call: @escaping BackendKnowledgeFetcher.Call = BackendKnowledgeFetcher.live,
         read: @escaping BundleFetcher.Read = BundleFetcher.live,
         cacheURL: URL? = BackendKnowledgeCache.fileURL,
-        bundleURL: URL? = BundleCache.fileURL
+        bundleURL: URL? = BundleCache.fileURL,
+        pinnedRead: @escaping PinnedGenerationClient.Read = PinnedGenerationClient.live,
+        pinnedStore: PinnedGenerationStore? = .standard
     ) async -> ShadowReport {
         var cache = backendCache ?? BackendKnowledgeCache.load(from: cacheURL)
         // The rows as kept, not as this device's identity evidence reads them:
@@ -430,6 +432,13 @@ actor DigWorker {
         bundleCache = bundles
         if bundleFetch.reads > 0 { bundles.save(to: bundleURL) }
 
+        // The pinned generation for this evaluation day: read whole and
+        // verified, or the last one kept whole -- never mixed with the live
+        // answers above. See `PinnedGeneration.swift`.
+        let pinned: (PinnedGeneration?, PinnedGenerationClient.Report)? = if let pinnedStore {
+            await PinnedGenerationClient.resolve(period: visible.stamp.period, store: pinnedStore, read: pinnedRead, now: now)
+        } else { nil }
+
         return Trace.step("explore.shadow") {
             let visibleRanking = ShadowComparison.ranking(
                 personal: visible.personal, knowledge: visible.knowledge, asOf: asOf, turn: turn)
@@ -451,6 +460,21 @@ actor DigWorker {
                     report.bundles = statuses
                     report.backendShared = CanonicalDigest.of(snapshot.shared)
                 }
+            }
+            if let (generation, fetch) = pinned {
+                var shadow = PinnedShadow(fetch: fetch)
+                if let generation {
+                    let (snapshot, coverage, statuses) = PinnedKnowledgeAdapter.snapshot(
+                        personal: rows, deviceLocal: visible.knowledge.deviceLocal, generation: generation, now: now)
+                    shadow.stage = ShadowStage.measure(.relationships, visible: visible, knowledge: snapshot,
+                                                       visibleRanking: visibleRanking, asOf: asOf, turn: turn)
+                    shadow.coverage = coverage
+                    shadow.bundles = statuses
+                    shadow.shared = CanonicalDigest.of(snapshot.shared)
+                    let ranking = ShadowComparison.ranking(personal: rows, knowledge: snapshot, asOf: asOf, turn: turn)
+                    shadow.ranked = CanonicalDigest.of(ranking.next.map(\.id) + ranking.all.map(\.id) + ranking.shows + [ranking.direction])
+                }
+                report.pinned = shadow
             }
             return report
         }

@@ -644,6 +644,9 @@ nonisolated struct ShadowReport: Codable, Sendable, Equatable {
     var backendShared = ""
     var deviceLocal = ""
     var at = Date.distantPast
+    /// The same look from the pinned generation alone. Nil where none was
+    /// tried (a report from before, or a caller that passed no store).
+    var pinned: PinnedShadow? = nil
 }
 
 /// Whether the shadow runs at all. On in debug builds, where its panel is;

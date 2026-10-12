@@ -37,10 +37,16 @@ final class ExploreDiagnostics {
         /// the direction named.
         var ranked: [String]
         var report: ExploreBuildReport
+        /// The pinned generation the shadow ranked from on this device and
+        /// how much of these rows it covers (`PinnedShadow.codePart`), once
+        /// the shadow has run. Never part of what the visible page used.
+        var pinned: String? = nil
 
         var rankedDigest: String { CanonicalDigest.of(ranked) }
 
         /// `FY<format>.<day>.<personal>.<shared>.<device>.<identity>.<known>.<ranked>`,
+        /// then `.g<manifest>.<coverage>` once the pinned generation's shadow
+        /// has run,
         /// each digest cut to twelve characters: short enough to read out, long
         /// enough that two different inputs never share one in practice.
         ///
@@ -51,7 +57,7 @@ final class ExploreDiagnostics {
         var code: String {
             ["FY\(stamp.format)", "\(stamp.period)", Self.cut(stamp.personal), Self.cut(stamp.shared),
              Self.cut(stamp.deviceLocal), Self.cut(stamp.identity ?? "-"), Self.cut(stamp.known ?? "-"),
-             Self.cut(rankedDigest)].joined(separator: ".")
+             Self.cut(rankedDigest)].joined(separator: ".") + (pinned.map { ".\($0)" } ?? "")
         }
 
         static func cut(_ digest: String) -> String { String(digest.prefix(12)) }
@@ -83,15 +89,18 @@ final class ExploreDiagnostics {
             let parts = code.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ".").map(String.init)
             guard parts.first?.hasPrefix("FY") == true else { return nil }
             switch parts.count {
-            case 8: return parts
-            case 6: return Array(parts[0..<5]) + ["—", "—", parts[5]]
+            case 10: return parts
+            case 8: return parts + ["—", "—"]
+            case 6: return Array(parts[0..<5]) + ["—", "—", parts[5], "—", "—"]
             default: return nil
             }
         }
         guard let mine = parts(here), let theirs = parts(there) else { return nil }
-        let names = ["Format", "Evaluation day", "Personal digest", "Shared knowledge digest",
+        var names = ["Format", "Evaluation day", "Personal digest", "Shared knowledge digest",
                      "Device-local digest", "Identity evidence digest", "Known artists digest",
-                     "Ranked recommendation IDs"]
+                     "Ranked recommendation IDs", "Pinned generation", "Pinned coverage"]
+        // The pinned rows only when either code has them.
+        if mine[8] == "—", theirs[8] == "—" { names.removeLast(2) }
         return names.indices.map { Row(input: names[$0], here: mine[$0], there: theirs[$0]) }
     }
 
@@ -107,6 +116,15 @@ final class ExploreDiagnostics {
 
     func record(shadow report: ShadowReport) {
         shadow = report
+        if let pinned = report.pinned, latest != nil {
+            latest?.pinned = pinned.codePart
+            let f = pinned.fetch
+            Trace.note("explore.pinned \(latest!.code) source=\(f.source) selected=\(f.selected ?? "-") "
+                       + "objects=\(f.objectsDownloaded)+\(f.objectsReused) bytes=\(f.bytesDownloaded) "
+                       + "ms=\(Int(f.milliseconds.rounded())) cache=\(f.cacheBytes)B kept=\(f.keptGenerations) "
+                       + "revoked=[\(f.revoked.joined(separator: ","))] errors=\(f.errors.count) "
+                       + "top20=\(pinned.stage.top20Overlap)/20 shared=\(pinned.shared.prefix(12)) ranked=\(pinned.ranked.prefix(12))")
+        }
         let c = report.comparison
         let ms = report.fetch.milliseconds.map { "\(Int($0.rounded()))" }.joined(separator: "+")
         Trace.note("explore.shadow source=\(report.source) top12=\(c.top12Overlap)/12 top20=\(c.top20Overlap)/20 "
