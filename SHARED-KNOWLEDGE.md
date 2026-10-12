@@ -1089,3 +1089,91 @@ target should come from one generation, not partly from live data.)
 - 491 artist targets with no Discogs id in the cut; 130 known only by an
   adopted name.
 
+## 15. The pinned-generation client, in shadow (2026-10-12)
+
+`Indigo/Explore/PinnedGeneration.swift`, run beside the existing shadow in
+`DigWorker.exploreShadow`; nothing visible reads it.
+
+**Reading.** `current.json` → the selected day's pointer (must name the
+listed manifest) → the manifest → every object it names (answers, the
+identity snapshot, the pinned bundles). Each object's SHA-256 is taken over
+the exact bytes received, before anything is decoded; a mismatch, a 404 or
+an HTTP error makes the whole generation unusable on this device.
+
+**Selection.** The newest listed generation, not withdrawn, dated *before*
+the evaluation day (`ExplorePeriod`). A day's own generation is published
+40 minutes into it, so the one before has been there all day: two devices
+evaluating the same day select the same generation whenever they look.
+Withdrawn generations (by date, or date and manifest) are never served and
+are reported as `revoked`; the last list read is kept, so a withdrawal
+still holds offline.
+
+**Cache.** `Caches/knowledge-generations/`: `objects/<aa>/<digest>` written
+only after its digest was checked; `generations/<manifest>.json`, a marker
+written last, after every named object was present and checked. A kept
+generation is checked again, byte for byte, every time it is loaded; a
+damaged object is dropped and fetched again. An interrupted download leaves
+objects and no marker, and never touches a generation already kept. Three
+generations kept besides the one in use; unreferenced objects older than an
+hour are removed.
+
+**Fallback.** List unreachable: the newest kept generation that qualifies
+(`offline-cache`). Selected generation unobtainable: the same
+(`fallback`), with the reason. Nothing kept: `none`.
+
+**Knowledge.** Built from the generation alone, through the same adapter as
+the live shadow. A starting point the manifest does not hold is `deferred`
+and has no neighbourhood; it is never asked of the live SQL. `unknown`,
+`unsupported`, `deferred`, `partial` and `missing` survive into the coverage.
+Bundles come only from the manifest's pinned digests, never from the
+mutable `refs/`.
+
+**FY code.** Once the shadow has run, the code gains two parts:
+`.g<manifest12>.s<found>-<unknown>-<unsupported>-<deferred>a<found>-<unknown>-<deferred>b<complete>-<partial>-<missing>-<no id>`
+(starting points, artists, bundles). Codes without them compare as before
+(8 rows); with them, 10.
+
+**Tests** (`PinnedGenerationTests`, 12, generations built in the test with
+real digests): two clean clients produce identical knowledge digests,
+candidate sets and rankings; a re-encoded manifest and an NFD answer are
+refused (bytes, not JSON, are verified); a missing object falls back to the
+last generation kept whole; a corrupt object is never written to the cache;
+an interrupted download keeps the previous generation and resumes, reusing
+what arrived; offline startup downloads nothing; a stale kept generation is
+served and said to be; a withdrawn generation is reported and never served,
+online or offline; selection does not move when the day's own generation
+appears; on-disk corruption is caught and repaired by one object; coverage
+states survive; the FY code carries the generation. The existing Explore,
+golden, backend and bundle tests pass unchanged (52).
+
+**Measured against the published generation** (`PinnedGenerationMeasurement`,
+opt-in), evaluation day 2026-10-12, which selects 2026-10-11:
+
+| | macOS, network | iOS simulator, published bytes |
+|---|---|---|
+| Cold, clean client (×2, each its own ephemeral session) | 3,464 / 3,407 ms, 176 objects, 1.48 MB | 150 / 102 ms (no network) |
+| Warm (kept, list re-read) | 96 ms, 209 bytes | 23 ms |
+| Offline startup | 20 ms, 0 bytes, `offline-cache` | 24 ms |
+| Cache on disk | 1.49 MB | 1.49 MB |
+
+Parity: for each input set, two clean clients agree on the knowledge
+digest, the candidate set and the ranked digest.
+
+| Inputs | Personal | Coverage | Knowledge | Ranked |
+|---|---|---|---|---|
+| Pilot listener (macOS) | `c24149ed7b5f` | `s11-1-0-0a13-1-0b5-1-7-0` | `7ec78ceed33d` | `e9e5607e1785` |
+| Pilot listener (iOS simulator) | `c24149ed7b5f` | `s11-1-0-0a13-1-0b5-1-7-0` | `7ec78ceed33d` | `e9e5607e1785` |
+| Development rows (macOS) | `5f46aead5489` | `s8-3-1-0a140-8-0b5-1-2-0` | `ffa012feac79` | `fc7306a7481f` |
+| Production rows (macOS) | `8e50ac7a1edf` | `s7-2-3-0a143-8-0b4-1-5-0` | `9e8fea987b27` | `2cb74eecdad2` |
+
+The iOS run read the bytes reader A saved (§14.3) from a folder, every
+digest checked, because the simulator's Indigo has no network here: LuLu
+(the Mac's firewall) has *Allow simulator apps* off, and every simulator
+install of Indigo is a new path to it. Safari on the same simulator reaches
+the bucket. The live iOS fetch timing is therefore still to be measured.
+
+The development and production rows have no `deferred` starting points:
+the pilot demand set was built from them. A device whose rows moved on
+since would see `deferred`, as the design intends, until demand is
+collected (§9.7).
+
