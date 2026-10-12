@@ -958,3 +958,134 @@ Explore, CloudKit or weights. Next (2C, needs approval): the writing half —
 reserve, write, read back and verify, then the conditional day pointer, then
 `current.json` — and one real publication.
 
+## 14. The first generation: 2026-10-11, published and verified
+
+### 14.1 What the publisher does
+
+`publishGeneration` (`generations.ts`), behind `knowledge-publisher`:
+
+1. **Day pointer first.** If `days/<date>.json` exists, the day is committed:
+   read its manifest, verify it and every object it names by digest, and
+   finish advertising it. No new cut. A second call is a no-op.
+2. **Cut**: one `knowledge_cut` over the function's own Postgres connection,
+   in a `REPEATABLE READ READ ONLY` transaction with a local 120 s timeout.
+   Any `cutProblems` stops it before a single write.
+3. **Plan**: answers normalised (edges by kind, then target kind, name,
+   row, Discogs id, provider, handle, year, then confidence and occurrences
+   descending, then reason; the canonical edge text breaks remaining ties;
+   identities and seeds canonically). Nothing added, dropped or rewritten,
+   except that canonical JSON writes strings in NFC (as bundles do): 2 of
+   30,660 strings in the pilot arrived decomposed ("Pelè", "Vía"), and Swift
+   compares strings by canonical equivalence.
+4. **Pinned bundles**: each bundle object the references name is read and
+   its digest checked. Missing and partial bundles are recorded states; a
+   bundle object that does not match its reference blocks publication.
+5. **Objects** (answers, identity): read each key; a verified object is
+   reused, a wrong one blocks publication (never overwritten), an absent one
+   is reserved through `r2_reserve`, created with `If-None-Match: *` and read
+   back.
+6. **Manifest**: the same, then read back with everything under it.
+   `publication.complete` is in the manifest because a manifest is only ever
+   written after that; `summary` (musical coverage) is separate.
+7. **Probe**: a create-only write of the manifest's own bytes over itself
+   must be refused (412), or publication stops before the day pointer.
+8. **Commit**: `days/<date>.json` created with `If-None-Match: *` and read
+   back. If another manifest got there first, the result is `conflict`,
+   nothing is overwritten and `current.json` is not touched.
+9. **Advertise**: `current.json` replaced with `If-Match` on the version read
+   (create-only when absent), retried on a conflict; keeps the six newest
+   other days, every `withdrawn` entry and unknown fields; refuses to list a
+   withdrawn day.
+
+**Failure injection** (`generations_test.ts`, 28 tests): an object write
+interrupted at the 40th (nothing visible; the retry reuses what landed), a
+corrupt object at a digest's key, a write that reads back wrong, a manifest
+that fails verification, a pinned bundle not matching its reference, a day
+pointer created by someone else between check and write, a day pointer
+naming a broken generation, `current.json` interrupted after the commit (the
+retry finishes it once, keeping withdrawals and unknown fields), a concurrent
+`current.json` change (merged), a withdrawn day, a refused cut, a refused
+budget, an R2 that ignores create-only, edge order shuffled, a second
+publication the same day.
+
+**Access.** The function answers only to `x-publish-token`, a random token
+held as the function secret `KNOWLEDGE_PUBLISH_TOKEN` and in Vault as
+`indigo_publisher_token`; the trigger is one `net.http_post` run as the
+database owner. The worker's Vault key could not be used: it is refused by
+`r2_budget()`, so it is the app's publishable key, not a service key. Without
+the token, or with the publishable key, the function answers 403. Nothing
+schedules it.
+
+### 14.2 The publication
+
+Three calls failed before any write: two were refused at the gate, which
+then checked for a service key, and the worker's Vault key is not one
+(above). The third ran the cut through PostgREST, whose 8 s statement
+timeout applies to every role there (§10.3's "no timeout" was the role
+setting, not the API's), and the cut took longer. R2's write count stayed
+2,056 throughout.
+
+The third, at 23:34:44 UTC, published **2026-10-11**:
+
+| | |
+|---|---|
+| Manifest | `dba738672cd97d3b21c9cf0cb5446da3be9c8d1163badcc5af3838bfc4819e17` |
+| Source | snapshot `2778717:2778717:`, cut at 23:34:45.60, statement 5,993 ms; rebuild proof run 88841 (job 6 `indigo-rebuild-edges`, `select public.rebuild_radio_dig_edges()`, succeeded 00:23:00.11 → 00:23:18.90, confirmed in `cron.job_run_details`); latest rebuild 91252 (21:23) |
+| Demand | `5754856d…c88e0`, 24 starting points (16 found, 5 unknown, 3 unsupported), 163 artists (152 found, 11 unknown) |
+| Objects | 170 written (168 answers, identity, manifest) + day pointer + `current.json`; 0 reused; 176 verified (incl. 6 pinned bundles) |
+| Size | 1.35 MB written |
+| R2 | 172 Class A (2,056 → 2,228 this month, exactly as the dry run projected), 543 GETs |
+| Time | 37.1 s: cut 6.0 s, bundle refs 0.7 s, plan 0.1 s, bundles 0.4 s, objects 21.8 s, manifest 0.9 s + 5.0 s verification, probe 0.1 s, day 0.4 s, current 0.9 s |
+| Conditional writes | enforced (the probe was refused) |
+| Failures | none in this attempt |
+
+Calling it again: `already-published`, 0 writes, no cut, 178 reads, 5.1 s.
+
+### 14.3 Independent verification
+
+Two readers through the public host, written separately: reader A in Deno
+(`Scripts/knowledge-generation-read.ts`, also checks the contract) and reader
+B in Python with its own hashing and JSON (`Scripts/knowledge-generation-read.py`).
+Both verified every digest, with no problems, and got the same fingerprint
+`6f443c06094858d4abc532dc3735643e3eac4201fe456900832ebe8eb7b484ca` over 177
+objects (the day pointer, the manifest, 168 answers, the identity snapshot,
+6 bundles). Their copies are byte-identical (`diff -r`).
+
+Reader A's contract checks, all passing: the frozen digest, 24 and 163,
+`publication.complete`, `station:n10as` unsupported, the unknown name
+unknown, Speedy J `ambiguousName` and two namesake rows, 3,129 edges all in
+normalised order, and no identity placed without document evidence. The
+identity snapshot: 1,465 rows; 923 `discogs-document` (placeable), 130
+`adopted-by-name` and 27 `name-matched` (neither placeable).
+
+Fresh `knowledge_answers` for the same demand set three minutes after
+publication: all 187 entities equal to their published answers, order-blind
+and NFC-blind.
+
+**After Postgres moved on.** The next edge rebuild ran at 00:23 UTC on
+2026-10-12 (run 91596, succeeded 00:23:22). At 00:24, fresh
+`knowledge_answers` differed from the published answers for 8 starting
+points (Anika, Ciro Vitiello, Dean Blunt, Hype Williams, Joanne Robertson,
+Mica Levi, Micachu, Prefuse 73). These are real catalogue changes: rows'
+display names were rewritten ("Young Thug" → "YOUNG THUG", "A.S.O" →
+"a.s.o.", "BadBadNotGood" → "BADBADNOTGOOD"), with the same rows and edge
+counts. Reader B, run again then into a fresh directory, got the same
+fingerprint `6f443c06…`, and its copy is byte-identical to reader A's from
+before the rebuild. The pinned generation did not move.
+
+(Those renames are also why the name a device shows for a relationship
+target should come from one generation, not partly from live data.)
+
+### 14.4 Coverage gaps (recorded, not failures)
+
+- Bundles for 16 starting identities: 5 complete, 1 partial (Hype Williams
+  1874027, 71/84 documents), 10 missing: Anika 3999072, Attilio Novellino,
+  Duenn, Hype Williams 398459 (the director), Joanne Robertson, Mica Levi,
+  Micachu, Prefuse 73 (3722), both Speedy J entries. `prefuse73` has no
+  identity at all.
+- 5 starting points unknown (Annika Henderson, the unknown name, three
+  Kiosk episodes) and 3 unsupported (two stations and a recording); 11 of
+  163 artists unknown.
+- 491 artist targets with no Discogs id in the cut; 130 known only by an
+  adopted name.
+
