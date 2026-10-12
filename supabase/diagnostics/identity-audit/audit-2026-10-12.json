@@ -1,0 +1,1036 @@
+{
+ "byDiscogsID": [
+  {
+   "label": "anika",
+   "discogsID": 3999072,
+   "catalogue": {
+    "id": null,
+    "name": null,
+    "musicbrainz_id": null,
+    "releases": 0,
+    "cached_docs": 0,
+    "shelf": false,
+    "ids": null
+   },
+   "discogs": {
+    "name": "Annika Henderson",
+    "realname": null,
+    "namevariations": [
+     "Anika Henderson",
+     "Annika Henderson aka Anika"
+    ],
+    "aliases": [
+     {
+      "id": 1982320,
+      "name": "Anika (9)"
+     }
+    ],
+    "groups": [
+     {
+      "id": 4416371,
+      "name": "A&R (3)"
+     },
+     {
+      "id": 4976319,
+      "name": "Exploded View"
+     },
+     {
+      "id": 10356079,
+      "name": "Monika Werkstatt"
+     }
+    ],
+    "members": [],
+    "profile": "Anika (born Annika Henderson; 6 February 1987 in Surrey, England) is a British and German singer-songwriter, musician, political journalist and poet.",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Anika_(musician)"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "15c0e62b-3e46-4666-845d-d6c86bd44774",
+     "name": "Anika",
+     "disambiguation": "British singer-songwriter, poet, DJ, photographer, and filmmaker"
+    }
+   ],
+   "credits": {
+    "documents": 0,
+    "main": 0,
+    "extra": 0,
+    "track": 0,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "anika",
+   "discogsID": 1982320,
+   "catalogue": {
+    "id": "9f3f4c3a-8dd2-4678-bba1-9ecde815a1bf",
+    "name": "Anika (9)",
+    "musicbrainz_id": null,
+    "releases": 12,
+    "cached_docs": 12,
+    "shelf": false,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "1982320"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Anika (9)",
+    "realname": "Annika Henderson",
+    "namevariations": [],
+    "aliases": [
+     {
+      "id": 3999072,
+      "name": "Annika Henderson"
+     }
+    ],
+    "groups": [],
+    "members": [],
+    "profile": "Performing alias of British-German singer-songwriter and political journalist Annika Henderson.\r\nHer first album was a collaborative project with [a1586859].",
+    "urls": [
+     "http://en.wikipedia.org/wiki/Anika_(musician)"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "15c0e62b-3e46-4666-845d-d6c86bd44774",
+     "name": "Anika",
+     "disambiguation": "British singer-songwriter, poet, DJ, photographer, and filmmaker"
+    }
+   ],
+   "credits": {
+    "documents": 12,
+    "main": 12,
+    "extra": 3,
+    "track": 2,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "attilio novellino",
+   "discogsID": 1720124,
+   "catalogue": {
+    "id": "968814b7-88ff-4ad7-8c43-bbe2f1722733",
+    "name": "Attilio Novellino",
+    "musicbrainz_id": null,
+    "releases": 10,
+    "cached_docs": 10,
+    "shelf": false,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "1720124"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Attilio Novellino",
+    "realname": null,
+    "namevariations": [
+     "Novellino"
+    ],
+    "aliases": [
+     {
+      "id": 1720125,
+      "name": "Un Vortice Di Bassa Pressione"
+     },
+     {
+      "id": 1862852,
+      "name": "Sentimental Machines"
+     }
+    ],
+    "groups": [
+     {
+      "id": 1862852,
+      "name": "Sentimental Machines"
+     },
+     {
+      "id": 6461297,
+      "name": "Luton"
+     }
+    ],
+    "members": [],
+    "profile": "Attilio Novellino is an italian sound artist born in 1983. \r\nHe has released solo albums for international labels and he has promoted collaborative works focused on soundscape composition and avant/electronic sounds.",
+    "urls": []
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "834257c7-8f4f-49ca-8bfb-ad852f151ba9",
+     "name": "Attilio Novellino",
+     "disambiguation": ""
+    }
+   ],
+   "credits": {
+    "documents": 10,
+    "main": 10,
+    "extra": 4,
+    "track": 2,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "duenn",
+   "discogsID": 3328071,
+   "catalogue": {
+    "id": "ad500a89-bd0c-43ea-9d95-764f399fa27d",
+    "name": "Duenn",
+    "musicbrainz_id": null,
+    "releases": 22,
+    "cached_docs": 22,
+    "shelf": false,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "3328071"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Duenn",
+    "realname": null,
+    "namevariations": [
+     "Duenn."
+    ],
+    "aliases": [],
+    "groups": [
+     {
+      "id": 6797798,
+      "name": "3RENSA"
+     }
+    ],
+    "members": [],
+    "profile": "Sound artist and composer from Fukuoka, Japan.\r\n\r\nFocuses on using a minimum of equipment. Co-hosts the  “Hardcore Ambience” events with Nyantora (Koji Nakamura)\r\nFormed “3RENSA”  in 2017 together with Merzbow and Nyantora.\r\n\r\n\r\n\r\n",
+    "urls": []
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "dae18b63-a865-4bdf-b12a-dc206ec2e4d5",
+     "name": "duenn",
+     "disambiguation": "Japanese electronic musician"
+    }
+   ],
+   "credits": {
+    "documents": 22,
+    "main": 22,
+    "extra": 8,
+    "track": 2,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "hype williams",
+   "discogsID": 398459,
+   "catalogue": {
+    "id": "5dbab0e3-b85a-42e9-8c35-64529418a062",
+    "name": "Hype Williams",
+    "musicbrainz_id": "fdd6ea04-81fa-45a2-96d8-c29ba08bfbde",
+    "releases": 3,
+    "cached_docs": 0,
+    "shelf": false,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "398459"
+     },
+     {
+      "p": "musicbrainz_discogs",
+      "x": "1874027"
+     },
+     {
+      "p": "nts",
+      "x": "hype williams"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Hype Williams",
+    "realname": "Harold Williams",
+    "namevariations": [
+     "HW",
+     "Hype",
+     "Hypeness"
+    ],
+    "aliases": [],
+    "groups": [],
+    "members": [],
+    "profile": "American music video and film director and photographer, born in 1970 in Queens, New York, USA.",
+    "urls": []
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "9b825c18-b870-48d6-9577-e28f1180babd",
+     "name": "Hype Williams",
+     "disambiguation": "music video director"
+    }
+   ],
+   "musicbrainzForRowMBID": {
+    "name": "Hype Williams",
+    "disambiguation": "lo‐fi music duo",
+    "discogs": [
+     "1874027"
+    ],
+    "aliases": []
+   },
+   "credits": {
+    "documents": 0,
+    "main": 0,
+    "extra": 0,
+    "track": 0,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "hype williams",
+   "discogsID": 1874027,
+   "catalogue": {
+    "id": "8c74e06d-4b24-44c6-9a18-e69160d402ea",
+    "name": "Hype Williams (2)",
+    "musicbrainz_id": null,
+    "releases": 36,
+    "cached_docs": 36,
+    "shelf": false,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "1874027"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Hype Williams (2)",
+    "realname": null,
+    "namevariations": [],
+    "aliases": [],
+    "groups": [],
+    "members": [
+     {
+      "id": 1985093,
+      "name": "Roy Nnawuchi"
+     },
+     {
+      "id": 3967747,
+      "name": "Alina Astrova"
+     },
+     {
+      "id": 9146245,
+      "name": "Slaughter (18)"
+     },
+     {
+      "id": 9325345,
+      "name": "Silvermane"
+     }
+    ],
+    "profile": "Hype Williams is a musical group best known for consisting of UK-born artist [a=Dean Blunt] and Russian-born artist [a=Inga Copeland] between 2007 and 2012. Supposedly founded in 2005 as a \"relay\" project by [a=baahama moutchatka] and passe",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Hype_Williams_(band)"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "fdd6ea04-81fa-45a2-96d8-c29ba08bfbde",
+     "name": "Hype Williams",
+     "disambiguation": "lo‐fi music duo"
+    }
+   ],
+   "credits": {
+    "documents": 36,
+    "main": 36,
+    "extra": 3,
+    "track": 2,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "joanne robertson",
+   "discogsID": 1053396,
+   "catalogue": {
+    "id": "e51935c9-a9ec-4e91-a74e-b9bc842bbca4",
+    "name": "Joanne Robertson",
+    "musicbrainz_id": "daf06c03-68bc-4619-80e1-519b5fc67424",
+    "releases": 13,
+    "cached_docs": 13,
+    "shelf": true,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "1053396"
+     },
+     {
+      "p": "nts",
+      "x": "joanne robertson"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Joanne Robertson",
+    "realname": null,
+    "namevariations": [
+     "JR",
+     "Joanne R.",
+     "Джоанн Робертсон",
+     "ジョアン・ロバートソン"
+    ],
+    "aliases": [],
+    "groups": [
+     {
+      "id": 3803207,
+      "name": "Bo Khat Eternal Troof Family Band"
+     }
+    ],
+    "members": [],
+    "profile": "Singer, songwriter, guitarist and painter from Blackpool, UK.",
+    "urls": []
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "daf06c03-68bc-4619-80e1-519b5fc67424",
+     "name": "Joanne Robertson",
+     "disambiguation": ""
+    }
+   ],
+   "musicbrainzForRowMBID": {
+    "name": "Joanne Robertson",
+    "disambiguation": "",
+    "discogs": [
+     "1053396"
+    ],
+    "aliases": []
+   },
+   "credits": {
+    "documents": 13,
+    "main": 13,
+    "extra": 5,
+    "track": 2,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "mica levi",
+   "discogsID": 2576890,
+   "catalogue": {
+    "id": "57f1ba9f-a68a-4881-8ffe-5d4adec3501c",
+    "name": "Mica Levi",
+    "musicbrainz_id": "996d6c0c-c27e-4c08-8307-ca341f65147e",
+    "releases": 17,
+    "cached_docs": 13,
+    "shelf": true,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "2576890"
+     },
+     {
+      "p": "nts",
+      "x": "mica levi"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Mica Levi",
+    "realname": "Micaela Levi",
+    "namevariations": [
+     "Blue Shit",
+     "M. Levi",
+     "Meeks",
+     "Mica",
+     "Micaela Rachel Levi",
+     "Michaela Levi"
+    ],
+    "aliases": [
+     {
+      "id": 1172814,
+      "name": "Micachu"
+     },
+     {
+      "id": 9565285,
+      "name": "Meeks (7)"
+     }
+    ],
+    "groups": [
+     {
+      "id": 1874692,
+      "name": "Kwesachu"
+     },
+     {
+      "id": 2071978,
+      "name": "M.A.T.H.E.S."
+     },
+     {
+      "id": 6614905,
+      "name": "Curl (9)"
+     },
+     {
+      "id": 8207804,
+      "name": "Good Sad Happy Bad"
+     },
+     {
+      "id": 8234107,
+      "name": "Micachu & The Shapes"
+     }
+    ],
+    "members": [],
+    "profile": "Mica Levi is a classically trained musician, composer, performer, producer and singer. Levi was born and raised in Surrey, England, UK to two musicians and started writing and playing music at the age of four.\r\nLevi won the European Film Aw",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Mica_Levi"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "996d6c0c-c27e-4c08-8307-ca341f65147e",
+     "name": "Mica Levi",
+     "disambiguation": "English singer‐songwriter and score composer aka “Micachu”"
+    }
+   ],
+   "musicbrainzForRowMBID": {
+    "name": "Mica Levi",
+    "disambiguation": "English singer‐songwriter and score composer aka “Micachu”",
+    "discogs": [
+     "1172814",
+     "2576890"
+    ],
+    "aliases": [
+     "Levi",
+     "Mica Ledi",
+     "Mica Leni",
+     "Mica Levi",
+     "Mica Levis",
+     "Mica Levvi",
+     "Mica Lewi",
+     "Micachu",
+     "Micaela Levi",
+     "Micah Levi",
+     "Mical Levi",
+     "Micca Levi"
+    ]
+   },
+   "credits": {
+    "documents": 13,
+    "main": 13,
+    "extra": 3,
+    "track": 2,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "micachu",
+   "discogsID": 1172814,
+   "catalogue": {
+    "id": "3e0e6f20-d4b2-4cf7-a5a3-a0f565699e14",
+    "name": "Micachu",
+    "musicbrainz_id": null,
+    "releases": 13,
+    "cached_docs": 12,
+    "shelf": true,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "1172814"
+     },
+     {
+      "p": "nts",
+      "x": "micachu"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Micachu",
+    "realname": "Mica Levi",
+    "namevariations": [],
+    "aliases": [
+     {
+      "id": 2576890,
+      "name": "Mica Levi"
+     },
+     {
+      "id": 9565285,
+      "name": "Meeks (7)"
+     }
+    ],
+    "groups": [],
+    "members": [],
+    "profile": "British musician and recording artist.\r\nBased in London, plays in various bands, often doing experimental music.",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Micachu"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "996d6c0c-c27e-4c08-8307-ca341f65147e",
+     "name": "Mica Levi",
+     "disambiguation": "English singer‐songwriter and score composer aka “Micachu”"
+    }
+   ],
+   "credits": {
+    "documents": 12,
+    "main": 12,
+    "extra": 7,
+    "track": 4,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "prefuse 73",
+   "discogsID": 3722,
+   "catalogue": {
+    "id": "36133fd1-32cc-4b26-8375-6d0583a5c346",
+    "name": "Prefuse 73",
+    "musicbrainz_id": "fc61dd75-880b-44ba-9ba9-c7b643d33413",
+    "releases": 65,
+    "cached_docs": 63,
+    "shelf": true,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "3722"
+     },
+     {
+      "p": "nts",
+      "x": "prefuse 73"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Prefuse 73",
+    "realname": "Guillermo Scott Herren",
+    "namevariations": [
+     "Pre fuse 73",
+     "Pre-Fuse 73",
+     "Pre-fuse73",
+     "Prefuse",
+     "Prefuse 73 & The Failing Institute Of...",
+     "Prefuse-73",
+     "Prefuse/73",
+     "Prefuse73",
+     "Prefuze 73"
+    ],
+    "aliases": [
+     {
+      "id": 1918,
+      "name": "Delarosa & Asora"
+     },
+     {
+      "id": 104331,
+      "name": "Ahmad Szabo"
+     },
+     {
+      "id": 227795,
+      "name": "Piano Overlord"
+     },
+     {
+      "id": 229415,
+      "name": "Scott Herren"
+     },
+     {
+      "id": 1580833,
+      "name": "The Predicate Production Guild"
+     },
+     {
+      "id": 6810891,
+      "name": "Reto A Ichi"
+     }
+    ],
+    "groups": [],
+    "members": [],
+    "profile": "Music producer, who has been based in Atlanta, Barcelona and New York.",
+    "urls": [
+     "http://en.wikipedia.org/wiki/Prefuse_73"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "fc61dd75-880b-44ba-9ba9-c7b643d33413",
+     "name": "Prefuse 73",
+     "disambiguation": ""
+    }
+   ],
+   "musicbrainzForRowMBID": {
+    "name": "Prefuse 73",
+    "disambiguation": "",
+    "discogs": [
+     "3722"
+    ],
+    "aliases": [
+     "Prefuse '73",
+     "Prefuse 73 (versus Pedro)",
+     "Prefuse73"
+    ]
+   },
+   "credits": {
+    "documents": 63,
+    "main": 63,
+    "extra": 15,
+    "track": 6,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "speedy j",
+   "discogsID": 316464,
+   "catalogue": {
+    "id": "207b520d-8799-42b3-ab26-e32bd2a46a37",
+    "name": "Speedy J",
+    "musicbrainz_id": null,
+    "releases": 0,
+    "cached_docs": 0,
+    "shelf": false,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "316464"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Speedy J (2)",
+    "realname": null,
+    "namevariations": [
+     "Speedy J."
+    ],
+    "aliases": [],
+    "groups": [],
+    "members": [],
+    "profile": "",
+    "urls": []
+   },
+   "musicbrainzForDiscogsURL": [],
+   "credits": {
+    "documents": 0,
+    "main": 0,
+    "extra": 0,
+    "track": 0,
+    "unreadable": 0
+   }
+  },
+  {
+   "label": "speedy j",
+   "discogsID": 823,
+   "catalogue": {
+    "id": "f12c0c6a-aa86-477b-b70f-bdc463e2740b",
+    "name": "Speedy J",
+    "musicbrainz_id": "734fa82c-864e-468b-bee4-944cb4b1952b",
+    "releases": 34,
+    "cached_docs": 31,
+    "shelf": true,
+    "ids": [
+     {
+      "p": "discogs",
+      "x": "823"
+     },
+     {
+      "p": "nts",
+      "x": "speedy j"
+     }
+    ]
+   },
+   "discogs": {
+    "name": "Speedy J",
+    "realname": "Jochem George Paap",
+    "namevariations": [
+     "\"Speedy J\"",
+     "D.J. Speedy J.",
+     "D.J.Speedy J.",
+     "SPD",
+     "SPDJ",
+     "Speed J.",
+     "Speedy",
+     "Speedy - J",
+     "Speedy G",
+     "Speedy G.",
+     "Speedy J.",
+     "Speedy.J",
+     "SpeedyJ",
+     "Speedyj"
+    ],
+    "aliases": [
+     {
+      "id": 4203,
+      "name": "Electric Deluxe"
+     },
+     {
+      "id": 4295,
+      "name": "Jochem Paap"
+     },
+     {
+      "id": 6243,
+      "name": "Tune"
+     },
+     {
+      "id": 7635,
+      "name": "Public Energy"
+     },
+     {
+      "id": 13640,
+      "name": "DCC"
+     },
+     {
+      "id": 39101,
+      "name": "The Second Wave"
+     },
+     {
+      "id": 56912,
+      "name": "Aq"
+     },
+     {
+      "id": 6278293,
+      "name": "JPG (3)"
+     }
+    ],
+    "groups": [],
+    "members": [],
+    "profile": "Electronic music producer from Rotterdam, The Netherlands (born 10 August 1969 in Rotterdam).\nAfter two albums of electronic listening music on the label Warp, he released two albums with a more experimental sounds in 1997 and 2000. The alb",
+    "urls": [
+     "http://en.wikipedia.org/wiki/Speedy_J"
+    ]
+   },
+   "musicbrainzForDiscogsURL": [
+    {
+     "mbid": "734fa82c-864e-468b-bee4-944cb4b1952b",
+     "name": "Speedy J",
+     "disambiguation": "Dutch techno DJ/producer Jochem Paap"
+    }
+   ],
+   "musicbrainzForRowMBID": {
+    "name": "Speedy J",
+    "disambiguation": "Dutch techno DJ/producer Jochem Paap",
+    "discogs": [
+     "823"
+    ],
+    "aliases": [
+     "Speedy J."
+    ]
+   },
+   "credits": {
+    "documents": 31,
+    "main": 31,
+    "extra": 3,
+    "track": 0,
+    "unreadable": 0
+   }
+  }
+ ],
+ "byName": [
+  {
+   "label": "anika",
+   "row": "22904f8c-b792-413a-a70e-a2e73e7d5f30",
+   "name": "Anika",
+   "musicbrainz_id": "15c0e62b-3e46-4666-845d-d6c86bd44774",
+   "ids": [
+    {
+     "p": "musicbrainz_discogs",
+     "x": "1982320"
+    },
+    {
+     "p": "musicbrainz_discogs",
+     "x": "3999072"
+    },
+    {
+     "p": "nts",
+     "x": "anika"
+    }
+   ],
+   "musicbrainz": {
+    "name": "Anika",
+    "disambiguation": "British singer-songwriter, poet, DJ, photographer, and filmmaker",
+    "discogs": [
+     "1982320",
+     "3999072"
+    ],
+    "aliases": [
+     "Annika Henderson"
+    ]
+   }
+  },
+  {
+   "label": "attilio novellino",
+   "row": "968814b7-88ff-4ad7-8c43-bbe2f1722733",
+   "name": "Attilio Novellino",
+   "musicbrainz_id": null,
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "1720124"
+    }
+   ]
+  },
+  {
+   "label": "duenn",
+   "row": "ad500a89-bd0c-43ea-9d95-764f399fa27d",
+   "name": "Duenn",
+   "musicbrainz_id": null,
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "3328071"
+    }
+   ]
+  },
+  {
+   "label": "hype williams",
+   "row": "5dbab0e3-b85a-42e9-8c35-64529418a062",
+   "name": "Hype Williams",
+   "musicbrainz_id": "fdd6ea04-81fa-45a2-96d8-c29ba08bfbde",
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "398459"
+    },
+    {
+     "p": "musicbrainz_discogs",
+     "x": "1874027"
+    },
+    {
+     "p": "nts",
+     "x": "hype williams"
+    }
+   ],
+   "musicbrainz": {
+    "name": "Hype Williams",
+    "disambiguation": "lo‐fi music duo",
+    "discogs": [
+     "1874027"
+    ],
+    "aliases": []
+   }
+  },
+  {
+   "label": "joanne robertson",
+   "row": "e51935c9-a9ec-4e91-a74e-b9bc842bbca4",
+   "name": "Joanne Robertson",
+   "musicbrainz_id": "daf06c03-68bc-4619-80e1-519b5fc67424",
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "1053396"
+    },
+    {
+     "p": "nts",
+     "x": "joanne robertson"
+    }
+   ],
+   "musicbrainz": {
+    "name": "Joanne Robertson",
+    "disambiguation": "",
+    "discogs": [
+     "1053396"
+    ],
+    "aliases": []
+   }
+  },
+  {
+   "label": "mica levi",
+   "row": "57f1ba9f-a68a-4881-8ffe-5d4adec3501c",
+   "name": "Mica Levi",
+   "musicbrainz_id": "996d6c0c-c27e-4c08-8307-ca341f65147e",
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "2576890"
+    },
+    {
+     "p": "nts",
+     "x": "mica levi"
+    }
+   ],
+   "musicbrainz": {
+    "status": 503
+   }
+  },
+  {
+   "label": "micachu",
+   "row": "3e0e6f20-d4b2-4cf7-a5a3-a0f565699e14",
+   "name": "Micachu",
+   "musicbrainz_id": null,
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "1172814"
+    },
+    {
+     "p": "nts",
+     "x": "micachu"
+    }
+   ]
+  },
+  {
+   "label": "prefuse 73",
+   "row": "36133fd1-32cc-4b26-8375-6d0583a5c346",
+   "name": "Prefuse 73",
+   "musicbrainz_id": "fc61dd75-880b-44ba-9ba9-c7b643d33413",
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "3722"
+    },
+    {
+     "p": "nts",
+     "x": "prefuse 73"
+    }
+   ],
+   "musicbrainz": {
+    "name": "Prefuse 73",
+    "disambiguation": "",
+    "discogs": [
+     "3722"
+    ],
+    "aliases": [
+     "Prefuse '73",
+     "Prefuse 73 (versus Pedro)",
+     "Prefuse73"
+    ]
+   }
+  },
+  {
+   "label": "prefuse73",
+   "row": "cc290916-e418-457f-81e4-8e97b8a910bb",
+   "name": "Prefuse73",
+   "musicbrainz_id": null,
+   "ids": [
+    {
+     "p": "nts",
+     "x": "prefuse73"
+    }
+   ]
+  },
+  {
+   "label": "speedy j",
+   "row": "f12c0c6a-aa86-477b-b70f-bdc463e2740b",
+   "name": "Speedy J",
+   "musicbrainz_id": "734fa82c-864e-468b-bee4-944cb4b1952b",
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "823"
+    },
+    {
+     "p": "nts",
+     "x": "speedy j"
+    }
+   ],
+   "musicbrainz": {
+    "name": "Speedy J",
+    "disambiguation": "Dutch techno DJ/producer Jochem Paap",
+    "discogs": [
+     "823"
+    ],
+    "aliases": [
+     "Speedy J."
+    ]
+   }
+  },
+  {
+   "label": "speedy j",
+   "row": "207b520d-8799-42b3-ab26-e32bd2a46a37",
+   "name": "Speedy J",
+   "musicbrainz_id": null,
+   "ids": [
+    {
+     "p": "discogs",
+     "x": "316464"
+    }
+   ]
+  }
+ ]
+}

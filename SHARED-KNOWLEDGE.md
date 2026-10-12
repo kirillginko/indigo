@@ -1178,3 +1178,67 @@ the pilot demand set was built from them. A device whose rows moved on
 since would see `deferred`, as the design intends, until demand is
 collected (§9.7).
 
+## 16. Phase 3B: identity audit of the missing starting-point bundles (2026-10-12)
+
+The pinned generation (2026-10-11) has bundles for 6 of the pilot's 16
+starting identities. Before building any, each missing one was checked
+against three independent sources, none of them its name:
+
+- the **Discogs artist document** for the id (name, real name, name
+  variations, aliases, groups, members, profile);
+- **MusicBrainz's own Discogs links**, both ways: the artist a Discogs URL is
+  attached to, and the Discogs URLs on the catalogue row's MBID;
+- the **release documents** R2 holds for the catalogue's releases under the
+  row, counted only where a credit names that exact Discogs id.
+
+Read-only: `supabase/diagnostics/identity-audit/catalogue.sql` (catalogue
+rows, by id and by name) and `Scripts/bundle-identity-audit.py`; the full
+result is `supabase/diagnostics/identity-audit/audit-2026-10-12.json`.
+
+| Starting point | Discogs id | Discogs | MusicBrainz | Credits naming the id | Category |
+|---|---|---|---|---|---|
+| Anika | 3999072 | "Annika Henderson"; mutual aliases with Anika (9) 1982320 | one artist (15c0e62b) for both ids | none cached: no catalogue row holds the id | verified alias; missing source documents |
+| Attilio Novellino | 1720124 | Italian sound artist | 834257c7 links back | 10 of 10 documents | verified |
+| Duenn | 3328071 | sound artist from Fukuoka; Nyantora is a collaborator, not an alias | dae18b63 "duenn" | 22 of 22 | verified |
+| Hype Williams | 398459 | Harold Williams, music-video director | 9b825c18 "music video director" | 0 | contradicted (wrong entity) |
+| Joanne Robertson | 1053396 | singer and painter, Blackpool | daf06c03, both ways | 13 of 13 | verified |
+| Mica Levi | 2576890 | aliases: Micachu 1172814 | 996d6c0c, aka Micachu, both ids | 13 of 13 | verified |
+| Micachu | 1172814 | its own entry; aliases: Mica Levi 2576890 | the same MusicBrainz artist | 12 of 12 | verified, distinct alias |
+| Prefuse 73 | 3722 | Guillermo Scott Herren; "Prefuse73" among its name variations | fc61dd75, both ways; alias "Prefuse73" | 63 of 63 | verified |
+| Speedy J | 823 | Jochem George Paap, Rotterdam | 734fa82c, both ways | 31 of 31 | verified |
+| Speedy J | 316464 | "Speedy J (2)", no profile | none | 0, and no catalogue releases | unresolved namesake |
+
+Unresolved or contradicted, and **not built**:
+
+- **Hype Williams 398459** is the director, not the duo. The catalogue row
+  5dbab0e3 holds it as its Discogs id, adopted by name when the radio row
+  met the Discogs entry, while its own MBID (fdd6ea04, "lo-fi music duo")
+  links to 1874027, the duo, whose bundle is in the generation (partial,
+  71/84). A bundle for 398459 would attach a film director's credits to the
+  duo. The row's id needs correcting (a catalogue change, proposed, not
+  made); until then the cut keeps naming 398459 for "hype williams", and its
+  bundle stays `missing` on purpose.
+- **Speedy J (2) 316464**: an entry with no profile, no MusicBrainz link and
+  nothing in the catalogue but a row with no releases. Nothing says it is
+  Jochem Paap. Kept separate, not built. Speedy J stays `ambiguousName` with
+  two seeds; only 823 is built.
+
+Relationships kept explicit, not merged:
+
+- **Anika / Annika Henderson**: two Discogs entries for one person (mutual
+  aliases, one MusicBrainz artist). Each keeps its own bundle; the cut
+  already lists both as Anika's identities, and the bundle edges drop an
+  artist's own other names as targets (`ownIdentities`).
+- **Mica Levi / Micachu**: two entries, mutual Discogs aliases, one
+  MusicBrainz artist. Two bundles, two starting points, linked as aliases;
+  neither's records are folded into the other's.
+- **Prefuse73 / Prefuse 73**: the radio row `prefuse73` (cc290916, NTS only)
+  has no identity in the catalogue, so its starting point is `noIdentity`.
+  The evidence that it is 3722 exists (Discogs name variation, MusicBrainz
+  alias) and is what the app's identity graph already uses; recording it on
+  the catalogue row is a catalogue change, proposed, not made. Until then
+  the 3722 bundle reaches "prefuse 73" only.
+
+To build: 8 bundles — 3999072, 1720124, 3328071, 1053396, 2576890,
+1172814, 3722, 823.
+
