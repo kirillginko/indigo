@@ -1149,11 +1149,11 @@ golden, backend and bundle tests pass unchanged (52).
 **Measured against the published generation** (`PinnedGenerationMeasurement`,
 opt-in), evaluation day 2026-10-12, which selects 2026-10-11:
 
-| | macOS, network | iOS simulator, published bytes |
+| | macOS, network | iOS simulator, network |
 |---|---|---|
-| Cold, clean client (×2, each its own ephemeral session) | 3,464 / 3,407 ms, 176 objects, 1.48 MB | 150 / 102 ms (no network) |
-| Warm (kept, list re-read) | 96 ms, 209 bytes | 23 ms |
-| Offline startup | 20 ms, 0 bytes, `offline-cache` | 24 ms |
+| Cold, clean client (×2, each its own ephemeral session) | 3,464 / 3,407 ms, 176 objects, 1.48 MB | 8,440 / 5,208 ms, 176 objects, 1.48 MB |
+| Warm (kept, list re-read) | 96 ms, 209 bytes | 94 ms, 209 bytes |
+| Offline startup | 20 ms, 0 bytes, `offline-cache` | 29 ms, 0 bytes, `offline-cache` |
 | Cache on disk | 1.49 MB | 1.49 MB |
 
 Parity: for each input set, two clean clients agree on the knowledge
@@ -1162,15 +1162,16 @@ digest, the candidate set and the ranked digest.
 | Inputs | Personal | Coverage | Knowledge | Ranked |
 |---|---|---|---|---|
 | Pilot listener (macOS) | `c24149ed7b5f` | `s11-1-0-0a13-1-0b5-1-7-0` | `7ec78ceed33d` | `e9e5607e1785` |
-| Pilot listener (iOS simulator) | `c24149ed7b5f` | `s11-1-0-0a13-1-0b5-1-7-0` | `7ec78ceed33d` | `e9e5607e1785` |
+| Pilot listener (iOS simulator, network) | `c24149ed7b5f` | `s11-1-0-0a13-1-0b5-1-7-0` | `7ec78ceed33d` | `e9e5607e1785` |
 | Development rows (macOS) | `5f46aead5489` | `s8-3-1-0a140-8-0b5-1-2-0` | `ffa012feac79` | `fc7306a7481f` |
 | Production rows (macOS) | `8e50ac7a1edf` | `s7-2-3-0a143-8-0b4-1-5-0` | `9e8fea987b27` | `2cb74eecdad2` |
 
-The iOS run read the bytes reader A saved (§14.3) from a folder, every
-digest checked, because the simulator's Indigo has no network here: LuLu
-(the Mac's firewall) has *Allow simulator apps* off, and every simulator
-install of Indigo is a new path to it. Safari on the same simulator reaches
-the bucket. The live iOS fetch timing is therefore still to be measured.
+The iOS simulator's Indigo first had no network: LuLu (the Mac's firewall)
+held every simulator install of Indigo, each a new path to it, while Safari
+on the same simulator reached the bucket. Meanwhile the iOS client read the
+bytes reader A saved (§14.3) from a folder, digests checked, with the same
+knowledge and ranked digests. Once simulator apps were allowed in LuLu, the
+live run above fetched over the network and agreed again.
 
 The development and production rows have no `deferred` starting points:
 the pilot demand set was built from them. A device whose rows moved on
