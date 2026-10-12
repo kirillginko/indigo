@@ -1242,3 +1242,74 @@ Relationships kept explicit, not merged:
 To build: 8 bundles — 3999072, 1720124, 3328071, 1053396, 2576890,
 1172814, 3722, 823.
 
+## 17. Phase 3B: the eight verified bundles, built and measured (2026-10-12)
+
+The eight identities §16 verified were added to the worker's pilot list
+(`knowledge.ts`; Hype Williams 398459 and Speedy J (2) 316464 are named as
+excluded, and the boundary test now uses them) and the worker redeployed
+(version 55; the live source it replaced matched this branch except for
+2C's unused R2 helpers). One `discover_discography` job each; discovery,
+document caching and builds ran through the normal drains, 02:36–03:26 UTC.
+R2 writes this month 2,228 → 2,517.
+
+**Checked** (`BundleCoverageMeasurement`, opt-in): every bundle read through
+its reference, its SHA-256 equal to the reference's digest, and built for
+the expected Discogs id.
+
+| Discogs id | Bundle | Discovery | Documents read | Releases / collaborators / credits / labels | Own other entries seen in it |
+|---|---|---|---|---|---|
+| 3999072 Annika Henderson | complete | 1/1 pages, 24 entries | 21/21 | 21 / 10 / 0 / 0 | Anika (9) 1982320 |
+| 1720124 Attilio Novellino | complete | 1/1, 42 | 36/36 | 34 / 20 / 27 / 14 | — |
+| 3328071 Duenn | complete | 1/1, 62 | 60/60 | 60 / 29 / 49 / 28 | — |
+| 1053396 Joanne Robertson | complete | 1/1, 40 | 39/39 | 36 / 13 / 10 / 7 | — |
+| 2576890 Mica Levi | complete | 1/1, 93 | 86/86 | 84 / 53 / 49 / 13 | Micachu 1172814 |
+| 1172814 Micachu | complete | 1/1, 98 | 94/94 | 90 / 38 / 65 / 15 | Mica Levi 2576890 |
+| 3722 Prefuse 73 | **partial** | 5/5, 440 | 165/414 (249 missing) | 162 / 60 / 94 / 22 | — |
+| 823 Speedy J | **partial** | 10/10, 967 | 145/936 (791 missing) | 147 / 60 / 19 / 11 | — |
+
+Discovery is complete for all eight; Prefuse 73 and Speedy J are partial
+because their release documents are not all cached (each discovery queues
+at most 40), and are recorded as partial with read/of, not filled in. Six
+document jobs were still pending at 03:27; when they land the affected
+bundles rebuild and their references move, which a later generation pins.
+The aliases appear in each other's bundles as collaborators, and the bundle
+edges leave them out as targets (`ownIdentities`): Anika is not offered
+Annika Henderson, nor Mica Levi Micachu.
+
+**Before and after, in shadow.** Before: the 2026-10-11 generation as
+published. After: the same, with the eight bundles laid over it in memory,
+pinned as the publisher pins. Nothing was published; the October 11
+generation is unchanged; this knowledge enters a later generation.
+
+| | Pilot listener (12 starting points) | This Mac's Development rows |
+|---|---|---|
+| Starting-point bundles | 5 complete, 1 partial, 7 missing → 11 complete, 1 partial, 1 missing | 5 / 1 / 2 → 6 / 1 / 1 |
+| Edges out of the starting points | 2,800 → 3,183 | 1,830 → 1,830 |
+| New edges | collaborator +128, personnel +151, producer +60, sameRelease +23, sharedLabel +21 (Attilio Novellino, Duenn, Joanne Robertson, Mica Levi, Micachu) | none |
+| Top 20 | 9 in, 9 out (e.g. in: Oliver Coates "Made Remain Calm together", Tirzah "Made Devotion together", Matthew Herbert "Producer on Jewellery") | unchanged |
+| Visible top 20 reached | — | 16 → 16; top-20 overlap 1 → 1 |
+
+The one missing bundle left in both is Hype Williams 398459, on purpose.
+The pilot listener's twelve starting points do not include Prefuse 73 or
+Speedy J (the listener's oldest two), so their bundles add nothing there.
+Annika Henderson's bundle adds no edge to Anika: its ten collaborators are
+the ones Anika (9)'s bundle already names.
+
+**What was actually recovered for the real rows: nothing, and why.** The
+Development rows' starting points that gained a bundle (Anika's second
+identity) gained no new relationship. The four visible top-twenty
+recommendations the backend still cannot reach are not starting-point
+bundle gaps at all; this device reaches them through:
+
+- Duenn: Ciro Vitiello's label Opal Tapes (a label roster);
+- Ryuichi Sakamoto: Eric Kloss's label Music On Vinyl (a label roster);
+- Frederick Seibert: "Producer on Now", a credit on an Eric Kloss release;
+- 239EF: an NTS show that played Anika and Dean Blunt (radio coverage).
+
+Ciro Vitiello and Eric Kloss already have complete bundles. So the next
+coverage work for these rows is label rosters (who else releases on a
+label), the one release credit the Eric Kloss bundle lacks, and NTS show
+coverage — Phase 3 items 2 and 3 — not more starting-point bundles.
+
+Full output: `supabase/diagnostics/identity-audit/bundle-coverage-2026-10-12.json`.
+

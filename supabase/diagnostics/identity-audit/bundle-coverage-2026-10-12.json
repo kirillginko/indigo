@@ -1,0 +1,477 @@
+{
+  "bundles" : [
+    {
+      "artistMatches" : true,
+      "collaborators" : 10,
+      "credits" : 0,
+      "digest" : "7a01aba344b93742a4de5d2732da96e792d822d1c2f356b832f86f7bccf1d6d9",
+      "digestVerified" : true,
+      "discogsID" : 3999072,
+      "labels" : 0,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+        "Anika (9) (1982320)"
+      ],
+      "releases" : 21,
+      "source" : "discovery complete 1/1 pages, 24 entries, 21/21 documents read, 0 missing, 0 over budget",
+      "status" : "complete"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 20,
+      "credits" : 27,
+      "digest" : "4df9dc9b78e69b8d5a174ee289148e7a2ec2e1da081491f2993f1346fc070492",
+      "digestVerified" : true,
+      "discogsID" : 1720124,
+      "labels" : 14,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+
+      ],
+      "releases" : 34,
+      "source" : "discovery complete 1/1 pages, 42 entries, 36/36 documents read, 0 missing, 0 over budget",
+      "status" : "complete"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 29,
+      "credits" : 49,
+      "digest" : "64dcb751116076fd24bf419bad40194891a3151e05139302915a8494414f0958",
+      "digestVerified" : true,
+      "discogsID" : 3328071,
+      "labels" : 28,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+
+      ],
+      "releases" : 60,
+      "source" : "discovery complete 1/1 pages, 62 entries, 60/60 documents read, 0 missing, 0 over budget",
+      "status" : "complete"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 13,
+      "credits" : 10,
+      "digest" : "69f2fabd896509859538716d56f21ee6a113e8f67b71968c370d67b064eda0b9",
+      "digestVerified" : true,
+      "discogsID" : 1053396,
+      "labels" : 7,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+
+      ],
+      "releases" : 36,
+      "source" : "discovery complete 1/1 pages, 40 entries, 39/39 documents read, 0 missing, 0 over budget",
+      "status" : "complete"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 53,
+      "credits" : 49,
+      "digest" : "cfc22c0e3e76148582ceb9b1b02a946e8b12162a2a2492f8c1bbadc7eb3a3a76",
+      "digestVerified" : true,
+      "discogsID" : 2576890,
+      "labels" : 13,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+        "Micachu (1172814)"
+      ],
+      "releases" : 84,
+      "source" : "discovery complete 1/1 pages, 93 entries, 86/86 documents read, 0 missing, 0 over budget",
+      "status" : "complete"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 38,
+      "credits" : 65,
+      "digest" : "b9f91679ec0c46c826e02ac1eb3d60a888030d3ec505ab07d308389e558538cc",
+      "digestVerified" : true,
+      "discogsID" : 1172814,
+      "labels" : 15,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+        "Mica Levi (2576890)"
+      ],
+      "releases" : 90,
+      "source" : "discovery complete 1/1 pages, 98 entries, 94/94 documents read, 0 missing, 0 over budget",
+      "status" : "complete"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 60,
+      "credits" : 94,
+      "digest" : "f0187d487983b410e80b4b5447e69ad6e2e3773594dd2ac5469545288d966467",
+      "digestVerified" : true,
+      "discogsID" : 3722,
+      "labels" : 22,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+
+      ],
+      "releases" : 162,
+      "source" : "discovery complete 5/5 pages, 440 entries, 165/414 documents read, 249 missing, 0 over budget",
+      "status" : "partial"
+    },
+    {
+      "artistMatches" : true,
+      "collaborators" : 60,
+      "credits" : 19,
+      "digest" : "bd37cf1923843b7f6bca4f0949b82be4f96ef8149afd8058bd172d22e06b8b65",
+      "digestVerified" : true,
+      "discogsID" : 823,
+      "labels" : 11,
+      "notes" : [
+
+      ],
+      "ownNamesInBundle" : [
+
+      ],
+      "releases" : 147,
+      "source" : "discovery complete 10/10 pages, 967 entries, 145/936 documents read, 791 missing, 0 over budget",
+      "status" : "partial"
+    }
+  ],
+  "generation" : "2026-10-11 dba738672cd9",
+  "inputs" : [
+    {
+      "added" : {
+        "Attilio Novellino" : [
+          "collaborator +20: Alessio Ballerini — Made Loud Listening #002: Through The Sound Of Murano Glass together | Ciro Vitiello — Featuring, Mixed By on The Island of Bouncy Memories | Collin McKelvey — Made Métaphysiques Cannibales together | Drekka — Made Quadrature together",
+          "personnel +27: Alessio Ballerini — Featuring on Through Glass (1, 8) | Alexandr Vatagin — Cello on A Conscious Effort (A01) | Angelo Bignamini — Bass on A Conscious Effort (B04) | Campbell Kneale — Composed By on The Assault Of Heaven (1-2)",
+          "producer +1: Saverio Rosi — Mixed By on Objects In Mirror Are Closer Than They Appear",
+          "sharedLabel +4: Dragon's Eye Recordings — Releases on Dragon's Eye Recordings | Kohlhaas — Releases on Kohlhaas | Manza Nera — Releases on Manza Nera | Oak Editions — Releases on Oak Editions"
+        ],
+        "Duenn" : [
+          "collaborator +29: $3.33 — Made Hz together | 36 — Made Distance As Power together | 3RENSA — Made 3D together | Akiko Nakayama — Made V.A. Landscape Painting together",
+          "personnel +26: 36 — Written-By on Distance As Power | 555 — Sounds on Fragment | Akiko Kiyama — Performer [Collaboration With] on Nakaniwa (3, 5) | Allon Kaye — Edited By on 086-087 Area (2)",
+          "producer +28: 36 — Producer on Distance As Power | Aclds — Remix on fb05 (4) | Adam Asnan — Remix on 3RENSA fb03 (3) | Ametsub — Remix on Feat Nyantora Returns I (A1)",
+          "sharedLabel +10: Entr'acte — Releases on Entr'acte | Hardcore Ambience — Releases on Hardcore Ambience | Progressive Form — Releases on Progressive Form | SaD — Releases on SaD"
+        ],
+        "Joanne Robertson" : [
+          "collaborator +11: Bo Khat Eternal Troof Family Band — Performer on Infinity | David Cunningham — Made Maybelle together | Dean Blunt — Made Backstage Raver together | Elias Bender Rønnenfelt — Vocals on Heavy Glory",
+          "personnel +9: Alex Cowan — Mastered By on Wildflower | David Cunningham — Arranged By on Maybelle (A, B) | David Tippet — Composed By [From Original Text 'Drop'Em Down'] on Maybelle (A) | Elias Bender Rønnenfelt — Featuring on Backstage Raver (4)",
+          "producer +3: David Cunningham — Producer on Maybelle (B) | Dean Blunt — Producer on Black Moon Days (A3) | Kool Music — Producer on Wildflower",
+          "sameRelease +2: Grouper — Appears on RA.621 | Oliver Coates — Appears on Fact Mix 778"
+        ],
+        "Mica Levi" : [
+          "collaborator +34: Adrian Corker — Performer on Tin Star Liverpool (Original Score) | Alpha Maid — Made Spresso together | Arca — Co-producer, Music By on Kick II | Ben Babbitt — Performer on I Hate It Here",
+          "personnel +44: Anisa Arslanagic — Viola on Under The Skin | Beau Thomas — Mastered By on Remain Calm | Benjamin Griffiths — Flute on Under The Skin | Bridget Samuels Of Orchestrate — Other [Fixer] on Under The Skin",
+          "producer +7: Dilip Harris — Mixed By on Monos | Jake Jackson — Mixed By [Score Mixer] on Under The Skin | Kwes. — Mixed By on Zola (Original Motion Picture Soundtrack) | Oliver Coates — Mixed By on Remain Calm",
+          "sameRelease +18: Bersarin Quartett — Appears on Isolatedmix 69 | Chihiro Yoshikawa — Appears on Pain Chrisantemo | Cosmin TRG — Appears on Secret Thirteen Mix 136 | Dels — Appears on Gob",
+          "sharedLabel +2: A24 Music — Releases on A24 Music | White Cube — Releases on White Cube"
+        ],
+        "Micachu" : [
+          "collaborator +34: Alessi's Ark — Made I'm Every Woman together | Amanda Ghost — Made I'm Every Woman together | Babyfather — Co-producer, Featuring on BBF Hosted By DJ Escrow | Ben Vince — Featuring on Assimilation",
+          "personnel +45: Action Pyramid — Performer on Kwesachu Vol. 2 (12) | BILA — Featuring on Kwesachu Vol. 2 (8) | Baker Trouble — MC on Filthy Friends: Mix Tape Volume 1 | Bang On! — Featuring on Kwesachu Vol. 2 (9)",
+          "producer +21: Alex Egan — Producer [Additional Production] on Lips Remixes (6) | Astronomer — Remix on Lips Remixes (6) | Carl Craig — Remix on Bonus Disc (2) | Clark Kunt — Remix on Lips Remixes (1)",
+          "sameRelease +3: Patten — Appears on FACT Mix 285 | Shuttle — Appears on The Vostok 1 Mixtape | Stopmakingme — Appears on Do You Come Here Often?",
+          "sharedLabel +5: ActionAid — Releases on ActionAid | Foom — Releases on Foom | Swag — Releases on Swag | The Vinyl Factory — Releases on The Vinyl Factory"
+        ]
+      },
+      "after" : {
+        "bundles" : {
+          "complete" : 11,
+          "missing" : 1,
+          "partial" : 1
+        },
+        "candidates" : 40,
+        "edges" : 3183,
+        "edgesByKind" : {
+          "appearsOnRelease" : 205,
+          "collaborator" : 200,
+          "frequentlyPlayedNearby" : 270,
+          "personnel" : 400,
+          "playedInShow" : 123,
+          "producer" : 100,
+          "sameRelease" : 77,
+          "sharedLabel" : 1808
+        },
+        "missingKinds" : [
+
+        ],
+        "shared" : "8483e1e88d36",
+        "top20" : [
+          "Oliver Coates — Made Remain Calm together (collaborator)",
+          "Foodman — Remix on Для = For (11) (producer)",
+          "King Midas Sound — Remix, Remix [Rework] on Without You (collaborator)",
+          "JASSS — Remix on 3RENSA fb03 (2) (producer)",
+          "Babyfather — Drum Machine [Uncredited], Synth [Uncredited] on Platinum Tears (collaborator)",
+          "Beatrice Dillon — Both release on FACT Magazine (sharedLabel)",
+          "Klein — Featuring [Ft] on Roaches 2012 - 2019 (​$​up£r D€lux£) (32) (personnel)",
+          "Jessy Lanza — Remix on Room For The Moon Remixes (1) (producer)",
+          "Lawrence English — Made V.A.Time EP together (collaborator)",
+          "bar italia — Featuring on Bedhead (collaborator)",
+          "Aya — Both release on FACT Magazine (sharedLabel)",
+          "Tirzah — Made Devotion together (collaborator)",
+          "Carl Craig — Remix on Bonus Disc (2) (producer)",
+          "Jim O'Rourke — Remix on Hotokenuma EP (2) (producer)",
+          "Opal Tapes — Releases on Opal Tapes (sharedLabel)",
+          "239EF — Played on 239EF (playedInShow)",
+          "Matthew Herbert — Producer on Jewellery (producer)",
+          "Angelo Harmsworth — Both release on Opal Tapes (sharedLabel)",
+          "Basic House — Both release on Opal Tapes (sharedLabel)",
+          "Jon Collin — Both release on Feeding Tube Records (sharedLabel)"
+        ],
+        "top20Overlap" : 0,
+        "visibleReached" : 0
+      },
+      "before" : {
+        "bundles" : {
+          "complete" : 5,
+          "missing" : 7,
+          "partial" : 1
+        },
+        "candidates" : 40,
+        "edges" : 2800,
+        "edgesByKind" : {
+          "appearsOnRelease" : 205,
+          "collaborator" : 72,
+          "frequentlyPlayedNearby" : 270,
+          "personnel" : 249,
+          "playedInShow" : 123,
+          "producer" : 40,
+          "sameRelease" : 54,
+          "sharedLabel" : 1787
+        },
+        "missingKinds" : [
+
+        ],
+        "shared" : "7ec78ceed33d",
+        "top20" : [
+          "Foodman — Remix on Для = For (11) (producer)",
+          "King Midas Sound — Remix, Remix [Rework] on Without You (collaborator)",
+          "Beatrice Dillon — Both release on FACT Magazine (sharedLabel)",
+          "Klein — Featuring [Ft] on Roaches 2012 - 2019 (​$​up£r D€lux£) (32) (personnel)",
+          "Inga Copeland — Made The Attitude Era together (collaborator)",
+          "Jessy Lanza — Remix on Room For The Moon Remixes (1) (producer)",
+          "Aya — Both release on FACT Magazine (sharedLabel)",
+          "Demdike Stare — Made Meet Shangaan Electro together (collaborator)",
+          "Talpah — Made Lost In The Colloid together (collaborator)",
+          "Lawrence English — Both release on Crónica (sharedLabel)",
+          "Opal Tapes — Releases on Opal Tapes (sharedLabel)",
+          "239EF — Played on 239EF (playedInShow)",
+          "Jockstrap — Featuring [Ft, Uncredited] on Soul On Fire (personnel)",
+          "Decisive Pink — Engineer [Engineering By], Music By on Ticket To Fame (collaborator)",
+          "Nmesh — Remix on Needle Exchange 282 (collaborator)",
+          "Angelo Harmsworth — Both release on Opal Tapes (sharedLabel)",
+          "Jon Collin — Both release on Feeding Tube Records (sharedLabel)",
+          "Arca — Co-producer [Uncredited] on The Redeemer (6) (producer)",
+          "150 Session — Played on 150 Session (playedInShow)",
+          "Finest Hour w/ Cynthia — Played on Finest Hour w/ Cynthia (playedInShow)"
+        ],
+        "top20Overlap" : 0,
+        "visibleReached" : 0
+      },
+      "candidatesAdded" : [
+        "10 / 10",
+        "100",
+        "2008 / 2011",
+        "Alex Smoke",
+        "Alexa Stay With Me",
+        "AyGeeTee",
+        "Babyfather",
+        "Basic House",
+        "Bersarin Quartett",
+        "Carl Craig",
+        "Guests",
+        "Henry Mancini",
+        "JASSS",
+        "Jim O'Rourke",
+        "Jimmy Owens",
+        "Marc Pell",
+        "Matthew Herbert",
+        "Oliver Coates",
+        "Rachel Alina",
+        "Tirzah",
+        "bar italia"
+      ],
+      "candidatesRemoved" : [
+        "A Message",
+        "ASAP Rocky",
+        "Absence / 不在 ",
+        "Arca",
+        "Bgm",
+        "Blue Alibi",
+        "Boss Mischief",
+        "Cal Lampley",
+        "Carole King",
+        "Decisive Pink",
+        "Demdike Stare",
+        "Don Schlitten",
+        "Gina",
+        "Heba Kadry",
+        "Inga Copeland",
+        "Jockstrap",
+        "Michael Cuscuna",
+        "Nmesh",
+        "Philippe Sarde",
+        "Smerz",
+        "Talpah"
+      ],
+      "enteredTop20" : [
+        "Oliver Coates — Made Remain Calm together",
+        "JASSS — Remix on 3RENSA fb03 (2)",
+        "Babyfather — Drum Machine [Uncredited], Synth [Uncredited] on Platinum Tears",
+        "bar italia — Featuring on Bedhead",
+        "Tirzah — Made Devotion together",
+        "Carl Craig — Remix on Bonus Disc (2)",
+        "Jim O'Rourke — Remix on Hotokenuma EP (2)",
+        "Matthew Herbert — Producer on Jewellery",
+        "Basic House — Both release on Opal Tapes"
+      ],
+      "label" : "pilot listener",
+      "leftTop20" : [
+        "Inga Copeland — Made The Attitude Era together",
+        "Demdike Stare — Made Meet Shangaan Electro together",
+        "Talpah — Made Lost In The Colloid together",
+        "Jockstrap — Featuring [Ft, Uncredited] on Soul On Fire",
+        "Decisive Pink — Engineer [Engineering By], Music By on Ticket To Fame",
+        "Nmesh — Remix on Needle Exchange 282",
+        "Arca — Co-producer [Uncredited] on The Redeemer (6)",
+        "150 Session — Played on 150 Session",
+        "Finest Hour w/ Cynthia — Played on Finest Hour w/ Cynthia"
+      ],
+      "recovered" : [
+
+      ],
+      "stillUnreached" : [
+
+      ]
+    },
+    {
+      "added" : {
+
+      },
+      "after" : {
+        "bundles" : {
+          "complete" : 6,
+          "missing" : 1,
+          "partial" : 1
+        },
+        "candidates" : 40,
+        "edges" : 1830,
+        "edgesByKind" : {
+          "appearsOnRelease" : 135,
+          "collaborator" : 72,
+          "frequentlyPlayedNearby" : 185,
+          "personnel" : 249,
+          "playedInShow" : 126,
+          "producer" : 40,
+          "sameRelease" : 54,
+          "sharedLabel" : 969
+        },
+        "missingKinds" : [
+
+        ],
+        "shared" : "ffa012feac79",
+        "top20" : [
+          "Foodman — Remix on Для = For (11) (producer)",
+          "King Midas Sound — Remix, Remix [Rework] on Without You (collaborator)",
+          "Jessy Lanza — Remix on Room For The Moon Remixes (1) (producer)",
+          "Lucas Dupuy — Played Anthony Naples and Boards Of Canada and 1 more you keep (playedInShow)",
+          "somatic reflex w/ subwayknitting — Played Aphex Twin and Boards Of Canada and 1 more you keep (playedInShow)",
+          "Beatrice Dillon — Both release on FACT Magazine (sharedLabel)",
+          "Klein — Featuring [Ft] on Roaches 2012 - 2019 (​$​up£r D€lux£) (32) (personnel)",
+          "Kit Grill - Ambient Special — Played Aphex Twin, who you keep (playedInShow)",
+          "SOPHIA ZHURAVKOVA Presents textural bug — Played Boards Of Canada, who you keep (playedInShow)",
+          "United In Flames w/ Malibu — Played Boards Of Canada, who you keep (playedInShow)",
+          "United In Flames w/ Malibu & Murex — Played Bibio, who you keep (playedInShow)",
+          "GAIKA — Instrumentation By [Additional Player], Vocals [Additional Singer] on Heaters 4 The 2 Seaters (collaborator)",
+          "Dave Clarke — Made The Desecration Of Desire together (collaborator)",
+          "World Music — Releases on World Music (sharedLabel)",
+          "7FO — Both release on FACT Magazine (sharedLabel)",
+          "Blue Iverson — Drums, Guitar on Hotep (collaborator)",
+          "Bo Khat Eternal Troof Family Band — Made Infinity together (collaborator)",
+          "Denna Frances Glass — Producer [Contribution, Uncredited] on Black Is Beautiful (producer)",
+          "Stan Iordanov — Producer [Also Features Production] on Untitled (producer)",
+          "Hundebiss — Releases on Hundebiss (sharedLabel)"
+        ],
+        "top20Overlap" : 1,
+        "visibleReached" : 16
+      },
+      "before" : {
+        "bundles" : {
+          "complete" : 5,
+          "missing" : 2,
+          "partial" : 1
+        },
+        "candidates" : 40,
+        "edges" : 1830,
+        "edgesByKind" : {
+          "appearsOnRelease" : 135,
+          "collaborator" : 72,
+          "frequentlyPlayedNearby" : 185,
+          "personnel" : 249,
+          "playedInShow" : 126,
+          "producer" : 40,
+          "sameRelease" : 54,
+          "sharedLabel" : 969
+        },
+        "missingKinds" : [
+
+        ],
+        "shared" : "ffa012feac79",
+        "top20" : [
+          "Foodman — Remix on Для = For (11) (producer)",
+          "King Midas Sound — Remix, Remix [Rework] on Without You (collaborator)",
+          "Jessy Lanza — Remix on Room For The Moon Remixes (1) (producer)",
+          "Lucas Dupuy — Played Anthony Naples and Boards Of Canada and 1 more you keep (playedInShow)",
+          "somatic reflex w/ subwayknitting — Played Aphex Twin and Boards Of Canada and 1 more you keep (playedInShow)",
+          "Beatrice Dillon — Both release on FACT Magazine (sharedLabel)",
+          "Klein — Featuring [Ft] on Roaches 2012 - 2019 (​$​up£r D€lux£) (32) (personnel)",
+          "Kit Grill - Ambient Special — Played Aphex Twin, who you keep (playedInShow)",
+          "SOPHIA ZHURAVKOVA Presents textural bug — Played Boards Of Canada, who you keep (playedInShow)",
+          "United In Flames w/ Malibu — Played Boards Of Canada, who you keep (playedInShow)",
+          "United In Flames w/ Malibu & Murex — Played Bibio, who you keep (playedInShow)",
+          "GAIKA — Instrumentation By [Additional Player], Vocals [Additional Singer] on Heaters 4 The 2 Seaters (collaborator)",
+          "Dave Clarke — Made The Desecration Of Desire together (collaborator)",
+          "World Music — Releases on World Music (sharedLabel)",
+          "7FO — Both release on FACT Magazine (sharedLabel)",
+          "Blue Iverson — Drums, Guitar on Hotep (collaborator)",
+          "Bo Khat Eternal Troof Family Band — Made Infinity together (collaborator)",
+          "Denna Frances Glass — Producer [Contribution, Uncredited] on Black Is Beautiful (producer)",
+          "Stan Iordanov — Producer [Also Features Production] on Untitled (producer)",
+          "Hundebiss — Releases on Hundebiss (sharedLabel)"
+        ],
+        "top20Overlap" : 1,
+        "visibleReached" : 16
+      },
+      "candidatesAdded" : [
+
+      ],
+      "candidatesRemoved" : [
+
+      ],
+      "enteredTop20" : [
+
+      ],
+      "label" : "development rows",
+      "leftTop20" : [
+
+      ],
+      "recovered" : [
+
+      ],
+      "stillUnreached" : [
+        "Duenn — Both release on Opal Tapes ← Anika: sharedStyle Shared sound: Experimental [discogs] | Anika: sameEra Experimental in the 2010s [discogs] | Ciro Vitiello: sharedLabel Both release on Opal Tapes [discogs]",
+        "Ryuichi Sakamoto — Both release on Music On Vinyl ← Eric Kloss: sharedLabel Both release on Music On Vinyl [discogs] | Eric Kloss: sameEra Music On Vinyl in the 2020s [discogs] | Anika: sharedStyle Shared sound: Experimental [discogs]",
+        "Frederick Seibert — Producer on Now ← Eric Kloss: producer Producer on Now [discogs]",
+        "239EF — Played Anika and Dean Blunt, who you keep ← Anika: playedInShow Played on NTS / 239EF [radio] | Dean Blunt: playedInShow Played on NTS / 239EF [radio]"
+      ]
+    }
+  ]
+}

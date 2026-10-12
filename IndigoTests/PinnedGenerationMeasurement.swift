@@ -55,6 +55,19 @@ final class PinnedGenerationMeasurement: XCTestCase {
         "Hype Williams", "Joanne Robertson", "Kate NV", "Mica Levi", "Micachu", "Prefuse 73", "Speedy J",
     ]
 
+    /// The pilot's starting artists as one listener's rows, the same on every
+    /// platform: each met once, an hour apart, ending at the day's start.
+    static func pilotListener(period: Int) -> PersonalInputs {
+        let base = Date(timeIntervalSince1970: Double(period) * ExplorePeriod.length)
+        return PersonalInputs(
+            crate: [], plays: [],
+            met: pilotArtists.enumerated()
+                .map { PersonalInputs.Met(node: .artist($1), weight: 1, lastAt: base.addingTimeInterval(-Double($0) * 3_600)) }
+                .sorted { $0.node.id < $1.node.id },
+            artistPlays: Dictionary(uniqueKeysWithValues: pilotArtists.map { (RecordingKey.normalizeArtist($0), 2) }),
+            haunts: [])
+    }
+
     func testMeasureThePinnedGeneration() async throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["INDIGO_MEASURE_PINNED"] == "1",
                           "Set TEST_RUNNER_INDIGO_MEASURE_PINNED=1 to measure the published generation.")
@@ -115,13 +128,8 @@ final class PinnedGenerationMeasurement: XCTestCase {
 
         var inputs: [(String, PersonalInputs)] = []
         let base = Date(timeIntervalSince1970: Double(period) * ExplorePeriod.length)
-        inputs.append(("pilot listener", PersonalInputs(
-            crate: [], plays: [],
-            met: Self.pilotArtists.enumerated()
-                .map { PersonalInputs.Met(node: .artist($1), weight: 1, lastAt: base.addingTimeInterval(-Double($0) * 3_600)) }
-                .sorted { $0.node.id < $1.node.id },
-            artistPlays: Dictionary(uniqueKeysWithValues: Self.pilotArtists.map { (RecordingKey.normalizeArtist($0), 2) }),
-            haunts: [])))
+        _ = base
+        inputs.append(("pilot listener", Self.pilotListener(period: period)))
         #if os(macOS)
         let support = StoreLayout.standard.directory
         for (label, folder) in [("development rows", support.appendingPathComponent("Development", isDirectory: true)),
@@ -172,8 +180,9 @@ final class PinnedGenerationMeasurement: XCTestCase {
         try data.write(to: URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("pinned-measure.json"))
         // A simulator's clone is deleted with its temporary directory; a
         // folder of the host's can be named instead.
+        // Best effort: a sandboxed macOS host cannot write outside its container.
         if let out = ProcessInfo.processInfo.environment["INDIGO_MEASURE_OUT"], !out.isEmpty {
-            try data.write(to: URL(fileURLWithPath: out))
+            try? data.write(to: URL(fileURLWithPath: out))
         }
         print("PINNED-MEASURE " + String(decoding: data, as: UTF8.self))
     }

@@ -58,6 +58,18 @@ export const PILOT_ARTISTS = new Set([
   1874027, // Hype Williams (identity from a device's cache)
   5302639, // Kate NV
   306157, // Burial: four pages of entries, for the bounded pagination test
+  // Phase 3B (SHARED-KNOWLEDGE.md §16): the pilot's starting identities with
+  // no bundle, each verified by its Discogs document, MusicBrainz's own link
+  // and release credits naming the id -- never by name. Not Hype Williams
+  // 398459 (the director, contradicted) or Speedy J (2) 316464 (unresolved).
+  3999072, // Annika Henderson: Anika's own-name entry (mutual aliases, one MusicBrainz artist)
+  1720124, // Attilio Novellino
+  3328071, // Duenn
+  1053396, // Joanne Robertson
+  2576890, // Mica Levi
+  1172814, // Micachu: Mica Levi's alias, kept a bundle of its own
+  3722, // Prefuse 73
+  823, // Speedy J (Jochem Paap)
 ]);
 
 /// How long a reader may keep an object. A digest-addressed object never
