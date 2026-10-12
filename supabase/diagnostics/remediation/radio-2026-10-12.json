@@ -1,0 +1,22 @@
+{
+ "radio": {
+  "appearances": 252935,
+  "appearances_resolved": 242278,
+  "artist_episode_pairs": 205693,
+  "artist_show_pairs": 173678,
+  "artists_with_appearances": 98299,
+  "episodes": 10555,
+  "episodes_with_tracklist": 9188,
+  "pairs_in_5_plus": 1705,
+  "pairs_in_one_episode": 154128,
+  "played_by_edges": 173876,
+  "played_by_with_episode_count": 11545,
+  "radio_neighbor_edges": 202828,
+  "shows": 1975,
+  "shows_by_provider": {
+   "lotradio": 1406,
+   "nts": 491,
+   "youtube": 78
+  }
+ }
+}
