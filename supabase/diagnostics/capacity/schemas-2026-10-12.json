@@ -1,0 +1,297 @@
+{
+ "by_schema": [
+  {
+   "mb": 479,
+   "schema": "public"
+  },
+  {
+   "mb": 11.3,
+   "schema": "pg_catalog"
+  },
+  {
+   "mb": 4.7,
+   "schema": "cron"
+  },
+  {
+   "mb": 1.1,
+   "schema": "auth"
+  },
+  {
+   "mb": 0.6,
+   "schema": "net"
+  },
+  {
+   "mb": 0.4,
+   "schema": "supabase_migrations"
+  },
+  {
+   "mb": 0.3,
+   "schema": "storage"
+  },
+  {
+   "mb": 0.2,
+   "schema": "information_schema"
+  },
+  {
+   "mb": 0.1,
+   "schema": "realtime"
+  },
+  {
+   "mb": 0,
+   "schema": "vault"
+  }
+ ],
+ "database_bytes": 521350291,
+ "top_relations": [
+  {
+   "dead": 2020,
+   "heap_mb": 73.9,
+   "idx_mb": 61.7,
+   "last_autovacuum": "2026-10-01T00:24:31.325487+00:00",
+   "last_vacuum": null,
+   "live": 383066,
+   "rel": "public.music_relationships",
+   "toast_mb": 0.1
+  },
+  {
+   "dead": 8722,
+   "heap_mb": 59,
+   "idx_mb": 57.2,
+   "last_autovacuum": "2026-10-12T18:27:09.022985+00:00",
+   "last_vacuum": null,
+   "live": 256431,
+   "rel": "public.radio_appearances",
+   "toast_mb": 0.1
+  },
+  {
+   "dead": 165,
+   "heap_mb": 26.4,
+   "idx_mb": 29.2,
+   "last_autovacuum": "2026-09-23T06:43:40.142109+00:00",
+   "last_vacuum": "2026-09-25T16:44:50.427801+00:00",
+   "live": 176933,
+   "rel": "public.releases",
+   "toast_mb": 0
+  },
+  {
+   "dead": 33,
+   "heap_mb": 26.7,
+   "idx_mb": 23.7,
+   "last_autovacuum": "2026-09-29T23:10:57.386868+00:00",
+   "last_vacuum": null,
+   "live": 215772,
+   "rel": "public.external_ids",
+   "toast_mb": 0
+  },
+  {
+   "dead": 8097,
+   "heap_mb": 14.5,
+   "idx_mb": 22.4,
+   "last_autovacuum": "2026-10-12T15:15:15.876568+00:00",
+   "last_vacuum": null,
+   "live": 119804,
+   "rel": "public.artists",
+   "toast_mb": 0
+  },
+  {
+   "dead": 259,
+   "heap_mb": 11.8,
+   "idx_mb": 11.7,
+   "last_autovacuum": "2026-10-11T00:14:05.142638+00:00",
+   "last_vacuum": null,
+   "live": 84161,
+   "rel": "public.scene_members",
+   "toast_mb": 0
+  },
+  {
+   "dead": 0,
+   "heap_mb": 18.7,
+   "idx_mb": 4.3,
+   "last_autovacuum": "2026-10-10T06:17:49.470462+00:00",
+   "last_vacuum": null,
+   "live": 91140,
+   "rel": "public.artwork",
+   "toast_mb": 0
+  },
+  {
+   "dead": 1289,
+   "heap_mb": 7.3,
+   "idx_mb": 2.3,
+   "last_autovacuum": "2026-10-01T06:00:35.055106+00:00",
+   "last_vacuum": null,
+   "live": 10769,
+   "rel": "public.radio_episodes",
+   "toast_mb": 0.1
+  },
+  {
+   "dead": 0,
+   "heap_mb": 4.4,
+   "idx_mb": 5.3,
+   "last_autovacuum": "2026-09-29T12:50:40.969322+00:00",
+   "last_vacuum": null,
+   "live": 26047,
+   "rel": "public.recordings",
+   "toast_mb": 0
+  },
+  {
+   "dead": 1488,
+   "heap_mb": 6.1,
+   "idx_mb": 1.3,
+   "last_autovacuum": "2026-10-12T21:00:56.961475+00:00",
+   "last_vacuum": null,
+   "live": 19287,
+   "rel": "public.enrichment_jobs",
+   "toast_mb": 0
+  },
+  {
+   "dead": 4,
+   "heap_mb": 3.9,
+   "idx_mb": 2.7,
+   "last_autovacuum": "2026-09-24T21:51:01.361449+00:00",
+   "last_vacuum": null,
+   "live": 41558,
+   "rel": "public.labels",
+   "toast_mb": 0
+  },
+  {
+   "dead": 0,
+   "heap_mb": 4.3,
+   "idx_mb": 0.3,
+   "last_autovacuum": "2026-10-12T04:17:46.887937+00:00",
+   "last_vacuum": null,
+   "live": 5512,
+   "rel": "cron.job_run_details",
+   "toast_mb": 0
+  },
+  {
+   "dead": 4,
+   "heap_mb": 1.5,
+   "idx_mb": 1.1,
+   "last_autovacuum": "2026-09-24T21:34:03.266597+00:00",
+   "last_vacuum": null,
+   "live": 5494,
+   "rel": "public.metadata_cache",
+   "toast_mb": 0
+  },
+  {
+   "dead": 549,
+   "heap_mb": 1.4,
+   "idx_mb": 0.4,
+   "last_autovacuum": null,
+   "last_vacuum": null,
+   "live": 3590,
+   "rel": "pg_catalog.pg_proc",
+   "toast_mb": 0.2
+  },
+  {
+   "dead": 111,
+   "heap_mb": 0.6,
+   "idx_mb": 0,
+   "last_autovacuum": "2026-10-12T08:06:54.221858+00:00",
+   "last_vacuum": null,
+   "live": 688,
+   "rel": "pg_catalog.pg_statistic",
+   "toast_mb": 0.8
+  },
+  {
+   "dead": 799,
+   "heap_mb": 0.8,
+   "idx_mb": 0.4,
+   "last_autovacuum": "2026-09-15T19:26:19.657793+00:00",
+   "last_vacuum": null,
+   "live": 5110,
+   "rel": "pg_catalog.pg_attribute",
+   "toast_mb": 0
+  },
+  {
+   "dead": 94,
+   "heap_mb": 0.7,
+   "idx_mb": 0.3,
+   "last_autovacuum": "2026-09-30T19:50:21.254448+00:00",
+   "last_vacuum": null,
+   "live": 1995,
+   "rel": "public.radio_shows",
+   "toast_mb": 0
+  },
+  {
+   "dead": 0,
+   "heap_mb": 0.1,
+   "idx_mb": 0,
+   "last_autovacuum": null,
+   "last_vacuum": null,
+   "live": 2,
+   "rel": "pg_catalog.pg_rewrite",
+   "toast_mb": 0.6
+  },
+  {
+   "dead": 6,
+   "heap_mb": 0.4,
+   "idx_mb": 0.2,
+   "last_autovacuum": null,
+   "last_vacuum": null,
+   "live": 38,
+   "rel": "pg_catalog.pg_description",
+   "toast_mb": 0
+  },
+  {
+   "dead": 714,
+   "heap_mb": 0.3,
+   "idx_mb": 0.3,
+   "last_autovacuum": "2026-09-06T08:46:18.460325+00:00",
+   "last_vacuum": null,
+   "live": 3932,
+   "rel": "pg_catalog.pg_depend",
+   "toast_mb": 0
+  },
+  {
+   "dead": 5,
+   "heap_mb": 0.5,
+   "idx_mb": 0.1,
+   "last_autovacuum": "2026-10-12T23:17:58.743816+00:00",
+   "last_vacuum": null,
+   "live": 360,
+   "rel": "net._http_response",
+   "toast_mb": 0
+  },
+  {
+   "dead": 201,
+   "heap_mb": 0.2,
+   "idx_mb": 0.1,
+   "last_autovacuum": "2026-09-25T16:20:30.493493+00:00",
+   "last_vacuum": null,
+   "live": 804,
+   "rel": "pg_catalog.pg_class",
+   "toast_mb": 0
+  },
+  {
+   "dead": 1,
+   "heap_mb": 0,
+   "idx_mb": 0,
+   "last_autovacuum": null,
+   "last_vacuum": null,
+   "live": 76,
+   "rel": "supabase_migrations.schema_migrations",
+   "toast_mb": 0.3
+  },
+  {
+   "dead": 49,
+   "heap_mb": 0.1,
+   "idx_mb": 0,
+   "last_autovacuum": "2026-10-06T00:31:08.003627+00:00",
+   "last_vacuum": null,
+   "live": 82,
+   "rel": "public.enrichment_cursors",
+   "toast_mb": 0.2
+  },
+  {
+   "dead": 30,
+   "heap_mb": 0.1,
+   "idx_mb": 0.1,
+   "last_autovacuum": null,
+   "last_vacuum": null,
+   "live": 296,
+   "rel": "pg_catalog.pg_constraint",
+   "toast_mb": 0
+  }
+ ]
+}
