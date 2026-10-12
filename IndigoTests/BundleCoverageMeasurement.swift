@@ -221,7 +221,19 @@ final class BundleCoverageMeasurement: XCTestCase {
                             (local[origin] ?? EdgeSet()).byDestination.filter { $0.node.id == new.id }
                                 .flatMap(\.edges).map { "\(origin.title): \($0.kind.rawValue) \($0.reason) [\($0.source.rawValue)]" }
                         }
-                        result.stillUnreached.append("\(names[new.id] ?? new.id) ← " + (routes.isEmpty ? "?" : routes.prefix(3).joined(separator: " | ")))
+                        // And what the backend has under a similar name, by id:
+                        // a node keyed differently is not missing knowledge.
+                        let title = (visibleRanking.all.first { $0.id == new.id }?.node.title ?? "").lowercased()
+                        let words = Set(title.split(separator: " ").map(String.init).filter { $0.count > 3 })
+                        let backend = ExploreRanker.edgeSets(sides[1].1).flatMap { origin, set in
+                            set.byDestination.filter { c in
+                                let t = c.node.title.lowercased()
+                                return t == title || (!words.isEmpty && words.isSubset(of: Set(t.split(separator: " ").map(String.init))))
+                                    || (words.contains { t.contains($0) } && c.node.kind == (visibleRanking.all.first { $0.id == new.id }?.node.kind))
+                            }.map { "\(origin.title) → \($0.node.id) [\($0.edges.map(\.kind.rawValue).joined(separator: ","))]" }
+                        }
+                        result.stillUnreached.append("\(names[new.id] ?? new.id) {\(new.id)} ← " + (routes.isEmpty ? "?" : routes.prefix(3).joined(separator: " | "))
+                            + " || backend has: " + (backend.isEmpty ? "nothing similar" : backend.prefix(4).joined(separator: " | ")))
                     }
                 }
             }

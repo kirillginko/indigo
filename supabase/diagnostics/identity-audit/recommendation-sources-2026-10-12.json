@@ -1,0 +1,668 @@
+{
+  "rows" : [
+    {
+      "backend" : {
+        "+0076" : "1133 0.518",
+        "+bundles" : "1132 0.518",
+        "published" : "1132 0.518"
+      },
+      "id" : "artist:solar bears",
+      "reachedBy" : {
+        "+0076" : [
+          "sameRelease"
+        ],
+        "+bundles" : [
+          "sameRelease"
+        ],
+        "published" : [
+          "sameRelease"
+        ]
+      },
+      "title" : "Solar Bears",
+      "visibleKinds" : [
+        "collaborator",
+        "sameEra",
+        "sharedStyle"
+      ],
+      "visibleRank" : 1,
+      "visibleScore" : 1.293
+    },
+    {
+      "backend" : {
+        "+0076" : "74 0.718",
+        "+bundles" : "74 0.718",
+        "published" : "74 0.718"
+      },
+      "id" : "artist:alexander nut",
+      "reachedBy" : {
+        "+0076" : [
+          "sharedLabel"
+        ],
+        "+bundles" : [
+          "sharedLabel"
+        ],
+        "published" : [
+          "sharedLabel"
+        ]
+      },
+      "title" : "Alexander Nut",
+      "visibleKinds" : [
+        "sameEra",
+        "sharedLabel",
+        "sharedStyle"
+      ],
+      "visibleRank" : 2,
+      "visibleScore" : 1.236
+    },
+    {
+      "backend" : {
+        "+0076" : "267 0.707",
+        "+bundles" : "268 0.707",
+        "published" : "268 0.707"
+      },
+      "id" : "artist:cuushe",
+      "reachedBy" : {
+        "+0076" : [
+          "collaborator"
+        ],
+        "+bundles" : [
+          "collaborator"
+        ],
+        "published" : [
+          "collaborator"
+        ]
+      },
+      "title" : "Cuushe",
+      "visibleKinds" : [
+        "collaborator",
+        "sameEra",
+        "sharedStyle"
+      ],
+      "visibleRank" : 3,
+      "visibleScore" : 1.142
+    },
+    {
+      "backend" : {
+        "+0076" : "676 0.589",
+        "+bundles" : "677 0.589",
+        "published" : "677 0.589"
+      },
+      "id" : "artist:billy gomberg",
+      "reachedBy" : {
+        "+0076" : [
+          "sharedLabel"
+        ],
+        "+bundles" : [
+          "sharedLabel"
+        ],
+        "published" : [
+          "sharedLabel"
+        ]
+      },
+      "title" : "Billy Gomberg",
+      "visibleKinds" : [
+        "sameEra",
+        "sharedLabel",
+        "sharedStyle"
+      ],
+      "visibleRank" : 4,
+      "visibleScore" : 1.107
+    },
+    {
+      "backend" : {
+        "+0076" : "712 0.589",
+        "+bundles" : "713 0.589",
+        "published" : "713 0.589"
+      },
+      "id" : "artist:dali muru",
+      "reachedBy" : {
+        "+0076" : [
+          "sharedLabel"
+        ],
+        "+bundles" : [
+          "sharedLabel"
+        ],
+        "published" : [
+          "sharedLabel"
+        ]
+      },
+      "title" : "Dali Muru & The Polyphonic Swarm",
+      "visibleKinds" : [
+        "sameEra",
+        "sharedBroadcast",
+        "sharedLabel",
+        "sharedStyle"
+      ],
+      "visibleRank" : 5,
+      "visibleScore" : 1.107
+    },
+    {
+      "backend" : {
+        "+0076" : "—",
+        "+bundles" : "—",
+        "published" : "—"
+      },
+      "id" : "artist:duenn nyantora",
+      "reachedBy" : {
+        "+0076" : [
+
+        ],
+        "+bundles" : [
+
+        ],
+        "published" : [
+
+        ]
+      },
+      "title" : "Duenn",
+      "visibleKinds" : [
+        "sameEra",
+        "sharedLabel",
+        "sharedStyle"
+      ],
+      "visibleRank" : 6,
+      "visibleScore" : 1.107
+    },
+    {
+      "backend" : {
+        "+0076" : "313 0.688",
+        "+bundles" : "314 0.688",
+        "published" : "314 0.688"
+      },
+      "id" : "artist:shackleton",
+      "reachedBy" : {
+        "+0076" : [
+          "collaborator"
+        ],
+        "+bundles" : [
+          "collaborator"
+        ],
+        "published" : [
+          "collaborator"
+        ]
+      },
+      "title" : "Shackleton",
+      "visibleKinds" : [
+        "sameEra",
+        "sharedLabel",
+        "sharedStyle"
+      ],
+      "visibleRank" : 7,
+      "visibleScore" : 1.107
+    },
+    {
+      "backend" : {
+        "+0076" : "293 0.688",
+        "+bundles" : "294 0.688",
+        "published" : "294 0.688"
+      },
+      "id" : "artist:christin nichols",
+      "reachedBy" : {
+        "+0076" : [
+          "collaborator"
+        ],
+        "+bundles" : [
+          "collaborator"
+        ],
+        "published" : [
+          "collaborator"
+        ]
+      },
+      "title" : "Christin Nichols",
+      "visibleKinds" : [
+        "collaborator",
+        "sameEra",
+        "sharedStyle"
+      ],
+      "visibleRank" : 8,
+      "visibleScore" : 0.991
+    },
+    {
+      "backend" : {
+        "+0076" : "—",
+        "+bundles" : "—",
+        "published" : "—"
+      },
+      "id" : "artist:ryuichi sakamoto",
+      "reachedBy" : {
+        "+0076" : [
+
+        ],
+        "+bundles" : [
+
+        ],
+        "published" : [
+
+        ]
+      },
+      "title" : "Ryuichi Sakamoto",
+      "visibleKinds" : [
+        "sameEra",
+        "sharedLabel",
+        "sharedStyle"
+      ],
+      "visibleRank" : 9,
+      "visibleScore" : 0.985
+    },
+    {
+      "backend" : {
+        "+0076" : "57 0.737",
+        "+bundles" : "57 0.737",
+        "published" : "57 0.737"
+      },
+      "id" : "artist:barry miles",
+      "reachedBy" : {
+        "+0076" : [
+          "collaborator",
+          "personnel",
+          "producer"
+        ],
+        "+bundles" : [
+          "collaborator",
+          "personnel",
+          "producer"
+        ],
+        "published" : [
+          "collaborator",
+          "personnel",
+          "producer"
+        ]
+      },
+      "title" : "Barry Miles",
+      "visibleKinds" : [
+        "collaborator",
+        "personnel"
+      ],
+      "visibleRank" : 10,
+      "visibleScore" : 0.693
+    },
+    {
+      "backend" : {
+        "+0076" : "1002 0.522",
+        "+bundles" : "1001 0.522",
+        "published" : "1001 0.522"
+      },
+      "id" : "artist:bobby rodriguez",
+      "reachedBy" : {
+        "+0076" : [
+          "sameRelease"
+        ],
+        "+bundles" : [
+          "sameRelease"
+        ],
+        "published" : [
+          "sameRelease"
+        ]
+      },
+      "title" : "Bobby Rodriguez",
+      "visibleKinds" : [
+        "collaborator"
+      ],
+      "visibleRank" : 11,
+      "visibleScore" : 0.693
+    },
+    {
+      "backend" : {
+        "+0076" : "41 0.839",
+        "+bundles" : "41 0.839",
+        "published" : "41 0.839"
+      },
+      "id" : "artist:blue iverson",
+      "reachedBy" : {
+        "+0076" : [
+          "collaborator",
+          "frequentlyPlayedNearby",
+          "sharedLabel"
+        ],
+        "+bundles" : [
+          "collaborator",
+          "frequentlyPlayedNearby",
+          "sharedLabel"
+        ],
+        "published" : [
+          "collaborator",
+          "frequentlyPlayedNearby",
+          "sharedLabel"
+        ]
+      },
+      "title" : "Blue Iverson",
+      "visibleKinds" : [
+        "collaborator"
+      ],
+      "visibleRank" : 12,
+      "visibleScore" : 0.688
+    },
+    {
+      "backend" : {
+        "+0076" : "323 0.687",
+        "+bundles" : "324 0.687",
+        "published" : "324 0.687"
+      },
+      "id" : "artist:bill goodwin",
+      "reachedBy" : {
+        "+0076" : [
+          "producer"
+        ],
+        "+bundles" : [
+          "producer"
+        ],
+        "published" : [
+          "producer"
+        ]
+      },
+      "title" : "Bill Goodwin",
+      "visibleKinds" : [
+        "producer"
+      ],
+      "visibleRank" : 13,
+      "visibleScore" : 0.687
+    },
+    {
+      "backend" : {
+        "+0076" : "58 0.727",
+        "+bundles" : "58 0.727",
+        "published" : "58 0.727"
+      },
+      "id" : "artist:cal lampley",
+      "reachedBy" : {
+        "+0076" : [
+          "producer"
+        ],
+        "+bundles" : [
+          "producer"
+        ],
+        "published" : [
+          "producer"
+        ]
+      },
+      "title" : "Cal Lampley",
+      "visibleKinds" : [
+        "producer"
+      ],
+      "visibleRank" : 14,
+      "visibleScore" : 0.687
+    },
+    {
+      "backend" : {
+        "+0076" : "56 0.742",
+        "+bundles" : "56 0.742",
+        "published" : "56 0.742"
+      },
+      "id" : "artist:don schlitten",
+      "reachedBy" : {
+        "+0076" : [
+          "producer"
+        ],
+        "+bundles" : [
+          "producer"
+        ],
+        "published" : [
+          "producer"
+        ]
+      },
+      "title" : "Don Schlitten",
+      "visibleKinds" : [
+        "producer"
+      ],
+      "visibleRank" : 15,
+      "visibleScore" : 0.687
+    },
+    {
+      "backend" : {
+        "+0076" : "—",
+        "+bundles" : "—",
+        "published" : "—"
+      },
+      "id" : "artist:frederick seibert",
+      "reachedBy" : {
+        "+0076" : [
+
+        ],
+        "+bundles" : [
+
+        ],
+        "published" : [
+
+        ]
+      },
+      "title" : "Frederick Seibert",
+      "visibleKinds" : [
+        "producer"
+      ],
+      "visibleRank" : 16,
+      "visibleScore" : 0.687
+    },
+    {
+      "backend" : {
+        "+0076" : "60 0.722",
+        "+bundles" : "60 0.722",
+        "published" : "60 0.722"
+      },
+      "id" : "artist:michael cuscuna",
+      "reachedBy" : {
+        "+0076" : [
+          "producer"
+        ],
+        "+bundles" : [
+          "producer"
+        ],
+        "published" : [
+          "producer"
+        ]
+      },
+      "title" : "Michael Cuscuna",
+      "visibleKinds" : [
+        "producer"
+      ],
+      "visibleRank" : 17,
+      "visibleScore" : 0.687
+    },
+    {
+      "backend" : {
+        "+0076" : "342 0.682",
+        "+bundles" : "343 0.682",
+        "published" : "343 0.682"
+      },
+      "id" : "artist:vegyn",
+      "reachedBy" : {
+        "+0076" : [
+          "personnel",
+          "producer"
+        ],
+        "+bundles" : [
+          "personnel",
+          "producer"
+        ],
+        "published" : [
+          "personnel",
+          "producer"
+        ]
+      },
+      "title" : "Vegyn",
+      "visibleKinds" : [
+        "producer"
+      ],
+      "visibleRank" : 18,
+      "visibleScore" : 0.682
+    },
+    {
+      "backend" : {
+        "+0076" : "show-level",
+        "+bundles" : "show-level",
+        "published" : "show-level"
+      },
+      "id" : "broadcast:nts|239ef/239ef-13th-december-2021",
+      "reachedBy" : {
+        "+0076" : [
+
+        ],
+        "+bundles" : [
+
+        ],
+        "published" : [
+
+        ]
+      },
+      "title" : "239EF",
+      "visibleKinds" : [
+        "playedInShow"
+      ],
+      "visibleRank" : 19,
+      "visibleScore" : 0.667
+    },
+    {
+      "backend" : {
+        "+0076" : "372 0.657",
+        "+bundles" : "373 0.657",
+        "published" : "373 0.657"
+      },
+      "id" : "artist:al williams",
+      "reachedBy" : {
+        "+0076" : [
+          "personnel"
+        ],
+        "+bundles" : [
+          "personnel"
+        ],
+        "published" : [
+          "personnel"
+        ]
+      },
+      "title" : "Al Williams",
+      "visibleKinds" : [
+        "personnel"
+      ],
+      "visibleRank" : 20,
+      "visibleScore" : 0.637
+    }
+  ],
+  "states" : {
+    "+0076" : {
+      "bundles" : {
+        "complete" : 6,
+        "partial" : 1
+      },
+      "edges" : 1830,
+      "edgesBySource" : {
+        "artist relationships" : 261,
+        "labels" : 969,
+        "radio" : 311,
+        "release credits" : 289
+      },
+      "showLevelOnly" : 1,
+      "startingPoints" : {
+        "artist:anika" : "found",
+        "artist:ciro vitiello" : "found",
+        "artist:dean blunt" : "found",
+        "artist:eric kloss" : "found",
+        "artist:hype williams" : "found",
+        "artist:kate nv" : "found",
+        "broadcast:kiosk|/episode/2026-09-02/rtj" : "unknown",
+        "broadcast:kiosk|/episode/2026-09-06/outsiders-graphical-recordings-w-lv-reader" : "unknown",
+        "broadcast:kiosk|/episode/2026-09-06/priori" : "unknown",
+        "broadcast:lot|jadalareign/2026-09-14-1200" : "found",
+        "broadcast:lot|takuya-nakamura/2026-09-24-1600" : "found",
+        "station:n10as" : "unsupported"
+      },
+      "top20BySource" : {
+        "artist relationships" : 6,
+        "labels" : 12,
+        "radio" : 2,
+        "release credits" : 6
+      },
+      "top20Overlap" : 1,
+      "visibleReachedByID" : 16,
+      "visibleReachedByIdentity" : 0
+    },
+    "+bundles" : {
+      "bundles" : {
+        "complete" : 6,
+        "missing" : 1,
+        "partial" : 1
+      },
+      "edges" : 1830,
+      "edgesBySource" : {
+        "artist relationships" : 261,
+        "labels" : 969,
+        "radio" : 311,
+        "release credits" : 289
+      },
+      "showLevelOnly" : 1,
+      "startingPoints" : {
+        "artist:anika" : "found",
+        "artist:ciro vitiello" : "found",
+        "artist:dean blunt" : "found",
+        "artist:eric kloss" : "found",
+        "artist:hype williams" : "found",
+        "artist:kate nv" : "found",
+        "broadcast:kiosk|/episode/2026-09-02/rtj" : "unknown",
+        "broadcast:kiosk|/episode/2026-09-06/outsiders-graphical-recordings-w-lv-reader" : "unknown",
+        "broadcast:kiosk|/episode/2026-09-06/priori" : "unknown",
+        "broadcast:lot|jadalareign/2026-09-14-1200" : "found",
+        "broadcast:lot|takuya-nakamura/2026-09-24-1600" : "found",
+        "station:n10as" : "unsupported"
+      },
+      "top20BySource" : {
+        "artist relationships" : 6,
+        "labels" : 12,
+        "radio" : 2,
+        "release credits" : 6
+      },
+      "top20Overlap" : 1,
+      "visibleReachedByID" : 16,
+      "visibleReachedByIdentity" : 0
+    },
+    "published" : {
+      "bundles" : {
+        "complete" : 5,
+        "missing" : 2,
+        "partial" : 1
+      },
+      "edges" : 1830,
+      "edgesBySource" : {
+        "artist relationships" : 261,
+        "labels" : 969,
+        "radio" : 311,
+        "release credits" : 289
+      },
+      "showLevelOnly" : 1,
+      "startingPoints" : {
+        "artist:anika" : "found",
+        "artist:ciro vitiello" : "found",
+        "artist:dean blunt" : "found",
+        "artist:eric kloss" : "found",
+        "artist:hype williams" : "found",
+        "artist:kate nv" : "found",
+        "broadcast:kiosk|/episode/2026-09-02/rtj" : "unknown",
+        "broadcast:kiosk|/episode/2026-09-06/outsiders-graphical-recordings-w-lv-reader" : "unknown",
+        "broadcast:kiosk|/episode/2026-09-06/priori" : "unknown",
+        "broadcast:lot|jadalareign/2026-09-14-1200" : "found",
+        "broadcast:lot|takuya-nakamura/2026-09-24-1600" : "found",
+        "station:n10as" : "unsupported"
+      },
+      "top20BySource" : {
+        "artist relationships" : 6,
+        "labels" : 12,
+        "radio" : 2,
+        "release credits" : 6
+      },
+      "top20Overlap" : 1,
+      "visibleReachedByID" : 16,
+      "visibleReachedByIdentity" : 0
+    }
+  },
+  "visibleEdgesBySource" : {
+    "artist relationships" : 206,
+    "labels" : 177,
+    "radio" : 74,
+    "release credits" : 118,
+    "styles and eras" : 3049
+  },
+  "visibleTop20BySource" : {
+    "artist relationships" : 6,
+    "labels" : 6,
+    "radio" : 2,
+    "release credits" : 8,
+    "styles and eras" : 9
+  }
+}

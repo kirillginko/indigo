@@ -1398,3 +1398,120 @@ visible in DIG):
   MusicBrainz-recorded one), refuse when several namesakes match and the row
   has none, and re-fetch the 121.
 
+## 19. The four missing paths, and where recommendations come from (2026-10-12)
+
+Read-only diagnostics: `supabase/diagnostics/identity-audit/missing-paths.sql`
+(catalogue), the published generation's answers and bundles, and two shadow
+measurements on a copy of this Mac's Development rows
+(`BundleCoverageMeasurement`, `RecommendationSourceMeasurement`; output in
+`recommendation-sources-2026-10-12.json`).
+
+### 19.1 The four paths
+
+| Visible recommendation | Source documents | Backend has | Cause |
+|---|---|---|---|
+| **Duenn** — "Both release on Opal Tapes" (via Ciro Vitiello) | Ciro's Opal Tapes record is *Lost In The Colloid* (25271893), a joint release by **Talpah and Ciro Vitiello**; its document is in R2 and Ciro's bundle lists Opal Tapes | Opal Tapes roster (24 artists, Duenn among them), but not Ciro: the release row is filed under **Talpah** only | **Indexing**: `releases` keeps one artist per record. Also, the visible candidate's id is `artist:duenn nyantora` — the lookalike the pilot flagged — so the device's own identity for it is suspect |
+| **Ryuichi Sakamoto** — "Both release on Music On Vinyl" (via Eric Kloss) | Eric Kloss's record there is *Kloss Encounters (Live In Bremen 1978)* (37791006), with Barry Miles, on **two labels**: Timeless (9) and Music On Vinyl | Music On Vinyl roster (27 artists; Sakamoto 25th, well inside the 300 cap), but not Eric Kloss | **Indexing**: `releases` keeps one label per record |
+| **Frederick Seibert** — "Producer on Now" | *Now* (2551460, Muse, 1978) cached; the credit names Discogs 409922 | Eric Kloss's bundle credits **Fred Seibert** (409922; ANV "Frederick Seibert") as producer of *Now*; the backend reaches `artist:fred seibert` | **Keying**: same person, credited spelling vs. Discogs name; the device's node carries no Discogs id, so nothing can say they are one |
+| **239EF** — "Played Anika and Dean Blunt" | Show `nts/239ef`, 12 episodes, tracklists available; the 2021-12-13 episode has Anika and Dean Blunt, resolved to their rows; `played_by` edges exist | `Played on 239EF` from Anika, Dean Blunt and Kate NV — to the **show** | **Granularity**: the device recommends the episode, the backend's edges are show-level (episodes only for broadcast starting points) |
+
+Nothing was changed for these. None is ingestion, provenance or a query
+bound; each needs a decision rather than a patch:
+
+- **Indexing (Opal Tapes, Music On Vinyl)**: the documents name every artist
+  and label; the catalogue keeps the first of each. The fix is to index
+  releases by every main artist and every label — a schema change (a
+  release–artist and release–label index, or arrays on `releases`) plus
+  filling it, which the constraints rule out (no new tables, no global
+  backfill). Proposed, not done.
+- **Keying (Seibert)**: the backend is right by identity; the device's credit
+  node should carry the Discogs id its document gives, so the two meet under
+  identity. A device-side change to credit nodes (visible DIG data), so
+  proposed, not done.
+- **Granularity (239EF)**: emitting episode-level `playedInShow` edges for
+  starting artists is a change to `knowledge_answers` (and the cut's size);
+  a design choice — does For You recommend shows or episodes? — not a gap.
+- **Duenn**: the device's candidate is keyed as "Duenn Nyantora"; the backend
+  should not imitate a lookalike. Worth an app-side identity check.
+
+### 19.2 Before and after, measured
+
+Three states, all for the Development rows: the published generation; with
+the eight Phase 3B bundles; and with 0076's two corrected starting points
+too (their live answers laid over it — measurement only, not published).
+
+| | Published | +bundles | +0076 |
+|---|---|---|---|
+| Visible top 20 reached (by id) | 16 | 16 | 16 |
+| … by Discogs identity only | 0 | 0 | 0 |
+| … only at show level | 1 | 1 | 1 |
+| Overlap with the visible top 20 | 1 | 1 | 1 |
+| Starting-point bundles | 5 complete, 1 partial, 2 missing | 6 / 1 / 1 | 6 / 1 / 0 |
+
+`prefuse73` is not one of these rows' starting points; Hype Williams is, and
+now pins only the duo's bundle (no director). Ranks moved by at most one.
+
+**Ranks, not presence, are the gap.** Of the visible top twenty, the backend
+reaches sixteen, and ranks them far down:
+
+| Visible | Visible score | Backend rank (score) | Visible routes |
+|---|---|---|---|
+| 1 Solar Bears | 1.293 | 1,132 (0.518) | collaborator, sameEra, sharedStyle |
+| 3 Cuushe | 1.142 | 268 (0.707) | collaborator, sameEra, sharedStyle |
+| 4 Billy Gomberg | 1.107 | 677 (0.589) | sameEra, sharedLabel, sharedStyle |
+| 7 Shackleton | 1.107 | 314 (0.688) | sameEra, sharedLabel, sharedStyle |
+| 10 Barry Miles | 0.693 | 57 (0.737) | collaborator, personnel |
+| 12 Blue Iverson | 0.688 | 41 (0.839) | collaborator |
+| 15 Don Schlitten | 0.687 | 56 (0.742) | producer |
+
+The visible top items score 1.1–1.3 because a collaborator or label route is
+corroborated by a shared style and era; the backend reaches them by the same
+collaborator or label route alone, scores them ~0.5–0.7, and ranks
+hundreds of single-route candidates around them.
+
+### 19.3 Where recommendations come from
+
+Kinds grouped by source; a recommendation counts once for each source among
+its routes.
+
+| Source | Visible: top 20 | Visible: edges | Backend: top 20 | Backend: edges |
+|---|---|---|---|---|
+| Styles and eras | **9** | **3,049** | 0 | **0** |
+| Release credits | 8 | 118 | 6 | 289 |
+| Labels | 6 | 177 | 12 | 969 |
+| Artist relationships | 6 | 206 | 6 | 261 |
+| Radio | 2 | 74 | 2 | 311 |
+| Scenes | 0 | 0 | 0 | 0 |
+
+The backend has more of every kind of evidence except one: style and era
+resemblance, which it does not carry at all, and which corroborates nearly
+half of what the visible For You puts first. Labels dominate the backend's
+own top twenty for the same reason — with no resemblance to break ties, the
+biggest rosters win.
+
+### 19.4 Bundles and documents
+
+No document job is outstanding. Prefuse 73 (3722) is partial at 165 of 414
+documents, Speedy J (823) at 158 of 936 (it rebuilt as the last queued
+documents landed), and the Hype Williams duo (1874027) at 71 of 84; each
+discovery queues at most 40 missing documents, so the rest need further
+discovery runs. The other six are complete.
+
+### 19.5 What this says about where to invest
+
+1. **Resemblance, deliberately.** Whether shared style and era belong in the
+   shared knowledge — they are the largest single difference — or the backend
+   ranker should corroborate with something stronger, is the decision that
+   moves overlap most. Bundles already carry each starting artist's styles
+   and genres (`relationshipsAndStyles`), so per-artist style knowledge is
+   one step away for the bundled ones; peers' styles are not.
+2. **Release indexing by every artist and label**: recovers joint and
+   multi-label records for every roster at once (both label paths here),
+   without more bundles.
+3. **Identity on credit nodes** (Discogs id from the document), so credited
+   spellings meet canonical names.
+4. **Episode or show**: decide what For You recommends from radio.
+
+Artist bundles deepen relationships but recovered none of the four; the
+first two items are not bundle work at all.
+
