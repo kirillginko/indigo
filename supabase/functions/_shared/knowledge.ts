@@ -544,14 +544,18 @@ export async function publishCataloguePilot(
   const { deps } = counting(base);
   const artists: Record<string, { digest: string; key: string; bytes: number }> = {};
   const missing: number[] = [];
-  for (const id of [...pilot.keys()].sort((a, b) => a - b)) {
-    const ref = await readJSON<CatalogueRef>(deps, catalogueRefKey(id));
-    const body = ref ? await deps.getObject(ref.key) : null;
-    if (!ref || body === null || (await sha256(body)) !== ref.digest) {
-      missing.push(id);
-      continue;
+  const ids = [...pilot.keys()].sort((a, b) => a - b);
+  // Sixteen at a time: thousands of reference-and-bundle reads in one run.
+  for (let i = 0; i < ids.length; i += 16) {
+    const checked = await Promise.all(ids.slice(i, i + 16).map(async (id) => {
+      const ref = await readJSON<CatalogueRef>(deps, catalogueRefKey(id));
+      const body = ref ? await deps.getObject(ref.key) : null;
+      return { id, ref: ref && body !== null && (await sha256(body)) === ref.digest ? ref : null };
+    }));
+    for (const { id, ref } of checked) {
+      if (ref) artists[String(id)] = { digest: ref.digest, key: ref.key, bytes: ref.bytes };
+      else missing.push(id);
     }
-    artists[String(id)] = { digest: ref.digest, key: ref.key, bytes: ref.bytes };
   }
   const manifest = canonicalJSON({ format: "indigo.catalogue-pilot/1", artists, missing });
   const stored = await putAddressed(deps, "catalogue/manifests", manifest);

@@ -28,6 +28,11 @@ import {
   buildArtistBundle, buildCatalogueBundle, discoverDiscography, publishCataloguePilot, readArtistJob, settleBatches,
 } from "../_shared/knowledge.ts";
 import { CATALOGUE_PILOT } from "../_shared/catalogue_pilot.ts";
+import { CATALOGUE_BATCH1 } from "../_shared/catalogue_batch1.ts";
+
+/// Every artist a catalogue bundle may be built for: the pilot and batch 1,
+/// each approved and validated before it was added. Never from a payload.
+const CATALOGUE_APPROVED: ReadonlyMap<number, string> = new Map([...CATALOGUE_PILOT, ...CATALOGUE_BATCH1]);
 import { liveKnowledgeDeps } from "../_shared/knowledge_live.ts";
 import { linkDiscogsIdentity, liveIdentityDeps } from "../_shared/identity.ts";
 import {
@@ -507,7 +512,7 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
     // any published generation.
     case "build_catalogue_bundle": {
       const result = await buildCatalogueBundle(
-        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload), CATALOGUE_PILOT,
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload), CATALOGUE_APPROVED,
       );
       console.log("catalogue_build", job.dedupe_key, JSON.stringify(result).slice(0, 400));
       return;
@@ -515,7 +520,7 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
 
     case "publish_catalogue_pilot": {
       const result = await publishCataloguePilot(
-        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), CATALOGUE_PILOT,
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), CATALOGUE_APPROVED,
       );
       console.log("catalogue_pilot", JSON.stringify(result).slice(0, 600));
       return;
