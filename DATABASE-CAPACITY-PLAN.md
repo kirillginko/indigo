@@ -390,3 +390,45 @@ read once before the window (it is not visible from here).
 - **Final**: expected ≈ 410 MiB; above 420 means something else grew —
   investigate before resuming.
 
+## 8. B2 executed (2026-10-13, 00:36–00:40 UTC)
+
+**Quota, as the dashboard counts it.** The dashboard's "Database Size
+0.536 / 0.5 GB" is the sum of **all three databases** (`postgres`,
+`template0`, `template1`) in **decimal** bytes: 536,238,901 = 520,965,267 +
+7,520,783 + 7,752,851. The allowance is 500,000,000 bytes, and the project
+was 7% over it while not read-only — so §6's inference that the limit was
+500 MiB was wrong. B2's safety did not depend on it (no step grows the
+database past its start), and the abort gates are on
+`pg_database_size('postgres')`, so they held.
+
+| Step | UTC | Result |
+|---|---|---|
+| Preflight | 00:36:25 | postgres 496.83 MiB (≤ 498); both jobs active and idle; the 00:23 rebuild finished 00:23:32; no `rebuild_dig_edges` job pending |
+| 1 Export | 00:36–00:37 | 383,117 rows, 16 slices, 105 MB, 75 s; **independently verified**: restored into a throwaway Postgres, all 16 slices equal live by rows and md5, and the whole sequence plus rollback re-run on this exact data |
+| 2 Pause | 00:38:06 | `cron.alter_job(6/34, active := false)`; both inactive, none running; **live equal to the export**, all 16 slices |
+| 3 Checksums | 00:38:25 | 187,073 rows to keep; 196,044 single adjacencies; table 135.61 MiB |
+| 4 Delete | | **196,044 deleted**, 187,073 remain; 3.7 s |
+| 5 Drop | | `to_idx`, `edge_idx`, primary key; 3.4 s. Measured in a fresh statement (the drops free their files at commit): 496.83 → **435.17 MiB, −61.66 MiB** — gate (≥ 55) **passed** |
+| 6 Rewrite | | one transaction, 5.5 s including the CLI round trip; heap 73.95 → **28.5 MiB**; metadata left 0; no lock waiting afterwards |
+| 7 Recreate | | primary key 2.5 s, `edge_idx` (unique) 3.0 s, `to_idx` 3.1 s, analyze 2.5 s (each with the round trip); indexes 5.65 / 15.38 / 1.74 MiB |
+| 8 Verify | | kept rows **identical** (id, endpoints, type, count, confidence, `updated_at`, source); episode counts **carried over exactly**; 0 single adjacencies, 0 metadata; columns, constraints, indexes, trigger, RLS, policy and grants **identical** to the definition captured in the backup |
+| 9 Resume | 00:40:23 | both jobs active again on their schedules |
+
+Writers were paused for 2 min 17 s; the steps that change the table took
+about 20 s, of which the rewrite (the only one that blocks reads) ~3 s.
+
+| | Before | Peak | After |
+|---|---|---|---|
+| `postgres` | 496.83 MiB | **496.83** (never exceeded) | **412.51 MiB** (−84.3) |
+| Dashboard measure (all databases) | 536.2 MB | 536.2 | **447.8 MB — 90% of 0.5 GB** |
+| `music_relationships` | 135.61 MiB | | **51.28 MiB** |
+
+**DIG after B2**: the four readers' output for the 60 sampled artists and
+76 starting points is **identical** to the capture taken just before the
+window. DIG page timings on the busiest artists: cold first call 0.36–0.78 s
+(was up to 1.9 s after B1), warm 49–219 ms; obscure artists 1–38 ms.
+
+**Backup kept**: `backups/b2-live/export` (local, outside git): every row
+and column of the table before the window, with its manifest; checksums in
+`supabase/diagnostics/capacity/b2/`.
+
