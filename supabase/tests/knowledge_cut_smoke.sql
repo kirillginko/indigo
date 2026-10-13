@@ -11,6 +11,23 @@ create temp table pilot as
 select :'demand'::jsonb as demand, (now() at time zone 'UTC')::date as day,
        (((now() at time zone 'UTC')::date)::timestamp at time zone 'UTC') as midnight;
 
+-- Between midnight and 00:31 UTC no rebuild today can have finished (it starts
+-- at 00:23 and takes under seven minutes), so a fixture run "today at 00:23"
+-- would be in the future and the cut rightly refuses everything. Then only the
+-- refusal is checked; the rest runs at any other time of day.
+select (now() at time zone 'UTC')::time < time '00:31' as before_proof \gset
+\if :before_proof
+do $$
+begin
+    if public.knowledge_cut((select day from pilot), (select demand from pilot))->>'reason'
+       is distinct from 'no-completed-rebuild-today' then
+        raise exception 'before 00:31 UTC the cut must refuse for want of today''s rebuild';
+    end if;
+end $$;
+\echo '    knowledge_cut: before 00:31 UTC, refuses for want of today''s rebuild (the rest runs later in the day)'
+\quit
+\endif
+
 -- Privileges: the publishing worker only. Supabase's default privileges
 -- (stubbed in 00_supabase_stubs.sql) grant every new function to anon and
 -- authenticated by name; 0075 must have taken both back, and PUBLIC.
