@@ -322,13 +322,27 @@ nonisolated struct GraphStore {
         // again to assemble the answer, doubles the only real work in here —
         // which `testCostOfTheWalkThePageActuallyAsksFor` notices.
         let built = rows.map { $0.edge(from: node) }
+        // By name, and by Discogs id where the destination knows its own: a
+        // picture verified for that id first, and a name's picture only when
+        // its address does not show somebody else (`picturedArtist`) -- a name
+        // is shared by namesakes, and one's face is not every one's.
         let portraits = portraitURLs(
-            forKeys: built.compactMap { $0.to.artworkURL == nil ? $0.to.key : nil }
+            forKeys: built.flatMap { edge -> [String] in
+                guard edge.to.artworkURL == nil else { return [] }
+                return [edge.to.key] + (edge.to.discogsID.map { [ArtistPortrait.identityKey($0)] } ?? [])
+            }
         )
+        func portrait(for node: MusicNode) -> URL? {
+            guard let id = node.discogsID else { return portraits[node.key] }
+            if let verified = portraits[ArtistPortrait.identityKey(id)] { return verified }
+            guard let byName = portraits[node.key] else { return nil }
+            if let pictured = DiscogsClient.picturedArtist(in: byName.absoluteString), pictured != id { return nil }
+            return byName
+        }
         var edges = EdgeSet()
         for original in built {
             var edge = original
-            if edge.to.artworkURL == nil, let portrait = portraits[edge.to.key] {
+            if edge.to.artworkURL == nil, let portrait = portrait(for: edge.to) {
                 var destination = edge.to
                 destination.artworkURL = portrait
                 edge = MusicEdge(

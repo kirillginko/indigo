@@ -726,7 +726,7 @@ private struct DigShelf: View {
                             .overlay {
                                 GeometryReader { proxy in
                                     ArtworkView(
-                                        remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                                        remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title, discogsID: pick.node.discogsID),
                                         side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic
                                     )
                                 }
@@ -779,7 +779,7 @@ private struct DigArtistCard: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 8) {
                 ArtworkView(
-                    remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                    remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title, discogsID: pick.node.discogsID),
                     side: Self.side,
                     glyphScale: 0.26,
                     placeholder: .mosaic

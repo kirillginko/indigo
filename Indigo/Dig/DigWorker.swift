@@ -41,12 +41,14 @@ actor DigWorker {
     let modelContext: ModelContext
 
     /// Nothing configured here: `DiscogsClient()` reads the same credential
-    /// the store's does, and it is a value type with no state of its own.
-    private let discogs = DiscogsClient()
+    /// the store's does, and it is a value type with no state of its own. A
+    /// test hands in one with a transport of its own.
+    private let discogs: DiscogsClient
 
-    init(modelContainer: ModelContainer) {
+    init(modelContainer: ModelContainer, discogs: DiscogsClient = DiscogsClient()) {
         self.modelContainer = modelContainer
         self.modelContext = ModelContext(modelContainer)
+        self.discogs = discogs
     }
 
     /// One engine, kept until something is written.
@@ -547,22 +549,28 @@ actor DigWorker {
     func fillPortrait(named name: String) async -> PortraitOutcome {
         // Whoever the full lookup already decided this artist is.
         //
-        // `artistThumbnail(named:)` is one search and takes the first result
-        // that matches the name, which is right until two people share one.
         // Where a page has already been opened the answer is sitting in the
         // store — the right Discogs id, and their picture — so asking a
         // search engine to guess again is both a wasted request and the way
         // the video director's photograph got filed under the duo's name.
+        // That picture is verified by identity, so it is kept under the
+        // Discogs id as well as the name (`ArtistPortrait.identityKey`).
         // Unless all it holds is the 150-pixel thumb, which is why this
         // name was asked for again: then the search, for the cover.
         if let resolved = Self.resolvedPortrait(named: name, in: modelContext),
-           !DiscogsClient.isSmallCut(resolved) {
-            return write(resolved, named: name)
+           !DiscogsClient.isSmallCut(resolved.address) {
+            writeIdentity(resolved.address, discogsID: resolved.discogsID, named: name)
+            return write(resolved.address, named: name)
         }
 
-        let found: String?
+        // By name only: a picture only when exactly one Discogs artist has
+        // the name. Shared by namesakes, there is no saying whose face it is,
+        // and none is better than a stranger's -- the miss also replaces a
+        // face an earlier first-match search left under this name. A unique
+        // match is a picture, not an identity: it is kept by name only.
+        let pick: DiscogsClient.PortraitPick
         do {
-            found = try await discogs.artistThumbnail(named: name)
+            pick = try await discogs.artistPortrait(named: name)
         } catch is CancellationError {
             return .cancelled
         } catch DiscogsError.rateLimited {
@@ -571,33 +579,104 @@ actor DigWorker {
             return .unreachable
         }
         guard !Task.isCancelled else { return .cancelled }
-        return write(found, named: name)
-    }
-
-    /// Portraits the shared catalogue had already found, written down here as
-    /// though this machine had found them.
-    ///
-    /// The queue is then shorter by exactly the names the backend has already
-    /// paid for, which is the whole point of filling them once for everybody
-    /// rather than once per listener. See migration 0019.
-    /// Through `write` rather than a bare insert: `nameKey` is unique, and an
-    /// artist the fill already recorded a miss for is exactly the case this is
-    /// most useful in.
-    func adopt(_ found: [(name: String, address: String)]) {
-        for entry in found {
-            _ = write(entry.address, named: entry.name)
+        switch pick {
+        case .unique(let address, _): return write(address, named: name)
+        case .ambiguous, .none: return write(nil, named: name)
         }
     }
 
-    /// The picture on the artist row, when a full lookup has written one.
-    private static func resolvedPortrait(named name: String, in context: ModelContext) -> String? {
+    /// What the shared catalogue says about a name's portrait (0081).
+    nonisolated struct CataloguePortrait: Sendable, Equatable, Decodable {
+        /// `verified`: the artist's own Discogs picture. `unresolved`: no
+        /// identity, the only Discogs artist with the name -- or written before
+        /// portraits had a state. `withheld`: namesakes and no identity.
+        let state: String
+        let url: String?
+        let discogsID: Int?
+
+        init(state: String, url: String? = nil, discogsID: Int? = nil) {
+            self.state = state
+            self.url = url
+            self.discogsID = discogsID
+        }
+    }
+
+    /// Portraits the shared catalogue had already found -- or withheld --
+    /// written down here as though this machine had found them.
+    ///
+    /// The queue is then shorter by exactly the names the backend has already
+    /// paid for, which is the whole point of filling them once for everybody
+    /// rather than once per listener. See migration 0019. A withheld one
+    /// replaces whatever this device kept under the name with a miss, so a
+    /// stranger's face cached by the old rule goes too (0081); a verified one
+    /// is kept under the Discogs id as well. Returns the names withheld, each
+    /// with the face it had here before.
+    /// Through `write` rather than a bare insert: `nameKey` is unique, and an
+    /// artist the fill already recorded a miss for is exactly the case this is
+    /// most useful in.
+    @discardableResult
+    func adopt(_ found: [(name: String, portrait: CataloguePortrait)]) -> [String: String?] {
+        var withheld: [String: String?] = [:]
+        for entry in found {
+            switch entry.portrait.state {
+            case "withheld":
+                // The face it replaces, so the store can take exactly that one
+                // off the edges still wearing it.
+                let key = RecordingKey.normalizeArtist(entry.name)
+                var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
+                descriptor.fetchLimit = 1
+                let stale = (try? modelContext.fetch(descriptor))?.first?.imageURLString
+                _ = write(nil, named: entry.name)
+                withheld[entry.name] = .some(stale)
+            default:
+                guard let address = entry.portrait.url else { continue }
+                if entry.portrait.state == "verified", let id = entry.portrait.discogsID {
+                    writeIdentity(address, discogsID: id, named: entry.name)
+                }
+                _ = write(address, named: entry.name)
+            }
+        }
+        return withheld
+    }
+
+    /// The picture on the artist row, when a full lookup has written one, and
+    /// whose it is.
+    private static func resolvedPortrait(named name: String, in context: ModelContext) -> (address: String, discogsID: Int)? {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return nil }
         var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.nameKey == key })
         descriptor.fetchLimit = 1
-        guard let artist = (try? context.fetch(descriptor))?.first else { return nil }
-        return DiscogsClient.usableImage(artist.thumbnailURLString)
-            ?? DiscogsClient.usableImage(artist.imageURLString)
+        guard let artist = (try? context.fetch(descriptor))?.first,
+              let address = DiscogsClient.usableImage(artist.thumbnailURLString)
+                ?? DiscogsClient.usableImage(artist.imageURLString) else { return nil }
+        return (address, artist.discogsID)
+    }
+
+    /// Every name this device holds a picture for, as the rows named it --
+    /// not the identity keys, which are verified already.
+    func namesWithPortraits() -> [String] {
+        let records = (try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? []
+        return records
+            .filter { !$0.nameKey.hasPrefix("#") && $0.imageURL != nil }
+            .map(\.name)
+            .sorted()
+    }
+
+    /// A portrait verified by identity, kept under the Discogs id too, so a
+    /// row that knows who it is finds this face and no namesake's.
+    private func writeIdentity(_ address: String, discogsID: Int, named name: String) {
+        guard discogsID > 0 else { return }
+        let key = ArtistPortrait.identityKey(discogsID)
+        var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
+        descriptor.fetchLimit = 1
+        if let existing = (try? modelContext.fetch(descriptor))?.first {
+            guard existing.imageURLString != address else { return }
+            modelContext.delete(existing)
+        }
+        let record = ArtistPortrait(nameKey: key, name: name)
+        record.imageURLString = address
+        modelContext.insert(record)
+        try? modelContext.save()
     }
 
     private func write(_ found: String?, named name: String) -> PortraitOutcome {

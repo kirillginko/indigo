@@ -962,7 +962,7 @@ struct ArtistDigView: View {
                     ForEach(artists.prefix(12)) { peer in
                         ConnectionExplainer(
                             artist: peer,
-                            portrait: dig.portraitURL(for: peer.name)
+                            portrait: dig.portraitURL(for: peer.name, discogsID: peer.discogsID)
                         ) {
                             appState.open(.digArtist(mbid: peer.mbid, name: peer.name, discogsID: peer.discogsID))
                         }

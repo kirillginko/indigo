@@ -376,24 +376,68 @@ nonisolated struct DiscogsClient: Sendable {
         return response.results ?? []
     }
 
-    /// Just a picture of an artist, in one request.
+    /// What a name-only portrait search may conclude.
+    nonisolated enum PortraitPick: Sendable, Equatable {
+        /// Exactly one Discogs artist has the name. A picture, never an
+        /// identity: nothing here says the row is that artist.
+        case unique(address: String, discogsID: Int)
+        /// Several namesakes and nothing to choose between them by. No face
+        /// rather than a stranger's.
+        case ambiguous([Int])
+        case none
+    }
+
+    /// A picture of an artist by name, in one request -- only when the name
+    /// is not shared.
     ///
     /// The full `artist(named:)` bundle is four requests and fetches a
-    /// discography nobody asked for. When all that is wanted is a thumbnail
-    /// for a row, this is a quarter of the cost — which is what makes filling
-    /// in a page of forty neighbours possible at all.
-    func artistThumbnail(named name: String) async throws -> String? {
+    /// discography nobody asked for; this is a quarter of the cost, which is
+    /// what makes filling in a page of forty neighbours possible at all. It
+    /// used to take the first result whose name matched, which is how the duo
+    /// Hype Williams came to wear the film director's face: Discogs ranks
+    /// namesakes in no particular order. Now a name two Discogs artists share
+    /// is `ambiguous`, and the caller shows none.
+    func artistPortrait(named name: String) async throws -> PortraitPick {
         let response: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "q", value: name),
             URLQueryItem(name: "type", value: "artist"),
-            URLQueryItem(name: "per_page", value: "5")
+            // Enough to see a name's namesakes, not only its first answer.
+            URLQueryItem(name: "per_page", value: "25")
         ])
-        guard let match = Self.bestArtistMatch(name: name, results: response.results ?? [])
-        else { return nil }
+        return Self.portraitPick(name: name, results: response.results ?? [])
+    }
+
+    /// The decision behind `artistPortrait(named:)`, for tests.
+    nonisolated static func portraitPick(name: String, results: [DiscogsSearchResult]) -> PortraitPick {
+        let matches = artistMatches(name: name, results: results)
+        let ids = Array(Set(matches.compactMap(\.id))).sorted()
+        guard !ids.isEmpty else { return .none }
+        guard ids.count == 1, let match = matches.first(where: { $0.id == ids[0] }) else { return .ambiguous(ids) }
         // The cover (600 pixels), not the thumb (150): the phone draws these
         // half a screen wide, where the thumb blurred. Its address is signed,
         // so a size cannot be asked of the thumb.
-        return Self.usableImage(match.coverImage) ?? Self.usableImage(match.thumbnail)
+        guard let address = usableImage(match.coverImage) ?? usableImage(match.thumbnail) else { return .none }
+        return .unique(address: address, discogsID: ids[0])
+    }
+
+    /// The Discogs artist a Discogs image shows, read from its address.
+    ///
+    /// Discogs serves images through a signed proxy whose path carries the
+    /// original file's location, base64-encoded:
+    /// `s3://discogs-database-images/A-398459-1256391322.jpeg` is a picture
+    /// filed under artist 398459. Nil for anything else (a release cover, an
+    /// address of another shape). How a cached portrait is checked against the
+    /// artist it is about to be drawn for, with no field to store it in.
+    nonisolated static func picturedArtist(in address: String?) -> Int? {
+        guard let address, let range = address.range(of: #"/w:\d+/"#, options: .regularExpression) else { return nil }
+        var encoded = address[range.upperBound...]
+            .split(separator: "/").joined()
+            .split(separator: ".").first.map(String.init) ?? ""
+        encoded = encoded.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        while encoded.count % 4 != 0 { encoded += "=" }
+        guard let data = Data(base64Encoded: encoded), let path = String(data: data, encoding: .utf8),
+              let match = path.range(of: #"/A-(\d+)-"#, options: .regularExpression) else { return nil }
+        return Int(path[match].dropFirst(3).dropLast())
     }
 
     /// What Discogs has under a typed query, in one of the three kinds a dig

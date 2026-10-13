@@ -140,6 +140,24 @@ nonisolated extension StoredEdge {
         let rows = (try? context.fetch(FetchDescriptor<StoredEdge>(predicate: #Predicate {
             $0.toKey == key && $0.toKindRaw == artist && $0.toArtworkURLString != address
         }))) ?? []
-        for row in rows { row.toArtworkURLString = address }
+        // Not onto an edge that knows its artist is somebody else: a name is
+        // shared by namesakes, and a picture of one is not a picture of all.
+        let pictured = DiscogsClient.picturedArtist(in: address)
+        for row in rows {
+            if let pictured, let own = row.toDiscogsID, own != pictured { continue }
+            row.toArtworkURLString = address
+        }
+    }
+
+    /// Takes a withheld portrait back off the edges that carry it (0081): the
+    /// name's namesakes cannot be told apart, so none of them wears the face.
+    /// Only that address; a picture an edge got another way is left alone.
+    static func unpaint(artistKey key: String, address: String, in context: ModelContext) {
+        guard !key.isEmpty else { return }
+        let artist = MusicNodeKind.artist.rawValue
+        let rows = (try? context.fetch(FetchDescriptor<StoredEdge>(predicate: #Predicate {
+            $0.toKey == key && $0.toKindRaw == artist && $0.toArtworkURLString == address
+        }))) ?? []
+        for row in rows { row.toArtworkURLString = nil }
     }
 }

@@ -38,6 +38,21 @@ final class DigStore {
         let _ = artworkRevision
         return portraits[RecordingKey.normalizeArtist(name)]
     }
+
+    /// The portrait for an artist whose Discogs identity may be known.
+    ///
+    /// With an id: the picture verified for that id first; failing that, the
+    /// one kept under the name -- unless its address shows it is somebody
+    /// else (`DiscogsClient.picturedArtist`), which is how one namesake's face
+    /// leaked onto another's row. Without an id, the name's, as before.
+    func portraitURL(for name: String, discogsID: Int?) -> URL? {
+        let _ = artworkRevision
+        guard let discogsID else { return portraits[RecordingKey.normalizeArtist(name)] }
+        if let verified = portraits[ArtistPortrait.identityKey(discogsID)] { return verified }
+        guard let byName = portraits[RecordingKey.normalizeArtist(name)] else { return nil }
+        if let pictured = DiscogsClient.picturedArtist(in: byName.absoluteString), pictured != discogsID { return nil }
+        return byName
+    }
     var notice: String?
     private(set) var discogsLabelProfiles: [String: DiscogsLabelProfile] = [:
     ]
@@ -926,6 +941,9 @@ final class DigStore {
         let index = await worker.portraitIndex()
         portraits = index.found
         portraitsSettled = index.settled
+        // Once: faces cached by the old first-match rule, checked against the
+        // catalogue's portrait states (0081).
+        await revalidateCachedPortraits()
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -1134,9 +1152,9 @@ final class DigStore {
 
     /// Where the portraits the backend has already found come from. A property
     /// so a test can stand in for the backend, which is off under XCTest.
-    @ObservationIgnored var cataloguePortraits: @Sendable ([String]) async -> [String: URL] = { keys in
+    @ObservationIgnored var cataloguePortraits: @Sendable ([String]) async -> [String: DigWorker.CataloguePortrait] = { keys in
         guard SupabaseService.isConfigured else { return [:] }
-        return (try? await ArtworkRepository.shared.portraits(forArtistKeys: keys)) ?? [:]
+        return (try? await ArtworkRepository.shared.portraitStates(forArtistKeys: keys)) ?? [:]
     }
 
     /// Catalogue keys already asked about this session. A page reports its rows
@@ -1173,30 +1191,82 @@ final class DigStore {
             "\(onScreen ? "screen" : "backlog") asked=\(byCatalogueKey.count) found=\(found.count)"
         ) {}
 
-        var adopted: [(name: String, address: String)] = []
-        var resolved: [String: URL] = [:]
-        for (key, url) in found {
+        await apply(found, asked: byCatalogueKey, onScreen: onScreen)
+        // One announcement for the batch. See `artworkRevision`.
+        artworkRevision &+= 1
+    }
+
+    /// What the catalogue said, kept: verified and unresolved portraits by
+    /// name (verified ones under the Discogs id as well), and withheld ones
+    /// taken off the name -- out of the map, off the stored edges carrying
+    /// that face, and recorded as a miss -- so a stranger's face cached under
+    /// the old first-match rule does not outlive the catalogue's correction.
+    private func apply(_ found: [String: DigWorker.CataloguePortrait], asked byCatalogueKey: [String: String], onScreen: Bool) async {
+        var adopted: [(name: String, portrait: DigWorker.CataloguePortrait)] = []
+        for (key, portrait) in found {
             guard let name = byCatalogueKey[key] else { continue }
-            adopted.append((name, url.absoluteString))
-            resolved[RecordingKey.normalizeArtist(name)] = url
+            adopted.append((name, portrait))
         }
         guard !adopted.isEmpty else { return }
 
-        await worker.adopt(adopted)
-        for (key, url) in resolved {
+        let withheld = await worker.adopt(adopted)
+        for (name, portrait) in adopted {
+            let key = RecordingKey.normalizeArtist(name)
+            if let stale = withheld[name] {
+                let inMemory = portraits.removeValue(forKey: key)?.absoluteString
+                for address in Set([stale, inMemory].compactMap { $0 }) {
+                    StoredEdge.unpaint(artistKey: key, address: address, in: context)
+                }
+                portraitsSettled.insert(key)
+                continue
+            }
+            guard let address = portrait.url, let url = URL(string: address) else { continue }
             portraits[key] = url
+            if portrait.state == "verified", let id = portrait.discogsID {
+                portraits[ArtistPortrait.identityKey(id)] = url
+            }
             portraitsSettled.insert(key)
+            // Rows already drawn are repainted, as the fill repaints them, for
+            // the ones on screen. Not for the backlog: up to two hundred edge
+            // rewrites on the main thread for rows nobody is looking at, which
+            // read the portrait table when they are next drawn anyway.
+            if onScreen { paint(name, with: address) }
         }
-        // Rows already drawn are repainted, as the fill repaints them, for the
-        // ones on screen. Not for the backlog: up to two hundred edge rewrites
-        // on the main thread for rows nobody is looking at, which read the
-        // portrait table when they are next drawn anyway.
-        if onScreen {
-            for (name, address) in adopted { paint(name, with: address) }
-            saveContext()
+        if onScreen || !withheld.isEmpty { saveContext() }
+    }
+
+    /// Once per install: every name this device holds a portrait for, asked
+    /// of the catalogue again with the portrait states of 0081, so faces the
+    /// old first-match rule cached here are withheld or replaced. Names are
+    /// otherwise only asked about while they have no picture at all, so
+    /// without this a wrong one would stay for good.
+    private static let revalidatedKey = "portraitStates.revalidated.v1"
+
+    /// Where "done" is remembered. Never the app's own defaults under XCTest:
+    /// the test host is the app, and a test run would otherwise tell the real
+    /// one its portraits had already been checked.
+    @ObservationIgnored var portraitDefaults: UserDefaults = Persistence.isRunningTests
+        ? UserDefaults(suiteName: "indigo.tests.portrait-states") ?? .standard
+        : .standard
+
+    func revalidateCachedPortraits(batch: Int = cataloguePortraitBatch) async {
+        guard !portraitDefaults.bool(forKey: Self.revalidatedKey) else { return }
+        let names = await worker.namesWithPortraits()
+        var done = 0
+        while done < names.count {
+            var byCatalogueKey: [String: String] = [:]
+            for name in names[done..<min(done + batch, names.count)] {
+                let key = RecordingKey.normalize(name)
+                if !key.isEmpty, byCatalogueKey[key] == nil { byCatalogueKey[key] = name }
+            }
+            done += batch
+            guard !byCatalogueKey.isEmpty else { continue }
+            let found = await cataloguePortraits(Array(byCatalogueKey.keys))
+            await apply(found, asked: byCatalogueKey, onScreen: false)
         }
-        // One announcement for the batch. See `artworkRevision`.
         artworkRevision &+= 1
+        Trace.step("portraits.revalidated", "names=\(names.count)") {}
+        portraitDefaults.set(true, forKey: Self.revalidatedKey)
     }
 
     /// Whether this name still owes a picture.
