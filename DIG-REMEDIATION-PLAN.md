@@ -461,4 +461,4 @@ Never read: off. Checked at every bundle read, cached ones included. Off deletes
 - A namesake (e.g. Speedy J): no face that belongs to the other entry.
 - An artist outside the pilot (e.g. Prefuse 73): unchanged.
 - From a credited release, a credit opens the credited artist, not a namesake.
-- `Scripts/dig-enrichment-switch.sh off`, wait 15 min or relaunch: the pilot rows are gone; `on debug`: back.
+- `Scripts/dig-enrichment-switch.sh off`, then wait out the 15-minute TTL (a relaunch keeps the last answer until then): the pilot rows are gone; `on debug`, 15 minutes again: back.
