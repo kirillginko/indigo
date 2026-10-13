@@ -11,7 +11,7 @@
 // Or Scripts/test-functions.sh, which runs everything under supabase/functions.
 
 import { assert, assertEquals } from "jsr:@std/assert@1";
-import { DISCOGS_SPACING_MS, fetchArtistPortrait, searchTarget } from "./discogs.ts";
+import { chooseArtistPortrait, DISCOGS_SPACING_MS, searchTarget } from "./discogs.ts";
 
 Deno.test("an artist hit becomes a complete artist row", () => {
   const target = searchTarget({ id: 2477159, type: "artist", title: "Purelink", country: "US" });
@@ -97,9 +97,9 @@ Deno.test("portrait searches leave a second between them", async () => {
     return Promise.resolve(new Response(JSON.stringify({ results: [] }), { status: 200 }));
   }) as typeof fetch;
   try {
-    await fetchArtistPortrait("Purelink", undefined, "IndigoTest/1");
-    await fetchArtistPortrait("Skee Mask", undefined, "IndigoTest/1");
-    await fetchArtistPortrait("Bandulu", undefined, "IndigoTest/1");
+    await chooseArtistPortrait("Purelink", [], undefined, "IndigoTest/1");
+    await chooseArtistPortrait("Skee Mask", [], undefined, "IndigoTest/1");
+    await chooseArtistPortrait("Bandulu", [], undefined, "IndigoTest/1");
   } finally {
     globalThis.fetch = realFetch;
   }
@@ -110,3 +110,81 @@ Deno.test("portrait searches leave a second between them", async () => {
     assert(gap >= DISCOGS_SPACING_MS - 5, `requests ${i} and ${i + 1} were ${gap}ms apart`);
   }
 });
+
+// MARK: - Choosing a portrait by identity
+
+/// Discogs as the portrait lane sees it: artist documents by id, and a search.
+async function withDiscogs<T>(
+  artists: Record<number, unknown>, search: unknown[], work: (asked: string[]) => Promise<T>, status = 200,
+): Promise<T> {
+  const asked: string[] = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = ((input: unknown) => {
+    const url = String(input);
+    asked.push(url);
+    if (status !== 200) return Promise.resolve(new Response("", { status }));
+    const byID = url.match(/\/artists\/(\d+)$/);
+    if (byID) {
+      const doc = artists[Number(byID[1])];
+      return Promise.resolve(doc ? new Response(JSON.stringify(doc), { status: 200 }) : new Response("", { status: 404 }));
+    }
+    return Promise.resolve(new Response(JSON.stringify({ results: search }), { status: 200 }));
+  }) as typeof fetch;
+  try {
+    return await work(asked);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
+const DIRECTOR = { id: 398459, type: "artist", title: "Hype Williams", thumb: "https://i.discogs.com/director.jpeg" };
+const DUO = { id: 1874027, type: "artist", title: "Hype Williams (2)", thumb: "https://i.discogs.com/duo-search.jpeg" };
+
+Deno.test("a row with a Discogs id gets that artist's own picture, without a search", async () => {
+  const choice = await withDiscogs(
+    { 1874027: { images: [{ type: "secondary", uri150: "https://i.discogs.com/duo-2.jpeg" },
+                          { type: "primary", uri150: "https://i.discogs.com/duo.jpeg", width: 150, height: 150 }] } },
+    [DIRECTOR, DUO],
+    async (asked) => {
+      const c = await chooseArtistPortrait("Hype Williams", [1874027], undefined, "IndigoTest/1");
+      assertEquals(asked.length, 1);
+      assert(asked[0].endsWith("/artists/1874027"), asked[0]);
+      return c;
+    });
+  assertEquals(choice, { kind: "found", url: "https://i.discogs.com/duo.jpeg", width: 150, height: 150, discogsID: 1874027, via: "identity" });
+});
+
+Deno.test("namesakes and no identity: the portrait is withheld, never the first result", async () => {
+  const choice = await withDiscogs({}, [DIRECTOR, DUO, { id: 5, type: "artist", title: "Hype Williams Tribute" }],
+    () => chooseArtistPortrait("Hype Williams", [], undefined, "IndigoTest/1"));
+  assertEquals(choice, { kind: "ambiguous", candidates: [398459, 1874027] });
+});
+
+Deno.test("a name exactly one Discogs artist carries is accepted", async () => {
+  const choice = await withDiscogs({}, [{ id: 77, type: "artist", title: "Purelink (2)", thumb: "https://i.discogs.com/p.jpeg" },
+                                        { id: 78, type: "artist", title: "Purelink Sound System" }],
+    () => chooseArtistPortrait("Purelink", [], undefined, "IndigoTest/1"));
+  assertEquals(choice, { kind: "found", url: "https://i.discogs.com/p.jpeg", width: null, height: null, discogsID: 77, via: "unique-name" });
+});
+
+Deno.test("no picture is a finding: the spacer, an empty document, an unknown id", async () => {
+  assertEquals(await withDiscogs({ 9: { images: [{ type: "primary", uri150: "https://s.discogs.com/images/spacer.gif" }] } }, [],
+    () => chooseArtistPortrait("X", [9], undefined, "IndigoTest/1")), { kind: "none" });
+  assertEquals(await withDiscogs({ 9: { images: [] } }, [],
+    () => chooseArtistPortrait("X", [9], undefined, "IndigoTest/1")), { kind: "none" });
+  assertEquals(await withDiscogs({}, [],
+    () => chooseArtistPortrait("X", [404404], undefined, "IndigoTest/1")), { kind: "none" });
+  assertEquals(await withDiscogs({}, [{ id: 1, type: "artist", title: "Somebody Else" }],
+    () => chooseArtistPortrait("X", [], undefined, "IndigoTest/1")), { kind: "none" });
+});
+
+Deno.test("being told to slow down is retried, not recorded as no picture", async () => {
+  let threw = false;
+  try {
+    await withDiscogs({}, [], () => chooseArtistPortrait("X", [9], undefined, "IndigoTest/1"), 429);
+  } catch (error) {
+    threw = String(error).includes("rate_limited");
+  }
+  assert(threw);
+});
+

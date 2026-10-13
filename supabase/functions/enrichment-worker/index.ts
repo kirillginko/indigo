@@ -20,7 +20,7 @@ import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
 import {
   cacheDiscogsRelease,
   cacheDiscogsShelf,
-  fetchArtistPortrait,
+  chooseArtistPortrait,
 } from "../_shared/discogs.ts";
 import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
@@ -371,12 +371,31 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       const name = String(job.payload?.name ?? "");
       if (!artistId || !name) throw new Error("missing artist");
 
-      const found = await fetchArtistPortrait(
-        name, Deno.env.get("DISCOGS_TOKEN"), USER_AGENT);
+      // The row's Discogs identity, best first: its own id, then any
+      // MusicBrainz recorded for it. With one, the portrait is that artist's;
+      // without, only a name exactly one Discogs artist carries will do.
+      const { data: ids, error: idError } = await supabase
+        .from("external_ids")
+        .select("provider, external_id")
+        .eq("entity_type", "artist").eq("entity_id", artistId)
+        .in("provider", ["discogs", "musicbrainz_discogs"]);
+      if (idError) throw new Error(idError.message);
+      const discogsIDs = (ids ?? [])
+        .sort((a, b) => (a.provider === "discogs" ? 0 : 1) - (b.provider === "discogs" ? 0 : 1)
+          || Number(a.external_id) - Number(b.external_id))
+        .map((row) => Number(row.external_id));
 
-      // Recorded either way. An artist Discogs has no picture of is a finding,
-      // and writing it down is what stops the queue asking again next week —
-      // the same bargain `fetch_artist_origin` makes above.
+      const choice = await chooseArtistPortrait(
+        name, discogsIDs, Deno.env.get("DISCOGS_TOKEN"), USER_AGENT);
+      console.log("artist_portrait", artistId, choice.kind,
+        choice.kind === "found" ? `${choice.via} ${choice.discogsID}` : choice.kind === "ambiguous" ? choice.candidates.join(",") : "");
+
+      // Recorded either way. An artist Discogs has no picture of -- or several
+      // namesakes and no way to tell which -- is a finding, and writing it
+      // down is what stops the queue asking again next week, the same bargain
+      // `fetch_artist_origin` makes above. A withheld portrait is a miss: a
+      // stranger's face is worse than none.
+      const found = choice.kind === "found" ? choice : null;
       const { error } = await supabase.rpc("record_artist_portrait", {
         p_artist_id: artistId,
         p_url: found?.url ?? null,

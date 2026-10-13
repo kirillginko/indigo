@@ -388,58 +388,103 @@ export async function pacedPortraitFetch(input: URL, init: RequestInit): Promise
   return await fetch(input, init);
 }
 
-/// A picture of an artist, or the finding that Discogs has none.
+/// How an artist's portrait was chosen, or why there is none.
+export type PortraitChoice =
+  | {
+    kind: "found";
+    url: string;
+    width: number | null;
+    height: number | null;
+    /// The Discogs artist the picture belongs to.
+    discogsID: number;
+    /// `identity`: the row's own Discogs id (or one MusicBrainz recorded for
+    /// it). `unique-name`: no id, and exactly one Discogs artist has the name.
+    via: "identity" | "unique-name";
+  }
+  /// Discogs has no usable picture of that artist, or nobody by that name.
+  | { kind: "none" }
+  /// No identity, and several Discogs artists answer to the name. Withheld:
+  /// a stranger's face is worse than none (2026-10-12: 121 rows showed another
+  /// artist's portrait; 962 more were a namesake chosen by search order).
+  | { kind: "ambiguous"; candidates: number[] };
+
+/// A picture of an artist, chosen by identity -- or the finding that there is
+/// none to be had safely.
 ///
 /// Moved here from the app, where it ran as a background loop on every
 /// listener's machine and was the largest single consumer of a Discogs budget
 /// that all of them share. See migration 0019.
 ///
-/// The name must match. Discogs ranks loosely and will happily return a
-/// tribute band, a bootleg label or somebody else entirely for a name it does
-/// not have — and a wrong portrait is worse than none, because nothing about
-/// the page it lands on will say so. `withoutDisambiguator` is applied before
-/// comparing, so the artist really called Bandulu still matches the row
-/// Discogs files as "Bandulu (3)".
-export async function fetchArtistPortrait(
+/// With a Discogs id (`discogsIDs`, best first: the row's own, then any
+/// MusicBrainz recorded for it), the picture comes from that artist's own
+/// document -- no search, so no namesake can answer. Without one, a search
+/// result is accepted only when exactly one Discogs artist carries the name
+/// (compared with Discogs' "(2)" stripped and names folded); several mean the
+/// portrait is withheld. Discogs ranks loosely, and the first namesake it
+/// returned was how the duo Hype Williams came to show the film director.
+export async function chooseArtistPortrait(
   name: string,
+  discogsIDs: number[],
   token: string | undefined,
   userAgent: string,
-): Promise<{ url: string; width: number | null; height: number | null } | null> {
-  const clean = name.trim();
-  if (!clean) return null;
-
-  const url = new URL("https://api.discogs.com/database/search");
-  url.searchParams.set("q", clean);
-  url.searchParams.set("type", "artist");
-  url.searchParams.set("per_page", "5");
-
+): Promise<PortraitChoice> {
   const headers: Record<string, string> = {
     Accept: "application/json",
     "User-Agent": userAgent,
   };
   if (token) headers.Authorization = `Discogs token=${token}`;
 
+  const id = discogsIDs.find((candidate) => Number.isInteger(candidate) && candidate > 0);
+  if (id !== undefined) {
+    const response = await pacedPortraitFetch(new URL(`https://api.discogs.com/artists/${id}`), { headers });
+    // Thrown rather than swallowed: the queue's own retry is the right answer
+    // to being told to slow down, and recording a miss here would write down
+    // "no picture exists" on the strength of a refusal.
+    if (response.status === 429) throw new Error("discogs_rate_limited");
+    if (response.status === 404) {
+      await response.body?.cancel();
+      return { kind: "none" };
+    }
+    if (!response.ok) throw new Error(`discogs_${response.status}`);
+    const artist = await response.json() as { images?: Payload[] };
+    const images = artist.images ?? [];
+    const image = images.find((i) => i?.type === "primary") ?? images[0];
+    // The 150-pixel cut first: this fills a row, not a hero image.
+    const picture = image ? usableImage(image.uri150) ?? usableImage(image.uri) : null;
+    if (!picture) return { kind: "none" };
+    return {
+      kind: "found", url: picture, discogsID: id, via: "identity",
+      width: Number.isFinite(Number(image.width)) ? Math.trunc(Number(image.width)) : null,
+      height: Number.isFinite(Number(image.height)) ? Math.trunc(Number(image.height)) : null,
+    };
+  }
+
+  const clean = name.trim();
+  if (!clean) return { kind: "none" };
+  const url = new URL("https://api.discogs.com/database/search");
+  url.searchParams.set("q", clean);
+  url.searchParams.set("type", "artist");
+  // Enough to see a name's namesakes, not only its first answer.
+  url.searchParams.set("per_page", "25");
+
   const response = await pacedPortraitFetch(url, { headers });
-  // Thrown rather than swallowed: the queue's own retry is the right answer to
-  // being told to slow down, and recording a miss here would write down "no
-  // picture exists" on the strength of a refusal.
   if (response.status === 429) throw new Error("discogs_rate_limited");
   if (!response.ok) throw new Error(`discogs_${response.status}`);
 
   const payload = await response.json() as { results?: Payload[] };
   const wanted = normalizeName(clean);
-  const match = (payload.results ?? []).find(
+  const matches = (payload.results ?? []).filter(
     (result) => normalizeName(withoutDisambiguator(String(result?.title ?? ""))) === wanted,
   );
-  if (!match) return null;
+  const ids = [...new Set(matches.map((m) => Number(m.id)).filter(Number.isInteger))];
+  if (ids.length === 0) return { kind: "none" };
+  if (ids.length > 1) return { kind: "ambiguous", candidates: ids.sort((a, b) => a - b) };
 
-  // `thumb` first: this fills a row, not a hero image, and the small cut is
-  // the one the app actually draws.
+  const match = matches[0];
   const picture = usableImage(match.thumb) ?? usableImage(match.cover_image);
-  if (!picture) return null;
-
+  if (!picture) return { kind: "none" };
   return {
-    url: picture,
+    kind: "found", url: picture, discogsID: ids[0], via: "unique-name",
     width: Number.isFinite(Number(match.width)) ? Math.trunc(Number(match.width)) : null,
     height: Number.isFinite(Number(match.height)) ? Math.trunc(Number(match.height)) : null,
   };
