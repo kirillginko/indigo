@@ -12,7 +12,9 @@ import { MAX_PAGES, PAGES_PER_JOB } from "./discography.ts";
 import {
   ArtistJob, ArtistRef, artistRefKey, buildArtistBundle, DiscographyRef, discographyRefKey, discoverDiscography, KnowledgeDeps,
   knowledgeCacheControl, MISSING_DOCUMENTS_BUDGET, releaseDocumentKey, settleBatches,
+  buildCatalogueBundle, catalogueBundle, CatalogueRef, catalogueRefKey, cataloguePilotPointerKey, publishCataloguePilot,
 } from "./knowledge.ts";
+import { bundleKey, canonicalJSON } from "./artist_bundle.ts";
 
 const KATE = { discogsID: 5302639, name: "Kate NV", identity: "backend" as const };
 const DEAN = { discogsID: 2419343, name: "Dean Blunt", identity: "backend" as const };
@@ -275,4 +277,44 @@ Deno.test("references are revalidated within a minute; addressed objects are kep
   assertEquals(knowledgeCacheControl("knowledge/v1/state/discovery/306157.json"), "public, max-age=60");
   assertEquals(knowledgeCacheControl("knowledge/v1/bundles/e4/e4c2.json"), "public, max-age=31536000, immutable");
   assertEquals(knowledgeCacheControl("knowledge/v1/pages/aa/aa.json"), "public, max-age=31536000, immutable");
+});
+
+// MARK: Catalogue bundles (the DIG pilot)
+
+Deno.test("a catalogue bundle is built from the catalogue's own documents, for pilot artists only", async () => {
+  const input = structuredClone(deanBlunt) as BundleInput;
+  const world = new World([], 50, input.releases);
+  world.own = input.releases.map((d) => d.id!).concat([987_654_321]); // one the catalogue names but R2 lacks
+  const pilot = new Map([[DEAN.discogsID, "Dean Blunt"]]);
+
+  await assertRejects(() => buildCatalogueBundle(world.deps(), { discogsID: 398459, name: "Hype Williams" }, pilot));
+  const first = await buildCatalogueBundle(world.deps(), { discogsID: DEAN.discogsID, name: "anything a payload says" }, pilot);
+  assertEquals(first.status, "published");
+  const ref = world.ref<CatalogueRef>(catalogueRefKey(DEAN.discogsID))!;
+  assertEquals(ref.key, bundleKey(ref.digest));
+  // The same bytes a check outside the worker builds from the same documents.
+  const docs = input.releases.filter((d) => world.own.includes(d.id!));
+  assertEquals(world.r2.get(ref.key), canonicalJSON(catalogueBundle({ discogsID: DEAN.discogsID, name: "Dean Blunt" }, docs, docs.length, 0)));
+  assert(!world.r2.has(artistRefKey(DEAN.discogsID)), "For You's reference is not touched");
+  const again = await buildCatalogueBundle(world.deps(), { discogsID: DEAN.discogsID, name: "Dean Blunt" }, pilot);
+  assertEquals(again.status, "unchanged");
+});
+
+Deno.test("the pilot manifest lists every sound bundle and names the rest missing", async () => {
+  const input = structuredClone(deanBlunt) as BundleInput;
+  const world = new World([], 50, input.releases);
+  world.own = input.releases.map((d) => d.id!);
+  const pilot = new Map([[DEAN.discogsID, "Dean Blunt"], [4978, "Mayday"]]);
+  await buildCatalogueBundle(world.deps(), { discogsID: DEAN.discogsID, name: "Dean Blunt" }, pilot);
+  const result = await publishCataloguePilot(world.deps(), pilot);
+  assertEquals(result.artists, 1);
+  assertEquals(result.missing, [4978]);
+  const pointer = world.ref<{ manifest: string; digest: string }>(cataloguePilotPointerKey)!;
+  const manifest = JSON.parse(world.r2.get(pointer.manifest)!);
+  assertEquals(Object.keys(manifest.artists), [String(DEAN.discogsID)]);
+
+  // A bundle that no longer reads as its digest is left out, not served.
+  const ref = world.ref<CatalogueRef>(catalogueRefKey(DEAN.discogsID))!;
+  world.r2.set(ref.key, "{}");
+  assertEquals((await publishCataloguePilot(world.deps(), pilot)).missing, [4978, DEAN.discogsID].sort((a, b) => a - b));
 });

@@ -24,7 +24,10 @@ import {
 } from "../_shared/discogs.ts";
 import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
-import { buildArtistBundle, discoverDiscography, readArtistJob, settleBatches } from "../_shared/knowledge.ts";
+import {
+  buildArtistBundle, buildCatalogueBundle, discoverDiscography, publishCataloguePilot, readArtistJob, settleBatches,
+} from "../_shared/knowledge.ts";
+import { CATALOGUE_PILOT } from "../_shared/catalogue_pilot.ts";
 import { liveKnowledgeDeps } from "../_shared/knowledge_live.ts";
 import { linkDiscogsIdentity, liveIdentityDeps } from "../_shared/identity.ts";
 import {
@@ -495,6 +498,26 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
         liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload),
       );
       console.log("knowledge_build", job.dedupe_key, JSON.stringify(result).slice(0, 600));
+      return;
+    }
+
+    // The DIG catalogue pilot: bundles from the catalogue's own documents for
+    // the 300 approved artists only (catalogue_pilot.ts), then the one
+    // manifest a device reads. Nothing here touches For You's references or
+    // any published generation.
+    case "build_catalogue_bundle": {
+      const result = await buildCatalogueBundle(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload), CATALOGUE_PILOT,
+      );
+      console.log("catalogue_build", job.dedupe_key, JSON.stringify(result).slice(0, 400));
+      return;
+    }
+
+    case "publish_catalogue_pilot": {
+      const result = await publishCataloguePilot(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), CATALOGUE_PILOT,
+      );
+      console.log("catalogue_pilot", JSON.stringify(result).slice(0, 600));
       return;
     }
 

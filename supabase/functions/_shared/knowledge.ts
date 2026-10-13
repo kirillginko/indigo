@@ -458,3 +458,106 @@ export async function settleBatches(
   }
   return queued;
 }
+
+// MARK: - Catalogue bundles (the DIG pilot)
+
+// An artist's bundle from the documents the catalogue already files under
+// them -- no discography, no Discogs request -- for the dead-end artists DIG
+// otherwise has nothing to offer (DIG-REMEDIATION-PLAN.md §7 step 3). Kept
+// apart from For You's knowledge: the bundle itself is addressed like every
+// other (an object under a digest never changes), but its reference lives
+// under `catalogue/`, which neither For You nor the generation publisher
+// reads, and only the approved pilot artists are ever built.
+
+export const CATALOGUE_ROOT = `${KNOWLEDGE_ROOT}/catalogue`;
+export const catalogueRefKey = (id: number) => `${CATALOGUE_ROOT}/refs/artists/${id}.json`;
+export const cataloguePilotPointerKey = `${CATALOGUE_ROOT}/pilot.json`;
+
+export interface CatalogueRef {
+  format: "indigo.catalogue-ref/1";
+  artist: number;
+  digest: string;
+  key: string;
+  bytes: number;
+  documents: number;
+  missing: number;
+  builtAt: string;
+}
+
+/// The bundle a catalogue build makes, from documents already read. Pure, so
+/// a check outside the worker can build the same bytes from the same
+/// documents (Scripts/catalogue-pilot.ts).
+export function catalogueBundle(
+  artist: { discogsID: number; name: string }, docs: DiscogsReleaseDoc[], asked: number, truncated: number,
+) {
+  const source: BundleSource = {
+    identity: "backend", discography: null, complete: false, truncated: truncated > 0,
+    totalReported: null, pagesReported: null, pagesFetched: 0, entries: 0, representativeReleases: 0,
+    documentsRead: docs.length, documentsMissing: asked - docs.length, documentsTruncated: truncated,
+  };
+  return deriveArtistBundle({ artist, shelf: null, releases: docs, source });
+}
+
+export async function buildCatalogueBundle(
+  base: KnowledgeDeps, job: { discogsID: number; name: string }, pilot: ReadonlyMap<number, string>,
+): Promise<{ status: "unchanged" | "published"; ref: CatalogueRef }> {
+  if (!pilot.has(job.discogsID)) throw new Error(`catalogue: ${job.discogsID} is not in the pilot`);
+  const { deps } = counting(base);
+  const own = [...new Set(await deps.ownCachedReleases(job.discogsID))].sort((a, b) => a - b);
+  const toRead = own.slice(0, MAX_DOCUMENTS);
+  const docs: DiscogsReleaseDoc[] = [];
+  for (let i = 0; i < toRead.length; i += READ_CONCURRENCY) {
+    const read = await Promise.all(toRead.slice(i, i + READ_CONCURRENCY).map(async (id) => {
+      const body = await deps.getObject(releaseDocumentKey(id));
+      if (body === null) return null;
+      try {
+        return JSON.parse(body) as DiscogsReleaseDoc;
+      } catch {
+        return null;
+      }
+    }));
+    for (const doc of read) if (doc) docs.push(doc);
+  }
+  const bundle = catalogueBundle({ discogsID: job.discogsID, name: pilot.get(job.discogsID)! }, docs, toRead.length, own.length - toRead.length);
+  const body = canonicalJSON(bundle);
+  const digest = await sha256(body);
+  const current = await readJSON<CatalogueRef>(deps, catalogueRefKey(job.discogsID));
+  if (current?.digest === digest) return { status: "unchanged", ref: current };
+  const stored = await putAddressed(deps, "bundles", body);
+  if (stored.key !== bundleKey(digest)) throw new Error(`catalogue: ${stored.key} is not the bundle key`);
+  const ref: CatalogueRef = {
+    format: "indigo.catalogue-ref/1", artist: job.discogsID, digest, key: stored.key,
+    bytes: new TextEncoder().encode(body).length, documents: docs.length, missing: toRead.length - docs.length,
+    builtAt: deps.now().toISOString(),
+  };
+  await put(deps, catalogueRefKey(job.discogsID), canonicalJSON(ref));
+  return { status: "published", ref };
+}
+
+/// The pilot as one object a device reads: every pilot artist whose bundle
+/// exists and reads back as its digest, by Discogs id. Addressed, with a small
+/// pointer to it. Artists without a sound bundle are listed as missing, never
+/// filled in.
+export async function publishCataloguePilot(
+  base: KnowledgeDeps, pilot: ReadonlyMap<number, string>,
+): Promise<{ key: string; digest: string; artists: number; missing: number[] }> {
+  const { deps } = counting(base);
+  const artists: Record<string, { digest: string; key: string; bytes: number }> = {};
+  const missing: number[] = [];
+  for (const id of [...pilot.keys()].sort((a, b) => a - b)) {
+    const ref = await readJSON<CatalogueRef>(deps, catalogueRefKey(id));
+    const body = ref ? await deps.getObject(ref.key) : null;
+    if (!ref || body === null || (await sha256(body)) !== ref.digest) {
+      missing.push(id);
+      continue;
+    }
+    artists[String(id)] = { digest: ref.digest, key: ref.key, bytes: ref.bytes };
+  }
+  const manifest = canonicalJSON({ format: "indigo.catalogue-pilot/1", artists, missing });
+  const stored = await putAddressed(deps, "catalogue/manifests", manifest);
+  await put(deps, cataloguePilotPointerKey, canonicalJSON({
+    format: "indigo.catalogue-pointer/1", manifest: stored.key, digest: stored.digest,
+    artists: Object.keys(artists).length, missing: missing.length, publishedAt: deps.now().toISOString(),
+  }));
+  return { key: stored.key, digest: stored.digest, artists: Object.keys(artists).length, missing };
+}
