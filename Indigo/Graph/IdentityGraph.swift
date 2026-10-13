@@ -189,6 +189,40 @@ nonisolated final class IdentityGraph {
                 if edge.to.kind == .artist { keys[edge.to.id, default: []].insert(raw.to.key) }
             }
         }
+        // The catalogue pilot's bundle for this entry, when the pilot is on
+        // and the page read it (`CataloguePilot`): routes from the documents
+        // the catalogue already holds, each to an entry by its Discogs id.
+        // Added to the walk, never stored; off, nothing here runs.
+        if node.kind == .artist, let id = entry ?? node.discogsID, let bundle = CataloguePilot.shared.bundle(for: id) {
+            let present = Set(set.all.map(\.to.id))
+            for raw in measure("walk.pilot", { BundleEdges.edges(from: canonical, bundle: bundle, ownIdentities: [id], sqlTargets: present) }) {
+                // Placed by the id the document's credit names -- the evidence
+                // a kept credit is (`provenance: .credit`) -- rather than asked
+                // of this device, which holds none of these documents' credits.
+                // A namesake under another id stays another node.
+                // No entry, or one of Discogs' stand-ins for nobody in particular,
+                // is no route: never a name-only row from a bundle.
+                if raw.to.kind == .artist {
+                    guard let target = raw.to.discogsID, target > 0,
+                          !CataloguePilot.standIns.contains(target) else { continue }
+                }
+                var edge = raw
+                if raw.to.kind == .artist, let target = raw.to.discogsID {
+                    var placed = MusicNode(kind: .artist, key: GraphIdentityKey.discogs(target).nodeKey, title: raw.to.title)
+                    placed.discogsID = target
+                    edge = MusicEdge(from: canonical, to: placed, kind: raw.kind, source: raw.source,
+                                     reason: raw.reason, confidence: raw.confidence, occurrences: raw.occurrences)
+                }
+                guard !own.contains(edge.to.id) else { continue }
+                if raw.to.kind == .artist {
+                    dependencies.names.insert(raw.to.key)
+                    dependencies.entries.formUnion([raw.to.discogsID, edge.to.discogsID].compactMap { $0 })
+                }
+                set.insert(MusicEdge(from: canonical, to: edge.to, kind: edge.kind, source: edge.source,
+                                     reason: edge.reason, confidence: edge.confidence, occurrences: edge.occurrences))
+                if edge.to.kind == .artist { keys[edge.to.id, default: []].insert(raw.to.key) }
+            }
+        }
         for identity in set.all.map(\.to) where identity.kind == .artist {
             guard let id = identity.discogsID, GraphIdentityKey(nodeKey: identity.key) != nil else { continue }
             keys[identity.id, default: []].formUnion(measure("walk.names") { names(of: id, title: identity.title) }.map(RecordingKey.normalizeArtist))

@@ -470,7 +470,15 @@ final class DigStore {
         let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
         let key = Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID)
         let asked = revision
-        if let fresh = profiles.fresh(key, revision: asked) { return fresh }
+        // The catalogue pilot's bundle, read before the walk so the walk can
+        // use it (development only; see `CataloguePilot`). One read the first
+        // time, and a walk again then, past an answer kept from before it.
+        var pilotArrived = false
+        if CataloguePilot.shared.isEnabled,
+           let entry = discogsID ?? artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID)).identity.discogsID {
+            pilotArrived = await CataloguePilot.shared.ensure(entry) == .fetched
+        }
+        if !pilotArrived, let fresh = profiles.fresh(key, revision: asked) { return fresh }
 
         if let running = walking[key] {
             Trace.step("graph.join", key) {}
