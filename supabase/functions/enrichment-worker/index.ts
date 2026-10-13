@@ -31,7 +31,9 @@ import {
   moveInlinePayloadsToR2,
   moveReleasePayloadsToR2,
   offloadReleasePayloads,
+  reserveR2,
 } from "../_shared/release_cache.ts";
+import { putObject, r2Config } from "../_shared/r2.ts";
 
 interface Job {
   id: string;
@@ -390,17 +392,34 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       console.log("artist_portrait", artistId, choice.kind,
         choice.kind === "found" ? `${choice.via} ${choice.discogsID}` : choice.kind === "ambiguous" ? choice.candidates.join(",") : "");
 
-      // Recorded either way. An artist Discogs has no picture of -- or several
-      // namesakes and no way to tell which -- is a finding, and writing it
-      // down is what stops the queue asking again next week, the same bargain
-      // `fetch_artist_origin` makes above. A withheld portrait is a miss: a
-      // stranger's face is worse than none.
+      // A dry run (DIG-REMEDIATION-PLAN.md §9) says what the rule would do
+      // and records nothing: the choice is written to a small diagnostic
+      // object in R2, beside what the row shows today.
+      if (job.payload?.dry_run === true) {
+        const r2 = r2Config();
+        if (!r2) throw new Error("dry run: R2 is not configured");
+        const body = JSON.stringify({ artist_id: artistId, name, discogs_ids: discogsIDs, choice, at: new Date().toISOString() });
+        await reserveR2(supabase, 1, body.length);
+        await putObject(r2, `diagnostics/portrait-dry-run/${artistId}.json`, body, "application/json", "no-store");
+        return;
+      }
+
+      // Recorded either way, with how it was chosen (0081): `verified` (the
+      // row's own Discogs artist), `unresolved` (no identity; the only Discogs
+      // artist with the name -- shown, never promoted to an identity),
+      // `withheld` (namesakes and no identity -- no face rather than a
+      // stranger's). An artist Discogs has no picture of is a miss with no
+      // state. Writing each down is what stops the queue asking again next
+      // week, the same bargain `fetch_artist_origin` makes above.
       const found = choice.kind === "found" ? choice : null;
       const { error } = await supabase.rpc("record_artist_portrait", {
         p_artist_id: artistId,
         p_url: found?.url ?? null,
         p_width: found?.width ?? null,
         p_height: found?.height ?? null,
+        p_state: found ? (found.via === "identity" ? "verified" : "unresolved")
+          : choice.kind === "ambiguous" ? "withheld" : null,
+        p_discogs_id: found?.discogsID ?? null,
       });
       if (error) throw new Error(error.message);
       return;
