@@ -338,3 +338,59 @@ until a separate switch.
 - **Radio-only artists with no identity** (90,454 rows): indexing helps only
   once a radio name is identified; identity work (MusicBrainz links, the
   verified-variation rule from 0076) is its own track.
+
+---
+
+## 9. Portraits: implementation status and what needs approval (2026-10-13)
+
+**Where every artist portrait comes from.** One writer: the worker's
+`fetch_artist_portrait` job (`record_artist_portrait`), which searched Discogs
+by **name** and kept the first match; `merge_artist_halves` only moves a
+portrait between rows it merges. So the 121 wrong, 962 ambiguous and 30,409
+unverified portraits were all chosen by that rule — none by identity.
+
+**The rule, rewritten (committed, not deployed):** `chooseArtistPortrait`
+(`discogs.ts`), used by the worker job:
+
+- The row's Discogs identity, best first — its own `discogs` id, then any
+  `musicbrainz_discogs` — fetches **that artist's own document**
+  (`/artists/{id}`, primary image, 150-pixel cut). No search; no namesake can
+  answer.
+- No identity: a search (25 results) is accepted only when **exactly one**
+  Discogs artist carries the name (Discogs' "(2)" stripped, names folded).
+  Several → **withheld**, recorded as a miss, so DIG shows no portrait rather
+  than a stranger's. None → a miss, as before.
+- A refusal (429) is retried, never recorded as "no picture".
+- Tests: identity wins without a search; namesakes withheld; unique name
+  accepted; spacer, empty document and unknown id are misses; 429 retried
+  (`discogs_test.ts`, 5 new).
+
+**The app has the same rule on its side.** `DigWorker.fillPortrait` falls
+back to `artistThumbnail(named:)` — one search, first match — and the
+device's `ArtistPortrait` cache is keyed by **name**; `adopt` copies the
+backend's portraits in by name and never clears one. So a wrong portrait
+already cached on a device stays even after the backend corrects it. Fixing
+DIG needs both halves.
+
+**Proposed, for approval (each step changes what DIG shows, as intended):**
+
+1. **Deploy** the worker with the new rule. From then on every new portrait
+   is chosen by identity or by a unique name.
+2. **The 121 wrong**: enqueue `fetch_artist_portrait` for exactly those rows
+   (`wrong-portraits-2026-10-12.json`) straight after the deploy. Each has a
+   Discogs id, so each gets its own artist's picture, or a recorded miss —
+   the wrong face is gone either way.
+3. **The 962 ambiguous**: a dry run first — the same rule, run by the worker
+   with a `dry_run` flag that logs the choice and records nothing — so we see
+   how many the new rule keeps (a name only one Discogs artist carries),
+   withholds (several), or finds nothing for, before any portrait is touched.
+   Then re-run for real only those the dry run would change, after review.
+4. **The app** (Local store only, not CloudKit; a schema change only if a
+   field is added — not needed): `fillPortrait` uses the same rule — the
+   resolved Discogs id when the row has one, otherwise a name only one
+   Discogs artist carries; `adopt` also applies the backend's misses (so a
+   withheld portrait clears the cached one), and portraits cached by the
+   old name-only search are re-checked once.
+5. The 30,409 unverified stay until their rows gain an identity or are
+   re-asked; the new rule governs every future fetch.
+
