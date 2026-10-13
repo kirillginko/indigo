@@ -92,6 +92,27 @@ nonisolated struct ArtworkRepository: Sendable {
             .value
     }
 
+    /// Which names' portrait answers changed after a watermark (0083), the
+    /// watermark being whatever the last answer's `until` was. Sends no names.
+    struct PortraitChanges: Decodable, Sendable {
+        let names: [String]
+        let until: String
+        let more: Bool
+    }
+
+    private struct ChangesParams: Encodable {
+        let pSince: String
+        enum CodingKeys: String, CodingKey { case pSince = "p_since" }
+    }
+
+    func portraitChanges(since: String) async throws -> PortraitChanges {
+        let client = try SupabaseService.requireClient()
+        return try await client
+            .rpc("portrait_changes_since", params: ChangesParams(pSince: since))
+            .execute()
+            .value
+    }
+
     func artwork(for entityType: Catalog.EntityType, id entityID: UUID) async throws -> Catalog.Artwork? {
         let client = try SupabaseService.requireClient()
         let rows: [Catalog.Artwork] = try await client

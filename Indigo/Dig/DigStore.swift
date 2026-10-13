@@ -944,6 +944,8 @@ final class DigStore {
         // Once: faces cached by the old first-match rule, checked against the
         // catalogue's portrait states (0081).
         await revalidateCachedPortraits()
+        // Then, every launch, only what the catalogue changed since (0083).
+        await followPortraitChanges()
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -1242,7 +1244,20 @@ final class DigStore {
     /// old first-match rule cached here are withheld or replaced. Names are
     /// otherwise only asked about while they have no picture at all, so
     /// without this a wrong one would stay for good.
-    private static let revalidatedKey = "portraitStates.revalidated.v1"
+    ///
+    /// v2: again after 0082, which began answering "no face" for the artists
+    /// whose own entry has no picture -- 25 corrected faces a v1 pass kept.
+    private static let revalidatedKey = "portraitStates.revalidated.v2"
+
+    /// Where the change feed (0083) was last read up to.
+    private static let changesSinceKey = "portraitStates.changesSince"
+
+    /// Which names' portrait answers changed after a watermark. A property so
+    /// a test can stand in for the backend.
+    @ObservationIgnored var portraitChanges: @Sendable (String) async -> ArtworkRepository.PortraitChanges? = { since in
+        guard SupabaseService.isConfigured else { return nil }
+        return try? await ArtworkRepository.shared.portraitChanges(since: since)
+    }
 
     /// Where "done" is remembered. Never the app's own defaults under XCTest:
     /// the test host is the app, and a test run would otherwise tell the real
@@ -1269,6 +1284,51 @@ final class DigStore {
         artworkRevision &+= 1
         Trace.step("portraits.revalidated", "names=\(names.count)") {}
         portraitDefaults.set(true, forKey: Self.revalidatedKey)
+    }
+
+    /// After that, only what changed: once a launch, the names whose answer
+    /// the catalogue changed since this device last asked -- a face withheld,
+    /// replaced, or found when an artist's identity changed (0083) -- and of
+    /// those, only the ones this device holds a face for. Nothing is asked on
+    /// a page visit, and a launch with nothing changed is one small request.
+    func followPortraitChanges(batch: Int = cataloguePortraitBatch, pages: Int = 5) async {
+        guard let since = portraitDefaults.string(forKey: Self.changesSinceKey) else {
+            // First run: the full pass just covered everything. Started a few
+            // minutes back, so a clock running ahead loses nothing.
+            portraitDefaults.set(ISO8601DateFormatter().string(from: Date().addingTimeInterval(-600)), forKey: Self.changesSinceKey)
+            return
+        }
+        var watermark = since
+        var held: [String: String]?
+        var reread = 0
+        for _ in 0..<pages {
+            guard let changes = await portraitChanges(watermark) else { return }
+            if !changes.names.isEmpty {
+                if held == nil {
+                    var byKey: [String: String] = [:]
+                    for name in await worker.namesWithPortraits() {
+                        let key = RecordingKey.normalize(name)
+                        if !key.isEmpty, byKey[key] == nil { byKey[key] = name }
+                    }
+                    held = byKey
+                }
+                let asked = (held ?? [:]).filter { Set(changes.names).contains($0.key) }
+                let keys = Array(asked.keys)
+                var done = 0
+                while done < keys.count {
+                    let part = Dictionary(uniqueKeysWithValues: keys[done..<min(done + batch, keys.count)].map { ($0, asked[$0]!) })
+                    done += batch
+                    let found = await cataloguePortraits(Array(part.keys))
+                    await apply(found, asked: part, onScreen: false)
+                }
+                reread += keys.count
+            }
+            watermark = changes.until
+            portraitDefaults.set(watermark, forKey: Self.changesSinceKey)
+            guard changes.more else { break }
+        }
+        if reread > 0 { artworkRevision &+= 1 }
+        Trace.step("portraits.changes", "reread=\(reread)") {}
     }
 
     /// Whether this name still owes a picture.

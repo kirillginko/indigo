@@ -133,3 +133,4 @@ run -v root="$ROOT" -f "$ROOT/supabase/tests/identity_corrections_smoke.sql" | s
 run -f "$ROOT/supabase/tests/radio_adjacency_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/job_retention_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/portrait_state_smoke.sql" | sed 's/^/    /'
+run -f "$ROOT/supabase/tests/portrait_follows_identity_smoke.sql" | sed 's/^/    /'

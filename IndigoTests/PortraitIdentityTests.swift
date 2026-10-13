@@ -46,6 +46,8 @@ private final class PortraitAsks: @unchecked Sendable {
     private var asks: [[String]] = []
     func record(_ keys: [String]) { lock.withLock { asks.append(keys) } }
     var count: Int { lock.withLock { asks.count } }
+    var keys: [[String]] { lock.withLock { asks } }
+    var last: [String]? { lock.withLock { asks.last } }
 }
 
 @MainActor
@@ -250,5 +252,40 @@ final class PortraitIdentityTests: XCTestCase {
         for _ in 0..<300 where dig.portraitURL(for: "Tom Zé") == nil { try await Task.sleep(for: .milliseconds(10)) }
         XCTAssertEqual(dig.portraitURL(for: "Tom Zé", discogsID: 465904)?.absoluteString, Faces.tomZe)
         XCTAssertNil(dig.portraitURL(for: "Tom Zé", discogsID: 999))
+    }
+
+    // MARK: Following the catalogue's changes (0083)
+
+    func testOnlyCachedNamesTheCatalogueChangedAreAskedAgain() async throws {
+        cache("Logic", "https://img.test/logic-old.jpg")
+        cache("Untouched", "https://img.test/untouched.jpg")
+        let dig = store()
+        let asked = PortraitAsks()
+        let feeds = PortraitAsks()
+        dig.cataloguePortraits = { keys in
+            asked.record(keys)
+            return ["logic": .init(state: "withheld")]
+        }
+        dig.portraitChanges = { since in
+            feeds.record([since])
+            return .init(names: ["logic", "somebody-not-cached"], until: "2026-10-13T16:00:00Z", more: false)
+        }
+
+        // The first run starts the watermark and asks nothing: the full pass covered it.
+        await dig.followPortraitChanges()
+        XCTAssertEqual(feeds.count, 0)
+        XCTAssertEqual(asked.count, 0)
+
+        await dig.followPortraitChanges()
+        XCTAssertEqual(feeds.count, 1)
+        XCTAssertEqual(asked.keys, [["logic"]], "Only the cached name the feed named")
+        XCTAssertNil(dig.portraitURL(for: "Logic"), "Withheld since: its face is dropped")
+        let untouchedKey = RecordingKey.normalizeArtist("Untouched")
+        XCTAssertEqual(try ModelContext(container).fetch(FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == untouchedKey })).first?.imageURLString,
+                       "https://img.test/untouched.jpg")
+
+        // The next launch starts where the answer ended.
+        await dig.followPortraitChanges()
+        XCTAssertEqual(feeds.last, ["2026-10-13T16:00:00Z"])
     }
 }
