@@ -284,3 +284,109 @@ track_index)` and `(radio_episode_id, track_index) include (artist_id)` —
 would make the derivation index-only and remove most of the cold cost on the
 busiest pages, for ~8 MiB. It does not fit before B2.
 
+## 7. B2 pre-execution checks (2026-10-13) — not executed
+
+`pgstattuple` installed (0080; +8 kB; revoked from anon and authenticated).
+
+### Density, measured
+
+| | Now | Measured |
+|---|---|---|
+| Heap | 73.9 MiB | 95.5% live tuples, 0.68% free, 193 B per row of which `metadata` 52.4 B |
+| Primary key | 13.9 | leaf density 75%, fragmentation 50% |
+| `edge_idx` | 39.0 | leaf density 73%, fragmentation 50% |
+| `to_idx` | 8.8 | leaf density 84%, fragmentation 50% |
+
+### Dropping the primary key: what depends on it
+
+- **Foreign keys**: none reference `music_relationships`.
+- **Constraints**: three CHECKs and the primary key; nothing else uses it.
+- **Replication**: the table is in no publication (`supabase_realtime` is
+  not all-tables); replica identity `default` has no effect.
+- **Upserts**: the rebuild's `on conflict do nothing` uses `edge_idx`
+  (unique), recreated in step 7; no writer runs in the window.
+- **Writers**: exactly two functions write the table —
+  `rebuild_radio_dig_edges` (cron `indigo-rebuild-edges`, job 6, `23 */3 * * *`)
+  and `merge_artist_halves` via `merge_split_artists` (cron
+  `indigo-merge-split-artists`, job 34, `23 4 * * *`). The worker's
+  `rebuild_dig_edges` job type was retired by 0068: no function enqueues it
+  (one old failed row remains). Both cron jobs are owned by `postgres`, and
+  `cron.alter_job(…, active := false)` (pg_cron 1.6.4) pauses them
+  reversibly.
+- **App code**: nothing reads or writes the table directly; it reads through
+  `artist_radio_relations` and `dig_radio_for_artists`. On any error, the DIG
+  artist page's radio block shows nothing (the rest of the page is local and
+  already drawn) and DIG's radio block is empty (`try?`); both load again on
+  the next open.
+
+### Rehearsal (`Scripts/b2-rehearsal.sh`, output in `b2/rehearsal-2026-10-13.txt`)
+
+A throwaway Postgres 17 built from every migration, with the live table
+restored from the backup:
+
+- **Backup** (`Scripts/b2-export.py`): all **383,066 rows, every column**
+  (metadata and timestamps included), in 16 slices with row counts and md5s
+  taken in the same statement, plus the table definition (columns,
+  defaults, constraints, indexes, trigger, RLS policy, grants). Exported in
+  71 s, 105 MB, kept outside git (`backups/`, excluded locally).
+- **Restore**: all 16 slices match live exactly — rows and md5.
+- **Sequence**, exactly as the runbook: delete 196,044 single adjacencies;
+  drop `to_idx`, `edge_idx` and the primary key; one `alter … using`
+  rewrite; recreate primary key, `edge_idx` (unique), `to_idx`; analyze.
+
+| Step | Time (local) | Database |
+|---|---|---|
+| Start | | 147.6 (table 138.3) |
+| Checksums | 209 ms | 147.6 |
+| Delete | 121 ms | 147.6 |
+| Drop three indexes | 29 ms | 86.7 |
+| Rewrite | 263 ms | 37.8 |
+| Primary key | 84 ms | 43.5 |
+| `edge_idx` | 191 ms | 58.9 |
+| `to_idx` | 160 ms | 60.6 |
+
+- **Peak = the starting size.** Sampled every 50 ms, the database never
+  exceeded where it began: the drops free 61 MiB before the rewrite needs
+  its 28.5 MiB copy.
+- **After**: table 138.3 → **51.3 MiB** (heap 28.5, `edge_idx` 15.4,
+  primary key 5.6, `to_idx` 1.7). Saved **87.0 MiB**.
+- **Integrity**: kept rows identical (id, endpoints, type, count,
+  confidence, `updated_at`, source); episode counts carried over from the
+  document for the 352,221 rows still holding them there; no stored single
+  adjacency or metadata left; primary key, unique `edge_idx`, trigger and RLS
+  present; the rebuild runs afterwards.
+- **Rollback**: the 196,044 deleted rows restored from the backup in 3.9 s,
+  every id back.
+
+### Projection for live
+
+| | MiB |
+|---|---|
+| Start (2026-10-13) | 496.8 |
+| Peak | **496.8** (no step grows the database past its start; highest point after the drops: ~464) |
+| After | **≈ 410** (−87) |
+
+Local times will not hold on Supabase's shared CPU; allowing 10–20× the
+whole sequence is ~10–20 s, of which the rewrite (the only step that blocks
+reads) is ~3–5 s.
+
+### Quota and abort thresholds
+
+The quota is the size of the one database (`postgres`): `pg_database_size`
+= 496.8 MiB. It has stood above 500 million bytes without the project going
+read-only, so the limit is 500 MiB. The dashboard's own figure should be
+read once before the window (it is not visible from here).
+
+- **Before step 4**: database ≤ 498.0 MiB; both cron jobs inactive; neither
+  running (`cron.job_run_details`); no `rebuild_dig_edges` job pending; a
+  fresh export taken in the window and verified slice by slice; not within
+  10 minutes of :23 past a third hour or of 04:23 UTC. Otherwise stop.
+- **After step 5**: the database must have dropped by ≥ 55 MiB. Otherwise
+  stop: recreate the indexes (nothing is lost), resume cron.
+- **Step 6** is one transaction; if it fails, nothing changed: recreate the
+  indexes, resume.
+- **After step 7**: every integrity check must pass. If not: keep cron
+  paused, restore the deleted rows from the export (rehearsed), investigate.
+- **Final**: expected ≈ 410 MiB; above 420 means something else grew —
+  investigate before resuming.
+

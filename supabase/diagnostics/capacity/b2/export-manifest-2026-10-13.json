@@ -1,0 +1,241 @@
+{
+ "table": "public.music_relationships",
+ "columns": "id, from_entity_type, from_entity_id, to_entity_type, to_entity_id, relationship_type, confidence, source, created_at, updated_at, evidence_count, metadata, episode_count",
+ "slices": [
+  {
+   "slice": "0",
+   "rows": 24100,
+   "md5": "48a5abee34c8b12ce0ab4f25a30d47b3",
+   "file": "music_relationships-0.json"
+  },
+  {
+   "slice": "1",
+   "rows": 24157,
+   "md5": "1a53cbfec21bb96e502121f99e161192",
+   "file": "music_relationships-1.json"
+  },
+  {
+   "slice": "2",
+   "rows": 23839,
+   "md5": "5421e7b9e52a8e89948ef0880597566f",
+   "file": "music_relationships-2.json"
+  },
+  {
+   "slice": "3",
+   "rows": 23907,
+   "md5": "9df35e09ae8d275c7458d19f8eecc775",
+   "file": "music_relationships-3.json"
+  },
+  {
+   "slice": "4",
+   "rows": 23943,
+   "md5": "afaadd5f5c9b5bb087f97f2f5698a690",
+   "file": "music_relationships-4.json"
+  },
+  {
+   "slice": "5",
+   "rows": 24019,
+   "md5": "ae50cb0c33bb176bf86882d3a872a4f4",
+   "file": "music_relationships-5.json"
+  },
+  {
+   "slice": "6",
+   "rows": 24087,
+   "md5": "09dcb7c88e84c794d2baf9d93217c0f9",
+   "file": "music_relationships-6.json"
+  },
+  {
+   "slice": "7",
+   "rows": 23688,
+   "md5": "92898cad6b141aa8099c760a991f26a4",
+   "file": "music_relationships-7.json"
+  },
+  {
+   "slice": "8",
+   "rows": 23947,
+   "md5": "72184d7eb1d7356470a223ed6f18445f",
+   "file": "music_relationships-8.json"
+  },
+  {
+   "slice": "9",
+   "rows": 23914,
+   "md5": "eec65c47a0725e6ee34675c3100b9929",
+   "file": "music_relationships-9.json"
+  },
+  {
+   "slice": "a",
+   "rows": 23975,
+   "md5": "c5a1a018248b088dd20a38f19fa3b2c0",
+   "file": "music_relationships-a.json"
+  },
+  {
+   "slice": "b",
+   "rows": 23967,
+   "md5": "8d02ca8069a3f5fa7b4e2e39219faf77",
+   "file": "music_relationships-b.json"
+  },
+  {
+   "slice": "c",
+   "rows": 23949,
+   "md5": "fa290b9c687cf20bd93b980ddbc011b3",
+   "file": "music_relationships-c.json"
+  },
+  {
+   "slice": "d",
+   "rows": 24050,
+   "md5": "05098e0904674a3af4d6152d2403d14d",
+   "file": "music_relationships-d.json"
+  },
+  {
+   "slice": "e",
+   "rows": 23890,
+   "md5": "4552aa9102fc65a20a841349672954ba",
+   "file": "music_relationships-e.json"
+  },
+  {
+   "slice": "f",
+   "rows": 23634,
+   "md5": "0cd795d066d804b245e9afc531b92ee3",
+   "file": "music_relationships-f.json"
+  }
+ ],
+ "definition": {
+  "columns": [
+   {
+    "default": "gen_random_uuid()",
+    "name": "id",
+    "not_null": true,
+    "type": "uuid"
+   },
+   {
+    "default": null,
+    "name": "from_entity_type",
+    "not_null": true,
+    "type": "text"
+   },
+   {
+    "default": null,
+    "name": "from_entity_id",
+    "not_null": true,
+    "type": "uuid"
+   },
+   {
+    "default": null,
+    "name": "to_entity_type",
+    "not_null": true,
+    "type": "text"
+   },
+   {
+    "default": null,
+    "name": "to_entity_id",
+    "not_null": true,
+    "type": "uuid"
+   },
+   {
+    "default": null,
+    "name": "relationship_type",
+    "not_null": true,
+    "type": "text"
+   },
+   {
+    "default": null,
+    "name": "confidence",
+    "not_null": false,
+    "type": "double precision"
+   },
+   {
+    "default": null,
+    "name": "source",
+    "not_null": false,
+    "type": "text"
+   },
+   {
+    "default": "now()",
+    "name": "created_at",
+    "not_null": true,
+    "type": "timestamp with time zone"
+   },
+   {
+    "default": "now()",
+    "name": "updated_at",
+    "not_null": true,
+    "type": "timestamp with time zone"
+   },
+   {
+    "default": "1",
+    "name": "evidence_count",
+    "not_null": true,
+    "type": "integer"
+   },
+   {
+    "default": null,
+    "name": "metadata",
+    "not_null": false,
+    "type": "jsonb"
+   },
+   {
+    "default": null,
+    "name": "episode_count",
+    "not_null": false,
+    "type": "smallint"
+   }
+  ],
+  "constraints": [
+   "CHECK (((confidence IS NULL) OR ((confidence >= (0)::double precision) AND (confidence <= (1)::double precision)))) -- music_relationships_confidence_check",
+   "CHECK ((from_entity_type = ANY (ARRAY['artist'::text, 'label'::text, 'release'::text, 'recording'::text, 'radio_show'::text, 'radio_episode'::text]))) -- music_relationships_from_type_check",
+   "PRIMARY KEY (id) -- music_relationships_pkey",
+   "CHECK ((to_entity_type = ANY (ARRAY['artist'::text, 'label'::text, 'release'::text, 'recording'::text, 'radio_show'::text, 'radio_episode'::text]))) -- music_relationships_to_type_check"
+  ],
+  "grants": [
+   "postgres:INSERT",
+   "postgres:SELECT",
+   "postgres:UPDATE",
+   "postgres:DELETE",
+   "postgres:TRUNCATE",
+   "postgres:REFERENCES",
+   "postgres:TRIGGER",
+   "anon:INSERT",
+   "anon:SELECT",
+   "anon:UPDATE",
+   "anon:DELETE",
+   "anon:TRUNCATE",
+   "anon:REFERENCES",
+   "anon:TRIGGER",
+   "authenticated:INSERT",
+   "authenticated:SELECT",
+   "authenticated:UPDATE",
+   "authenticated:DELETE",
+   "authenticated:TRUNCATE",
+   "authenticated:REFERENCES",
+   "authenticated:TRIGGER",
+   "service_role:INSERT",
+   "service_role:SELECT",
+   "service_role:UPDATE",
+   "service_role:DELETE",
+   "service_role:TRUNCATE",
+   "service_role:REFERENCES",
+   "service_role:TRIGGER"
+  ],
+  "indexes": [
+   "CREATE UNIQUE INDEX music_relationships_pkey ON public.music_relationships USING btree (id)",
+   "CREATE UNIQUE INDEX music_relationships_edge_idx ON public.music_relationships USING btree (from_entity_type, from_entity_id, to_entity_type, to_entity_id, relationship_type)",
+   "CREATE INDEX music_relationships_to_idx ON public.music_relationships USING btree (to_entity_type, to_entity_id, relationship_type)"
+  ],
+  "policies": [
+   {
+    "cmd": "SELECT",
+    "name": "music_relationships_read",
+    "qual": "true",
+    "roles": [
+     "anon",
+     "authenticated"
+    ]
+   }
+  ],
+  "rls": true,
+  "triggers": [
+   "CREATE TRIGGER music_relationships_touch_updated_at BEFORE UPDATE ON public.music_relationships FOR EACH ROW EXECUTE FUNCTION touch_updated_at()"
+  ]
+ },
+ "total_rows": 383066
+}
