@@ -780,9 +780,9 @@ final class DigStore {
     /// later would otherwise not show until the source node was walked again.
     /// Rewriting one column on the rows that name them is a great deal cheaper
     /// than rebuilding anybody's graph.
-    private func paint(_ name: String, with address: String) {
+    private func paint(_ name: String, with address: String, owner: Int? = nil) {
         StoredEdge.repaint(
-            artistKey: RecordingKey.normalizeArtist(name), with: address, in: context
+            artistKey: RecordingKey.normalizeArtist(name), with: address, owner: owner, in: context
         )
     }
 
@@ -1230,7 +1230,9 @@ final class DigStore {
             // the ones on screen. Not for the backlog: up to two hundred edge
             // rewrites on the main thread for rows nobody is looking at, which
             // read the portrait table when they are next drawn anyway.
-            if onScreen { paint(name, with: address) }
+            if onScreen {
+                paint(name, with: address, owner: portrait.state == "verified" ? portrait.discogsID : nil)
+            }
         }
         if onScreen || !withheld.isEmpty { saveContext() }
     }

@@ -21,6 +21,10 @@ enum Faces {
     static let director = "https://i.discogs.com/gF3UcIDXVLHrrOyr2NC1Eqc9SfLQ4TukYpInFcDDDok/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM5ODQ1/OS0xMjU2MzkxMzIy/LmpwZWc.jpeg"
     /// s3://discogs-database-images/A-823-1777548001-5282.jpeg -- Speedy J (Jochem Paap)
     static let speedyJ = "https://i.discogs.com/kmPB8IPC_2VvKewUf0uIhjUhha8OgPJ-NWIuQ9Z3Dko/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyMy0x/Nzc3NTQ4MDAxLTUy/ODIuanBlZw.jpeg"
+    /// s3://discogs-database-images/A-65619-001.jpg -- Tom Zé's own picture on
+    /// his entry, 465904; 65619 is an entry Discogs merged away, and the file
+    /// kept its path.
+    static let tomZe = "https://i.discogs.com/A3xw-7WhYaD9Q-OiJ5yOr_4uVuZg3c0UnVemgvgBqpg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTY1NjE5/LTAwMS5qcGc.jpeg"
     static let duo = "https://img.test/hype-williams-duo.jpg"
     static let prefuse = "https://img.test/prefuse-73.jpg"
 }
@@ -212,5 +216,39 @@ final class PortraitIdentityTests: XCTestCase {
         let before = asked.count
         await dig.revalidateCachedPortraits()
         XCTAssertEqual(asked.count, before)
+    }
+
+    // MARK: Merged entries
+
+    /// Discogs keeps an image's path when entries merge, so a verified picture
+    /// can name a retired id. Whose it is comes from the verification, not the
+    /// path: 4 of the 121 audited rows were this, and were never wrong.
+    func testAVerifiedFaceIsKeptWhenItsPathNamesAMergedEntry() async throws {
+        XCTAssertEqual(DiscogsClient.picturedArtist(in: Faces.tomZe), 65619)
+        func edge(to id: Int) -> StoredEdge {
+            var target = MusicNode.artist("Tom Zé")
+            target.discogsID = id
+            let row = StoredEdge(from: .artist("Os Mutantes"), edge: MusicEdge(
+                from: .artist("Os Mutantes"), to: target, kind: .collaborator,
+                source: .discogs, reason: "Recorded with", confidence: 0.9, occurrences: 1))
+            context.insert(row)
+            return row
+        }
+        let his = edge(to: 465904), namesake = edge(to: 999)
+        let key = RecordingKey.normalizeArtist("Tom Zé")
+
+        StoredEdge.repaint(artistKey: key, with: Faces.tomZe, in: context)
+        XCTAssertNil(his.toArtworkURLString, "Unverified, the path is all there is to go on")
+
+        StoredEdge.repaint(artistKey: key, with: Faces.tomZe, owner: 465904, in: context)
+        XCTAssertEqual(his.toArtworkURLString, Faces.tomZe, "Verified for 465904: his")
+        XCTAssertNil(namesake.toArtworkURLString, "And still nobody else's")
+
+        let dig = store()
+        dig.cataloguePortraits = { _ in [key: .init(state: "verified", url: Faces.tomZe, discogsID: 465904)] }
+        dig.wantPortraits(for: ["Tom Zé"])
+        for _ in 0..<300 where dig.portraitURL(for: "Tom Zé") == nil { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertEqual(dig.portraitURL(for: "Tom Zé", discogsID: 465904)?.absoluteString, Faces.tomZe)
+        XCTAssertNil(dig.portraitURL(for: "Tom Zé", discogsID: 999))
     }
 }

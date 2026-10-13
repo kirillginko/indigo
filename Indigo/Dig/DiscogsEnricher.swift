@@ -485,9 +485,8 @@ nonisolated struct DiscogsEnricher {
 
     /// Files the resolved artist's own picture as this name's portrait.
     ///
-    /// Portraits are filled in bulk by `artistThumbnail(named:)`, which is one
-    /// search and takes the first namesake it sees — cheap, and right until
-    /// two people share a name. EXPLORE draws from that cache, so a For You
+    /// Portraits used to be filled in bulk by one search that took the first
+    /// namesake it saw — cheap, and right until two people share a name. EXPLORE draws from that cache, so a For You
     /// page went on showing the video director's photograph beside a link
     /// that opened the duo's page: the artist row had been corrected and the
     /// portrait had not, and nothing ever asked it again because a portrait
@@ -515,9 +514,25 @@ nonisolated struct DiscogsEnricher {
         portrait.lookupFailed = false
         portrait.fetchedAt = Date()
 
+        // And under the artist's identity, which no namesake shares and which
+        // a lookup by id reads first (`ArtistPortrait.identityKey`).
+        if record.discogsID > 0 {
+            let identity = ArtistPortrait.identityKey(record.discogsID)
+            var byIdentity = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == identity })
+            byIdentity.fetchLimit = 1
+            let owned = (try? context.fetch(byIdentity))?.first ?? {
+                let fresh = ArtistPortrait(nameKey: identity, name: record.name)
+                context.insert(fresh)
+                return fresh
+            }()
+            owned.imageURLString = address
+            owned.lookupFailed = false
+            owned.fetchedAt = Date()
+        }
+
         // And everywhere it was already copied to. See `StoredEdge.repaint`.
         guard wasShowing != address else { return }
-        StoredEdge.repaint(artistKey: key, with: address, in: context)
+        StoredEdge.repaint(artistKey: key, with: address, owner: record.discogsID > 0 ? record.discogsID : nil, in: context)
 
         // EXPLORE writes its answer down, faces and all, so the copy on disk
         // is now a page of somebody who has been corrected. Thrown away

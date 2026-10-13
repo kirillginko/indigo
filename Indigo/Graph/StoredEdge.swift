@@ -134,7 +134,13 @@ nonisolated extension StoredEdge {
     /// Deliberately rewrites a picture that is merely *different*, not only a
     /// missing one. Filling the blanks is the ordinary case; replacing a face
     /// that turned out to belong to somebody else is why this is a function.
-    static func repaint(artistKey key: String, with address: String, in context: ModelContext) {
+    ///
+    /// `owner` is the Discogs artist the picture was verified for, when it
+    /// was: that settles whose it is. Without one, the picture's own address
+    /// says (`DiscogsClient.picturedArtist`) -- except that Discogs keeps an
+    /// image's original path when entries merge, so a verified picture can
+    /// name a retired id, and the address is only the fallback.
+    static func repaint(artistKey key: String, with address: String, owner: Int? = nil, in context: ModelContext) {
         guard !key.isEmpty else { return }
         let artist = MusicNodeKind.artist.rawValue
         let rows = (try? context.fetch(FetchDescriptor<StoredEdge>(predicate: #Predicate {
@@ -142,7 +148,7 @@ nonisolated extension StoredEdge {
         }))) ?? []
         // Not onto an edge that knows its artist is somebody else: a name is
         // shared by namesakes, and a picture of one is not a picture of all.
-        let pictured = DiscogsClient.picturedArtist(in: address)
+        let pictured = owner ?? DiscogsClient.picturedArtist(in: address)
         for row in rows {
             if let pictured, let own = row.toDiscogsID, own != pictured { continue }
             row.toArtworkURLString = address
