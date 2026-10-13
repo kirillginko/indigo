@@ -1,0 +1,24 @@
+{
+ "rows": 962,
+ "counts": {
+  "still ambiguous (namesakes, no identity)": 940,
+  "~ today's image potentially incorrect": 940,
+  "unique name, same face as today": 22
+ },
+ "examples": {
+  "still ambiguous (namesakes, no identity)": [
+   "NEZ (today 10043857) -> {'kind': 'ambiguous', 'candidates': [114799, 888391, 1135803, 1652654, 2041399, 3318416, 4332785, 5420940, 10043857]}",
+   "Odyssey (today 6021) -> {'kind': 'ambiguous', 'candidates': [2094, 6021, 50743, 94607, 130012, 147215, 211296, 356364, 836193, 1113383, 1370626, 2269375, 2552382, 2855242, 3173350]}",
+   "Gradient (today 1522070) -> {'kind': 'ambiguous', 'candidates': [169817, 1522070, 5957282, 14234647]}",
+   "Snow (today 72672) -> {'kind': 'ambiguous', 'candidates': [72672, 1600815, 3176602, 4749689]}",
+   "Kilbourne (today 4822586) -> {'kind': 'ambiguous', 'candidates': [1014907, 3264532, 4822586]}"
+  ],
+  "unique name, same face as today": [
+   "The Lyman Woodard Organization (today 344724) -> {'kind': 'found', 'url': 'https://i.discogs.com/pyj-85CU9SwjgUYZriIJdvNRLIvXCMRt_ukQy1SnvvQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM0NDcy/NC0xMjY5NDMzNzQ4/LmpwZWc.jpeg', 'discogsID': 344724, 'via': 'unique-name', 'width': None, 'height': None}",
+   "Mind State (today 413448) -> {'kind': 'found', 'url': 'https://i.discogs.com/l4uNlcqMx5vZsR6xi4wUDKH19TfwqffcBR-_6Awd1ys/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQxMzQ0/OC0xMTQ0OTQ0NTg3/LmpwZWc.jpeg', 'discogsID': 413448, 'via': 'unique-name', 'width': None, 'height': None}",
+   "I. JORDAN (today 12614969) -> {'kind': 'found', 'url': 'https://i.discogs.com/lILnX-PZgAQl6ppSqV_vdWQRJDXQTmJBQuKwiiIk_28/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEyNjE0/OTY5LTE3MjkwOTIx/MjctOTk4NS5qcGVn.jpeg', 'discogsID': 12614969, 'via': 'unique-name', 'width': None, 'height': None}",
+   "Hyd (today 9705610) -> {'kind': 'found', 'url': 'https://i.discogs.com/xJne14t2ghN6TSJaP8OVstKN58B6POWTXpby6lBcb_Y/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3MDU2/MTAtMTYzMjEwMDgz/My02ODY4LmpwZWc.jpeg', 'discogsID': 9705610, 'via': 'unique-name', 'width': None, 'height': None}",
+   "Kahn (today 2045151) -> {'kind': 'found', 'url': 'https://i.discogs.com/9Y16WvOfuDm9kaJ2N0y56wgDqRfwrSDxizY3NOXUUHk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTIwNDUx/NTEtMTM2NTE3NTEx/NC05NDgwLmpwZWc.jpeg', 'discogsID': 2045151, 'via': 'unique-name', 'width': None, 'height': None}"
+  ]
+ }
+}
