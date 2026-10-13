@@ -394,3 +394,37 @@ DIG needs both halves.
 5. The 30,409 unverified stay until their rows gain an identity or are
    re-asked; the new rule governs every future fetch.
 
+
+---
+
+## 10. Status, 2026-10-13: portraits done, catalogue pilot in DIG
+
+**Capacity: closed.** The scheduled rebuilds after B2 (03:23, 06:23, 09:23, 12:23 UTC) all succeeded in 18–20 s; single-play radio links still 0 rows; postgres 413 MiB, all databases 448 MB of 500 MB.
+
+**Portraits.**
+
+| | |
+|---|---|
+| 121 confirmed wrong | 91 now the artist's own verified picture; 25 removed (own entry has no picture, now answered "no face", 0082); 4 were never wrong (merged Discogs entries keep the old image path); 1 late, verified |
+| 6 more, found after | rows that gained an identity after the audit (Hype Williams the duo among them); re-fetched, verified |
+| 962 ambiguous (dry run, nothing published) | 940 namesakes with no identity; 22 a unique name showing the same face; 0 resolvable by a verified id |
+
+Invalidation is event-driven (0083): an identity added, moved or removed queues that artist's portrait once; devices read a change feed once a launch and re-read only the cached names it lists. App: identity-keyed portrait cache, no namesake's face on a row that knows its entry, the neutral placeholder otherwise.
+
+**Credit identity.** No V9: V8's kept credits already carry each credit's Discogs id, and DIG has walked them since 453d247.
+
+**Catalogue pilot.** 300 bundles built by the worker from the catalogue's own documents, published under `knowledge/v1/bundles` with references and one manifest under `knowledge/v1/catalogue/` (never For You's references, never a generation); 300/300 rebuild byte-for-byte from their documents (`Scripts/catalogue-pilot-verify.ts`). DIG reads them behind `-INDIGO_DIG_CATALOGUE_PILOT` (development builds only), never waiting on them.
+
+On real pages (30 of the 300, live; `pilot-pages-{mac,ios}-2026-10-13.json`):
+
+| | Mac | iOS simulator |
+|---|---|---|
+| pages offering a verified route, pilot off (store only) | 0/30 | 0/30 |
+| …pilot on | 28/30 | 26–27/30 (two 10 s simulator timeouts fell back to the page as it was) |
+| routes checked, each opening its own entry | 201, 0 wrong | 180, 0 wrong |
+| first paint | 27 ms | 4 ms |
+| bundle to routes: cold / disk / memory, p50 | 151 / 99 / 0 ms | 95 / 92 / 0 ms |
+
+The 2 pages with nothing are the pilot's remaining dead ends (documents name nobody catalogued). A caveat on "off": the test host does not call Discogs, and the real app does when a page opens — Magic Carpathians Project's page fetched its 30 releases live — so the pilot's gain on a real device is routes at once, without the Discogs budget, rather than routes where there would never have been any. Seen on the iPhone simulator: the page lists the bundle's "Credited together" and personnel rows (Six Organs Of Admittance, Ben Chasny, …) with the record each rests on.
+
+Not done: no rollout beyond the 300; the r2.dev public host is fine at pilot scale but rate-limited, so a wider rollout wants the bucket on a custom domain first.
