@@ -470,15 +470,24 @@ final class DigStore {
         let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
         let key = Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID)
         let asked = revision
-        // The catalogue pilot's bundle, read before the walk so the walk can
-        // use it (development only; see `CataloguePilot`). One read the first
-        // time, and a walk again then, past an answer kept from before it.
-        var pilotArrived = false
+        // The catalogue pilot's bundle (development only; see `CataloguePilot`).
+        // Never waited on: the page walks with what it has, and a bundle that
+        // arrives is announced as any other enrichment is, so the page walks
+        // again with it. A slow host costs the page nothing.
+        var walkWithBundle = false
         if CataloguePilot.shared.isEnabled,
            let entry = discogsID ?? artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID)).identity.discogsID {
-            pilotArrived = await CataloguePilot.shared.ensure(entry) == .fetched
+            if CataloguePilot.shared.bundle(for: entry) == nil {
+                Task { [weak self] in
+                    _ = await CataloguePilot.shared.ensure(entry)
+                    if CataloguePilot.shared.bundle(for: entry) != nil { self?.announceChange() }
+                }
+            } else {
+                // Once with it, past an answer kept from before it arrived.
+                walkWithBundle = pilotWalked.insert(key).inserted
+            }
         }
-        if !pilotArrived, let fresh = profiles.fresh(key, revision: asked) { return fresh }
+        if !walkWithBundle, let fresh = profiles.fresh(key, revision: asked) { return fresh }
 
         if let running = walking[key] {
             Trace.step("graph.join", key) {}
@@ -514,6 +523,9 @@ final class DigStore {
         let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
         return profiles.any(Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID))
     }
+
+    /// Pages walked with their catalogue-pilot bundle (see `artistProfile`).
+    @ObservationIgnored private var pilotWalked: Set<String> = []
 
     private static func artistKey(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) -> String {
         let base = "\(mbid ?? "-")|\(discogsID.map(String.init) ?? "-")|\(RecordingKey.normalizeArtist(name))"

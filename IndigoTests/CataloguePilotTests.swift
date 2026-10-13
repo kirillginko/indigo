@@ -141,4 +141,14 @@ final class CataloguePilotTests: XCTestCase {
         XCTAssertFalse(edges.contains { $0.to.discogsID == 272472 }, "Not its own neighbour")
         XCTAssertEqual(edges.filter { $0.to.title == "Ben Chasny" }.compactMap(\.to.discogsID), [274470])
     }
+
+    func testAnUnreachableHostCostsOneWaitNotOneAPage() async {
+        let storage = storage!
+        storage.objects = [:]   // nothing answers
+        guard case .failed = await pilot.ensure(272472) else { return XCTFail() }
+        let reads = storage.count
+        guard case .failed = await pilot.ensure(274469) else { return XCTFail() }
+        XCTAssertEqual(storage.count, reads, "Within the cooldown nothing is asked again")
+        XCTAssertTrue(neighbours().isEmpty, "And the page is what it was")
+    }
 }

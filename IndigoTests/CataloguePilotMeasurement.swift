@@ -41,6 +41,7 @@ final class CataloguePilotMeasurement: XCTestCase {
         var name = ""
         var offFirstPaint = Side()
         var offAfterLiveEnrichment = Side()
+        var onFirstPaint = Side()
         var onCold = Side()
         var onFromDisk = Side()
         var onFromMemory = Side()
@@ -105,8 +106,15 @@ final class CataloguePilotMeasurement: XCTestCase {
             pilot.enabledOverride = true
             pilot.reset()
             let (container, dig) = try store()
-            let (cold, coldMs) = await timed { await dig.artistProfile(name: name, mbid: nil, discogsID: id) }
-            page.onCold = side(cold, ms: coldMs)
+            // First paint never waits on the pilot; then the time until the
+            // bundle's routes are on the page.
+            let (firstPaint, firstMs) = await timed { await dig.artistProfile(name: name, mbid: nil, discogsID: id) }
+            page.onFirstPaint = side(firstPaint, ms: firstMs)
+            let (cold, coldMs) = await timed {
+                _ = await pilot.ensure(id)
+                return await dig.artistProfile(name: name, mbid: nil, discogsID: id)
+            }
+            page.onCold = side(cold, ms: coldMs + firstMs)
             page.pilotOutcome = pilot.bundle(for: id) == nil ? "no bundle" : "bundle"
             pilot.reset()
             let (fromDisk, diskMs) = await timed {

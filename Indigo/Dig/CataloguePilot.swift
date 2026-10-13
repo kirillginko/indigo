@@ -88,7 +88,7 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
         return lock.withLock { bundles[discogsID] }
     }
 
-    /// Makes sure a page's bundle is in memory before its walk.
+    /// Reads a page's bundle into memory. The page does not wait on it.
     func ensure(_ discogsID: Int) async -> Outcome {
         guard isEnabled else { return .off }
         if lock.withLock({ bundles[discogsID] != nil }) { return .held }
@@ -102,7 +102,7 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
 
     /// Forgets what is in memory (not what is on disk). Tests.
     func reset() {
-        lock.withLock { manifest = nil; bundles = [:] }
+        lock.withLock { manifest = nil; bundles = [:]; manifestFailedAt = nil }
     }
 
     private func load(_ discogsID: Int) async -> Outcome {
@@ -125,8 +125,20 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
         }
     }
 
+    /// When the manifest last failed. An unreachable host is asked once a
+    /// minute, not once a page.
+    private var manifestFailedAt: ContinuousClock.Instant?
+    static let failureCooldown: Duration = .seconds(60)
+
     private func manifestEntries() async -> [Int: Entry]? {
         if let held = lock.withLock({ manifest }) { return held }
+        if let failed = lock.withLock({ manifestFailedAt }), ContinuousClock.now - failed < Self.failureCooldown { return nil }
+        let entries = await readManifest()
+        if entries == nil { lock.withLock { manifestFailedAt = .now } }
+        return entries
+    }
+
+    private func readManifest() async -> [Int: Entry]? {
         do {
             let (status, data) = try await read(Self.pointerKey, true)
             guard status == 200, let data else { return nil }
