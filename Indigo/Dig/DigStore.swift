@@ -134,7 +134,17 @@ final class DigStore {
         worker = DigWorker(modelContainer: context.container)
         self.client = client
         self.discogsClient = discogsClient
+        // The remote switch for shared enrichment: read at launch, in the
+        // background; a change redraws what is open (`DigEnrichmentSwitch`).
+        switchObserver = NotificationCenter.default.addObserver(
+            forName: .digEnrichmentSwitchChanged, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.announceChange() }
+        }
+        if !Persistence.isRunningTests { DigEnrichmentSwitch.shared.refreshInBackgroundIfDue() }
     }
+
+    @ObservationIgnored private var switchObserver: NSObjectProtocol?
 
     /// Deallocating a MainActor-isolated observable hops to the executor to
     /// run its deinit, and that hop aborts the process. The app never sees it
@@ -475,6 +485,7 @@ final class DigStore {
         // arrives is announced as any other enrichment is, so the page walks
         // again with it. A slow host costs the page nothing.
         var walkWithBundle = false
+        DigEnrichmentSwitch.shared.refreshInBackgroundIfDue()
         if CataloguePilot.shared.isEnabled,
            let entry = discogsID ?? artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID)).identity.discogsID {
             if CataloguePilot.shared.bundle(for: entry) == nil {

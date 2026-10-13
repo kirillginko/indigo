@@ -182,3 +182,186 @@ private final class FlakyOnce: @unchecked Sendable {
     private var seen: Set<String> = []
     func first(_ key: String) -> Bool { lock.withLock { seen.insert(key).inserted } }
 }
+
+/// A clock a test can move.
+private final class TestClock: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = Date(timeIntervalSince1970: 1_800_000_000)
+    var now: Date { lock.withLock { value } }
+    func advance(_ seconds: TimeInterval) { lock.withLock { value += seconds } }
+}
+
+/// The remote config, as a test sets it; nil is a network failure.
+private final class RemoteConfig: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: DigEnrichmentSwitch.Config?
+    private(set) var reads = 0
+    func set(_ config: DigEnrichmentSwitch.Config?) { lock.withLock { value = config } }
+    func read() throws -> DigEnrichmentSwitch.Config {
+        try lock.withLock {
+            reads += 1
+            guard let value else { throw URLError(.notConnectedToInternet) }
+            return value
+        }
+    }
+}
+
+/// The remote switch (0084) in front of the pilot: every way it can be on, off,
+/// stale or unreachable, and that turning it off deletes nothing.
+@MainActor
+final class DigEnrichmentSwitchTests: XCTestCase {
+    var container: ModelContainer!
+    var context: ModelContext!
+    fileprivate var storage: PilotStorage!
+    fileprivate var clock: TestClock!
+    fileprivate var remote: RemoteConfig!
+    var gate: DigEnrichmentSwitch!
+    var pilot: CataloguePilot { .shared }
+    var manifestDigest = ""
+
+    override func setUp() async throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        context = ModelContext(container)
+        storage = PilotStorage()
+        clock = TestClock()
+        remote = RemoteConfig()
+
+        // The published pilot, as CataloguePilotTests publishes it.
+        let data = Data(CataloguePilotTests.bundle.utf8)
+        let digest = BundleFetcher.digest(data)
+        let key = "knowledge/v1/bundles/\(digest.prefix(2))/\(digest).json"
+        storage.objects[key] = data
+        let manifest = Data(#"{"artists":{"272472":{"digest":"\#(digest)","key":"\#(key)","bytes":\#(data.count)}},"format":"indigo.catalogue-pilot/1","missing":[]}"#.utf8)
+        manifestDigest = BundleFetcher.digest(manifest)
+        let manifestKey = "knowledge/v1/catalogue/manifests/\(manifestDigest.prefix(2))/\(manifestDigest).json"
+        storage.objects[manifestKey] = manifest
+        storage.objects[CataloguePilot.pointerKey] = Data(#"{"manifest":"\#(manifestKey)","digest":"\#(manifestDigest)"}"#.utf8)
+
+        gate = DigEnrichmentSwitch()
+        gate.defaults = UserDefaults(suiteName: "indigo.tests.switch.\(UUID().uuidString)")!
+        gate.cohort = .debug
+        let clock = clock!, remote = remote!, storage = storage!
+        gate.now = { clock.now }
+        gate.fetch = { try remote.read() }
+
+        pilot.reset()
+        pilot.enabledOverride = nil
+        pilot.remote = gate
+        pilot.directory = FileManager.default.temporaryDirectory.appendingPathComponent("switch-\(UUID().uuidString)")
+        pilot.read = { key, _ in storage.read(key) }
+    }
+
+    override func tearDown() {
+        pilot.reset()
+        pilot.remote = .shared
+        pilot.read = CataloguePilot.live
+        context = nil
+        container = nil
+    }
+
+    private func config(enabled: Bool = true, cohorts: [String] = ["debug"], manifest: String? = nil) -> DigEnrichmentSwitch.Config {
+        .init(version: 1, enabled: enabled, cohorts: cohorts, manifest: manifest ?? manifestDigest, ttlSeconds: 900, offlineGraceSeconds: 86_400)
+    }
+
+    private func routes() -> [MusicEdge] {
+        IdentityGraph(context: context).neighbors(of: .artist("Magic Carpathians Project", discogsID: 272472))
+    }
+
+    func testNeverReadIsOffAndReadsNothing() async {
+        XCTAssertEqual(gate.decision(), .off("never read"))
+        XCTAssertFalse(pilot.isEnabled)
+        let outcome = await pilot.ensure(272472)
+        XCTAssertEqual(outcome, .off)
+        XCTAssertEqual(storage.count, 0)
+        XCTAssertTrue(routes().isEmpty)
+    }
+
+    func testOnThenOffRemotelyAndCachedBundlesStopToo() async {
+        remote.set(config())
+        await gate.refreshIfDue()
+        XCTAssertTrue(pilot.isEnabled)
+        let first = await pilot.ensure(272472)
+        XCTAssertEqual(first, .fetched)
+        XCTAssertFalse(routes().isEmpty, "On: the page has its routes")
+
+        // Switched off; the device asks again once its 15 minutes are up.
+        remote.set(config(enabled: false))
+        await gate.refreshIfDue()
+        XCTAssertTrue(pilot.isEnabled, "Within its TTL the device has not asked yet")
+        let changed = expectation(forNotification: .digEnrichmentSwitchChanged, object: nil)
+        clock.advance(901)
+        await gate.refreshIfDue()
+        await fulfillment(of: [changed], timeout: 1)
+        XCTAssertEqual(gate.decision(), .off("disabled"))
+        XCTAssertNil(pilot.bundle(for: 272472), "A bundle already in memory is not read either")
+        XCTAssertTrue(routes().isEmpty, "Off: the page is as it was")
+    }
+
+    func testAnUnlistedCohortIsOff() async {
+        remote.set(config(cohorts: ["testflight"]))
+        await gate.refreshIfDue()
+        XCTAssertEqual(gate.decision(), .off("cohort debug not listed"))
+        gate.cohort = .appstore
+        XCTAssertFalse(gate.isOn)
+        gate.cohort = .testflight
+        XCTAssertTrue(gate.isOn)
+    }
+
+    func testOfflineStartupKeepsTheLastAnswerUntilItsGraceRunsOut() async {
+        remote.set(config())
+        await gate.refreshIfDue()
+        _ = await pilot.ensure(272472)
+
+        // A later launch, offline: the kept answer, the kept manifest, the bundle on disk.
+        pilot.reset()
+        remote.set(nil)
+        storage.objects = [:]
+        clock.advance(3_600)
+        await gate.refreshIfDue()
+        XCTAssertTrue(gate.isOn, "A failed refresh keeps the last answer")
+        let offline = await pilot.ensure(272472)
+        XCTAssertEqual(offline, .held)
+        XCTAssertFalse(routes().isEmpty)
+
+        // Still offline a day later: expired, off.
+        clock.advance(86_400)
+        XCTAssertEqual(gate.decision(), .off("expired"))
+        XCTAssertTrue(routes().isEmpty)
+    }
+
+    func testOnlyThePinnedManifestIsRead() async {
+        remote.set(config(manifest: String(repeating: "0", count: 64)))
+        await gate.refreshIfDue()
+        XCTAssertTrue(gate.isOn)
+        guard case .failed = await pilot.ensure(272472) else { return XCTFail("a manifest the switch did not pin is refused") }
+        XCTAssertTrue(routes().isEmpty)
+    }
+
+    func testTurningItOffDeletesNothing() async throws {
+        let portrait = ArtistPortrait(nameKey: "anna nacher", name: "Anna Nacher")
+        portrait.imageURLString = "https://img.test/anna.jpg"
+        context.insert(portrait)
+        try context.save()
+        remote.set(config())
+        await gate.refreshIfDue()
+        _ = await pilot.ensure(272472)
+
+        remote.set(config(enabled: false))
+        clock.advance(901)
+        await gate.refreshIfDue()
+        XCTAssertFalse(gate.isOn)
+        XCTAssertEqual(try ModelContext(container).fetch(FetchDescriptor<ArtistPortrait>()).count, 1, "The device's own data stays")
+
+        // And back on: the bundle comes from disk, with no network read for it.
+        pilot.reset()
+        remote.set(config())
+        clock.advance(901)
+        await gate.refreshIfDue()
+        let reads = storage.count
+        let back = await pilot.ensure(272472)
+        XCTAssertEqual(back, .held)
+        XCTAssertEqual(storage.count, reads + 2, "Pointer and manifest only")
+        XCTAssertFalse(routes().isEmpty)
+    }
+}

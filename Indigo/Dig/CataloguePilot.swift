@@ -8,9 +8,10 @@
 //  them, which labels released them, every one by Discogs id. Read here so an
 //  artist page DIG otherwise has nothing to offer for can lead somewhere.
 //
-//  Development only, behind a switch (`-INDIGO_DIG_CATALOGUE_PILOT YES`, or
-//  the same key in the defaults); a release build never reads it. Off, DIG is
-//  exactly as it was.
+//  Behind the remote switch (`DigEnrichmentSwitch`, 0084): off unless it is
+//  on for this device's cohort, and then only the manifest it pins. A
+//  development build can force it on (`-INDIGO_DIG_CATALOGUE_PILOT YES`).
+//  Off, DIG is exactly as it was.
 //
 //  What is read: a small pointer (asked once a launch, never from a cache),
 //  the manifest it names, and for a page being opened the one bundle that
@@ -39,13 +40,31 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
     static let confidenceShare = 0.95
 
     /// Whether the pilot is on. Never in a release build.
+    /// Whether DIG reads the pilot: what the remote switch decides for this
+    /// device (`DigEnrichmentSwitch`), asked at every read -- network, disk or
+    /// memory alike. A development build can still force it on with the
+    /// launch argument; nothing can in a release build.
     var isEnabled: Bool {
+        if let enabledOverride { return enabledOverride }
+        if isForcedLocally { return true }
+        return remote.isOn
+    }
+
+    private var isForcedLocally: Bool {
         #if DEBUG
-        enabledOverride ?? UserDefaults.standard.bool(forKey: Self.switchKey)
+        UserDefaults.standard.bool(forKey: Self.switchKey)
         #else
         false
         #endif
     }
+
+    /// The manifest the switch allows, when the switch is what decides: the
+    /// approved pilot, and nothing a later publication adds.
+    var requiredManifest: String? {
+        enabledOverride != nil || isForcedLocally ? nil : remote.pinnedManifest
+    }
+
+    var remote: DigEnrichmentSwitch = .shared
 
     /// For tests: on or off whatever the defaults say.
     var enabledOverride: Bool?
@@ -85,6 +104,7 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
 
     private let lock = NSLock()
     private var manifest: [Int: Entry]?
+    private var manifestDigest: String?
     private var bundles: [Int: ArtistBundle] = [:]
 
     /// The bundle for an entry, if the pilot is on and it has been read.
@@ -108,7 +128,7 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
 
     /// Forgets what is in memory (not what is on disk). Tests.
     func reset() {
-        lock.withLock { manifest = nil; bundles = [:]; manifestFailedAt = nil }
+        lock.withLock { manifest = nil; manifestDigest = nil; bundles = [:]; manifestFailedAt = nil }
     }
 
     private func load(_ discogsID: Int) async -> Outcome {
@@ -138,7 +158,8 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
     static let failureCooldown: Duration = .seconds(60)
 
     private func manifestEntries() async -> [Int: Entry]? {
-        if let held = lock.withLock({ manifest }) { return held }
+        let required = requiredManifest
+        if let held = lock.withLock({ manifest }), required == nil || required == lock.withLock({ manifestDigest }) { return held }
         if let failed = lock.withLock({ manifestFailedAt }), ContinuousClock.now - failed < Self.failureCooldown {
             return keptManifest()
         }
@@ -172,10 +193,12 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
             guard status == 200, let data else { return nil }
             let pointer = try JSONDecoder().decode(Pointer.self, from: data)
             let (manifestStatus, body) = try await readTwice(pointer.manifest, fresh: false)
+            // Only the manifest the switch pins, when it is the switch deciding.
+            if let required = requiredManifest, pointer.digest != required { return nil }
             guard manifestStatus == 200, let body, BundleFetcher.digest(body) == pointer.digest,
                   let entries = Self.entries(body) else { return nil }
             keep(manifest: body)
-            lock.withLock { manifest = entries }
+            lock.withLock { manifest = entries; manifestDigest = pointer.digest }
             return entries
         } catch {
             return nil
@@ -204,6 +227,7 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
         guard let url = keptManifestURL, let digestURL = keptDigestURL,
               let body = try? Data(contentsOf: url), let digest = try? Data(contentsOf: digestURL),
               BundleFetcher.digest(body) == String(decoding: digest, as: UTF8.self) else { return nil }
+        if let required = requiredManifest, BundleFetcher.digest(body) != required { return nil }
         return Self.entries(body)
     }
 
