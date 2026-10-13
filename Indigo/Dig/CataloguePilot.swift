@@ -32,6 +32,12 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
     /// Artist, Traditional, Anonymous. A credit to one is not a route.
     static let standIns: Set<Int> = [194, 118760, 151641, 967691]
 
+    /// What a route from a bundle is worth beside the same kind of route the
+    /// device found itself: a little less, so where the page has room for only
+    /// so many, what this device read for itself is never pushed out by what
+    /// the catalogue says. One both found combines, and outranks either.
+    static let confidenceShare = 0.95
+
     /// Whether the pilot is on. Never in a release build.
     var isEnabled: Bool {
         #if DEBUG

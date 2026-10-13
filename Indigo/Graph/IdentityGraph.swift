@@ -222,7 +222,8 @@ nonisolated final class IdentityGraph {
                     dependencies.entries.formUnion([raw.to.discogsID, edge.to.discogsID].compactMap { $0 })
                 }
                 set.insert(MusicEdge(from: canonical, to: edge.to, kind: edge.kind, source: edge.source,
-                                     reason: edge.reason, confidence: edge.confidence, occurrences: edge.occurrences))
+                                     reason: edge.reason, confidence: edge.confidence * CataloguePilot.confidenceShare,
+                                     occurrences: edge.occurrences))
                 if edge.to.kind == .artist { keys[edge.to.id, default: []].insert(raw.to.key) }
             }
         }

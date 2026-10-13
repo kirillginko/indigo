@@ -92,6 +92,8 @@ final class CataloguePilotTests: XCTestCase {
         XCTAssertEqual(byTitle["Six Organs Of Admittance"]?.kind, .collaborator)
         XCTAssertEqual(byTitle["Six Organs Of Admittance"]?.reason.hasPrefix("Made "), true)
         XCTAssertEqual(byTitle["Ben Chasny"]?.kind, .personnel)
+        // A shade under the device's own credit of the same kind: on a tie, its own finds come first.
+        XCTAssertEqual(byTitle["Ben Chasny"]?.confidence ?? 0, RelationshipKind.personnel.baseConfidence * CataloguePilot.confidenceShare, accuracy: 1e-9)
         XCTAssertEqual(byTitle["Mental Telemetry"]?.kind, .sharedLabel)
         // Every route opens its own entry, not whoever shares the name.
         guard case .digArtist(_, _, let chasny)? = byTitle["Ben Chasny"]?.to.destination else { return XCTFail() }
