@@ -113,15 +113,16 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
             return .held
         }
         do {
-            let (status, data) = try await read(entry.key, false)
+            let (status, data) = try await readTwice(entry.key, fresh: false)
             guard status == 200, let data else { return .failed("bundle HTTP \(status)") }
+            // A body that is not its digest is wrong, not late.
             guard BundleFetcher.digest(data) == entry.digest else { return .failed("bundle digest") }
             let bundle = try JSONDecoder().decode(ArtistBundle.self, from: data)
             toDisk(data, entry)
             lock.withLock { bundles[discogsID] = bundle }
             return .fetched
         } catch {
-            return .failed("bundle \(error.localizedDescription)")
+            return .failed("bundle \((error as? URLError).map { "URLError \($0.code.rawValue)" } ?? error.localizedDescription)")
         }
     }
 
@@ -132,27 +133,72 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
 
     private func manifestEntries() async -> [Int: Entry]? {
         if let held = lock.withLock({ manifest }) { return held }
-        if let failed = lock.withLock({ manifestFailedAt }), ContinuousClock.now - failed < Self.failureCooldown { return nil }
-        let entries = await readManifest()
-        if entries == nil { lock.withLock { manifestFailedAt = .now } }
-        return entries
+        if let failed = lock.withLock({ manifestFailedAt }), ContinuousClock.now - failed < Self.failureCooldown {
+            return keptManifest()
+        }
+        if let entries = await readManifest() { return entries }
+        lock.withLock { manifestFailedAt = .now }
+        // The last manifest this device checked, when the host cannot be
+        // reached: its bundles are addressed, so what it names is still exact.
+        return keptManifest()
     }
 
-    private func readManifest() async -> [Int: Entry]? {
+    /// The pointer and the manifest it names.
+    private func readManifest() async -> [Int: Entry]? { await readManifestOnce() }
+
+    /// One read, tried again once after a short pause when it fails or is
+    /// refused: a first read on a cold network often fails where the second
+    /// does not. A 404 is an answer, not a failure.
+    private func readTwice(_ key: String, fresh: Bool) async throws -> (status: Int, data: Data?) {
         do {
-            let (status, data) = try await read(Self.pointerKey, true)
+            let first = try await read(key, fresh)
+            if first.status == 200 || first.status == 404 { return first }
+        } catch {}
+        try? await Task.sleep(for: Self.retryPause)
+        return try await read(key, fresh)
+    }
+
+    static let retryPause: Duration = .milliseconds(800)
+
+    private func readManifestOnce() async -> [Int: Entry]? {
+        do {
+            let (status, data) = try await readTwice(Self.pointerKey, fresh: true)
             guard status == 200, let data else { return nil }
             let pointer = try JSONDecoder().decode(Pointer.self, from: data)
-            let (manifestStatus, body) = try await read(pointer.manifest, false)
-            guard manifestStatus == 200, let body, BundleFetcher.digest(body) == pointer.digest else { return nil }
-            let decoded = try JSONDecoder().decode(Manifest.self, from: body)
-            var entries: [Int: Entry] = [:]
-            for (id, entry) in decoded.artists { if let id = Int(id) { entries[id] = entry } }
+            let (manifestStatus, body) = try await readTwice(pointer.manifest, fresh: false)
+            guard manifestStatus == 200, let body, BundleFetcher.digest(body) == pointer.digest,
+                  let entries = Self.entries(body) else { return nil }
+            keep(manifest: body)
             lock.withLock { manifest = entries }
             return entries
         } catch {
             return nil
         }
+    }
+
+    private static func entries(_ body: Data) -> [Int: Entry]? {
+        guard let decoded = try? JSONDecoder().decode(Manifest.self, from: body) else { return nil }
+        var entries: [Int: Entry] = [:]
+        for (id, entry) in decoded.artists { if let id = Int(id) { entries[id] = entry } }
+        return entries
+    }
+
+    /// The last manifest checked, with its digest, so it can be checked again.
+    private var keptManifestURL: URL? { directory?.appendingPathComponent("manifest.json") }
+    private var keptDigestURL: URL? { directory?.appendingPathComponent("manifest.digest") }
+
+    private func keep(manifest body: Data) {
+        guard let directory, let url = keptManifestURL, let digestURL = keptDigestURL else { return }
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try? body.write(to: url, options: .atomic)
+        try? Data(BundleFetcher.digest(body).utf8).write(to: digestURL, options: .atomic)
+    }
+
+    private func keptManifest() -> [Int: Entry]? {
+        guard let url = keptManifestURL, let digestURL = keptDigestURL,
+              let body = try? Data(contentsOf: url), let digest = try? Data(contentsOf: digestURL),
+              BundleFetcher.digest(body) == String(decoding: digest, as: UTF8.self) else { return nil }
+        return Self.entries(body)
     }
 
     private func file(_ entry: Entry) -> URL? { directory?.appendingPathComponent("\(entry.digest).json") }

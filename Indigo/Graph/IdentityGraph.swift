@@ -195,7 +195,10 @@ nonisolated final class IdentityGraph {
         // Added to the walk, never stored; off, nothing here runs.
         if node.kind == .artist, let id = entry ?? node.discogsID, let bundle = CataloguePilot.shared.bundle(for: id) {
             let present = Set(set.all.map(\.to.id))
-            for raw in measure("walk.pilot", { BundleEdges.edges(from: canonical, bundle: bundle, ownIdentities: [id], sqlTargets: present) }) {
+            // The artist's own other names are not people they worked with: a
+            // credit to an alias the entry lists is the alias edge's to tell.
+            let ownNames = Set([id] + (identityStore.facts(id)?.aliases.map(\.id) ?? []))
+            for raw in measure("walk.pilot", { BundleEdges.edges(from: canonical, bundle: bundle, ownIdentities: ownNames, sqlTargets: present) }) {
                 // Placed by the id the document's credit names -- the evidence
                 // a kept credit is (`provenance: .credit`) -- rather than asked
                 // of this device, which holds none of these documents' credits.

@@ -151,4 +151,32 @@ final class CataloguePilotTests: XCTestCase {
         XCTAssertEqual(storage.count, reads, "Within the cooldown nothing is asked again")
         XCTAssertTrue(neighbours().isEmpty, "And the page is what it was")
     }
+
+    func testAnUnreachableHostFallsBackToTheLastCheckedManifest() async {
+        let storage = storage!
+        _ = await pilot.ensure(272472)        // a good launch keeps the manifest and the bundle
+        pilot.reset()
+        storage.objects = [:]                 // the next launch cannot reach the host
+        let outcome = await pilot.ensure(272472)
+        XCTAssertEqual(outcome, .held, "From the kept manifest and the bundle on disk")
+        XCTAssertFalse(neighbours().isEmpty)
+    }
+
+    func testAReadThatFailsOnceIsTriedAgain() async {
+        let storage = storage!
+        let flaky = FlakyOnce()
+        pilot.read = { key, _ in
+            if flaky.first(key) { throw URLError(.timedOut) }
+            return storage.read(key)
+        }
+        let outcome = await pilot.ensure(272472)
+        XCTAssertEqual(outcome, .fetched)
+    }
+}
+
+/// Fails the first read of each key.
+private final class FlakyOnce: @unchecked Sendable {
+    private let lock = NSLock()
+    private var seen: Set<String> = []
+    func first(_ key: String) -> Bool { lock.withLock { seen.insert(key).inserted } }
 }
