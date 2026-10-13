@@ -1,0 +1,373 @@
+{
+ "totals": {
+  "pages": 22,
+  "bundle_rows_shown": 140,
+  "new_from_bundle": 101,
+  "new_other": 38,
+  "gone": 42,
+  "rescued": 0,
+  "nav_ok": 0,
+  "nav_checked": 0
+ },
+ "pages": [
+  {
+   "name": "Chris Liberator & Sterling Moss",
+   "inPilot": true,
+   "off": 32,
+   "on": 31,
+   "newFromBundle": 2,
+   "newOther": 0,
+   "gone": [
+    "Sicknote",
+    "The Dice",
+    "Tribazik"
+   ],
+   "bundleShown": 3,
+   "bundleSize": 3,
+   "nav": "nav=opened Ant"
+  },
+  {
+   "name": "Craz Digga",
+   "inPilot": true,
+   "off": 8,
+   "on": 18,
+   "newFromBundle": 11,
+   "newOther": 0,
+   "gone": [
+    "ARTIST"
+   ],
+   "bundleShown": 13,
+   "bundleSize": 17,
+   "nav": "nav=did NOT show 3M5"
+  },
+  {
+   "name": "DKMD",
+   "inPilot": true,
+   "off": 13,
+   "on": 15,
+   "newFromBundle": 2,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 5,
+   "bundleSize": 5,
+   "nav": "nav=opened Antoni Maiovvi"
+  },
+  {
+   "name": "Fines Double",
+   "inPilot": true,
+   "off": 16,
+   "on": 28,
+   "newFromBundle": 12,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 14,
+   "bundleSize": 22,
+   "nav": "nav=opened Aj Suede"
+  },
+  {
+   "name": "Gardna",
+   "inPilot": true,
+   "off": 30,
+   "on": 41,
+   "newFromBundle": 11,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 12,
+   "bundleSize": 14,
+   "nav": "nav=opened Eva Lazarus"
+  },
+  {
+   "name": "Hong Chulki",
+   "inPilot": true,
+   "off": 25,
+   "on": 12,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [
+    "Astronoise",
+    "Choi Joonyong",
+    "Jason Kahn",
+    "Joe Foster",
+    "Jon Abbey",
+    "Ross Chait",
+    "Seoul Frequency Group",
+    "Taku Unami",
+    "류한길",
+    "박승준",
+    "진상태",
+    "최준용",
+    "홍철기"
+   ],
+   "bundleShown": 0,
+   "bundleSize": 3,
+   "nav": "nav=-"
+  },
+  {
+   "name": "Isabell Gustafsson-Ny",
+   "inPilot": true,
+   "off": 15,
+   "on": 23,
+   "newFromBundle": 7,
+   "newOther": 1,
+   "gone": [],
+   "bundleShown": 10,
+   "bundleSize": 11,
+   "nav": "nav=opened Alexander Zethson"
+  },
+  {
+   "name": "John Wall",
+   "inPilot": true,
+   "off": 23,
+   "on": 35,
+   "newFromBundle": 12,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 13,
+   "bundleSize": 68,
+   "nav": "nav=opened Andrzej Dudek-Dürer"
+  },
+  {
+   "name": "Kim Salmon",
+   "inPilot": true,
+   "off": 42,
+   "on": 42,
+   "newFromBundle": 1,
+   "newOther": 0,
+   "gone": [
+    "Scientists"
+   ],
+   "bundleShown": 1,
+   "bundleSize": 5,
+   "nav": "nav=opened Antenna"
+  },
+  {
+   "name": "Lewis OfMan",
+   "inPilot": true,
+   "off": 16,
+   "on": 24,
+   "newFromBundle": 6,
+   "newOther": 2,
+   "gone": [],
+   "bundleShown": 6,
+   "bundleSize": 6,
+   "nav": "nav=opened Alaska Reid"
+  },
+  {
+   "name": "Magic Carpathians Project",
+   "inPilot": true,
+   "off": 21,
+   "on": 28,
+   "newFromBundle": 2,
+   "newOther": 5,
+   "gone": [],
+   "bundleShown": 4,
+   "bundleSize": 16,
+   "nav": "nav=opened Six Organs Of Admittance"
+  },
+  {
+   "name": "Niilas",
+   "inPilot": true,
+   "off": 23,
+   "on": 17,
+   "newFromBundle": 4,
+   "newOther": 0,
+   "gone": [
+    "David Grytten",
+    "Eirik Aas",
+    "Eirik Moberg",
+    "Fieh",
+    "Hester V75",
+    "Kjartan Lauritzen",
+    "Loui & Lexus",
+    "Mato Polo",
+    "Skatebård",
+    "Sverres Ark"
+   ],
+   "bundleShown": 5,
+   "bundleSize": 5,
+   "nav": "nav=opened Benedicte Maurseth"
+  },
+  {
+   "name": "Ortho Acusto",
+   "inPilot": true,
+   "off": 17,
+   "on": 20,
+   "newFromBundle": 3,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 7,
+   "bundleSize": 8,
+   "nav": "nav=opened Comb"
+  },
+  {
+   "name": "Quartetto Cetra",
+   "inPilot": true,
+   "off": 17,
+   "on": 32,
+   "newFromBundle": 1,
+   "newOther": 14,
+   "gone": [],
+   "bundleShown": 4,
+   "bundleSize": 13,
+   "nav": "nav=opened Antonella Bolli"
+  },
+  {
+   "name": "Remy Unger",
+   "inPilot": true,
+   "off": 20,
+   "on": 23,
+   "newFromBundle": 3,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 3,
+   "bundleSize": 3,
+   "nav": "nav=opened Escalated Edits"
+  },
+  {
+   "name": "Sam Wilkes",
+   "inPilot": true,
+   "off": 31,
+   "on": 33,
+   "newFromBundle": 1,
+   "newOther": 9,
+   "gone": [
+    "Chicks",
+    "Cities Aviv",
+    "Crustacean",
+    "Emile Mosseri",
+    "Frisco",
+    "Otro",
+    "Shuggie Otis",
+    "Torn Curtain"
+   ],
+   "bundleShown": 2,
+   "bundleSize": 2,
+   "nav": "nav=opened Bryce Gonzales"
+  },
+  {
+   "name": "Soul Circuit",
+   "inPilot": true,
+   "off": 5,
+   "on": 11,
+   "newFromBundle": 6,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 7,
+   "bundleSize": 10,
+   "nav": "nav=opened Funk D'Void"
+  },
+  {
+   "name": "The Squires Of The Subterrain",
+   "inPilot": true,
+   "off": 13,
+   "on": 15,
+   "newFromBundle": 8,
+   "newOther": 0,
+   "gone": [
+    "Silk Hope Hockey Club",
+    "The Bedbugs",
+    "The Rosey Beats",
+    "The Salamanders",
+    "The Squires Of The Subterrain And Big Boy Pete",
+    "The Sunnyside Ups"
+   ],
+   "bundleShown": 11,
+   "bundleSize": 18,
+   "nav": "nav=opened Arpad Sekeres"
+  },
+  {
+   "name": "Thingamajigs Performance Group",
+   "inPilot": true,
+   "off": 21,
+   "on": 21,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 8,
+   "bundleSize": 8,
+   "nav": "nav=opened Dylan Bolles"
+  },
+  {
+   "name": "Victoria Jordanova",
+   "inPilot": true,
+   "off": 9,
+   "on": 20,
+   "newFromBundle": 4,
+   "newOther": 7,
+   "gone": [],
+   "bundleShown": 4,
+   "bundleSize": 4,
+   "nav": "nav=opened Aaron Keane"
+  },
+  {
+   "name": "Vitor Joaquim",
+   "inPilot": true,
+   "off": 30,
+   "on": 31,
+   "newFromBundle": 1,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 1,
+   "bundleSize": 1,
+   "nav": "nav=opened Simon Fisher Turner"
+  },
+  {
+   "name": "Willie Jolley",
+   "inPilot": true,
+   "off": 16,
+   "on": 20,
+   "newFromBundle": 4,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 7,
+   "bundleSize": 13,
+   "nav": "nav=opened Bill Beard"
+  },
+  {
+   "name": "Hype Williams",
+   "inPilot": false,
+   "off": 35,
+   "on": 26,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [
+    "Chasms",
+    "Coil",
+    "Dean Blunt",
+    "Enrico Giletti",
+    "Inga Copeland",
+    "Leslie Winer",
+    "Nourished By Time",
+    "Sister Irene O’connor",
+    "The Rootsman"
+   ],
+   "bundleShown": 0,
+   "bundleSize": 0,
+   "nav": "nav=-"
+  },
+  {
+   "name": "Mica Levi",
+   "inPilot": false,
+   "off": 33,
+   "on": 33,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 0,
+   "bundleSize": 0,
+   "nav": "nav=-"
+  },
+  {
+   "name": "Prefuse 73",
+   "inPilot": false,
+   "off": 11,
+   "on": 11,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 0,
+   "bundleSize": 0,
+   "nav": "nav=-"
+  }
+ ]
+}
