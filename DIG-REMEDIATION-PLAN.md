@@ -428,3 +428,37 @@ On real pages (30 of the 300, live; `pilot-pages-{mac,ios}-2026-10-13.json`):
 The 2 pages with nothing are the pilot's remaining dead ends (documents name nobody catalogued). A caveat on "off": the test host does not call Discogs, and the real app does when a page opens — Magic Carpathians Project's page fetched its 30 releases live — so the pilot's gain on a real device is routes at once, without the Discogs budget, rather than routes where there would never have been any. Seen on the iPhone simulator: the page lists the bundle's "Credited together" and personnel rows (Six Organs Of Admittance, Ben Chasny, …) with the record each rests on.
 
 Not done: no rollout beyond the 300; the r2.dev public host is fine at pilot scale but rate-limited, so a wider rollout wants the bucket on a custom domain first.
+
+---
+
+## 11. Limited-release preparation (2026-10-13)
+
+**Portraits.** The 940 identity-ambiguous portraits are withheld (guarded, reversible: `portrait-withhold-2026-10-13/`); devices drop the cached faces through the change feed (verified live). The 22 unique-name portraits are `unresolved`: shown, never verified.
+
+**Pilot behaviour, measured in the running app** (iOS simulator, the app's own Discogs and R2 reads on; `pilot-pages-app-ios-2026-10-13.json`): every one of 22 pilot pages shows its bundle (140 rows, 101 people the same session's own discovery had not shown); 21/21 bundle rows opened their own artist; no duplicates, no alias offered as a collaborator; bundle-only routes rank a shade under the device's own (95%), so they never push out what the page found itself. Time to the first route on the test host: 277 ms p50 with the pilot, 771 ms from the device's own discovery. The pilot saves no Discogs requests yet: discovery runs as before (a later optimisation, not before release).
+
+**Remote switch (0084).** `public.dig_enrichment_config()` — a function, no table, independent of every generation:
+
+| field | now | meaning |
+|---|---|---|
+| enabled | true | false turns every device off at its next check |
+| cohorts | `debug` | who may receive it: `debug`, `testflight`, `appstore` |
+| manifest | `5d20a44c…` | the one manifest devices read: the 300 approved artists |
+| ttlSeconds | 900 | asked again after 15 min, in the background |
+| offlineGraceSeconds | 86400 | offline, the last answer holds 24 h, then off |
+
+Never read: off. Checked at every bundle read, cached ones included. Off deletes nothing. `Scripts/dig-enrichment-switch.sh off | on <cohorts…> | show`. A limited release is `on debug testflight`; nothing reaches the App Store cohort until it is listed.
+
+**Custom domain (not done: needs the Cloudflare account).**
+1. Cloudflare → R2 → the `indigo` bucket → Settings → Custom Domains → Connect Domain: a dedicated hostname on a zone in the same account (e.g. `cache.<domain>`). Same bucket, same paths; nothing moves.
+2. Caching → Cache Rules: for that hostname, *Eligible for cache*, Edge TTL *use cache-control header if present*. Cloudflare does not cache `.json` by default; without this rule the edge cache check fails.
+3. `deno run --allow-net Scripts/r2-domain-check.ts <hostname> pub-480815b6ab564616ae87a484cb506184.r2.dev` until `ready: true` and the second read shows `cf-cache-status: HIT`.
+4. Then, and only then, `CATALOG_CACHE_HOST` in `Config/Indigo.xcconfig`, a Mac and an iPhone run, and a release.
+
+**Manual Mac check (Debug build from Xcode, `-INDIGO_DIG_CATALOGUE_PILOT YES` not needed: the switch is on for debug).**
+- Magic Carpathians Project: "Credited together" Six Organs Of Admittance and Vibracathedral Orchestra; personnel Ben Chasny et al.; each opens its own page.
+- Hype Williams: the duo's picture or none — never the film director's.
+- A namesake (e.g. Speedy J): no face that belongs to the other entry.
+- An artist outside the pilot (e.g. Prefuse 73): unchanged.
+- From a credited release, a credit opens the credited artist, not a namesake.
+- `Scripts/dig-enrichment-switch.sh off`, wait 15 min or relaunch: the pilot rows are gone; `on debug`: back.
