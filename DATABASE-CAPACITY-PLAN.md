@@ -109,11 +109,14 @@ construction). Later, `drop column metadata` (a catalog change; pending
 old rebuild re-materialises the single adjacencies (but only once there is
 room for them again).
 
-### C. Finished jobs: keep two days — ~4 MB
+### C. Job retention — corrected (done 2026-10-12, 0079)
 
-Shorten `prune_spent_rows`' retention for `done` jobs from 7 days to 2, then
-`vacuum full public.enrichment_jobs` (a 7.5 MB table; the copy is small).
-Failed jobs keep their longer retention.
+The audit's premise was wrong: finished jobs have been kept **two** days
+since 0047, not seven, and the queue is at steady state (~3 days of churn
+between nightly sweeps). There is nothing to reclaim. What the approval's
+condition pointed at was real, though: failed jobs were swept after the same
+two days. 0079 keeps **failed jobs (with their errors) for 14 days** and
+finished jobs for 2, as before. A few hundred rows; no space effect.
 
 ### D. Archive search index — ~5 MB
 
@@ -127,9 +130,9 @@ after B (it needs ~19 MB of temporary room).
 | Now | 497 |
 | A | −0.4 |
 | B | −80 to −85 |
-| C | −4 |
+| C | 0 (corrected, see above) |
 | D | −5 |
-| **After** | **≈ 400–405** |
+| **After** | **≈ 405–410** |
 
 ## 4. Not proposed
 
@@ -147,3 +150,137 @@ after B (it needs ~19 MB of temporary room).
 3. Approve C and D.
 4. Optional: install `pgstattuple` (an extension; catalog-only) to measure
    exact index fill before B2, which would tighten the peak estimate.
+
+## 6. Progress (2026-10-12)
+
+| | Status | Commit |
+|---|---|---|
+| A — two never-scanned indexes | **Done.** Final check: 0 scans since statistics began (2026-08-25), no constraint, no dependants; the episode list uses `radio_episodes_show_idx`; nothing filters shows by station. Freed 424 kB. | `cf026e2` (0077) |
+| B1 — single adjacencies on demand | **Done and validated** (below). Frees nothing by itself. | `f89cccf` (0078) |
+| C — job retention | **Done** as corrected above. | `5b0081d` (0079) |
+| B2 — deletion and rewrite | Not executed. Readiness below. | — |
+| D — archive index | Deferred until after B2. | — |
+
+Note on units: `pg_database_size` is 520.9 million bytes = **496.8 MiB**.
+The project has not gone read-only above 500 million bytes, so the limit is
+500 MiB (524.3 million bytes), and the headroom is ~3.2 MiB. All figures
+here are MiB.
+
+### B1 validation
+
+`Scripts/b1-capture.py` captured all four readers for 60 artists sampled by
+radio popularity (12 each: the most played — John Coltrane 250 appearances,
+Miles Davis 231, Sun Ra 228 — and the 5th, 25th, 50th and 95th percentiles)
+plus the pilot's 16 starting artists, before and after deployment
+(`supabase/diagnostics/capacity/b1/`).
+
+- **Whole neighbour sets, no page limit:** identical for all 60 artists —
+  2,134 neighbours under both rules — except 84 stored edges whose pair is no
+  longer adjacent in any episode (stale), which are no longer shown
+  (`b1/fullset.sql`).
+- **The DIG page reader** (`artist_radio_relations`, ≤ 200 rows): 46 of 60
+  pages identical; the 14 others are the most played artists, where single
+  adjacencies tie at (evidence 1, confidence 0.65) under the 200-row limit
+  and which tied rows are kept was arbitrary before and after; plus stale
+  edges dropped.
+- **`dig_radio_for_artists`**: 52 of 60 identical; the rest the same tie
+  under its limit, and stale edges.
+- **`knowledge_answers` / `explore_knowledge`** (76 starting points each):
+  56 identical; every one of the 94 differing edges (by row) is a stale
+  stored edge. No current neighbour lost, none invented.
+- **`knowledge_cut`** (frozen pilot set): `ok`, 24/163; 355 nearby edges vs
+  335 in the October 11 generation — 10 stale pairs dropped, 8 the same rows
+  renamed in the catalogue since ("Young Thug" → "YOUNG THUG", "Björk" →
+  "Bjork"), 38 adjacencies new since then. Future generations keep their
+  radio relationships.
+- **Timing** (warm, anon): `explore_knowledge` batches unchanged (median
+  110–180 ms vs 105–131 before). The DIG page reader: median and obscure
+  artists 1–6 ms warm, ≤ 70 ms cold; **the most played artists 14–82 ms warm
+  (was 3–9 ms) and 0.4–1.9 s on a cold first call** (Coltrane 1.9 s, Sun Ra
+  1.15 s). Inside anon's 3 s, but a real cold-cache cost on the busiest pages;
+  the first call of the heaviest `explore_knowledge` batch was 2.3–3.4 s cold
+  (the app retries a timeout once). Remedy below.
+- **Rollback**: `b1/rollback-0078.sql` restores the five functions exactly.
+
+### B2 readiness
+
+| Check (from the approval) | Status |
+|---|---|
+| B1 against real pages, popular and obscure, all four readers | Done (above) |
+| `knowledge_cut`, future generations and the backend shadow keep radio relationships | Done (above) |
+| Deletion removes nothing unreconstructable | **Measured catalogue-wide** (`b2-reconstructable.sql`, 16 slices): of 196,044 stored single adjacencies, **193,545 (98.7%) are reproduced exactly** from `radio_appearances`; **2,499 (1.3%) are stale** — the pair is adjacent in no episode now (appearances re-resolved since). None became stronger unseen. The 2,499 are already hidden by B1; they are exported before deletion (below). |
+| Peak disk, including rewrite, indexes, temporary files, WAL, concurrent growth | Below |
+| `pgstattuple` | Proposed, needs approval (an extension; catalog-only) |
+| Backup and recovery | Procedure below; the export is read-only and runs at the start of the window |
+| Pause/resume and integrity checks | Runbook below |
+| Free more before the rewrite | Yes — drop the primary key too (below) |
+
+**Peak, revised to free more first.** Current: database 496.8 MiB;
+`music_relationships` heap 73.9, `edge_idx` 39.0, `pkey` 13.9, `to_idx`
+8.8. After the deletion the table keeps 187,022 rows; estimated rewritten
+heap ~26 MiB (≈140 bytes a row without `metadata`), rebuilt `pkey` ~6,
+`edge_idx` ~17, `to_idx` ~5.
+
+| Step | Database |
+|---|---|
+| Start | 496.8 |
+| Drop `edge_idx`, `to_idx` **and the primary key** (constraint dropped, rows untouched; nothing writes in the window) | ~435 |
+| Rewrite (`alter … using`): new heap only, no index to build | **peak ~461**, then ~387 |
+| Recreate primary key, `edge_idx` (unique), `to_idx`; `analyze` | ~415 |
+
+Peak margin ~39 MiB (vs ~19 with the primary key kept).
+
+- **Temporary files** (sorts for the index builds) live in `pgsql_tmp`,
+  outside the database directory `pg_database_size` measures; index builds
+  run one at a time after the heap is rewritten and the old one released.
+- **WAL**: the rewrite and builds write roughly their own size (~55 MiB) of
+  WAL. WAL is not part of the database size (it was 128 MiB at the audit);
+  it is recycled at checkpoints.
+- **Concurrent growth**: in the window, the cron jobs that write
+  `music_relationships` are paused; radio ingest (`discover_*`, the drains)
+  writes `radio_appearances`/`radio_episodes` at ~7,000 jobs a day — well
+  under 1 MiB in ten minutes. They can be paused too for a strict bound.
+- `pgstattuple` (if approved) would replace the "~140 bytes a row" estimate
+  with measured tuple and index density.
+
+**Backup and recovery** (Supabase Free has no downloadable backups or
+point-in-time recovery, so the backup is ours):
+
+1. Export, read-only, in slices: every row B2 deletes (196,044 single
+   adjacencies, all columns) and `id, metadata` for every row whose
+   `episode_count` is still null — ~60 MB of JSON, kept outside the repo.
+2. Verify: load it into the throwaway Postgres (`Scripts/test-migrations.sh`'s
+   schema) and compare row counts and an `md5(string_agg(id‖…))` per slice
+   with live.
+3. Restore path, if needed after B2: re-insert from the export (the rows
+   have their ids; `on conflict do nothing`), then re-run the rebuild once.
+   Needs ~70 MiB of room, which B2 creates.
+4. Before step 1 of the window, rollback is a no-op; the rewrite is one
+   transaction (fails → nothing changed); index builds can be re-run.
+
+**Window runbook** (statement by statement, ~10 minutes):
+
+1. Export and verify the backup (above).
+2. Pause cron: `indigo-rebuild-edges`, `indigo-merge-split-artists`,
+   `indigo-resolve-radio` (and, for a strict bound, the drains).
+3. Record: row counts by type; `md5` of `id‖updated_at‖evidence_count` for
+   `played_by` and for `radio_neighbor` with evidence ≥ 2; the B1 capture.
+4. Delete `radio_neighbor` with `evidence_count = 1`.
+5. Drop `music_relationships_to_idx`, `music_relationships_edge_idx`, and the
+   primary key constraint.
+6. Rewrite: `alter table music_relationships alter column episode_count type
+   smallint using coalesce(episode_count, (metadata->>'episodes')::smallint),
+   alter column metadata type jsonb using null;`
+7. Recreate the primary key, `edge_idx` (unique, same definition), `to_idx`;
+   `analyze`.
+8. Verify: the md5s and counts from step 3 match; zero stored single
+   adjacencies; `episode_count` set wherever `metadata` had episodes; the B1
+   capture identical to step 3's; `pg_database_size`.
+9. Resume cron; watch one rebuild (00:23/03:23… UTC) for errors and size.
+
+**Cold-call remedy (after B2, separately):** an index covering the
+adjacency lookup — `radio_appearances (artist_id) include (radio_episode_id,
+track_index)` and `(radio_episode_id, track_index) include (artist_id)` —
+would make the derivation index-only and remove most of the cold cost on the
+busiest pages, for ~8 MiB. It does not fit before B2.
+
