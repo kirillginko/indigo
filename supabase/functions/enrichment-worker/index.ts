@@ -409,17 +409,21 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       // artist with the name -- shown, never promoted to an identity),
       // `withheld` (namesakes and no identity -- no face rather than a
       // stranger's). An artist Discogs has no picture of is a miss with no
-      // state. Writing each down is what stops the queue asking again next
-      // week, the same bargain `fetch_artist_origin` makes above.
+      // state -- unless the row knows its entry, and that entry has no
+      // picture: then it is `verified` with no address (0082), which a name
+      // answers as no face, so devices drop one the old rule cached. Writing
+      // each down is what stops the queue asking again next week, the same
+      // bargain `fetch_artist_origin` makes above.
       const found = choice.kind === "found" ? choice : null;
+      const identity = discogsIDs.find((id) => Number.isInteger(id) && id > 0) ?? null;
       const { error } = await supabase.rpc("record_artist_portrait", {
         p_artist_id: artistId,
         p_url: found?.url ?? null,
         p_width: found?.width ?? null,
         p_height: found?.height ?? null,
         p_state: found ? (found.via === "identity" ? "verified" : "unresolved")
-          : choice.kind === "ambiguous" ? "withheld" : null,
-        p_discogs_id: found?.discogsID ?? null,
+          : choice.kind === "ambiguous" ? "withheld" : identity !== null ? "verified" : null,
+        p_discogs_id: found?.discogsID ?? (choice.kind === "none" ? identity : null),
       });
       if (error) throw new Error(error.message);
       return;

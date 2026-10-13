@@ -5,14 +5,20 @@ insert into public.artists (id, name, normalized_name) values
     ('41000000-0000-0000-0000-000000000002', 'Speedy J', 'speedy j'),
     ('41000000-0000-0000-0000-000000000003', 'Speedy J', 'speedy j'),               -- a namesake row
     ('41000000-0000-0000-0000-000000000004', 'Purelink', 'purelink'),               -- old rule, no state
-    ('41000000-0000-0000-0000-000000000005', 'Nez', 'nez');                          -- withheld
+    ('41000000-0000-0000-0000-000000000005', 'Nez', 'nez'),                          -- withheld
+    ('41000000-0000-0000-0000-000000000006', 'Logic', 'logic'),                      -- own entry, no picture (0082)
+    ('41000000-0000-0000-0000-000000000007', 'Om', 'om'),                            -- the same, beside a namesake's face
+    ('41000000-0000-0000-0000-000000000008', 'Om', 'om');
 select public.record_artist_portrait('41000000-0000-0000-0000-000000000001', 'https://i.discogs.com/duo.jpeg', 150, 150, 'verified', 1874027);
 select public.record_artist_portrait('41000000-0000-0000-0000-000000000002', 'https://i.discogs.com/paap.jpeg', 150, 150, 'verified', 823);
 select public.record_artist_portrait('41000000-0000-0000-0000-000000000003', 'https://i.discogs.com/other-speedy.jpeg', 150, 150, 'unresolved', 316464);
 select public.record_artist_portrait('41000000-0000-0000-0000-000000000004', 'https://i.discogs.com/purelink.jpeg', 150, 150);
 select public.record_artist_portrait('41000000-0000-0000-0000-000000000005', 'https://i.discogs.com/nez13.jpeg', 150, 150, 'withheld', null);
+select public.record_artist_portrait('41000000-0000-0000-0000-000000000006', null, null, null, 'verified', 15177);
+select public.record_artist_portrait('41000000-0000-0000-0000-000000000007', null, null, null, 'verified', 17004);
+select public.record_artist_portrait('41000000-0000-0000-0000-000000000008', 'https://i.discogs.com/om-other.jpeg', 150, 150, 'unresolved', 9);
 do $$
-declare r jsonb := public.portrait_states_for_artists(array['hype williams','speedy j','purelink','nez','nobody']);
+declare r jsonb := public.portrait_states_for_artists(array['hype williams','speedy j','purelink','nez','nobody','logic','om']);
 begin
     if r->'hype williams' <> '{"url": "https://i.discogs.com/duo.jpeg", "state": "verified", "discogsID": 1874027}'::jsonb then
         raise exception 'verified: %', r->'hype williams'; end if;
@@ -22,6 +28,10 @@ begin
         raise exception 'legacy: %', r->'purelink'; end if;
     if r->'nez' <> '{"state": "withheld"}'::jsonb then raise exception 'withheld: %', r->'nez'; end if;
     if r ? 'nobody' then raise exception 'a name with nothing answered'; end if;
+    -- 0082: a row whose own entry has no picture answers no face, so a device drops the one it cached.
+    if r->'logic' <> '{"state": "withheld"}'::jsonb then raise exception 'verified without picture: %', r->'logic'; end if;
+    if r->'om' <> '{"url": "https://i.discogs.com/om-other.jpeg", "state": "unresolved", "discogsID": 9}'::jsonb then
+        raise exception 'beside another row''s face: %', r->'om'; end if;
     if (select original_url from public.artwork where entity_id = '41000000-0000-0000-0000-000000000005') is not null then
         raise exception 'a withheld portrait kept its address'; end if;
     -- The name-only reader installed builds use: same addresses, nothing for namesakes or withheld.
