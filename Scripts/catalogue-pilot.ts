@@ -155,6 +155,12 @@ for (const { pilot, bundle } of bundles) {
   const usable = routes.filter((r) => r.verified && r.catalogued);
   const meaningful = usable.filter((r) => r.leadsOn && !r.weak);
   bump("artists");
+  // Provenance: documents filed under the artist that do not name its id,
+  // and an id the catalogue files under more than one row.
+  if (bundle.coverage.unrelated > 0) bump("artists with a document that does not credit them");
+  bump("documents not crediting the artist", bundle.coverage.unrelated);
+  bump("documents used", bundle.coverage.used);
+  if ((input.artists[String(Math.min(...pilot.discogs))]?.rows ?? 1) > 1) bump("artist id on more than one catalogue row");
   bump(`documents per artist: ${Math.min(bundle.coverage.used, 5)}${bundle.coverage.used >= 5 ? "+" : ""}`);
   if (bundle.coverage.used === 0) bump("no document readable");
   if (usable.length > 0) bump("rescued: any verified route to a catalogued artist or label");
