@@ -132,3 +132,4 @@ run -v demand="$(cat "$ROOT/supabase/functions/_shared/testdata/pilot_demand_v1.
 run -v root="$ROOT" -f "$ROOT/supabase/tests/identity_corrections_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/radio_adjacency_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/job_retention_smoke.sql" | sed 's/^/    /'
+run -f "$ROOT/supabase/tests/portrait_state_smoke.sql" | sed 's/^/    /'
