@@ -73,7 +73,9 @@ nonisolated extension CreditRole {
     /// "Mix" alone is the mix engineer; a remix or a DJ's mix is not.
     private static let technicalJobs = [
         "engineer", "master", "recorded", "recording", "mixed", "mixing", "edited", "editing",
-        "transfer", "restor", "technician", "tape op", "remaster", "lathe", "cut by", "programming [technical"
+        "transfer", "restor", "technician", "tape op", "remaster", "lathe", "cut by", "programming [technical",
+        // Sleeve and screen work the older list does not name.
+        "art direction", "graphic", "styling", "video", "film", "creative direction", "photo"
     ]
 
     /// What kind of part a credit was, or nil when it is not a musical one.

@@ -17,7 +17,8 @@
 //
 //  Here the starting points are two halves, chosen apart:
 //  - **Now**: up to four places touched in the last fortnight, by weight
-//    decayed with a week's half-life -- what the listener is into today.
+//    decayed with a week's half-life -- what the listener is into today. A
+//    record crated counts double a play, so crating one is noticed at once.
 //  - **Over time**: the rest from the whole of what is kept, played and
 //    returned to, undecayed and logarithmic in repetition, so a record played
 //    forty times outweighs one played twice without drowning the collection;
@@ -67,8 +68,13 @@ nonisolated enum MusicianFirstRanker {
             let held = score[node.id]
             score[node.id] = (held.map { MusicNode.preferred($0.node, node) } ?? node, (held?.weight ?? 0) + decayed)
         }
-        for item in personal.crate { if let node = item.node { add(node, 1.0, at: item.addedAt) } }
-        for met in personal.met where met.weight > 0 { add(met.node, min(met.weight, 3), at: met.lastAt) }
+        // Crating is a decision and the strongest claim on what someone is
+        // into now; a station played all week should not outweigh it.
+        for item in personal.crate { if let node = item.node { add(node, 2.0, at: item.addedAt) } }
+        // A play is attention, counted once however often: a week of one
+        // station, or a record crated and played this morning, must not keep
+        // what was crated a moment ago out of the four.
+        for met in personal.met where met.weight > 0 { add(met.node, min(met.weight, 1), at: met.lastAt) }
         return ordered(score)
     }
 
@@ -203,10 +209,15 @@ nonisolated enum MusicianFirstRanker {
         var best: [String: ExploreSuggestion] = [:]
         var reach: [String: Set<String>] = [:]
         var kinds: [String: Set<RelationshipKind>] = [:]
+        // Where the best route came from what they are into now: judged by
+        // that, not by how well it fits what they liked before.
+        var fromNow = Set<String>()
         for origin in origins {
             for connection in (neighbourhoods[origin.node] ?? EdgeSet()).byDestination {
                 let node = connection.node
                 guard node.destination != nil, !seen.contains(node.id), !encountered.contains(node.id) else { continue }
+                // A catalogue number is a filing detail, not somewhere to go.
+                guard node.kind != .catalogNumber else { continue }
                 guard let route = connection.edges
                     .map({ (edge: $0, value: $0.weight * worth($0)) })
                     .filter({ $0.value > 0 })
@@ -220,6 +231,7 @@ nonisolated enum MusicianFirstRanker {
                     node: node, reason: route.edge.reason, via: origin.node.title, kind: route.edge.kind,
                     corroboration: 1, score: score
                 )
+                if origin.half == .now { fromNow.insert(node.id) } else { fromNow.remove(node.id) }
             }
         }
         for (id, found) in best {
@@ -232,7 +244,7 @@ nonisolated enum MusicianFirstRanker {
             let score = found.score
                 * (1 + 0.22 * Double(origins - 1))
                 * independent
-                * (found.node.kind == .artist ? relevance(tags, taste: taste) : 1)
+                * (found.node.kind == .artist && !fromNow.contains(id) ? relevance(tags, taste: taste) : 1)
                 * (found.node.kind == .artist ? onwardFactor(onward[id]) : 1)
             best[id] = ExploreSuggestion(node: found.node, reason: found.reason, via: found.via, kind: found.kind,
                                          corroboration: origins, score: score)
@@ -251,6 +263,16 @@ nonisolated enum MusicianFirstRanker {
                 score: max(existing.score, suggestion.score)
             )
         }
-        return ExploreSuggestionEngine.spread(best.values.sorted(by: ExploreSuggestion.ranksAhead), limit: limit)
+        // A label is a neighbourhood: a few of its roster, never the list.
+        var labels = 0
+        let ranked = best.values.sorted(by: ExploreSuggestion.ranksAhead).filter { suggestion in
+            guard suggestion.kind == .sharedLabel else { return true }
+            labels += 1
+            return labels <= labelCap
+        }
+        return ExploreSuggestionEngine.spread(ranked, limit: limit)
     }
+
+    /// At most this many labelmates in one list.
+    static let labelCap = 3
 }

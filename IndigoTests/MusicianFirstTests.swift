@@ -43,7 +43,8 @@ final class MusicianFirstTests: XCTestCase {
 
     func testWorkingTheEquipmentIsTechnical() {
         for role in ["Engineer", "Recorded By", "Mixed By", "Mastered By", "Remastered By", "Edited By",
-                     "Engineer [Assistant]", "Executive-Producer", "Recording Supervisor"] {
+                     "Engineer [Assistant]", "Executive-Producer", "Recording Supervisor",
+                     "Art Direction, Graphic Design", "Video Director"] {
             XCTAssertEqual(CreditRole.contribution(of: role), .technical, role)
         }
     }
