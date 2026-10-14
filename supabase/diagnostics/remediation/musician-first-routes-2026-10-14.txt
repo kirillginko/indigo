@@ -1,0 +1,66 @@
+DIG routes in the catalogue sample, 3300 bundles (manifest read 0.52873375 seconds)
+routes built: today 1.288344625 seconds, musician-first 2.151674708 seconds
+A meaningful route: a verified musician (collaborator, player, writer, producer) with a musician route on to somebody else, as the sample's documents know it.
+
+== pilot (300): 300 pages
+meaningful musician routes   today: 0 → 73, 1–2 → 169, 3+ → 58
+                       musician-first: 0 → 73, 1–2 → 169, 3+ → 58
+pages whose musician routes are all technical (today): 2; more than half technical: 3
+technical routes removed: 217 of 2451 musician routes today
+pages with only label routes: 7
+first five routes shown: technical credits today 91 (pages with 2+: 15), musician-first 0
+first five routes shown that lead nowhere further: today 745, musician-first 576
+two-hop reach (today through every route offered; musician-first through musicians only)  today: median 8, mean 17.0; musician-first: median 7, mean 14.5
+
+== batch 1 (3,000): 3000 pages
+meaningful musician routes   today: 0 → 761, 1–2 → 1731, 3+ → 508
+                       musician-first: 0 → 761, 1–2 → 1731, 3+ → 508
+pages whose musician routes are all technical (today): 32; more than half technical: 70
+technical routes removed: 1963 of 22835 musician routes today
+pages with only label routes: 66
+first five routes shown: technical credits today 1019 (pages with 2+: 227), musician-first 0
+first five routes shown that lead nowhere further: today 7511, musician-first 5746
+two-hop reach (today through every route offered; musician-first through musicians only)  today: median 8, mean 14.9; musician-first: median 7, mean 13.0
+
+== journeys
+
+Kaffe Matthews [404] — jazz
+  today:          Mandy McIntosh (Made Weightless Animals together); Zeena Parkins (Made Weightless Animals together); David Kean (Slide Guitar on Weightless Animals (6))
+  musician-first: Zeena Parkins (Made Weightless Animals together); Mandy McIntosh (Made Weightless Animals together); David Kean (Slide Guitar on Weightless Animals (6))
+  two hops:       Kaffe Matthews → Zeena Parkins → The Adorables (2)
+
+Thug [771] — experimental electronic
+  today:          Aspen (Remix on Thug :: Remixed (11)); Ben Cormier (Remix on Thug :: Remixed (7)); Boulderdash (Remix on Thug :: Remixed (1)); Codec (Remix on Thug :: Remixed (14)); Groovescooter (Remix on Thug :: Remixed (9))
+  musician-first: Aspen (Remix on Thug :: Remixed (11)); Sense (Remix on Thug :: Remixed (12)); Ben Cormier (Remix on Thug :: Remixed (7)); Boulderdash (Remix on Thug :: Remixed (1)); Codec (Remix on Thug :: Remixed (14))
+  two hops:       Thug → Aspen → Velvet Trench Vibes
+
+Lowfish [2089] — experimental electronic
+  today:          Solvent (Made Suction001 together); ADULT. (Producer on Suction001 (B5)); Adam Equation (Performer on Suction001 (B5)); Gregory de Rocher (Performer on Suction001 (A1, A3, B2, B4)); Jason Amm (Performer on Suction001 (A2, B1, B3, B5))
+  musician-first: Solvent (Made Suction001 together); ADULT. (Producer on Suction001 (B5)); Adam Equation (Performer on Suction001 (B5)); Gregory de Rocher (Performer on Suction001 (A1, A3, B2, B4)); Jason Amm (Performer on Suction001 (A2, B1, B3, B5))
+
+Tommy Hools [2810] — hip-hop
+  today:          DJ Cam (Producer on Love Is The Message / The Blue Eyed Bandit (A2, B1)); Jasiri (Made Love Is The Message / The Blue Eyed Bandit together); Cutee B (Mixed By on Love Is The Message / The Blue Eyed Bandit (A2, B1)); Guy Davie (Mastered By on Love Is The Message / The Blue Eyed Bandit)
+  musician-first: DJ Cam (Producer on Love Is The Message / The Blue Eyed Bandit (A2, B1)); Jasiri (Made Love Is The Message / The Blue Eyed Bandit together)
+  two hops:       Tommy Hools → DJ Cam → Synchrofiles 1.0
+
+Greedy Fingers [19097] — hip-hop
+  today:          MF Doom (Made I Sell Rhymes Like Dimes together); Megalon (Made I Sell Rhymes Like Dimes together); Smimooz (Mixed By on I Sell Rhymes Like Dimes); DJ Grazzhoppa (Producer on I Sell Rhymes Like Dimes); Howard Stevens (Producer on I Sell Rhymes Like Dimes)
+  musician-first: MF Doom (Made I Sell Rhymes Like Dimes together); DJ Grazzhoppa (Producer on I Sell Rhymes Like Dimes); Megalon (Made I Sell Rhymes Like Dimes together); Howard Stevens (Producer on I Sell Rhymes Like Dimes)
+  two hops:       Greedy Fingers → MF Doom → Carlo (2)
+
+David Watson [33154] — jazz
+  today:          Amanda Stewart (Made Bit-Part Actor together); Ikue Mori (Made Bit-Part Actor together); Jim Denley (Made Bit-Part Actor together); Rik Rue (Made Bit-Part Actor together); Kato Hideki (Edited By on Bit-Part Actor)
+  musician-first: Ikue Mori (Made Bit-Part Actor together); Amanda Stewart (Made Bit-Part Actor together); Jim Denley (Made Bit-Part Actor together); Rik Rue (Made Bit-Part Actor together)
+  two hops:       David Watson → Ikue Mori → Kaze (4)
+
+Ben Kweller [167371] — indie
+  today:          Bryce Goggin (Producer on Sha Sha (20th Anniversary Deluxe) (E3)); Dan Myers (Producer on Sha Sha (20th Anniversary Deluxe) (E4)); Fred Maher (Producer on Sha Sha (20th Anniversary Deluxe) (C4)); Roger Greenawalt (Producer on Sha Sha (20th Anniversary Deluxe) (C2)); Paul Barber (Co-producer on Sha Sha (20th Anniversary Deluxe) (E1))
+  musician-first: Evan Dando (Composed By on Sha Sha (20th Anniversary Deluxe) (E6)); Juliana Hatfield (Featuring on Sha Sha (20th Anniversary Deluxe) (F4)); Nils Lofgren (Featuring on Sha Sha (20th Anniversary Deluxe) (D5)); Rivers Cuomo (Composed By on Sha Sha (20th Anniversary Deluxe) (F4)); Terry Melcher (Composed By on Sha Sha (20th Anniversary Deluxe) (E4))
+  two hops:       Ben Kweller → Evan Dando → Sharon Stoned
+
+Hefner (2) [177383] — indie
+  today:          Baxendale (Remix on We Love The City (2.17)); Electric Sound Of Joy (Remix on We Love The City (1.20)); Piano Magic (Remix on We Love The City (2.19)); Rob Lord (Remix on We Love The City (2.18)); Wisdom Of Harry (Remix on We Love The City (2.16))
+  musician-first: Piano Magic (Remix on We Love The City (2.19)); Baxendale (Remix on We Love The City (2.17)); Electric Sound Of Joy (Remix on We Love The City (1.20)); Rob Lord (Remix on We Love The City (2.18)); Wisdom Of Harry (Remix on We Love The City (2.16))
+  two hops:       Hefner (2) → Piano Magic → Differnet
+
+content digest (timings excluded): 8c1fa8c5649696841df6d9bb2182b3061eca863d4aeb4f28a833cfd6382f1aa1
