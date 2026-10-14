@@ -531,7 +531,7 @@ extension DigSearchIndex {
                 title: release.title,
                 detail: [credit, year].compactMap { $0?.nilIfEmpty }.joined(separator: " · ")
                     .nilIfEmpty,
-                artworkURL: release.thumbnailURL ?? release.imageURL,
+                artworkURL: release.imageURL ?? release.thumbnailURL,
                 destination: .digRelease(id: release.discogsID, title: release.title),
                 opensByIdentity: true,
                 closeness: dug

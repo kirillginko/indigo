@@ -496,9 +496,8 @@ nonisolated struct DiscogsEnricher {
     /// belongs to whoever the full lookup decided this artist is — which is
     /// the answer the cheap search was guessing at.
     private static func repaintPortrait(of record: DiscogsArtist, in context: ModelContext) {
-        guard let address = DiscogsClient.usableImage(
-            record.thumbnailURLString ?? record.imageURLString
-        ) else { return }
+        guard let address = DiscogsClient.usableImage(record.imageURLString)
+            ?? DiscogsClient.usableImage(record.thumbnailURLString) else { return }
         let key = record.nameKey
         guard !key.isEmpty else { return }
         var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })

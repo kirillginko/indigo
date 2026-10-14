@@ -647,8 +647,10 @@ actor DigWorker {
         var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.nameKey == key })
         descriptor.fetchLimit = 1
         guard let artist = (try? context.fetch(descriptor))?.first,
-              let address = DiscogsClient.usableImage(artist.thumbnailURLString)
-                ?? DiscogsClient.usableImage(artist.imageURLString) else { return nil }
+              // The full image first: the 150-pixel cut is soft at any size
+              // a phone draws a portrait.
+              let address = DiscogsClient.usableImage(artist.imageURLString)
+                ?? DiscogsClient.usableImage(artist.thumbnailURLString) else { return nil }
         return (address, artist.discogsID)
     }
 

@@ -288,4 +288,17 @@ final class PortraitIdentityTests: XCTestCase {
         await dig.followPortraitChanges()
         XCTAssertEqual(feeds.last, ["2026-10-13T16:00:00Z"])
     }
+
+    // MARK: Sharp, not the 150-pixel cut
+
+    func testAKnownArtistsPortraitIsTheFullImage() async throws {
+        let duo = DiscogsArtist(nameKey: RecordingKey.normalizeArtist("Hype Williams"), discogsID: 1874027, name: "Hype Williams")
+        duo.thumbnailURLString = "https://i.discogs.com/x/rs:fit/g:sm/q:40/h:150/w:150/duo.jpeg"
+        duo.imageURLString = "https://i.discogs.com/x/rs:fit/g:sm/q:90/h:600/w:600/duo.jpeg"
+        context.insert(duo)
+        try context.save()
+        let worker = DigWorker(modelContainer: container, discogs: DiscogsClient(transport: SearchTransport([]), token: "test"))
+        guard case .found(let url) = await worker.fillPortrait(named: "Hype Williams") else { return XCTFail() }
+        XCTAssertFalse(DiscogsClient.isSmallCut(url.absoluteString), url.absoluteString)
+    }
 }

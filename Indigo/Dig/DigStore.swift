@@ -1297,6 +1297,7 @@ final class DigStore {
             }
             guard let address = portrait.url, let url = URL(string: address) else { continue }
             portraits[key] = url
+            if portrait.state == "verified" { catalogueVouched.insert(key) }
             if portrait.state == "verified", let id = portrait.discogsID {
                 portraits[ArtistPortrait.identityKey(id)] = url
             }
@@ -1412,6 +1413,10 @@ final class DigStore {
     /// them and every name would look unasked-for.
     /// Names whose small picture has been asked to be replaced this session.
     @ObservationIgnored private var sharpened: Set<String> = []
+    /// Names whose face the catalogue verified by identity. Not "unresolved":
+    /// the catalogue answers old-rule faces that way too, and those are the
+    /// ones most in need of the full image.
+    @ObservationIgnored private var catalogueVouched: Set<String> = []
 
     /// Whether a name on screen holds only Discogs' 150-pixel thumb, kept
     /// from when these were 38-point rows: asked for again, once a session
@@ -1419,7 +1424,10 @@ final class DigStore {
     /// request budget goes on what is being looked at.
     private func wantsSharperPortrait(_ name: String) -> Bool {
         let key = RecordingKey.normalizeArtist(name)
-        guard !key.isEmpty, !sharpened.contains(key) else { return false }
+        // Not a face the catalogue verified: asking again by name could
+        // only lose it to a namesake, and the catalogue upgrades its own to the
+        // full image, which reaches this device through the change feed.
+        guard !key.isEmpty, !sharpened.contains(key), !catalogueVouched.contains(key) else { return false }
         return DiscogsClient.isSmallCut(portraits[key]?.absoluteString)
     }
 
