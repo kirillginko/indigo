@@ -462,3 +462,20 @@ Never read: off. Checked at every bundle read, cached ones included. Off deletes
 - An artist outside the pilot (e.g. Prefuse 73): unchanged.
 - From a credited release, a credit opens the credited artist, not a namesake.
 - `Scripts/dig-enrichment-switch.sh off`, then wait out the 15-minute TTL (a relaunch keeps the last answer until then): the pilot rows are gone; `on debug`, 15 minutes again: back.
+
+---
+
+## 12. Batch 1 and the DIG page (2026-10-13/14)
+
+- **Batch 1:** 3,000 dead-end artists (none had a route), validated before publication (2,686 gain a strong route that leads on; all routes by Discogs id), built by the worker for the approved list only, published with the pilot as one manifest of 3,300, and verified from the public host: 3,300/3,300 rebuild byte-for-byte from their documents.
+- **Page:** verified aliases and same-record routes were never shown and now have lanes; remixers have their own; routes that lead on come first in every lane and say where they go ("leads to N more"); lanes open past twelve; the bundle's labels join the page; "From the records" says what the documents state when there is no written profile (31% of these artists have one; 99.5% have two or more facts). No generated biographies.
+- **Real iOS pages (batch 1, 22 artists):** 20/22 show their bundle, 120 people new to the page, 5 pages from nothing to 5–29 rows.
+- **Anomalies, traced in the app:** a label neighbour's variant spelling opened the wrong Discogs entry (fixed: no row for a credited variant); catalogue search dropped the Discogs id (fixed: Ritual Band now has 8 routes); OG Parker's bundle row was the 13th of 13 collaborators, below the device's own (as designed). A page opened by name uses its bundle only when its identity is verified.
+- **Artwork:** portraits are Discogs' full image (backend and device); 886 of 892 catalogue portraits re-fetched to it, none lost; the cache is keyed by URL, and an upgraded face is not asked for again.
+
+## 13. Internal TestFlight build 4
+
+- Switch: on for `debug` and `testflight`, pinned to the 3,300-artist manifest; App Store builds read nothing. `Scripts/release-enrichment-guard.sh <archive>` must pass before any upload: no development override in the bundle, no App Store cohort in the switch.
+- Archive: 1.0 (4), arm64, iOS 18.0+, team M3D5972R39; 82 iOS tests pass (enrichment, switch, pages, portraits, search, identity, schema and migration).
+- Store: V7 → V8 is lightweight and adds local cache tables only; the synced user-data models are unchanged, so the Production CloudKit schema needs no deploy.
+- Not verifiable here: App Store signing (no distribution certificate or Xcode account in this shell) -- Xcode Organizer re-signs with the App Store profile (push and iCloud Production). TestFlight is told apart by its sandbox receipt; if a device reports otherwise, enrichment stays off -- the safe failure.
