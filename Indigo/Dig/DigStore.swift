@@ -1022,9 +1022,7 @@ final class DigStore {
         // the window had settled and the listener had started scrolling. The
         // same read is measured at over two hundred milliseconds inside the
         // fold, and nothing here measured it at all.
-        let index = await worker.portraitIndex()
-        portraits = index.found
-        portraitsSettled = index.settled
+        await loadPortraitIndex()
         // Once: faces cached by the old first-match rule, checked against the
         // catalogue's portrait states (0081).
         await revalidateCachedPortraits()
@@ -1433,6 +1431,20 @@ final class DigStore {
     /// from when these were 38-point rows: asked for again, once a session
     /// and only while on screen, for the cover. Off screen it waits, so the
     /// request budget goes on what is being looked at.
+    /// What this device holds, read off the worker: the faces, and the names
+    /// already settled. What a launch starts from.
+    func loadPortraitIndex() async {
+        let index = await worker.portraitIndex()
+        portraits = index.found
+        portraitsSettled = index.settled
+    }
+
+    /// Whether a name would cost a request now: it has no face and is not
+    /// settled, or holds only the 150-pixel cut. Read-only.
+    func wantsPortraitRequest(for name: String) -> Bool {
+        isPortraitWanted(name) || wantsSharperPortrait(name)
+    }
+
     private func wantsSharperPortrait(_ name: String) -> Bool {
         let key = RecordingKey.normalizeArtist(name)
         // Not a face the catalogue verified: asking again by name could

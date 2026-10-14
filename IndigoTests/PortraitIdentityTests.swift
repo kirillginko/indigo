@@ -301,4 +301,25 @@ final class PortraitIdentityTests: XCTestCase {
         guard case .found(let url) = await worker.fillPortrait(named: "Hype Williams") else { return XCTFail() }
         XCTAssertFalse(DiscogsClient.isSmallCut(url.absoluteString), url.absoluteString)
     }
+
+    func testAnUpgradedFaceIsNotAskedForAgainOnTheNextLaunch() async throws {
+        // A face the old rule left at 150 pixels.
+        cache("Purelink", "https://i.discogs.com/x/rs:fit/g:sm/q:40/h:150/w:150/purelink.jpeg")
+        let firstLaunch = store()
+        await firstLaunch.loadPortraitIndex()
+        XCTAssertTrue(firstLaunch.wantsPortraitRequest(for: "Purelink"), "A small cut on screen is asked for once")
+
+        // The request finds the cover, and it is written down.
+        let transport = SearchTransport([["id": 77, "title": "Purelink", "cover_image": "https://i.discogs.com/x/rs:fit/g:sm/q:90/h:600/w:600/purelink.jpeg"]])
+        let worker = DigWorker(modelContainer: container, discogs: DiscogsClient(transport: transport, token: "test"))
+        guard case .found(let url) = await worker.fillPortrait(named: "Purelink") else { return XCTFail() }
+        XCTAssertFalse(DiscogsClient.isSmallCut(url.absoluteString))
+
+        // The next launch starts from what was written: nothing to ask.
+        let nextLaunch = store()
+        await nextLaunch.loadPortraitIndex()
+        XCTAssertEqual(nextLaunch.portraitURL(for: "Purelink"), url)
+        XCTAssertFalse(nextLaunch.wantsPortraitRequest(for: "Purelink"), "Sharp now: no request on this launch or any after")
+        XCTAssertEqual(transport.asked, 1)
+    }
 }
