@@ -485,9 +485,15 @@ final class DigStore {
         // arrives is announced as any other enrichment is, so the page walks
         // again with it. A slow host costs the page nothing.
         var walkWithBundle = false
+        // The entry a page opened by name is, when the evidence verifies it:
+        // only then may its catalogue bundle speak for the page, and the walk
+        // is given the id so the bundle's routes are added to it (OG Parker,
+        // opened by name, showed none of its bundle's). An unverified guess
+        // never picks whose bundle a page gets.
+        var walkID = discogsID
         DigEnrichmentSwitch.shared.refreshInBackgroundIfDue()
-        if CataloguePilot.shared.isEnabled,
-           let entry = discogsID ?? artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID)).identity.discogsID {
+        if CataloguePilot.shared.isEnabled, let entry = discogsID ?? verifiedEntry(name: name, mbid: mbid) {
+            if walkID == nil, CataloguePilot.shared.hasBundle(entry) { walkID = entry }
             let pilot = CataloguePilot.shared
             if pilot.bundle(for: entry) == nil {
                 Task { [weak self] in
@@ -523,15 +529,21 @@ final class DigStore {
         // so it is what the line has to show.
         let running = Task { [worker] in
             await Trace.stage("graph.walk", key) {
-                await worker.artistProfile(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID, generation: asked)
+                await worker.artistProfile(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: walkID, generation: asked)
             }
         }
         walking[key] = running
-        let profile = forPage(await running.value, discogsID: discogsID)
+        let profile = forPage(await running.value, discogsID: walkID)
         walking[key] = nil
         profiles.store(profile, key: key, revision: asked)
         Task { await settleGraphNames() }
         return profile
+    }
+
+    /// The Discogs entry a name is, only when the evidence verifies it.
+    private func verifiedEntry(name: String, mbid: String?) -> Int? {
+        let resolution = artistResolution(ArtistReference(name: name, mbid: mbid))
+        return resolution.isVerified ? resolution.identity.discogsID : nil
     }
 
     /// What the page adds to a walked profile: which routes lead on (this
@@ -552,8 +564,7 @@ final class DigStore {
             }
             return row
         }
-        guard let entry = discogsID ?? artistResolution(ArtistReference(name: walked.name, mbid: walked.mbid)).identity.discogsID
-        else { return profile }
+        guard let entry = discogsID ?? verifiedEntry(name: walked.name, mbid: walked.mbid) else { return profile }
         if (profile.biography ?? "").isEmpty, let bundle = pilot.bundle(for: entry) {
             profile.fromTheRecords = RecordsSummary.make(bundle)
         }

@@ -609,7 +609,10 @@ extension DigSearchResult {
                 title: $0.name,
                 detail: $0.country?.nilIfEmpty,
                 artworkURL: nil,
-                destination: .digArtist(mbid: nil, name: $0.name)
+                // By the catalogue's own Discogs id, when it has one: opened by
+                // name, a page whose name Discogs cannot settle never learns
+                // who it is (Ritual Band, 9242020, showed nothing at all).
+                destination: .digArtist(mbid: nil, name: $0.name, discogsID: $0.discogsID.flatMap(Int.init))
             )
         }
         + results.labels.map { label in
