@@ -14,13 +14,16 @@ set -euo pipefail
 archive="${1:?the .xcarchive}"
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-binary=$(find "$archive/Products/Applications" -maxdepth 3 -type f -perm -u+x -path "*Indigo.app/Indigo" | head -1)
-[ -n "$binary" ] || { echo "FAIL: no Indigo binary in $archive" >&2; exit 1; }
-if strings -a "$binary" | grep -q "INDIGO_DIG_CATALOGUE_PILOT"; then
-    echo "FAIL: the release binary contains the development enrichment override" >&2
+app=$(find "$archive/Products/Applications" -maxdepth 1 -type d -name "*.app" | head -1)
+[ -n "$app" ] || { echo "FAIL: no app in $archive" >&2; exit 1; }
+# Every file in the bundle: a development build keeps its code in a separate
+# Indigo.debug.dylib, and a check of the main binary alone would miss it.
+found=$(find "$app" -type f -print0 | xargs -0 grep -l -a "INDIGO_DIG_CATALOGUE_PILOT" 2>/dev/null || true)
+if [ -n "$found" ]; then
+    echo "FAIL: the development enrichment override is in: $found" >&2
     exit 1
 fi
-echo "ok: no development override in $(basename "$(dirname "$binary")")"
+echo "ok: no development override anywhere in $(basename "$app")"
 
 config=$(supabase db query --linked "select public.dig_enrichment_config() as c" 2>/dev/null)
 python3 - "$config" <<'PY'
