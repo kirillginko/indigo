@@ -231,7 +231,15 @@ struct PhoneRootView: View {
             PhoneTabBar(
                 selected: PhoneTab.of(appState.route),
                 searching: appState.route == .dig,
-                select: { tab in appState.select(tab.route) },
+                select: { tab in
+                    // For You chosen again while on its feed: back to the globe. From
+                    // a page opened out of it, the first tap returns to the feed.
+                    if tab == .forYou, appState.route == .forYou, appState.path.isEmpty {
+                        withAnimation(.easeInOut(duration: 0.4)) { PhoneFeeds.shared.forYouID = "cover" }
+                    } else {
+                        appState.select(tab.route)
+                    }
+                },
                 search: { appState.select(.dig) }
             )
         }

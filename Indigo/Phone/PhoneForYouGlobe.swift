@@ -37,7 +37,8 @@ struct PhoneForYouGlobe: View {
     /// How far the globe has been turned by hand, in radians.
     @State private var turned: Double = 0
     @Environment(PlaybackCoordinator.self) private var player
-    @GestureState private var turning: Double = 0
+    /// How far the hand is turning it now, before it lets go.
+    @State private var turning: Double = 0
 
     /// One turn a minute and a bit, on its own.
     private static let turnsPerSecond = 1.0 / 75
@@ -106,18 +107,16 @@ struct PhoneForYouGlobe: View {
                     }
                 }
             }
-            // Sideways only: up and down still page the feed.
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 12)
-                    .updating($turning) { value, state, _ in
-                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                        state = Double(value.translation.width / radius)
-                    }
-                    .onEnded { value in
-                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                        turned += Double(value.translation.width / radius)
-                    }
-            )
+            // Sideways only: up and down still page the feed, from anywhere
+            // on the globe. SwiftUI's DragGesture, even as a simultaneous
+            // one, took every swipe that began on the globe from the scroll
+            // view, so the feed only paged from below it.
+            .sidewaysPan { width in
+                turning = Double(width / radius)
+            } ended: { width in
+                turned += Double(width / radius)
+                turning = 0
+            }
         }
     }
 
@@ -260,3 +259,63 @@ struct PhoneForYouGlobe: View {
         .accessibilityLabel("\(item.title), \(item.label)")
     }
 }
+
+// MARK: Turning by hand
+
+private extension View {
+    /// A horizontal drag that never begins on a vertical one, so whatever
+    /// scrolls up and down around it still does.
+    func sidewaysPan(changed: @escaping (CGFloat) -> Void, ended: @escaping (CGFloat) -> Void) -> some View {
+        #if os(iOS)
+        gesture(SidewaysPan(changed: changed, ended: ended))
+        #else
+        simultaneousGesture(
+            DragGesture(minimumDistance: 12)
+                .onChanged { value in
+                    guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                    changed(value.translation.width)
+                }
+                .onEnded { value in ended(abs(value.translation.width) > abs(value.translation.height) ? value.translation.width : 0) }
+        )
+        #endif
+    }
+}
+
+#if os(iOS)
+import UIKit
+
+private struct SidewaysPan: UIGestureRecognizerRepresentable {
+    let changed: (CGFloat) -> Void
+    let ended: (CGFloat) -> Void
+
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator { Coordinator() }
+
+    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
+        let pan = UIPanGestureRecognizer()
+        pan.delegate = context.coordinator
+        return pan
+    }
+
+    func handleUIGestureRecognizerAction(_ recognizer: UIPanGestureRecognizer, context: Context) {
+        let width = recognizer.translation(in: recognizer.view).x
+        switch recognizer.state {
+        case .changed: changed(width)
+        case .ended: ended(width)
+        case .cancelled, .failed: ended(0)
+        default: break
+        }
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        /// Begins only when the finger set off more across than down.
+        func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
+            guard let pan = recognizer as? UIPanGestureRecognizer else { return true }
+            let velocity = pan.velocity(in: pan.view)
+            return abs(velocity.x) > abs(velocity.y)
+        }
+
+        func gestureRecognizer(_ recognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
+    }
+}
+#endif
