@@ -57,6 +57,30 @@ final class CataloguePilotPagesUITests: XCTestCase {
         return found
     }
 
+    func press(_ element: XCUIElement) {
+        #if os(macOS)
+        element.click()
+        #else
+        element.tap()
+        #endif
+    }
+
+    func scrollDown() {
+        #if os(macOS)
+        app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.6)).scroll(byDeltaX: 0, deltaY: -600)
+        #else
+        app.swipeUp()
+        #endif
+    }
+
+    func scrollUp() {
+        #if os(macOS)
+        app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.6)).scroll(byDeltaX: 0, deltaY: 600)
+        #else
+        app.swipeDown()
+        #endif
+    }
+
     /// Opens the page; nil when search did not offer the artist.
     func open(_ name: String, pilot: Bool) -> (firstMs: Int?, rows: Set<String>)? {
         app = XCUIApplication.indigo()
@@ -64,14 +88,24 @@ final class CataloguePilotPagesUITests: XCTestCase {
         app.launchArguments += ["-INDIGO_DIG_CATALOGUE_PILOT", pilot ? "YES" : "NO"]
         app.launch()
         sleep(3)
+        #if os(macOS)
+        app.buttons["Dig"].firstMatch.click()
+        sleep(2)
+        let field = app.textFields.firstMatch
+        guard field.waitForExistence(timeout: 15) else { return nil }
+        field.click()
+        field.typeKey("a", modifierFlags: .command)
+        app.typeText(name)
+        #else
         app.buttons["Search"].firstMatch.tap()
         let field = app.textFields.firstMatch
         guard field.waitForExistence(timeout: 10) else { return nil }
         field.tap()
         field.typeText(name)
+        #endif
         let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Artist, " + name)).firstMatch
         guard row.waitForExistence(timeout: 45) else { return nil }
-        row.tap()
+        press(row)
         let opened = Date()
         var first: Int?
         var rows = Set<String>()
@@ -84,7 +118,7 @@ final class CataloguePilotPagesUITests: XCTestCase {
         }
         // Then all of it, scrolled through.
         for _ in 0..<12 {
-            app.swipeUp()
+            scrollDown()
             usleep(700_000)
             rows.formUnion(relationshipLabels())
         }
@@ -103,11 +137,20 @@ final class CataloguePilotPagesUITests: XCTestCase {
             app = XCUIApplication.indigo()
             app.launch()
             sleep(3)
+            #if os(macOS)
+            app.buttons["Dig"].firstMatch.click()
+            #else
             app.buttons["Search"].firstMatch.tap()
+            #endif
             let field = app.textFields.firstMatch
             if field.waitForExistence(timeout: 10) {
-                field.tap()
+                press(field)
+                #if os(macOS)
+                field.typeKey("a", modifierFlags: .command)
+                app.typeText("Prefuse 73")
+                #else
                 field.typeText("Prefuse 73")
+                #endif
                 warm = app.buttons.matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Artist, Prefuse 73")).firstMatch.waitForExistence(timeout: 30)
             }
             app.terminate()
@@ -121,11 +164,11 @@ final class CataloguePilotPagesUITests: XCTestCase {
             if let on, let off, let gained = on.rows.subtracting(off.rows).sorted().first {
                 // A row the pilot added opens the artist it names.
                 let target = String(gained.prefix { $0 != "," })
-                for _ in 0..<12 { app.swipeDown() }
+                for _ in 0..<12 { scrollUp() }
                 let button = app.buttons.matching(NSPredicate(format: "label == %@", gained)).firstMatch
-                for _ in 0..<14 where !button.isHittable { app.swipeUp(); usleep(500_000) }
+                for _ in 0..<14 where !button.isHittable { scrollDown(); usleep(500_000) }
                 if button.isHittable {
-                    button.tap()
+                    press(button)
                     sleep(6)
                     let title = app.staticTexts.matching(NSPredicate(format: "label == %@", target)).firstMatch
                     opened = title.waitForExistence(timeout: 10) ? "opened \(target)" : "did NOT show \(target)"
