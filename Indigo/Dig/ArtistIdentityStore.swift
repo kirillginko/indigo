@@ -248,6 +248,28 @@ nonisolated struct ReleaseCreditStore {
 
     func provenance(releaseID: Int) -> String? { record(releaseID)?.source }
 
+    /// The one entry the kept credits name under a spelling, or nil when none
+    /// does or several do.
+    ///
+    /// For a page opened by a sleeve's spelling and nothing else: Discogs'
+    /// search does not answer "Guillermo S. Herren" with Scott Herren, and the
+    /// spelling check rightly will not take a different name on trust, so a
+    /// link to a credit that arrived without its id led to an empty page. The
+    /// release documents already held say which entry the spelling credited;
+    /// read the same way `CreditEdgeIdentity` reads them, so two entries
+    /// credited alike are namesakes and answer nothing.
+    func entry(credited spelling: String) -> ReleaseCredit? {
+        let key = RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(spelling))
+        guard !key.isEmpty else { return nil }
+        let matching = ((try? context.fetch(FetchDescriptor<ReleaseCreditRecord>())) ?? [])
+            .flatMap(\.credits)
+            .filter {
+                RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator($0.creditedName)) == key
+                    || RecordingKey.normalizeArtist($0.name) == key
+            }
+        return CreditEdgeIdentity.entries(in: matching)[key]
+    }
+
     private func record(_ id: Int) -> ReleaseCreditRecord? {
         var descriptor = FetchDescriptor<ReleaseCreditRecord>(predicate: #Predicate { $0.releaseDiscogsID == id })
         descriptor.fetchLimit = 1

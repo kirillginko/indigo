@@ -2715,8 +2715,21 @@ final class DigStore {
                         genre: nil, style: nil, label: nil, year: nil
                     ), spelling: nil)
                 } else {
-                    lookup = try await Trace.stage("dig.head", name) {
+                    let found = try await Trace.stage("dig.head", name) {
                         try await discogsClient.artistLookup(named: name)
+                    }
+                    // Nobody on Discogs answers to the spelling: a sleeve's
+                    // own spelling of somebody, opened from a link that lost
+                    // the id. The credits held say whose it is, when they say
+                    // it of exactly one entry. See `ReleaseCreditStore.entry`.
+                    if found.head == nil, let credit = ReleaseCreditStore(context: context).entry(credited: name),
+                       let id = credit.discogsID {
+                        lookup = DiscogsArtistLookup(head: DiscogsSearchResult(
+                            id: id, title: name, coverImage: nil, thumbnail: nil,
+                            genre: nil, style: nil, label: nil, year: nil
+                        ), spelling: found.spelling)
+                    } else {
+                        lookup = found
                     }
                 }
                 let head = lookup.head

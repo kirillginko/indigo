@@ -97,6 +97,26 @@ final class ReleaseCreditStoreTests: XCTestCase {
         XCTAssertEqual(store.provenance(releaseID: 555), "discogs:releases/555")
     }
 
+    func testASleeveSpellingFindsTheEntryItCredited() throws {
+        enricher.store(try decode(document), id: 555)
+        let store = ReleaseCreditStore(context: context)
+
+        XCTAssertEqual(store.entry(credited: "G. S. Herren")?.discogsID, 229415,
+                       "A spelling Discogs' search cannot place, placed by the credit that used it")
+        XCTAssertEqual(store.entry(credited: "Prefuse73")?.discogsID, 3722)
+        XCTAssertNil(store.entry(credited: "Unfiled Friend"), "No entry named, no answer")
+        XCTAssertNil(store.entry(credited: "Nobody At All"))
+    }
+
+    func testASpellingCreditedToTwoEntriesAnswersNothing() throws {
+        enricher.store(try decode(document), id: 555)
+        enricher.store(try decode(#"""
+        {"id":556,"title":"Other","artists":[{"id":1,"name":"Someone"}],
+         "extraartists":[{"id":424242,"name":"Gary Herren","anv":"G. S. Herren","role":"Bass"}]}
+        """#), id: 556)
+        XCTAssertNil(ReleaseCreditStore(context: context).entry(credited: "G. S. Herren"), "Namesakes: cannot say which")
+    }
+
     func testARefreshedDocumentReplacesEveryCredit() throws {
         enricher.store(try decode(document), id: 555)
         enricher.store(try decode(refreshed), id: 555, source: ReleaseCreditStore.source(storedRelease: 555))
