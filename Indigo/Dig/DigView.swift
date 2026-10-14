@@ -481,8 +481,22 @@ struct DigView: View {
     /// own — what is on screen before anybody scrolls a shelf sideways.
     private func facesWanted(_ found: CrateRecommendations) -> [String] {
         let rows = [found.forYou] + found.shelves.map(\.picks)
-        let names = rows.flatMap { $0.prefix(8).filter { $0.node.artworkURL == nil }.map(\.node.title) }
+        // No picture, or only the 150-pixel cut stamped on the node when its
+        // edge was built: both are asked for, the second for the full image.
+        let names = rows.flatMap {
+            $0.prefix(8).filter { $0.node.artworkURL == nil || DiscogsClient.isSmallCut(tileImage($0.node)?.absoluteString) }
+                .map(\.node.title)
+        }
         return Array(names.prefix(40))
+    }
+
+    /// An artist's portrait first -- the device's current one, kept by identity
+    /// where it is known and upgraded to the full image -- and only then the
+    /// picture copied onto the node when its edge was built, which is the
+    /// 150-pixel cut of whatever was known then.
+    private func tileImage(_ node: MusicNode) -> URL? {
+        guard node.kind == .artist else { return node.artworkURL }
+        return dig.portraitURL(for: node.title, discogsID: node.discogsID) ?? node.artworkURL
     }
 
     /// Spotify's shape, Indigo's evidence: rows of faces to go and open, each
@@ -726,7 +740,7 @@ private struct DigShelf: View {
                             .overlay {
                                 GeometryReader { proxy in
                                     ArtworkView(
-                                        remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title, discogsID: pick.node.discogsID),
+                                        remoteURL: tileImage(pick.node),
                                         side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic
                                     )
                                 }
@@ -779,7 +793,7 @@ private struct DigArtistCard: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 8) {
                 ArtworkView(
-                    remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title, discogsID: pick.node.discogsID),
+                    remoteURL: tileImage(pick.node),
                     side: Self.side,
                     glyphScale: 0.26,
                     placeholder: .mosaic

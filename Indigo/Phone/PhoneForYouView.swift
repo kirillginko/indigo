@@ -73,7 +73,7 @@ struct PhoneForYouView: View {
                                     PhoneForYouSlide(
                                         suggestion: suggestion,
                                         portrait: suggestion.node.kind == .artist
-                                            ? dig.portraitURL(for: suggestion.node.title) : nil,
+                                            ? dig.portraitURL(for: suggestion.node.title, discogsID: suggestion.node.discogsID) : nil,
                                         insets: insets
                                     ) { Task { await open(suggestion.node) } }
                                 case .onNow(let entry):

@@ -397,8 +397,11 @@ struct ExploreView: View {
     /// of names is a list and a row of faces is a shelf, but not at the price
     /// of a dozen fetches on the thread that draws.
     private func artwork(for suggestion: ExploreSuggestion) -> URL? {
-        suggestion.node.artworkURL
-            ?? (suggestion.node.kind == .artist ? dig.portraitURL(for: suggestion.node.title) : nil)
+        // The artist's current portrait, by identity where known, before the
+        // 150-pixel cut copied onto the node when its edge was built.
+        (suggestion.node.kind == .artist
+            ? dig.portraitURL(for: suggestion.node.title, discogsID: suggestion.node.discogsID) : nil)
+            ?? suggestion.node.artworkURL
     }
 
     /// Sleeves for the kept rows that are local files, by crate row.
