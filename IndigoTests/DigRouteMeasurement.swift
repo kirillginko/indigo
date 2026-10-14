@@ -38,6 +38,13 @@ final class DigRouteMeasurement: XCTestCase {
         var byID: [Int: (name: String, kinds: Set<RelationshipKind>, weight: Double, reason: String)] = [:]
     }
 
+    /// Value, then name, then id: two people of one name never tie.
+    private static func ahead(_ a: (Int, String, String, Double), _ b: (Int, String, String, Double)) -> Bool {
+        if a.3 != b.3 { return a.3 > b.3 }
+        if a.1 != b.1 { return a.1 < b.1 }
+        return a.0 < b.0
+    }
+
     private static let musicianKinds: Set<RelationshipKind> = [.collaborator, .personnel, .producer]
 
     func testMeasureRoutesInTheCatalogueSample() throws {
@@ -100,6 +107,28 @@ final class DigRouteMeasurement: XCTestCase {
         }
         let beforeGraph = index(before), afterGraph = index(after)
 
+        // Technical contributors as steps, never destinations: who each one
+        // connects, and whether they are specific (a handful of artists in
+        // the sample) or a hub (a mastering engineer on everyone's records).
+        var technicalTies: [Int: Set<Int>] = [:]
+        for (from, found) in before {
+            let kept = Set(after[from]?.byID.keys.map { $0 } ?? [])
+            for to in found.byID.keys where !kept.contains(to) { technicalTies[to, default: []].insert(from) }
+        }
+        let specificLimit = 5
+        func bridgedReach(_ id: Int, hubs: Bool) -> Int {
+            var reach = afterGraph[id] ?? []
+            for next in afterGraph[id] ?? [] { reach.formUnion(afterGraph[next] ?? []) }
+            // A → technical T → C: C is a musician reached through somebody
+            // who worked on both their records, when T is specific.
+            for (_, artists) in technicalTies where artists.contains(id) && (hubs || artists.count <= specificLimit) {
+                reach.formUnion(artists)
+            }
+            reach.remove(id)
+            return reach.count
+        }
+        let hubCount = technicalTies.values.filter { $0.count > specificLimit }.count
+
         struct PageStats {
             var meaningful = 0, musician = 0, technical = 0, label = 0, coAppearance = 0, twoHop = 0
         }
@@ -140,7 +169,7 @@ final class DigRouteMeasurement: XCTestCase {
                 }
                 return (to, route.name, route.reason, value)
             }
-            .sorted { $0.3 != $1.3 ? $0.3 > $1.3 : $0.1 < $1.1 }
+            .sorted(by: Self.ahead)
             .map { ($0.0, $0.1, $0.2) }
         }
         var lines: [String] = []
@@ -152,6 +181,7 @@ final class DigRouteMeasurement: XCTestCase {
             var technicalOnly = 0, technicalMostly = 0, labelOnly = 0
             var reachBefore: [Int] = [], reachAfter: [Int] = []
             var crowdedTop = 0, technicalInTop = 0, deadEndsInTopBefore = 0, deadEndsInTopAfter = 0
+            var reachSpecific: [Int] = [], reachHubs: [Int] = []
             var technicalRoutes = 0, musicianRoutesBefore = 0
             for id in set where bundles[id] != nil {
                 let technical = Set((before[id]?.byID.keys).map(Array.init) ?? [])
@@ -167,6 +197,7 @@ final class DigRouteMeasurement: XCTestCase {
                 if b.musician > 0 && Double(b.technical) / Double(b.musician) > 0.5 { technicalMostly += 1 }
                 if b.musician == 0 && b.coAppearance == 0 && b.label > 0 { labelOnly += 1 }
                 reachBefore.append(b.twoHop); reachAfter.append(a.twoHop)
+                reachSpecific.append(bridgedReach(id, hubs: false)); reachHubs.append(bridgedReach(id, hubs: true))
                 technicalRoutes += b.technical; musicianRoutesBefore += b.musician
                 // What the page shows first: today's lanes, musician-first's order.
                 let topToday = ordered(before[id]?.byID ?? [:], musicianFirst: false, graph: afterGraph, from: id).prefix(5)
@@ -188,6 +219,7 @@ final class DigRouteMeasurement: XCTestCase {
             lines.append("pages with only label routes: \(labelOnly)")
             lines.append("first five routes shown: technical credits today \(technicalInTop) (pages with 2+: \(crowdedTop)), musician-first 0")
             lines.append("first five routes shown that lead nowhere further: today \(deadEndsInTopBefore), musician-first \(deadEndsInTopAfter)")
+            lines.append("two-hop musician reach, musicians only: median \(median(reachAfter)), mean \(mean(reachAfter)); with specific technical steps (≤\(specificLimit) artists): median \(median(reachSpecific)), mean \(mean(reachSpecific)); with every technical step, hubs included: median \(median(reachHubs)), mean \(mean(reachHubs)) (\(hubCount) hubs in the sample)")
             lines.append("two-hop reach (today through every route offered; musician-first through musicians only)  today: median \(median(reachBefore)), mean \(mean(reachBefore)); musician-first: median \(median(reachAfter)), mean \(mean(reachAfter))")
         }
 

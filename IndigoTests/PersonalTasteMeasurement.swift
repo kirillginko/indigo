@@ -23,7 +23,7 @@ import CryptoKit
 final class PersonalTasteMeasurement: XCTestCase {
     override func tearDown() { MusicianFirst.override = nil }
 
-    func testMeasureStartingPointsAndOffersOnTheRealHistory() throws {
+    func testMeasureStartingPointsAndOffersOnTheRealHistory() async throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["INDIGO_MEASURE_TASTE"] == "1",
                           "Set INDIGO_MEASURE_TASTE=1 to measure the real history.")
         let support = try XCTUnwrap(FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first)
@@ -120,103 +120,92 @@ final class PersonalTasteMeasurement: XCTestCase {
                 .map { "\($0.node.title) \(String(format: "%.2f", $0.weight))" }.joined(separator: ", "))
         }
 
-        // Offers: today's ranking on today's knowledge (switch off), the
-        // shadow on musician-first knowledge, and the shadow from the newest
-        // crate only.
-        func knowledge(_ origins: [MusicNode], musicianFirst: Bool) -> (KnowledgeSnapshot, Duration) {
+        // For You as the app works it out (`DigWorker`), today's engine and
+        // musician-first, each on a worker of its own so the first look is
+        // cold; then the same look again, warm.
+        let period = ExplorePeriod.containing(asOf)
+        func forYou(musicianFirst: Bool, rows: PersonalInputs? = nil) async
+            -> (offers: ExploreOffers, cold: Duration, warm: Duration, coldRank: Duration, warmRank: Duration) {
+            ForYouMusicianFirst.override = musicianFirst
             MusicianFirst.override = musicianFirst
-            let started = ContinuousClock.now
-            let adapter = LocalKnowledgeAdapter(context: context)
-            var walked: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
-            for origin in origins { walked[origin] = adapter.neighbourhood(of: origin) }
-            let snapshot = LocalKnowledgeAdapter.assemble(
-                origins: origins, walked: walked, shows: adapter.shows(),
-                artistTags: LocalKnowledgeAdapter.artistTags(for: personal.tasteArtistKeys, in: context),
-                scenes: nil, libraryCounts: adapter.libraryCounts())
-            return (snapshot, ContinuousClock.now - started)
-        }
-        func onward(_ nodes: [MusicNode]) -> [String: Int] {
-            let graph = GraphStore(context: context)
-            var counts: [String: Int] = [:]
-            for node in nodes where node.kind == .artist {
-                counts[node.id] = Set(graph.neighbors(of: node).all
-                    .filter { $0.to.kind == .artist && MusicianFirstRanker.isMusicianRoute($0.kind) }
-                    .map(\.to.id)).count
+            defer { ForYouMusicianFirst.override = nil; MusicianFirst.override = nil }
+            let worker = DigWorker(modelContainer: container)
+            func look() async -> (ExploreOffers, Duration, Duration) {
+                let started = ContinuousClock.now
+                let run = await worker.exploreRun(asOf: asOf, period: period, generation: 0, scenes: false,
+                                                  rebuild: false, now: asOf, personal: rows)
+                let ranking = ContinuousClock.now
+                let offers = await worker.exploreRecommendations(run, asOf: asOf)
+                let done = ContinuousClock.now
+                return (offers, done - started, done - ranking)
             }
-            return counts
+            let (offers, cold, coldRank) = await look()
+            let (_, warm, warmRank) = await look()
+            return (offers, cold, warm, coldRank, warmRank)
         }
-        func shadowOffers(_ rows: PersonalInputs) -> ([ExploreSuggestion], Duration, Duration) {
-            let (snapshot, built) = knowledge(MusicianFirstRanker.startingPoints(rows, asOf: asOf).map(\.node), musicianFirst: true)
-            let started = ContinuousClock.now
-            let taste = ExploreRanker.taste(personal: rows, knowledge: snapshot, asOf: asOf)
-            let first = MusicianFirstRanker.suggestions(personal: rows, knowledge: snapshot, taste: taste, asOf: asOf, limit: 24)
-            let artists = first.map(\.node).filter { $0.kind == .artist }
-            let tags = LocalKnowledgeAdapter.artistTags(for: Set(artists.map(\.key)), in: context)
-            let ranked = MusicianFirstRanker.suggestions(personal: rows, knowledge: snapshot, taste: taste, asOf: asOf,
-                                                         candidateTags: tags, onward: onward(artists), limit: 24)
-            return (ranked, built, ContinuousClock.now - started)
-        }
+        func blocks(_ offers: ExploreOffers) -> [ExploreSuggestion] { offers.next + offers.shows + offers.artists }
 
-        let (todayKnowledge, todayBuilt) = knowledge(ExploreRanker.startingPoints(personal), musicianFirst: false)
-        var started = ContinuousClock.now
-        let todayTaste = ExploreRanker.taste(personal: personal, knowledge: todayKnowledge, asOf: asOf)
-        let todayOffers = ExploreRanker.suggestions(personal: personal, knowledge: todayKnowledge, taste: todayTaste, limit: 24)
-        let todayRanked = ContinuousClock.now - started
-        let (shadowRanked, shadowBuilt, shadowRanking) = shadowOffers(personal)
+        let visible = await forYou(musicianFirst: false)
+        let shadowRun = await forYou(musicianFirst: true)
+        let again = await forYou(musicianFirst: true)
         var newestOnly = personal
         newestOnly.crate = Array(personal.crate.prefix(ExploreSuggestionEngine.origins))
         newestOnly.met = []; newestOnly.haunts = []
-        let (newestRanked, _, _) = shadowOffers(newestOnly)
-        started = ContinuousClock.now
-        let (again, warmBuilt, warmRanking) = shadowOffers(personal)
-        let warm = ContinuousClock.now - started
+        let newest = await forYou(musicianFirst: true, rows: newestOnly)
 
-        // How well each list fits the listener's long-term taste, and how
-        // varied it is.
-        let longTerm = ExploreRanker.taste(personal: personal, knowledge: todayKnowledge, asOf: asOf)
-        let allArtists = Set((todayOffers + shadowRanked + newestRanked).map(\.node).filter { $0.kind == .artist }.map(\.key))
-        let tags = LocalKnowledgeAdapter.artistTags(for: allArtists, in: context)
-        let graph = GraphStore(context: context)
-        func summary(_ label: String, _ offers: [ExploreSuggestion]) {
-            let top = Array(offers.prefix(12))
-            let artists = top.filter { $0.node.kind == .artist }
+        // What each list is, and what its explanations rest on.
+        let longTerm = TasteProfile.collected(personal: personal,
+                                              artistTags: LocalKnowledgeAdapter.artistTags(for: personal.tasteArtistKeys, in: context),
+                                              now: asOf)
+        let index = OnwardIndex(context: context)
+        func explanation(_ kind: RelationshipKind) -> String {
+            switch kind {
+            case .collaborator, .personnel, .producer, .aliasOrProject, .sameRelease, .appearsOnRelease: "a musician fact"
+            case .sharedLabel: "a label"
+            case .playedInShow, .sharedBroadcast, .playedBySameSelector, .frequentlyPlayedNearby: "radio"
+            default: "resemblance or other"
+            }
+        }
+        func summary(_ label: String, _ list: [ExploreSuggestion]) {
+            let artists = list.filter { $0.node.kind == .artist }
+            let tags = LocalKnowledgeAdapter.artistTags(for: Set(artists.map(\.node.key)), in: context)
             let fits = artists.compactMap { tags[$0.node.key] }.map { longTerm.affinity(for: $0) }
-            let leads = artists.map { artist in
-                Set(graph.neighbors(of: artist.node).all.filter { $0.to.kind == .artist && MusicianFirstRanker.isMusicianRoute($0.kind) }.map(\.to.id)).count
-            }
-            let styles = Set(artists.compactMap { tags[$0.node.key]?.first })
+            let onward = artists.map { index.count(for: $0.node) }
+            var reasons: [String: Int] = [:]
+            for offer in list { reasons[explanation(offer.kind), default: 0] += 1 }
             out.append("")
-            out.append("\(label): \(top.count) offers, \(artists.count) artists")
-            out.append(String(format: "  starting points used %d; route kinds %d; leading styles %d; long-term taste fit (artists with known styles: %d) mean %.2f; artists that lead on: %d of %d",
-                              Set(top.map(\.via)).count, Set(top.map(\.kind)).count, styles.count, fits.count,
-                              fits.isEmpty ? 0 : fits.reduce(0, +) / Double(fits.count), leads.filter { $0 > 0 }.count, artists.count))
-            for offer in top {
-                out.append("  \(offer.node.kind.rawValue) \(offer.node.title) — \(offer.reason) — via \(offer.via)")
-            }
+            out.append("\(label): \(list.count) offers, \(artists.count) artists")
+            out.append(String(format: "  diversity: %d starting points, %d route kinds, %d leading styles; taste fit (of %d with styles) %.2f",
+                              Set(list.map(\.via)).count, Set(list.map(\.kind)).count,
+                              Set(artists.compactMap { tags[$0.node.key]?.first }).count, fits.count,
+                              fits.isEmpty ? 0 : fits.reduce(0, +) / Double(fits.count)))
+            out.append("  explanations: " + reasons.sorted { $0.key < $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", "))
+            out.append("  artists that lead on (held knowledge): \(onward.filter { ($0 ?? 0) > 0 }.count), dead ends \(onward.filter { $0 == 0 }.count), unknown \(onward.filter { $0 == nil }.count)")
+            for offer in list { out.append("  \(offer.node.kind.rawValue) \(offer.node.title) — \(offer.reason) — via \(offer.via)") }
         }
-        summary("Offers today (ExploreRanker, today's knowledge)", todayOffers)
-        summary("Offers, shadow (musician-first, now + over time)", shadowRanked)
-        summary("Offers, shadow from the newest crate only", newestRanked)
+        summary("For You today (visible engine)", blocks(visible.offers))
+        summary("For You musician-first", blocks(shadowRun.offers))
+        summary("For You musician-first from the newest crate only", blocks(newest.offers))
         if withJazz.crate.count > personal.crate.count {
-            let (jazzToday, _) = knowledge(ExploreRanker.startingPoints(withJazz), musicianFirst: false)
-            summary("After crating the jazz record, today", ExploreRanker.suggestions(
-                personal: withJazz, knowledge: jazzToday,
-                taste: ExploreRanker.taste(personal: withJazz, knowledge: jazzToday, asOf: asOf), limit: 24))
-            summary("After crating the jazz record, shadow", shadowOffers(withJazz).0)
+            let jazzVisible = await forYou(musicianFirst: false, rows: withJazz)
+            let jazzShadow = await forYou(musicianFirst: true, rows: withJazz)
+            summary("After crating the jazz record, today", blocks(jazzVisible.offers))
+            summary("After crating the jazz record, musician-first", blocks(jazzShadow.offers))
+            let before = Set(blocks(shadowRun.offers).map(\.id)), after = Set(blocks(jazzShadow.offers).map(\.id))
+            out.append("Musician-first after the jazz record: \(after.subtracting(before).count) new offers, \(before.intersection(after).count) of \(before.count) kept")
         }
-        let overlap = Set(shadowRanked.prefix(12).map(\.id)).intersection(newestRanked.prefix(12).map(\.id)).count
         out.append("")
-        out.append("Full history vs newest crate only: \(overlap) of 12 offers shared")
-        out.append("Today vs shadow: \(Set(todayOffers.prefix(12).map(\.id)).intersection(shadowRanked.prefix(12).map(\.id)).count) of 12 offers shared")
-        out.append("Shadow worked out twice, same answer: \(again.map(\.id) == shadowRanked.map(\.id) && again.map(\.score) == shadowRanked.map(\.score))")
-        out.append("Timings: today knowledge \(todayBuilt), ranking \(todayRanked); shadow knowledge \(shadowBuilt), ranking with tags and onward \(shadowRanking); shadow again, warm: \(warm) (knowledge \(warmBuilt), ranking \(warmRanking))")
+        out.append("Full history vs newest crate only: \(Set(blocks(shadowRun.offers).map(\.id)).intersection(blocks(newest.offers).map(\.id)).count) offers shared")
+        out.append("Today vs musician-first: \(Set(blocks(visible.offers).map(\.id)).intersection(blocks(shadowRun.offers).map(\.id)).count) offers shared")
+        out.append("Musician-first worked out twice on fresh workers, same answer: \(blocks(again.offers).map(\.id) == blocks(shadowRun.offers).map(\.id))")
+        out.append("Timings: today cold \(visible.cold) (ranking \(visible.coldRank)), warm \(visible.warm) (ranking \(visible.warmRank)); musician-first cold \(shadowRun.cold) (ranking \(shadowRun.coldRank)), warm \(shadowRun.warm) (ranking \(shadowRun.warmRank))")
 
         let body = out.joined(separator: "\n")
         let digest = SHA256.hash(data: Data(out.filter { !$0.hasPrefix("Timings") }.joined(separator: "\n").utf8))
             .map { String(format: "%02x", $0) }.joined()
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("personal-taste-measurement.txt")
         try (body + "\n\ncontent digest (timings excluded): \(digest)\n").write(to: url, atomically: true, encoding: .utf8)
-        XCTAssertEqual(again.map(\.id), shadowRanked.map(\.id))
+        XCTAssertEqual(blocks(again.offers).map(\.id), blocks(shadowRun.offers).map(\.id))
     }
 
     private func span(_ dates: [Date]) -> String {
