@@ -483,7 +483,8 @@ export async function chooseArtistPortrait(
   if (ids.length > 1) return { kind: "ambiguous", candidates: ids.sort((a, b) => a - b) };
 
   const match = matches[0];
-  const picture = usableImage(match.thumb) ?? usableImage(match.cover_image);
+  // The search's cover image is the full one; its thumb is the 150-pixel cut.
+  const picture = usableImage(match.cover_image) ?? usableImage(match.thumb);
   if (!picture) return { kind: "none" };
   return {
     kind: "found", url: picture, discogsID: ids[0], via: "unique-name",
