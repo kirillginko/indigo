@@ -517,10 +517,37 @@ final class DigStore {
             }
         }
         walking[key] = running
-        let profile = await running.value
+        let profile = forPage(await running.value, discogsID: discogsID)
         walking[key] = nil
         profiles.store(profile, key: key, revision: asked)
         Task { await settleGraphNames() }
+        return profile
+    }
+
+    /// What the page adds to a walked profile: which routes lead on (this
+    /// device knows the artist's records, or the catalogue has a bundle for
+    /// them), and the labels the page's own bundle names that the device's
+    /// records did not.
+    private func forPage(_ walked: ArtistProfile, discogsID: Int?) -> ArtistProfile {
+        var profile = walked
+        let pilot = CataloguePilot.shared
+        profile.related = profile.related.map { row in
+            var row = row
+            if let id = row.discogsID {
+                row.leadsOn = pilot.hasBundle(id) || describedRecord(id) != nil
+            } else {
+                row.leadsOn = discogsEnricher.cachedArtist(named: row.name) != nil
+            }
+            return row
+        }
+        guard let entry = discogsID ?? artistResolution(ArtistReference(name: walked.name, mbid: walked.mbid)).identity.discogsID
+        else { return profile }
+        let held = Set(profile.labels.compactMap(\.discogsID))
+        let heldNames = Set(profile.labels.map { RecordingKey.normalize($0.name) })
+        for label in pilot.labels(for: entry) {
+            guard let id = label.discogsID, !held.contains(id), !heldNames.contains(RecordingKey.normalize(label.display)) else { continue }
+            profile.labels.append(ArtistProfile.LabelRef(name: label.display, mbid: nil, releaseCount: label.releases, discogsID: id))
+        }
         return profile
     }
 

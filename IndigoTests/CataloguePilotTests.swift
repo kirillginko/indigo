@@ -365,3 +365,45 @@ final class DigEnrichmentSwitchTests: XCTestCase {
         XCTAssertFalse(routes().isEmpty)
     }
 }
+
+/// What the page takes from the catalogue (`DigStore.forPage`).
+@MainActor
+final class DigPageFromCatalogueTests: XCTestCase {
+    func testThePageGetsItsBundlesLabelsAndKnowsWhichRoutesLeadOn() async throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let storage = PilotStorage()
+        // Two bundles: the page's, and Six Organs Of Admittance's own.
+        func put(_ body: String) -> (String, String, Int) {
+            let data = Data(body.utf8)
+            let digest = BundleFetcher.digest(data)
+            let key = "knowledge/v1/bundles/\(digest.prefix(2))/\(digest).json"
+            storage.objects[key] = data
+            return (digest, key, data.count)
+        }
+        let page = put(CataloguePilotTests.bundle)
+        let six = put(#"{"artist":{"discogsID":274469,"name":"Six Organs Of Admittance"},"collaborators":[],"credits":[],"format":"indigo.artist-knowledge/1","genres":[],"labels":[],"releases":[],"styles":[],"stylesAround":[]}"#)
+        let manifest = Data(#"{"artists":{"272472":{"digest":"\#(page.0)","key":"\#(page.1)","bytes":\#(page.2)},"274469":{"digest":"\#(six.0)","key":"\#(six.1)","bytes":\#(six.2)}},"format":"indigo.catalogue-pilot/1","missing":[]}"#.utf8)
+        let manifestDigest = BundleFetcher.digest(manifest)
+        let manifestKey = "knowledge/v1/catalogue/manifests/\(manifestDigest.prefix(2))/\(manifestDigest).json"
+        storage.objects[manifestKey] = manifest
+        storage.objects[CataloguePilot.pointerKey] = Data(#"{"manifest":"\#(manifestKey)","digest":"\#(manifestDigest)"}"#.utf8)
+
+        let pilot = CataloguePilot.shared
+        pilot.reset()
+        pilot.enabledOverride = true
+        pilot.directory = FileManager.default.temporaryDirectory.appendingPathComponent("page-\(UUID().uuidString)")
+        pilot.read = { key, _ in storage.read(key) }
+        defer { pilot.reset(); pilot.enabledOverride = nil; pilot.read = CataloguePilot.live }
+
+        let dig = DigStore(context: ModelContext(container))
+        dig.portraitDefaults = UserDefaults(suiteName: "indigo.tests.page.\(UUID().uuidString)")!
+        _ = await pilot.ensure(272472)
+        let profile = await dig.artistProfile(name: "Magic Carpathians Project", mbid: nil, discogsID: 272472)
+
+        XCTAssertEqual(profile.labels.first { $0.name == "Mental Telemetry" }?.discogsID, 79314, "The bundle's label, openable by its id")
+        let byName = Dictionary(profile.related.map { ($0.name, $0) }, uniquingKeysWith: { a, _ in a })
+        XCTAssertEqual(byName["Six Organs Of Admittance"]?.leadsOn, true, "Has a bundle of its own: leads somewhere")
+        XCTAssertEqual(byName["Ben Chasny"]?.leadsOn, false, "Nothing known beyond the credit")
+    }
+}

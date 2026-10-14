@@ -97,6 +97,10 @@ nonisolated struct RelatedArtist: Identifiable, Hashable, Sendable {
     /// The Discogs entry, when the evidence names one (see `IdentityGraph`):
     /// the page opens by it, so a credit that said "Blunt" opens Dean Blunt.
     var discogsID: Int? = nil
+    /// Whether opening them leads somewhere: this device already knows their
+    /// records, or a shared catalogue bundle describes them. A row into
+    /// another dead end is still shown, after the ones that lead on.
+    var leadsOn = false
 
     /// Namesakes share a name and nothing else here, so an entry is part of
     /// who the row is.

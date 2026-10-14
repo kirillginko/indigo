@@ -107,6 +107,18 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
     private var manifestDigest: String?
     private var bundles: [Int: ArtistBundle] = [:]
 
+    /// Whether the catalogue has a bundle for an entry, from the manifest
+    /// already read. Never a network read: before the manifest, no.
+    func hasBundle(_ discogsID: Int) -> Bool {
+        guard isEnabled else { return false }
+        return lock.withLock { manifest?[discogsID] != nil }
+    }
+
+    /// The labels an entry's bundle names, by Discogs id, when it has been read.
+    func labels(for discogsID: Int) -> [ArtistBundle.Label] {
+        bundle(for: discogsID)?.labels.filter { !$0.placeholder && !$0.ownName && $0.discogsID != nil } ?? []
+    }
+
     /// The bundle for an entry, if the pilot is on and it has been read.
     /// Synchronous: the graph walk asks, and never waits on the network.
     func bundle(for discogsID: Int) -> ArtistBundle? {

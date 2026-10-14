@@ -69,6 +69,8 @@ struct ArtistDigView: View {
     /// exactly what navigation felt like. The shell paints first and fills in.
     @State private var profile: ArtistProfile?
     @State private var lanes = Connections()
+    /// Lanes showing every row rather than the first twelve.
+    @State private var expandedLanes: Set<String> = []
     /// Set once the catalogues have actually been asked. "Nothing found"
     /// before that is a failure announced in advance.
     @State private var hasEnriched = false
@@ -94,7 +96,9 @@ struct ArtistDigView: View {
         let isCrated = kept != nil
         let collaborators = lanes.collaborators
         let producers = lanes.producers
+        let remixers = lanes.remixers
         let personnel = lanes.personnel
+        let sameRecords = lanes.sameRecords
         let projects = lanes.projects
         let labelArtists = lanes.labelArtists
         let soundArtists = lanes.soundArtists
@@ -399,7 +403,9 @@ struct ArtistDigView: View {
                                 // artists whose records they made. Which way
                                 // round it is, is in each row's own reason.
                                 connectionLane("Production", artists: producers)
+                                connectionLane("Remixes", artists: remixers)
                                 connectionLane("Personnel", artists: personnel)
+                                connectionLane("On the same records", artists: sameRecords)
                                 connectionLane("Aliases & projects", artists: projects)
                                 connectionLane("Label neighbours", artists: labelArtists)
                                 connectionLane("Same frequency", artists: soundArtists)
@@ -671,7 +677,9 @@ struct ArtistDigView: View {
     struct Connections {
         var collaborators: [RelatedArtist] = []
         var producers: [RelatedArtist] = []
+        var remixers: [RelatedArtist] = []
         var personnel: [RelatedArtist] = []
+        var sameRecords: [RelatedArtist] = []
         var projects: [RelatedArtist] = []
         var labelArtists: [RelatedArtist] = []
         var soundArtists: [RelatedArtist] = []
@@ -683,16 +691,29 @@ struct ArtistDigView: View {
         /// lands in the strongest lane that claims them.
         static func split(_ related: [RelatedArtist]) -> Connections {
             var lanes = Connections()
-            for artist in related {
+            // Who leads somewhere first, the order within each kind kept.
+            let ordered = related.enumerated().sorted {
+                $0.element.leadsOn != $1.element.leadsOn ? $0.element.leadsOn : $0.offset < $1.offset
+            }.map(\.element)
+            for artist in ordered {
                 let kinds = Set(artist.reasons.map(\.kind))
-                if !kinds.isDisjoint(with: [.collaborator, .appearsOnRelease]) {
+                if !kinds.isDisjoint(with: [.sameAlias, .aliasOrProject]) {
+                    // Their own other names first: an alias is the same
+                    // person, whatever else the records say about them.
+                    lanes.projects.append(artist)
+                } else if !kinds.isDisjoint(with: [.collaborator, .appearsOnRelease]) {
                     lanes.collaborators.append(artist)
                 } else if kinds.contains(.producer) {
-                    lanes.producers.append(artist)
+                    // A remixer is somebody whose production credits are all
+                    // remixes. One credit often names several jobs ("Producer,
+                    // Remix"): any production beyond the remix keeps them here.
+                    let jobs = artist.reasons.filter { $0.kind == .producer }.map { $0.detail.lowercased() }
+                    let remixOnly = !jobs.isEmpty && jobs.allSatisfy { $0.contains("remix") && !$0.contains("produc") }
+                    if remixOnly { lanes.remixers.append(artist) } else { lanes.producers.append(artist) }
                 } else if kinds.contains(.personnel) {
                     lanes.personnel.append(artist)
-                } else if kinds.contains(.aliasOrProject) {
-                    lanes.projects.append(artist)
+                } else if kinds.contains(.sameRelease) {
+                    lanes.sameRecords.append(artist)
                 } else if kinds.contains(.sharedLabel) {
                     lanes.labelArtists.append(artist)
                 } else if kinds.contains(.sharedStyle) {
@@ -959,7 +980,7 @@ struct ArtistDigView: View {
                     alignment: .leading,
                     spacing: 10
                 ) {
-                    ForEach(artists.prefix(12)) { peer in
+                    ForEach(expandedLanes.contains(title) ? Array(artists) : Array(artists.prefix(12))) { peer in
                         ConnectionExplainer(
                             artist: peer,
                             portrait: dig.portraitURL(for: peer.name, discogsID: peer.discogsID)
@@ -967,6 +988,15 @@ struct ArtistDigView: View {
                             appState.open(.digArtist(mbid: peer.mbid, name: peer.name, discogsID: peer.discogsID))
                         }
                     }
+                }
+                // Twelve to a lane at first; the rest a tap away, not cut.
+                if artists.count > 12 {
+                    Button(expandedLanes.contains(title) ? "Fewer" : "All \(artists.count)") {
+                        if expandedLanes.contains(title) { expandedLanes.remove(title) } else { expandedLanes.insert(title) }
+                    }
+                    .buttonStyle(.plain)
+                    .microLabel(1.2, size: 9)
+                    .foregroundStyle(Palette.inkMuted)
                 }
             }
         }

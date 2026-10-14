@@ -44,8 +44,8 @@ nonisolated struct ArtistProfile: Sendable {
         let thumbnailURL: URL?
         var id: String { pageURL.absoluteString }
     }
-    let labels: [LabelRef]
-    let related: [RelatedArtist]
+    var labels: [LabelRef]
+    var related: [RelatedArtist]
     let libraryTrackCount: Int
     let crateCount: Int
     let radioAppearances: [AppearanceLine]
