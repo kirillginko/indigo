@@ -101,6 +101,9 @@ nonisolated struct RelatedArtist: Identifiable, Hashable, Sendable {
     /// records, or a shared catalogue bundle describes them. A row into
     /// another dead end is still shown, after the ones that lead on.
     var leadsOn = false
+    /// How many further artists their own catalogue bundle names, when it has
+    /// been read: where this row goes next.
+    var onward: Int? = nil
 
     /// Namesakes share a name and nothing else here, so an entry is part of
     /// who the row is.

@@ -114,6 +114,26 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
         return lock.withLock { manifest?[discogsID] != nil }
     }
 
+    /// The people an entry's bundle names, by Discogs id: who it leads to.
+    func people(in discogsID: Int) -> Set<Int> {
+        guard let bundle = bundle(for: discogsID) else { return [] }
+        let ids = (bundle.collaborators.map(\.artist.discogsID) + bundle.credits.map(\.artist.discogsID)).compactMap { $0 }
+        return Set(ids.filter { $0 > 0 && $0 != discogsID && !Self.standIns.contains($0) })
+    }
+
+    /// Reads the bundles of some of the artists a page leads to, so their rows
+    /// can say where they go next and DEEP can walk on through them. Only
+    /// those the manifest lists, at most `limit`, one at a time; never in
+    /// front of a page.
+    func prefetch(_ ids: [Int], limit: Int = 12) async -> Int {
+        guard isEnabled else { return 0 }
+        var read = 0
+        for id in ids where read < limit && hasBundle(id) && bundle(for: id) == nil {
+            if await ensure(id) == .fetched { read += 1 }
+        }
+        return read
+    }
+
     /// The labels an entry's bundle names, by Discogs id, when it has been read.
     func labels(for discogsID: Int) -> [ArtistBundle.Label] {
         bundle(for: discogsID)?.labels.filter { !$0.placeholder && !$0.ownName && $0.discogsID != nil } ?? []

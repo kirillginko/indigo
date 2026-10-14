@@ -488,14 +488,24 @@ final class DigStore {
         DigEnrichmentSwitch.shared.refreshInBackgroundIfDue()
         if CataloguePilot.shared.isEnabled,
            let entry = discogsID ?? artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID)).identity.discogsID {
-            if CataloguePilot.shared.bundle(for: entry) == nil {
+            let pilot = CataloguePilot.shared
+            if pilot.bundle(for: entry) == nil {
                 Task { [weak self] in
-                    _ = await CataloguePilot.shared.ensure(entry)
-                    if CataloguePilot.shared.bundle(for: entry) != nil { self?.announceChange() }
+                    _ = await pilot.ensure(entry)
+                    guard pilot.bundle(for: entry) != nil else { return }
+                    self?.announceChange()
+                    // Then where its routes lead: their own bundles, so the
+                    // rows can say so and DEEP can walk on.
+                    if await pilot.prefetch(pilot.people(in: entry).sorted()) > 0 { self?.announceChange() }
                 }
             } else {
                 // Once with it, past an answer kept from before it arrived.
                 walkWithBundle = pilotWalked.insert(key).inserted
+                if walkWithBundle {
+                    Task { [weak self] in
+                        if await pilot.prefetch(pilot.people(in: entry).sorted()) > 0 { self?.announceChange() }
+                    }
+                }
             }
         }
         if !walkWithBundle, let fresh = profiles.fresh(key, revision: asked) { return fresh }
@@ -534,7 +544,9 @@ final class DigStore {
         profile.related = profile.related.map { row in
             var row = row
             if let id = row.discogsID {
-                row.leadsOn = pilot.hasBundle(id) || describedRecord(id) != nil
+                let onward = pilot.people(in: id)
+                row.onward = pilot.bundle(for: id) == nil ? nil : onward.count
+                row.leadsOn = !onward.isEmpty || describedRecord(id) != nil || (pilot.hasBundle(id) && pilot.bundle(for: id) == nil)
             } else {
                 row.leadsOn = discogsEnricher.cachedArtist(named: row.name) != nil
             }

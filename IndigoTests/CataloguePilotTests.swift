@@ -382,7 +382,7 @@ final class DigPageFromCatalogueTests: XCTestCase {
             return (digest, key, data.count)
         }
         let page = put(CataloguePilotTests.bundle)
-        let six = put(#"{"artist":{"discogsID":274469,"name":"Six Organs Of Admittance"},"collaborators":[],"credits":[],"format":"indigo.artist-knowledge/1","genres":[],"labels":[],"releases":[],"styles":[],"stylesAround":[]}"#)
+        let six = put(#"{"artist":{"discogsID":274469,"name":"Six Organs Of Admittance"},"collaborators":[],"credits":[{"artist":{"discogsID":274470,"name":"Ben Chasny"},"roles":[{"kind":"performance","releases":[{"id":1,"tracks":[]}],"role":"Guitar"}]}],"format":"indigo.artist-knowledge/1","genres":[],"labels":[],"releases":[],"styles":[],"stylesAround":[]}"#)
         let manifest = Data(#"{"artists":{"272472":{"digest":"\#(page.0)","key":"\#(page.1)","bytes":\#(page.2)},"274469":{"digest":"\#(six.0)","key":"\#(six.1)","bytes":\#(six.2)}},"format":"indigo.catalogue-pilot/1","missing":[]}"#.utf8)
         let manifestDigest = BundleFetcher.digest(manifest)
         let manifestKey = "knowledge/v1/catalogue/manifests/\(manifestDigest.prefix(2))/\(manifestDigest).json"
@@ -405,5 +405,14 @@ final class DigPageFromCatalogueTests: XCTestCase {
         let byName = Dictionary(profile.related.map { ($0.name, $0) }, uniquingKeysWith: { a, _ in a })
         XCTAssertEqual(byName["Six Organs Of Admittance"]?.leadsOn, true, "Has a bundle of its own: leads somewhere")
         XCTAssertEqual(byName["Ben Chasny"]?.leadsOn, false, "Nothing known beyond the credit")
+        // Opening the page reads, in the background, the bundles of the routes
+        // the manifest lists -- here Six Organs Of Admittance's, and nobody else's.
+        for _ in 0..<200 where pilot.bundle(for: 274469) == nil { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertNotNil(pilot.bundle(for: 274469))
+        XCTAssertNil(pilot.bundle(for: 274470), "Not in the manifest: not read")
+        let again = DigStore(context: ModelContext(container))
+        again.portraitDefaults = dig.portraitDefaults
+        let next = await again.artistProfile(name: "Magic Carpathians Project", mbid: nil, discogsID: 272472)
+        XCTAssertEqual(next.related.first { $0.name == "Six Organs Of Admittance" }?.onward, 1)
     }
 }
