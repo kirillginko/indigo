@@ -46,17 +46,22 @@ nonisolated final class CataloguePilot: @unchecked Sendable {
     /// launch argument; nothing can in a release build.
     var isEnabled: Bool {
         if let enabledOverride { return enabledOverride }
-        if isForcedLocally { return true }
+        if let forced = forcedLocally { return forced }
         return remote.isOn
     }
 
-    private var isForcedLocally: Bool {
+    /// A development build's own say, when it has one: `YES` forces the pilot
+    /// on, `NO` forces it off (to compare a page with and without it), and no
+    /// setting leaves it to the switch. Never in a release build.
+    private var forcedLocally: Bool? {
         #if DEBUG
-        UserDefaults.standard.bool(forKey: Self.switchKey)
+        UserDefaults.standard.object(forKey: Self.switchKey).map { _ in UserDefaults.standard.bool(forKey: Self.switchKey) }
         #else
-        false
+        nil
         #endif
     }
+
+    private var isForcedLocally: Bool { forcedLocally != nil }
 
     /// The manifest the switch allows, when the switch is what decides: the
     /// approved pilot, and nothing a later publication adds.

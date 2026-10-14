@@ -12,7 +12,7 @@ out, host = sys.argv[1], sys.argv[2]
 def get(key):
     with urllib.request.urlopen(urllib.request.Request(f"https://{host}/{key}", headers={"User-Agent": "indigo-pages/1"}), timeout=20) as r:
         return json.loads(r.read())
-ts = open("supabase/functions/_shared/catalogue_pilot.ts").read()
+ts = open("supabase/functions/_shared/catalogue_pilot.ts").read() + open("supabase/functions/_shared/catalogue_batch1.ts").read()
 ids = {json.loads(n).split(" (")[0]: int(i) for i, n in re.findall(r'^  \[(\d+), (".*")\],$', ts, re.M)}
 manifest = get(get("knowledge/v1/catalogue/pilot.json")["manifest"])["artists"]
 attachments = json.load(open(f"{out}/manifest.json"))

@@ -17,12 +17,15 @@ import XCTest
 
 final class CataloguePilotPagesUITests: XCTestCase {
     static let artists = [
-        "Soul Circuit", "John Wall", "Vitor Joaquim", "Remy Unger", "Magic Carpathians Project", "Kim Salmon",
-        "Victoria Jordanova", "Quartetto Cetra", "Hong Chulki", "Ortho Acusto", "Chris Liberator & Sterling Moss",
-        "The Squires Of The Subterrain", "Willie Jolley", "DKMD", "Gardna", "Lewis OfMan", "Isabell Gustafsson-Ny",
-        "Fines Double", "Craz Digga", "Thingamajigs Performance Group", "Sam Wilkes", "Niilas",
-        // Not in the pilot: nothing may change.
-        "Prefuse 73", "Hype Williams", "Mica Levi",
+        // Batch 1 (supabase/functions/_shared/catalogue_batch1.ts): distinctive names, chosen by hash.
+        "Christin Nichols", "Arturo En El Barco", "Ai Phoenix", "Martin Brygmann", "Tricky Disco", "Ron Pope",
+        "OG Parker", "Rafael Kasma", "Benjamin Koppel", "M. Caye Castagnetto", "Ritual Band", "Rusconi Trio",
+        "This Celestial Engine", "Midnite Radio", "Keak Da Sneak", "Nec Nymbl", "Gayun Cannon", "Martin East Project",
+        "De Nazaten", "Owain Bellis", "Bruce Mennel", "Luigi Butera",
+        // The pilot.
+        "Magic Carpathians Project",
+        // No bundle: nothing may change.
+        "Prefuse 73", "Hype Williams",
     ]
 
     /// What a relationship row's label reads like: a name, then why.
@@ -57,7 +60,8 @@ final class CataloguePilotPagesUITests: XCTestCase {
     /// Opens the page; nil when search did not offer the artist.
     func open(_ name: String, pilot: Bool) -> (firstMs: Int?, rows: Set<String>)? {
         app = XCUIApplication.indigo()
-        if pilot { app.launchArguments += ["-INDIGO_DIG_CATALOGUE_PILOT", "YES"] }
+        // Forced either way: the remote switch is on for development builds.
+        app.launchArguments += ["-INDIGO_DIG_CATALOGUE_PILOT", pilot ? "YES" : "NO"]
         app.launch()
         sleep(3)
         app.buttons["Search"].firstMatch.tap()
