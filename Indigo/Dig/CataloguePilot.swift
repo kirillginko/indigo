@@ -26,7 +26,12 @@ import Foundation
 nonisolated final class CataloguePilot: @unchecked Sendable {
     static let shared = CataloguePilot()
 
+    #if DEBUG
+    /// A development build's own override. Compiled into development builds
+    /// only: Scripts/release-enrichment-guard.sh fails a release archive whose
+    /// binary contains it.
     static let switchKey = "INDIGO_DIG_CATALOGUE_PILOT"
+    #endif
     static let pointerKey = "knowledge/v1/catalogue/pilot.json"
 
     /// Discogs entries that stand for nobody in particular: Various, Unknown
