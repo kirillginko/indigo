@@ -224,7 +224,9 @@ actor DigWorker {
             context: modelContext, graph: graph ?? GraphStore(context: modelContext), scenes: sceneEngine(asked)
         )
 
-        let origins = ExploreRanker.startingPoints(personal)
+        let origins = ForYouMusicianFirst.isEnabled
+            ? MusicianFirstRanker.startingPoints(personal, asOf: asOf).map(\.node)
+            : ExploreRanker.startingPoints(personal)
         // A walk is kept while the evidence it rested on says the same: a
         // check or credit about anything else leaves it alone, and a
         // correction, a new credit or a removal under it walks it again.
@@ -485,12 +487,33 @@ actor DigWorker {
     /// The blocks somebody can act on, ranked from a run. Pure; here only to
     /// stay off the thread that draws.
     func exploreRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
-        Trace.step("explore.rank") {
+        if ForYouMusicianFirst.isEnabled { return musicianFirstRecommendations(run, asOf: asOf) }
+        return Trace.step("explore.rank") {
             ExploreRanker.recommendations(
                 personal: run.personal, knowledge: run.knowledge,
                 taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf),
                 alsoKnown: run.alsoKnown
             )
+        }
+    }
+
+    /// For You musician-first: ranked once to find the candidates, their
+    /// styles and whether they lead on read from what is held (never a walk,
+    /// see `OnwardIndex`), then ranked with both.
+    private func musicianFirstRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
+        Trace.step("explore.rank.musicianFirst") {
+            let taste = ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf)
+            let first = MusicianFirstRanker.suggestions(
+                personal: run.personal, knowledge: run.knowledge, taste: taste, asOf: asOf,
+                limit: 24, alsoKnown: run.alsoKnown)
+            let artists = first.map(\.node).filter { $0.kind == .artist }
+            let index = OnwardIndex(context: modelContext)
+            var onward: [String: Int] = [:]
+            for artist in artists { if let count = index.count(for: artist) { onward[artist.id] = count } }
+            return MusicianFirstRanker.recommendations(
+                personal: run.personal, knowledge: run.knowledge, taste: taste, asOf: asOf,
+                candidateTags: LocalKnowledgeAdapter.artistTags(for: Set(artists.map(\.key)), in: modelContext),
+                onward: onward, alsoKnown: run.alsoKnown)
         }
     }
 

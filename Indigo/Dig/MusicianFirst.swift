@@ -31,6 +31,8 @@ nonisolated enum MusicianFirst {
 
     static var isEnabled: Bool {
         if let override { return override }
+        // For You musician-first ranks the musician-first graph.
+        if ForYouMusicianFirst.isEnabled { return true }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
         #else
@@ -43,6 +45,27 @@ nonisolated enum MusicianFirst {
     static func isRoute(_ role: String?) -> Bool {
         guard CreditRole.isMusical(role) else { return false }
         return !isEnabled || CreditRole.contribution(of: role) != .technical
+    }
+}
+
+/// For You ranked by `MusicianFirstRanker` instead of `ExploreRanker`: its
+/// own development switch (`-INDIGO_FORYOU_MUSICIAN_FIRST YES`), and it brings
+/// the musician-first graph with it. Off, For You is exactly as before. Never
+/// in a release build.
+nonisolated enum ForYouMusicianFirst {
+    #if DEBUG
+    static let switchKey = "INDIGO_FORYOU_MUSICIAN_FIRST"
+    #endif
+
+    nonisolated(unsafe) static var override: Bool?
+
+    static var isEnabled: Bool {
+        if let override { return override }
+        #if DEBUG
+        return UserDefaults.standard.bool(forKey: switchKey)
+        #else
+        return false
+        #endif
     }
 }
 

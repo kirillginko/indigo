@@ -273,6 +273,25 @@ nonisolated enum MusicianFirstRanker {
         return ExploreSuggestionEngine.spread(ranked, limit: limit)
     }
 
+    /// The blocks For You shows, cut as `ExploreRanker.recommendations`
+    /// cuts them: where to go next, shows, more artists.
+    static func recommendations(
+        personal: PersonalInputs, knowledge: KnowledgeSnapshot, taste: TasteProfile, asOf: Date,
+        candidateTags: [String: [String]], onward: [String: Int],
+        next: Int = 12, shows: Int = 6, artists: Int = 6, alsoKnown: Set<String> = []
+    ) -> ExploreOffers {
+        let all = suggestions(personal: personal, knowledge: knowledge, taste: taste, asOf: asOf,
+                              candidateTags: candidateTags, onward: onward,
+                              limit: next + artists + shows, alsoKnown: alsoKnown)
+        var offers = ExploreOffers()
+        offers.shows = Array(all.filter { $0.node.kind == .broadcast }.prefix(shows))
+        let rest = all.filter { $0.node.kind != .broadcast }
+        offers.next = Array(rest.prefix(next))
+        let taken = Set(offers.next.map(\.id))
+        offers.artists = Array(rest.filter { $0.node.kind == .artist && !taken.contains($0.id) }.prefix(artists))
+        return offers
+    }
+
     /// At most this many labelmates in one list.
     static let labelCap = 3
 }

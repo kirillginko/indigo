@@ -96,3 +96,79 @@ final class MusicianFirstRankerTests: XCTestCase {
         XCTAssertLessThan(drummer?.score ?? 1, bass?.score ?? 0, "A route with nowhere further to go ranks lower")
     }
 }
+
+// MARK: - A new crate item, and what leads on
+
+final class MusicianFirstBalanceTests: XCTestCase {
+    private let asOf = Date(timeIntervalSince1970: 1_790_000_000)
+    private func daysAgo(_ days: Double) -> Date { asOf.addingTimeInterval(-days * 86_400) }
+
+    /// Twelve kept artists over two months, each with two collaborators.
+    private func world(adding jazz: Bool) -> (PersonalInputs, KnowledgeSnapshot) {
+        var crate: [PersonalInputs.Kept] = []
+        var met: [PersonalInputs.Met] = []
+        var nodes: [MusicNode] = []
+        var neighbourhoods: [Neighbourhood] = []
+        func origin(_ node: MusicNode, _ friends: [(String, RelationshipKind, String)], added: Date, tag: String) {
+            crate.append(.init(node: node, addedAt: added, genreTags: [tag], tasteArtistKeys: [node.key], sceneArtistKey: node.key))
+            met.append(.init(node: node, weight: 1.5, lastAt: added))
+            let at = nodes.count
+            nodes.append(node)
+            var edges: [KnownEdge] = []
+            for (name, kind, reason) in friends {
+                nodes.append(.artist(name, discogsID: 10_000 + nodes.count))
+                edges.append(KnownEdge(from: at, to: nodes.count - 1, kind: kind, source: RelationshipSource.discogs.rawValue,
+                                       reason: reason, confidence: kind.baseConfidence, occurrences: 1))
+            }
+            neighbourhoods.append(Neighbourhood(origin: at, edges: edges))
+        }
+        for index in 0..<12 {
+            origin(.artist("Electronic \(index)", discogsID: 100 + index),
+                   [("Partner \(index)a", .collaborator, "Credited together"), ("Partner \(index)b", .collaborator, "Credited together")],
+                   added: daysAgo(15 + Double(index) * 4), tag: "electronic")
+        }
+        if jazz {
+            origin(.release("Obscure Jazz Record", discogsID: 9_999),
+                   [("The Pianist", .personnel, "Piano on Obscure Jazz Record"), ("The Drummer", .personnel, "Drums on Obscure Jazz Record")],
+                   added: asOf, tag: "jazz")
+        }
+        let personal = PersonalInputs(crate: crate.sorted(by: PersonalInputs.newestFirst), plays: [],
+                                      met: met.sorted { $0.node.id < $1.node.id }, artistPlays: [:], haunts: [])
+        let knowledge = KnowledgeSnapshot(
+            shared: SharedKnowledge(nodes: nodes, neighbourhoods: neighbourhoods, shows: [], artistTags: [:], scenes: nil),
+            deviceLocal: .empty)
+        return (personal, knowledge)
+    }
+
+    func testANewCrateItemChangesSomeOffersWithoutReplacingTheRest() {
+        let (before, beforeKnowledge) = world(adding: false)
+        let (after, afterKnowledge) = world(adding: true)
+        let old = MusicianFirstRanker.suggestions(personal: before, knowledge: beforeKnowledge, taste: .empty, asOf: asOf)
+        let new = MusicianFirstRanker.suggestions(personal: after, knowledge: afterKnowledge, taste: .empty, asOf: asOf)
+        XCTAssertEqual(old.count, 12)
+        XCTAssertTrue(new.contains { $0.node.title == "The Pianist" }, "Today's record leads somewhere at once")
+        let kept = Set(old.map(\.id)).intersection(new.map(\.id)).count
+        XCTAssertGreaterThanOrEqual(kept, 8, "Most of what was offered for the collection is still offered")
+        XCTAssertLessThan(kept, 12, "And something did change")
+    }
+
+    func testABundleSaysHowManyMusiciansLeadOnAndWhoIsOnlyTechnical() throws {
+        let json = #"""
+        {"artist":{"discogsID":1,"name":"Someone"},"collaborators":[
+          {"artist":{"discogsID":2,"name":"Bandmate"},"how":["joint"],"releases":[10]},
+          {"artist":{"discogsID":3,"name":"Desk"},"how":["Mixed By"],"releases":[11]}],
+         "credits":[
+          {"artist":{"discogsID":4,"name":"Bassist"},"roles":[{"kind":"performance","releases":[{"id":10,"tracks":[]},{"id":12,"tracks":[]}],"role":"Bass"}]},
+          {"artist":{"discogsID":5,"name":"Mastering"},"roles":[{"kind":"engineering","releases":[{"id":10,"tracks":[]}],"role":"Mastered By"}]},
+          {"artist":{"discogsID":194,"name":"Various"},"roles":[{"kind":"performance","releases":[{"id":10,"tracks":[]}],"role":"Vocals"}]}],
+         "format":"indigo.artist-knowledge/1","genres":[],"labels":[],"releases":[],"styles":[],"stylesAround":[]}
+        """#
+        let bundle = try JSONDecoder().decode(ArtistBundle.self, from: Data(json.utf8))
+        let potential = DiscoveryPotential.of(bundle)
+        XCTAssertEqual(potential.musicians, 2, "The bandmate and the bassist; not the stand-in")
+        XCTAssertEqual(potential.supportingReleases, 2)
+        XCTAssertEqual(potential.technical, [3, 5])
+        XCTAssertFalse(potential.technicalOnly)
+        XCTAssertEqual(potential.version, DiscoveryPotential.currentVersion)
+    }
+}
