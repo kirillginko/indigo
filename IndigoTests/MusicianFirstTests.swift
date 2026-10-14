@@ -92,6 +92,20 @@ final class MusicianFirstTests: XCTestCase {
         XCTAssertFalse(titles.contains("Some Engineer"))
     }
 
+    func testTurningTheSwitchNeverReadsTheOtherRulesStoredEdges() {
+        release(sleeve)
+        let node = MusicNode.release("Vernal Equinox", discogsID: 1)
+        MusicianFirst.override = false
+        XCTAssertTrue(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" })
+        try? context.save()
+        MusicianFirst.override = true
+        XCTAssertFalse(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" },
+                       "Stored under today's rules, worked out again under musician-first")
+        try? context.save()
+        MusicianFirst.override = false
+        XCTAssertTrue(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" })
+    }
+
     func testOnTheReleasePageStillListsEveryone() throws {
         MusicianFirst.override = true
         release(sleeve)

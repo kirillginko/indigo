@@ -293,7 +293,11 @@ nonisolated struct GraphStore {
     /// with no picture and no way back to the artist it is a spelling of.
     /// The names are stripped at the boundary now, and every edge written
     /// before that has one of those nodes on the end of it.
-    static let builderVersion = 2
+    ///
+    /// Musician-first (`MusicianFirst`) walks by other rules, so it stores
+    /// under a number of its own: turning the switch either way works every
+    /// answer out again rather than reading the other rules' edges.
+    static var builderVersion: Int { MusicianFirst.isEnabled ? 1_002 : 2 }
 
     private func stored(for node: MusicNode) -> EdgeSet? {
         let identity = node.id
