@@ -25,6 +25,9 @@ struct SyncDiagnosticsView: View {
     /// The other device's For You code, pasted in.
     @State private var otherCode = ""
     private var explore = ExploreDiagnostics.shared
+    /// The musician-first development switches, kept until turned off.
+    @AppStorage(MusicianFirst.switchKey) private var digMusicianFirst = false
+    @AppStorage(ForYouMusicianFirst.switchKey) private var forYouMusicianFirst = false
 
     /// The shared things both devices act on, so their actions meet.
     static let testArtist = MusicNode.artist("\(TwoDeviceSyncRunner.marker) shared artist")
@@ -46,6 +49,14 @@ struct SyncDiagnosticsView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    Toggle("DIG: musicians first", isOn: $digMusicianFirst)
+                    Toggle("For You: musician-first ranking", isOn: $forYouMusicianFirst)
+                } header: {
+                    Text("Musician-first (development)")
+                } footer: {
+                    Text("DIG leaves engineers off artist pages (release pages still list them). For You starts from what you are into now and over time, and brings DIG's setting with it. Relaunch Indigo to apply; the first look after a change rebuilds the graph and takes a few seconds.")
+                }
                 Section("Mirroring") {
                     row("iCloud account", account)
                     row("UserData syncs", Persistence.syncing ? "yes" : "NO")
