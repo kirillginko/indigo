@@ -218,6 +218,20 @@ final class ReleaseCreditStoreTests: XCTestCase {
         XCTAssertEqual(DigEngine(context: context).releaseProfile(id: 555)?.artistCredits.first?.discogsID, 1874027)
     }
 
+    func testOpeningAnArtistFillsTheIDsBehindTheirRecordsCredits() async throws {
+        try cachedBeforeCredits()
+        let reads = Reads()
+        let store = store(answering: .document(try decode(document)), reads: reads)
+
+        await store.backfillReleaseCredits(forArtist: "Hype Williams")
+
+        XCTAssertEqual(reads.count, 1)
+        // The sleeve's "G. S. Herren" now opens Scott Herren's entry.
+        XCTAssertEqual(ReleaseCreditStore(context: context).entry(credited: "G. S. Herren")?.discogsID, 229415)
+        await store.backfillReleaseCredits(forArtist: "Hype Williams")
+        XCTAssertEqual(reads.count, 1, "Held credits are never read again")
+    }
+
     func testAMissingDocumentIsNotAskedForAgain() async throws {
         try cachedBeforeCredits()
         let reads = Reads()

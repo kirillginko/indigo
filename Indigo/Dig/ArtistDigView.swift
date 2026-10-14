@@ -546,6 +546,9 @@ struct ArtistDigView: View {
             // revision, and the store now walks it once for both.
             await readProfile()
             hasEnriched = true
+            // The ids behind the credits on their own records, where the
+            // cache predates them, so a credit opens the entry it names.
+            await dig.backfillReleaseCredits(forArtist: artistName)
 
             // The sleeves the page is showing, and nothing else yet. Running
             // Bandcamp alongside doubled the request stream while somebody was

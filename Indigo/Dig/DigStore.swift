@@ -313,18 +313,20 @@ final class DigStore {
     /// public request with no Discogs budget. A missing document is remembered
     /// for the session; a failed read is not, and is asked again next time.
     /// Nothing is ever cleared: credits already held are never read again here.
-    func backfillReleaseCredits(id: Int) async {
+    @discardableResult
+    func backfillReleaseCredits(id: Int, announce: Bool = true) async -> Bool {
         let store = ReleaseCreditStore(context: context)
         guard id > 0, store.credits(releaseID: id) == nil,
               !storedReleasesWithoutCredits.contains(id),
               discogsEnricher.cachedRelease(id: id) != nil
-        else { return }
+        else { return false }
         switch await readStoredRelease(id) {
         case .document(let detail):
-            guard store.credits(releaseID: id) == nil else { return }
+            guard store.credits(releaseID: id) == nil else { return false }
             if store.replace(releaseID: id, from: detail, source: ReleaseCreditStore.source(storedRelease: id)) {
                 saveContext()
-                announceChange()
+                if announce { announceChange() }
+                return true
             } else {
                 storedReleasesWithoutCredits.insert(id)
             }
@@ -333,6 +335,31 @@ final class DigStore {
         case .unavailable:
             break
         }
+        return false
+    }
+
+    /// The same, for an artist's own records, when their page opens.
+    ///
+    /// Only a release page used to ask, so the credits on an artist's page
+    /// stayed spellings: Speedy J's *Pedestrian Sketches* credits "Oberman",
+    /// which is Sjoerd Oberman's entry on the document and nobody's by name,
+    /// and the link opened an empty page. Read after the page is up, a few
+    /// at a time from R2 (no Discogs budget), and the page's routes worked
+    /// out again once, if anything arrived.
+    func backfillReleaseCredits(forArtist name: String, limit: Int = 16) async {
+        let store = ReleaseCreditStore(context: context)
+        let ids = GraphStore(context: context).releaseIDs(creditedTo: RecordingKey.normalizeArtist(name))
+            .filter { $0 > 0 && store.credits(releaseID: $0) == nil }
+            .sorted()
+            .prefix(limit)
+        var filled = false
+        for id in ids {
+            guard !Task.isCancelled else { break }
+            if await backfillReleaseCredits(id: id, announce: false) { filled = true }
+        }
+        guard filled else { return }
+        forgetGraph(for: .artist(name))
+        announceChange()
     }
 
     /// Entries whose identity could not be read this session. Not stored: a
