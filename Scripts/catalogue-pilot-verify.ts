@@ -7,20 +7,28 @@
 //   bundles, and names every other pilot artist missing;
 // - nothing was written under For You's references.
 //
-//   deno run --allow-net --allow-read Scripts/catalogue-pilot-verify.ts pilot-input.json <r2-public-host>
+//   deno run --allow-net --allow-read Scripts/catalogue-pilot-verify.ts <r2-public-host> <input.json>...
+//
+// Each input is a pilot.sql or batch1 input (artists with their releases);
+// the approved set is the pilot and batch 1 together.
 
 import { canonicalJSON, type DiscogsReleaseDoc } from "../supabase/functions/_shared/artist_bundle.ts";
-import { CATALOGUE_PILOT } from "../supabase/functions/_shared/catalogue_pilot.ts";
+import { CATALOGUE_PILOT as PILOT } from "../supabase/functions/_shared/catalogue_pilot.ts";
+import { CATALOGUE_BATCH1 } from "../supabase/functions/_shared/catalogue_batch1.ts";
+const CATALOGUE_PILOT: ReadonlyMap<number, string> = new Map([...PILOT, ...CATALOGUE_BATCH1]);
 import {
   artistRefKey, catalogueBundle, type CatalogueRef, catalogueRefKey, cataloguePilotPointerKey, sha256,
 } from "../supabase/functions/_shared/knowledge.ts";
 
-const [inputPath, host] = Deno.args;
-const text = await Deno.readTextFile(inputPath);
-const input = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)).rows[0].pilot as {
-  pilot: { name: string; discogs: number[]; releases: string[] | null }[];
-};
-const releasesOf = new Map(input.pilot.map((p) => [Math.min(...p.discogs), (p.releases ?? []).map(Number)]));
+const [host, ...inputPaths] = Deno.args;
+const releasesOf = new Map<number, number[]>();
+for (const inputPath of inputPaths) {
+  const text = await Deno.readTextFile(inputPath);
+  const input = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)).rows[0].pilot as {
+    pilot: { name: string; discogs: number[]; releases: string[] | null }[];
+  };
+  for (const p of input.pilot) releasesOf.set(Math.min(...p.discogs), (p.releases ?? []).map(Number));
+}
 
 let reads = 0;
 async function get(key: string): Promise<string | null> {
