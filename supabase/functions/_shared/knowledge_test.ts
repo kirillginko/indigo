@@ -313,8 +313,8 @@ Deno.test("the pilot manifest lists every sound bundle and names the rest missin
   const manifest = JSON.parse(world.r2.get(pointer.manifest)!);
   assertEquals(Object.keys(manifest.artists), [String(DEAN.discogsID)]);
 
-  // A bundle that no longer reads as its digest is left out, not served.
+  // A reference that does not name its bundle's addressed key is left out.
   const ref = world.ref<CatalogueRef>(catalogueRefKey(DEAN.discogsID))!;
-  world.r2.set(ref.key, "{}");
+  world.r2.set(catalogueRefKey(DEAN.discogsID), JSON.stringify({ ...ref, key: "knowledge/v1/bundles/elsewhere.json" }));
   assertEquals((await publishCataloguePilot(world.deps(), pilot)).missing, [4978, DEAN.discogsID].sort((a, b) => a - b));
 });
