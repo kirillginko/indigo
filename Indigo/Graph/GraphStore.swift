@@ -903,7 +903,7 @@ nonisolated struct GraphStore {
             // person to meet; the page is already about them.
             guard !headline.contains(RecordingKey.normalizeArtist(name)) else { continue }
             let role = index < record.creditRoles.count ? record.creditRoles[index] : ""
-            guard let kind = CreditRole.kind(of: role) else { continue }
+            guard let kind = CreditRole.kind(of: role), MusicianFirst.isRoute(role) else { continue }
             let tracks = index < record.creditTracks.count ? record.creditTracks[index] : ""
             edges.insert(MusicEdge(
                 from: node, to: .artist(name),
