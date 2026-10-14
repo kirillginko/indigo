@@ -92,9 +92,16 @@ nonisolated struct ArtistBundle: Codable, Sendable, Equatable {
         let name: String
     }
 
+    struct Years: Codable, Sendable, Equatable {
+        let first: Int
+        let last: Int
+    }
+
     let format: String
     let artist: Artist
     let releases: [Release]
+    /// The span of the artist's own records, when their documents give years.
+    var years: Years? = nil
     let styles: [Count]
     let genres: [Count]
     let stylesAround: [Count]

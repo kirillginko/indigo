@@ -46,6 +46,9 @@ nonisolated struct ArtistProfile: Sendable {
     }
     var labels: [LabelRef]
     var related: [RelatedArtist]
+    /// What the artist's own release documents say, when the entry has no
+    /// written profile (`RecordsSummary`). Set by the page, never stored.
+    var fromTheRecords: RecordsSummary.Summary? = nil
     let libraryTrackCount: Int
     let crateCount: Int
     let radioAppearances: [AppearanceLine]

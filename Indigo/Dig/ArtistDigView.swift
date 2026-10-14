@@ -218,6 +218,11 @@ struct ArtistDigView: View {
                                                 .fixedSize(horizontal: false, vertical: true)
                                                 .padding(.top, 5)
                                         }
+                                    } else if let records = profile.fromTheRecords {
+                                        DigSection(title: "From the records") {
+                                            recordsSummary(records, font: Typeface.body(12.5), color: Palette.inkMuted)
+                                                .padding(.top, 5)
+                                        }
                                     }
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -914,9 +919,26 @@ struct ArtistDigView: View {
                     .lineSpacing(3)
                     .foregroundStyle(.white.opacity(0.72))
                     .fixedSize(horizontal: false, vertical: true)
+            } else if let records = profile.fromTheRecords {
+                recordsSummary(records, font: Typeface.mono(12.5), color: .white.opacity(0.72))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The facts the artist's own documents state, and what they rest on --
+    /// said as such, so it is never mistaken for a written profile.
+    private func recordsSummary(_ records: RecordsSummary.Summary, font: Font, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(records.text)
+                .font(font)
+                .lineSpacing(3)
+                .foregroundStyle(color)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("From \(records.documents) release \(records.documents == 1 ? "document" : "documents") on Discogs")
+                .font(Typeface.mono(9.5))
+                .foregroundStyle(Palette.inkFaint)
+        }
     }
 
     @ViewBuilder

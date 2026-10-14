@@ -554,6 +554,9 @@ final class DigStore {
         }
         guard let entry = discogsID ?? artistResolution(ArtistReference(name: walked.name, mbid: walked.mbid)).identity.discogsID
         else { return profile }
+        if (profile.biography ?? "").isEmpty, let bundle = pilot.bundle(for: entry) {
+            profile.fromTheRecords = RecordsSummary.make(bundle)
+        }
         let held = Set(profile.labels.compactMap(\.discogsID))
         let heldNames = Set(profile.labels.map { RecordingKey.normalize($0.name) })
         for label in pilot.labels(for: entry) {
