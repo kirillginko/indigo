@@ -540,6 +540,15 @@ final class DigStore {
         return profile
     }
 
+    /// The picture a tile draws for a node: an artist's current portrait first
+    /// -- by identity where the node knows it, upgraded to the full image --
+    /// and only then the picture copied onto the node when its edge was built,
+    /// which is the 150-pixel cut of whatever was known then.
+    func tileImage(for node: MusicNode) -> URL? {
+        guard node.kind == .artist else { return node.artworkURL }
+        return portraitURL(for: node.title, discogsID: node.discogsID) ?? node.artworkURL
+    }
+
     /// The Discogs entry a name is, only when the evidence verifies it.
     private func verifiedEntry(name: String, mbid: String?) -> Int? {
         let resolution = artistResolution(ArtistReference(name: name, mbid: mbid))
