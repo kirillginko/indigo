@@ -53,3 +53,20 @@ final class DigPageRoutesTests: XCTestCase {
         XCTAssertEqual(lanes.personnel.map(\.name), ["Bridget Hayden", "Ben Chasny", "Adam Davenport", "Aleksandra Yaromoya"])
     }
 }
+
+/// Label and style neighbours come from search titles, by name only.
+final class DiscogsNeighbourSpellingTests: XCTestCase {
+    func testAVariantSpellingIsNotOfferedAsSomebodyToOpenByName() {
+        let results: [DiscogsSearchResult] = [
+            // On Konspiracy Rekords, "Drama Aka Treason*" credits Drama Treason (9087331);
+            // the entry named "Drama aka Treason" (10218922) is somebody else's page.
+            .init(id: 18204358, title: "Drama Aka Treason* - Barz", coverImage: nil, thumbnail: nil, genre: nil, style: nil, label: nil, year: nil),
+            .init(id: 18204502, title: "Young Ghost - Wolf", coverImage: nil, thumbnail: nil, genre: nil, style: nil, label: nil, year: nil),
+            .init(id: 18335375, title: "Drama Treason - Operation Cypher", coverImage: nil, thumbnail: nil, genre: nil, style: nil, label: nil, year: nil),
+        ]
+        let names = DiscogsClient.neighbours(from: results).map(\.name)
+        XCTAssertFalse(names.contains("Drama Aka Treason"), "A variant spelling opens nobody")
+        XCTAssertTrue(names.contains("Young Ghost"))
+        XCTAssertTrue(names.contains("Drama Treason"), "Under their own name they are still offered")
+    }
+}

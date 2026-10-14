@@ -20,8 +20,9 @@ final class DigEnrichmentSwitchLiveCheck: XCTestCase {
         guard case .on(let manifest) = decided else { return XCTFail("debug: \(decided)") }
         XCTAssertEqual(manifest.count, 64)
         gate.cohort = .testflight
-        XCTAssertFalse(gate.isOn, "TestFlight is not enabled yet")
+        XCTAssertTrue(gate.isOn, "Internal TestFlight builds receive it (approved 2026-10-14)")
         gate.cohort = .appstore
-        XCTAssertFalse(gate.isOn, "Nor the App Store")
+        XCTAssertFalse(gate.isOn, "App Store builds never do until approved")
+        XCTAssertEqual(manifest, "b0bb56323c467633aa8db134fb30ed7e6091f379ebf5269689e63792e8457ee7", "The pilot and batch 1, nothing more")
     }
 }

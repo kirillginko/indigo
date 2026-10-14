@@ -639,6 +639,13 @@ nonisolated struct DiscogsClient: Sendable {
             // where the 150-pixel thumb blurred.
             let thumbnail = result.coverImage ?? result.thumbnail
             for artist in Self.creditedNames(credit) {
+                // "Name*" is Discogs saying the record credited somebody under
+                // a variant spelling: the entry is filed under another name,
+                // and opening this one by name can land on a different
+                // artist ("Drama Aka Treason*" is Drama Treason, 9087331; the
+                // entry called "Drama aka Treason" is 10218922). No row
+                // rather than a stranger's page.
+                if credit.contains(artist + "*") { continue }
                 let key = RecordingKey.normalizeArtist(artist)
                 guard !key.isEmpty, seen.insert(key).inserted else { continue }
                 found.append(DiscogsNeighbour(name: artist, thumbnailURL: thumbnail))
