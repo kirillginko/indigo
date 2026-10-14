@@ -188,3 +188,14 @@ Deno.test("being told to slow down is retried, not recorded as no picture", asyn
   assert(threw);
 });
 
+
+Deno.test("an identity's picture is the full image, the 150-pixel cut only when that is all there is", async () => {
+  const full = await withDiscogs(
+    { 1874027: { images: [{ type: "primary", uri: "https://i.discogs.com/duo-600.jpeg", uri150: "https://i.discogs.com/duo-150.jpeg", width: 600, height: 600 }] } },
+    [], () => chooseArtistPortrait("Hype Williams", [1874027], undefined, "IndigoTest/1"));
+  assertEquals(full, { kind: "found", url: "https://i.discogs.com/duo-600.jpeg", width: 600, height: 600, discogsID: 1874027, via: "identity" });
+  const small = await withDiscogs(
+    { 1874027: { images: [{ type: "primary", uri150: "https://i.discogs.com/duo-150.jpeg", width: 150, height: 150 }] } },
+    [], () => chooseArtistPortrait("Hype Williams", [1874027], undefined, "IndigoTest/1"));
+  assertEquals(small.kind === "found" ? small.url : null, "https://i.discogs.com/duo-150.jpeg");
+});

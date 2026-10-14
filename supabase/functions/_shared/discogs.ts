@@ -449,8 +449,10 @@ export async function chooseArtistPortrait(
     const artist = await response.json() as { images?: Payload[] };
     const images = artist.images ?? [];
     const image = images.find((i) => i?.type === "primary") ?? images[0];
-    // The 150-pixel cut first: this fills a row, not a hero image.
-    const picture = image ? usableImage(image.uri150) ?? usableImage(image.uri) : null;
+    // The full image first: a 150-pixel cut is soft on any screen drawing it
+    // at more than 50 points, which is every phone row and every For You
+    // card. The small cut only when that is all there is.
+    const picture = image ? usableImage(image.uri) ?? usableImage(image.uri150) : null;
     if (!picture) return { kind: "none" };
     return {
       kind: "found", url: picture, discogsID: id, via: "identity",
