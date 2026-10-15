@@ -74,4 +74,50 @@ final class StreamDropTests: XCTestCase {
             )
         }
     }
+
+    /// A drop with no network waits for one instead of spending the
+    /// station's chances, and reopens the moment the path comes back.
+    func testADropWithNoNetworkWaitsForOne() async throws {
+        let engine = StreamAudioEngine(monitorsNetwork: false)
+        engine.setVolume(0)
+        defer { engine.stop() }
+        engine.play(url: try Self.shortStream())
+        await waitUntil(5) { engine.state == .playing }
+        XCTAssertEqual(engine.state, .playing)
+
+        // The car drives into a dead zone just as the stream closes.
+        engine.networkChanged(isOnline: false)
+        await waitUntil(5) { engine.connections >= 2 || engine.state != .playing }
+        try await Task.sleep(for: .seconds(2))
+        XCTAssertEqual(engine.state, .buffering)
+        XCTAssertEqual(engine.connections, 1, "Nothing was tried with no way to reach the station")
+
+        engine.networkChanged(isOnline: true)
+        XCTAssertEqual(engine.connections, 2, "Reopened the moment the network came back")
+        await waitUntil(5) { engine.state == .playing }
+        XCTAssertEqual(engine.state, .playing)
+    }
+
+    /// A station that ran out of chances while it was the network's fault
+    /// is put back on when the network returns.
+    func testAStationThatGaveUpAfterPlayingComesBackWithTheNetwork() async throws {
+        let engine = StreamAudioEngine(
+            monitorsNetwork: false, reconnect: ReconnectPolicy(limit: 1, sustainedLimit: 1)
+        )
+        engine.setVolume(0)
+        defer { engine.stop() }
+        let file = try Self.shortStream()
+        engine.play(url: file)
+        await waitUntil(5) { engine.state == .playing }
+        // The file goes, so every reconnect fails, as on a network that has
+        // a path and carries nothing.
+        try FileManager.default.removeItem(at: file)
+        await waitUntil(10) { if case .failed = engine.state { true } else { false } }
+        guard case .failed = engine.state else { return XCTFail("Never gave up: \(engine.state)") }
+        let spent = engine.connections
+
+        engine.networkChanged(isOnline: false)
+        engine.networkChanged(isOnline: true)
+        XCTAssertEqual(engine.connections, spent + 1)
+    }
 }

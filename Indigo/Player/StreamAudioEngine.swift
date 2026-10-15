@@ -8,6 +8,7 @@
 
 import AVFoundation
 import Foundation
+import Network
 import Observation
 
 /// One failure is one failure, however many observers notice it.
@@ -36,23 +37,54 @@ nonisolated struct ReconnectPolicy {
         /// The failure already being dealt with, noticed again.
         case ignore
         case retry(after: Duration)
+        /// There is no network to try. Nothing is spent; try again the
+        /// moment there is one.
+        case waitForNetwork
         /// Out of chances. The station is unavailable and should say so.
         case giveUp
     }
 
     /// How many chances a station gets before it is called unavailable.
     let limit: Int
+    /// How many it gets once it has played.
+    ///
+    /// Five chances spent in sixteen seconds is the right answer to a station
+    /// that never answers, and the wrong one to a station that was playing a
+    /// moment ago: that one dropping is the network far more often than the
+    /// station, and a phone in a car loses the network for longer than
+    /// sixteen seconds all the time. In the trace, a lookup failure spent
+    /// attempts one to five in 7.2s. Twenty, at the same backoff capped at
+    /// eight seconds, is a little over two minutes of trying.
+    let sustainedLimit: Int
+    /// Whether the station has played since it was put on.
+    private(set) var hasPlayed = false
     /// How many it has used. Shown in the trace, and nowhere else.
     private(set) var attempts = 0
     /// Whether a retry is scheduled and has not yet been acted on. This is
     /// the whole of what tells a second observer from a second failure.
     private var isAwaitingRetry = false
 
-    init(limit: Int) { self.limit = limit }
+    init(limit: Int, sustainedLimit: Int? = nil) {
+        self.limit = limit
+        self.sustainedLimit = max(limit, sustainedLimit ?? limit)
+    }
 
-    mutating func interrupted() -> Response {
+    /// The limit that applies now.
+    var currentLimit: Int { hasPlayed ? sustainedLimit : limit }
+
+    /// - Parameter isOnline: whether the device has a network path at all.
+    ///   A station that has played cannot be judged while there is no way
+    ///   to reach it, so an outage spends none of its chances. One that has
+    ///   not is still told it is unavailable, with the system's reason —
+    ///   "the Internet connection appears to be offline" says more to a
+    ///   listener who has just pressed play than buffering forever would.
+    mutating func interrupted(isOnline: Bool = true) -> Response {
         guard !isAwaitingRetry else { return .ignore }
-        guard attempts < limit else { return .giveUp }
+        guard isOnline || !hasPlayed else {
+            isAwaitingRetry = true
+            return .waitForNetwork
+        }
+        guard attempts < currentLimit else { return .giveUp }
         attempts += 1
         isAwaitingRetry = true
         return .retry(after: Self.delay(attempt: attempts))
@@ -61,10 +93,19 @@ nonisolated struct ReconnectPolicy {
     /// The stream is being opened again, so whatever fails next is new.
     mutating func opening() { isAwaitingRetry = false }
 
-    /// Something played, or the listener took over.
+    /// Something played: the trouble is over, and the station has shown it
+    /// works.
+    mutating func playing() {
+        attempts = 0
+        isAwaitingRetry = false
+        hasPlayed = true
+    }
+
+    /// The listener put a station on.
     mutating func reset() {
         attempts = 0
         isAwaitingRetry = false
+        hasPlayed = false
     }
 
     /// How long to wait before trying again.
@@ -113,11 +154,37 @@ final class StreamAudioEngine {
     /// seconds is longer than any of these stations takes on a working
     /// connection and short enough to be an answer.
     @ObservationIgnored private static let connectTimeout = Duration.seconds(20)
-    @ObservationIgnored private var reconnect = ReconnectPolicy(limit: 5)
+    @ObservationIgnored private var reconnect: ReconnectPolicy
     @ObservationIgnored private var volume: Double = 1
     @ObservationIgnored private var isUserPaused = false
 
+    /// Whether the device has a network path, as `NWPathMonitor` last said.
+    @ObservationIgnored private var isOnline = true
+    /// A drop happened with no network; the stream reopens when one returns.
+    @ObservationIgnored private var isWaitingForNetwork = false
+    /// A reconnect is scheduled and still sleeping off its backoff.
+    @ObservationIgnored private var isRetryPending = false
+    @ObservationIgnored private var pathMonitor: NWPathMonitor?
+    /// How many times a stream has been opened. Read by tests.
+    @ObservationIgnored private(set) var connections = 0
+
+    /// `monitorsNetwork` is off only in tests, which say what the network
+    /// is doing through `networkChanged(isOnline:)`, and use a smaller
+    /// `reconnect` budget so that giving up takes seconds, not minutes.
+    init(monitorsNetwork: Bool = true, reconnect: ReconnectPolicy = ReconnectPolicy(limit: 5, sustainedLimit: 20)) {
+        self.reconnect = reconnect
+        guard monitorsNetwork else { return }
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler = { [weak self] path in
+            let online = path.status == .satisfied
+            Task { @MainActor [weak self] in self?.networkChanged(isOnline: online) }
+        }
+        monitor.start(queue: DispatchQueue(label: "StreamAudioEngine.path"))
+        pathMonitor = monitor
+    }
+
     deinit {
+        pathMonitor?.cancel()
         removeObservers()
     }
 
@@ -156,6 +223,8 @@ final class StreamAudioEngine {
 
     func play(url: URL) {
         reconnectTask?.cancel()
+        isWaitingForNetwork = false
+        isRetryPending = false
         reconnect.reset()
         isUserPaused = false
         start(url: url)
@@ -172,6 +241,8 @@ final class StreamAudioEngine {
         connectDeadline?.cancel()
         isUserPaused = true
         reconnectTask?.cancel()
+        isWaitingForNetwork = false
+        isRetryPending = false
         player.pause()
         setState(.paused)
     }
@@ -181,6 +252,8 @@ final class StreamAudioEngine {
         reconnectTask?.cancel()
         connectDeadline?.cancel()
         reconnect.reset()
+        isWaitingForNetwork = false
+        isRetryPending = false
         isUserPaused = false
         removeObservers()
         player.pause()
@@ -221,6 +294,10 @@ final class StreamAudioEngine {
         removeObservers()
         // Whatever failed last is behind us; the next failure is a new one.
         reconnect.opening()
+        reconnectTask?.cancel()
+        isWaitingForNetwork = false
+        isRetryPending = false
+        connections += 1
         currentURL = url
         setState(.buffering)
 
@@ -356,7 +433,7 @@ final class StreamAudioEngine {
                 guard let self, self.player === player, !self.isUserPaused else { return }
                 switch status {
                 case .playing:
-                    self.reconnect.reset()
+                    self.reconnect.playing()
                     self.connectDeadline?.cancel()
                     self.setState(.playing)
                 case .waitingToPlayAtSpecifiedRate:
@@ -418,20 +495,51 @@ final class StreamAudioEngine {
 
     private func handleInterruption(_ message: String) {
         guard !isUserPaused, let url = currentURL else { return }
-        switch reconnect.interrupted() {
+        switch reconnect.interrupted(isOnline: isOnline) {
         case .ignore:
             return
         case .giveUp:
             setState(.failed(message))
+        case .waitForNetwork:
+            Trace.note("stream.reconnect waiting for a network \(message)")
+            connectDeadline?.cancel()
+            isWaitingForNetwork = true
+            setState(.buffering)
         case .retry(let delay):
-            Trace.note("stream.reconnect \(reconnect.attempts)/\(reconnect.limit) \(message)")
+            Trace.note("stream.reconnect \(reconnect.attempts)/\(reconnect.currentLimit) \(message)")
             setState(.buffering)
             reconnectTask?.cancel()
+            isRetryPending = true
             reconnectTask = Task { [weak self] in
                 if delay > .zero { try? await Task.sleep(for: delay) }
                 guard !Task.isCancelled else { return }
                 self?.start(url: url)
             }
+        }
+    }
+
+    /// The device gained or lost its network path.
+    ///
+    /// A path coming back is the best news a dropped station can have, so a
+    /// stream waiting on it, or sleeping off a backoff, reopens at once. So
+    /// does one that ran out of chances after it had played: the drop was
+    /// the network's, and the network is back.
+    func networkChanged(isOnline online: Bool) {
+        let cameBack = online && !isOnline
+        guard online != isOnline else { return }
+        isOnline = online
+        Trace.note("stream.network \(online ? "online" : "offline")")
+        guard cameBack, !isUserPaused, let url = currentURL else { return }
+        let gaveUpAfterPlaying: Bool = {
+            if case .failed = state { return reconnect.hasPlayed }
+            return false
+        }()
+        if gaveUpAfterPlaying {
+            // A fresh set of chances, as if the listener had pressed play.
+            reconnect.reset()
+            start(url: url)
+        } else if isWaitingForNetwork || isRetryPending {
+            start(url: url)
         }
     }
 

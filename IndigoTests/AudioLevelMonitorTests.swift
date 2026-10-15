@@ -140,3 +140,55 @@ final class ReconnectPolicyTests: XCTestCase {
         XCTAssertEqual(ReconnectPolicy.delay(attempt: 9), .seconds(8))
     }
 }
+
+// MARK: - A station that has played is given time to come back
+
+final class SustainedReconnectPolicyTests: XCTestCase {
+    /// Five chances in sixteen seconds is right for a station that never
+    /// answers and wrong for one that was playing a moment ago.
+    func testAStationThatHasPlayedGetsTheLongerBudget() {
+        var policy = ReconnectPolicy(limit: 2, sustainedLimit: 4)
+        policy.playing()
+        for _ in 0..<4 {
+            guard case .retry = policy.interrupted() else { return XCTFail("Gave up early") }
+            policy.opening()
+        }
+        XCTAssertEqual(policy.interrupted(), .giveUp)
+        XCTAssertEqual(policy.attempts, 4)
+    }
+
+    func testAStationThatNeverPlayedKeepsTheShortOne() {
+        var policy = ReconnectPolicy(limit: 2, sustainedLimit: 4)
+        _ = policy.interrupted(); policy.opening()
+        _ = policy.interrupted(); policy.opening()
+        XCTAssertEqual(policy.interrupted(), .giveUp)
+    }
+
+    /// A dead zone is not the station's fault, and costs it nothing.
+    func testAnOutageSpendsNoChances() {
+        var policy = ReconnectPolicy(limit: 2, sustainedLimit: 2)
+        policy.playing()
+        XCTAssertEqual(policy.interrupted(isOnline: false), .waitForNetwork)
+        XCTAssertEqual(policy.interrupted(isOnline: false), .ignore, "Already waiting")
+        XCTAssertEqual(policy.attempts, 0)
+        policy.opening()
+        XCTAssertEqual(policy.interrupted(), .retry(after: .zero),
+                       "Back online, the first retry is still the free one")
+    }
+
+    /// Pressing play offline says why, rather than buffering forever.
+    func testAStationNeverHeardIsStillJudgedOffline() {
+        var policy = ReconnectPolicy(limit: 1)
+        XCTAssertEqual(policy.interrupted(isOnline: false), .retry(after: .zero))
+        policy.opening()
+        XCTAssertEqual(policy.interrupted(isOnline: false), .giveUp)
+    }
+
+    func testPuttingAStationOnForgetsThatTheLastOnePlayed() {
+        var policy = ReconnectPolicy(limit: 1, sustainedLimit: 5)
+        policy.playing()
+        policy.reset()
+        XCTAssertFalse(policy.hasPlayed)
+        XCTAssertEqual(policy.currentLimit, 1)
+    }
+}
