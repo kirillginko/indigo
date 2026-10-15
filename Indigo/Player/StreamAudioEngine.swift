@@ -10,6 +10,9 @@ import AVFoundation
 import Foundation
 import Network
 import Observation
+#if os(iOS)
+import UIKit
+#endif
 
 /// One failure is one failure, however many observers notice it.
 ///
@@ -275,8 +278,40 @@ final class StreamAudioEngine {
         // station reached `playing`, stalled, or was never asked. This does.
         Trace.note("stream.\(Self.label(new)) \(currentURL?.host ?? "-")")
         state = new
+        #if os(iOS)
+        if new != .buffering { releaseBackgroundTime() }
+        #endif
         onStateChange?()
     }
+
+    #if os(iOS)
+    @ObservationIgnored private var backgroundTime: UIBackgroundTaskIdentifier = .invalid
+
+    /// Keeps the app running while a dropped station is being reopened.
+    ///
+    /// The audio background mode keeps a locked phone's app alive while it
+    /// is playing, and a station being reconnected is not playing: its
+    /// player has been thrown away and the next is sleeping off a backoff or
+    /// waiting for a network. iOS is free to suspend the app in that gap, and
+    /// a suspended app's retry never fires — the station stays silent until
+    /// the phone is unlocked. This asks for the time to finish the job. It is
+    /// let go of the moment the stream plays, pauses, stops or gives up.
+    private func holdBackgroundTime() {
+        guard backgroundTime == .invalid else { return }
+        backgroundTime = UIApplication.shared.beginBackgroundTask(withName: "Reconnect station") { [weak self] in
+            MainActor.assumeIsolated {
+                Trace.note("stream.background time ran out")
+                self?.releaseBackgroundTime()
+            }
+        }
+    }
+
+    private func releaseBackgroundTime() {
+        guard backgroundTime != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTime)
+        backgroundTime = .invalid
+    }
+    #endif
 
     private static func label(_ state: State) -> String {
         switch state {
@@ -505,9 +540,15 @@ final class StreamAudioEngine {
             connectDeadline?.cancel()
             isWaitingForNetwork = true
             setState(.buffering)
+            #if os(iOS)
+            holdBackgroundTime()
+            #endif
         case .retry(let delay):
             Trace.note("stream.reconnect \(reconnect.attempts)/\(reconnect.currentLimit) \(message)")
             setState(.buffering)
+            #if os(iOS)
+            holdBackgroundTime()
+            #endif
             reconnectTask?.cancel()
             isRetryPending = true
             reconnectTask = Task { [weak self] in
