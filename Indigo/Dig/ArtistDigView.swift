@@ -549,6 +549,7 @@ struct ArtistDigView: View {
             // The ids behind the credits on their own records, where the
             // cache predates them, so a credit opens the entry it names.
             await dig.backfillReleaseCredits(forArtist: artistName)
+            await dig.verifyRecommendationCandidates(forArtist: artistName, discogsID: discogsID)
 
             // The sleeves the page is showing, and nothing else yet. Running
             // Bandcamp alongside doubled the request stream while somebody was

@@ -178,6 +178,27 @@ final class DigStore {
     }
 
     @ObservationIgnored private var pages: [ArtistReference: (revision: Int, page: ArtistPageIdentity)] = [:]
+    /// Recommendation cards per artist page, kept for a revision (`DigRecommendationSource`).
+    @ObservationIgnored var recommendationCache: [String: (revision: Int, cards: [DigRecommendation])] = [:]
+    @ObservationIgnored var recommendationListener: (at: Date, listener: DigRecommender.Listener)?
+    /// Each described artist's records that are somebody else's, by that
+    /// artist's folded name: what a bare "Credited together" rests on. Held
+    /// for the session only (`DigRecommendations`).
+    @ObservationIgnored var shelfEvidence: [String: [String: DigRecommender.ShelfEntry]] = [:]
+
+    func keepShelfEvidence(of name: String, _ releases: DiscogsArtistReleases) {
+        var entries: [String: DigRecommender.ShelfEntry] = [:]
+        // Newest first, so the record a card names is the latest they shared.
+        for release in (releases.releases ?? []).sorted(by: { ($0.year ?? 0, $0.id ?? 0) > ($1.year ?? 0, $1.id ?? 0) }) {
+            guard let role = release.role, role != "Main", !release.isVideo,
+                  let other = release.artist.map(DiscogsClient.withoutDisambiguator), let title = release.title else { continue }
+            let key = RecordingKey.normalizeArtist(other)
+            guard !key.isEmpty, entries[key] == nil else { continue }
+            entries[key] = .init(title: title, year: (release.year ?? 0) > 0 ? release.year : nil, role: role,
+                                 releaseID: release.type == "master" ? release.mainRelease : release.id)
+        }
+        shelfEvidence[RecordingKey.normalizeArtist(name)] = entries
+    }
 
     /// Names whose catalogue lookup has answered this session — found
     /// somebody, found nobody, or failed. Until then a name that nothing
@@ -2648,6 +2669,60 @@ final class DigStore {
         }
     }
 
+    /// Who the strongest unverified names on a page's cards are, asked of the
+    /// catalogue while the page is open (`DigRecommendations` only).
+    ///
+    /// Most of a page's collaborators arrive as bare names -- "Credited
+    /// together" from the artist's own shelf -- and a card is only ever a
+    /// verified entry, so on a page nobody had dug around before the cards
+    /// fell back to labelmates and resemblance. The same lookup a page opened
+    /// by that name makes, for the top four, with room in the minute only; an
+    /// answer that is not one entry is no answer.
+    func verifyRecommendationCandidates(forArtist name: String, discogsID: Int?, limit: Int = 4) async {
+        guard DigRecommendations.isEnabled, discogsClient.isConfigured else { return }
+        let source = DigRecommendationSource(context: context)
+        let origin = MusicNode.artist(name, discogsID: discogsID)
+        // The shelf, from Indigo's cache, when this session has not read it.
+        let shelfKey = RecordingKey.normalizeArtist(name)
+        if shelfEvidence[shelfKey] == nil,
+           let id = discogsID ?? artistPage(ArtistReference(name: name)).discogsID,
+           let shelf = await catalogShelves.shelf(discogsID: id) {
+            keepShelfEvidence(of: name, shelf)
+            announceChange()
+        }
+        let edges = IdentityGraph(context: context).neighbourhood(of: origin).edges.all
+        let names = DigRecommender.unverified(from: edges, origin: origin, lookups: source.lookups(for: name, shelf: shelfEvidence[shelfKey] ?? [:]),
+                                              listener: source.listener(now: Date(), opened: origin,
+                                                                        longTerm: recommendationListener?.listener),
+                                              limit: limit)
+        var found = false
+        for candidate in names {
+            guard !Task.isCancelled, await waitForRoom() else { break }
+            guard let lookup = try? await discogsClient.artistLookup(named: candidate.title), let head = lookup.head else { continue }
+            if let check = lookup.spelling { identityStore.record(check) }
+            let filed = lookup.isCreditedSpelling ? DiscogsClient.withoutDisambiguator(head.title) : candidate.title
+            discogsEnricher.artistIdentity(named: filed, head: head)
+            found = true
+        }
+        if found {
+            saveContext()
+            announceChange()
+        }
+        // Something to hear: the records the cards name, read from R2 (no
+        // Discogs budget) where this device has not described them.
+        var read = false
+        for card in recommendations(forArtist: name, discogsID: discogsID) {
+            guard !Task.isCancelled, let id = card.evidence?.releaseID, discogsEnricher.cachedRelease(id: id) == nil,
+                  case .document(let detail) = await readStoredRelease(id) else { continue }
+            discogsEnricher.store(detail, id: id, source: ReleaseCreditStore.source(storedRelease: id))
+            read = true
+        }
+        if read {
+            saveContext()
+            announceChange()
+        }
+    }
+
     /// Steps out of the foreground for the duration of `body`.
     ///
     /// The mirror of `inForeground`, for the part of a dig that is not work
@@ -2726,6 +2801,7 @@ final class DigStore {
             shelves.requestCache(discogsID: id)
         }
 
+        if DigRecommendations.isEnabled { keepShelfEvidence(of: name, releases) }
         return discogsEnricher.artist(named: name, bundle: DiscogsArtistBundle(
             detail: described,
             releases: releases,
