@@ -82,6 +82,10 @@ final class EmbedAudioEngine: NSObject {
     @ObservationIgnored private var isBridgeReady = false
     @ObservationIgnored private var volume: Double = 1
     @ObservationIgnored private var currentRequest: (provider: EmbedProvider, url: URL)?
+    /// Where to pick up once a reloaded episode starts playing again.
+    @ObservationIgnored private var resumePosition: TimeInterval?
+    /// How many times the bridge page has been loaded. Read by tests.
+    @ObservationIgnored private(set) var bridgeLoads = 0
 
     private static let bridgeName = "indigo"
 
@@ -252,6 +256,7 @@ final class EmbedAudioEngine: NSObject {
     static let origin = "https://w.soundcloud.com"
 
     private func loadBridge() {
+        bridgeLoads += 1
         webView.loadHTMLString(Self.bridgeHTML, baseURL: URL(string: Self.origin + "/indigo"))
     }
 
@@ -312,6 +317,10 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
             setState(.loading)
         case "play":
             setState(.playing)
+            if let resume = resumePosition, self.duration > 0 {
+                resumePosition = nil
+                seek(to: resume)
+            }
         case "pause":
             setState(.paused)
         case "progress":
@@ -332,6 +341,30 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
 }
 
 extension EmbedAudioEngine: WKNavigationDelegate {
+    nonisolated func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Task { @MainActor [weak self] in self?.contentProcessTerminated() }
+    }
+
+    /// The page's process is gone — iOS ends a background app's web
+    /// processes when it wants the memory, and they crash.
+    ///
+    /// The widget, the bridge and the music all went with it, and nothing
+    /// noticed: the bridge still counted as ready, so every command after it
+    /// was run against a blank page, failed, and the episode could not be
+    /// played again until the app was relaunched. The bridge is loaded again
+    /// and the episode put back where it was, playing if it was playing.
+    func contentProcessTerminated() {
+        Trace.note("embed: web content process ended")
+        isBridgeReady = false
+        pendingCommands = []
+        let wasPlaying = state == .playing || state == .loading
+        let heard = position
+        loadBridge()
+        guard let request = currentRequest else { return }
+        load(provider: request.provider, url: request.url, autoplay: wasPlaying)
+        resumePosition = heard > 0 ? heard : nil
+    }
+
     nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         let message = error.localizedDescription
         Task { @MainActor [weak self] in self?.setState(.failed(message)) }
