@@ -501,6 +501,9 @@ struct ArtistDigView: View {
             try? await Task.sleep(for: .milliseconds(600))
             guard !Task.isCancelled else { return }
             cards = dig.recommendations(forArtist: artistName, discogsID: discogsID)
+        // Something to hear on the radio, asked after the cards are up; a
+        // found episode moves the revision and this runs again.
+        await dig.fillRadioListens(for: cards)
         }
         .task(id: dig.revision) {
             // Writes arrive in bursts — the catalogue, then the
@@ -716,8 +719,9 @@ struct ArtistDigView: View {
                 subtitle: card.artist.title, detail: card.evidence?.title ?? card.artist.title,
                 remoteArtworkURL: card.artist.artworkURL, playbackURL: url, embedProvider: .youtube
             )], startingAt: 0)
-        case .radio(_, _, let url, let page)?:
-            if let destination = page?.destination { appState.open(destination) } else if let url { openURL(url) }
+        case .radio(let episode)?:
+            // The episode's own page, which plays it.
+            if let destination = episode.page.destination { appState.open(destination) } else { openURL(episode.archiveURL) }
         case nil:
             break
         }

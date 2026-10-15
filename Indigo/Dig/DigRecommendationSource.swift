@@ -29,7 +29,8 @@ extension DigStore {
         }
         let cards = Trace.step("dig.recommend.cards", name) {
             source.recommendations(forArtist: name, discogsID: discogsID, now: now, longTerm: recommendationListener?.listener,
-                                   shelf: shelfEvidence[RecordingKey.normalizeArtist(name)] ?? [:])
+                                   shelf: shelfEvidence[RecordingKey.normalizeArtist(name)] ?? [:],
+                                   radio: radioListens.found)
         }
         recommendationCache[key] = (revision, cards)
         return cards
@@ -43,14 +44,16 @@ nonisolated struct DigRecommendationSource {
 
     func recommendations(forArtist name: String, discogsID: Int?, now: Date = Date(),
                          longTerm: DigRecommender.Listener? = nil,
-                         shelf: [String: DigRecommender.ShelfEntry] = [:]) -> [DigRecommendation] {
+                         shelf: [String: DigRecommender.ShelfEntry] = [:],
+                         radio: [Int: RadioListen?] = [:]) -> [DigRecommendation] {
         let origin = MusicNode.artist(name, discogsID: discogsID)
         let edges = IdentityGraph(context: context).neighbourhood(of: origin).edges.all
-        return DigRecommender.recommend(from: edges, origin: origin, lookups: lookups(for: name, shelf: shelf),
+        return DigRecommender.recommend(from: edges, origin: origin, lookups: lookups(for: name, shelf: shelf, radio: radio),
                                         listener: listener(now: now, opened: origin, longTerm: longTerm))
     }
 
-    func lookups(for name: String, shelf: [String: DigRecommender.ShelfEntry] = [:]) -> DigRecommender.Lookups {
+    func lookups(for name: String, shelf: [String: DigRecommender.ShelfEntry] = [:],
+                 radio: [Int: RadioListen?] = [:]) -> DigRecommender.Lookups {
         let ids = GraphStore(context: context).releaseIDs(creditedTo: RecordingKey.normalizeArtist(name))
         var records: [Int: DiscogsReleaseRecord] = [:]
         if !ids.isEmpty {
@@ -78,7 +81,9 @@ nonisolated struct DigRecommendationSource {
             guard let record = records[id] ?? enricherForRecords.cachedRelease(id: id) else { return [] }
             return zip(record.trackPositions, record.trackTitles).map { (position: $0.0, title: $0.1) }
         }
-        lookups.radio = { artist in radio(for: artist) }
+        // Only an episode verified to play (`RadioListenFinder`), found by
+        // the artist's Discogs entry; looked up after the cards are shown.
+        lookups.radio = { artist in artist.discogsID.flatMap { radio[$0] ?? nil }.map { .radio($0) } }
         let onward = OnwardIndex(context: context)
         lookups.onward = { onward.count(for: $0) }
         let enricher = DiscogsEnricher(context: context, client: DiscogsClient())
@@ -107,21 +112,6 @@ nonisolated struct DigRecommendationSource {
             }
         }
         return lookups
-    }
-
-    /// A broadcast the stored graph already says they were played on.
-    private func radio(for artist: MusicNode) -> DigRecommendation.Listen? {
-        for identity in Set([artist.id, MusicNode.artist(artist.title).id]) {
-            var rows = FetchDescriptor<StoredEdge>(predicate: #Predicate { $0.fromID == identity && $0.toKindRaw == "broadcast" })
-            rows.fetchLimit = 12
-            let found = ((try? context.fetch(rows)) ?? [])
-                .sorted { $0.occurrences != $1.occurrences ? $0.occurrences > $1.occurrences : $0.toID < $1.toID }
-            if let edge = found.first {
-                let page = edge.destination
-                return .radio(title: page.title, show: page.subtitle, url: nil, page: page)
-            }
-        }
-        return nil
     }
 
     /// Taste over time and what they already know: slow to read, slow to change.

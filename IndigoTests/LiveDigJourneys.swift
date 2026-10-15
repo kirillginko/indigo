@@ -92,7 +92,7 @@ final class LiveDigJourneys: XCTestCase {
             let record = card.evidence.map { " — \($0.title)\($0.year.map { " (\($0))" } ?? "")" } ?? ""
             switch card.listen {
             case .recording(_, let title)?: return "\(card.artist.title) [\(card.relationship.label)]\(record) ▶ \(title)"
-            case .radio(let title, _, _, _)?: return "\(card.artist.title) [\(card.relationship.label)]\(record) ▶ radio: \(title)"
+            case .radio(let episode)?: return "\(card.artist.title) [\(card.chip)]\(record) ▶ radio: \(RecommendationCardView.radioLine(episode))"
             case nil: return "\(card.artist.title) [\(card.relationship.label)]\(record)"
             }
         }

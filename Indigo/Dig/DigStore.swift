@@ -181,6 +181,32 @@ final class DigStore {
     /// Recommendation cards per artist page, kept for a revision (`DigRecommendationSource`).
     @ObservationIgnored var recommendationCache: [String: (revision: Int, cards: [DigRecommendation])] = [:]
     @ObservationIgnored var recommendationListener: (at: Date, listener: DigRecommender.Listener)?
+    /// Verified radio episodes for Hear next cards (`RadioListenFinder`).
+    @ObservationIgnored var radioListens = RadioListenCache()
+    /// Settable so a test can drive it without the backend.
+    @ObservationIgnored var radioListenFinder = RadioListenFinder.live
+
+    /// Something to hear on the radio, for the cards that have no recording
+    /// of their own: asked in the background, after the cards are on screen.
+    /// The cards are worked out again only when an episode was found.
+    @discardableResult
+    func fillRadioListens(for cards: [DigRecommendation], limit: Int = 3) async -> RadioListenFinder.Report? {
+        guard DigRecommendations.isEnabled, SupabaseService.isConfigured || radioListenFinderIsInjected else { return nil }
+        let wanted = cards.filter { card in
+            if case .recording? = card.listen { return false }
+            return card.artist.discogsID != nil
+        }.compactMap(\.artist.discogsID)
+        let ids = radioListens.claim(Array(wanted.prefix(limit)))
+        guard !ids.isEmpty else { return nil }
+        let finder = radioListenFinder
+        let (found, report) = await Task.detached(priority: .utility) { await finder.find(ids) }.value
+        radioListens.record(found, asked: ids)
+        if found.values.contains(where: { $0 != nil }) { announceChange() }
+        return report
+    }
+
+    /// Whether a test replaced the finder (then the backend need not be configured).
+    @ObservationIgnored var radioListenFinderIsInjected = false
     /// Each described artist's records that are somebody else's, by that
     /// artist's folded name: what a bare "Credited together" rests on. Held
     /// for the session only (`DigRecommendations`).

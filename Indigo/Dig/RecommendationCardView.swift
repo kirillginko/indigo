@@ -21,13 +21,23 @@ struct RecommendationCardView: View {
     private var listenLabel: String? {
         switch card.listen {
         case .recording(_, let title)?: title
-        case .radio(let title, let show, _, _)?: show.map { "\($0) — \(title)" } ?? title
+        case .radio(let episode)?: RecommendationCardView.radioLine(episode)
         case nil: nil
         }
     }
 
     var body: some View {
         if isPhone { phone } else { mac }
+    }
+
+    /// "“Track” on Show · 12 Mar 2025": what of theirs was played, where and
+    /// when -- the appearance's own facts, not the record on the card.
+    static func radioLine(_ episode: RadioListen) -> String {
+        let show = episode.showTitle ?? episode.episodeTitle
+        let date = episode.airedAt.map { $0.formatted(.dateTime.day().month(.abbreviated).year()) }
+        let place = [show, date].compactMap { $0 }.joined(separator: " · ")
+        guard let played = episode.played?.trimmingCharacters(in: .whitespaces), !played.isEmpty else { return "Played on \(place)" }
+        return "“\(played)” on \(place)"
     }
 
     private var phone: some View {

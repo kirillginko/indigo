@@ -109,9 +109,9 @@ nonisolated struct DigRecommendation: Identifiable, Equatable, Sendable {
     nonisolated enum Listen: Equatable, Sendable {
         /// A recording catalogued with the very release that connects them.
         case recording(URL, title: String)
-        /// One of their radio appearances: the episode's page in Indigo when
-        /// it has one, its archive link when that is what is known.
-        case radio(title: String, show: String?, url: URL?, page: MusicNode?)
+        /// An episode they were played in, verified to play. Says what of
+        /// theirs was played -- never that it holds the record on the card.
+        case radio(RadioListen)
 
         var isFromTheEvidence: Bool { if case .recording = self { true } else { false } }
     }

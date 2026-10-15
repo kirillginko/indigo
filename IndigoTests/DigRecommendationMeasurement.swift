@@ -89,7 +89,8 @@ final class DigRecommendationMeasurement: XCTestCase {
             lookups.radio = { artist in
                 guard let id = artist.discogsID, let latest = radio[String(id)]?.latest, let link = latest.url,
                       let url = URL(string: link) else { return nil }
-                return .radio(title: latest.title ?? "Radio appearance", show: latest.show, url: url, page: nil)
+                return .radio(RadioListen(provider: "nts", episode: "", episodeTitle: latest.title ?? "Radio appearance",
+                                          showTitle: latest.show, airedAt: nil, played: nil, offsetSeconds: nil, archiveURL: url))
             }
             lookups.onward = { artist in artist.discogsID.map { (musicians[$0] ?? []).subtracting([id]).count } }
             lookups.tags = { artist in
@@ -196,7 +197,7 @@ final class DigRecommendationMeasurement: XCTestCase {
             let listen: String
             switch card.listen {
             case .recording(_, let title)?: listen = " ▶ \(title)"
-            case .radio(let title, let show, _, _)?: listen = " ▶ radio: \(show.map { "\($0): " } ?? "")\(title)"
+            case .radio(let episode)?: listen = " ▶ radio: \(RecommendationCardView.radioLine(episode))"
             case nil: listen = ""
             }
             return "\(card.artist.title) [\(card.relationship.label)]\(record)\(listen)"
