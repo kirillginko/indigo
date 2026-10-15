@@ -32,7 +32,7 @@ nonisolated enum MusicianFirst {
     static var isEnabled: Bool {
         if let override { return override }
         // For You musician-first ranks the musician-first graph.
-        if ForYouMusicianFirst.isEnabled { return true }
+        if ForYouMusicianFirst.isEnabled || DigRecommendations.isEnabled { return true }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
         #else
