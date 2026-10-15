@@ -1,9 +1,9 @@
-Live journeys, 5 starts, 19 pages, 14 steps followed. Today's top three: 55 routes, 1 of them technical. Cards: 55, direct 47, something to hear 11 (from the record 11). Cards worked out in 292 ms median, 917 ms slowest. Verifying the top unverified names took 5.206754334 seconds median.
+Live journeys, 5 starts, 19 pages, 14 steps followed. Today's top three: 55 routes, 1 of them technical. Cards: 55, direct 47, something to hear 11 (from the record 11). Cards worked out in 286 ms median, 924 ms slowest. Verifying the top unverified names took 5.1184955 seconds median.
 
 == obscure jazz: Eric Kloss
 start: Eric Kloss [357122] — 246 routes
   today:  Barry Miles (Credited together); Bobby Rodriguez (Credited together); Colin Curtis (Credited together)
-  cards:  Al Williams [Played on it] — First Class! (2004) ▶ Eric Kloss - African Cookbook; Billy Butler [Played on it] — First Class! (2004) ▶ Eric Kloss - African Cookbook; Kenny Karsh [Played on it] — Celebration (1980) ▶ Eric Kloss – The Samba Express
+  cards:  Al Williams [Played on it] — First Class! (2004) ▶ eric kloss - grits and gravy; Billy Butler [Played on it] — First Class! (2004) ▶ eric kloss - grits and gravy; Kenny Karsh [Played on it] — Celebration (1980) ▶ Eric Kloss – The Samba Express
 step 1: Al Williams [477765] — 183 routes
   today:  Big Joe Turner (Credited together); Buck Clayton (Credited together); Dizzy Gillespie (Credited together)
   cards:  Dizzy Gillespie [Played on it] — Soul & Salvation (2024); Johnny Hodges Septet [Played on it] — In Concert (2023); Johnny Hodges [Played on it] — Live In Paris - 13 Mars 1961 (2021)
