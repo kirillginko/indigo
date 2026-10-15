@@ -90,6 +90,23 @@ final class SpellingCheckTests: XCTestCase {
 
     /// The false positive from the audit: A.R.P. lists "Arp" as a spelling,
     /// and Arp is a different artist filed under exactly that name.
+    /// What Discogs returned for `q=Guillermo S. Herren&type=artist`: three
+    /// matches, nobody filed under it; Scott Herren lists it as a spelling.
+    func testASleeveSpellingOfAFullNameFindsTheEntryThatListsIt() {
+        let results = [result("Scott Herren", id: 229415), result("Savath & Savalas", id: 3838), result("Various", id: 194)]
+        XCTAssertEqual(SpellingCheck.candidates(for: "Guillermo S. Herren", in: results), [229415],
+                       "Only the entry sharing the surname is read")
+        let verdict = SpellingCheck.verdict(
+            spelling: "Guillermo S. Herren", results: results, complete: true,
+            details: [229415: facts(229415, "Scott Herren", variations: ["Guillermo S. Herren", "S. Herren"])])
+        XCTAssertEqual(verdict, .variation(229415))
+    }
+
+    func testASurnameSharedByManyIsNoVerdict() {
+        let results = (1...5).map { result("Person \($0) Oberman", id: $0) }
+        XCTAssertNil(SpellingCheck.candidates(for: "Jo Oberman", in: results), "Too many to read: no guess")
+    }
+
     func testArpIsNotARP() {
         let verdict = SpellingCheck.verdict(
             spelling: "Arp",
