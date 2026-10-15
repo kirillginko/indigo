@@ -343,21 +343,49 @@ final class DigStore {
     /// Only a release page used to ask, so the credits on an artist's page
     /// stayed spellings: Speedy J's *Pedestrian Sketches* credits "Oberman",
     /// which is Sjoerd Oberman's entry on the document and nobody's by name,
-    /// and the link opened an empty page. Read after the page is up, a few
-    /// at a time from R2 (no Discogs budget), and the page's routes worked
-    /// out again once, if anything arrived.
-    func backfillReleaseCredits(forArtist name: String, limit: Int = 16) async {
+    /// and the link opened an empty page. Every record of theirs that names
+    /// anybody besides them -- not the first few by id, which is how the first
+    /// version missed exactly that one among 52 -- read from R2 (no Discogs
+    /// budget) six at a time after the page is up, and the page's routes
+    /// worked out again once, if anything arrived.
+    func backfillReleaseCredits(forArtist name: String, limit: Int = 60) async {
         let store = ReleaseCreditStore(context: context)
+        let enricher = discogsEnricher
         let ids = GraphStore(context: context).releaseIDs(creditedTo: RecordingKey.normalizeArtist(name))
-            .filter { $0 > 0 && store.credits(releaseID: $0) == nil }
+            .filter { id in
+                id > 0 && !storedReleasesWithoutCredits.contains(id) && store.credits(releaseID: id) == nil
+                    && enricher.cachedRelease(id: id).map { !$0.creditNames.isEmpty } == true
+            }
             .sorted()
             .prefix(limit)
+        guard !ids.isEmpty else { return }
+        let read = readStoredRelease
+        var documents: [(Int, StoredReleaseRead)] = []
+        for batch in stride(from: 0, to: ids.count, by: 6).map({ Array(ids.dropFirst($0).prefix(6)) }) {
+            guard !Task.isCancelled else { return }
+            documents += await withTaskGroup(of: (Int, StoredReleaseRead).self) { group in
+                for id in batch { group.addTask { (id, await read(id)) } }
+                var found: [(Int, StoredReleaseRead)] = []
+                for await answer in group { found.append(answer) }
+                return found
+            }
+        }
         var filled = false
-        for id in ids {
-            guard !Task.isCancelled else { break }
-            if await backfillReleaseCredits(id: id, announce: false) { filled = true }
+        for (id, answer) in documents.sorted(by: { $0.0 < $1.0 }) {
+            switch answer {
+            case .document(let detail):
+                guard store.credits(releaseID: id) == nil else { continue }
+                if store.replace(releaseID: id, from: detail, source: ReleaseCreditStore.source(storedRelease: id)) {
+                    filled = true
+                } else {
+                    storedReleasesWithoutCredits.insert(id)
+                }
+            case .missing: storedReleasesWithoutCredits.insert(id)
+            case .unavailable: break
+            }
         }
         guard filled else { return }
+        saveContext()
         forgetGraph(for: .artist(name))
         announceChange()
     }
