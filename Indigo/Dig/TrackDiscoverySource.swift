@@ -96,13 +96,16 @@ nonisolated struct TrackDiscoverySource: Sendable {
         for chunk in stride(from: 0, to: wanted.count, by: 80).map({ Array(wanted.dropFirst($0).prefix(80)) }) {
             do { report.requests += 1; verified.merge(try await discogsIDs(chunk)) { first, _ in first } } catch { report.failures += 1 }
         }
+        // A starting point is somebody they already have: never offered back,
+        // whichever other starting point it was found next to.
+        let seedIDs = Set(seeds.map(\.discogsID))
         var neighbours = neighbourRows.compactMap { row -> TrackDiscovery.Neighbour? in
-            guard let id = verified[row.uuid], id != row.seed.discogsID else { return nil }
+            guard let id = verified[row.uuid], !seedIDs.contains(id) else { return nil }
             return .init(discogsID: id, name: row.name, seed: row.seed,
                          reason: "Played next to \(row.seed.name) in \(row.episodes) radio episode\(row.episodes == 1 ? "" : "s")",
                          strength: 1 + log2(Double(row.episodes)))
         }
-        neighbours += collaborators
+        neighbours += collaborators.filter { !seedIDs.contains($0.discogsID) }
         report.neighbours = Set(neighbourRows.map(\.uuid)).count + collaborators.count
         report.verifiedNeighbours = Set(neighbours.map(\.discogsID)).count
 

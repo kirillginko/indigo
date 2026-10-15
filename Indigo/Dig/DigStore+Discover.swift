@@ -23,6 +23,12 @@ extension DigStore {
     /// Up to twelve starting points that are verified entries, the long-term
     /// half and a bounded "now" (`MusicianFirstRanker.startingPoints`).
     func discoverInputs(now: Date = Date()) -> DiscoverInputs {
+        Self.discoverInputs(context: context, now: now)
+    }
+
+    /// The same, from any context: Discover reads it off the main thread.
+    nonisolated static func discoverInputs(context: ModelContext, now: Date = Date()) -> DiscoverInputs {
+        let identityStore = ArtistIdentityStore(context: context)
         let personal = PersonalInputs.read(context: context, asOf: now)
         var seeds: [TrackDiscovery.Seed] = []
         var seen = Set<Int>()
@@ -79,10 +85,13 @@ extension DigStore {
         if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60, !discover.tracks.isEmpty { return }
         guard !discover.working else { return }
         discover.working = true
-        let inputs = Trace.step("dig.discover.inputs") { discoverInputs() }
         let source = trackDiscoverySource
+        let container = context.container
         let (tracks, report) = await Task.detached(priority: .userInitiated) {
-            await source.discover(seeds: inputs.seeds, collaborators: inputs.collaborators, taste: inputs.taste,
+            // Read on a context of its own: two seconds of the listener's
+            // history is not something to read on the thread that draws.
+            let inputs = Trace.step("dig.discover.inputs") { DigStore.discoverInputs(context: ModelContext(container)) }
+            return await source.discover(seeds: inputs.seeds, collaborators: inputs.collaborators, taste: inputs.taste,
                                   knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks)
         }.value
         discover = DiscoverState(tracks: tracks, report: report, at: Date(), working: false)

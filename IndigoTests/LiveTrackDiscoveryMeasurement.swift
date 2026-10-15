@@ -15,6 +15,7 @@
 
 import XCTest
 import SwiftData
+import SwiftUI
 @testable import Indigo
 
 @MainActor
@@ -24,6 +25,25 @@ final class LiveTrackDiscoveryMeasurement: XCTestCase {
         let bucket: String
         let show: String
         let seeds: [Seed]
+    }
+
+    /// The rows as the phone draws them, to a PNG beside the report.
+    private func render(_ tracks: [DiscoveredTrack], named name: String) {
+        let view = VStack(alignment: .leading, spacing: 14) {
+            ForEach(tracks) { track in DiscoverRow(track: track, play: {}, artist: {}, episode: {}) }
+        }
+        .padding(16).frame(width: 390, alignment: .leading)
+        .background(Color(red: 0.08, green: 0.1, blue: 0.09)).foregroundStyle(.white)
+        .environment(\.isPhoneLayout, true)
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 2
+        #if os(macOS)
+        guard let image = renderer.nsImage, let tiff = image.tiffRepresentation,
+              let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) else { return }
+        #else
+        guard let png = renderer.uiImage?.pngData() else { return }
+        #endif
+        try? png.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("\(name).png"))
     }
 
     override func tearDown() { MusicianFirst.override = nil; TrackDiscoveryFeature.override = nil }
@@ -98,6 +118,7 @@ final class LiveTrackDiscoveryMeasurement: XCTestCase {
             let (tracks, report) = await source.discover(seeds: inputs.seeds, collaborators: inputs.collaborators,
                                                          taste: inputs.taste, knownArtists: inputs.knownArtists,
                                                          knownTracks: inputs.knownTracks)
+            render(tracks, named: "discover-you")
             record("You (this Mac's history; seeds \(inputs.seeds.map(\.name).joined(separator: ", ")); inputs read in \(inputTime))",
                    tracks, report, known: inputs.knownArtists)
         }

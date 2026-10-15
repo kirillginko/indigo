@@ -136,6 +136,10 @@ struct DigView: View {
                         .padding(.top, 22)
                 }
 
+                if TrackDiscoveryFeature.isEnabled {
+                    DiscoverSection()
+                }
+
                 recommendationShelves(shown.recommendations)
 
                 memory(shown)
