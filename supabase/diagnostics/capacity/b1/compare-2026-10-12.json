@@ -1,0 +1,289 @@
+{
+ "relations": {
+  "identical": 46,
+  "different": 14,
+  "rows_only_before": 267,
+  "rows_only_after": 222,
+  "examples": [
+   {
+    "key": "57dd7219-75f9-4771-b761-6cf8f619c5da",
+    "only_before": [
+     "('near', '09a80333-1fff-44d9-9caf-0c6eb1ac3840', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '1450e21b-f26b-451f-a7b8-3cf29c5e1cad', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '20dbd6cc-cf1c-42c6-a9ab-c0b8254a9a12', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ],
+    "only_after": [
+     "('near', 'a70ece52-c209-46e0-bcef-b369a24a198d', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', 'a8d60b49-17d4-4b78-8bbd-58c1689d4fa1', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', 'ad7e53cd-4de3-4e7c-bf85-2458a2aeb049', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ]
+   },
+   {
+    "key": "58539bda-1f4b-4a6a-a561-a33713b6bef2",
+    "only_before": [
+     "('near', '262019fb-3f55-4e5d-9a10-f74be181389b', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '26f03593-c3ac-4274-aa57-3d3ac029249d', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '28a1cdba-1c25-4435-b056-14f31b0ddaca', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ],
+    "only_after": [
+     "('near', '0a1951e2-527f-4336-b942-329f95c3a905', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '0ec37411-c944-437b-a3b0-2c8d4c756b7d', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '11454baa-19fe-4e2d-90e3-bed99da6997e', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ]
+   },
+   {
+    "key": "61d2d619-9d1a-4276-b947-786b85e394a2",
+    "only_before": [
+     "('near', '5094e578-49c8-4081-bc98-3214e3c7fdde', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '929b2bcc-8b6a-4e6d-91d6-2c801529c4c3', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', 'a07e5d85-f1fe-4386-90df-0fc2f3fbfa09', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "785fa052-f495-4dbd-9253-cbc39ea286d8",
+    "only_before": [
+     "('near', '83d7918b-738b-4dd0-bca3-3674262d1670', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', 'de3ca6ec-b498-4ef0-bd75-8ed20c3232c2', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "868c3d4e-c65e-4e69-a140-9ad583b8a7d9",
+    "only_before": [
+     "('near', '0e6fe1cf-12a6-43d3-9409-7fbca1cb806a', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '19b19e0d-df0f-4b28-b31b-3b26942d11fe', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '20adc13f-279f-4e0f-a1ae-70e1267d1630', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ],
+    "only_after": [
+     "('near', 'e7ffaff6-5390-41bd-95e3-686ced20f0eb', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', 'eeab07d1-2156-4c77-9f69-d1dfb78c8c49', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', 'ef10c0c6-db1f-4751-a195-acd32611ba6f', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ]
+   },
+   {
+    "key": "8dbba6d5-026c-4c73-857d-75fd605e8963",
+    "only_before": [
+     "('near', '7d485444-0c62-44f6-88e8-717bd67291f5', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '7ec21101-9447-4131-b187-000638fa6a29', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '84108822-0878-4ffc-ace5-dfe1f34c74ac', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ],
+    "only_after": [
+     "('near', '47cb3741-b719-4f16-84b4-968efbc5bdd5', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '48308d5b-1d2b-4f47-870d-29a411fa6779', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')",
+     "('near', '4c1778f4-8d72-4a10-a15e-379ce74f14c8', 1, '0.65', '{\"adjacencies\": 1, \"episodes\": 1}')"
+    ]
+   }
+  ]
+ },
+ "alongside": {
+  "identical": 52,
+  "different": 8,
+  "rows_only_before": 21,
+  "rows_only_after": 19,
+  "examples": [
+   {
+    "key": "ahmad jamal",
+    "only_before": [
+     "('092d0a91-6b52-4b00-8eb6-48fe7eb929b6', 1, 'Ahmad Jamal')",
+     "('42868929-a9d7-4b80-aa67-909b53f07574', 1, 'Ahmad Jamal')",
+     "('a4642959-acb5-47c3-ba5e-bbb520753d39', 1, 'Ahmad Jamal')"
+    ],
+    "only_after": [
+     "('16d7d211-2a99-46d9-a905-3591fe40a4ba', 1, 'Ahmad Jamal')",
+     "('34161b2f-0864-4734-b324-386aa7e951d9', 1, 'Ahmad Jamal')",
+     "('45ef9dd3-f141-41e9-9e27-9b273382e7d6', 1, 'Ahmad Jamal')"
+    ]
+   },
+   {
+    "key": "booth",
+    "only_before": [
+     "('973ea433-c677-4777-88cc-36fb707cce29', 1, 'Booth')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "herbie hancock",
+    "only_before": [
+     "('0e6fe1cf-12a6-43d3-9409-7fbca1cb806a', 1, 'Herbie Hancock')",
+     "('3bd6ceae-448f-4d08-a05d-2c53ac64689b', 1, 'Herbie Hancock')",
+     "('497c19ca-bd99-4136-a4e5-4d8271f7b4b7', 1, 'Herbie Hancock')"
+    ],
+    "only_after": [
+     "('0b9dbce9-40ce-4f14-9c17-92ecc897efe2', 1, 'Herbie Hancock')",
+     "('a926024c-2736-499d-8f23-c4d76ee316f1', 1, 'Herbie Hancock')",
+     "('c7e1887d-4c64-488a-9e55-3c1070513bb0', 1, 'Herbie Hancock')"
+    ]
+   },
+   {
+    "key": "john coltrane",
+    "only_before": [
+     "('de3ca6ec-b498-4ef0-bd75-8ed20c3232c2', 1, 'John Coltrane')"
+    ],
+    "only_after": [
+     "('f71d01c3-0ff4-4ff3-adae-9e0c3f071d53', 1, 'John Coltrane')"
+    ]
+   },
+   {
+    "key": "michał lorenc",
+    "only_before": [
+     "('f276efc7-85a1-48df-b700-5fcdf4f92fe4', 1, 'Michał Lorenc')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "miles davis",
+    "only_before": [
+     "('5094e578-49c8-4081-bc98-3214e3c7fdde', 1, 'Miles Davis')"
+    ],
+    "only_after": [
+     "('3a12a6a1-63dd-48ea-b625-cd9473a4d099', 1, 'Miles Davis')"
+    ]
+   }
+  ]
+ },
+ "explore": {
+  "identical": 56,
+  "different": 20,
+  "rows_only_before": 125,
+  "rows_only_after": 31,
+  "examples": [
+   {
+    "key": "artist:ahmad jamal",
+    "only_before": [
+     "('Art Blakey And The Jazz Messengers', 1, 0.65, 'Played next to each other on the radio')",
+     "('Aspects Of Paragonne', 1, 0.65, 'Played next to each other on the radio')",
+     "('Azymuth', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "artist:anika",
+    "only_before": [
+     "('Young Thug', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('YOUNG THUG', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   },
+   {
+    "key": "artist:aphex twin",
+    "only_before": [
+     "('MOESHA  13', 1, 0.65, 'Played next to each other on the radio')",
+     "('Salem', 1, 0.65, 'Played next to each other on the radio')",
+     "('Zayok', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('MOESHA 13', 1, 0.65, 'Played next to each other on the radio')",
+     "('SALEM', 1, 0.65, 'Played next to each other on the radio')",
+     "('zayok', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   },
+   {
+    "key": "artist:booth",
+    "only_before": [
+     "('Carm Mascarenhas', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "artist:d angelo",
+    "only_before": [
+     "('Björk', 1, 0.65, 'Played next to each other on the radio')",
+     "('MIKE', 1, 0.65, 'Played next to each other on the radio')",
+     "('Vhoor', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('Bjork', 1, 0.65, 'Played next to each other on the radio')",
+     "('Mike', 1, 0.65, 'Played next to each other on the radio')",
+     "('VHOOR', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   },
+   {
+    "key": "artist:dean blunt",
+    "only_before": [
+     "('A.S.O', 1, 0.65, 'Played next to each other on the radio')",
+     "('Björk', 1, 0.65, 'Played next to each other on the radio')",
+     "('Diamond*', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('Bjork', 1, 0.65, 'Played next to each other on the radio')",
+     "('Diamond', 1, 0.65, 'Played next to each other on the radio')",
+     "('Evilgiane', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   }
+  ]
+ },
+ "answers": {
+  "identical": 56,
+  "different": 20,
+  "rows_only_before": 125,
+  "rows_only_after": 31,
+  "examples": [
+   {
+    "key": "artist:ahmad jamal",
+    "only_before": [
+     "('Art Blakey And The Jazz Messengers', 1, 0.65, 'Played next to each other on the radio')",
+     "('Aspects Of Paragonne', 1, 0.65, 'Played next to each other on the radio')",
+     "('Azymuth', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "artist:anika",
+    "only_before": [
+     "('Young Thug', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('YOUNG THUG', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   },
+   {
+    "key": "artist:aphex twin",
+    "only_before": [
+     "('MOESHA  13', 1, 0.65, 'Played next to each other on the radio')",
+     "('Salem', 1, 0.65, 'Played next to each other on the radio')",
+     "('Zayok', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('MOESHA 13', 1, 0.65, 'Played next to each other on the radio')",
+     "('SALEM', 1, 0.65, 'Played next to each other on the radio')",
+     "('zayok', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   },
+   {
+    "key": "artist:booth",
+    "only_before": [
+     "('Carm Mascarenhas', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "artist:d angelo",
+    "only_before": [
+     "('Björk', 1, 0.65, 'Played next to each other on the radio')",
+     "('MIKE', 1, 0.65, 'Played next to each other on the radio')",
+     "('Vhoor', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('Bjork', 1, 0.65, 'Played next to each other on the radio')",
+     "('Mike', 1, 0.65, 'Played next to each other on the radio')",
+     "('VHOOR', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   },
+   {
+    "key": "artist:dean blunt",
+    "only_before": [
+     "('A.S.O', 1, 0.65, 'Played next to each other on the radio')",
+     "('Björk', 1, 0.65, 'Played next to each other on the radio')",
+     "('Diamond*', 1, 0.65, 'Played next to each other on the radio')"
+    ],
+    "only_after": [
+     "('Bjork', 1, 0.65, 'Played next to each other on the radio')",
+     "('Diamond', 1, 0.65, 'Played next to each other on the radio')",
+     "('Evilgiane', 1, 0.65, 'Played next to each other on the radio')"
+    ]
+   }
+  ]
+ }
+}

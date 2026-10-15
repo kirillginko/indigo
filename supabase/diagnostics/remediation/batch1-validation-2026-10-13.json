@@ -1,0 +1,80 @@
+{
+ "counts": {
+  "artists": 3000,
+  "documents not crediting the artist": 1,
+  "documents used": 3514,
+  "documents per artist: 3": 59,
+  "still a dead end: names people/labels, none catalogued": 130,
+  "routes": 24114,
+  "routes verified by Discogs id": 24114,
+  "routes name-only (unresolved, not used)": 0,
+  "routes to catalogued": 6818,
+  "routes meaningful": 6028,
+  "routes weak": 385,
+  "routes into another dead end": 419,
+  "routes with namesake risk (id on >1 row)": 5,
+  "documents per artist: 1": 2641,
+  "rescued: any verified route to a catalogued artist or label": 2778,
+  "rescued meaningfully: a strong route that leads on": 2686,
+  "meaningful via made-with": 980,
+  "meaningful ONLY via made-with": 462,
+  "meaningful via credited": 2196,
+  "meaningful ONLY via credited": 1668,
+  "documents per artist: 2": 272,
+  "rescued, weak only (engineering, huge or placeholder label, or into another dead end)": 92,
+  "documents per artist: 4": 15,
+  "meaningful via label": 101,
+  "still a dead end: documents name nobody else": 92,
+  "documents per artist: 5+": 12,
+  "meaningful ONLY via label": 5,
+  "artists with a namesake-risk route": 4,
+  "artists with a document that does not credit them": 1,
+  "documents per artist: 0": 1,
+  "no document readable": 1
+ },
+ "examples": {
+  "dead": [
+   "Orelha Negra: credited → DJ Glue (272559); credited → Prodígio (3241188); credited → Van Sophie (3241185)",
+   "La Cedille: credited → Steve Whitfield (245172); credited → Aurélius (1402154); credited → BSF (3) (1843140)",
+   "Jxnblk: credited → Jeff Milligan (56377); credited → Silent Cuts (559421)",
+   "合輯: —",
+   "R8R: made-with → L-Wood (6347847)",
+   "DJ Purple Image: —"
+  ],
+  "meaningful": [
+   "Brennan Heart: made-with → Roland Clark (10780)",
+   "Ronnie Vineyard: credited → Geto Mark (6987313)",
+   "Marcus Manchild: credited → Fat Trel (2347092); credited → Johnny Cinco (3256750); credited → Sauce Walka (4322899)",
+   "vai5000: credited → Lucy Bedroque (15112574); credited → Zayok (13553914)",
+   "Blak Madeen: made-with → Tragedy Khadafi (176111)",
+   "Greg Copeland: credited → Anna Butterss (6778705)"
+  ],
+  "weak": [
+   "Olivier Labbé: made-with → Emmanuel Lalande (1787921)",
+   "Twisted Tongue: credited → Craz Digga (14250457); credited → Graham Flowers (502613)",
+   "LIO (415): credited → Fumitake Tamura (2294501)",
+   "DJ RIKU: label → Not On Label (1818, 1854 catalogued)",
+   "The Darling Downs: credited → Kim Salmon (416861)",
+   "Atol Diskz: label → Not On Label (1818, 1854 catalogued)"
+  ]
+ },
+ "reads": {
+  "requests": 3515,
+  "missing": 0,
+  "failed": 0,
+  "bytes": 27787944,
+  "p50ms": 176,
+  "p95ms": 421
+ },
+ "objects": {
+  "bundles": 3000,
+  "bundleBytesTotal": 6817792,
+  "bundleP50": 1592,
+  "bundleP95": 5623,
+  "bundleMax": 45242,
+  "rosters": 3102,
+  "rosterBytesTotal": 623697,
+  "buildMsTotal": 423,
+  "r2WritesIfStored": 9102
+ }
+}

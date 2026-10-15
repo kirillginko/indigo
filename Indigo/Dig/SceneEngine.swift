@@ -143,6 +143,9 @@ nonisolated struct MusicScene: Identifiable, Sendable {
     let radioAppearances: Int
     let libraryTrackCount: Int
     let crateCount: Int
+    /// Every artist key in it, sorted -- the names above are the ones of them
+    /// that have a name to show. What a foothold is counted over.
+    var memberKeys: [String] = []
 
     var id: String { "\(RecordingKey.normalize(city))|\(soundKey)" }
 
@@ -317,6 +320,55 @@ nonisolated struct SceneEngine {
         directions(taste: taste).first
     }
 
+    /// Which of the directions to name on a turn. EXPLORE's turn is its
+    /// evaluation period, so every device names the same place on the same
+    /// day, and the next day names the next one.
+    nonisolated static func pickDirection<Scene>(_ found: [Scene], turn: Int) -> Scene? {
+        guard !found.isEmpty else { return nil }
+        return found[((turn % found.count) + found.count) % found.count]
+    }
+
+    /// Every place that could be a direction, for anybody: each city that is
+    /// a city (not a country) with enough people in it, its members, and its
+    /// substantial scenes, without the counts of what any listener keeps.
+    ///
+    /// `directions(taste:)` narrows to the places this store's listener has a
+    /// foot in before building anything, which is cheaper and is personal.
+    /// For You's ranker is handed this instead and narrows the same way from
+    /// the listener's own rows (`ExploreRanker.directions`), so what is known
+    /// about places does not change when the crate does.
+    func catalogue() -> SceneCatalogue {
+        let caches = self.caches
+        var cities: [SceneCity] = []
+        for cityKey in caches.cities.keys.sorted() {
+            guard !caches.countries.contains(cityKey) else { continue }
+            let members = caches.artistsForCity[cityKey] ?? []
+            guard members.count >= Self.directionMinimum else { continue }
+            let found = scenes(cityKey: cityKey, caches: caches)
+                .filter(\.isSubstantial)
+                .map { scene in
+                    SceneCandidate(
+                        city: scene.city, sound: scene.sound,
+                        eraLow: scene.era?.lowerBound, eraHigh: scene.era?.upperBound,
+                        members: scene.memberKeys, artistCount: scene.artists.count,
+                        labelCount: scene.labels.count, radioAppearances: scene.radioAppearances,
+                        signature: scene.signature, tags: scene.tags
+                    )
+                }
+            guard !found.isEmpty else { continue }
+            cities.append(SceneCity(key: cityKey, members: members.sorted(), scenes: found))
+        }
+        // The same credits `distributeCredits` shares counts out across.
+        var credits: [String: [String]] = [:]
+        for (key, name) in caches.artistNames {
+            let members = ArtistName.split(name)
+            guard members.count > 1 else { continue }
+            let keys = members.map(RecordingKey.normalizeArtist).filter { !$0.isEmpty && $0 != key }
+            if !keys.isEmpty { credits[key] = keys }
+        }
+        return SceneCatalogue(cities: cities, creditMembers: credits)
+    }
+
     /// Every scene this listener could be said to be heading into, best first.
     ///
     /// Plural because the singular was always the same answer. Scoring already
@@ -488,7 +540,8 @@ nonisolated struct SceneEngine {
 
             radioAppearances: radio,
             libraryTrackCount: library,
-            crateCount: crate
+            crateCount: crate,
+            memberKeys: artistKeys.sorted()
         )
     }
 
@@ -540,7 +593,10 @@ extension SceneCaches {
             var seenForArtist = Set<String>()
             for tag in tagsForArtist[key] ?? [] {
                 for folded in ListeningLog.foldTags([tag]) {
-                    spelling[folded] = spelling[folded] ?? tag
+                    // The first spelling by content, not the first one a set
+                    // happened to yield: it is the sound a scene is named by,
+                    // and it is part of what For You's knowledge digests.
+                    spelling[folded] = spelling[folded].map { min($0, tag) } ?? tag
                     guard seenForArtist.insert(folded).inserted else { continue }
                     here[folded, default: 0] += 1
                 }

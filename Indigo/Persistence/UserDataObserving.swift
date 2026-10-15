@@ -28,6 +28,9 @@ enum UserDataObserving {
         let observer = {
             var observer = HistoryObserver(context: context, ownAuthor: author)
             observer.onNewerGeneration = { Persistence.refuse(newerGeneration: $0) }
+            // What was worked out from the rows another device changed is
+            // looked at again: the crate's lists, and EXPLORE's offers.
+            observer.onForeignChange = { UserDataImports.shared.note($0) }
             // What each pass looked at, beside what it cost: whether the
             // passes during a first import are what stalls the main thread.
             observer.onPass = { pass in

@@ -481,7 +481,12 @@ struct DigView: View {
     /// own — what is on screen before anybody scrolls a shelf sideways.
     private func facesWanted(_ found: CrateRecommendations) -> [String] {
         let rows = [found.forYou] + found.shelves.map(\.picks)
-        let names = rows.flatMap { $0.prefix(8).filter { $0.node.artworkURL == nil }.map(\.node.title) }
+        // No picture, or only the 150-pixel cut stamped on the node when its
+        // edge was built: both are asked for, the second for the full image.
+        let names = rows.flatMap {
+            $0.prefix(8).filter { $0.node.artworkURL == nil || DiscogsClient.isSmallCut(dig.tileImage(for: $0.node)?.absoluteString) }
+                .map(\.node.title)
+        }
         return Array(names.prefix(40))
     }
 
@@ -726,7 +731,7 @@ private struct DigShelf: View {
                             .overlay {
                                 GeometryReader { proxy in
                                     ArtworkView(
-                                        remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                                        remoteURL: dig.tileImage(for: pick.node),
                                         side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic
                                     )
                                 }
@@ -779,7 +784,7 @@ private struct DigArtistCard: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 8) {
                 ArtworkView(
-                    remoteURL: pick.node.artworkURL ?? dig.portraitURL(for: pick.node.title),
+                    remoteURL: dig.tileImage(for: pick.node),
                     side: Self.side,
                     glyphScale: 0.26,
                     placeholder: .mosaic

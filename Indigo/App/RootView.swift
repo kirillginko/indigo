@@ -7,6 +7,9 @@
 //
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 /// The phone layout on a phone-width screen, the sidebar everywhere else --
 /// including an iPad, unless split view narrows it to a phone's width.
@@ -17,7 +20,7 @@ struct AdaptiveRootView: View {
 
     var body: some View {
         #if os(iOS)
-        if sizeClass == .compact {
+        if sizeClass == .compact || UIDevice.current.userInterfaceIdiom == .phone {
             PhoneRootView()
         } else {
             RootView()

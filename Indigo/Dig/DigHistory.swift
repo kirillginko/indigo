@@ -237,9 +237,12 @@ nonisolated struct DigHistory {
     func haunts(kinds: Set<MusicNodeKind> = [.label, .artist, .broadcast], limit: Int = 6) -> [DigVisit] {
         let descriptor = FetchDescriptor<DigVisit>(
             predicate: #Predicate { $0.visits > 1 },
+            // The node last, so two places returned to as often at the same
+            // moment come out in the same order on every device.
             sortBy: [
                 SortDescriptor(\.visits, order: .reverse),
-                SortDescriptor(\.lastVisitedAt, order: .reverse)
+                SortDescriptor(\.lastVisitedAt, order: .reverse),
+                SortDescriptor(\.nodeID)
             ]
         )
         return Self.onePerNode((try? context.fetch(descriptor)) ?? [])

@@ -1,0 +1,327 @@
+{
+ "totals": {
+  "pages": 22,
+  "bundle_rows_shown": 137,
+  "new_from_bundle": 120,
+  "new_other": 135,
+  "gone": 3,
+  "rescued": 5,
+  "nav_ok": 0,
+  "nav_checked": 0
+ },
+ "pages": [
+  {
+   "name": "Ai Phoenix",
+   "inPilot": true,
+   "off": 6,
+   "on": 32,
+   "newFromBundle": 6,
+   "newOther": 20,
+   "gone": [],
+   "bundleShown": 11,
+   "bundleSize": 18,
+   "nav": "nav=opened Airbuz"
+  },
+  {
+   "name": "Arturo En El Barco",
+   "inPilot": true,
+   "off": 17,
+   "on": 21,
+   "newFromBundle": 4,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 6,
+   "bundleSize": 7,
+   "nav": "nav=opened .tape."
+  },
+  {
+   "name": "Benjamin Koppel",
+   "inPilot": true,
+   "off": 0,
+   "on": 29,
+   "newFromBundle": 4,
+   "newOther": 25,
+   "gone": [],
+   "bundleShown": 4,
+   "bundleSize": 4,
+   "nav": "nav=opened Aalborg Symfoniorkester"
+  },
+  {
+   "name": "Bruce Mennel",
+   "inPilot": true,
+   "off": 0,
+   "on": 5,
+   "newFromBundle": 1,
+   "newOther": 4,
+   "gone": [],
+   "bundleShown": 1,
+   "bundleSize": 1,
+   "nav": "nav=did NOT show Drama Aka Treason"
+  },
+  {
+   "name": "Christin Nichols",
+   "inPilot": true,
+   "off": 5,
+   "on": 7,
+   "newFromBundle": 1,
+   "newOther": 1,
+   "gone": [],
+   "bundleShown": 1,
+   "bundleSize": 1,
+   "nav": "nav=opened Anika"
+  },
+  {
+   "name": "De Nazaten",
+   "inPilot": true,
+   "off": 1,
+   "on": 27,
+   "newFromBundle": 13,
+   "newOther": 13,
+   "gone": [],
+   "bundleShown": 14,
+   "bundleSize": 14,
+   "nav": "nav=opened Bastiaan Kuijt"
+  },
+  {
+   "name": "Gayun Cannon",
+   "inPilot": true,
+   "off": 1,
+   "on": 2,
+   "newFromBundle": 1,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 2,
+   "bundleSize": 2,
+   "nav": "nav=opened Drew The Kiiid"
+  },
+  {
+   "name": "Keak Da Sneak",
+   "inPilot": true,
+   "off": 0,
+   "on": 22,
+   "newFromBundle": 12,
+   "newOther": 10,
+   "gone": [],
+   "bundleShown": 12,
+   "bundleSize": 25,
+   "nav": "nav=opened 3X Krazy"
+  },
+  {
+   "name": "Luigi Butera",
+   "inPilot": true,
+   "off": 0,
+   "on": 11,
+   "newFromBundle": 2,
+   "newOther": 9,
+   "gone": [],
+   "bundleShown": 2,
+   "bundleSize": 2,
+   "nav": "nav=opened Artificiel"
+  },
+  {
+   "name": "M. Caye Castagnetto",
+   "inPilot": true,
+   "off": 0,
+   "on": 13,
+   "newFromBundle": 13,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 13,
+   "bundleSize": 16,
+   "nav": "nav=opened Aileen Bryant"
+  },
+  {
+   "name": "Magic Carpathians Project",
+   "inPilot": true,
+   "off": 20,
+   "on": 21,
+   "newFromBundle": 2,
+   "newOther": 0,
+   "gone": [
+    "Magic Carpathians"
+   ],
+   "bundleShown": 4,
+   "bundleSize": 16,
+   "nav": "nav=opened Six Organs Of Admittance"
+  },
+  {
+   "name": "Martin Brygmann",
+   "inPilot": true,
+   "off": 10,
+   "on": 45,
+   "newFromBundle": 14,
+   "newOther": 21,
+   "gone": [],
+   "bundleShown": 14,
+   "bundleSize": 75,
+   "nav": "nav=opened Anders Gårdmand"
+  },
+  {
+   "name": "Martin East Project",
+   "inPilot": true,
+   "off": 10,
+   "on": 32,
+   "newFromBundle": 13,
+   "newOther": 9,
+   "gone": [],
+   "bundleShown": 13,
+   "bundleSize": 19,
+   "nav": "nav=opened Canata"
+  },
+  {
+   "name": "Midnite Radio",
+   "inPilot": true,
+   "off": 13,
+   "on": 14,
+   "newFromBundle": 1,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 1,
+   "bundleSize": 1,
+   "nav": "nav=opened Danton Eeprom"
+  },
+  {
+   "name": "Nec Nymbl",
+   "inPilot": true,
+   "off": 11,
+   "on": 21,
+   "newFromBundle": 3,
+   "newOther": 8,
+   "gone": [
+    "Shark the SOB"
+   ],
+   "bundleShown": 3,
+   "bundleSize": 3,
+   "nav": "nav=opened Anno Domini Beats"
+  },
+  {
+   "name": "OG Parker",
+   "inPilot": true,
+   "off": 22,
+   "on": 22,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 0,
+   "bundleSize": 1,
+   "nav": "nav=-"
+  },
+  {
+   "name": "Rafael Kasma",
+   "inPilot": true,
+   "off": 11,
+   "on": 16,
+   "newFromBundle": 5,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 5,
+   "bundleSize": 5,
+   "nav": "nav=opened Adrian Bergmann"
+  },
+  {
+   "name": "Ritual Band",
+   "inPilot": true,
+   "off": 0,
+   "on": 0,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 0,
+   "bundleSize": 9,
+   "nav": "nav=-"
+  },
+  {
+   "name": "Ron Pope",
+   "inPilot": true,
+   "off": 1,
+   "on": 17,
+   "newFromBundle": 13,
+   "newOther": 3,
+   "gone": [],
+   "bundleShown": 13,
+   "bundleSize": 13,
+   "nav": "nav=opened Adam Christgau"
+  },
+  {
+   "name": "Rusconi Trio",
+   "inPilot": true,
+   "off": 4,
+   "on": 23,
+   "newFromBundle": 7,
+   "newOther": 12,
+   "gone": [],
+   "bundleShown": 10,
+   "bundleSize": 10,
+   "nav": "nav=opened AORO"
+  },
+  {
+   "name": "This Celestial Engine",
+   "inPilot": true,
+   "off": 17,
+   "on": 18,
+   "newFromBundle": 1,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 1,
+   "bundleSize": 1,
+   "nav": "nav=opened JK Flesh"
+  },
+  {
+   "name": "Tricky Disco",
+   "inPilot": true,
+   "off": 24,
+   "on": 27,
+   "newFromBundle": 4,
+   "newOther": 0,
+   "gone": [
+    "Tensnake"
+   ],
+   "bundleShown": 7,
+   "bundleSize": 15,
+   "nav": "nav=opened Gerrard Varley"
+  },
+  {
+   "name": "Hype Williams",
+   "inPilot": false,
+   "off": 22,
+   "on": 25,
+   "newFromBundle": 0,
+   "newOther": 9,
+   "gone": [
+    "Chasms",
+    "Coil",
+    "Leslie Winer",
+    "Nourished By Time",
+    "Sister Irene O’connor",
+    "The Rootsman"
+   ],
+   "bundleShown": 0,
+   "bundleSize": 0,
+   "nav": "nav=opened Björk"
+  },
+  {
+   "name": "Owain Bellis",
+   "inPilot": false,
+   "off": 3,
+   "on": 3,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 0,
+   "bundleSize": 0,
+   "nav": "nav=-"
+  },
+  {
+   "name": "Prefuse 73",
+   "inPilot": false,
+   "off": 19,
+   "on": 19,
+   "newFromBundle": 0,
+   "newOther": 0,
+   "gone": [],
+   "bundleShown": 0,
+   "bundleSize": 0,
+   "nav": "nav=-"
+  }
+ ]
+}

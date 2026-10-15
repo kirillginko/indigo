@@ -107,19 +107,27 @@ private typealias PlatformRepresentable = UIViewRepresentable
 /// that wears it -- the phone's sheen chip (`Chip`).
 struct MineralSheenSurface: View {
     var moving = true
-    var body: some View { MineralSheenLayer(moving: moving) }
+    /// Drawn at one pixel a point: the light is a smooth field, so it looks
+    /// the same, at a ninth of the drawing. For tiles that stand in for a
+    /// missing picture, of which a grid may hold many.
+    var lowResolution = false
+    var body: some View { MineralSheenLayer(moving: moving, lowResolution: lowResolution) }
 }
 
 /// Two tiles side by side in one image, slid left by one tile and around again.
 private struct MineralSheenLayer: PlatformRepresentable {
     let moving: Bool
+    var lowResolution = false
 
     #if os(macOS)
     func makeNSView(context: Context) -> SheenView { SheenView() }
     func updateNSView(_ view: SheenView, context: Context) { view.moving = moving }
     #else
     func makeUIView(context: Context) -> SheenView { SheenView() }
-    func updateUIView(_ view: SheenView, context: Context) { view.moving = moving }
+    func updateUIView(_ view: SheenView, context: Context) {
+        view.lowResolution = lowResolution
+        view.moving = moving
+    }
     #endif
 
     final class SheenView: PlatformView {
@@ -127,6 +135,11 @@ private struct MineralSheenLayer: PlatformRepresentable {
         private var drawnFor: CGSize = .zero
         private var tileWidth: CGFloat = 0
         var moving = true { didSet { if moving != oldValue { restart() } } }
+        var lowResolution = false { didSet { if lowResolution != oldValue { drawnFor = .zero; redraw() } } }
+
+        /// Drawn images by pixel size: every tile of a grid is one size, so
+        /// the light is drawn once for all of them, not once a tile.
+        private static var drawn: [String: CGImage] = [:]
 
         #if os(macOS)
         override init(frame: NSRect) {
@@ -159,8 +172,18 @@ private struct MineralSheenLayer: PlatformRepresentable {
             guard size.width > 0, size.height > 0, size != drawnFor else { return }
             drawnFor = size
             let tileWidth = (size.width * MineralSheen.tileWidthInPlates).rounded(.up)
+            let scale = lowResolution ? 1 : self.scale
             let pixelsWide = Int(tileWidth * scale), pixelsHigh = Int((size.height * scale).rounded(.up))
-            guard let image = MineralSheen.tile(width: pixelsWide, height: pixelsHigh, tiles: 2) else { return }
+            let key = "\(pixelsWide)x\(pixelsHigh)"
+            let image: CGImage
+            if let held = Self.drawn[key] {
+                image = held
+            } else {
+                guard let made = MineralSheen.tile(width: pixelsWide, height: pixelsHigh, tiles: 2) else { return }
+                if Self.drawn.count > 40 { Self.drawn.removeAll() }
+                Self.drawn[key] = made
+                image = made
+            }
 
             CATransaction.begin()
             CATransaction.setDisableActions(true)

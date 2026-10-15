@@ -28,15 +28,15 @@ final class SchemaVersioningTests: XCTestCase {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    func testTheCurrentSchemaIsVersionSeven() {
-        XCTAssertEqual(Persistence.schema.version, Schema.Version(7, 0, 0))
-        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 7)
-        XCTAssertEqual(IndigoMigrationPlan.stages.count, 6)
+    func testTheCurrentSchemaIsVersionEight() {
+        XCTAssertEqual(Persistence.schema.version, Schema.Version(8, 0, 0))
+        XCTAssertEqual(IndigoMigrationPlan.schemas.count, 8)
+        XCTAssertEqual(IndigoMigrationPlan.stages.count, 7)
     }
 
     func testEveryModelTheAppStoresIsInTheVersionedSchema() {
         let names = Set(IndigoSchemaCurrent.models.map { String(describing: $0) })
-        XCTAssertEqual(names.count, 20)
+        XCTAssertEqual(names.count, 23)
         for model in ["CrateItem", "ListeningEvent", "DigVisit", "DigStep", "Recording"] {
             XCTAssertTrue(names.contains(model), "\(model) missing from SchemaV1")
         }

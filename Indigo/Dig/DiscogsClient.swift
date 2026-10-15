@@ -59,6 +59,29 @@ nonisolated enum DiscogsConfiguration {
     }
 }
 
+/// What looking an artist up by name found, and on what evidence.
+nonisolated struct DiscogsArtistLookup: Sendable {
+    let head: DiscogsSearchResult?
+    /// Present when nobody was filed under the name and a spelling check ran.
+    let spelling: DiscogsSpellingCheck?
+
+    /// Whether the head is somebody filed under another name, found because
+    /// their records were credited under this one.
+    var isCreditedSpelling: Bool {
+        if case .variation? = spelling?.verdict { return head != nil }
+        return false
+    }
+}
+
+/// A completed spelling check: the verdict, and the entries it read to reach it.
+nonisolated struct DiscogsSpellingCheck: Sendable {
+    let spelling: String
+    let verdict: SpellingVerdict
+    let resultCount: Int
+    let results: [DiscogsSearchResult]
+    let facts: [DiscogsIdentityFacts]
+}
+
 nonisolated struct DiscogsClient: Sendable {
     private let transport: DiscogsTransport
     private let suppliedToken: String?
@@ -133,14 +156,74 @@ nonisolated struct DiscogsClient: Sendable {
     /// the bundle is a second round trip, and waiting for it before drawing
     /// anything meant the portrait arrived twice as late as it had to.
     func artistHead(named name: String) async throws -> DiscogsSearchResult? {
+        try await artistLookup(named: name).head
+    }
+
+    /// The search that finds them, and the evidence for it when the name was a
+    /// spelling rather than what they are filed under.
+    ///
+    /// Asked for "Prefuse73", Discogs' search returns Prefuse 73 first — and
+    /// the match below, which compares filing names, rightly refuses it:
+    /// "prefuse73" and "prefuse 73" are not the same string, and folding them
+    /// together is how "Arp" would become A.R.P. So the page opened with
+    /// nothing on it. What makes Prefuse 73 the answer is that his entry lists
+    /// "Prefuse73" as a spelling his records were credited under, and that
+    /// nobody is filed under it — which `spellingCheck` establishes, or fails
+    /// to, from a search that returned every match it has.
+    func artistLookup(named name: String) async throws -> DiscogsArtistLookup {
         let search: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "q", value: name),
             URLQueryItem(name: "type", value: "artist"),
             URLQueryItem(name: "per_page", value: "5")
         ])
         let candidates = Self.artistMatches(name: name, results: search.results ?? [])
-        guard candidates.count > 1 else { return candidates.first }
-        return try await Self.whicheverMakesRecords(candidates, using: self) ?? candidates.first
+        if candidates.count == 1 { return DiscogsArtistLookup(head: candidates[0], spelling: nil) }
+        if candidates.count > 1 {
+            let head = try await Self.whicheverMakesRecords(candidates, using: self) ?? candidates.first
+            return DiscogsArtistLookup(head: head, spelling: nil)
+        }
+        guard let check = await spellingCheck(name) else { return DiscogsArtistLookup(head: nil, spelling: nil) }
+        guard case .variation(let id) = check.verdict, let head = check.results.first(where: { $0.id == id }) else {
+            return DiscogsArtistLookup(head: nil, spelling: check)
+        }
+        return DiscogsArtistLookup(head: head, spelling: check)
+    }
+
+    /// Whether exactly one Discogs entry answers to a spelling, or nil when
+    /// that could not be established.
+    ///
+    /// Nil is the answer to every kind of not knowing: a search that failed,
+    /// one with more matches than it returned, more candidates than are worth
+    /// reading, or a candidate whose entry would not load. None of those is
+    /// evidence that nobody else answers to the name, and the caller stores
+    /// nothing for them. See `SpellingCheck.verdict`.
+    func spellingCheck(_ spelling: String) async -> DiscogsSpellingCheck? {
+        let response: DiscogsSearchResponse
+        do {
+            response = try await get("database/search", query: [
+                URLQueryItem(name: "q", value: spelling),
+                URLQueryItem(name: "type", value: "artist"),
+                URLQueryItem(name: "per_page", value: String(SpellingCheck.pageSize))
+            ])
+        } catch {
+            return nil
+        }
+        let results = response.results ?? []
+        guard let total = response.pagination?.items, total <= results.count else { return nil }
+        guard let candidates = SpellingCheck.candidates(for: spelling, in: results) else { return nil }
+
+        var facts: [Int: DiscogsIdentityFacts] = [:]
+        for id in candidates {
+            guard let detail = try? await artistDetail(id: id) else { return nil }
+            facts[id] = DiscogsIdentityFacts(detail: detail)
+        }
+        guard let verdict = SpellingCheck.verdict(
+            spelling: spelling, results: results, complete: true, details: facts
+        ) else { return nil }
+        return DiscogsSpellingCheck(
+            spelling: spelling, verdict: verdict, resultCount: total,
+            results: results, facts: facts.keys.sorted().compactMap { facts[$0] }
+        )
     }
 
     /// Which of several people with one name is the one who makes the records.
@@ -275,6 +358,14 @@ nonisolated struct DiscogsClient: Sendable {
         try await get(Self.shelfPath(id: id), query: Self.shelfQuery)
     }
 
+    /// How many releases Discogs files under an entry, in one small request.
+    /// Nil when the answer did not say — which is not zero.
+    func artistReleaseCount(id: Int) async throws -> Int? {
+        let shelf: DiscogsArtistReleases = try await get(
+            Self.shelfPath(id: id), query: [URLQueryItem(name: "per_page", value: "1")])
+        return shelf.pagination?.items
+    }
+
     /// The sleeves the shelf does not carry.
     func artistCatalogue(named name: String) async throws -> [DiscogsSearchResult] {
         let response: DiscogsSearchResponse = try await get("database/search", query: [
@@ -285,21 +376,68 @@ nonisolated struct DiscogsClient: Sendable {
         return response.results ?? []
     }
 
-    /// Just a picture of an artist, in one request.
+    /// What a name-only portrait search may conclude.
+    nonisolated enum PortraitPick: Sendable, Equatable {
+        /// Exactly one Discogs artist has the name. A picture, never an
+        /// identity: nothing here says the row is that artist.
+        case unique(address: String, discogsID: Int)
+        /// Several namesakes and nothing to choose between them by. No face
+        /// rather than a stranger's.
+        case ambiguous([Int])
+        case none
+    }
+
+    /// A picture of an artist by name, in one request -- only when the name
+    /// is not shared.
     ///
     /// The full `artist(named:)` bundle is four requests and fetches a
-    /// discography nobody asked for. When all that is wanted is a thumbnail
-    /// for a row, this is a quarter of the cost — which is what makes filling
-    /// in a page of forty neighbours possible at all.
-    func artistThumbnail(named name: String) async throws -> String? {
+    /// discography nobody asked for; this is a quarter of the cost, which is
+    /// what makes filling in a page of forty neighbours possible at all. It
+    /// used to take the first result whose name matched, which is how the duo
+    /// Hype Williams came to wear the film director's face: Discogs ranks
+    /// namesakes in no particular order. Now a name two Discogs artists share
+    /// is `ambiguous`, and the caller shows none.
+    func artistPortrait(named name: String) async throws -> PortraitPick {
         let response: DiscogsSearchResponse = try await get("database/search", query: [
             URLQueryItem(name: "q", value: name),
             URLQueryItem(name: "type", value: "artist"),
-            URLQueryItem(name: "per_page", value: "5")
+            // Enough to see a name's namesakes, not only its first answer.
+            URLQueryItem(name: "per_page", value: "25")
         ])
-        guard let match = Self.bestArtistMatch(name: name, results: response.results ?? [])
-        else { return nil }
-        return Self.usableImage(match.thumbnail) ?? Self.usableImage(match.coverImage)
+        return Self.portraitPick(name: name, results: response.results ?? [])
+    }
+
+    /// The decision behind `artistPortrait(named:)`, for tests.
+    nonisolated static func portraitPick(name: String, results: [DiscogsSearchResult]) -> PortraitPick {
+        let matches = artistMatches(name: name, results: results)
+        let ids = Array(Set(matches.compactMap(\.id))).sorted()
+        guard !ids.isEmpty else { return .none }
+        guard ids.count == 1, let match = matches.first(where: { $0.id == ids[0] }) else { return .ambiguous(ids) }
+        // The cover (600 pixels), not the thumb (150): the phone draws these
+        // half a screen wide, where the thumb blurred. Its address is signed,
+        // so a size cannot be asked of the thumb.
+        guard let address = usableImage(match.coverImage) ?? usableImage(match.thumbnail) else { return .none }
+        return .unique(address: address, discogsID: ids[0])
+    }
+
+    /// The Discogs artist a Discogs image shows, read from its address.
+    ///
+    /// Discogs serves images through a signed proxy whose path carries the
+    /// original file's location, base64-encoded:
+    /// `s3://discogs-database-images/A-398459-1256391322.jpeg` is a picture
+    /// filed under artist 398459. Nil for anything else (a release cover, an
+    /// address of another shape). How a cached portrait is checked against the
+    /// artist it is about to be drawn for, with no field to store it in.
+    nonisolated static func picturedArtist(in address: String?) -> Int? {
+        guard let address, let range = address.range(of: #"/w:\d+/"#, options: .regularExpression) else { return nil }
+        var encoded = address[range.upperBound...]
+            .split(separator: "/").joined()
+            .split(separator: ".").first.map(String.init) ?? ""
+        encoded = encoded.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        while encoded.count % 4 != 0 { encoded += "=" }
+        guard let data = Data(base64Encoded: encoded), let path = String(data: data, encoding: .utf8),
+              let match = path.range(of: #"/A-(\d+)-"#, options: .regularExpression) else { return nil }
+        return Int(path[match].dropFirst(3).dropLast())
     }
 
     /// What Discogs has under a typed query, in one of the three kinds a dig
@@ -497,9 +635,17 @@ nonisolated struct DiscogsClient: Sendable {
             guard let separator = result.title.range(of: " - ") else { continue }
             let credit = String(result.title[..<separator.lowerBound])
                 .trimmingCharacters(in: .whitespaces)
-            // The small cut. A 38-point row has no use for a 600-pixel sleeve.
-            let thumbnail = result.thumbnail ?? result.coverImage
+            // The cover: these are drawn as half-screen cards on the phone,
+            // where the 150-pixel thumb blurred.
+            let thumbnail = result.coverImage ?? result.thumbnail
             for artist in Self.creditedNames(credit) {
+                // "Name*" is Discogs saying the record credited somebody under
+                // a variant spelling: the entry is filed under another name,
+                // and opening this one by name can land on a different
+                // artist ("Drama Aka Treason*" is Drama Treason, 9087331; the
+                // entry called "Drama aka Treason" is 10218922). No row
+                // rather than a stranger's page.
+                if credit.contains(artist + "*") { continue }
                 let key = RecordingKey.normalizeArtist(artist)
                 guard !key.isEmpty, seen.insert(key).inserted else { continue }
                 found.append(DiscogsNeighbour(name: artist, thumbnailURL: thumbnail))
@@ -626,6 +772,11 @@ nonisolated struct DiscogsClient: Sendable {
     /// transparent one-pixel image. Stored and drawn, that is a tile showing
     /// nothing where the placeholder artwork should be, on a record whose own
     /// page fetches a perfectly good cover a moment later.
+    /// Whether an address is Discogs' 150-pixel thumb, too small for a card.
+    nonisolated static func isSmallCut(_ address: String?) -> Bool {
+        address?.contains("/h:150/") == true || address?.contains("/w:150/") == true
+    }
+
     static func usableImage(_ address: String?) -> String? {
         guard let address, !address.isEmpty else { return nil }
         return address.contains("/images/spacer") ? nil : address

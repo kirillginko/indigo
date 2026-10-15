@@ -86,7 +86,10 @@ struct ExploreView: View {
         // the crate rather than on the graph: enrichment moves the graph
         // several times a second and almost none of it changes what should be
         // suggested.
-        .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
+        // Asked again when the crate moves, and when another device changed
+        // something the offers are worked out from; the store decides
+        // whether that is a rebuild. See `DigStore.refreshExploreOffers`.
+        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) { await dig.refreshExploreOffers() }
     }
 
     private func header(_ kept: [CrateItem]) -> some View {
@@ -394,8 +397,11 @@ struct ExploreView: View {
     /// of names is a list and a row of faces is a shelf, but not at the price
     /// of a dozen fetches on the thread that draws.
     private func artwork(for suggestion: ExploreSuggestion) -> URL? {
-        suggestion.node.artworkURL
-            ?? (suggestion.node.kind == .artist ? dig.portraitURL(for: suggestion.node.title) : nil)
+        // The artist's current portrait, by identity where known, before the
+        // 150-pixel cut copied onto the node when its edge was built.
+        (suggestion.node.kind == .artist
+            ? dig.portraitURL(for: suggestion.node.title, discogsID: suggestion.node.discogsID) : nil)
+            ?? suggestion.node.artworkURL
     }
 
     /// Sleeves for the kept rows that are local files, by crate row.

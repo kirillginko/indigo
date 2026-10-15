@@ -41,12 +41,14 @@ actor DigWorker {
     let modelContext: ModelContext
 
     /// Nothing configured here: `DiscogsClient()` reads the same credential
-    /// the store's does, and it is a value type with no state of its own.
-    private let discogs = DiscogsClient()
+    /// the store's does, and it is a value type with no state of its own. A
+    /// test hands in one with a transport of its own.
+    private let discogs: DiscogsClient
 
-    init(modelContainer: ModelContainer) {
+    init(modelContainer: ModelContainer, discogs: DiscogsClient = DiscogsClient()) {
         self.modelContainer = modelContainer
         self.modelContext = ModelContext(modelContainer)
+        self.discogs = discogs
     }
 
     /// One engine, kept until something is written.
@@ -56,6 +58,9 @@ actor DigWorker {
     /// Rebuilding that for each of them was most of the time it took to open
     /// anything.
     private var graph: GraphStore?
+    /// The graph under identity keys, for this generation: DIG's pages and
+    /// For You read the same one.
+    private var identity: IdentityGraph?
     private var engine: DigEngine?
     private var deep: DeepEngine?
     private var scenes: SceneEngine?
@@ -79,8 +84,13 @@ actor DigWorker {
         // when nothing has been inserted since. See `Caches.rowCounts`.
         let next = GraphStore(context: modelContext, inheriting: graph)
         graph = next
-        engine = DigEngine(context: modelContext, graph: next)
-        deep = DeepEngine(context: modelContext, graph: next)
+        // One identity graph over it for both, so an artist is placed once a
+        // generation whichever block asks first. New evidence is a write, so
+        // it arrives with the next generation.
+        let identity = IdentityGraph(context: modelContext, graph: next)
+        self.identity = identity
+        engine = DigEngine(context: modelContext, graph: next, identity: identity)
+        deep = DeepEngine(context: modelContext, graph: next, identity: identity)
         scenes = SceneEngine(context: modelContext, inheriting: scenes)
         // The index is deliberately *not* discarded here any more.
         //
@@ -122,41 +132,400 @@ actor DigWorker {
         return scenes ?? SceneEngine(context: modelContext)
     }
 
-    /// What EXPLORE should offer that is not already in the crate.
+    // MARK: - For You
+
+    /// What For You's knowledge is kept for between looks, part by part.
     ///
-    /// Here rather than on the store's own context for the ordinary reason: it
-    /// reads the crate, the listening log and the dig history, then walks the
-    /// graph out of a dozen nodes. Measured cold on a real library that is a
-    /// couple of seconds, which on the main actor is a page that hangs on the
-    /// way in.
+    /// Each part is worked out again only when what it is about changes, or
+    /// when it has stood for `knowledgeLifetime`. A play or a new record in
+    /// the crate changes the listener's rows, not what is known about music:
+    /// the neighbourhoods are kept for every starting point that is still a
+    /// starting point, and only a new one is walked. The lifetime is the
+    /// quarter of an hour the kept answer used to stand for -- enrichment
+    /// writes several times a second, and an answer rebuilt for each would
+    /// move under the reader.
+    private struct ExploreKnowledgeCache {
+        var since: Date?
+        /// Each starting point's walk under identity keys, the digest of the
+        /// evidence it rested on, and the generation that digest was last
+        /// confirmed in. Evidence only changes with a write, and every write
+        /// is a new generation, so within one nothing needs confirming again.
+        var walked: [MusicNode: (walk: IdentityNeighbourhood, evidence: String, generation: Int)] = [:]
+        /// The last look's one-artist-one-candidate pass and known artists,
+        /// for the same generation, starting points and rows.
+        var identityPass: IdentityPass?
+        var shows: [ShowProfile]?
+        var tagKeys: Set<String>?
+        var tags: [String: [String]] = [:]
+        var scenes: SceneCatalogue?
+        var library: [String: Int]?
+    }
+    private var exploreCache = ExploreKnowledgeCache()
+
+    /// One look's identity work, kept for the next look in the same
+    /// generation with the same starting points and rows: the walks made one
+    /// artist one candidate, who the listener knows, the edges split for the
+    /// snapshot and the counts the diagnostics print. Re-splitting a dozen
+    /// walks of hundreds of edges on every look was most of a warm look.
+    private struct IdentityPass {
+        let generation: Int
+        let origins: [MusicNode]
+        let rows: PersonalInputs
+        let walked: [MusicNode: LocalKnowledgeAdapter.Walked]
+        let known: (alsoKnown: Set<String>, digest: String)
+        let counts: [String: Int]
+    }
+    /// Moves whenever a part of the kept knowledge is worked out again, so a
+    /// look whose knowledge is all kept reuses its digest instead of encoding
+    /// a megabyte to arrive at the same string.
+    private var knowledgeVersion = 0
+    private var lastKnowledgeDigests: (key: KnowledgeDigestKey, shared: (digest: String, bytes: Int), local: (digest: String, bytes: Int))?
+    private struct KnowledgeDigestKey: Equatable {
+        let version: Int
+        let origins: [MusicNode]
+        let scenes: Bool
+    }
+    private var lastPersonal: (inputs: PersonalInputs, digest: String, bytes: Int)?
+    static let knowledgeLifetime: TimeInterval = 15 * 60
+
+    /// The listener's rows and the knowledge around them, digested.
     ///
-    /// Plain values cross back, as with everything here.
-    /// The blocks somebody can act on. Answered first, and separately from
-    /// the direction below, so the page's headline does not wait a second on
-    /// a slower claim about where its reader is going.
-    func exploreRecommendations(generation: Int) -> ExploreOffers {
-        refresh(generation)
-        return Trace.step("explore.suggest") {
-            ExploreSuggestionEngine(context: modelContext).recommendations()
+    /// `now` decides only whether kept knowledge has expired; the answer is
+    /// worked out for `asOf`. `scenes` asks for the slow half as well.
+    /// `rebuild` throws everything kept away first, for a correction that
+    /// landed in the store (see `DigStore.invalidateExploreOffers`).
+    /// `personal` is the rows a first half already read (`ExploreRun.rows`,
+    /// as kept), so the second half of one look is about the same rows.
+    func exploreRun(
+        asOf: Date, period: Int, generation asked: Int, scenes withScenes: Bool, rebuild: Bool, now: Date,
+        personal known: PersonalInputs? = nil
+    ) async -> ExploreRun {
+        refresh(asked)
+        var report = ExploreBuildReport()
+        func timed<T>(_ part: String, _ work: () -> T) -> T {
+            let started = ContinuousClock.now
+            let value = Trace.step("explore.build", part) { work() }
+            let spent = ContinuousClock.now - started
+            report.milliseconds[part, default: 0] += Double(spent.components.attoseconds) / 1e15
+                + Double(spent.components.seconds) * 1_000
+            return value
+        }
+
+        let identity = self.identity ?? IdentityGraph(context: modelContext, graph: graph ?? GraphStore(context: modelContext))
+        // The listener's rows as they are kept, and read under identity: the
+        // rows are not touched (see `GraphCanonicalizer.canonical(_:)`).
+        let rows = known ?? timed("personal") { PersonalInputs.read(context: modelContext, asOf: asOf) }
+        let personal = timed("identity.history") { identity.canonicalizer.canonical(rows) }
+        if rebuild || exploreCache.since.map({ now.timeIntervalSince($0) > Self.knowledgeLifetime }) ?? true {
+            exploreCache = ExploreKnowledgeCache(since: now)
+            knowledgeVersion &+= 1
+        }
+        let adapter = LocalKnowledgeAdapter(
+            context: modelContext, graph: graph ?? GraphStore(context: modelContext), scenes: sceneEngine(asked)
+        )
+
+        let origins = ForYouMusicianFirst.isEnabled
+            ? MusicianFirstRanker.startingPoints(personal, asOf: asOf).map(\.node)
+            : ExploreRanker.startingPoints(personal)
+        // A walk is kept while the evidence it rested on says the same: a
+        // check or credit about anything else leaves it alone, and a
+        // correction, a new credit or a removal under it walks it again.
+        var walks: [IdentityNeighbourhood] = []
+        var evidence: [String] = []
+        var fresh = 0, moved = 0
+        for origin in origins {
+            if let kept = exploreCache.walked[origin],
+               kept.generation == asked
+                || timed("identity.evidence") { identity.evidenceDigest(of: kept.walk.dependencies) } == kept.evidence {
+                exploreCache.walked[origin]?.generation = asked
+                walks.append(kept.walk)
+                evidence.append("\(origin.id) \(kept.evidence)")
+                continue
+            }
+            if exploreCache.walked[origin] != nil { moved += 1 }
+            let walk = timed("neighbourhoods") { identity.neighbourhood(of: origin) }
+            let digest = timed("identity.evidence") { identity.evidenceDigest(of: walk.dependencies) }
+            exploreCache.walked[origin] = (walk, digest, asked)
+            walks.append(walk)
+            evidence.append("\(origin.id) \(digest)")
+            fresh += 1
+            // Between starting points, whatever DIG has asked of this actor
+            // goes first: a page being opened should not wait behind a whole
+            // cold For You. This run holds its own graph and identity layer,
+            // so a newer generation arriving meanwhile cannot mix into it.
+            await Task.yield()
+        }
+        if fresh > 0 {
+            report.rebuilt.append("neighbourhoods \(fresh)/\(origins.count)")
+            if moved > 0 { report.rebuilt.append("identity \(moved)") }
+            knowledgeVersion &+= 1
+        }
+        // One artist, one candidate, across every starting point; and who the
+        // listener knows. Kept while nothing under them has moved.
+        let pass: IdentityPass
+        if fresh == 0, let kept = exploreCache.identityPass, kept.generation == asked,
+           kept.origins == origins, kept.rows == rows {
+            pass = kept
+        } else {
+            let collapsed = timed("identity.collapse") { identity.collapsing(walks) }
+            let known = timed("identity.known") {
+                Self.knownArtists(rows: rows, personal: personal, walks: collapsed, identity: identity)
+            }
+            var split: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
+            var destinations = Set<String>()
+            var merged = Set<String>()
+            timed("identity.split") {
+                for (origin, walk) in zip(origins, collapsed) {
+                    // Sorted once here and kept: the snapshot sorts each
+                    // neighbourhood on every look, which is nearly free on
+                    // edges already in order and costly on edges that are not.
+                    let edges = walk.edges.all
+                    split[origin] = LocalKnowledgeAdapter.split(edges)
+                    for edge in edges where edge.to.kind == .artist { destinations.insert(edge.to.id) }
+                    for (id, names) in walk.keys where names.count > 1 && id.hasPrefix("artist:discogs:") { merged.insert(id) }
+                }
+            }
+            let verified = destinations.filter { $0.hasPrefix("artist:discogs:") || $0.hasPrefix("artist:mbid:") }.count
+            pass = IdentityPass(
+                generation: asked, origins: origins, rows: rows, walked: split, known: known,
+                counts: ["identityVerified": verified, "identityUnresolved": destinations.count - verified,
+                         "identityMerged": merged.count, "identityKnown": known.alsoKnown.count])
+            exploreCache.identityPass = pass
+        }
+        let walked = pass.walked
+        let knownArtists = pass.known
+        for (phase, ms) in identity.takePhases() { report.milliseconds[phase, default: 0] += ms }
+        if exploreCache.shows == nil {
+            exploreCache.shows = timed("shows") { adapter.shows() }
+            report.rebuilt.append("shows")
+            knowledgeVersion &+= 1
+        }
+        let keys = personal.tasteArtistKeys
+        if exploreCache.tagKeys != keys {
+            exploreCache.tags = timed("artistTags") { LocalKnowledgeAdapter.artistTags(for: keys, in: modelContext) }
+            exploreCache.tagKeys = keys
+            report.rebuilt.append("artistTags")
+            knowledgeVersion &+= 1
+        }
+        if exploreCache.library == nil {
+            exploreCache.library = timed("library") { adapter.libraryCounts() }
+            report.rebuilt.append("library")
+            knowledgeVersion &+= 1
+        }
+        if withScenes, exploreCache.scenes == nil {
+            exploreCache.scenes = timed("scenes") { adapter.sceneCatalogue() }
+            report.rebuilt.append("scenes")
+            knowledgeVersion &+= 1
+        }
+
+        let knowledge = timed("assemble") {
+            LocalKnowledgeAdapter.assemble(
+                origins: origins, walked: walked, shows: exploreCache.shows ?? [],
+                artistTags: exploreCache.tags, scenes: withScenes ? exploreCache.scenes : nil,
+                libraryCounts: exploreCache.library ?? [:]
+            )
+        }
+        // The rows' digest is kept with the rows: the second half of a look
+        // asks again with the same ones.
+        let personalDigest: (digest: String, bytes: Int)
+        if let last = lastPersonal, last.inputs == personal {
+            personalDigest = (last.digest, last.bytes)
+        } else {
+            personalDigest = timed("digest") { CanonicalDigest.digestAndSize(of: personal) }
+            lastPersonal = (personal, personalDigest.digest, personalDigest.bytes)
+        }
+        let digestKey = KnowledgeDigestKey(version: knowledgeVersion, origins: origins, scenes: withScenes)
+        let shared: (digest: String, bytes: Int)
+        let local: (digest: String, bytes: Int)
+        if let last = lastKnowledgeDigests, last.key == digestKey {
+            (shared, local) = (last.shared, last.local)
+        } else {
+            shared = timed("digest") { CanonicalDigest.digestAndSize(of: knowledge.shared) }
+            local = timed("digest") { CanonicalDigest.digestAndSize(of: knowledge.deviceLocal) }
+            lastKnowledgeDigests = (digestKey, shared, local)
+        }
+        report.bytes = ["personal": personalDigest.bytes, "shared": shared.bytes, "deviceLocal": local.bytes]
+        var counts = pass.counts
+        counts["startingPoints"] = origins.count
+        counts["edges"] = knowledge.shared.neighbourhoods.reduce(0) { $0 + $1.edges.count }
+        counts["deviceLocalEdges"] = knowledge.deviceLocal.neighbourhoods.reduce(0) { $0 + $1.edges.count }
+        counts["nodes"] = knowledge.shared.nodes.count
+        counts["shows"] = knowledge.shared.shows.count
+        counts["sceneCities"] = knowledge.shared.scenes?.cities.count ?? 0
+        report.counts = counts
+        var stamp = ExploreStamp(
+            format: knowledge.format, period: period, personal: personalDigest.digest,
+            shared: shared.digest, deviceLocal: local.digest
+        )
+        stamp.identity = CanonicalDigest.of(evidence.sorted())
+        stamp.known = knownArtists.digest
+        return ExploreRun(personal: personal, knowledge: knowledge, stamp: stamp, report: report,
+                          alsoKnown: knownArtists.alsoKnown, rows: rows)
+    }
+
+    /// Who the listener already knows under identity, and a digest of it.
+    ///
+    /// A name links to the one verified artist that answers to it among the
+    /// walks and the history — never to one of several namesakes, and never
+    /// by sharing a name alone (`KnownArtistPolicy`). Worked out from content,
+    /// so the same rows and walks give the same answer whatever was asked
+    /// first.
+    static func knownArtists(
+        rows: PersonalInputs, personal: PersonalInputs, walks: [IdentityNeighbourhood], identity: IdentityGraph
+    ) -> (alsoKnown: Set<String>, digest: String) {
+        var owners: [String: Set<GraphIdentityKey>] = [:]
+        var names: [String: Set<String>] = [:]
+        for walk in walks {
+            for (id, keys) in walk.keys {
+                guard let key = GraphIdentityKey(nodeKey: String(id.dropFirst("artist:".count))) else { continue }
+                for name in keys { owners[name, default: []].insert(key) }
+                names[id, default: []].formUnion(keys)
+            }
+        }
+        let kept = rows.crate.compactMap(\.node) + rows.met.map(\.node) + rows.haunts.map(\.node)
+        var mapping: [String] = []
+        for node in kept where node.kind == .artist {
+            guard let placement = identity.canonicalizer.placement(of: node) else { continue }
+            mapping.append("\(node.id) \(placement.key.nodeID)")
+            guard placement.key.isVerified else { continue }
+            owners[node.key, default: []].insert(placement.key)
+            names[placement.key.nodeID, default: []].insert(node.key)
+        }
+        let history = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
+        let alsoKnown = KnownArtistPolicy.alsoKnown(
+            history: history, owners: owners, namesOf: { names[$0.id] ?? [$0.key] })
+        return (alsoKnown, CanonicalDigest.of(mapping.sorted() + ["known"] + alsoKnown.sorted()))
+    }
+
+    /// The backend's answers, kept by entity between looks and across launches.
+    private var backendCache: BackendKnowledgeCache?
+    private var bundleCache: BundleCache?
+
+    /// For You as the backend's knowledge would have it, beside the one on
+    /// screen. Asks the backend only for starting points and artists whose
+    /// answers are missing or from an older edge generation; ranks with the
+    /// same pure ranker; never shows anything. See `BackendKnowledge.swift`.
+    func exploreShadow(
+        _ visible: ExploreRun, asOf: Date, turn: Int, now: Date,
+        call: @escaping BackendKnowledgeFetcher.Call = BackendKnowledgeFetcher.live,
+        read: @escaping BundleFetcher.Read = BundleFetcher.live,
+        cacheURL: URL? = BackendKnowledgeCache.fileURL,
+        bundleURL: URL? = BundleCache.fileURL,
+        pinnedRead: @escaping PinnedGenerationClient.Read = PinnedGenerationClient.live,
+        pinnedStore: PinnedGenerationStore? = .standard
+    ) async -> ShadowReport {
+        var cache = backendCache ?? BackendKnowledgeCache.load(from: cacheURL)
+        // The rows as kept, not as this device's identity evidence reads them:
+        // the backend places artists by its own evidence, and an
+        // identity-keyed starting point ("discogs:3722") is not a name it can
+        // look up. And only artists the rows name — never ones only this
+        // device's library knows, so what is asked is the same on every device.
+        let rows = visible.rows
+        let origins = ExploreRanker.startingPoints(rows)
+        let artists = BackendKnowledgeAdapter.artistsWanted(rows, deviceLocal: .empty)
+        let fetch = await BackendKnowledgeFetcher.refresh(&cache, nodes: origins, artists: artists, now: now, call: call)
+        backendCache = cache
+        if fetch.calls > 0 { cache.save(to: cacheURL) }
+
+        // The bundles of the Discogs artists the backend says the starting
+        // artists are -- at most a couple of reads each, once a generation.
+        var bundles = bundleCache ?? BundleCache.load(from: bundleURL)
+        let wanted = origins.filter { $0.kind == .artist }
+            .flatMap { cache.nodes[$0.id]?.answer.cataloguedDiscogsIDs ?? [] }
+        let bundleFetch = await BundleFetcher.refresh(&bundles, discogsIDs: wanted, now: now, read: read)
+        bundleCache = bundles
+        if bundleFetch.reads > 0 { bundles.save(to: bundleURL) }
+
+        // The pinned generation for this evaluation day: read whole and
+        // verified, or the last one kept whole -- never mixed with the live
+        // answers above. See `PinnedGeneration.swift`.
+        let pinned: (PinnedGeneration?, PinnedGenerationClient.Report)? = if let pinnedStore {
+            await PinnedGenerationClient.resolve(period: visible.stamp.period, store: pinnedStore, read: pinnedRead, now: now)
+        } else { nil }
+
+        return Trace.step("explore.shadow") {
+            let visibleRanking = ShadowComparison.ranking(
+                personal: visible.personal, knowledge: visible.knowledge, asOf: asOf, turn: turn)
+            var report = ShadowReport(fetch: fetch, visibleShared: visible.stamp.shared,
+                                      deviceLocal: visible.stamp.deviceLocal, at: now)
+            report.bundleFetch = bundleFetch
+            report.visibleDepth = .init(CorroborationDepth.of(
+                visibleRanking.all.prefix(20).map(\.id), personal: visible.personal, knowledge: visible.knowledge))
+            for use in BackendKnowledgeAdapter.BundleUse.allCases {
+                let (snapshot, coverage, statuses) = BackendKnowledgeAdapter.snapshot(
+                    personal: rows, deviceLocal: visible.knowledge.deviceLocal,
+                    cache: cache, now: now, bundles: bundles, use: use)
+                let stage = ShadowStage.measure(use, visible: visible, knowledge: snapshot,
+                                                visibleRanking: visibleRanking, asOf: asOf, turn: turn)
+                report.stages.append(stage)
+                if use == .relationships {
+                    report.comparison = stage.comparison
+                    report.coverage = coverage
+                    report.bundles = statuses
+                    report.backendShared = CanonicalDigest.of(snapshot.shared)
+                }
+            }
+            if let (generation, fetch) = pinned {
+                var shadow = PinnedShadow(fetch: fetch)
+                if let generation {
+                    let (snapshot, coverage, statuses) = PinnedKnowledgeAdapter.snapshot(
+                        personal: rows, deviceLocal: visible.knowledge.deviceLocal, generation: generation, now: now)
+                    shadow.stage = ShadowStage.measure(.relationships, visible: visible, knowledge: snapshot,
+                                                       visibleRanking: visibleRanking, asOf: asOf, turn: turn)
+                    shadow.coverage = coverage
+                    shadow.bundles = statuses
+                    shadow.shared = CanonicalDigest.of(snapshot.shared)
+                    let ranking = ShadowComparison.ranking(personal: rows, knowledge: snapshot, asOf: asOf, turn: turn)
+                    shadow.ranked = CanonicalDigest.of(ranking.next.map(\.id) + ranking.all.map(\.id) + ranking.shows + [ranking.direction])
+                }
+                report.pinned = shadow
+            }
+            return report
         }
     }
 
-    /// And where they are heading, which means assembling every place in the
-    /// catalogue. Uses the engine this actor already holds rather than
-    /// building a second set of the same caches.
-    /// `turn` moves along the list of places somebody could be said to be
-    /// heading into, so a collection that changes slowly is not told the same
-    /// thing forever. Costs nothing: they are all worked out either way.
-    func exploreDirection(generation: Int, turn: Int) -> ExploreOffers.SceneOffer? {
-        let scenes = sceneEngine(generation)
-        return Trace.step("explore.direction") {
-            let taste = TasteProfile.collected(context: modelContext)
-            let found = scenes.directions(taste: taste)
-            guard !found.isEmpty else { return nil }
-            let scene = found[((turn % found.count) + found.count) % found.count]
-            return ExploreOffers.SceneOffer(
-                city: scene.city, title: scene.title,
-                sound: scene.soundLabel, size: scene.sizeLine
+    /// The blocks somebody can act on, ranked from a run. Pure; here only to
+    /// stay off the thread that draws.
+    func exploreRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
+        if ForYouMusicianFirst.isEnabled { return musicianFirstRecommendations(run, asOf: asOf) }
+        return Trace.step("explore.rank") {
+            ExploreRanker.recommendations(
+                personal: run.personal, knowledge: run.knowledge,
+                taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf),
+                alsoKnown: run.alsoKnown
+            )
+        }
+    }
+
+    /// For You musician-first: ranked once to find the candidates, their
+    /// styles and whether they lead on read from what is held (never a walk,
+    /// see `OnwardIndex`), then ranked with both.
+    private func musicianFirstRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
+        Trace.step("explore.rank.musicianFirst") {
+            let taste = ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf)
+            let first = MusicianFirstRanker.suggestions(
+                personal: run.personal, knowledge: run.knowledge, taste: taste, asOf: asOf,
+                limit: 24, alsoKnown: run.alsoKnown)
+            let artists = first.map(\.node).filter { $0.kind == .artist }
+            let index = OnwardIndex(context: modelContext)
+            var onward: [String: Int] = [:]
+            for artist in artists { if let count = index.count(for: artist) { onward[artist.id] = count } }
+            return MusicianFirstRanker.recommendations(
+                personal: run.personal, knowledge: run.knowledge, taste: taste, asOf: asOf,
+                candidateTags: LocalKnowledgeAdapter.artistTags(for: Set(artists.map(\.key)), in: modelContext),
+                onward: onward, alsoKnown: run.alsoKnown)
+        }
+    }
+
+    /// And where they are heading. `turn` moves along the list of places
+    /// somebody could be said to be heading into -- EXPLORE passes its period,
+    /// so every device names the same place on the same day.
+    func exploreDirection(_ run: ExploreRun, asOf: Date, turn: Int) -> ExploreOffers.SceneOffer? {
+        Trace.step("explore.direction") {
+            ExploreRanker.direction(
+                personal: run.personal, knowledge: run.knowledge,
+                taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf),
+                turn: turn
             )
         }
     }
@@ -203,19 +572,28 @@ actor DigWorker {
     func fillPortrait(named name: String) async -> PortraitOutcome {
         // Whoever the full lookup already decided this artist is.
         //
-        // `artistThumbnail(named:)` is one search and takes the first result
-        // that matches the name, which is right until two people share one.
         // Where a page has already been opened the answer is sitting in the
         // store — the right Discogs id, and their picture — so asking a
         // search engine to guess again is both a wasted request and the way
         // the video director's photograph got filed under the duo's name.
-        if let resolved = Self.resolvedPortrait(named: name, in: modelContext) {
-            return write(resolved, named: name)
+        // That picture is verified by identity, so it is kept under the
+        // Discogs id as well as the name (`ArtistPortrait.identityKey`).
+        // Unless all it holds is the 150-pixel thumb, which is why this
+        // name was asked for again: then the search, for the cover.
+        if let resolved = Self.resolvedPortrait(named: name, in: modelContext),
+           !DiscogsClient.isSmallCut(resolved.address) {
+            writeIdentity(resolved.address, discogsID: resolved.discogsID, named: name)
+            return write(resolved.address, named: name)
         }
 
-        let found: String?
+        // By name only: a picture only when exactly one Discogs artist has
+        // the name. Shared by namesakes, there is no saying whose face it is,
+        // and none is better than a stranger's -- the miss also replaces a
+        // face an earlier first-match search left under this name. A unique
+        // match is a picture, not an identity: it is kept by name only.
+        let pick: DiscogsClient.PortraitPick
         do {
-            found = try await discogs.artistThumbnail(named: name)
+            pick = try await discogs.artistPortrait(named: name)
         } catch is CancellationError {
             return .cancelled
         } catch DiscogsError.rateLimited {
@@ -224,33 +602,106 @@ actor DigWorker {
             return .unreachable
         }
         guard !Task.isCancelled else { return .cancelled }
-        return write(found, named: name)
-    }
-
-    /// Portraits the shared catalogue had already found, written down here as
-    /// though this machine had found them.
-    ///
-    /// The queue is then shorter by exactly the names the backend has already
-    /// paid for, which is the whole point of filling them once for everybody
-    /// rather than once per listener. See migration 0019.
-    /// Through `write` rather than a bare insert: `nameKey` is unique, and an
-    /// artist the fill already recorded a miss for is exactly the case this is
-    /// most useful in.
-    func adopt(_ found: [(name: String, address: String)]) {
-        for entry in found {
-            _ = write(entry.address, named: entry.name)
+        switch pick {
+        case .unique(let address, _): return write(address, named: name)
+        case .ambiguous, .none: return write(nil, named: name)
         }
     }
 
-    /// The picture on the artist row, when a full lookup has written one.
-    private static func resolvedPortrait(named name: String, in context: ModelContext) -> String? {
+    /// What the shared catalogue says about a name's portrait (0081).
+    nonisolated struct CataloguePortrait: Sendable, Equatable, Decodable {
+        /// `verified`: the artist's own Discogs picture. `unresolved`: no
+        /// identity, the only Discogs artist with the name -- or written before
+        /// portraits had a state. `withheld`: namesakes and no identity.
+        let state: String
+        let url: String?
+        let discogsID: Int?
+
+        init(state: String, url: String? = nil, discogsID: Int? = nil) {
+            self.state = state
+            self.url = url
+            self.discogsID = discogsID
+        }
+    }
+
+    /// Portraits the shared catalogue had already found -- or withheld --
+    /// written down here as though this machine had found them.
+    ///
+    /// The queue is then shorter by exactly the names the backend has already
+    /// paid for, which is the whole point of filling them once for everybody
+    /// rather than once per listener. See migration 0019. A withheld one
+    /// replaces whatever this device kept under the name with a miss, so a
+    /// stranger's face cached by the old rule goes too (0081); a verified one
+    /// is kept under the Discogs id as well. Returns the names withheld, each
+    /// with the face it had here before.
+    /// Through `write` rather than a bare insert: `nameKey` is unique, and an
+    /// artist the fill already recorded a miss for is exactly the case this is
+    /// most useful in.
+    @discardableResult
+    func adopt(_ found: [(name: String, portrait: CataloguePortrait)]) -> [String: String?] {
+        var withheld: [String: String?] = [:]
+        for entry in found {
+            switch entry.portrait.state {
+            case "withheld":
+                // The face it replaces, so the store can take exactly that one
+                // off the edges still wearing it.
+                let key = RecordingKey.normalizeArtist(entry.name)
+                var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
+                descriptor.fetchLimit = 1
+                let stale = (try? modelContext.fetch(descriptor))?.first?.imageURLString
+                _ = write(nil, named: entry.name)
+                withheld[entry.name] = .some(stale)
+            default:
+                guard let address = entry.portrait.url else { continue }
+                if entry.portrait.state == "verified", let id = entry.portrait.discogsID {
+                    writeIdentity(address, discogsID: id, named: entry.name)
+                }
+                _ = write(address, named: entry.name)
+            }
+        }
+        return withheld
+    }
+
+    /// The picture on the artist row, when a full lookup has written one, and
+    /// whose it is.
+    private static func resolvedPortrait(named name: String, in context: ModelContext) -> (address: String, discogsID: Int)? {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return nil }
         var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.nameKey == key })
         descriptor.fetchLimit = 1
-        guard let artist = (try? context.fetch(descriptor))?.first else { return nil }
-        return DiscogsClient.usableImage(artist.thumbnailURLString)
-            ?? DiscogsClient.usableImage(artist.imageURLString)
+        guard let artist = (try? context.fetch(descriptor))?.first,
+              // The full image first: the 150-pixel cut is soft at any size
+              // a phone draws a portrait.
+              let address = DiscogsClient.usableImage(artist.imageURLString)
+                ?? DiscogsClient.usableImage(artist.thumbnailURLString) else { return nil }
+        return (address, artist.discogsID)
+    }
+
+    /// Every name this device holds a picture for, as the rows named it --
+    /// not the identity keys, which are verified already.
+    func namesWithPortraits() -> [String] {
+        let records = (try? modelContext.fetch(FetchDescriptor<ArtistPortrait>())) ?? []
+        return records
+            .filter { !$0.nameKey.hasPrefix("#") && $0.imageURL != nil }
+            .map(\.name)
+            .sorted()
+    }
+
+    /// A portrait verified by identity, kept under the Discogs id too, so a
+    /// row that knows who it is finds this face and no namesake's.
+    private func writeIdentity(_ address: String, discogsID: Int, named name: String) {
+        guard discogsID > 0 else { return }
+        let key = ArtistPortrait.identityKey(discogsID)
+        var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
+        descriptor.fetchLimit = 1
+        if let existing = (try? modelContext.fetch(descriptor))?.first {
+            guard existing.imageURLString != address else { return }
+            modelContext.delete(existing)
+        }
+        let record = ArtistPortrait(nameKey: key, name: name)
+        record.imageURLString = address
+        modelContext.insert(record)
+        try? modelContext.save()
     }
 
     private func write(_ found: String?, named name: String) -> PortraitOutcome {
@@ -356,8 +807,8 @@ actor DigWorker {
         }
     }
 
-    func artistProfile(name: String, mbid: String?, generation: Int) -> ArtistProfile {
-        engine(generation).artistProfile(name: name, mbid: mbid)
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil, generation: Int) -> ArtistProfile {
+        engine(generation).artistProfile(name: name, mbid: mbid, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
     }
 
     func releaseProfile(id: Int, generation: Int) -> DigReleaseProfile? {

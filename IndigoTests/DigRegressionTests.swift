@@ -298,7 +298,10 @@ final class DigRegressionTests: XCTestCase {
         )
         let names = DiscogsClient.neighbours(from: decoded.results ?? []).map(\.name)
 
-        XCTAssertEqual(names, ["Bing", "Flowdan", "Ineffekt", "Space Afrika"])
+        // "Flowdan*" is a credited variant: Discogs files it under another
+        // entry, and opening it by name could land on a namesake, so it
+        // makes no row at all (cf0c3b4, "Drama Aka Treason*").
+        XCTAssertEqual(names, ["Bing", "Ineffekt", "Space Afrika"])
         XCTAssertFalse(
             names.contains { $0.contains("(") || $0.hasSuffix("*") },
             "A name carrying Discogs' filing marks opens onto nothing: \(names)"

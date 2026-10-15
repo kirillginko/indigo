@@ -60,7 +60,9 @@ nonisolated struct TasteProfile: Sendable {
     func affinity(for tags: [String]) -> Double {
         let folded = ListeningLog.foldTags(tags)
         guard !folded.isEmpty else { return 0 }
-        let hits = folded.map { self[$0] }.filter { $0 > 0 }
+        // Summed smallest first, so the same tags in another order are the
+        // same number to the last bit.
+        let hits = folded.map { self[$0] }.filter { $0 > 0 }.sorted()
         guard !hits.isEmpty else { return 0 }
         let mean = hits.reduce(0, +) / Double(hits.count)
         let breadth = 1 + min(0.3, Double(hits.count - 1) * 0.1)

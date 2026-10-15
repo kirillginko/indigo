@@ -77,7 +77,7 @@ struct LYLEpisodeDetailView: View {
             ArtworkView(
                 remoteURL: episode.imageURL,
                 side: 300,
-                markURL: LYLProvider.logoURL,
+                markURL: StationMark.logoURL(for: LYLProvider.providerID),
                 mark: "LYL Radio"
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
@@ -286,12 +286,7 @@ extension LYLEpisodeDetailView {
             } } ?? [],
             tracklistNote: "LYL didn't publish a tracklist for this episode.",
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, subtitle: other.artists, date: other.broadcastAt,
-                             genres: other.styles, imageURL: other.imageURL, isPlayable: other.isPlayable,
-                             isCurrent: LYLPlayback.isCurrent(other, in: player),
-                             isPlaying: LYLPlayback.isPlaying(other, in: player),
-                             play: { LYLPlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.lylEpisode(slug: other.slug)) })
+                PhoneEpisode.lyl(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.showTitle.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(slug) ? nil : (browse.detailError(slug) ?? "LYL no longer publishes this episode.")

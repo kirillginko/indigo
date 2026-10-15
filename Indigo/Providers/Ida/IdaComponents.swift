@@ -82,7 +82,7 @@ struct IdaEpisodeTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: episode.thumbnailURL ?? episode.imageURL,
-                markURL: IdaProvider.logoURL,
+                markURL: StationMark.logoURL(for: IdaProvider.providerID),
                 mark: "IDA Radio"
             )
             .overlay(Rectangle().strokeBorder(
@@ -161,7 +161,7 @@ struct IdaShowTile: View {
         VStack(alignment: .leading, spacing: 9) {
             ArtworkView(
                 remoteURL: show.thumbnailURL ?? show.imageURL,
-                markURL: IdaProvider.logoURL,
+                markURL: StationMark.logoURL(for: IdaProvider.providerID),
                 mark: "IDA Radio"
             )
             .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))

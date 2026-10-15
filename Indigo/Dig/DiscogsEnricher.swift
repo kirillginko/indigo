@@ -309,7 +309,9 @@ nonisolated struct DiscogsEnricher {
         // this release was described by somebody else's request and Discogs is
         // never asked at all — and a warm read out of Postgres is quicker than
         // asking it would have been.
-        if let detail = await catalog.release(id: id) { return store(detail, id: id) }
+        if let detail = await catalog.release(id: id) {
+            return store(detail, id: id, source: ReleaseCreditStore.source(storedRelease: id))
+        }
         // A miss, so the page waits on Discogs directly rather than on the
         // backend's round trip to it. The shared copy is filled in behind us.
         let detail = try await client.release(id: id)
@@ -322,12 +324,19 @@ nonisolated struct DiscogsEnricher {
     /// Split from `release(id:)` so a caller can fetch several at once —
     /// which is network-bound and parallel — and then write them one at a
     /// time, which is what a single ModelContext requires.
+    ///
+    /// `source` is where the document came from, kept with its credits.
     @discardableResult
-    func store(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
-        Trace.step("enrich.release", String(id)) { writeRelease(detail, id: id) }
+    func store(_ detail: DiscogsReleaseDetail, id: Int, source: String? = nil) -> DiscogsReleaseRecord {
+        Trace.step("enrich.release", String(id)) {
+            writeRelease(detail, id: id, source: source ?? ReleaseCreditStore.source(discogsRelease: id))
+        }
     }
 
-    private func writeRelease(_ detail: DiscogsReleaseDetail, id: Int) -> DiscogsReleaseRecord {
+    private func writeRelease(_ detail: DiscogsReleaseDetail, id: Int, source: String) -> DiscogsReleaseRecord {
+        // Who it credits, by id, beside the names written below — which stay
+        // exactly as they were, because everything else reads them.
+        ReleaseCreditStore(context: context).replace(releaseID: id, from: detail, source: source)
         let record = cachedRelease(id: id) ?? {
             let value = DiscogsReleaseRecord(discogsID: id, title: detail.title)
             context.insert(value)
@@ -476,9 +485,8 @@ nonisolated struct DiscogsEnricher {
 
     /// Files the resolved artist's own picture as this name's portrait.
     ///
-    /// Portraits are filled in bulk by `artistThumbnail(named:)`, which is one
-    /// search and takes the first namesake it sees — cheap, and right until
-    /// two people share a name. EXPLORE draws from that cache, so a For You
+    /// Portraits used to be filled in bulk by one search that took the first
+    /// namesake it saw — cheap, and right until two people share a name. EXPLORE draws from that cache, so a For You
     /// page went on showing the video director's photograph beside a link
     /// that opened the duo's page: the artist row had been corrected and the
     /// portrait had not, and nothing ever asked it again because a portrait
@@ -488,9 +496,8 @@ nonisolated struct DiscogsEnricher {
     /// belongs to whoever the full lookup decided this artist is — which is
     /// the answer the cheap search was guessing at.
     private static func repaintPortrait(of record: DiscogsArtist, in context: ModelContext) {
-        guard let address = DiscogsClient.usableImage(
-            record.thumbnailURLString ?? record.imageURLString
-        ) else { return }
+        guard let address = DiscogsClient.usableImage(record.imageURLString)
+            ?? DiscogsClient.usableImage(record.thumbnailURLString) else { return }
         let key = record.nameKey
         guard !key.isEmpty else { return }
         var descriptor = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == key })
@@ -506,9 +513,25 @@ nonisolated struct DiscogsEnricher {
         portrait.lookupFailed = false
         portrait.fetchedAt = Date()
 
+        // And under the artist's identity, which no namesake shares and which
+        // a lookup by id reads first (`ArtistPortrait.identityKey`).
+        if record.discogsID > 0 {
+            let identity = ArtistPortrait.identityKey(record.discogsID)
+            var byIdentity = FetchDescriptor<ArtistPortrait>(predicate: #Predicate { $0.nameKey == identity })
+            byIdentity.fetchLimit = 1
+            let owned = (try? context.fetch(byIdentity))?.first ?? {
+                let fresh = ArtistPortrait(nameKey: identity, name: record.name)
+                context.insert(fresh)
+                return fresh
+            }()
+            owned.imageURLString = address
+            owned.lookupFailed = false
+            owned.fetchedAt = Date()
+        }
+
         // And everywhere it was already copied to. See `StoredEdge.repaint`.
         guard wasShowing != address else { return }
-        StoredEdge.repaint(artistKey: key, with: address, in: context)
+        StoredEdge.repaint(artistKey: key, with: address, owner: record.discogsID > 0 ? record.discogsID : nil, in: context)
 
         // EXPLORE writes its answer down, faces and all, so the copy on disk
         // is now a page of somebody who has been corrected. Thrown away

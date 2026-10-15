@@ -1,0 +1,20 @@
+{
+ "all_dbs_bytes": 536238901,
+ "by_type": {
+  "played_by": 176872,
+  "radio_neighbor": 206245
+ },
+ "episodes": [
+  187073,
+  "13710f08514c75bae9693730a7ffab92"
+ ],
+ "kept": [
+  187073,
+  "0bcc929019f5e3a2752e34f34da7a4b8"
+ ],
+ "postgres_mib": 496.83,
+ "singles": 196044,
+ "table_mib": 135.61,
+ "total": 383117,
+ "utc": "2026-10-13 00:38:25.098187+00"
+}

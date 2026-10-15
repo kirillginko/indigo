@@ -80,7 +80,7 @@ struct LYLEpisodeTile: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            ArtworkView(remoteURL: episode.imageURL, markURL: LYLProvider.logoURL, mark: "LYL Radio")
+            ArtworkView(remoteURL: episode.imageURL, markURL: StationMark.logoURL(for: LYLProvider.providerID), mark: "LYL Radio")
                 .overlay(Rectangle().strokeBorder(
                     isCurrent ? Palette.accent : Palette.rule,
                     lineWidth: isCurrent ? 1.5 : Metrics.hairline
@@ -155,7 +155,7 @@ struct LYLShowTile: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            ArtworkView(remoteURL: show.imageURL, markURL: LYLProvider.logoURL, mark: "LYL Radio")
+            ArtworkView(remoteURL: show.imageURL, markURL: StationMark.logoURL(for: LYLProvider.providerID), mark: "LYL Radio")
                 .overlay(Rectangle().strokeBorder(Palette.rule, lineWidth: Metrics.hairline))
                 // Everything in the directory is archived, so saying a show
                 // has ended tells the listener nothing they can act on. The

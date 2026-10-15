@@ -38,6 +38,21 @@ final class DigStore {
         let _ = artworkRevision
         return portraits[RecordingKey.normalizeArtist(name)]
     }
+
+    /// The portrait for an artist whose Discogs identity may be known.
+    ///
+    /// With an id: the picture verified for that id first; failing that, the
+    /// one kept under the name -- unless its address shows it is somebody
+    /// else (`DiscogsClient.picturedArtist`), which is how one namesake's face
+    /// leaked onto another's row. Without an id, the name's, as before.
+    func portraitURL(for name: String, discogsID: Int?) -> URL? {
+        let _ = artworkRevision
+        guard let discogsID else { return portraits[RecordingKey.normalizeArtist(name)] }
+        if let verified = portraits[ArtistPortrait.identityKey(discogsID)] { return verified }
+        guard let byName = portraits[RecordingKey.normalizeArtist(name)] else { return nil }
+        if let pictured = DiscogsClient.picturedArtist(in: byName.absoluteString), pictured != discogsID { return nil }
+        return byName
+    }
     var notice: String?
     private(set) var discogsLabelProfiles: [String: DiscogsLabelProfile] = [:
     ]
@@ -119,7 +134,17 @@ final class DigStore {
         worker = DigWorker(modelContainer: context.container)
         self.client = client
         self.discogsClient = discogsClient
+        // The remote switch for shared enrichment: read at launch, in the
+        // background; a change redraws what is open (`DigEnrichmentSwitch`).
+        switchObserver = NotificationCenter.default.addObserver(
+            forName: .digEnrichmentSwitchChanged, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.announceChange() }
+        }
+        if !Persistence.isRunningTests { DigEnrichmentSwitch.shared.refreshInBackgroundIfDue() }
     }
+
+    @ObservationIgnored private var switchObserver: NSObjectProtocol?
 
     /// Deallocating a MainActor-isolated observable hops to the executor to
     /// run its deinit, and that hop aborts the process. The app never sees it
@@ -132,6 +157,303 @@ final class DigStore {
     private var engine: DigEngine { DigEngine(context: context) }
     private var enricher: MusicBrainzEnricher { MusicBrainzEnricher(context: context, client: client) }
     private var discogsEnricher: DiscogsEnricher { DiscogsEnricher(context: context, client: discogsClient) }
+    var identityStore: ArtistIdentityStore { ArtistIdentityStore(context: context) }
+
+    /// Which artist a page means, and every spelling it should read under.
+    /// Decided by `ArtistIdentityStore.artistResolution`, which the graph's
+    /// identity layer reads off the main actor too: one answer for both.
+    func artistResolution(_ reference: ArtistReference) -> ArtistResolution {
+        identityStore.artistResolution(reference)
+    }
+
+    /// What an artist page opens, decided once per revision.
+    ///
+    /// Read from `body`, so it is kept: the answer only changes when something
+    /// is written, and every write moves `revision`.
+    func artistPage(_ reference: ArtistReference) -> ArtistPageIdentity {
+        if let held = pages[reference], held.revision == revision { return held.page }
+        let page = describePage(reference)
+        pages[reference] = (revision, page)
+        return page
+    }
+
+    @ObservationIgnored private var pages: [ArtistReference: (revision: Int, page: ArtistPageIdentity)] = [:]
+
+    /// Names whose catalogue lookup has answered this session — found
+    /// somebody, found nobody, or failed. Until then a name that nothing
+    /// identifies may be about to become somebody else's page.
+    @ObservationIgnored private var answeredIdentities: Set<String> = []
+
+    private func answeredIdentity(_ name: String) {
+        guard answeredIdentities.insert(RecordingKey.normalizeArtist(name)).inserted else { return }
+        announceChange()
+    }
+
+    /// Whether a page's name is not settled yet: nothing identifies it, the
+    /// catalogue could still answer, and has not. The page then draws its
+    /// title as a placeholder rather than a name it may be about to replace.
+    private func isTitlePending(_ reference: ArtistReference, _ resolution: ArtistResolution) -> Bool {
+        guard !resolution.isVerified, reference.mbid == nil, reference.discogsID == nil,
+              discogsClient.isConfigured else { return false }
+        return !answeredIdentities.contains(RecordingKey.normalizeArtist(reference.name))
+    }
+
+    private func describePage(_ reference: ArtistReference) -> ArtistPageIdentity {
+        let resolution = artistResolution(reference)
+        let opened = ArtistPageIdentity(
+            reference: reference, resolution: resolution,
+            name: resolution.canonicalName, mbid: reference.mbid,
+            discogsID: resolution.identity.discogsID,
+            alsoCreditedAs: resolution.equivalentNames, cameFrom: nil, borrowed: nil,
+            titlePending: isTitlePending(reference, resolution)
+        )
+        guard let id = resolution.identity.discogsID, let facts = identityStore.facts(id) else { return opened }
+
+        // What is known of each record: DIG's own description of it when it has
+        // one, and otherwise the summary an alias read left. Neither is a
+        // record nobody has read, which stays unknown.
+        var completeness: [Int: ProfileCompleteness] = [:]
+        var described: [Int: DiscogsArtist] = [:]
+        var aliasFacts: [DiscogsIdentityFacts] = []
+        for candidate in [id] + facts.aliases.map(\.id) {
+            if candidate != id, let found = identityStore.facts(candidate) { aliasFacts.append(found) }
+            if let record = describedRecord(candidate) {
+                described[candidate] = record
+                completeness[candidate] = Self.completeness(of: record)
+            } else if let summary = identityStore.summary(candidate) {
+                completeness[candidate] = summary
+            }
+        }
+        let evidence = ArtistIdentityEvidence(facts: [facts] + aliasFacts)
+        let choice = PreferredProfileResolver(evidence: evidence, completeness: completeness)
+            .choice(for: resolution.identity)
+
+        switch choice.mode {
+        case .own:
+            return opened
+        case .ownWithFallback(let related):
+            guard let relatedID = related.discogsID,
+                  let name = aliasName(relatedID, in: facts, described: described[relatedID]) else { return opened }
+            // Only what DIG has described can be borrowed; a summary says how
+            // much there is, not what it says.
+            guard let biography = described[relatedID]?.biography?.nilIfEmpty else { return opened }
+            return opened.borrowing(ArtistPageIdentity.Borrowed(
+                name: name, discogsID: relatedID, biography: biography))
+        case .openRelated(let related):
+            guard let relatedID = related.discogsID,
+                  let name = aliasName(relatedID, in: facts, described: described[relatedID]) else { return opened }
+            return ArtistPageIdentity(
+                reference: reference, resolution: resolution,
+                name: name, mbid: nil, discogsID: relatedID,
+                alsoCreditedAs: [name] + identityStore.creditedSpellings(of: relatedID),
+                cameFrom: resolution.canonicalName, borrowed: nil, titlePending: false
+            )
+        }
+    }
+
+    private func aliasName(_ id: Int, in facts: DiscogsIdentityFacts, described: DiscogsArtist?) -> String? {
+        facts.aliases.first { $0.id == id }.map { DiscogsClient.withoutDisambiguator($0.name) }
+            ?? identityStore.facts(id)?.canonicalName
+            ?? described?.name
+    }
+
+    /// The description DIG holds for a Discogs entry, if it has read one —
+    /// preferring the row filed under the entry's own name.
+    private func describedRecord(_ discogsID: Int) -> DiscogsArtist? {
+        var descriptor = FetchDescriptor<DiscogsArtist>(predicate: #Predicate { $0.discogsID == discogsID })
+        descriptor.fetchLimit = 4
+        let rows = (try? context.fetch(descriptor)) ?? []
+        let filedName = identityStore.facts(discogsID).map { ArtistSpelling.filingKey($0.name) }
+        return rows.first { row in filedName.map { ArtistSpelling.filingKey(row.name) == $0 } ?? false }
+            ?? rows.max { $0.releaseTitles.count < $1.releaseTitles.count }
+    }
+
+    /// What reading a release's stored document from R2 found.
+    nonisolated enum StoredReleaseRead: Sendable {
+        case document(DiscogsReleaseDetail)
+        /// R2 holds no document for it: nobody has cached this release.
+        case missing
+        /// The read failed, or what came back would not read as a release.
+        /// Not a finding about the release — asked again next time.
+        case unavailable
+    }
+
+    /// How a release's stored document is read. Replaced in tests.
+    @ObservationIgnored var readStoredRelease: @Sendable (Int) async -> StoredReleaseRead = DigStore.readStoredReleaseFromR2
+
+    /// The public R2 copy of a release document, read directly: one GET, no
+    /// Discogs budget. Never from a test process, which injects its own.
+    nonisolated static func readStoredReleaseFromR2(_ id: Int) async -> StoredReleaseRead {
+        guard !Persistence.isRunningTests,
+              let url = MetadataRepository.storedObjectURL(forPath: MetadataRepository.releasePath(id: String(id)))
+        else { return .unavailable }
+        do {
+            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url, timeoutInterval: 10))
+            guard let http = response as? HTTPURLResponse else { return .unavailable }
+            if http.statusCode == 404 { return .missing }
+            guard http.statusCode == 200,
+                  let detail = try? JSONDecoder().decode(DiscogsReleaseDetail.self, from: data)
+            else { return .unavailable }
+            return .document(detail)
+        } catch {
+            return .unavailable
+        }
+    }
+
+    /// Releases whose stored document is missing, or says nothing of who is
+    /// on it, as found this session — so a page does not ask again.
+    @ObservationIgnored private var storedReleasesWithoutCredits: Set<Int> = []
+
+    /// Gives a release DIG already holds its credits by id, from the document
+    /// R2 keeps for it.
+    ///
+    /// A release cached before credits were kept has its names and none of
+    /// their ids, and is fresh for weeks, so nothing re-reads it. Its document
+    /// is very likely in R2 — three in four were — and reading that is one
+    /// public request with no Discogs budget. A missing document is remembered
+    /// for the session; a failed read is not, and is asked again next time.
+    /// Nothing is ever cleared: credits already held are never read again here.
+    @discardableResult
+    func backfillReleaseCredits(id: Int, announce: Bool = true) async -> Bool {
+        let store = ReleaseCreditStore(context: context)
+        guard id > 0, store.credits(releaseID: id) == nil,
+              !storedReleasesWithoutCredits.contains(id),
+              discogsEnricher.cachedRelease(id: id) != nil
+        else { return false }
+        switch await readStoredRelease(id) {
+        case .document(let detail):
+            guard store.credits(releaseID: id) == nil else { return false }
+            if store.replace(releaseID: id, from: detail, source: ReleaseCreditStore.source(storedRelease: id)) {
+                saveContext()
+                if announce { announceChange() }
+                return true
+            } else {
+                storedReleasesWithoutCredits.insert(id)
+            }
+        case .missing:
+            storedReleasesWithoutCredits.insert(id)
+        case .unavailable:
+            break
+        }
+        return false
+    }
+
+    /// The same, for an artist's own records, when their page opens.
+    ///
+    /// Only a release page used to ask, so the credits on an artist's page
+    /// stayed spellings: Speedy J's *Pedestrian Sketches* credits "Oberman",
+    /// which is Sjoerd Oberman's entry on the document and nobody's by name,
+    /// and the link opened an empty page. Read after the page is up, a few
+    /// at a time from R2 (no Discogs budget), and the page's routes worked
+    /// out again once, if anything arrived.
+    func backfillReleaseCredits(forArtist name: String, limit: Int = 16) async {
+        let store = ReleaseCreditStore(context: context)
+        let ids = GraphStore(context: context).releaseIDs(creditedTo: RecordingKey.normalizeArtist(name))
+            .filter { $0 > 0 && store.credits(releaseID: $0) == nil }
+            .sorted()
+            .prefix(limit)
+        var filled = false
+        for id in ids {
+            guard !Task.isCancelled else { break }
+            if await backfillReleaseCredits(id: id, announce: false) { filled = true }
+        }
+        guard filled else { return }
+        forgetGraph(for: .artist(name))
+        announceChange()
+    }
+
+    /// Entries whose identity could not be read this session. Not stored: a
+    /// refusal is not a finding, and the next session asks again.
+    @ObservationIgnored private var factsUnavailable: Set<Int> = []
+
+    /// Makes sure an entry DIG has described also has its identity evidence.
+    ///
+    /// A record cached before that evidence was kept holds the entry's id but
+    /// not its credited spellings or its aliases' ids, and nothing it does hold
+    /// can stand in for them — alias names without ids are only names. So the
+    /// entry is read once: one request, answered from the backend's cache when
+    /// anybody has asked before, and only when no evidence is held. Offline,
+    /// nothing is kept and the page is exactly what it was.
+    func ensureIdentityFacts(for discogsID: Int) async {
+        guard discogsID > 0, discogsClient.isConfigured,
+              identityStore.facts(discogsID) == nil,
+              !factsUnavailable.contains(discogsID)
+        else { return }
+        guard let detail = try? await discogsClient.artistDetail(id: discogsID) else {
+            factsUnavailable.insert(discogsID)
+            return
+        }
+        identityStore.record(DiscogsIdentityFacts(detail: detail))
+        saveContext()
+        announceChange()
+    }
+
+    /// Aliases whose entry would not load this session, so a page does not
+    /// ask again on every visit. Not stored: a refusal is not a finding.
+    @ObservationIgnored private var unreadAliases: Set<Int> = []
+    /// Alias reads spent on each empty entry this session. The limit is per
+    /// entry, not per visit: coming back to the page spends nothing more.
+    @ObservationIgnored private var aliasReads: [Int: Int] = [:]
+
+    /// How many aliases an empty entry may read, and so how many requests it
+    /// may spend: an entry and the size of a shelf each.
+    static let aliasReadLimit = 3
+
+    /// Reads enough of an empty entry's aliases to tell which is richest.
+    ///
+    /// An alias whose own record is empty opens its richest alias instead
+    /// (`PreferredProfileResolver`), but only one DIG knows something about.
+    /// This finds out for aliases nobody has opened: each alias's entry —
+    /// which also says whether it lists the empty one back — and the size of
+    /// its shelf. At most `aliasReadLimit` aliases, two requests each, in the
+    /// order Discogs lists them, skipping any already known; through the
+    /// backend's cache, and only while the budget has room.
+    ///
+    /// An alias that does not list the empty one back is not read further. A
+    /// shelf that would not answer is kept as a failed read, never as an empty
+    /// one, and an entry that would not load is not kept at all.
+    func discoverRicherAlias(of subjectID: Int) async {
+        guard discogsClient.isConfigured, let subject = identityStore.facts(subjectID) else { return }
+        var read = 0
+        defer { aliasReads[subjectID, default: 0] += read }
+        let allowance = Self.aliasReadLimit - aliasReads[subjectID, default: 0]
+        for alias in subject.aliases where alias.id != subjectID {
+            guard read < allowance else { break }
+            if describedRecord(alias.id) != nil { continue }
+            if !identityStore.summaryIsDue(alias.id) { continue }
+            if unreadAliases.contains(alias.id) { continue }
+            guard await discogsClient.hasRoom(for: .background), !Task.isCancelled else { break }
+            read += 1
+
+            guard let detail = try? await discogsClient.artistDetail(id: alias.id) else {
+                unreadAliases.insert(alias.id)
+                continue
+            }
+            let facts = DiscogsIdentityFacts(detail: detail)
+            guard facts.aliases.contains(where: { $0.id == subjectID }) else {
+                identityStore.record(facts)
+                continue
+            }
+            let count = try? await discogsClient.artistReleaseCount(id: alias.id)
+            identityStore.recordSummary(of: detail, releaseCount: count ?? nil)
+        }
+        if read > 0 {
+            saveContext()
+            announceChange()
+        }
+    }
+
+    static func completeness(of record: DiscogsArtist) -> ProfileCompleteness {
+        ProfileCompleteness(
+            releases: record.releaseTitles.count,
+            credits: record.collaboratorNames.count,
+            hasBiography: !(record.biography ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+            hasArtwork: record.imageURL != nil || record.thumbnailURL != nil,
+            styles: record.styles.count,
+            labels: record.labelNames.count,
+            links: record.externalURLStrings.count
+        )
+    }
 
     // MARK: - Profiles
 
@@ -181,10 +503,45 @@ final class DigStore {
     /// land between two callers.
     func bumpRevisionForTesting() { revision &+= 1 }
 
-    func artistProfile(name: String, mbid: String?) async -> ArtistProfile {
-        let key = Self.artistKey(name: name, mbid: mbid)
+    func artistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) async -> ArtistProfile {
+        let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
+        let key = Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID)
         let asked = revision
-        if let fresh = profiles.fresh(key, revision: asked) { return fresh }
+        // The catalogue pilot's bundle (development only; see `CataloguePilot`).
+        // Never waited on: the page walks with what it has, and a bundle that
+        // arrives is announced as any other enrichment is, so the page walks
+        // again with it. A slow host costs the page nothing.
+        var walkWithBundle = false
+        // The entry a page opened by name is, when the evidence verifies it:
+        // only then may its catalogue bundle speak for the page, and the walk
+        // is given the id so the bundle's routes are added to it (OG Parker,
+        // opened by name, showed none of its bundle's). An unverified guess
+        // never picks whose bundle a page gets.
+        var walkID = discogsID
+        DigEnrichmentSwitch.shared.refreshInBackgroundIfDue()
+        if CataloguePilot.shared.isEnabled, let entry = discogsID ?? verifiedEntry(name: name, mbid: mbid) {
+            if walkID == nil, CataloguePilot.shared.hasBundle(entry) { walkID = entry }
+            let pilot = CataloguePilot.shared
+            if pilot.bundle(for: entry) == nil {
+                Task { [weak self] in
+                    _ = await pilot.ensure(entry)
+                    guard pilot.bundle(for: entry) != nil else { return }
+                    self?.announceChange()
+                    // Then where its routes lead: their own bundles, so the
+                    // rows can say so and DEEP can walk on.
+                    if await pilot.prefetch(pilot.people(in: entry).sorted()) > 0 { self?.announceChange() }
+                }
+            } else {
+                // Once with it, past an answer kept from before it arrived.
+                walkWithBundle = pilotWalked.insert(key).inserted
+                if walkWithBundle {
+                    Task { [weak self] in
+                        if await pilot.prefetch(pilot.people(in: entry).sorted()) > 0 { self?.announceChange() }
+                    }
+                }
+            }
+        }
+        if !walkWithBundle, let fresh = profiles.fresh(key, revision: asked) { return fresh }
 
         if let running = walking[key] {
             Trace.step("graph.join", key) {}
@@ -199,13 +556,60 @@ final class DigStore {
         // so it is what the line has to show.
         let running = Task { [worker] in
             await Trace.stage("graph.walk", key) {
-                await worker.artistProfile(name: name, mbid: mbid, generation: asked)
+                await worker.artistProfile(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: walkID, generation: asked)
             }
         }
         walking[key] = running
-        let profile = await running.value
+        let profile = forPage(await running.value, discogsID: walkID)
         walking[key] = nil
         profiles.store(profile, key: key, revision: asked)
+        Task { await settleGraphNames() }
+        return profile
+    }
+
+    /// The picture a tile draws for a node: an artist's current portrait first
+    /// -- by identity where the node knows it, upgraded to the full image --
+    /// and only then the picture copied onto the node when its edge was built,
+    /// which is the 150-pixel cut of whatever was known then.
+    func tileImage(for node: MusicNode) -> URL? {
+        guard node.kind == .artist else { return node.artworkURL }
+        return portraitURL(for: node.title, discogsID: node.discogsID) ?? node.artworkURL
+    }
+
+    /// The Discogs entry a name is, only when the evidence verifies it.
+    private func verifiedEntry(name: String, mbid: String?) -> Int? {
+        let resolution = artistResolution(ArtistReference(name: name, mbid: mbid))
+        return resolution.isVerified ? resolution.identity.discogsID : nil
+    }
+
+    /// What the page adds to a walked profile: which routes lead on (this
+    /// device knows the artist's records, or the catalogue has a bundle for
+    /// them), and the labels the page's own bundle names that the device's
+    /// records did not.
+    private func forPage(_ walked: ArtistProfile, discogsID: Int?) -> ArtistProfile {
+        var profile = walked
+        let pilot = CataloguePilot.shared
+        profile.related = profile.related.map { row in
+            var row = row
+            if let id = row.discogsID {
+                let onward = pilot.people(in: id)
+                row.onward = pilot.bundle(for: id) == nil ? nil : onward.count
+                row.leadsOn = !onward.isEmpty || describedRecord(id) != nil || (pilot.hasBundle(id) && pilot.bundle(for: id) == nil)
+            } else {
+                row.leadsOn = discogsEnricher.cachedArtist(named: row.name) != nil
+            }
+            return row
+        }
+        guard let entry = discogsID ?? verifiedEntry(name: walked.name, mbid: walked.mbid) else { return profile }
+        if (profile.biography ?? "").isEmpty, let bundle = pilot.bundle(for: entry) {
+            profile.fromTheRecords = RecordsSummary.make(bundle)
+        }
+        let held = Set(profile.labels.compactMap(\.discogsID))
+        let heldNames = Set(profile.labels.map { RecordingKey.normalize($0.name) })
+        for label in pilot.labels(for: entry) {
+            guard let id = label.discogsID, !held.contains(id), !heldNames.contains(RecordingKey.normalize(label.display)) else { continue }
+            profile.labels.append(ArtistProfile.LabelRef(name: label.display, mbid: nil, releaseCount: label.releases, discogsID: id))
+        }
         return profile
     }
 
@@ -215,12 +619,18 @@ final class DigStore {
     /// the instant it comes back, rather than flashing a loading bar while it
     /// rebuilds something the listener was looking at seconds ago. The fresh
     /// version replaces it a moment later.
-    func cachedArtistProfile(name: String, mbid: String?) -> ArtistProfile? {
-        profiles.any(Self.artistKey(name: name, mbid: mbid))
+    func cachedArtistProfile(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) -> ArtistProfile? {
+        let spellings = DigEngine.otherSpellings(alsoCreditedAs, besides: name)
+        return profiles.any(Self.artistKey(name: name, mbid: mbid, alsoCreditedAs: spellings, discogsID: discogsID))
     }
 
-    private static func artistKey(name: String, mbid: String?) -> String {
-        "\(mbid ?? "-")|\(RecordingKey.normalizeArtist(name))"
+    /// Pages walked with their catalogue-pilot bundle (see `artistProfile`).
+    @ObservationIgnored private var pilotWalked: Set<String> = []
+
+    private static func artistKey(name: String, mbid: String?, alsoCreditedAs: [String] = [], discogsID: Int? = nil) -> String {
+        let base = "\(mbid ?? "-")|\(discogsID.map(String.init) ?? "-")|\(RecordingKey.normalizeArtist(name))"
+        guard !alsoCreditedAs.isEmpty else { return base }
+        return base + "|" + alsoCreditedAs.map(RecordingKey.normalizeArtist).sorted().joined(separator: "+")
     }
 
     @ObservationIgnored private var labels = DigCache<LabelProfile>()
@@ -463,7 +873,10 @@ final class DigStore {
 
         guard !Task.isCancelled, !fetched.isEmpty else { return }
         for (identifier, detail) in fetched {
-            discogsEnricher.store(detail, id: identifier)
+            discogsEnricher.store(
+                detail, id: identifier,
+                source: shared[identifier] != nil ? ReleaseCreditStore.source(storedRelease: identifier) : nil
+            )
         }
         // Once per batch. Each bump invalidates the cached profile, so bumping
         // per release rebuilt the whole graph two dozen times — and bumping
@@ -487,9 +900,9 @@ final class DigStore {
     /// later would otherwise not show until the source node was walked again.
     /// Rewriting one column on the rows that name them is a great deal cheaper
     /// than rebuilding anybody's graph.
-    private func paint(_ name: String, with address: String) {
+    private func paint(_ name: String, with address: String, owner: Int? = nil) {
         StoredEdge.repaint(
-            artistKey: RecordingKey.normalizeArtist(name), with: address, in: context
+            artistKey: RecordingKey.normalizeArtist(name), with: address, owner: owner, in: context
         )
     }
 
@@ -645,9 +1058,12 @@ final class DigStore {
         // the window had settled and the listener had started scrolling. The
         // same read is measured at over two hundred milliseconds inside the
         // fold, and nothing here measured it at all.
-        let index = await worker.portraitIndex()
-        portraits = index.found
-        portraitsSettled = index.settled
+        await loadPortraitIndex()
+        // Once: faces cached by the old first-match rule, checked against the
+        // catalogue's portrait states (0081).
+        await revalidateCachedPortraits()
+        // Then, every launch, only what the catalogue changed since (0083).
+        await followPortraitChanges()
 
         // How many background pictures have been stored without telling the
         // page about them.
@@ -812,7 +1228,8 @@ final class DigStore {
         await onScreenAdoption?.value
         while let next = portraitPriority.first {
             portraitPriority.removeFirst()
-            if isPortraitWanted(next) {
+            if isPortraitWanted(next) || wantsSharperPortrait(next) {
+                sharpened.insert(RecordingKey.normalizeArtist(next))
                 lastWasOnScreen = true
                 return next
             }
@@ -855,9 +1272,9 @@ final class DigStore {
 
     /// Where the portraits the backend has already found come from. A property
     /// so a test can stand in for the backend, which is off under XCTest.
-    @ObservationIgnored var cataloguePortraits: @Sendable ([String]) async -> [String: URL] = { keys in
+    @ObservationIgnored var cataloguePortraits: @Sendable ([String]) async -> [String: DigWorker.CataloguePortrait] = { keys in
         guard SupabaseService.isConfigured else { return [:] }
-        return (try? await ArtworkRepository.shared.portraits(forArtistKeys: keys)) ?? [:]
+        return (try? await ArtworkRepository.shared.portraitStates(forArtistKeys: keys)) ?? [:]
     }
 
     /// Catalogue keys already asked about this session. A page reports its rows
@@ -894,30 +1311,143 @@ final class DigStore {
             "\(onScreen ? "screen" : "backlog") asked=\(byCatalogueKey.count) found=\(found.count)"
         ) {}
 
-        var adopted: [(name: String, address: String)] = []
-        var resolved: [String: URL] = [:]
-        for (key, url) in found {
+        await apply(found, asked: byCatalogueKey, onScreen: onScreen)
+        // One announcement for the batch. See `artworkRevision`.
+        artworkRevision &+= 1
+    }
+
+    /// What the catalogue said, kept: verified and unresolved portraits by
+    /// name (verified ones under the Discogs id as well), and withheld ones
+    /// taken off the name -- out of the map, off the stored edges carrying
+    /// that face, and recorded as a miss -- so a stranger's face cached under
+    /// the old first-match rule does not outlive the catalogue's correction.
+    private func apply(_ found: [String: DigWorker.CataloguePortrait], asked byCatalogueKey: [String: String], onScreen: Bool) async {
+        var adopted: [(name: String, portrait: DigWorker.CataloguePortrait)] = []
+        for (key, portrait) in found {
             guard let name = byCatalogueKey[key] else { continue }
-            adopted.append((name, url.absoluteString))
-            resolved[RecordingKey.normalizeArtist(name)] = url
+            adopted.append((name, portrait))
         }
         guard !adopted.isEmpty else { return }
 
-        await worker.adopt(adopted)
-        for (key, url) in resolved {
+        let withheld = await worker.adopt(adopted)
+        for (name, portrait) in adopted {
+            let key = RecordingKey.normalizeArtist(name)
+            if let stale = withheld[name] {
+                let inMemory = portraits.removeValue(forKey: key)?.absoluteString
+                for address in Set([stale, inMemory].compactMap { $0 }) {
+                    StoredEdge.unpaint(artistKey: key, address: address, in: context)
+                }
+                portraitsSettled.insert(key)
+                continue
+            }
+            guard let address = portrait.url, let url = URL(string: address) else { continue }
             portraits[key] = url
+            if portrait.state == "verified" { catalogueVouched.insert(key) }
+            if portrait.state == "verified", let id = portrait.discogsID {
+                portraits[ArtistPortrait.identityKey(id)] = url
+            }
             portraitsSettled.insert(key)
+            // Rows already drawn are repainted, as the fill repaints them, for
+            // the ones on screen. Not for the backlog: up to two hundred edge
+            // rewrites on the main thread for rows nobody is looking at, which
+            // read the portrait table when they are next drawn anyway.
+            if onScreen {
+                paint(name, with: address, owner: portrait.state == "verified" ? portrait.discogsID : nil)
+            }
         }
-        // Rows already drawn are repainted, as the fill repaints them, for the
-        // ones on screen. Not for the backlog: up to two hundred edge rewrites
-        // on the main thread for rows nobody is looking at, which read the
-        // portrait table when they are next drawn anyway.
-        if onScreen {
-            for (name, address) in adopted { paint(name, with: address) }
-            saveContext()
+        if onScreen || !withheld.isEmpty { saveContext() }
+    }
+
+    /// Once per install: every name this device holds a portrait for, asked
+    /// of the catalogue again with the portrait states of 0081, so faces the
+    /// old first-match rule cached here are withheld or replaced. Names are
+    /// otherwise only asked about while they have no picture at all, so
+    /// without this a wrong one would stay for good.
+    ///
+    /// v2: again after 0082, which began answering "no face" for the artists
+    /// whose own entry has no picture -- 25 corrected faces a v1 pass kept.
+    private static let revalidatedKey = "portraitStates.revalidated.v2"
+
+    /// Where the change feed (0083) was last read up to.
+    private static let changesSinceKey = "portraitStates.changesSince"
+
+    /// Which names' portrait answers changed after a watermark. A property so
+    /// a test can stand in for the backend.
+    @ObservationIgnored var portraitChanges: @Sendable (String) async -> ArtworkRepository.PortraitChanges? = { since in
+        guard SupabaseService.isConfigured else { return nil }
+        return try? await ArtworkRepository.shared.portraitChanges(since: since)
+    }
+
+    /// Where "done" is remembered. Never the app's own defaults under XCTest:
+    /// the test host is the app, and a test run would otherwise tell the real
+    /// one its portraits had already been checked.
+    @ObservationIgnored var portraitDefaults: UserDefaults = Persistence.isRunningTests
+        ? UserDefaults(suiteName: "indigo.tests.portrait-states") ?? .standard
+        : .standard
+
+    func revalidateCachedPortraits(batch: Int = cataloguePortraitBatch) async {
+        guard !portraitDefaults.bool(forKey: Self.revalidatedKey) else { return }
+        let names = await worker.namesWithPortraits()
+        var done = 0
+        while done < names.count {
+            var byCatalogueKey: [String: String] = [:]
+            for name in names[done..<min(done + batch, names.count)] {
+                let key = RecordingKey.normalize(name)
+                if !key.isEmpty, byCatalogueKey[key] == nil { byCatalogueKey[key] = name }
+            }
+            done += batch
+            guard !byCatalogueKey.isEmpty else { continue }
+            let found = await cataloguePortraits(Array(byCatalogueKey.keys))
+            await apply(found, asked: byCatalogueKey, onScreen: false)
         }
-        // One announcement for the batch. See `artworkRevision`.
         artworkRevision &+= 1
+        Trace.step("portraits.revalidated", "names=\(names.count)") {}
+        portraitDefaults.set(true, forKey: Self.revalidatedKey)
+    }
+
+    /// After that, only what changed: once a launch, the names whose answer
+    /// the catalogue changed since this device last asked -- a face withheld,
+    /// replaced, or found when an artist's identity changed (0083) -- and of
+    /// those, only the ones this device holds a face for. Nothing is asked on
+    /// a page visit, and a launch with nothing changed is one small request.
+    func followPortraitChanges(batch: Int = cataloguePortraitBatch, pages: Int = 5) async {
+        guard let since = portraitDefaults.string(forKey: Self.changesSinceKey) else {
+            // First run: the full pass just covered everything. Started a few
+            // minutes back, so a clock running ahead loses nothing.
+            portraitDefaults.set(ISO8601DateFormatter().string(from: Date().addingTimeInterval(-600)), forKey: Self.changesSinceKey)
+            return
+        }
+        var watermark = since
+        var held: [String: String]?
+        var reread = 0
+        for _ in 0..<pages {
+            guard let changes = await portraitChanges(watermark) else { return }
+            if !changes.names.isEmpty {
+                if held == nil {
+                    var byKey: [String: String] = [:]
+                    for name in await worker.namesWithPortraits() {
+                        let key = RecordingKey.normalize(name)
+                        if !key.isEmpty, byKey[key] == nil { byKey[key] = name }
+                    }
+                    held = byKey
+                }
+                let asked = (held ?? [:]).filter { Set(changes.names).contains($0.key) }
+                let keys = Array(asked.keys)
+                var done = 0
+                while done < keys.count {
+                    let part = Dictionary(uniqueKeysWithValues: keys[done..<min(done + batch, keys.count)].map { ($0, asked[$0]!) })
+                    done += batch
+                    let found = await cataloguePortraits(Array(part.keys))
+                    await apply(found, asked: part, onScreen: false)
+                }
+                reread += keys.count
+            }
+            watermark = changes.until
+            portraitDefaults.set(watermark, forKey: Self.changesSinceKey)
+            guard changes.more else { break }
+        }
+        if reread > 0 { artworkRevision &+= 1 }
+        Trace.step("portraits.changes", "reread=\(reread)") {}
     }
 
     /// Whether this name still owes a picture.
@@ -926,6 +1456,40 @@ final class DigStore {
     /// own context, and not only to save a fetch a second: the rows are
     /// written on the worker's context now, so this context would not see
     /// them and every name would look unasked-for.
+    /// Names whose small picture has been asked to be replaced this session.
+    @ObservationIgnored private var sharpened: Set<String> = []
+    /// Names whose face the catalogue verified by identity. Not "unresolved":
+    /// the catalogue answers old-rule faces that way too, and those are the
+    /// ones most in need of the full image.
+    @ObservationIgnored private var catalogueVouched: Set<String> = []
+
+    /// Whether a name on screen holds only Discogs' 150-pixel thumb, kept
+    /// from when these were 38-point rows: asked for again, once a session
+    /// and only while on screen, for the cover. Off screen it waits, so the
+    /// request budget goes on what is being looked at.
+    /// What this device holds, read off the worker: the faces, and the names
+    /// already settled. What a launch starts from.
+    func loadPortraitIndex() async {
+        let index = await worker.portraitIndex()
+        portraits = index.found
+        portraitsSettled = index.settled
+    }
+
+    /// Whether a name would cost a request now: it has no face and is not
+    /// settled, or holds only the 150-pixel cut. Read-only.
+    func wantsPortraitRequest(for name: String) -> Bool {
+        isPortraitWanted(name) || wantsSharperPortrait(name)
+    }
+
+    private func wantsSharperPortrait(_ name: String) -> Bool {
+        let key = RecordingKey.normalizeArtist(name)
+        // Not a face the catalogue verified: asking again by name could
+        // only lose it to a namesake, and the catalogue upgrades its own to the
+        // full image, which reaches this device through the change feed.
+        guard !key.isEmpty, !sharpened.contains(key), !catalogueVouched.contains(key) else { return false }
+        return DiscogsClient.isSmallCut(portraits[key]?.absoluteString)
+    }
+
     private func isPortraitWanted(_ name: String) -> Bool {
         let key = RecordingKey.normalizeArtist(name)
         guard !key.isEmpty else { return false }
@@ -1045,8 +1609,12 @@ final class DigStore {
     /// are not part of the music graph.
     func node(for page: DetailPage) -> MusicNode? {
         switch page {
-        case .digArtist(let mbid, let name):
-            return .artist(name, mbid: mbid)
+        case .digArtist(let mbid, let name, let discogsID):
+            // Remembered as the artist the page opens, so a visit to a spelling
+            // counts toward the artist it is. Visits made before were kept
+            // under the spelling, and still are.
+            let page = artistPage(ArtistReference(name: name, mbid: mbid, discogsID: discogsID))
+            return .artist(page.name, mbid: page.mbid, discogsID: page.discogsID)
         case .digLabel(let mbid, let name):
             return .label(name, mbid: mbid)
         case .digDiscogsLabel(let name, _):
@@ -1096,6 +1664,7 @@ final class DigStore {
             from: origin, at: level, generation: asked, showing: showing
         )
         descents.store(found, key: key, revision: asked)
+        Task { await settleGraphNames() }
         return found
     }
 
@@ -1142,22 +1711,6 @@ final class DigStore {
     private(set) var hasExploreDirection = false
     @ObservationIgnored private lazy var offersStore = ExploreOffersStore(context: context)
 
-    /// Which of the places somebody could be heading into to show next.
-    ///
-    /// Kept in defaults rather than in the store: it is a note about what was
-    /// last put on screen, not a fact about their music, and it should not be
-    /// worth a schema migration. Advanced once per recomputation — which is
-    /// about once a launch — so the page says something different each time
-    /// without any of it being worked out twice.
-    @ObservationIgnored static let directionTurnKey = "explore.direction.turn"
-
-    private static func nextDirectionTurn() -> Int {
-        let defaults = UserDefaults.standard
-        let turn = defaults.integer(forKey: directionTurnKey)
-        defaults.set(turn &+ 1, forKey: directionTurnKey)
-        return turn
-    }
-
     /// Reads back what was shown last time, so a launch opens on the page it
     /// closed on rather than on an empty one. Called once, from the app.
     func restoreExploreOffers() {
@@ -1165,79 +1718,117 @@ final class DigStore {
         exploreOffers = kept.offers
         hasExploreOffers = true
         hasExploreDirection = kept.offers.movingToward != nil
-        offersCrateRevision = kept.crateRevision
-        offersBuiltAt = kept.builtAt
+        offersStamp = kept.stamp
+        offersCoreStamp = kept.core
     }
-    @ObservationIgnored private var offersCrateRevision = -1
-    @ObservationIgnored private var offersBuiltAt = Date.distantPast
+    /// What the answer on screen was worked out from: all of it, and its first
+    /// half (everything but the direction). Nil until there is one, and for an
+    /// answer kept before stamps were: either is worked out again.
+    @ObservationIgnored private var offersStamp: ExploreStamp?
+    @ObservationIgnored private var offersCoreStamp: ExploreStamp?
     @ObservationIgnored private var offersTask: Task<Void, Never>?
+    @ObservationIgnored private var shadowTask: Task<Void, Never>?
+    /// What the last shadow look was made for, so the same visible answer in
+    /// the same backend generation is not compared twice.
+    @ObservationIgnored private var shadowKey: String?
 
-    /// How long an answer stands before it is worth asking again.
+    /// Looks again, and works the answer out again only if what it would be
+    /// worked out from has changed.
     ///
-    /// Not tied to `revision`, which is what this used to key on. Enrichment
-    /// bumps that several times a second while it works, so keying on it meant
-    /// the block was rebuilt on every visit and the cards moved under the
-    /// cursor a moment after the page opened. Almost none of those writes
-    /// changes what should be suggested.
-    @ObservationIgnored private static let offersLifetime: TimeInterval = 15 * 60
-
-    /// Recomputes when the crate has changed, when there is nothing yet, or
-    /// when the answer has simply been standing a while. Otherwise does
-    /// nothing at all — a set of recommendations that rearranges itself while
-    /// somebody is reading it is worse than one that is a quarter of an hour
-    /// out of date.
-    /// Works EXPLORE's answer out again, for when what it was built from has
-    /// changed without the crate moving — a show gaining its picture, say.
+    /// Called when the page appears, when the crate moves and when another
+    /// device's import lands. Each time the listener's rows are read and
+    /// digested, and the knowledge around them is taken from the worker --
+    /// kept there, and worked out again only for a new starting point or once
+    /// it has stood a quarter of an hour (`DigWorker.knowledgeLifetime`), so
+    /// enrichment writing several times a second does not move the cards
+    /// under the reader. If the stamp is the one on screen, nothing is ranked
+    /// at all; a play, a crate change or a new day is a new stamp.
     ///
-    /// Offers are kept for fifteen minutes and persisted across launches, so a
-    /// correction that lands in the store otherwise goes unseen: the page has
-    /// its answer and nothing asks for another.
-    ///
-    /// It rebuilds rather than merely marking the answer stale. Staleness is
-    /// only consulted when somebody asks, and nobody asks while the page is
-    /// already open — which is exactly when this is called. The persisted copy
-    /// is deliberately left alone until the new one is ready: it is what the
-    /// next launch draws before anything is recomputed, and clearing it traded
-    /// a page with a stale picture for a page with nothing on it.
-    func invalidateExploreOffers() async {
-        offersBuiltAt = .distantPast
-        await refreshExploreOffers(crateRevision: offersCrateRevision)
-    }
-
-    func refreshExploreOffers(crateRevision: Int) async {
-        let isStale = Date().timeIntervalSince(offersBuiltAt) > Self.offersLifetime
-        guard offersCrateRevision != crateRevision || exploreOffers.isEmpty || isStale
-        else { return }
+    /// `rebuildKnowledge` throws the kept knowledge away first.
+    func refreshExploreOffers(rebuildKnowledge: Bool = false) async {
         offersTask?.cancel()
         let asked = revision
+        let now = Date()
+        let period = ExplorePeriod.containing(now)
+        let asOf = ExplorePeriod.asOf(period)
         let task = Task { [weak self] in
             guard let self else { return }
             self.settle()
             // The blocks somebody can act on, published as soon as they are
             // known. Working out a direction reads every place in the
             // catalogue, and the page was making its headline wait behind it.
-            let found = await self.worker.exploreRecommendations(generation: asked)
-            guard !Task.isCancelled else { return }
-            self.offersCrateRevision = crateRevision
-            self.offersBuiltAt = Date()
-            self.exploreOffers = found
-            self.hasExploreOffers = true
-
-            // Then the slower half, folded into what is already on screen.
-            let direction = await self.worker.exploreDirection(
-                generation: asked, turn: Self.nextDirectionTurn()
+            let core = await self.worker.exploreRun(
+                asOf: asOf, period: period, generation: asked, scenes: false, rebuild: rebuildKnowledge, now: now
             )
             guard !Task.isCancelled else { return }
-            var withScene = self.exploreOffers
-            withScene.movingToward = direction
-            self.exploreOffers = withScene
-            self.hasExploreDirection = true
-            // Written down only once both halves are in, so a launch never
-            // restores an answer that is missing its direction.
-            self.offersStore.save(withScene, crateRevision: crateRevision)
+            if core.stamp != self.offersCoreStamp || !self.hasExploreOffers || self.exploreOffers.isEmpty {
+                let found = await self.worker.exploreRecommendations(core, asOf: asOf)
+                guard !Task.isCancelled else { return }
+                self.offersCoreStamp = core.stamp
+                self.exploreOffers = found
+                self.hasExploreOffers = true
+            }
+
+            // Then the slower half, folded into what is already on screen.
+            let full = await self.worker.exploreRun(
+                asOf: asOf, period: period, generation: asked, scenes: true, rebuild: false, now: now,
+                personal: core.rows
+            )
+            guard !Task.isCancelled else { return }
+            if full.stamp != self.offersStamp || !self.hasExploreDirection {
+                // Which of the places they could be heading into is named
+                // moves on with the period, so every device names the same
+                // place on the same day and the next day names the next one.
+                let direction = await self.worker.exploreDirection(full, asOf: asOf, turn: period)
+                guard !Task.isCancelled else { return }
+                var withScene = self.exploreOffers
+                withScene.movingToward = direction
+                self.exploreOffers = withScene
+                self.hasExploreDirection = true
+                self.offersStamp = full.stamp
+                // Written down only once both halves are in, so a launch never
+                // restores an answer that is missing its direction.
+                self.offersStore.save(withScene, stamp: full.stamp, core: core.stamp)
+            }
+            var report = full.report
+            report.rebuilt = core.report.rebuilt + full.report.rebuilt
+            report.milliseconds.merge(core.report.milliseconds, uniquingKeysWith: +)
+            ExploreDiagnostics.shared.record(ExploreDiagnostics.Entry(
+                stamp: full.stamp, ranked: ExploreDiagnostics.Entry.ranked(self.exploreOffers), report: report
+            ))
+            self.shadow(full, asOf: asOf, turn: period, now: now)
         }
         offersTask = task
         await task.value
+    }
+
+    /// The backend's For You beside the visible one, in the background: never
+    /// waited on, never shown, reported to `ExploreDiagnostics`. Skipped when
+    /// the visible answer and the backend's edge generation are both what the
+    /// last comparison was made for, unless that one failed.
+    private func shadow(_ visible: ExploreRun, asOf: Date, turn: Int, now: Date) {
+        guard ExploreShadow.isEnabled else { return }
+        let key = "\(CanonicalDigest.of(visible.stamp))|\(BackendKnowledgeCache.generation(at: now))"
+        let lastFailed = !(ExploreDiagnostics.shared.shadow?.fetch.errors.isEmpty ?? true)
+        guard key != shadowKey || lastFailed else { return }
+        shadowKey = key
+        shadowTask?.cancel()
+        shadowTask = Task { [worker] in
+            let report = await worker.exploreShadow(visible, asOf: asOf, turn: turn, now: now)
+            guard !Task.isCancelled else { return }
+            ExploreDiagnostics.shared.record(shadow: report)
+        }
+    }
+
+    /// Works EXPLORE's answer out again, for when what it was built from has
+    /// changed without the crate moving — a show gaining its picture, say.
+    ///
+    /// Knowledge is kept for a quarter of an hour, so a correction that lands
+    /// in the store otherwise goes unseen: the page has its answer and nothing
+    /// asks for another. The persisted copy is left alone until the new one is
+    /// ready: it is what the next launch draws before anything is recomputed.
+    func invalidateExploreOffers() async {
+        await refreshExploreOffers(rebuildKnowledge: true)
     }
 
     /// Everything next to something, of any kind — the step DIG takes.
@@ -1304,6 +1895,7 @@ final class DigStore {
             // unanswered queries* rather than the number of listeners, which
             // is the only version of this that survives more people using it.
             let catalogue = await catalogueSearch(query, limit: limit)
+            await checkAnsweringSpelling(in: catalogue, query: query)
             if DigSearchResult.answers(catalogue, query: query) {
                 return DigSearchResults(yours: [], catalogue: catalogue, discogs: [])
             }
@@ -1332,6 +1924,112 @@ final class DigStore {
         // session, however quiet Discogs had since become.
         if !found.discogsRefused { searches.store(found, key: key, revision: 0) }
         return found
+    }
+
+    /// Search rows with what identity evidence says about each artist.
+    ///
+    /// A row the evidence verifies carries that identity, so it joins the other
+    /// rows for the same artist and no others. One that is a credited spelling
+    /// of somebody filed otherwise is shown under their name, opens their page
+    /// by id, and keeps the spelling it matched. A row nothing verifies is left
+    /// exactly as it was.
+    func resolvingIdentities(_ rows: [DigSearchResult]) -> [DigSearchResult] {
+        rows.map { row in
+            guard row.kind == .artist, row.identity == nil,
+                  case .digArtist(let mbid, let name, let discogsID) = row.destination else { return row }
+            let resolution = artistResolution(ArtistReference(name: name, mbid: mbid, discogsID: discogsID))
+            guard resolution.isVerified else { return row }
+            var resolved = row
+            resolved.identity = resolution.identity.rawValue
+            guard let id = resolution.identity.discogsID else { return resolved }
+            if resolution.isRedirect {
+                resolved = DigSearchResult(
+                    kind: row.kind, origin: row.origin, title: resolution.canonicalName,
+                    detail: row.detail, artworkURL: row.artworkURL,
+                    destination: .digArtist(mbid: mbid, name: resolution.canonicalName, discogsID: id)
+                )
+                resolved.identity = resolution.identity.rawValue
+                resolved.alsoCreditedAs = row.title
+            } else if discogsID == nil {
+                resolved = DigSearchResult(
+                    kind: row.kind, origin: row.origin, title: row.title,
+                    detail: row.detail, artworkURL: row.artworkURL,
+                    destination: .digArtist(mbid: mbid, name: name, discogsID: id)
+                )
+                resolved.identity = resolution.identity.rawValue
+            }
+            return resolved
+        }
+    }
+
+    func resolvingIdentities(_ results: DigSearchResults) -> DigSearchResults {
+        DigSearchResults(
+            yours: resolvingIdentities(results.yours),
+            catalogue: resolvingIdentities(results.catalogue),
+            discogs: resolvingIdentities(results.discogs),
+            discogsRefused: results.discogsRefused
+        )
+    }
+
+    /// Spellings a search has checked this session, found or not, so typing
+    /// the same name again costs nothing.
+    @ObservationIgnored private var searchedSpellings: Set<String> = []
+
+    /// Checks the one artist row that answers the query, when nothing has
+    /// established who it is: "Prefuse73" in the catalogue is a row filed under
+    /// the spelling, and only Discogs can say it is Prefuse 73.
+    ///
+    /// Bounded to that row, to once per spelling per session, and to a budget
+    /// with room: one search and at most three entries, through the backend's
+    /// cache. A check that does not complete is not recorded and changes
+    /// nothing; see `DiscogsClient.spellingCheck`.
+    func checkAnsweringSpelling(in rows: [DigSearchResult], query: String) async {
+        let key = RecordingKey.normalize(query)
+        guard discogsClient.isConfigured, !key.isEmpty,
+              let row = rows.first(where: { row in
+                  guard row.kind == .artist, row.identity == nil,
+                        case .digArtist(nil, _, nil) = row.destination else { return false }
+                  return DigSearchIndex.tier(of: RecordingKey.normalize(row.title), matching: key) == 0
+              }),
+              case .digArtist(_, let name, _) = row.destination
+        else { return }
+        guard !artistResolution(ArtistReference(name: name)).isVerified,
+              identityStore.needsCheck(name),
+              !searchedSpellings.contains(ArtistSpelling.key(name)),
+              await discogsClient.canSearch()
+        else { return }
+        searchedSpellings.insert(ArtistSpelling.key(name))
+        guard let check = await discogsClient.spellingCheck(name) else { return }
+        identityStore.record(check)
+        saveContext()
+        announceChange()
+    }
+
+    /// Off in the unit-test host, whose pages are opened by tests with the
+    /// real client: a test reading a profile must not search Discogs.
+    @ObservationIgnored var settlesGraphNames = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
+
+    /// Asks Discogs about names the graph could not place (`IdentityChecks`):
+    /// each was shown as the one verified entry beside it, but one owner in
+    /// what this device has seen is not proof that nobody else answers to the
+    /// name. A complete check that names the entry places the name there, and
+    /// its routes count toward that artist from the next walk on; one that
+    /// finds the name shared gives it its own row back.
+    ///
+    /// Two a walk, once per spelling per session, and only with room in the
+    /// budget: one search and at most three entries each, through the backend's
+    /// cache. A check that does not complete records nothing.
+    func settleGraphNames() async {
+        guard settlesGraphNames, discogsClient.isConfigured else { return }
+        for _ in 0..<2 {
+            guard await discogsClient.canSearch(), let name = IdentityChecks.shared.take(1).first else { return }
+            let key = ArtistSpelling.key(name)
+            guard identityStore.needsCheck(name), searchedSpellings.insert(key).inserted else { continue }
+            guard let check = await discogsClient.spellingCheck(name) else { continue }
+            identityStore.record(check)
+            saveContext()
+            announceChange()
+        }
     }
 
     private func catalogueSearch(_ query: String, limit: Int) async -> [DigSearchResult] {
@@ -1857,7 +2555,10 @@ final class DigStore {
     /// catalogued recording to work back from. Only then, and only for a
     /// couple of recordings, is a label looked up, because a label is what
     /// RELATED is built from and nothing else on the page needs one.
-    func enrichArtist(name: String, mbid: String?) async {
+    ///
+    /// `discogsID` is the entry the caller already knows the artist by: they
+    /// are described by that id, never by searching the name again.
+    func enrichArtist(name: String, mbid: String?, discogsID: Int? = nil) async {
         // A number for the whole of it, to hold the parts against.
         //
         // This target is built with `SWIFT_APPROACHABLE_CONCURRENCY`, so a
@@ -1867,7 +2568,7 @@ final class DigStore {
         // pieces that were named are measured. If this total is far larger
         // than the pieces inside it, the difference is where to look next.
         await Trace.stage("dig.enrich", name) {
-            await inForeground { await digArtist(name: name, mbid: mbid) }
+            await inForeground { await digArtist(name: name, mbid: mbid, discogsID: discogsID) }
         }
     }
 
@@ -1958,8 +2659,10 @@ final class DigStore {
     /// settles the context before it asks the worker anything, so saving here
     /// would be a second save on the main thread for the same rows.
     private func describeArtist(named name: String, head: DiscogsSearchResult) async throws -> DiscogsArtist? {
-        if let fresh = discogsEnricher.freshArtist(named: name) { return fresh }
         guard let id = head.id else { return nil }
+        // Only the entry asked for. A row filed under this name for another id
+        // is a namesake, and returning it would describe the wrong artist.
+        if let fresh = discogsEnricher.freshArtist(named: name), fresh.discogsID == id { return fresh }
         let client = discogsClient
 
         // The shelf, out of Indigo's cache where somebody has already paid for
@@ -1980,6 +2683,9 @@ final class DigStore {
 
         let described = try await detail
         discogsEnricher.artistDetail(named: name, head: head, detail: described)
+        // Who the entry says it is — its credited spellings and aliases —
+        // kept apart from the description, as evidence. See `ArtistIdentityStore`.
+        identityStore.record(DiscogsIdentityFacts(detail: described))
         announceChange()
 
         let releases: DiscogsArtistReleases
@@ -2001,7 +2707,7 @@ final class DigStore {
         ))
     }
 
-    private func digArtist(name: String, mbid: String?) async {
+    private func digArtist(name: String, mbid: String?, discogsID: Int? = nil) async {
         let key = "artist:\(mbid ?? name)"
         let discogsKey = "discogs:artist:\(RecordingKey.normalizeArtist(name))"
         // A notice belongs to the page that produced it. Cleared before the
@@ -2011,6 +2717,7 @@ final class DigStore {
         // Discogs is the foreground path: it returns the complete artist
         // bundle concurrently and is not held behind MusicBrainz's global
         // one-request-per-second gate.
+        if !discogsClient.isConfigured { answeredIdentity(name) }
         if discogsClient.isConfigured, !attempted.contains(discogsKey) {
             attempted.insert(discogsKey)
             isEnriching = true
@@ -2028,25 +2735,71 @@ final class DigStore {
                 // falls past all of them to MusicBrainz below, and that fall
                 // was the whole of an eight-second page with nothing in the
                 // trace to show for it.
-                let head = try await Trace.stage("dig.head", name) {
-                    try await discogsClient.artistHead(named: name)
+                let lookup: DiscogsArtistLookup
+                if let discogsID {
+                    lookup = DiscogsArtistLookup(head: DiscogsSearchResult(
+                        id: discogsID, title: name, coverImage: nil, thumbnail: nil,
+                        genre: nil, style: nil, label: nil, year: nil
+                    ), spelling: nil)
+                } else {
+                    let found = try await Trace.stage("dig.head", name) {
+                        try await discogsClient.artistLookup(named: name)
+                    }
+                    // Nobody on Discogs answers to the spelling: a sleeve's
+                    // own spelling of somebody, opened from a link that lost
+                    // the id. The credits held say whose it is, when they say
+                    // it of exactly one entry. See `ReleaseCreditStore.entry`.
+                    if found.head == nil, let credit = ReleaseCreditStore(context: context).entry(credited: name),
+                       let id = credit.discogsID {
+                        lookup = DiscogsArtistLookup(head: DiscogsSearchResult(
+                            id: id, title: name, coverImage: nil, thumbnail: nil,
+                            genre: nil, style: nil, label: nil, year: nil
+                        ), spelling: found.spelling)
+                    } else {
+                        lookup = found
+                    }
                 }
+                let head = lookup.head
+                answeredIdentity(name)
+                // A spelling Discogs credits to somebody filed under another
+                // name is that somebody. The evidence is kept, and their
+                // record is kept under the name they are filed as — the page
+                // then resolves onward to it rather than holding a second copy
+                // under the spelling. See `ArtistIdentityResolver`.
+                if let check = lookup.spelling {
+                    identityStore.record(check)
+                }
+                let filed = lookup.isCreditedSpelling
+                    ? head.map { DiscogsClient.withoutDisambiguator($0.title) } ?? name
+                    : name
                 if let head {
-                    discogsEnricher.artistIdentity(named: name, head: head)
+                    discogsEnricher.artistIdentity(named: filed, head: head)
+                }
+                if lookup.spelling != nil || head != nil {
                     saveContext()
                     announceChange()
                 }
 
                 let described = try await Trace.stage("dig.describe", name) { () -> DiscogsArtist? in
                     guard let head else { return nil }
-                    return try await describeArtist(named: name, head: head)
+                    return try await describeArtist(named: filed, head: head)
                 }
                 if let artist = described {
                     saveContext()
+                    // A record described before identity evidence was kept is
+                    // fresh for a day and is not read again — so read who it
+                    // is now, rather than wait for the day to pass.
+                    await ensureIdentityFacts(for: artist.discogsID)
+                    // Nothing on this record: find out which of its aliases has
+                    // something, so the page can open that one instead.
+                    if Self.completeness(of: artist).isEmpty, artist.discogsID > 0 {
+                        await discoverRicherAlias(of: artist.discogsID)
+                    }
                     // What the graph knew about this artist was worked out
                     // from the catalogue entry that has just been replaced.
                     forgetGraph(for: .artist(name))
-                    backfillLocalGenres(artistName: name, genres: artist.styles + artist.genres)
+                    if filed != name { forgetGraph(for: .artist(filed)) }
+                    backfillLocalGenres(artistName: filed, genres: artist.styles + artist.genres)
                     announceChange()
                     isEnriching = false
                     let previews = artist.releaseThumbnailURLStrings.compactMap(URL.init(string:))
@@ -2077,6 +2830,7 @@ final class DigStore {
                 return
             } catch {
                 attempted.remove(discogsKey)
+                answeredIdentity(name)
                 // Catalogue enrichment is an implementation detail. The page
                 // keeps its local/MusicBrainz data if the developer service is
                 // unavailable; listeners never manage provider credentials.

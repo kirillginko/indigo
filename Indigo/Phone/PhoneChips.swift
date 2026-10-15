@@ -24,6 +24,8 @@ struct Chip: View {
     var tone: ChipTone = .plain
     var size: CGFloat = 15
     var uppercase = false
+    /// A shade in place of the tone's own colour, keeping its ink.
+    var fill: Color? = nil
 
     static let green = Color(red: 0.36, green: 0.49, blue: 0.36)
     static let black = Color(red: 0.11, green: 0.13, blue: 0.12)
@@ -41,11 +43,67 @@ struct Chip: View {
 
     @ViewBuilder
     private var background: some View {
+        if let fill {
+            fill
+        } else {
+            toneBackground
+        }
+    }
+
+    @ViewBuilder
+    private var toneBackground: some View {
         switch tone {
         case .lead: Self.green
         case .plain: Self.black
         case .sheen: MineralSheenSurface()
         }
+    }
+}
+
+/// What comes on next, set out the same everywhere: the time and NEXT UP
+/// as one row of two boxes touching -- they are one statement -- then, as a
+/// row of its own with the ordinary gap, the next show's name. See
+/// PHONE-DESIGN.md.
+struct NextUpRows: View {
+    let next: RadioShow
+    var spacing: CGFloat = 8
+
+    var body: some View {
+        VStack(spacing: spacing) {
+            ChipFlow {
+                if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
+                    Chip(text: time, tone: .sheen, size: 12.5)
+                }
+                Chip(text: "Next up", size: 12.5, uppercase: true)
+            }
+            ChipFlow { Chip(text: next.title, size: 15) }
+        }
+    }
+}
+
+extension Chip {
+    /// Greens to step through down a tracklist, one a line, so each line's
+    /// artist reads as its own: all light enough for the dark ink.
+    static let greens: [Color] = [
+        Color(red: 0.36, green: 0.49, blue: 0.36),
+        Color(red: 0.42, green: 0.56, blue: 0.38),
+        Color(red: 0.33, green: 0.52, blue: 0.43),
+        Color(red: 0.47, green: 0.58, blue: 0.42),
+        Color(red: 0.39, green: 0.54, blue: 0.47)
+    ]
+
+    static func green(at index: Int) -> Color { greens[index % greens.count] }
+
+    /// A genre's own green: the same genre is the same shade everywhere it
+    /// appears, and genres side by side are told apart.
+    static func green(for text: String) -> Color {
+        let sum = text.lowercased().unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
+        return green(at: sum)
+    }
+
+    /// A genre, in its green.
+    static func genre(_ text: String, size: CGFloat = 11) -> Chip {
+        Chip(text: text, tone: .lead, size: size, uppercase: true, fill: green(for: text))
     }
 }
 

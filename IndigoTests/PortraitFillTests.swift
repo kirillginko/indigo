@@ -515,7 +515,7 @@ final class CataloguePortraitTests: XCTestCase {
         let dig = DigStore(context: context)
         dig.cataloguePortraits = { keys in
             asks.record(keys)
-            return keys.contains("carl craig") ? ["carl craig": URL(string: "https://img.test/carl.jpg")!] : [:]
+            return keys.contains("carl craig") ? ["carl craig": .init(state: "unresolved", url: "https://img.test/carl.jpg")] : [:]
         }
 
         dig.wantPortraits(for: ["Carl Craig", "Somebody Buried"])

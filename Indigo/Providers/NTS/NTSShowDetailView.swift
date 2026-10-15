@@ -48,34 +48,7 @@ struct NTSShowDetailView: View {
 
     private func phoneEpisode(_ episode: NTSEpisodeSummary) -> PhoneEpisode {
         let isCurrent = player.isCurrent("nts.episode.\(episode.id)")
-        return PhoneEpisode(
-            id: episode.id,
-            title: episode.name,
-            date: episode.broadcastAt,
-            genres: episode.genres,
-            imageURL: episode.artworkURL,
-            isCurrent: isCurrent,
-            isPlaying: isCurrent && player.isPlaying,
-            play: { play(episode, isCurrent: isCurrent) },
-            open: { appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias)) }
-        )
-    }
-
-    /// The list holds no audio: the episode is read first, as its own page
-    /// would, then played.
-    private func play(_ episode: NTSEpisodeSummary, isCurrent: Bool) {
-        if isCurrent {
-            player.toggle()
-            return
-        }
-        Task {
-            await browse.loadDetailIfNeeded(show: episode.showAlias, episode: episode.episodeAlias)
-            if let item = browse.detail(show: episode.showAlias, episode: episode.episodeAlias)?.mediaItem() {
-                player.playEpisode(item)
-            } else {
-                appState.open(.ntsEpisode(show: episode.showAlias, episode: episode.episodeAlias))
-            }
-        }
+        return PhoneEpisode.nts(episode, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 
     private func page(_ show: NTSShowSummary?, episodes: NTSBrowseStore.Feed<NTSEpisodeSummary>) -> some View {

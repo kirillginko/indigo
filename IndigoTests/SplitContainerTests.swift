@@ -26,14 +26,10 @@ final class SplitContainerTests: XCTestCase {
         try? FileManager.default.removeItem(at: directory)
     }
 
+    /// Read from the file itself, through the reader the app uses, rather
+    /// than by running `sqlite3` -- which an iOS simulator cannot start.
     private func rows(_ url: URL, _ table: String) -> Int {
-        let p = Process()
-        p.executableURL = URL(fileURLWithPath: "/usr/bin/sqlite3")
-        p.arguments = ["-readonly", url.path, "select count(*) from \(table)"]
-        let pipe = Pipe(); p.standardOutput = pipe; p.standardError = Pipe()
-        try? p.run(); p.waitUntilExit()
-        return Int(String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) ?? "") ?? -1
+        SQLiteFiles.integer("SELECT COUNT(*) FROM \(table)", in: url) ?? -1
     }
 
     private func insertOneOfEach(_ context: ModelContext) throws {
@@ -119,6 +115,6 @@ final class SplitContainerTests: XCTestCase {
         XCTAssertEqual(user, IndigoSchemaCurrent.userDataModelNames)
         XCTAssertEqual(local, Set(IndigoSchemaCurrent.localModels.map { String(describing: $0) }))
         XCTAssertTrue(user.isDisjoint(with: local))
-        XCTAssertEqual(local.count, 15)
+        XCTAssertEqual(local.count, 18)
     }
 }

@@ -433,7 +433,7 @@ private struct TracklistRow: View {
                 Button {
                     appState.open(.digArtist(mbid: nil, name: entry.artist))
                 } label: {
-                    Chip(text: entry.artist, tone: .lead, size: 12).lineLimit(1)
+                    Chip(text: entry.artist, tone: .lead, size: 12, fill: Chip.green(at: index - 1)).lineLimit(1)
                 }
                 .buttonStyle(.plain)
                 .disabled(!ArtistName.isRealArtist(entry.artist))

@@ -95,6 +95,7 @@ nonisolated struct DeepEngine {
 
     private final class GraphBox {
         var store: GraphStore?
+        var identity: IdentityGraph?
     }
 
     private var graph: GraphStore {
@@ -104,14 +105,25 @@ nonisolated struct DeepEngine {
         return fresh
     }
 
+    /// The graph under identity keys, over the same store — what a descent
+    /// walks. See `IdentityGraph`.
+    private var identity: IdentityGraph {
+        if let existing = sharedGraph.identity { return existing }
+        let fresh = IdentityGraph(context: context, graph: graph)
+        sharedGraph.identity = fresh
+        return fresh
+    }
+
     /// Shares one walked graph with whoever else answers for this page.
     ///
     /// Assembling a `GraphStore`'s caches reads several whole tables. Each
     /// engine built its own, so a page that asks for a profile and a descent
-    /// paid for the same tables twice.
-    init(context: ModelContext, graph: GraphStore? = nil) {
+    /// paid for the same tables twice. The identity graph over it is shared
+    /// the same way, so its placements are worked out once a generation.
+    init(context: ModelContext, graph: GraphStore? = nil, identity: IdentityGraph? = nil) {
         self.context = context
-        sharedGraph.store = graph
+        sharedGraph.store = graph ?? identity?.graph
+        sharedGraph.identity = identity
     }
 
     /// Everything reachable from a node, each filed at the shallowest level
@@ -128,9 +140,14 @@ nonisolated struct DeepEngine {
         from origin: MusicNode, distance: Int = 1, showing: Set<String> = []
     ) -> [DeepResult] {
         let caches = self.caches
-        return graph.neighbors(of: origin).byDestination.compactMap { candidate in
-            guard !showing.contains(candidate.node.id) else { return nil }
-            let signals = caches.signals(for: candidate.node, distance: distance)
+        // Under identity keys: one artist reached under two spellings is one
+        // row, a credit names the entry it meant, and namesakes stay apart.
+        // What the page shows and what the listener keeps are by name, so each
+        // destination is matched against them under every name behind it.
+        let walked = identity.neighbourhood(of: origin)
+        return walked.edges.byDestination.compactMap { candidate in
+            guard walked.knownIDs(of: candidate.node).isDisjoint(with: showing) else { return nil }
+            let signals = caches.signals(for: candidate.node, keys: walked.keys[candidate.node.id] ?? [], distance: distance)
             return DeepResult(
                 node: candidate.node,
                 reasons: candidate.edges.map(\.relationship),
@@ -336,19 +353,24 @@ nonisolated struct DeepCaches {
         )
     }
 
-    func signals(for node: MusicNode, distance: Int) -> ObscuritySignals {
+    /// `keys` are the names behind an artist node, when it is an identity
+    /// reached under several (`IdentityNeighbourhood.keys`); the listener's
+    /// library, crate and radio are counted under each of them, once.
+    func signals(for node: MusicNode, keys: Set<String> = [], distance: Int) -> ObscuritySignals {
         var signals = ObscuritySignals()
         signals.distance = distance
         signals.isUnidentified = node.isUnidentified
 
         switch node.kind {
         case .artist:
-            signals.libraryMatches = libraryCounts[node.key] ?? 0
-            signals.crateCount = crateCounts[node.key] ?? 0
-            signals.radioAppearances = radioCounts[node.key] ?? 0
-            let discogs = artistsByKey[node.key]
-            signals.knownReleases = discogs?.releaseTitles.count ?? 0
-            signals.labelCatalogueSize = (discogs?.labelNames ?? [])
+            let names = (keys.isEmpty ? [node.key] : keys.union(GraphIdentityKey(nodeKey: node.key) == nil ? [node.key] : []))
+                .sorted()
+            signals.libraryMatches = names.reduce(0) { $0 + (libraryCounts[$1] ?? 0) }
+            signals.crateCount = names.reduce(0) { $0 + (crateCounts[$1] ?? 0) }
+            signals.radioAppearances = names.reduce(0) { $0 + (radioCounts[$1] ?? 0) }
+            let records = names.compactMap { artistsByKey[$0] }
+            signals.knownReleases = records.map(\.releaseTitles.count).max() ?? 0
+            signals.labelCatalogueSize = records.flatMap(\.labelNames)
                 .compactMap { labelSizes[RecordingKey.normalize($0)] }
                 .max() ?? 0
             // An artist is not a pressing, so nothing here should be read as

@@ -23,6 +23,8 @@ struct PhoneDetailHero: View {
     /// Whether the picture is still being looked for: the square stays dark
     /// rather than drawing the stand-in.
     var awaitingImage = false
+    /// See `PageHeader.titlePending`.
+    var titlePending = false
 
     @State private var width: CGFloat = 393
 
@@ -47,13 +49,16 @@ struct PhoneDetailHero: View {
                 ChipFlow { Chip(text: kind, tone: .lead, size: 13, uppercase: true) }
                 VStack(spacing: 0) {
                     ChipFlow { Chip(text: title, size: 20) }
-                    if let subtitle, !subtitle.isEmpty, subtitle != title {
+                        .redacted(reason: titlePending ? .placeholder : [])
+                        .opacity(titlePending ? 0.35 : 1)
+                        .accessibilityLabel(titlePending ? "Loading" : title)
+                    if !titlePending, let subtitle, !subtitle.isEmpty, subtitle != title {
                         ChipFlow { Chip(text: subtitle, tone: .lead, size: 13) }
                     }
                 }
                 if !genres.isEmpty {
                     ChipFlow {
-                        ForEach(genres.prefix(4), id: \.self) { Chip(text: $0, size: 12, uppercase: true) }
+                        ForEach(genres.prefix(4), id: \.self) { Chip.genre($0, size: 12) }
                     }
                 }
             }
@@ -143,6 +148,10 @@ enum PhoneLayout {
     /// The phone pages' side margin. Section titles undo it to sit against
     /// the screen's left edge.
     static let margin: CGFloat = 16
+    /// The mini player's height and the gap under it. Full-screen slides
+    /// keep this room at the bottom whether or not it shows, so their play
+    /// button does not jump when something starts playing.
+    static let miniPlayerRoom: CGFloat = 62 + 8
 }
 
 /// A page's side margin: the Mac's gutter, or the phone's narrower one.
@@ -162,14 +171,22 @@ extension View {
 /// chevron on it, as the tab bar's Dig cell is -- the one thing on every page
 /// that is always the same.
 struct PhoneBackGlyph: View {
+    var body: some View { PhoneRoundGlyph(symbol: "chevron.left") }
+}
+
+/// A round button's face on the wordmark's sheen: back, info.
+struct PhoneRoundGlyph: View {
+    let symbol: String
+
     var body: some View {
-        Image(systemName: "chevron.left")
+        Image(systemName: symbol)
             .font(.system(size: 18, weight: .bold))
             .foregroundStyle(Chip.ink)
             .frame(width: 46, height: 46)
             .background { MineralSheenSurface() }
-            .clipped()
-            .overlay(Rectangle().strokeBorder(.white.opacity(0.2)))
-            .contentShape(Rectangle())
+            // Round, as the tab bar's search button is.
+            .clipShape(Circle())
+            .overlay(Circle().strokeBorder(.white.opacity(0.2)))
+            .contentShape(Circle())
     }
 }

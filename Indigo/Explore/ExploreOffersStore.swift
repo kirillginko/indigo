@@ -28,8 +28,10 @@ nonisolated final class ExploreOffersRecord {
     @Attribute(.unique) var id: String
     var payload: Data
     var builtAt: Date
-    /// What the crate looked like when this was worked out, so a stale answer
-    /// can be told from a current one without unpacking it.
+    /// No longer read. It held the crate's in-process revision, which starts
+    /// again at nought every launch and so said nothing about a record written
+    /// by another one; what an answer was worked out from is now kept in the
+    /// payload as its `ExploreStamp`. Left in place rather than migrated away.
     var crateRevision: Int
 
     init(payload: Data, builtAt: Date = Date(), crateRevision: Int) {
@@ -49,22 +51,34 @@ nonisolated struct ExploreOffersStore {
         self.context = context
     }
 
-    /// What was shown last time, if anything, and when.
-    func load() -> (offers: ExploreOffers, builtAt: Date, crateRevision: Int)? {
+    /// The payload: the answer and what it was worked out from -- the stamp
+    /// of the whole answer, and of its first half (everything but the
+    /// direction). An answer written before stamps were kept has neither, and
+    /// is redrawn and then worked out again.
+    private struct Kept: Codable {
+        let stamp: ExploreStamp
+        let core: ExploreStamp
+        let offers: ExploreOffers
+    }
+
+    /// What was shown last time, if anything, when, and from what.
+    func load() -> (offers: ExploreOffers, builtAt: Date, stamp: ExploreStamp?, core: ExploreStamp?)? {
         var descriptor = FetchDescriptor<ExploreOffersRecord>(
             predicate: #Predicate { $0.id == "explore.offers" }
         )
         descriptor.fetchLimit = 1
-        guard let record = (try? context.fetch(descriptor))?.first,
-              let offers = try? JSONDecoder().decode(ExploreOffers.self, from: record.payload)
-        else { return nil }
-        return (offers, record.builtAt, record.crateRevision)
+        guard let record = (try? context.fetch(descriptor))?.first else { return nil }
+        if let kept = try? JSONDecoder().decode(Kept.self, from: record.payload) {
+            return (kept.offers, record.builtAt, kept.stamp, kept.core)
+        }
+        guard let offers = try? JSONDecoder().decode(ExploreOffers.self, from: record.payload) else { return nil }
+        return (offers, record.builtAt, nil, nil)
     }
 
     /// Writes the answer down. Failure is silent and harmless: the next launch
     /// simply works it out again, which is what it did before this existed.
-    func save(_ offers: ExploreOffers, crateRevision: Int) {
-        guard let payload = try? JSONEncoder().encode(offers) else { return }
+    func save(_ offers: ExploreOffers, stamp: ExploreStamp, core: ExploreStamp) {
+        guard let payload = try? JSONEncoder().encode(Kept(stamp: stamp, core: core, offers: offers)) else { return }
         var descriptor = FetchDescriptor<ExploreOffersRecord>(
             predicate: #Predicate { $0.id == "explore.offers" }
         )
@@ -72,9 +86,8 @@ nonisolated struct ExploreOffersStore {
         if let existing = (try? context.fetch(descriptor))?.first {
             existing.payload = payload
             existing.builtAt = Date()
-            existing.crateRevision = crateRevision
         } else {
-            context.insert(ExploreOffersRecord(payload: payload, crateRevision: crateRevision))
+            context.insert(ExploreOffersRecord(payload: payload, crateRevision: 0))
         }
         try? context.save()
     }

@@ -14,6 +14,9 @@
 import Foundation
 import Observation
 import WebKit
+#if os(iOS)
+import UIKit
+#endif
 
 /// What the page reported, read apart.
 ///
@@ -92,6 +95,12 @@ final class EmbedAudioEngine: NSObject {
         // inline, whatever the page asks (`playsinline`): a YouTube upload
         // took over the screen, and closing it stopped the music.
         configuration.allowsInlineMediaPlayback = true
+        // Into every frame, YouTube's included: the page never says it has
+        // been hidden, so the player has no reason of its own to pause when
+        // the phone is locked. See `resumeYouTubeInBackground`.
+        configuration.userContentController.addUserScript(WKUserScript(
+            source: Self.stayVisibleScript, injectionTime: .atDocumentStart, forMainFrameOnly: false
+        ))
         #endif
         configuration.userContentController.add(self, name: Self.bridgeName)
         #if os(macOS)
@@ -105,7 +114,61 @@ final class EmbedAudioEngine: NSObject {
         webView.setValue(false, forKey: "drawsBackground")
         #endif
         loadBridge()
+        #if os(iOS)
+        observeBackgrounding()
+        #endif
     }
+
+    #if os(iOS)
+    /// A page that always reports itself visible.
+    private static let stayVisibleScript = """
+    try {
+      Object.defineProperty(document, 'hidden', { get: function () { return false; } });
+      Object.defineProperty(document, 'visibilityState', { get: function () { return 'visible'; } });
+      document.addEventListener('visibilitychange', function (e) { e.stopImmediatePropagation(); }, true);
+      window.addEventListener('pagehide', function (e) { e.stopImmediatePropagation(); }, true);
+    } catch (e) {}
+    """
+
+    /// Whether a YouTube upload was playing as the app left the screen.
+    @ObservationIgnored private var youTubeWasPlaying = false
+
+    /// iOS pauses a web view's video -- a YouTube upload is one, where
+    /// SoundCloud's and Mixcloud's are audio -- when the app leaves the
+    /// screen, so locking the phone stopped the music. One that was playing
+    /// is told to play again a moment after; the audio background mode and
+    /// the playback session let it carry on. Only within those first
+    /// seconds: a pause from the lock screen after that is the listener's.
+    private func observeBackgrounding() {
+        let center = NotificationCenter.default
+        center.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.youTubeWasPlaying = self.currentRequest?.provider == .youtube && self.state == .playing
+            }
+        }
+        center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.resumeYouTubeInBackground() }
+        }
+        center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.youTubeWasPlaying = false }
+        }
+    }
+
+    private func resumeYouTubeInBackground() {
+        guard youTubeWasPlaying else { return }
+        for delay in [0.3, 1.0, 2.5] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self, self.youTubeWasPlaying, self.currentRequest?.provider == .youtube,
+                      self.state != .playing else { return }
+                self.run("indigoPlay()")
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.youTubeWasPlaying = false
+        }
+    }
+    #endif
 
     deinit {
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: Self.bridgeName)

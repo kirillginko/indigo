@@ -1,0 +1,59 @@
+{
+ "appearances_with_media_url": 79824,
+ "artists_left_without_route_if_e1_neighbours_removed": 0,
+ "artwork": {
+  "by_entity": {
+   "artist": 0
+  },
+  "misses": 51182,
+  "rows": 91140
+ },
+ "artwork_by_entity": {
+  "artist": 91140
+ },
+ "external_ids_source_url": {
+  "deezer": {
+   "derivable": 0,
+   "mb": 1.8,
+   "rows": 55661
+  },
+  "discogs": {
+   "derivable": 62962,
+   "mb": 2.26,
+   "rows": 62962
+  },
+  "musicbrainz_discogs": {
+   "derivable": 0,
+   "mb": 0,
+   "rows": 4
+  },
+  "nts": {
+   "derivable": 0,
+   "mb": 0.03,
+   "rows": 97145
+  }
+ },
+ "identification_source": {
+  "deezer_track": 18246,
+  "normalized_artist": 101586,
+  "normalized_recording": 4428,
+  "null": 91681,
+  "radio_adopted": 40490
+ },
+ "jobs": {
+  "done 1-7d": 12276,
+  "done <1d": 6920,
+  "failed 1-7d": 58,
+  "failed <1d": 32,
+  "pending <1d": 1
+ },
+ "jobs_by_type_done_old": null,
+ "media_url_distinct_per_episode": 119.32,
+ "radio_neighbor_by_evidence": {
+  "1": 196044,
+  "2": 8233,
+  "3-5": 1921,
+  "6+": 46
+ },
+ "radio_neighbor_single_episode_single_adjacency": 196044
+}

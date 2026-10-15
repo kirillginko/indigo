@@ -242,10 +242,15 @@ struct PhoneNowPlayingView: View {
                             // The episode's name, and the crate beside it.
                             let _ = crate.revision
                             let crated = crate.isCrated(nowPlaying: item, liveShow: show)
-                            HStack(alignment: .center, spacing: 10) {
-                                Chip(text: NowPlayingLines.primary(item, show), size: 18)
-                                    .multilineTextAlignment(.center)
-                                    .fixedSize(horizontal: false, vertical: true)
+                            // The name centred under the picture; the crate
+                            // under the name rather than beside it, which
+                            // pushed the name off the picture's centre.
+                            VStack(spacing: 10) {
+                                ChipFlow {
+                                    Chip(text: NowPlayingLines.primary(item, show), size: 18)
+                                        .multilineTextAlignment(.center)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
                                 Button { crate.toggle(nowPlaying: item, liveShow: show) } label: {
                                     Image(systemName: crated ? "checkmark.square.fill" : "plus.square")
                                         .font(.system(size: 24, weight: .regular))
@@ -275,10 +280,7 @@ struct PhoneNowPlayingView: View {
             }
             VStack {
                 Button(action: close) {
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 18, weight: .semibold))
-                        .frame(width: 46, height: 46)
-                        .background(Chip.black, ignoresSafeAreaEdges: [])
+                    PhoneRoundGlyph(symbol: "chevron.down")
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close the player")
@@ -315,16 +317,14 @@ struct PhoneNowPlayingView: View {
             remoteURL: show?.artworkURL ?? item.remoteArtworkURL,
             side: 300,
             glyphScale: 0.3,
-            markURL: StationMark.logoURL(for: item.sourceID)
+            markURL: StationMark.logoURL(for: item.sourceID),
+            showsGround: false
         )
         .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
         .overlay(alignment: .topTrailing) {
             if isVideo {
                 Button(action: maximize) {
-                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                        .font(.system(size: 15, weight: .semibold))
-                        .frame(width: 40, height: 40)
-                        .background(Chip.black, ignoresSafeAreaEdges: [])
+                    PhoneRoundGlyph(symbol: "arrow.up.left.and.arrow.down.right")
                 }
                 .buttonStyle(.plain)
                 .padding(8)

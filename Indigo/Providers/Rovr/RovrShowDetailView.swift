@@ -80,7 +80,7 @@ struct RovrShowDetailView: View {
                     ArtworkView(
                         remoteURL: show.imageURL ?? show.thumbnailURL,
                         side: 300,
-                        markURL: RovrProvider.logoURL,
+                        markURL: StationMark.logoURL(for: RovrProvider.providerID),
                         mark: "ROVR"
                     )
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
@@ -237,22 +237,6 @@ extension RovrShowDetailView {
     }
 
     private func phoneEpisode(_ broadcast: RovrBroadcast, in broadcasts: [RovrBroadcast]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: broadcast.id,
-            title: broadcast.title,
-            subtitle: broadcast.curatorName,
-            date: broadcast.broadcastAt,
-            genres: broadcast.tags,
-            imageURL: broadcast.thumbnailURL ?? broadcast.imageURL,
-            isPlayable: broadcast.isPlayable,
-            isCurrent: RovrPlayback.isCurrent(broadcast, in: player),
-            isPlaying: RovrPlayback.isPlaying(broadcast, in: player),
-            play: { RovrPlayback.toggle(broadcast, within: broadcasts, using: player) },
-            open: {
-                browse.remember([broadcast])
-                appState.open(.rovrBroadcast(id: broadcast.documentID))
-            },
-            crate: AnyView(RovrCrateButton(broadcast: broadcast, compact: true))
-        )
+        PhoneEpisode.rovr(broadcast, in: broadcasts, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }

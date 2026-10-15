@@ -205,12 +205,7 @@ extension CashmereEpisodeDetailView {
             play: { if let episode { CashmerePlayback.toggle(episode, within: [episode], using: player) } },
             crate: episode.map { AnyView(CashmereCrateButton(episode: $0, compact: true)) },
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, date: other.airedAt, genres: other.genres,
-                             imageURL: other.artworkURL, isPlayable: other.isPlayable,
-                             isCurrent: CashmerePlayback.isCurrent(other, in: player),
-                             isPlaying: CashmerePlayback.isPlaying(other, in: player),
-                             play: { CashmerePlayback.toggle(other, within: siblings, using: player) },
-                             open: { browse.remember([other]); appState.open(.cashmereEpisode(slug: other.slug)) })
+                PhoneEpisode.cashmere(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.showName.map { "More from \($0)" } ?? "More from the archive",
             error: browse.isLoadingDetail(slug) ? nil : (browse.detailError(slug) ?? "Cashmere no longer publishes this episode.")

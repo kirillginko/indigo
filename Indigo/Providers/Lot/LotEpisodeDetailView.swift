@@ -351,17 +351,7 @@ extension LotEpisodeDetailView {
             } } ?? [],
             tracklistNote: detail == nil ? nil : "The Lot didn't log a tracklist for this broadcast.",
             more: siblings.map { other in
-                PhoneEpisode(id: other.id, title: other.title, subtitle: other.artists.map(\.name).joined(separator: ", "),
-                             date: other.airedAt ?? other.startedAt, genres: other.genreNames,
-                             imageURL: other.artworkURL ?? other.imageURL, isPlayable: other.isPlayable,
-                             isCurrent: LotPlayback.isCurrent(other, in: player),
-                             isPlaying: LotPlayback.isPlaying(other, in: player),
-                             play: { LotPlayback.toggle(other, within: siblings, using: player) },
-                             open: {
-                                 guard let ref = other.ref else { return }
-                                 browse.remember([other])
-                                 appState.open(.lotEpisode(show: ref.show, episode: ref.episode))
-                             })
+                PhoneEpisode.lot(other, in: siblings, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
             },
             moreTitle: episode?.show.map { "More from \($0.name)" } ?? "More from the archive",
             error: browse.isLoadingEpisode(ref) ? nil : (browse.episodeError(ref) ?? "The Lot is no longer publishing this broadcast.")

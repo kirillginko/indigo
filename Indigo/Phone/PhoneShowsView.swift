@@ -43,6 +43,11 @@ struct PhoneShowsView: View {
     @Environment(NoodsBrowseStore.self) private var noods
     @Environment(AlharaBrowseStore.self) private var alhara
     @State private var feeds = PhoneFeeds.shared
+    /// The stations opened out in the list, showing their sections.
+    @State private var expanded: Set<String> = []
+    /// Set, only that station's grid, with no header or scroll of its own:
+    /// a station's page ends with it.
+    var embeddedStation: String? = nil
 
     struct Station: Identifiable {
         /// The key the grid is chosen by.
@@ -74,11 +79,19 @@ struct PhoneShowsView: View {
     private let columns = [GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2)]
 
     var body: some View {
-        if let station = Self.stations.first(where: { $0.id == feeds.showsStation }) {
+        if let key = embeddedStation, let station = Self.stations.first(where: { $0.id == key }) {
+            gridContent(station)
+                .task(id: station.id) { await load(station.id) }
+        } else if let station = Self.stations.first(where: { $0.id == feeds.showsStation }) {
             grid(station)
         } else {
             list
         }
+    }
+
+    /// The Shows tab's key for a station's provider, if it has shows.
+    static func key(forProvider providerID: String) -> String? {
+        stations.first { $0.providerID == providerID }?.id
     }
 
     // MARK: The stations
@@ -89,15 +102,35 @@ struct PhoneShowsView: View {
                 PhonePageTitle("Shows")
                 ForEach(Self.stations) { station in
                     stationRow(station)
+                    if expanded.contains(station.id) {
+                        sectionRows(station)
+                    }
                 }
             }
         }
         .foregroundStyle(.white)
     }
 
+    /// What a station has besides its shows, as the Mac lists it.
+    private func sections(of station: Station) -> [PhoneStationSection] {
+        station.providerID.map { PhoneStationSection.of(providerID: $0) } ?? []
+    }
+
     /// The station's mark; its name and how many shows, in boxes, touching.
+    /// A station with sections opens out, an accordion, to show them; one
+    /// without goes straight to its shows.
     private func stationRow(_ station: Station) -> some View {
-        Button { feeds.showsStation = station.id } label: {
+        let opens = !sections(of: station).isEmpty
+        let isOpen = expanded.contains(station.id)
+        return Button {
+            if opens {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isOpen { expanded.remove(station.id) } else { expanded.insert(station.id) }
+                }
+            } else {
+                feeds.showsStation = station.id
+            }
+        } label: {
             HStack(spacing: 12) {
                 Group {
                     if let providerID = station.providerID {
@@ -120,6 +153,7 @@ struct PhoneShowsView: View {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
+                    .rotationEffect(.degrees(opens && isOpen ? 90 : 0))
                     .padding(.trailing, 16)
             }
             .background(PhoneShowPage.rowGround)
@@ -129,17 +163,77 @@ struct PhoneShowsView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(station.name) shows")
+        .accessibilityLabel(opens ? station.name : "\(station.name) shows")
+        .accessibilityHint(opens ? (isOpen ? "Hides its sections" : "Shows its sections") : "")
         .task { await load(station.id) }
+    }
+
+    /// Under an opened station: its shows, then each other section, one row
+    /// each.
+    private func sectionRows(_ station: Station) -> some View {
+        VStack(spacing: 0) {
+            sectionRow(Self.countNoun(station.id).capitalized, station: station) { feeds.showsStation = station.id }
+            ForEach(sections(of: station)) { section in
+                sectionRow(section.title, station: station) {
+                    // Back from the section comes here, to the list.
+                    feeds.lastStationRoute = .shows
+                    appState.select(section.route)
+                }
+            }
+        }
+        .transition(.opacity)
+    }
+
+    /// A section under its station: the station's logo, smaller, so each
+    /// row says whose it is; the section's name; a chevron.
+    private func sectionRow(_ title: String, station: Station, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            // The logo in the station logos' column, from the left edge; the
+            // name level with the station names.
+            HStack(spacing: 26) {
+                Group {
+                    if let providerID = station.providerID {
+                        ArtworkView(side: 36, glyphScale: 0.3, markURL: StationMark.logoURL(for: providerID))
+                    } else {
+                        MineralSheenSurface()
+                    }
+                }
+                .frame(width: 36, height: 36)
+                .clipped()
+                Chip(text: title, size: 13, uppercase: true)
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .padding(.leading, (64 - 36) / 2)
+            .padding(.trailing, 16)
+            .frame(height: 52)
+            .background(Color.black.opacity(0.4))
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(.white.opacity(0.08)).frame(height: 1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: A station's shows
 
     private func grid(_ station: Station) -> some View {
-        let shown = cards(of: station.id)
-        return ScrollView {
+        ScrollView {
             VStack(spacing: 0) {
                 gridHeader(station)
+                gridContent(station)
+            }
+        }
+        .foregroundStyle(.white)
+        .task(id: station.id) { await load(station.id) }
+    }
+
+    private func gridContent(_ station: Station) -> some View {
+        let shown = cards(of: station.id)
+        return VStack(spacing: 0) {
                 if shown.isEmpty {
                     VStack(alignment: .leading, spacing: 14) {
                         Text(isLoading(station.id) ? "Loading shows…" : "No shows came back.")
@@ -171,10 +265,8 @@ struct PhoneShowsView: View {
                             .task(id: shown.count) { await loadMore(station.id) }
                     }
                 }
-            }
         }
         .foregroundStyle(.white)
-        .task(id: station.id) { await load(station.id) }
     }
 
     /// Back to the stations, and the station's name.

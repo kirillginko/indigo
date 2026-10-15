@@ -1,0 +1,22 @@
+{
+ "baseline": {
+  "artists": 118607,
+  "dead_end": 8557,
+  "dead_end_no_identity": 1,
+  "dead_end_radio_only": 648,
+  "dead_end_with_discogs": 7908,
+  "dead_end_with_releases": 6628,
+  "labels_over_300_artists": 3,
+  "labels_real": 38949,
+  "labels_with_one_artist": 24749,
+  "only_label_routes": 11637,
+  "only_radio_routes": 82571,
+  "radio_only_rows": 90454,
+  "releases_total": 176922,
+  "releases_with_discogs_doc": 154164,
+  "with_discogs": 28152,
+  "with_label_peer": 27479,
+  "with_relationship": 98413,
+  "with_releases": 40507
+ }
+}

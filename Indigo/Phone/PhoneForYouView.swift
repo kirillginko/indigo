@@ -30,6 +30,7 @@ struct PhoneForYouView: View {
     @Environment(DublabBrowseStore.self) private var dublabBrowse
     @Environment(Radio80000BrowseStore.self) private var radio80000Browse
     @Environment(N10ASBrowseStore.self) private var n10asBrowse
+    @Environment(PlaybackCoordinator.self) private var player
     @Bindable private var feeds = PhoneFeeds.shared
 
     /// One screen of the feed.
@@ -61,12 +62,18 @@ struct PhoneForYouView: View {
                             Group {
                                 switch slide {
                                 case .cover:
-                                    PhoneForYouCover(entries: entries, playable: playable, insets: insets)
+                                    PhoneForYouGlobe(
+                                        items: globeItems(suggestions: suggestions, entries: entries, playable: playable),
+                                        insets: insets
+                                    ) {
+                                        guard slides.count > 1 else { return }
+                                        withAnimation(.easeInOut(duration: 0.4)) { feeds.forYouID = slides[1].id }
+                                    }
                                 case .suggestion(let suggestion):
                                     PhoneForYouSlide(
                                         suggestion: suggestion,
                                         portrait: suggestion.node.kind == .artist
-                                            ? dig.portraitURL(for: suggestion.node.title) : nil,
+                                            ? dig.portraitURL(for: suggestion.node.title, discogsID: suggestion.node.discogsID) : nil,
                                         insets: insets
                                     ) { Task { await open(suggestion.node) } }
                                 case .onNow(let entry):
@@ -86,7 +93,18 @@ struct PhoneForYouView: View {
             }
             .ignoresSafeArea()
         }
-        .task(id: crate.revision) { await dig.refreshExploreOffers(crateRevision: crate.revision) }
+        // Asked again when the crate moves, and when another device changed
+        // something the offers are worked out from; the store decides
+        // whether that is a rebuild. See `DigStore.refreshExploreOffers`.
+        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) { await dig.refreshExploreOffers() }
+        // The suggested artists' portraits, asked for ahead of the rest -- and
+        // a small one already held replaced with the full-size picture.
+        .task(id: dig.exploreOffers.artists.count + dig.exploreOffers.next.count) {
+            let names = Self.slides(from: dig.exploreOffers)
+                .filter { $0.node.kind == .artist }
+                .map(\.node.title)
+            if !names.isEmpty { dig.wantPortraits(for: Array(names.prefix(24))) }
+        }
     }
 
     /// One show from each station, in an order of its own -- not Live's -- so
@@ -119,6 +137,55 @@ struct PhoneForYouView: View {
         return slides + shows.dropFirst(showIndex)
     }
 
+    /// What the globe carries: the suggestions, as the Mac's For You has
+    /// them; before anything has been kept, every station and the archives.
+    private func globeItems(
+        suggestions: [ExploreSuggestion],
+        entries: [StationEntry],
+        playable: @escaping (StationEntry) -> MediaItem?
+    ) -> [GlobeItem] {
+        // Always one box into the archives, wherever the rest come from.
+        let archives = GlobeItem(id: "archives", label: "", title: "Digital Archives") {
+            PhoneFeeds.shared.showsStation = "Archives"
+            appState.select(.shows)
+        }
+        if !suggestions.isEmpty {
+            // All of them, as the Mac's For You shows: up to twenty-four.
+            return [archives] + suggestions.map { suggestion in
+                GlobeItem(id: suggestion.id, label: Self.kind(of: suggestion.node), title: suggestion.node.title) {
+                    Task { await open(suggestion.node) }
+                }
+            }
+        }
+        return stationItems(entries, playable: playable) + [archives]
+    }
+
+    /// Every station, its city over its short name; tapped, it plays.
+    private func stationItems(_ entries: [StationEntry], playable: @escaping (StationEntry) -> MediaItem?) -> [GlobeItem] {
+        entries.map { entry in
+            let item = playable(entry)
+            let city = entry.location.split(separator: ",").first.map(String.init) ?? entry.location
+            return GlobeItem(
+                id: entry.id, label: city, title: entry.shortLabel,
+                isOn: item.map { player.isCurrent($0.id) && player.isPlaying } ?? false
+            ) {
+                guard let item else { return }
+                if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item) }
+            }
+        }
+    }
+
+    static func kind(of node: MusicNode) -> String {
+        switch node.kind {
+        case .artist: "Artist"
+        case .label: "Label"
+        case .release: "Release"
+        case .recording: "Track"
+        case .broadcast: "Show"
+        default: "Suggestion"
+        }
+    }
+
     private func open(_ node: MusicNode) async {
         let stations = KeptShow.Stations(nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
                                          radio80000: radio80000Browse, n10as: n10asBrowse)
@@ -135,15 +202,32 @@ private struct PhoneForYouSlide: View {
     let portrait: URL?
     let insets: EdgeInsets
     let open: () -> Void
+    @Environment(PlaybackCoordinator.self) private var player
 
     private var isShow: Bool { suggestion.node.kind == .broadcast }
-    private var picture: URL? { suggestion.node.artworkURL ?? portrait }
+    /// An artist's portrait first: it is asked for at full size (and a small
+    /// one replaced while on screen); the node's own picture was saved as
+    /// Discogs' 150-pixel thumb, for rows.
+    private var picture: URL? {
+        suggestion.node.kind == .artist ? (portrait ?? suggestion.node.artworkURL) : suggestion.node.artworkURL
+    }
+
+    /// Discogs' thumb, which cannot be asked for larger: drawn as a square
+    /// over the moving field at a size it holds, not blown up full-screen.
+    private var isSmall: Bool { DiscogsClient.isSmallCut(picture?.absoluteString) }
 
     var body: some View {
         ZStack {
             GeometryReader { proxy in
                 Group {
-                    if let picture {
+                    if let picture, isSmall {
+                        ZStack {
+                            PlayerShaderBackdrop()
+                            ArtworkView(remoteURL: picture, side: min(proxy.size.width * 0.62, 260), glyphScale: 0.3)
+                                .shadow(color: .black.opacity(0.4), radius: 20, y: 10)
+                                .offset(y: -proxy.size.height * 0.16)
+                        }
+                    } else if let picture {
                         ArtworkView(remoteURL: picture, side: max(proxy.size.width, proxy.size.height), glyphScale: 0.3)
                     } else {
                         PlayerShaderBackdrop()
@@ -170,12 +254,13 @@ private struct PhoneForYouSlide: View {
                     // What it is and its name, why it is here, and what it
                     // was reached through, in IDA's boxes; the button last, at
                     // the bottom, as on every slide.
+                    // One row each: what it is, its name, what more it says.
                     Button(action: open) {
-                        ChipFlow {
-                            Chip(text: isShow ? "Radio show" : kindLabel, tone: .lead, uppercase: true)
-                            Chip(text: suggestion.node.title, size: 19)
+                        VStack(spacing: 8) {
+                            ChipFlow { Chip(text: isShow ? "Radio show" : kindLabel, tone: .lead, uppercase: true) }
+                            ChipFlow { Chip(text: suggestion.node.title, size: 19) }
                             if let subtitle = suggestion.node.subtitle, !subtitle.isEmpty {
-                                Chip(text: subtitle, size: 13)
+                                ChipFlow { Chip(text: subtitle, size: 13) }
                             }
                         }
                     }
@@ -205,7 +290,7 @@ private struct PhoneForYouSlide: View {
                     .padding(.top, 6)
                 }
                 .padding(.horizontal, 22)
-                .padding(.bottom, insets.bottom + 22)
+                .padding(.bottom, insets.bottom + 22 + (player.current == nil ? PhoneLayout.miniPlayerRoom : 0))
             }
         }
         .foregroundStyle(.white)
@@ -219,129 +304,6 @@ private struct PhoneForYouSlide: View {
         case .recording: "Recording"
         default: "Suggestion"
         }
-    }
-}
-
-/// The first screen of For You: its moving field, full frame, and over it a
-/// grid of small square cards to start listening from -- every station,
-/// played with a tap, and the archives, opened with one. It does not scroll:
-/// the feed's swipe is the only one here. The suggestions are swiped up from
-/// it.
-private struct PhoneForYouCover: View {
-    let entries: [StationEntry]
-    let playable: (StationEntry) -> MediaItem?
-    let insets: EdgeInsets
-
-    @Environment(AppState.self) private var appState
-    @Environment(PlaybackCoordinator.self) private var player
-    @Environment(YouTubeChannelStore.self) private var archives
-
-    private static let columns = 5
-    private static let gap: CGFloat = 6
-    /// Archive channels shown before the card that opens them all: with it,
-    /// three rows of five, as many as the stations.
-    private static let archivesShown = 14
-
-    var body: some View {
-        GeometryReader { proxy in
-            let side = ((proxy.size.width - 36) - Self.gap * CGFloat(Self.columns - 1)) / CGFloat(Self.columns)
-            ZStack {
-                ExploreShaderField(seed: 0, size: proxy.size)
-                VStack(spacing: 18) {
-                    Spacer(minLength: 0)
-                    section("Radio") {
-                        ForEach(entries) { entry in stationCard(entry, side: side) }
-                    }
-                    section("Archives") {
-                        ForEach(archives.channels.prefix(Self.archivesShown)) { channel in
-                            archiveCard(channel, side: side)
-                        }
-                        allArchivesCard(side: side)
-                    }
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.up")
-                        .font(.system(size: 18, weight: .semibold))
-                        .padding(.bottom, insets.bottom + 22)
-                        .accessibilityHidden(true)
-                }
-                .padding(.top, insets.top)
-                .padding(.horizontal, 18)
-                .foregroundStyle(.white)
-            }
-        }
-        .task { await archives.loadChannelsIfNeeded() }
-    }
-
-    private func section<Cards: View>(_ title: String, @ViewBuilder cards: () -> Cards) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Chip(text: title, tone: .lead, size: 12, uppercase: true)
-            LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible(), spacing: Self.gap), count: Self.columns),
-                alignment: .leading,
-                spacing: Self.gap
-            ) { cards() }
-        }
-    }
-
-    private func stationCard(_ entry: StationEntry, side: CGFloat) -> some View {
-        let item = playable(entry)
-        let playing = item.map { player.isCurrent($0.id) && player.isPlaying } ?? false
-        return Button {
-            guard let item else { return }
-            if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item) }
-        } label: {
-            LiveShowReader(providerID: entry.station.providerID, stationID: entry.station.id) { show in
-                card(picture: show?.artworkURL, mark: StationMark.logoURL(for: entry.station.providerID),
-                     title: entry.shortLabel, side: side, playing: playing)
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(playing ? "Pause \(entry.station.name)" : "Play \(entry.station.name)")
-    }
-
-    private func archiveCard(_ channel: Catalog.RadioShow, side: CGFloat) -> some View {
-        Button { appState.open(.youtubeChannel(id: channel.id)) } label: {
-            card(picture: channel.imageURL.flatMap(URL.init(string:)), mark: nil,
-                 title: channel.title ?? "Archive", side: side, playing: false)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Open \(channel.title ?? "archive")")
-    }
-
-    private func allArchivesCard(side: CGFloat) -> some View {
-        // Every archive: the Shows tab, narrowed to them.
-        Button {
-            PhoneFeeds.shared.showsStation = "Archives"
-            appState.select(.shows)
-        } label: {
-            ZStack {
-                MineralSheenSurface()
-                Text("ALL")
-                    .font(Typeface.mono(13, weight: .medium))
-                    .tracking(1.5)
-                    .foregroundStyle(Chip.ink)
-            }
-            .frame(width: side, height: side)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("All archives")
-    }
-
-    /// A square, square-cornered; its name in a box along the bottom.
-    private func card(picture: URL?, mark: URL?, title: String, side: CGFloat, playing: Bool) -> some View {
-        ZStack(alignment: .bottomLeading) {
-            ArtworkView(remoteURL: picture, side: side, glyphScale: 0.3, markURL: mark)
-            Text(title)
-                .font(Typeface.mono(9.5, weight: .medium))
-                .lineLimit(1)
-                .padding(.horizontal, 4)
-                .padding(.vertical, 3)
-                .foregroundStyle(playing ? Chip.ink : .white)
-                .background(playing ? Chip.green : Chip.black)
-        }
-        .frame(width: side, height: side)
-        .clipped()
-        .overlay(Rectangle().strokeBorder(playing ? Chip.green : .clear, lineWidth: 2))
     }
 }
 

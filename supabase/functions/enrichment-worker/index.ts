@@ -20,15 +20,28 @@ import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
 import {
   cacheDiscogsRelease,
   cacheDiscogsShelf,
-  fetchArtistPortrait,
+  chooseArtistPortrait,
 } from "../_shared/discogs.ts";
 import { fetchTrackRelease } from "../_shared/deezer.ts";
 import { normalizeName } from "../_shared/normalize.ts";
 import {
+  buildArtistBundle, buildCatalogueBundle, discoverDiscography, publishCataloguePilot, readArtistJob, settleBatches,
+} from "../_shared/knowledge.ts";
+import { CATALOGUE_PILOT } from "../_shared/catalogue_pilot.ts";
+import { CATALOGUE_BATCH1 } from "../_shared/catalogue_batch1.ts";
+
+/// Every artist a catalogue bundle may be built for: the pilot and batch 1,
+/// each approved and validated before it was added. Never from a payload.
+const CATALOGUE_APPROVED: ReadonlyMap<number, string> = new Map([...CATALOGUE_PILOT, ...CATALOGUE_BATCH1]);
+import { liveKnowledgeDeps } from "../_shared/knowledge_live.ts";
+import { linkDiscogsIdentity, liveIdentityDeps } from "../_shared/identity.ts";
+import {
   moveInlinePayloadsToR2,
   moveReleasePayloadsToR2,
   offloadReleasePayloads,
+  reserveR2,
 } from "../_shared/release_cache.ts";
+import { putObject, r2Config } from "../_shared/r2.ts";
 
 interface Job {
   id: string;
@@ -90,7 +103,7 @@ Deno.serve(async (req: Request) => {
   // a gateway log line, and the plan's log allowance is 1 GB a month. Flushed
   // early when a batch runs long, so a worker killed mid-batch loses at most
   // FLUSH_AFTER_MS of finished work to the 15-minute reclaim (0030).
-  const pending: PendingWrites = { records: [], completions: [] };
+  const pending: PendingWrites = { records: [], completions: [], notifies: [] };
   let lastFlush = Date.now();
 
   // One at a time. These are all upstream fetches against one station, and a
@@ -122,6 +135,7 @@ Deno.serve(async (req: Request) => {
   }
   results.push(...await flush(supabase, pending));
   await release(supabase, unstarted);
+  await settle(supabase, pending);
 
   return json({ claimed: jobs.length, released: unstarted.length, results });
 });
@@ -173,6 +187,22 @@ interface Completion {
 interface PendingWrites {
   records: TrackReleaseRow[];
   completions: Completion[];
+  /// Batches of release documents a discovery queued, cached in this run.
+  notifies: Record<string, unknown>[];
+}
+
+/// Queues the builds whose document batches this run finished. Logged, not
+/// thrown: the releases are cached either way, and the next discovery or
+/// build picks them up.
+async function settle(supabase: SupabaseClient, pending: PendingWrites): Promise<void> {
+  if (pending.notifies.length === 0) return;
+  try {
+    const queued = await settleBatches(liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), pending.notifies);
+    if (queued.length) console.log("knowledge_builds_queued", queued.join(","));
+  } catch (cause) {
+    console.error("knowledge_settle_failed", String(cause).slice(0, 300));
+  }
+  pending.notifies = [];
 }
 
 /// Writes what the batch has found, then marks its jobs done or failed, in
@@ -351,17 +381,57 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       const name = String(job.payload?.name ?? "");
       if (!artistId || !name) throw new Error("missing artist");
 
-      const found = await fetchArtistPortrait(
-        name, Deno.env.get("DISCOGS_TOKEN"), USER_AGENT);
+      // The row's Discogs identity, best first: its own id, then any
+      // MusicBrainz recorded for it. With one, the portrait is that artist's;
+      // without, only a name exactly one Discogs artist carries will do.
+      const { data: ids, error: idError } = await supabase
+        .from("external_ids")
+        .select("provider, external_id")
+        .eq("entity_type", "artist").eq("entity_id", artistId)
+        .in("provider", ["discogs", "musicbrainz_discogs"]);
+      if (idError) throw new Error(idError.message);
+      const discogsIDs = (ids ?? [])
+        .sort((a, b) => (a.provider === "discogs" ? 0 : 1) - (b.provider === "discogs" ? 0 : 1)
+          || Number(a.external_id) - Number(b.external_id))
+        .map((row) => Number(row.external_id));
 
-      // Recorded either way. An artist Discogs has no picture of is a finding,
-      // and writing it down is what stops the queue asking again next week —
-      // the same bargain `fetch_artist_origin` makes above.
+      const choice = await chooseArtistPortrait(
+        name, discogsIDs, Deno.env.get("DISCOGS_TOKEN"), USER_AGENT);
+      console.log("artist_portrait", artistId, choice.kind,
+        choice.kind === "found" ? `${choice.via} ${choice.discogsID}` : choice.kind === "ambiguous" ? choice.candidates.join(",") : "");
+
+      // A dry run (DIG-REMEDIATION-PLAN.md §9) says what the rule would do
+      // and records nothing: the choice is written to a small diagnostic
+      // object in R2, beside what the row shows today.
+      if (job.payload?.dry_run === true) {
+        const r2 = r2Config();
+        if (!r2) throw new Error("dry run: R2 is not configured");
+        const body = JSON.stringify({ artist_id: artistId, name, discogs_ids: discogsIDs, choice, at: new Date().toISOString() });
+        await reserveR2(supabase, 1, body.length);
+        await putObject(r2, `diagnostics/portrait-dry-run/${artistId}.json`, body, "application/json", "no-store");
+        return;
+      }
+
+      // Recorded either way, with how it was chosen (0081): `verified` (the
+      // row's own Discogs artist), `unresolved` (no identity; the only Discogs
+      // artist with the name -- shown, never promoted to an identity),
+      // `withheld` (namesakes and no identity -- no face rather than a
+      // stranger's). An artist Discogs has no picture of is a miss with no
+      // state -- unless the row knows its entry, and that entry has no
+      // picture: then it is `verified` with no address (0082), which a name
+      // answers as no face, so devices drop one the old rule cached. Writing
+      // each down is what stops the queue asking again next week, the same
+      // bargain `fetch_artist_origin` makes above.
+      const found = choice.kind === "found" ? choice : null;
+      const identity = discogsIDs.find((id) => Number.isInteger(id) && id > 0) ?? null;
       const { error } = await supabase.rpc("record_artist_portrait", {
         p_artist_id: artistId,
         p_url: found?.url ?? null,
         p_width: found?.width ?? null,
         p_height: found?.height ?? null,
+        p_state: found ? (found.via === "identity" ? "verified" : "unresolved")
+          : choice.kind === "ambiguous" ? "withheld" : identity !== null ? "verified" : null,
+        p_discogs_id: found?.discogsID ?? (choice.kind === "none" ? identity : null),
       });
       if (error) throw new Error(error.message);
       return;
@@ -402,6 +472,57 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
       // throttle or an outage throws instead, and the queue's backoff brings
       // it round again.
       await cacheDiscogsRelease(supabase, releaseID, Deno.env.get("DISCOGS_TOKEN"));
+      // Queued by a discography discovery: remembered, and settled once this
+      // run's finished jobs are written back (see settleBatches).
+      if (job.payload?.notify) pending.notifies.push(job.payload.notify as Record<string, unknown>);
+      return;
+    }
+
+    case "discover_discography": {
+      // An artist's whole discography, a few pages a job (knowledge.ts).
+      // Pilot artists only, for now.
+      const result = await discoverDiscography(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload),
+      );
+      console.log("knowledge_discovery", job.dedupe_key, JSON.stringify(result).slice(0, 600));
+      return;
+    }
+
+    case "link_discogs_identity": {
+      // One catalogue row's Discogs pages, as MusicBrainz records them
+      // (identity.ts). Pilot rows only.
+      const artistID = String(job.payload?.artist_id ?? "");
+      const mbid = String(job.payload?.mbid ?? "");
+      const result = await linkDiscogsIdentity(liveIdentityDeps(supabase), { artistID, mbid });
+      console.log("identity_link", artistID, JSON.stringify(result));
+      return;
+    }
+
+    case "build_artist_bundle": {
+      const result = await buildArtistBundle(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload),
+      );
+      console.log("knowledge_build", job.dedupe_key, JSON.stringify(result).slice(0, 600));
+      return;
+    }
+
+    // The DIG catalogue pilot: bundles from the catalogue's own documents for
+    // the 300 approved artists only (catalogue_pilot.ts), then the one
+    // manifest a device reads. Nothing here touches For You's references or
+    // any published generation.
+    case "build_catalogue_bundle": {
+      const result = await buildCatalogueBundle(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), readArtistJob(job.payload), CATALOGUE_APPROVED,
+      );
+      console.log("catalogue_build", job.dedupe_key, JSON.stringify(result).slice(0, 400));
+      return;
+    }
+
+    case "publish_catalogue_pilot": {
+      const result = await publishCataloguePilot(
+        liveKnowledgeDeps(supabase, Deno.env.get("DISCOGS_TOKEN")), CATALOGUE_APPROVED,
+      );
+      console.log("catalogue_pilot", JSON.stringify(result).slice(0, 600));
       return;
     }
 

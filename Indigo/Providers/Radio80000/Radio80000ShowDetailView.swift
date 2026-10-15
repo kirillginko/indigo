@@ -77,7 +77,7 @@ struct Radio80000ShowDetailView: View {
                     ArtworkView(
                         remoteURL: show.imageURL,
                         side: 300,
-                        markURL: Radio80000Provider.logoURL,
+                        markURL: StationMark.logoURL(for: Radio80000Provider.providerID),
                         mark: "Radio 80000"
                     )
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
@@ -231,21 +231,6 @@ extension Radio80000ShowDetailView {
     }
 
     private func phoneEpisode(_ episode: Radio80000Episode, in episodes: [Radio80000Episode]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: episode.id,
-            title: episode.title,
-            date: episode.broadcastAt,
-            genres: episode.genres,
-            imageURL: episode.artworkURL,
-            isPlayable: episode.isPlayable,
-            isCurrent: Radio80000Playback.isCurrent(episode, in: player),
-            isPlaying: Radio80000Playback.isPlaying(episode, in: player),
-            play: { Radio80000Playback.toggle(episode, within: episodes, using: player) },
-            open: {
-                browse.remember([episode])
-                appState.open(.radio80000Episode(id: episode.id))
-            },
-            crate: AnyView(Radio80000CrateButton(episode: episode, compact: true))
-        )
+        PhoneEpisode.radio80000(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }

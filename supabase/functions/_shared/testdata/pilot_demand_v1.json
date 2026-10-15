@@ -1,0 +1,853 @@
+{
+  "artists" : [
+    {
+      "key" : "acen",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "afx",
+      "why" : "named by the rows (development)"
+    },
+    {
+      "key" : "akira ishikawa",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "aksak maboul",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "al green",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "aleksi perala",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ametsub",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "anf",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "angelo harmsworth",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "anika",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ann peebles",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "annika henderson",
+      "why" : "case: alias pair with Anika"
+    },
+    {
+      "key" : "anthony naples",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "aphex twin",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "archie shepp",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ariel pink s haunted graffiti",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ariel zetina",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "attilio novellino",
+      "why" : "case: reached by radio name and by credit"
+    },
+    {
+      "key" : "babaka",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "beaumont hannant",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "bell",
+      "why" : "named by the rows (development)"
+    },
+    {
+      "key" : "bibio",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "bjork",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "bluetung",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "boards of canada",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "bok bok",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "boredoms",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "byron the aquarius",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "cardinal",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "carl craig",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "cedar walton",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "celia hollander",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ciro vitiello",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "claire rousay",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "coh",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "cokiyu",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "comus",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "dagmar zuniga",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "dakhla brass",
+      "why" : "named by the rows (development)"
+    },
+    {
+      "key" : "daniel janin",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "dean blunt",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "dj fucci",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "dj plead",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "duenn",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "eiko ishibashi",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "eric kloss",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "figurine",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "flora purim",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "flying lotus",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "franco micalizzi",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "funkadelic",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "garbage",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "gennadiy alexandrov",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "golden living room",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "harvey scales",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "herbie hancock ron carter",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "hi fi set",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "hiroshi miyagawa",
+      "why" : "named by the rows (development)"
+    },
+    {
+      "key" : "hiroshi sato",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "honey cone",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "huerco s",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "human touch",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "huud",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "hype williams",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ibex walia",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "j t q theme",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "jack jackson",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "james ferraro",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "jang hyun",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "janko nilovic",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "jazz funk",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "jazz hip trio",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "joanne robertson",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "joe henderson",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "joe kaptein",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "john coltrane",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "john francis flynn",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "jorja smith",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "jose gonzalez",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "justine bradley",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "karen ramirez",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "kate nv",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "lamb",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "legowelt",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "lenny ibizarre",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "lida husik",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "linda clifford",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "little pleasure",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "logic1000",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "maps",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "mazzy star",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "mica levi",
+      "why" : "case: alias pair with Micachu"
+    },
+    {
+      "key" : "micachu",
+      "why" : "case: alias pair with Mica Levi"
+    },
+    {
+      "key" : "michel legrand",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "milt jackson",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "miroslav vitous",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "mister water wet",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "moss harvest",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "mr mister",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "mu tate",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "nahash",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "nathan davis",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "nav katze",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "neu",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "neville king all stars",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "nico niquo",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "nicola conte",
+      "why" : "named by the rows (development)"
+    },
+    {
+      "key" : "noah lennox",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ophion",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "orbital",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "orf big band",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "panda bear",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "panthera krause",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "papo2oo4",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "pat martino",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "perera elsewhere",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "pharoah sanders",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "phil moody",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "piero cotto",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "piero piccioni",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "pittsburg community choir",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "prefuse 73",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "prefuse73",
+      "why" : "case: spelling of Prefuse 73 (verified variation)"
+    },
+    {
+      "key" : "pugilist",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "purelink",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "quinoline yellow",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "rachel brown",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "reborn",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "reflexxe",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "ron morelli",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "saori mine 峰さを理",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "sbtrkt",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "seefeel",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "siegfried schwab",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "sola rosa",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "space afrika",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "speedy j",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "stephen steinbrink",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "stevens",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "stop and go",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the beatles",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the circling sun",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the paupers",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the pharaohs",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the roger webb sound",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the sytlistics",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "the white blinds",
+      "why" : "named by the rows (development)"
+    },
+    {
+      "key" : "theodore cale schafer",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "third space",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "tim koh",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "tirzah",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "tsuyoshi yamamoto trio",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "urszula sipinska",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "vito tommaso",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "vladislav delay",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "water from your eyes",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "wunsch strauch sextet",
+      "why" : "named by the rows (production)"
+    },
+    {
+      "key" : "yu grupa",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "zzz nobody files this name",
+      "why" : "case: unknown to the backend"
+    },
+    {
+      "key" : "ニューtvサウンド オーケストラ",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "宮川 泰 hiroshi miyagawa",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "田中亜矢",
+      "why" : "named by the rows (development), production"
+    },
+    {
+      "key" : "青葉市子 ichiko aoba",
+      "why" : "named by the rows (development), production"
+    }
+  ],
+  "format" : "indigo.pilot-demand/1",
+  "nodes" : [
+    {
+      "handle" : "",
+      "id" : "artist:anika",
+      "key" : "anika",
+      "kind" : "artist",
+      "mbid" : "15c0e62b-3e46-4666-845d-d6c86bd44774",
+      "provider" : "",
+      "why" : "starting point (development), production; case: alias pair with Annika Henderson"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:annika henderson",
+      "key" : "annika henderson",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: alias pair with Anika"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:attilio novellino",
+      "key" : "attilio novellino",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: reached by radio name and by credit"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:ciro vitiello",
+      "key" : "ciro vitiello",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "starting point (development), production"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:dean blunt",
+      "key" : "dean blunt",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "starting point (development), production; case: known artist; credited as Blunt"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:duenn",
+      "key" : "duenn",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: lookalike of Duenn Nyantora; filed-record trap"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:eric kloss",
+      "key" : "eric kloss",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "starting point (development)"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:hype williams",
+      "key" : "hype williams",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "starting point (development), production; case: namesakes: the duo (1874027) and the director (82)"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:joanne robertson",
+      "key" : "joanne robertson",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: known artist reached by credit"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:kate nv",
+      "key" : "kate nv",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "starting point (development), production"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:mica levi",
+      "key" : "mica levi",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: alias pair with Micachu"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:micachu",
+      "key" : "micachu",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: alias pair with Mica Levi"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:prefuse 73",
+      "key" : "prefuse 73",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "starting point (production); case: entry name (Discogs 3722)"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:prefuse73",
+      "key" : "prefuse73",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: spelling of Prefuse 73 (verified variation)"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:speedy j",
+      "key" : "speedy j",
+      "kind" : "artist",
+      "mbid" : "734fa82c-864e-468b-bee4-944cb4b1952b",
+      "provider" : "",
+      "why" : "starting point (production)"
+    },
+    {
+      "handle" : "",
+      "id" : "artist:zzz nobody files this name",
+      "key" : "zzz nobody files this name",
+      "kind" : "artist",
+      "provider" : "",
+      "why" : "case: unknown to the backend"
+    },
+    {
+      "handle" : "/episode/2026-09-02/rtj",
+      "id" : "broadcast:kiosk|/episode/2026-09-02/rtj",
+      "key" : "kiosk|/episode/2026-09-02/rtj",
+      "kind" : "broadcast",
+      "provider" : "kiosk",
+      "why" : "starting point (development), production"
+    },
+    {
+      "handle" : "/episode/2026-09-06/outsiders-graphical-recordings-w-lv-reader",
+      "id" : "broadcast:kiosk|/episode/2026-09-06/outsiders-graphical-recordings-w-lv-reader",
+      "key" : "kiosk|/episode/2026-09-06/outsiders-graphical-recordings-w-lv-reader",
+      "kind" : "broadcast",
+      "provider" : "kiosk",
+      "why" : "starting point (development), production"
+    },
+    {
+      "handle" : "/episode/2026-09-06/priori",
+      "id" : "broadcast:kiosk|/episode/2026-09-06/priori",
+      "key" : "kiosk|/episode/2026-09-06/priori",
+      "kind" : "broadcast",
+      "provider" : "kiosk",
+      "why" : "starting point (development)"
+    },
+    {
+      "handle" : "jadalareign/2026-09-14-1200",
+      "id" : "broadcast:lot|jadalareign/2026-09-14-1200",
+      "key" : "lot|jadalareign/2026-09-14-1200",
+      "kind" : "broadcast",
+      "provider" : "lot",
+      "why" : "starting point (development)"
+    },
+    {
+      "handle" : "takuya-nakamura/2026-09-24-1600",
+      "id" : "broadcast:lot|takuya-nakamura/2026-09-24-1600",
+      "key" : "lot|takuya-nakamura/2026-09-24-1600",
+      "kind" : "broadcast",
+      "provider" : "lot",
+      "why" : "starting point (development)"
+    },
+    {
+      "handle" : "",
+      "id" : "recording:ann peebles\u001fi can t stand the rain",
+      "key" : "ann peebles\u001fi can t stand the rain",
+      "kind" : "recording",
+      "provider" : "",
+      "why" : "starting point (production)"
+    },
+    {
+      "handle" : "",
+      "id" : "station:n10as",
+      "key" : "n10as",
+      "kind" : "station",
+      "provider" : "n10as",
+      "why" : "starting point (development), production"
+    },
+    {
+      "handle" : "",
+      "id" : "station:radio80000",
+      "key" : "radio80000",
+      "kind" : "station",
+      "provider" : "radio80000",
+      "why" : "starting point (production)"
+    }
+  ]
+}

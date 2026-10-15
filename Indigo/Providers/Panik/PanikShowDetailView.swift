@@ -79,7 +79,7 @@ struct PanikShowDetailView: View {
                     ArtworkView(
                         remoteURL: show.imageURL,
                         side: 300,
-                        markURL: PanikProvider.logoURL,
+                        markURL: StationMark.logoURL(for: PanikProvider.providerID),
                         mark: "Radio Panik"
                     )
                     .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))
@@ -221,20 +221,6 @@ extension PanikShowDetailView {
     }
 
     private func phoneEpisode(_ episode: PanikEpisode, in episodes: [PanikEpisode]) -> PhoneEpisode {
-        PhoneEpisode(
-            id: episode.id,
-            title: episode.title,
-            date: episode.publishedAt,
-            imageURL: episode.imageURL,
-            isPlayable: episode.isPlayable,
-            isCurrent: PanikPlayback.isCurrent(episode, in: player),
-            isPlaying: PanikPlayback.isPlaying(episode, in: player),
-            play: { PanikPlayback.toggle(episode, within: episodes, using: player) },
-            open: {
-                browse.remember([episode])
-                appState.open(.panikEpisode(id: episode.id))
-            },
-            crate: AnyView(PanikCrateButton(episode: episode, compact: true))
-        )
+        PhoneEpisode.panik(episode, in: episodes, browse: browse, PhoneRowContext(player: player, appState: appState, onShowPage: true))
     }
 }

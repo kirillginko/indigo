@@ -27,65 +27,47 @@ nonisolated struct ShowSuggestionEngine {
         self.context = context
     }
 
-    /// A show has to clear this to be offered at all. Low enough that a
-    /// station Indigo has barely heard can still say something, high enough
-    /// that a tracklist with nothing in common is not dressed up as a match.
-    static let threshold = 0.18
+    /// A show has to clear this to be offered at all. See
+    /// `ExploreRanker.showThreshold`, which is where it is applied now.
+    static let threshold = ExploreRanker.showThreshold
     /// Names shown before the sentence gives up counting.
     static let namesShown = 2
 
-    /// Shows worth offering, best first.
+    /// Shows worth offering, best first, from this store's tracklists.
     ///
     /// `known` is the set of node ids this listener already has, so a show
-    /// they crated is not offered back to them.
+    /// they crated is not offered back to them. The judging itself is
+    /// `ExploreRanker.shows`, over `profiles()`.
     func suggestions(
         taste: TasteProfile,
         known: Set<String>,
         keptArtistKeys: Set<String>,
         limit: Int = 6
     ) -> [ExploreSuggestion] {
-        let shows = tracklists()
-        guard !shows.isEmpty else { return [] }
-        let log = ListeningLog(context: context)
+        ExploreRanker.shows(
+            profiles(), taste: taste, known: known, keptArtistKeys: keptArtistKeys,
+            encountered: Set(ListeningLog.gather(ListeningLog(context: context).all()).map(\.node.id)),
+            limit: limit
+        )
+    }
+
+    /// Every tracklist, folded to what a show is judged on: who was on it,
+    /// and the catalogue's styles for them as one folded set. A set is all
+    /// the judging reads -- `TasteProfile.affinity` and `reason` fold and
+    /// deduplicate whatever they are given -- so it is the same judgement
+    /// from much less.
+    func profiles() -> [ShowProfile] {
         let styles = artistStyles()
-
-        var found: [ExploreSuggestion] = []
-        for show in shows.values {
-            var node = MusicNode.broadcast(
-                providerID: show.providerID, showID: show.showID, title: show.title
-            )
-            node.artworkURL = show.artworkURL
-            guard node.destination != nil else { continue }
-            guard !known.contains(node.id), !log.hasEncountered(node) else { continue }
-
-            // Whose records were played that this listener keeps.
-            let familiar = show.artists
-                .filter { keptArtistKeys.contains(RecordingKey.normalizeArtist($0)) }
-                .sorted()
-            // And what the rest of the hour sounded like.
-            let tags = show.artists.flatMap { styles[RecordingKey.normalizeArtist($0)] ?? [] }
-            let affinity = taste.affinity(for: tags)
-
-            // Deliberately not a sum. Three artists you keep is a reason on its
-            // own and so is an hour of exactly your music; a show with a little
-            // of each should not outrank either.
-            let byArtists = min(1, Double(familiar.count) / 3)
-            let score = max(byArtists, affinity * 0.9)
-            guard score >= Self.threshold else { continue }
-
-            found.append(ExploreSuggestion(
-                node: node,
-                reason: Self.reason(familiar: familiar, tags: tags, taste: taste, affinity: affinity),
-                via: familiar.first ?? "what you listen to",
-                kind: .playedInShow,
-                corroboration: max(1, familiar.count),
-                score: score
-            ))
-        }
-        return found
-            .sorted { $0.score == $1.score ? $0.node.title < $1.node.title : $0.score > $1.score }
-            .prefix(limit)
-            .map { $0 }
+        return tracklists().values
+            .map { show in
+                let artists = show.artists.sorted()
+                let tags = ListeningLog.foldTags(artists.flatMap { styles[RecordingKey.normalizeArtist($0)] ?? [] })
+                return ShowProfile(
+                    providerID: show.providerID, showID: show.showID, title: show.title,
+                    artworkURL: show.artworkURL, artists: artists, tags: Array(Set(tags)).sorted()
+                )
+            }
+            .sorted { $0.key < $1.key }
     }
 
     /// Why this show is being offered, in terms somebody would recognise.
@@ -106,7 +88,7 @@ nonisolated struct ShowSuggestionEngine {
         // than everything the hour touched.
         let matched = ListeningLog.foldTags(tags)
             .filter { taste[$0] > 0 }
-            .sorted { taste[$0] > taste[$1] }
+            .sorted { taste[$0] == taste[$1] ? $0 < $1 : taste[$0] > taste[$1] }
             .prefix(3)
         guard !matched.isEmpty else { return "Close to what you listen to" }
         return "\(matched.map(\.capitalized).joined(separator: ", ")) — what you listen to"
@@ -118,6 +100,8 @@ nonisolated struct ShowSuggestionEngine {
         let providerID: String
         let showID: String
         var title: String
+        /// Where it is filed: provider and show.
+        var key: String { "\(providerID)|\(showID)" }
         var artists: Set<String> = []
         /// The first picture any of these appearances carried. A show has one
         /// cover however many tracks were logged off it.
@@ -125,29 +109,43 @@ nonisolated struct ShowSuggestionEngine {
     }
 
     /// Every broadcast Indigo has a tracklist for, and who was on it.
+    ///
+    /// A show's name and picture are whatever its appearances say, chosen by
+    /// what they say: the first by name and by address. They were the first
+    /// appearance read, which is the order the store filed them in -- not the
+    /// same on two devices holding the same tracklist -- and a show whose
+    /// first appearance had no title kept the station's name even when a
+    /// later one had the show's.
     func tracklists() -> [String: Tracklist] {
         var byShow: [String: Tracklist] = [:]
+        var titles: [String: String] = [:]
         for appearance in (try? context.fetch(FetchDescriptor<MediaAppearance>())) ?? [] {
             guard let showID = appearance.showID, !showID.isEmpty else { continue }
             let key = "\(appearance.providerID)|\(showID)"
             var entry = byShow[key] ?? Tracklist(
                 providerID: appearance.providerID, showID: showID,
-                title: appearance.showTitle ?? BroadcastSource.label(for: appearance.providerID)
+                title: BroadcastSource.label(for: appearance.providerID)
             )
             if let name = appearance.recording?.artistName, !name.isEmpty {
                 entry.artists.insert(name)
             }
-            if entry.title.isEmpty, let title = appearance.showTitle { entry.title = title }
-            if entry.artworkURL == nil { entry.artworkURL = appearance.artworkURL }
+            if let title = appearance.showTitle, !title.isEmpty {
+                titles[key] = titles[key].map { min($0, title) } ?? title
+            }
+            if let artwork = appearance.artworkURL,
+               entry.artworkURL.map({ artwork.absoluteString < $0.absoluteString }) ?? true {
+                entry.artworkURL = artwork
+            }
             byShow[key] = entry
         }
+        for (key, title) in titles { byShow[key]?.title = title }
         // A show nobody could name a single track from says nothing about
         // itself, and guessing from its title is not evidence.
         return byShow.filter { !$0.value.artists.isEmpty }
     }
 
     /// What the catalogue says each artist sounds like, by normalised name.
-    private func artistStyles() -> [String: [String]] {
+    func artistStyles() -> [String: [String]] {
         var found: [String: [String]] = [:]
         for artist in (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? [] {
             let tags = artist.styles + artist.genres

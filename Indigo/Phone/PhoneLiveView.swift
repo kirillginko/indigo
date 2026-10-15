@@ -85,7 +85,7 @@ struct PhoneLiveSlide: View {
                     Spacer(minLength: 0)
                     details(show, next)
                         .padding(.horizontal, 22)
-                        .padding(.bottom, insets.bottom + 22)
+                        .padding(.bottom, insets.bottom + 22 + (player.current == nil ? PhoneLayout.miniPlayerRoom : 0))
                 }
             }
             .foregroundStyle(.white)
@@ -116,11 +116,7 @@ struct PhoneLiveSlide: View {
     private var topBar: some View {
         HStack {
             Button(action: openStation) {
-                Image(systemName: "info")
-                    .font(.system(size: 17, weight: .semibold))
-                    .frame(width: 46, height: 46)
-                    .background(Chip.black, ignoresSafeAreaEdges: [])
-                    .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
+                PhoneRoundGlyph(symbol: "info")
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open \(entry.station.name)")
@@ -132,10 +128,12 @@ struct PhoneLiveSlide: View {
                     .tracking(1.2)
                     .textCase(.uppercase)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 18)
             .frame(height: 46)
-            .background(Chip.black, ignoresSafeAreaEdges: [])
-            .overlay(Rectangle().strokeBorder(.white.opacity(0.14)))
+            // Rounded, on the player's moving field, as the mini player is.
+            .background { PlayerShaderBackdrop() }
+            .clipShape(Capsule())
+            .overlay(Capsule().strokeBorder(.white.opacity(0.14)))
             Spacer()
             // Balances the info button, so the station's name sits centred.
             Color.clear.frame(width: 46, height: 46)
@@ -162,17 +160,11 @@ struct PhoneLiveSlide: View {
             }
             if !genres.isEmpty {
                 ChipFlow {
-                    ForEach(genres, id: \.self) { Chip(text: $0, size: 12.5, uppercase: true) }
+                    ForEach(genres, id: \.self) { Chip.genre($0, size: 12.5) }
                 }
             }
             if let next {
-                ChipFlow {
-                    if let time = next.startsAt?.formatted(date: .omitted, time: .shortened) {
-                        Chip(text: time, tone: .sheen, size: 12.5)
-                    }
-                    Chip(text: "Next up", size: 12.5, uppercase: true)
-                }
-                ChipFlow { Chip(text: next.title, size: 15) }
+                NextUpRows(next: next)
             }
             playButton
                 .padding(.top, 10)

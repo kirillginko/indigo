@@ -250,7 +250,10 @@ struct ConnectionExplainer: View {
     /// happened to append in, so a row could lead with "catalogues overlap in
     /// the 2010s" while the shared label sat behind it.
     private var connectionLine: String {
-        why?.summary(limit: 3) ?? "Connected artist"
+        let line = why?.summary(limit: 3) ?? "Connected artist"
+        // Where the row goes next, when the catalogue says.
+        guard let onward = artist.onward, onward > 0 else { return line }
+        return line + " · leads to \(onward) more"
     }
 }
 

@@ -86,7 +86,7 @@ struct N10ASStationView: View {
             ArtworkView(
                 remoteURL: onAirShow?.imageURL,
                 side: 300,
-                markURL: N10ASProvider.logoURL,
+                markURL: StationMark.logoURL(for: N10ASProvider.providerID),
                 mark: "n10.as"
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

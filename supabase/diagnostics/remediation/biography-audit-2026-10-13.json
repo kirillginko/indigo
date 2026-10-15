@@ -1,0 +1,28 @@
+{
+ "artists": 3300,
+ "documents_state": {
+  "years": 3249,
+  "labels": 2627,
+  "styles": 2697,
+  "people": 3172
+ },
+ "two_or_more_facts": 3285,
+ "catalogue": {
+  "musicbrainz_id": 0,
+  "area": 0,
+  "began_year": 0
+ },
+ "discogs_sample": {
+  "asked": 150,
+  "read": 150,
+  "profile_80plus": 46,
+  "profile_any": 86,
+  "realname": 50,
+  "members_or_groups": 67,
+  "urls": 95
+ },
+ "sample_tiers": {
+  "factual": 104,
+  "written": 46
+ }
+}

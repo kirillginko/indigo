@@ -1,0 +1,48 @@
+== schema from the migrations
+empty database: 9.3 MiB
+== 1. restore from the export
+restored in 5646 ms
+-- 0 24100 48a5abee34c8b12ce0ab4f25a30d47b3
+-- 1 24157 1a53cbfec21bb96e502121f99e161192
+-- 2 23839 5421e7b9e52a8e89948ef0880597566f
+-- 3 23907 9df35e09ae8d275c7458d19f8eecc775
+-- 4 23943 afaadd5f5c9b5bb087f97f2f5698a690
+-- 5 24019 ae50cb0c33bb176bf86882d3a872a4f4
+-- 6 24087 09dcb7c88e84c794d2baf9d93217c0f9
+-- 7 23688 92898cad6b141aa8099c760a991f26a4
+-- 8 23947 72184d7eb1d7356470a223ed6f18445f
+-- 9 23914 eec65c47a0725e6ee34675c3100b9929
+-- a 23975 c5a1a018248b088dd20a38f19fa3b2c0
+-- b 23967 8d02ca8069a3f5fa7b4e2e39219faf77
+-- c 23949 fa290b9c687cf20bd93b980ddbc011b3
+-- d 24050 05098e0904674a3af4d6152d2403d14d
+-- e 23890 4552aa9102fc65a20a841349672954ba
+-- f 23634 0cd795d066d804b245e9afc531b92ee3
+restore: all 16 slices match live (rows and md5)
+restored: 383066 rows, 196044 single adjacencies, 352221 still without episode_count
+table 138.3 MiB = heap 77.4 + indexes 60.9
+database with the table: 147.6 MiB (the table is 138.3 MiB of it)
+== 2. the window, step by step
+record checksums: 209 ms, database 147.6 MiB
+4 delete single adjacencies: 121 ms, database 147.6 MiB
+5 drop to_idx, edge_idx, primary key: 29 ms, database 86.7 MiB
+6 rewrite (episode_count from the document, metadata nulled): 263 ms, database 37.8 MiB
+7a primary key: 84 ms, database 43.5 MiB
+7b edge_idx (unique): 191 ms, database 58.9 MiB
+7c to_idx: 160 ms, database 60.6 MiB
+7d analyze: 85 ms, database 60.6 MiB
+peak during the window: 147.6 MiB; after: 60.6 MiB
+table after: 51.3 MiB = heap 28.5 + indexes 22.8
+music_relationships_edge_idx: 15.4 MiB
+music_relationships_pkey: 5.6 MiB
+music_relationships_to_idx: 1.7 MiB
+== 3. integrity
+kept rows unchanged (ids, endpoints, counts, confidence, updated_at, source)
+episode counts carried over from the document
+stored single adjacencies left: 0; rows with metadata left: 0; rows: 187022
+primary key present: t; edge_idx unique: t; trigger present: t; RLS on: t
+rebuild after the window: 0 rows written (no appearances here, so none expected)
+== 4. rollback: the deleted rows back from the export
+restored the deleted rows in 3910 ms; database 143.0 MiB
+rows after rollback: 383066 (live had 383066)
+rollback: every deleted row back, by id

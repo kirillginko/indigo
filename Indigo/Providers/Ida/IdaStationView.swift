@@ -88,7 +88,7 @@ struct IdaStationView: View {
             ArtworkView(
                 remoteURL: state.episode?.imageURL,
                 side: 300,
-                markURL: IdaProvider.logoURL,
+                markURL: StationMark.logoURL(for: IdaProvider.providerID),
                 mark: "IDA Radio"
             )
             .overlay(Rectangle().strokeBorder(Palette.outline, lineWidth: Metrics.hairline))

@@ -224,7 +224,8 @@ final class DigSearchTests: XCTestCase {
         ]
         let rows = DigSearchResult.rows(fromDiscogs: results, kind: .artist)
         XCTAssertEqual(rows.map(\.title), ["Nirvana", "Flowdan"])
-        XCTAssertEqual(rows.first?.destination, .digArtist(mbid: nil, name: "Nirvana"))
+        XCTAssertEqual(rows.first?.destination, .digArtist(mbid: nil, name: "Nirvana", discogsID: 1),
+                       "Shown without the mark, opened by the entry: Nirvana (2) is not Nirvana")
     }
 
     /// A label result opens the label Discogs meant, by id — the whole reason

@@ -164,6 +164,16 @@ nonisolated final class RemoteArtworkStore: @unchecked Sendable {
         return nil
     }
 
+    /// The largest copy held at any size: a stand-in while the size a tile
+    /// wants loads -- the mini player's cover, say, while the full player's
+    /// fetches its larger cut.
+    func anyCachedImage(for url: URL) -> PlatformImage? {
+        for candidate in Self.steps.reversed() {
+            if let image = cache.object(forKey: cacheKey(url, candidate)) { return image }
+        }
+        return nil
+    }
+
     private func remember(_ image: PlatformImage, _ url: URL, _ step: Int) {
         cache.setObject(image, forKey: cacheKey(url, step), cost: Self.cost(of: image))
     }
@@ -373,8 +383,14 @@ struct ArtworkView: View {
     /// picture. Discogs answers "no image" with a `spacer.gif` that loads
     /// fine and draws nothing, and a dozen paths have carried one here; this
     /// is the one place every tile passes through.
-    private var remote: URL? { Self.usable(remoteURL) }
-    private var preview: URL? { Self.usable(previewRemoteURL) }
+    /// Asked for at the size it is drawn (`ArtworkSizing`); where that is a
+    /// different address, the station's own cut becomes the preview.
+    private var remote: URL? { Self.usable(ArtworkSizing.sharper(remoteURL, pixels: pixels)) }
+    private var preview: URL? {
+        if let given = Self.usable(previewRemoteURL) { return given }
+        let sharper = ArtworkSizing.sharper(remoteURL, pixels: pixels)
+        return sharper == remoteURL ? nil : Self.usable(remoteURL)
+    }
     private var markAddress: URL? { Self.usable(markURL) }
 
     static func usable(_ url: URL?) -> URL? {
@@ -387,12 +403,27 @@ struct ArtworkView: View {
         return RemoteArtworkStore.shared.cachedImage(for: remote, pixels: pixels)
     }
 
+    /// The same picture at whatever size is already held -- under the
+    /// sharper address or the one it was asked by (the mini player's cover,
+    /// say) -- shown while the size this tile wants loads, instead of the
+    /// grey ground.
+    private var cachedStandIn: PlatformImage? {
+        let store = RemoteArtworkStore.shared
+        if let remote, let held = store.anyCachedImage(for: remote) { return held }
+        if let asked = Self.usable(remoteURL), let held = store.anyCachedImage(for: asked) { return held }
+        return nil
+    }
+
     private var cachedPreview: PlatformImage? {
         guard let preview = distinctPreviewURL else { return nil }
+        // Any size held will do while the right one loads: the same picture,
+        // smaller, rather than an empty square.
         return RemoteArtworkStore.shared.cachedImage(for: preview, pixels: pixels)
+            ?? RemoteArtworkStore.shared.anyCachedImage(for: preview)
     }
 
     @Environment(\.displayScale) private var displayScale
+    @Environment(\.isPhoneLayout) private var isPhone
     /// The tile's size as laid out, for tiles not given a `side`.
     @State private var measured: CGFloat?
 
@@ -444,7 +475,7 @@ struct ArtworkView: View {
                         .resizable()
                         .interpolation(.medium)
                         .aspectRatio(contentMode: .fill)
-                } else if let full = remoteImage ?? cachedFull {
+                } else if let full = remoteImage ?? cachedFull ?? cachedStandIn {
                     Image(platformImage: full)
                         .resizable()
                         .interpolation(.medium)
@@ -472,6 +503,13 @@ struct ArtworkView: View {
                     Image(platformImage: preview)
                         .resizable()
                         .interpolation(.none)
+                        .aspectRatio(contentMode: .fill)
+                } else if let markImage, StationMark.isBundled(markAddress) {
+                    // The app's own station logos are designed squares,
+                    // background and all: they fill the tile.
+                    Image(platformImage: markImage)
+                        .resizable()
+                        .interpolation(.high)
                         .aspectRatio(contentMode: .fill)
                 } else if let markImage {
                     GeometryReader { geo in
@@ -577,7 +615,15 @@ struct ArtworkView: View {
         // The two common cases size themselves, so the overwhelming majority
         // of tiles cost no layout pass at all. Only the text mark — a station
         // with no logo, which is rare — still needs to measure.
-        if blursWhileLoading, isLoading {
+        if isPhone, isSettledEmpty, markAddress == nil, localKey == nil {
+            // On the phone, a show, artist or record with no picture -- or
+            // one that never loaded -- is the wordmark's moving green, one
+            // fallback everywhere rather than a mosaic, a glyph or a blank.
+            // Drawn once per size, at low resolution, so a grid of them
+            // costs one drawing.
+            MineralSheenSurface(lowResolution: true)
+                .accessibilityHidden(true)
+        } else if blursWhileLoading, isLoading {
             // The mosaic this tile would settle on, out of focus: colour where
             // the picture will be, and the same block, sharpened, if it turns
             // out there is none.

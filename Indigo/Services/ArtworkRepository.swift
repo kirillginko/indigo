@@ -77,6 +77,42 @@ nonisolated struct ArtworkRepository: Sendable {
         return rows.compactMapValues(URL.init(string:))
     }
 
+    /// The same, with how each portrait was chosen (0081): `verified` (the
+    /// artist's own Discogs picture, with its id), `unresolved` (by name; the
+    /// only Discogs artist with it), or `withheld` (namesakes the name cannot
+    /// tell apart -- no address). Names the catalogue knows nothing about are
+    /// absent.
+    func portraitStates(forArtistKeys keys: [String]) async throws -> [String: DigWorker.CataloguePortrait] {
+        let wanted = Array(Set(keys.filter { !$0.isEmpty }))
+        guard !wanted.isEmpty else { return [:] }
+        let client = try SupabaseService.requireClient()
+        return try await client
+            .rpc("portrait_states_for_artists", params: NamesParams(pNames: wanted))
+            .execute()
+            .value
+    }
+
+    /// Which names' portrait answers changed after a watermark (0083), the
+    /// watermark being whatever the last answer's `until` was. Sends no names.
+    struct PortraitChanges: Decodable, Sendable {
+        let names: [String]
+        let until: String
+        let more: Bool
+    }
+
+    private struct ChangesParams: Encodable {
+        let pSince: String
+        enum CodingKeys: String, CodingKey { case pSince = "p_since" }
+    }
+
+    func portraitChanges(since: String) async throws -> PortraitChanges {
+        let client = try SupabaseService.requireClient()
+        return try await client
+            .rpc("portrait_changes_since", params: ChangesParams(pSince: since))
+            .execute()
+            .value
+    }
+
     func artwork(for entityType: Catalog.EntityType, id entityID: UUID) async throws -> Catalog.Artwork? {
         let client = try SupabaseService.requireClient()
         let rows: [Catalog.Artwork] = try await client

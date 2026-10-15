@@ -456,6 +456,11 @@ nonisolated final class ArtistPortrait {
         lookupFailed = false
     }
 
+    /// Where a portrait verified by identity is kept, beside the name-keyed
+    /// one: the same table, a key no folded name can take (folding drops the
+    /// `#` and the colon). A row that knows its Discogs id reads this first.
+    nonisolated static func identityKey(_ discogsID: Int) -> String { "#discogs:\(discogsID)" }
+
     var imageURL: URL? {
         // Same filter as `DiscogsArtist.imageURL`: a row written before that
         // one was fixed can still be holding a `spacer.gif`, and a stored

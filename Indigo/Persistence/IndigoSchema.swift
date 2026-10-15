@@ -726,11 +726,32 @@ nonisolated enum IndigoSchemaV7: VersionedSchema {
     }
 }
 
+/// V7 and three new local models: the evidence artist identity is decided
+/// from, and who each release credits by id (see `ArtistIdentityRecords.swift`). Caches, so they live in the local
+/// store and are never synced. Nothing in V7 changes, so V7 is pinned.
+nonisolated enum IndigoSchemaV8: VersionedSchema {
+    static let versionIdentifier = Schema.Version(8, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        IndigoSchemaV7.models + [DiscogsIdentityRecord.self, ArtistSpellingRecord.self, ReleaseCreditRecord.self]
+    }
+
+    static let userDataModelNames: Set<String> = IndigoSchemaV7.userDataModelNames
+
+    static var userDataModels: [any PersistentModel.Type] {
+        models.filter { userDataModelNames.contains(String(describing: $0)) }
+    }
+
+    static var localModels: [any PersistentModel.Type] {
+        models.filter { !userDataModelNames.contains(String(describing: $0)) }
+    }
+}
+
 /// The schema the app opens its stores with now.
-typealias IndigoSchemaCurrent = IndigoSchemaV7
+typealias IndigoSchemaCurrent = IndigoSchemaV8
 
 nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self, IndigoSchemaV6.self, IndigoSchemaV7.self] }
+    static var schemas: [any VersionedSchema.Type] { [IndigoSchemaV1.self, IndigoSchemaV2.self, IndigoSchemaV3.self, IndigoSchemaV4.self, IndigoSchemaV5.self, IndigoSchemaV6.self, IndigoSchemaV7.self, IndigoSchemaV8.self] }
 
     /// V1 -> V2 is additive: eight optional or defaulted fields on `CrateItem`,
     /// and one rename. V2 -> V3 renames the recording id on `ListeningEvent` and
@@ -747,7 +768,10 @@ nonisolated enum IndigoMigrationPlan: SchemaMigrationPlan {
             .lightweight(fromVersion: IndigoSchemaV5.self, toVersion: IndigoSchemaV6.self),
             // Adds a table. The counts move into it after the store opens, from
             // `CounterBaseline`, which can tell a store that predates it.
-            .lightweight(fromVersion: IndigoSchemaV6.self, toVersion: IndigoSchemaV7.self)
+            .lightweight(fromVersion: IndigoSchemaV6.self, toVersion: IndigoSchemaV7.self),
+            // Adds two local tables. The cache store may be rebuilt rather than
+            // migrated; nothing in them is the listener's.
+            .lightweight(fromVersion: IndigoSchemaV7.self, toVersion: IndigoSchemaV8.self)
         ]
     }
 }

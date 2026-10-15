@@ -16,7 +16,12 @@ struct PageHeader<Trailing: View>: View {
     var onBack: (() -> Void)?
     var subtitle: String?
     var accessory: AnyView?
+    /// Whether the title is not known yet — an artist page whose name is still
+    /// being resolved. Drawn as a placeholder of the same size, so the header
+    /// neither shows a name it is about to replace nor jumps when it lands.
+    var titlePending = false
     @ViewBuilder var trailing: Trailing
+    @Environment(\.isPhoneLayout) private var isPhone
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -41,10 +46,17 @@ struct PageHeader<Trailing: View>: View {
                         .tracking(-0.8)
                         .foregroundStyle(Palette.ink)
                         .lineLimit(2)
+                        .redacted(reason: titlePending ? .placeholder : [])
+                        .opacity(titlePending ? 0.35 : 1)
+                        .accessibilityLabel(titlePending ? "Loading" : title)
                     if let subtitle {
+                        // Kept while the title is pending, and hidden with it,
+                        // so the header is the same height before and after.
                         Text(subtitle)
                             .font(Typeface.mono(10.5))
                             .foregroundStyle(Palette.inkMuted)
+                            .redacted(reason: titlePending ? .placeholder : [])
+                            .opacity(titlePending ? 0 : 1)
                     }
                 }
                 Spacer(minLength: 12)
@@ -54,12 +66,13 @@ struct PageHeader<Trailing: View>: View {
                 accessory.padding(.top, 14)
             }
         }
-        .padding(.horizontal, Metrics.gutter)
-        .padding(.top, Metrics.titleBarInset + 20)
-        .padding(.bottom, 16)
+        .padding(.horizontal, isPhone ? PhoneLayout.margin : Metrics.gutter)
+        // The Mac keeps room for its window buttons; the phone has none.
+        .padding(.top, isPhone ? 6 : Metrics.titleBarInset + 20)
+        .padding(.bottom, isPhone ? 12 : 16)
         // Solid, and a step darker than the page under it. Only the sidebar
         // stays glass.
-        .background(IndigoGlassBackground.header)
+        .background(IndigoGlassBackground.header.ignoresSafeArea(edges: isPhone ? .top : []))
         // The way to the mini player, in the corner of every page's header
         // rather than on the player: the player is for what is playing.
         .overlay(alignment: .topTrailing) {

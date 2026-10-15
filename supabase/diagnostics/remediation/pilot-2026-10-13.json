@@ -1,0 +1,73 @@
+{
+ "counts": {
+  "artists": 300,
+  "documents per artist: 1": 256,
+  "rescued: any verified route to a catalogued artist or label": 282,
+  "rescued meaningfully: a strong route that leads on": 273,
+  "meaningful via made-with": 93,
+  "meaningful via credited": 238,
+  "routes": 2607,
+  "routes verified by Discogs id": 2607,
+  "routes name-only (unresolved, not used)": 0,
+  "routes to catalogued": 762,
+  "routes meaningful": 663,
+  "routes weak": 50,
+  "routes into another dead end": 50,
+  "routes with namesake risk (id on >1 row)": 0,
+  "meaningful ONLY via credited": 170,
+  "rescued, weak only (engineering, huge or placeholder label, or into another dead end)": 9,
+  "documents per artist: 2": 29,
+  "still a dead end: names people/labels, none catalogued": 11,
+  "meaningful ONLY via made-with": 35,
+  "documents per artist: 3": 10,
+  "documents per artist: 4": 2,
+  "still a dead end: documents name nobody else": 7,
+  "meaningful via label": 13,
+  "documents per artist: 5+": 3
+ },
+ "examples": {
+  "meaningful": [
+   "Magic Carpathians Project: made-with → Six Organs Of Admittance (274469); credited → Neil Campbell (74960)",
+   "DKMD: credited → Marie Davidson (1404382)",
+   "Avelino (3): credited → Ghetts (1441548); credited → Wretch 32 (583090)",
+   "Spew (11): credited → Tony Bontana (7192268)",
+   "Horseless Headmen: credited → Ivor Kallin (293639)",
+   "Fines Double: credited → Aj Suede (3331737); credited → Big Flowers (8923852); credited → Defcee (3473136)"
+  ],
+  "weak": [
+   "mostinfantasy: label → Not On Label (1818, 1854 catalogued)",
+   "Gang Du Lyonnais: label → Not On Label (1818, 1854 catalogued)",
+   "Jeremy-Pastell: label → Not On Label (1818, 1854 catalogued)",
+   "Kala (13): made-with → Kilbourne (3) (4822586); label → Not On Label (1818, 1854 catalogued)",
+   "DJ Moondawg: label → Not On Label (1818, 1854 catalogued)",
+   "The Squires Of The Subterrain: credited → Dave Anderson (5) (875086)"
+  ],
+  "dead": [
+   "Maga (6): credited → Kosmas Efstratiou (551320)",
+   "DJ BK: —",
+   "Kid Sportswear: —",
+   "Amdiscs: —",
+   "Folky By Nature: credited → Biscuit Baloo (8716486); credited → SCART (2) (8716489)",
+   "Koperblond: credited → Silvio Ecomo (6423)"
+  ]
+ },
+ "reads": {
+  "requests": 372,
+  "missing": 0,
+  "failed": 0,
+  "bytes": 2932752,
+  "p50ms": 71,
+  "p95ms": 172
+ },
+ "objects": {
+  "bundles": 300,
+  "bundleBytesTotal": 713460,
+  "bundleP50": 1612,
+  "bundleP95": 6125,
+  "bundleMax": 20983,
+  "rosters": 309,
+  "rosterBytesTotal": 62495,
+  "buildMsTotal": 85,
+  "r2WritesIfStored": 909
+ }
+}

@@ -154,19 +154,21 @@ struct DigSearchView: View {
         try? await Task.sleep(for: Self.settle)
         guard !Task.isCancelled else { return }
 
-        let yours = await dig.searchYours(query)
+        let yours = dig.resolvingIdentities(await dig.searchYours(query))
         guard !Task.isCancelled else { return }
         results = DigSearchResults(yours: yours, catalogue: [], discogs: [])
         answered = key
 
         let elsewhere = await dig.searchElsewhere(query)
         guard !Task.isCancelled else { return }
-        results = DigSearchResults(
+        // Resolved after the fact, against whatever the search itself just
+        // learned — the check for the answering row lands before this.
+        results = dig.resolvingIdentities(DigSearchResults(
             yours: yours,
             catalogue: elsewhere.catalogue,
             discogs: elsewhere.discogs,
             discogsRefused: elsewhere.discogsRefused
-        )
+        ))
         isLooking = false
     }
 }
@@ -202,6 +204,12 @@ private struct DigSearchRow: View {
                         Text(result.title)
                             .font(Typeface.body(12.5, weight: .semibold))
                             .lineLimit(1)
+                        if let spelling = result.alsoCreditedAs {
+                            Text("— Also credited as \(spelling)")
+                                .font(Typeface.body(11.5))
+                                .foregroundStyle(Palette.inkMuted)
+                                .lineLimit(1)
+                        }
                     }
 
                     if let detail = result.detail {

@@ -52,16 +52,35 @@ struct PhoneRootView: View {
                 Color.black.ignoresSafeArea()
                     .zIndex(3)
             }
-            embedLayer(in: size)
+            // In an overlay of a view that takes the screen's size, so the
+            // web view -- parked as wide as the screen, or turned with a
+            // video -- can never make the layout wider: after a video was
+            // turned on its side, it kept the landscape width and the whole
+            // phone layout stayed stretched when it stood back up.
+            Color.clear
+                .overlay(alignment: .topLeading) { embedLayer(in: size) }
+                .clipped()
                 .zIndex(videoUp ? 4 : 0)
             page
                 .zIndex(1)
             if showsNowPlaying {
                 PhoneNowPlayingView(maximize: { videoFullScreen = true }) { close() }
-                    .transition(.move(edge: .bottom))
+                    // Down by the whole screen and then some: its ground runs
+                    // up under the status bar, and moved by its own height
+                    // only, that top strip -- close button and all -- was
+                    // left sitting at the bottom of the screen.
+                    .transition(.offset(y: size.height + 160))
                     .zIndex(2)
             }
             if videoUp {
+                // Swiped down anywhere, the video goes back to its thumbnail,
+                // as the full player closes; the web view takes no touches.
+                Color.clear
+                    .contentShape(Rectangle())
+                    .gesture(DragGesture(minimumDistance: 24).onEnded { value in
+                        if value.translation.height > 70 { videoFullScreen = false }
+                    })
+                    .zIndex(4.5)
                 minimizeButton
                     .zIndex(5)
                 videoControls
@@ -74,17 +93,23 @@ struct PhoneRootView: View {
         .onChange(of: player.embedProvider) { _, provider in
             if provider != .youtube { videoFullScreen = false }
         }
+        // Full screen, a video turns to landscape; back, the phone stands up.
+        .onChange(of: videoUp) { _, up in OrientationLock.allowsLandscape(up) }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
-        .modifier(RootChrome(bottomInset: keyboardUp || showsNowPlaying ? 0 : shellHeight, hostsEmbedPlayer: false))
+        // Not dependent on the full player: changed as it opened and closed,
+        // every page laid itself out again mid-slide, and the player sat at
+        // the bottom of the screen until they were done.
+        .modifier(RootChrome(bottomInset: keyboardUp ? 0 : shellHeight, hostsEmbedPlayer: false))
         // The page's dark ground to the screen's edges, under the status bar
         // and the home indicator too, and light status-bar text over it: the
         // phone is dark throughout.
         .background { IndigoGlassBackground.content.ignoresSafeArea() }
         .preferredColorScheme(.dark)
+        // The home bar fades until the screen is touched near it.
+        .persistentSystemOverlays(.hidden)
         .environment(\.colorScheme, .dark)
         .environment(\.isPhoneLayout, true)
         .animation(.easeOut(duration: 0.2), value: keyboardUp)
-        .animation(.spring(duration: 0.35), value: showsNowPlaying)
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
             keyboardUp = true
         }
@@ -105,6 +130,13 @@ struct PhoneRootView: View {
                 if !keyboardUp {
                     shell
                         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { shellHeight = $0 }
+                        // The home bar's strip under the tabs in the headers'
+                        // shade, as the status bar's is above them.
+                        .background(alignment: .bottom) {
+                            IndigoGlassBackground.header
+                                .frame(height: 0)
+                                .ignoresSafeArea(edges: .bottom)
+                        }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
@@ -118,7 +150,7 @@ struct PhoneRootView: View {
         // Up, it stops above the controls: YouTube sets its captions along
         // the bottom of its frame, and over the whole screen they covered
         // the seek bar's times.
-        let up = CGSize(width: size.width, height: max(200, size.height - Self.videoControlsHeight))
+        let up = CGSize(width: size.width, height: max(200, size.height - controlsHeight))
         return EmbedPlayerSurface(engine: player.embed)
             .frame(width: videoUp ? up.width : parked.width,
                    height: videoUp ? up.height : parked.height)
@@ -129,27 +161,41 @@ struct PhoneRootView: View {
             .accessibilityHidden(!videoUp)
     }
 
-    /// The room kept under the full-screen video for its controls.
-    private static let videoControlsHeight: CGFloat = 150
+    private var isLandscape: Bool { size.width > size.height }
+
+    /// The room kept under the full-screen video for its controls: on its
+    /// side, one slim row, so the picture keeps the height.
+    private var controlsHeight: CGFloat { isLandscape ? 64 : 150 }
 
     /// Along the bottom of the full-screen video: play and pause, and the
-    /// seek bar.
+    /// seek bar -- stacked upright, side by side in landscape.
     private var videoControls: some View {
         VStack(spacing: 14) {
             Spacer()
-            Button { player.toggle() } label: {
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 60, height: 60)
-                    .background(Chip.black, ignoresSafeAreaEdges: [])
+            if isLandscape {
+                HStack(spacing: 18) {
+                    playPause(side: 44)
+                    PhoneScrubber()
+                }
+            } else {
+                playPause(side: 60)
+                PhoneScrubber()
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
-            PhoneScrubber()
         }
         .padding(.horizontal, 24)
-        .padding(.bottom, 18)
+        .padding(.bottom, isLandscape ? 8 : 18)
+    }
+
+    private func playPause(side: CGFloat) -> some View {
+        Button { player.toggle() } label: {
+            Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                .font(.system(size: side * 0.46, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: side, height: side)
+                .background(Chip.black, ignoresSafeAreaEdges: [])
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
     }
 
     /// Back to the thumbnail; the video plays on. Top left, where the full
@@ -158,11 +204,7 @@ struct PhoneRootView: View {
         VStack {
             HStack {
                 Button { videoFullScreen = false } label: {
-                    Image(systemName: "arrow.down.right.and.arrow.up.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 44, height: 44)
-                        .background(Chip.black, ignoresSafeAreaEdges: [])
+                    PhoneRoundGlyph(symbol: "arrow.down.right.and.arrow.up.left")
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Minimise the video")
@@ -171,26 +213,41 @@ struct PhoneRootView: View {
             Spacer()
         }
         .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.top, 12)
     }
 
+    /// Only the player slides; nothing else is animated with it.
     private func close() {
-        showsNowPlaying = false
+        withAnimation(.spring(duration: 0.35)) { showsNowPlaying = false }
+    }
+
+    private func openPlayer() {
+        withAnimation(.spring(duration: 0.35)) { showsNowPlaying = true }
     }
 
     private var shell: some View {
         VStack(spacing: 8) {
-            PhoneMiniPlayer { showsNowPlaying = true }
+            PhoneMiniPlayer { openPlayer() }
             PhoneTabBar(
                 selected: PhoneTab.of(appState.route),
                 searching: appState.route == .dig,
-                select: { tab in appState.select(tab.route) },
+                select: { tab in
+                    // For You chosen again while on its feed: back to the globe. From
+                    // a page opened out of it, the first tap returns to the feed.
+                    if tab == .forYou, appState.route == .forYou, appState.path.isEmpty {
+                        withAnimation(.easeInOut(duration: 0.4)) { PhoneFeeds.shared.forYouID = "cover" }
+                    } else {
+                        appState.select(tab.route)
+                    }
+                },
                 search: { appState.select(.dig) }
             )
         }
         .padding(.horizontal, 14)
         .padding(.top, 8)
-        .padding(.bottom, 2)
+        // Down into the home bar's strip, which the bar fades out of: kept
+        // clear, it was an empty band under the tabs.
+        .padding(.bottom, -14)
     }
 }
 #endif

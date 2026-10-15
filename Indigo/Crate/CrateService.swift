@@ -14,7 +14,13 @@ import SwiftData
 final class CrateService {
     /// Bumped on every change so views observing the service re-read their
     /// @Query results and the button flips to CRATED without a round trip.
-    private(set) var revision = 0
+    ///
+    /// Every change, including another device's: a save here moves it, and so
+    /// does an import that touched the crate. It used to move on local saves
+    /// alone, so a record crated on the Mac reached the phone's store and
+    /// nothing that read the crate looked again. See `UserDataImports`.
+    var revision: Int { savedRevision &+ UserDataImports.shared.crateRevision }
+    private var savedRevision = 0
     var notice: String?
 
     /// Shares the app's main context deliberately: a crated recording has to
@@ -146,6 +152,17 @@ final class CrateService {
     func contains(dig kind: CrateItemKind, identifier: String, providerID: String) -> Bool {
         refreshMembershipIfNeeded()
         return digMembership.contains(Self.digKey(kind, identifier, providerID))
+    }
+
+    /// The first of several keys one thing is kept under, if any is kept.
+    ///
+    /// An artist page answers to more than one: crated before MusicBrainz
+    /// answered, an artist is kept by name; afterwards the page asks by MBID,
+    /// and asking only that said a crated artist was not crated. Each row
+    /// stays under the key it was written with.
+    func keptKey(dig kind: CrateItemKind, among keys: [(identifier: String, providerID: String)])
+        -> (identifier: String, providerID: String)? {
+        keys.first { contains(dig: kind, identifier: $0.identifier, providerID: $0.providerID) }
     }
 
     /// Remembered per address, because a Listen list asks about a dozen of
@@ -580,7 +597,7 @@ final class CrateService {
     func save() {
         do {
             try context.save()
-            revision &+= 1
+            savedRevision &+= 1
         } catch {
             // The crate is the one thing in the app that isn't a rebuildable
             // cache, so a failed write is worth telling the listener about.

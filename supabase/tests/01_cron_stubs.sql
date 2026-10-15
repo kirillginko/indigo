@@ -10,7 +10,8 @@ create table if not exists cron.job (
     jobid bigserial primary key, jobname text unique, schedule text,
     command text, active boolean default true);
 create table if not exists cron.job_run_details (
-    jobid bigint, status text, start_time timestamptz default now(), return_message text);
+    runid bigserial, jobid bigint, status text, start_time timestamptz default now(),
+    end_time timestamptz, return_message text);
 create or replace function cron.schedule(p_name text, p_schedule text, p_command text)
 returns bigint language sql as $$
     insert into cron.job (jobname, schedule, command) values (p_name, p_schedule, p_command)

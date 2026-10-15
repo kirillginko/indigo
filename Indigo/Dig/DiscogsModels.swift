@@ -46,6 +46,16 @@ nonisolated struct DiscogsFormat: Decodable, Sendable {
 
 nonisolated struct DiscogsSearchResponse: Decodable, Sendable {
     let results: [DiscogsSearchResult]?
+    /// How many matches there are in all. Read by the spelling check, which may
+    /// only conclude that nobody else answers to a name from a search that
+    /// returned every match it has. Absent from older cached answers, which
+    /// therefore never count as complete.
+    var pagination: DiscogsPagination? = nil
+}
+
+nonisolated struct DiscogsPagination: Decodable, Sendable {
+    let items: Int?
+    let pages: Int?
 }
 
 nonisolated struct DiscogsSearchResult: Decodable, Sendable {
@@ -85,6 +95,9 @@ nonisolated struct DiscogsNeighbour: Sendable, Hashable {
 nonisolated struct DiscogsArtistReference: Decodable, Sendable {
     let id: Int?
     let name: String?
+    /// The spelling this record credited them under, when it differs from
+    /// their filing name — "Prefuse73" on a record by Prefuse 73.
+    var anv: String? = nil
 }
 
 nonisolated struct DiscogsLabelReference: Decodable, Sendable {
@@ -115,6 +128,9 @@ nonisolated struct DiscogsArtistDetail: Decodable, Sendable {
     let aliases: [DiscogsArtistReference]?
     let members: [DiscogsArtistReference]?
     let groups: [DiscogsArtistReference]?
+    /// The spellings this entry's records were credited under — "Prefuse73"
+    /// for Prefuse 73. See `DiscogsIdentityFacts`.
+    var namevariations: [String]? = nil
 }
 
 nonisolated struct DiscogsArtistRelease: Decodable, Sendable {
@@ -169,6 +185,8 @@ nonisolated struct DiscogsArtistRelease: Decodable, Sendable {
 
 nonisolated struct DiscogsArtistReleases: Decodable, Sendable {
     let releases: [DiscogsArtistRelease]?
+    /// How many there are in all; read when only the size of a shelf is wanted.
+    var pagination: DiscogsPagination? = nil
 }
 
 /// One record in a label's own catalogue.
@@ -213,6 +231,8 @@ nonisolated struct DiscogsTrackLine: Decodable, Sendable {
     /// each track names who is actually on it. That is the whole point of a
     /// compilation and was being thrown away.
     let artists: [DiscogsArtistReference]?
+    /// Credits for this track alone: who produced or remixed it.
+    var extraartists: [DiscogsCredit]? = nil
 
     /// Who is on this track, when the record itself is credited to nobody.
     ///

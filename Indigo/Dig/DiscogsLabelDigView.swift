@@ -122,7 +122,12 @@ struct DiscogsLabelDigView: View {
                         }
                         DigSection(title: "Browse catalogue", trailing: "\(profile.releases.count)") {
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 148, maximum: 210), spacing: 18)], spacing: 22) {
-                                ForEach(profile.releases) { release in
+                                // By position, not by title: a label's catalogue
+                                // holds many records with the same title by
+                                // different artists ("Untitled"), and tiles that
+                                // shared one identity were dropped and redrawn
+                                // in each other's place while scrolling.
+                                ForEach(Array(profile.releases.enumerated()), id: \.offset) { _, release in
                                     DigReleaseTile(release: release) {
                                         // Always opens. A tile that does
                                         // nothing when clicked reads as a

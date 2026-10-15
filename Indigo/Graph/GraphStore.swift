@@ -52,6 +52,19 @@ nonisolated struct GraphStore {
         /// Whether the tables this store holds were built from an offer or
         /// read from nothing. Only a test reads it. See `builtFromInheritedTables`.
         var builtFromInherited = false
+        /// Release ids by every folded name their credits carry, read alone.
+        /// See `releaseIDs(creditedTo:)`.
+        var creditedReleases: CreditedReleases?
+        /// The last generation's, offered to this one as `inherited` is.
+        var inheritedCreditedReleases: CreditedReleases?
+    }
+
+    /// Release ids by credited name, and what the read saw: how many records
+    /// there were and when it began.
+    private struct CreditedReleases {
+        let byCredit: [String: [Int]]
+        let count: Int
+        let readAt: Date
     }
 
     init(context: ModelContext, inheriting previous: GraphStore? = nil) {
@@ -68,6 +81,7 @@ nonisolated struct GraphStore {
         // 1425ms. Holding the offer open until somebody takes it keeps the
         // chain intact across the generations nobody walked.
         box.inherited = previous?.box.caches ?? previous?.box.inherited
+        box.inheritedCreditedReleases = previous?.box.creditedReleases ?? previous?.box.inheritedCreditedReleases
     }
 
     /// Whether this store's tables came from the last generation's.
@@ -145,6 +159,53 @@ nonisolated struct GraphStore {
 
     /// Every record an artist is credited on, from the fold rather than from
     /// a scan of the whole table. See `Caches`.
+    /// The ids of every record credited to a name — what
+    /// `releases(creditedTo:)` answers, without the records.
+    ///
+    /// From the tables when this store has them or was offered the last
+    /// generation's, which is cheap. Otherwise from one read of the release
+    /// table alone, its credit names folded the way the tables fold them: the
+    /// six tables cost 1.7s to read from cold on a real store, and the
+    /// identity graph asks this of every artist it walks — For You's first look
+    /// paid all of it to learn which credits to read.
+    func releaseIDs(creditedTo key: String) -> [Int] {
+        if box.caches != nil || box.inherited != nil {
+            return caches.releases(creditedTo: key).map(\.discogsID)
+        }
+        if box.creditedReleases == nil, let offered = box.inheritedCreditedReleases {
+            // Handed on while the table is as it was read: the same number of
+            // records, none written since (with the overlap the tables allow,
+            // for a record stamped before the read and saved after it).
+            let since = offered.readAt.addingTimeInterval(-5)
+            let count = (try? context.fetchCount(FetchDescriptor<DiscogsReleaseRecord>())) ?? -1
+            let newer = (try? context.fetchCount(FetchDescriptor<DiscogsReleaseRecord>(
+                predicate: #Predicate { $0.fetchedAt > since }))) ?? -1
+            if count == offered.count, newer == 0 { box.creditedReleases = offered }
+        }
+        if box.creditedReleases == nil {
+            box.creditedReleases = Trace.step("t.creditedReleaseIDs") {
+                // Whole rows: SwiftData cannot fetch an array attribute alone.
+                let readAt = Date()
+                var byCredit: [String: [Int]] = [:]
+                var folded: [String: String] = [:]
+                let releases = (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
+                for release in releases {
+                    for raw in release.credits where !raw.isEmpty {
+                        let key: String
+                        if let known = folded[raw] { key = known } else {
+                            key = RecordingKey.normalizeArtist(raw)
+                            folded[raw] = key
+                        }
+                        guard !key.isEmpty else { continue }
+                        byCredit[key, default: []].append(release.discogsID)
+                    }
+                }
+                return CreditedReleases(byCredit: byCredit, count: releases.count, readAt: readAt)
+            }
+        }
+        return box.creditedReleases?.byCredit[key] ?? []
+    }
+
     func releases(creditedTo key: String) -> [DiscogsReleaseRecord] {
         caches.releases(creditedTo: key)
     }
@@ -232,7 +293,11 @@ nonisolated struct GraphStore {
     /// with no picture and no way back to the artist it is a spelling of.
     /// The names are stripped at the boundary now, and every edge written
     /// before that has one of those nodes on the end of it.
-    static let builderVersion = 2
+    ///
+    /// Musician-first (`MusicianFirst`) walks by other rules, so it stores
+    /// under a number of its own: turning the switch either way works every
+    /// answer out again rather than reading the other rules' edges.
+    static var builderVersion: Int { MusicianFirst.isEnabled ? 1_002 : 2 }
 
     private func stored(for node: MusicNode) -> EdgeSet? {
         let identity = node.id
@@ -261,13 +326,27 @@ nonisolated struct GraphStore {
         // again to assemble the answer, doubles the only real work in here —
         // which `testCostOfTheWalkThePageActuallyAsksFor` notices.
         let built = rows.map { $0.edge(from: node) }
+        // By name, and by Discogs id where the destination knows its own: a
+        // picture verified for that id first, and a name's picture only when
+        // its address does not show somebody else (`picturedArtist`) -- a name
+        // is shared by namesakes, and one's face is not every one's.
         let portraits = portraitURLs(
-            forKeys: built.compactMap { $0.to.artworkURL == nil ? $0.to.key : nil }
+            forKeys: built.flatMap { edge -> [String] in
+                guard edge.to.artworkURL == nil else { return [] }
+                return [edge.to.key] + (edge.to.discogsID.map { [ArtistPortrait.identityKey($0)] } ?? [])
+            }
         )
+        func portrait(for node: MusicNode) -> URL? {
+            guard let id = node.discogsID else { return portraits[node.key] }
+            if let verified = portraits[ArtistPortrait.identityKey(id)] { return verified }
+            guard let byName = portraits[node.key] else { return nil }
+            if let pictured = DiscogsClient.picturedArtist(in: byName.absoluteString), pictured != id { return nil }
+            return byName
+        }
         var edges = EdgeSet()
         for original in built {
             var edge = original
-            if edge.to.artworkURL == nil, let portrait = portraits[edge.to.key] {
+            if edge.to.artworkURL == nil, let portrait = portrait(for: edge.to) {
                 var destination = edge.to
                 destination.artworkURL = portrait
                 edge = MusicEdge(
@@ -347,10 +426,25 @@ nonisolated struct GraphStore {
         // The alias branch is not the peer list. Traumprinz is not a good way
         // to broaden out from Traumprinz, however strongly the two are
         // connected — that is what the aliases section is for.
-        let family = caches.aliasKeys(of: node.title, context: context)
+        let family = aliasKeys(of: node)
         return neighbors(of: node).byDestination.filter {
             $0.node.kind == .artist && !family.contains($0.node.key)
         }
+    }
+
+    /// The record DIG filed under a name, from this graph's fold when it has
+    /// been assembled — the same row `DiscogsEnricher.cachedArtist(named:)`
+    /// fetches. Nil (not "no record") when it has not: asking must never be
+    /// what assembles six tables. See `IdentityEvidenceFold`.
+    func assembledDiscogsArtist(named name: String) -> DiscogsArtist?? {
+        guard let caches = assembledCaches else { return nil }
+        return .some(caches.discogsArtist(RecordingKey.normalizeArtist(name)))
+    }
+
+    /// The folded names in an artist's alias family, which RELATED leaves to
+    /// the aliases section.
+    func aliasKeys(of node: MusicNode) -> Set<String> {
+        caches.aliasKeys(of: node.title, context: context)
     }
 
     // MARK: - Artist
@@ -403,7 +497,15 @@ nonisolated struct GraphStore {
         var labels: [String: String?] = [:]
         for recording in caches.recordings(byArtistKey: node.key) {
             guard let metadata = caches.metadata[recording.id], let name = metadata.labelName else { continue }
-            labels[name] = metadata.labelMBID
+            // Several recordings can name one label, not all with its MBID.
+            // The last one read used to decide, and so did the page the label
+            // opened; any MBID beats none, and the lowest of two beats order.
+            let mbid = metadata.labelMBID
+            switch (labels[name] ?? nil, mbid) {
+            case (nil, _): labels[name] = mbid
+            case (let held?, let new?) where new < held: labels[name] = new
+            default: break
+            }
             if let catalog = metadata.catalogNumber, !catalog.isEmpty {
                 edges.insert(MusicEdge(
                     from: node, to: .catalogNumber(catalog), kind: .appearsOnRelease,
@@ -609,7 +711,9 @@ nonisolated struct GraphStore {
             ) {
                 let sharedLabel = subject.sharedLabel(with: peer)
                 let sharedStyles = subject.styleKeys.intersection(peer.styleKeys)
-                let sharedStyle = subject.style(forKey: sharedStyles.first)
+                // The first by key rather than `first` of a set, which is a
+                // different style -- and so a different reason -- per process.
+                let sharedStyle = subject.style(forKey: sharedStyles.min())
 
                 if let sharedLabel {
                     link(peer.name, .sharedLabel, .discogs, "Both release on \(sharedLabel)",
@@ -678,8 +782,10 @@ nonisolated struct GraphStore {
             for appearance in recording.appearances {
                 guard let showID = appearance.showID,
                       let title = subjectShows["\(appearance.providerID)|\(showID)"] else { continue }
+                // The show a lone shared broadcast is named after is the first
+                // by title, not the first read.
                 let existing = shared[peer]
-                shared[peer] = (existing?.title ?? title, (existing?.count ?? 0) + 1)
+                shared[peer] = (existing.map { min($0.title, title) } ?? title, (existing?.count ?? 0) + 1)
             }
         }
         for (peer, evidence) in shared {
@@ -728,8 +834,12 @@ nonisolated struct GraphStore {
         }
         for artist in caches.discogsArtists
         where artist.labelNames.contains(where: { RecordingKey.normalize($0) == node.key }) {
+            // The record's id only when it is filed under its own name. One
+            // filed under another spelling came from looser matching, and its
+            // id says nothing about who that name is; see `ArtistNodeIdentity`.
             edges.insert(MusicEdge(
-                from: node, to: .artist(artist.name, discogsID: artist.discogsID),
+                from: node,
+                to: .artist(artist.name, discogsID: artist.isFiledUnderItsOwnName() ? artist.discogsID : nil),
                 kind: .sharedLabel, source: .discogs, reason: "Releases on \(node.title)",
                 confidence: RelationshipKind.sharedLabel.baseConfidence
             ))
@@ -797,7 +907,7 @@ nonisolated struct GraphStore {
             // person to meet; the page is already about them.
             guard !headline.contains(RecordingKey.normalizeArtist(name)) else { continue }
             let role = index < record.creditRoles.count ? record.creditRoles[index] : ""
-            guard let kind = CreditRole.kind(of: role) else { continue }
+            guard let kind = CreditRole.kind(of: role), MusicianFirst.isRoute(role) else { continue }
             let tracks = index < record.creditTracks.count ? record.creditTracks[index] : ""
             edges.insert(MusicEdge(
                 from: node, to: .artist(name),
@@ -1364,9 +1474,11 @@ private nonisolated struct Caches {
             })
         }
 
+        /// The first label the two share, by key. It is named in the edge's
+        /// reason, and taken out of a dictionary it named a different label
+        /// in every process.
         func sharedLabel(with peer: Shape) -> String? {
-            for (key, spelling) in labels where peer.labels[key] != nil { return spelling }
-            return nil
+            labels.keys.sorted().first { peer.labels[$0] != nil }.flatMap { labels[$0] }
         }
 
         func style(forKey key: String?) -> String? { key.flatMap { styles[$0] } }

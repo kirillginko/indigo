@@ -9,9 +9,50 @@
 import SwiftUI
 import SwiftData
 
+/// Opens the artist a reference means rather than the spelling it arrived as.
+///
+/// "Prefuse73" and "Prefuse 73" land on one page, titled as Discogs files him,
+/// reading what was credited under both. An alias whose own record is empty
+/// opens its richer alias, saying so. Decided from evidence on every write
+/// (`DigStore.artistPage`), so the page moves when evidence arrives — the
+/// first open of a new spelling starts as itself and becomes its artist once
+/// the catalogue has answered.
+struct ArtistPageRoute: View {
+    let reference: ArtistReference
+    @Environment(DigStore.self) private var dig
+
+    var body: some View {
+        let _ = dig.revision
+        let page = dig.artistPage(reference)
+        ArtistDigView(
+            artistName: page.name,
+            artistMBID: page.mbid,
+            discogsID: page.discogsID,
+            alsoCreditedAs: page.alsoCreditedAs,
+            arrivedAs: page.arrivedAs,
+            cameFrom: page.cameFrom,
+            borrowed: page.borrowed,
+            titlePending: page.titlePending
+        )
+        .id(page.pageID)
+    }
+}
+
 struct ArtistDigView: View {
     let artistName: String
     let artistMBID: String?
+    var discogsID: Int? = nil
+    /// Other spellings verified to be this artist; see `ArtistPageRoute`.
+    var alsoCreditedAs: [String] = []
+    /// The spelling the listener followed here, when it is not this page's name.
+    var arrivedAs: String? = nil
+    /// The alias the listener asked for, when its record was empty and this,
+    /// its richer alias, opened in its place.
+    var cameFrom: String? = nil
+    /// A richer alias's description, for a page with little of its own.
+    var borrowed: ArtistPageIdentity.Borrowed? = nil
+    /// The name may be about to change; the header holds a placeholder.
+    var titlePending = false
 
     @Environment(AppState.self) private var appState
     @Environment(CrateService.self) private var crate
@@ -28,6 +69,8 @@ struct ArtistDigView: View {
     /// exactly what navigation felt like. The shell paints first and fills in.
     @State private var profile: ArtistProfile?
     @State private var lanes = Connections()
+    /// Lanes showing every row rather than the first twelve.
+    @State private var expandedLanes: Set<String> = []
     /// Set once the catalogues have actually been asked. "Nothing found"
     /// before that is a failure announced in advance.
     @State private var hasEnriched = false
@@ -41,14 +84,21 @@ struct ArtistDigView: View {
         // recomputed. Coming back to a page you were reading seconds ago
         // should not put a loading bar in front of it.
         let profile = profile
-            ?? dig.cachedArtistProfile(name: artistName, mbid: artistMBID)
+            ?? dig.cachedArtistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
             ?? ArtistProfile.placeholder(name: artistName, mbid: artistMBID)
-        let crateProvider = profile.mbid == nil ? "dig.artist.name" : "dig.artist.mbid"
-        let crateID = profile.mbid ?? RecordingKey.normalizeArtist(profile.name)
-        let isCrated = crate.contains(dig: .artist, identifier: crateID, providerID: crateProvider)
+        // Kept under its MBID when there is one, and otherwise by name — so
+        // an artist crated before MusicBrainz answered is kept by name. Every
+        // key the page answers to counts; a new row takes the first.
+        let crateKeys = Self.crateKeys(profile, opened: artistName, alsoCreditedAs: alsoCreditedAs)
+        let kept = crate.keptKey(dig: .artist, among: crateKeys)
+        let crateProvider = (kept ?? crateKeys[0]).providerID
+        let crateID = (kept ?? crateKeys[0]).identifier
+        let isCrated = kept != nil
         let collaborators = lanes.collaborators
         let producers = lanes.producers
+        let remixers = lanes.remixers
         let personnel = lanes.personnel
+        let sameRecords = lanes.sameRecords
         let projects = lanes.projects
         let labelArtists = lanes.labelArtists
         let soundArtists = lanes.soundArtists
@@ -61,7 +111,8 @@ struct ArtistDigView: View {
                     title: profile.name,
                     breadcrumb: appState.breadcrumbTitle,
                     onBack: { appState.popDetail() },
-                    subtitle: subtitle(profile)
+                    subtitle: subtitle(profile),
+                    titlePending: titlePending
                 ) {
                     CrateButton(isCrated: isCrated) {
                         crate.toggle(
@@ -84,7 +135,8 @@ struct ArtistDigView: View {
                         imageURL: profile.coverURL,
                         previewURL: profile.previewURL,
                         // The genres have their own section just below.
-                        awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil
+                        awaitingImage: !hasEnriched && profile.coverURL == nil && profile.previewURL == nil,
+                        titlePending: titlePending
                     )
                 }
                 // Lazy: the sections below the fold cost nothing until they
@@ -122,6 +174,7 @@ struct ArtistDigView: View {
                     // above the image". Reserving its space answered neither
                     // — the page still had a moving thing on it saying what
                     // the empty portrait underneath already said.
+                    identityNote(profile)
                     if isPhone {
                         phoneIntro(profile)
                     } else {
@@ -163,6 +216,11 @@ struct ArtistDigView: View {
                                                 .font(Typeface.body(12.5))
                                                 .foregroundStyle(Palette.inkMuted)
                                                 .fixedSize(horizontal: false, vertical: true)
+                                                .padding(.top, 5)
+                                        }
+                                    } else if let records = profile.fromTheRecords {
+                                        DigSection(title: "From the records") {
+                                            recordsSummary(records, font: Typeface.body(12.5), color: Palette.inkMuted)
                                                 .padding(.top, 5)
                                         }
                                     }
@@ -211,7 +269,7 @@ struct ArtistDigView: View {
                             genresSection(profile)
                             DigSection(title: "Aliases", trailing: "\(profile.aliases.count)") {
                                 DigLinkGrid(items: profile.aliases) { alias in
-                                    appState.open(.digArtist(mbid: nil, name: alias))
+                                    openAlias(alias)
                                 }
                             }
                         }
@@ -223,7 +281,7 @@ struct ArtistDigView: View {
                                     VStack(alignment: .leading, spacing: 0) {
                                         ForEach(profile.aliases, id: \.self) { alias in
                                             DigLine(text: alias) {
-                                                appState.open(.digArtist(mbid: nil, name: alias))
+                                                openAlias(alias)
                                             }
                                         }
                                     }
@@ -350,7 +408,9 @@ struct ArtistDigView: View {
                                 // artists whose records they made. Which way
                                 // round it is, is in each row's own reason.
                                 connectionLane("Production", artists: producers)
+                                connectionLane("Remixes", artists: remixers)
                                 connectionLane("Personnel", artists: personnel)
+                                connectionLane("On the same records", artists: sameRecords)
                                 connectionLane("Aliases & projects", artists: projects)
                                 connectionLane("Label neighbours", artists: labelArtists)
                                 connectionLane("Same frequency", artists: soundArtists)
@@ -381,10 +441,11 @@ struct ArtistDigView: View {
                     // arrives on this page already asking.
                     EncounterSection(node: .artist(profile.name, mbid: profile.mbid))
 
-                    ArtistRadioSection(artistName: profile.name)
+                    ArtistRadioSection(
+                        artistName: profile.name, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
 
                     DeepSectionView(
-                        origin: .artist(profile.name, mbid: profile.mbid),
+                        origin: .artist(profile.name, mbid: profile.mbid, discogsID: discogsID),
                         isReady: hasEnriched,
                         initial: nil,
                         showing: Self.shown(profile)
@@ -476,7 +537,7 @@ struct ArtistDigView: View {
             // walks of the graph, two rebuilds of the whole view — and all of
             // it after the top of the page was already on screen, which is
             // what the stutter was.
-            await dig.enrichArtist(name: artistName, mbid: artistMBID)
+            await dig.enrichArtist(name: artistName, mbid: artistMBID, discogsID: discogsID)
             artistScenes = await earlyScenes
             // The one exception, and it costs nothing: "nothing to dig into"
             // is held behind `hasEnriched`, so that flag must not be raised
@@ -485,6 +546,9 @@ struct ArtistDigView: View {
             // revision, and the store now walks it once for both.
             await readProfile()
             hasEnriched = true
+            // The ids behind the credits on their own records, where the
+            // cache predates them, so a credit opens the entry it names.
+            await dig.backfillReleaseCredits(forArtist: artistName)
 
             // The sleeves the page is showing, and nothing else yet. Running
             // Bandcamp alongside doubled the request stream while somebody was
@@ -561,7 +625,7 @@ struct ArtistDigView: View {
     }
 
     private func readProfile() async {
-        let found = await dig.artistProfile(name: artistName, mbid: artistMBID)
+        let found = await dig.artistProfile(name: artistName, mbid: artistMBID, alsoCreditedAs: alsoCreditedAs, discogsID: discogsID)
         profile = found
         // What a listener can see after this read: whether the profile has
         // arrived, and whether the veil has lifted. The first line with each
@@ -621,7 +685,9 @@ struct ArtistDigView: View {
     struct Connections {
         var collaborators: [RelatedArtist] = []
         var producers: [RelatedArtist] = []
+        var remixers: [RelatedArtist] = []
         var personnel: [RelatedArtist] = []
+        var sameRecords: [RelatedArtist] = []
         var projects: [RelatedArtist] = []
         var labelArtists: [RelatedArtist] = []
         var soundArtists: [RelatedArtist] = []
@@ -633,16 +699,29 @@ struct ArtistDigView: View {
         /// lands in the strongest lane that claims them.
         static func split(_ related: [RelatedArtist]) -> Connections {
             var lanes = Connections()
-            for artist in related {
+            // Who leads somewhere first, the order within each kind kept.
+            let ordered = related.enumerated().sorted {
+                $0.element.leadsOn != $1.element.leadsOn ? $0.element.leadsOn : $0.offset < $1.offset
+            }.map(\.element)
+            for artist in ordered {
                 let kinds = Set(artist.reasons.map(\.kind))
-                if !kinds.isDisjoint(with: [.collaborator, .appearsOnRelease]) {
+                if !kinds.isDisjoint(with: [.sameAlias, .aliasOrProject]) {
+                    // Their own other names first: an alias is the same
+                    // person, whatever else the records say about them.
+                    lanes.projects.append(artist)
+                } else if !kinds.isDisjoint(with: [.collaborator, .appearsOnRelease]) {
                     lanes.collaborators.append(artist)
                 } else if kinds.contains(.producer) {
-                    lanes.producers.append(artist)
+                    // A remixer is somebody whose production credits are all
+                    // remixes. One credit often names several jobs ("Producer,
+                    // Remix"): any production beyond the remix keeps them here.
+                    let jobs = artist.reasons.filter { $0.kind == .producer }.map { $0.detail.lowercased() }
+                    let remixOnly = !jobs.isEmpty && jobs.allSatisfy { $0.contains("remix") && !$0.contains("produc") }
+                    if remixOnly { lanes.remixers.append(artist) } else { lanes.producers.append(artist) }
                 } else if kinds.contains(.personnel) {
                     lanes.personnel.append(artist)
-                } else if kinds.contains(.aliasOrProject) {
-                    lanes.projects.append(artist)
+                } else if kinds.contains(.sameRelease) {
+                    lanes.sameRecords.append(artist)
                 } else if kinds.contains(.sharedLabel) {
                     lanes.labelArtists.append(artist)
                 } else if kinds.contains(.sharedStyle) {
@@ -750,15 +829,79 @@ struct ArtistDigView: View {
     /// a second copy of it, and the descent began by asking somebody to press
     /// past what they had just scrolled through. The labels, the discography
     /// and the aliases are on the page for the same reason.
+    /// The crate keys this page answers to, the one a new row takes first.
+    static func crateKeys(_ profile: ArtistProfile, opened: String, alsoCreditedAs: [String])
+        -> [(identifier: String, providerID: String)] {
+        var keys: [(identifier: String, providerID: String)] = []
+        if let mbid = profile.mbid { keys.append((mbid, "dig.artist.mbid")) }
+        var names = Set<String>()
+        for name in [profile.name, opened] + alsoCreditedAs {
+            let key = RecordingKey.normalizeArtist(name)
+            guard !key.isEmpty, names.insert(key).inserted else { continue }
+            keys.append((key, "dig.artist.name"))
+        }
+        return keys.isEmpty ? [(RecordingKey.normalizeArtist(profile.name), "dig.artist.name")] : keys
+    }
+
     private static func shown(_ profile: ArtistProfile) -> Set<String> {
         var ids: Set<String> = []
-        for artist in profile.related { ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id) }
+        for artist in profile.related {
+            ids.insert(MusicNode.artist(artist.name, mbid: artist.mbid).id)
+            // And by entry: DEEP walks the same identities RELATED does.
+            if let id = artist.discogsID { ids.insert(GraphIdentityKey.discogs(id).nodeID) }
+        }
         for alias in profile.aliases { ids.insert(MusicNode.artist(alias).id) }
         for label in profile.labels { ids.insert(MusicNode.label(label.name, mbid: label.mbid).id) }
         for release in profile.releases {
             ids.insert(MusicNode.release(release.title, discogsID: release.discogsID).id)
         }
         return ids
+    }
+
+    /// Opens an alias by the Discogs entry this one names for it, rather than
+    /// by searching its name — "Micachu" is the entry Mica Levi's lists, not
+    /// whichever Micachu a search ranks first.
+    private func openAlias(_ alias: String) {
+        let key = ArtistSpelling.filingKey(alias)
+        let id = discogsID
+            .flatMap { dig.identityStore.facts($0) }?
+            .aliases.first { ArtistSpelling.filingKey($0.name) == key }?.id
+        appState.open(.digArtist(mbid: nil, name: alias, discogsID: id))
+    }
+
+    /// How this page relates to what was opened, when it is not simply that.
+    ///
+    /// Said in one quiet line, because the page is the artist's and this is
+    /// only how the listener got to it: the spelling they followed, or the
+    /// empty alias this page opened in place of. A sparse page borrowing a
+    /// richer alias's description says whose it is, and goes there.
+    @ViewBuilder
+    private func identityNote(_ profile: ArtistProfile) -> some View {
+        if let cameFrom {
+            Text("Opened from \(cameFrom), an alias with no record of its own")
+                .font(Typeface.mono(10))
+                .foregroundStyle(Palette.inkFaint)
+        } else if let arrivedAs {
+            Text("Also credited as \(arrivedAs)")
+                .font(Typeface.mono(10))
+                .foregroundStyle(Palette.inkFaint)
+        }
+        if let borrowed, (profile.biography ?? "").isEmpty, let biography = borrowed.biography {
+            VStack(alignment: .leading, spacing: 6) {
+                Button {
+                    appState.open(.digArtist(mbid: nil, name: borrowed.name, discogsID: borrowed.discogsID))
+                } label: {
+                    Text("About the artist, from their alias \(borrowed.name) ↗")
+                        .font(Typeface.mono(10))
+                        .foregroundStyle(Palette.inkFaint)
+                }
+                .buttonStyle(.plain)
+                Text(biography)
+                    .font(Typeface.body(12.5))
+                    .foregroundStyle(Palette.inkMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 
     @ViewBuilder
@@ -779,9 +922,26 @@ struct ArtistDigView: View {
                     .lineSpacing(3)
                     .foregroundStyle(.white.opacity(0.72))
                     .fixedSize(horizontal: false, vertical: true)
+            } else if let records = profile.fromTheRecords {
+                recordsSummary(records, font: Typeface.mono(12.5), color: .white.opacity(0.72))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The facts the artist's own documents state, and what they rest on --
+    /// said as such, so it is never mistaken for a written profile.
+    private func recordsSummary(_ records: RecordsSummary.Summary, font: Font, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(records.text)
+                .font(font)
+                .lineSpacing(3)
+                .foregroundStyle(color)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("From \(records.documents) release \(records.documents == 1 ? "document" : "documents") on Discogs")
+                .font(Typeface.mono(9.5))
+                .foregroundStyle(Palette.inkFaint)
+        }
     }
 
     @ViewBuilder
@@ -845,14 +1005,23 @@ struct ArtistDigView: View {
                     alignment: .leading,
                     spacing: 10
                 ) {
-                    ForEach(artists.prefix(12)) { peer in
+                    ForEach(expandedLanes.contains(title) ? Array(artists) : Array(artists.prefix(12))) { peer in
                         ConnectionExplainer(
                             artist: peer,
-                            portrait: dig.portraitURL(for: peer.name)
+                            portrait: dig.portraitURL(for: peer.name, discogsID: peer.discogsID)
                         ) {
-                            appState.open(.digArtist(mbid: peer.mbid, name: peer.name))
+                            appState.open(.digArtist(mbid: peer.mbid, name: peer.name, discogsID: peer.discogsID))
                         }
                     }
+                }
+                // Twelve to a lane at first; the rest a tap away, not cut.
+                if artists.count > 12 {
+                    Button(expandedLanes.contains(title) ? "Fewer" : "All \(artists.count)") {
+                        if expandedLanes.contains(title) { expandedLanes.remove(title) } else { expandedLanes.insert(title) }
+                    }
+                    .buttonStyle(.plain)
+                    .microLabel(1.2, size: 9)
+                    .foregroundStyle(Palette.inkMuted)
                 }
             }
         }

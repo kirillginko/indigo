@@ -12,6 +12,7 @@
 
 import XCTest
 import OSLog
+import Darwin
 import SwiftData
 @testable import Indigo
 
@@ -902,5 +903,109 @@ final class DigPerformanceTests: XCTestCase {
             "A page re-reads its profile on every write; the Artist table is "
             + "being walked again"
         )
+    }
+
+    // MARK: For You
+
+    /// The process's physical footprint, in megabytes: what the system
+    /// charges the app for, the figure Xcode's memory gauge shows.
+    private func footprintMB() -> Double {
+        var info = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<natural_t>.size)
+        let result = withUnsafeMutablePointer(to: &info) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+            }
+        }
+        return result == KERN_SUCCESS ? Double(info.phys_footprint) / 1_048_576 : -1
+    }
+
+    /// What a listener brings to For You: twelve artists played.
+    private func seedListening() throws {
+        for index in 0..<12 {
+            context.insert(ListeningEvent(node: .artist("Artist \(index * 7)"), action: .played,
+                                          at: ExploreFixtures.base.addingTimeInterval(Double(index) * 60),
+                                          seconds: 1_200, completion: 1, tags: [], source: nil))
+        }
+        try context.save()
+    }
+
+    private func forYou(_ worker: DigWorker, generation: Int) async -> ExploreRun {
+        await worker.exploreRun(asOf: ExploreFixtures.asOf, period: ExplorePeriod.containing(ExploreFixtures.asOf),
+                                generation: generation, scenes: false, rebuild: false, now: Date())
+    }
+
+    /// The first look of a session, from nothing.
+    ///
+    /// Here, where no edge is stored and every walk is computed: 6.7s before
+    /// identity, 9.8s when it arrived. On a copy of a real store, 1.0s and
+    /// 2.7s: crediting each artist's edges listed the releases credited to
+    /// them, and only the graph's six tables could say, so For You read all of
+    /// them (1.7s) to learn it; and the listener's twelve artists were placed
+    /// by reading five thousand filed records. The release table alone answers
+    /// the first, and a fetch apiece the second.
+    func testCostOfAColdForYou() async throws {
+        try seedListening()
+        let worker = DigWorker(modelContainer: container)
+        var run: ExploreRun?
+        let before = footprintMB()
+        let cost = await milliseconds2 { run = await forYou(worker, generation: 0) }
+        let after = footprintMB()
+        let parts = (run?.report.milliseconds ?? [:]).sorted { $0.key < $1.key }.map { "\($0.key)=\(Int($0.value))" }
+        record("forYou(cold) \(cost)ms footprint \(Int(before))→\(Int(after))MB \(parts.joined(separator: " "))")
+        XCTAssertLessThan(cost, 8_500, "Identity costs a cold For You more than it did")
+    }
+
+    /// The same generation again: nothing walked, nothing re-confirmed.
+    func testCostOfAWarmForYou() async throws {
+        try seedListening()
+        let worker = DigWorker(modelContainer: container)
+        _ = await forYou(worker, generation: 0)
+        var run: ExploreRun?
+        let cost = await milliseconds2 { run = await forYou(worker, generation: 0) }
+        let parts = (run?.report.milliseconds ?? [:]).sorted { $0.key < $1.key }.map { "\($0.key)=\(Int($0.value))" }
+        record("forYou(warm) \(cost)ms rebuilt=\(run?.report.rebuilt ?? []) \(parts.joined(separator: " "))")
+        XCTAssertEqual(run?.report.rebuilt, [])
+        XCTAssertNil(run?.report.milliseconds["identity.evidence"], "Not re-confirmed within a generation")
+        XCTAssertLessThan(cost, 400)
+    }
+
+    /// An artist page opened while For You's first look is being worked out
+    /// waits for one starting point, not for all of them.
+    func testAnArtistPageIsNotHeldBehindAColdForYou() async throws {
+        try seedListening()
+        let idle = DigWorker(modelContainer: container)
+        let alone = await milliseconds2 { _ = await idle.artistProfile(name: "Artist 3", mbid: nil, generation: 0) }
+
+        let worker = DigWorker(modelContainer: container)
+        var forYouCost = 0
+        let started = ContinuousClock.now
+        let look = Task { await forYou(worker, generation: 0) }
+        await Task.yield()
+        let page = await milliseconds2 { _ = await worker.artistProfile(name: "Artist 3", mbid: nil, generation: 0) }
+        _ = await look.value
+        let total = ContinuousClock.now - started
+        forYouCost = Int(total.components.seconds * 1000 + total.components.attoseconds / 1_000_000_000_000_000)
+        record("contention: page alone \(alone)ms, page during a cold For You \(page)ms, For You \(forYouCost)ms")
+        XCTAssertLessThan(page, forYouCost, "The page did not wait for the whole look")
+    }
+
+    /// Within a generation the credited-release map is read once, and a
+    /// generation after a write that touched no release takes it over.
+    func testRepeatedLookupsInOneGenerationReadTheReleaseTableOnce() throws {
+        // Past the overlap a read allows for records saved while it ran: the
+        // seed wrote every record a moment ago.
+        sleep(6)
+        let graph = GraphStore(context: context)
+        let first = milliseconds { _ = graph.releaseIDs(creditedTo: "artist 1") }
+        let again = milliseconds { for index in 0..<200 { _ = graph.releaseIDs(creditedTo: "artist \(index)") } }
+        context.insert(ListeningEvent(node: .artist("Artist 2"), action: .played, at: ExploreFixtures.base,
+                                      seconds: 60, completion: 1, tags: [], source: nil))
+        try context.save()
+        let next = GraphStore(context: context, inheriting: graph)
+        let handedOn = milliseconds { _ = next.releaseIDs(creditedTo: "artist 1") }
+        record("releaseIDs: first \(first)ms, 200 more \(again)ms, next generation \(handedOn)ms")
+        XCTAssertLessThan(again, max(20, first / 4), "Read once a generation")
+        XCTAssertLessThan(handedOn, max(20, first / 4), "Handed on while the release table is unchanged")
     }
 }

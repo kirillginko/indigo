@@ -20,57 +20,69 @@ import SwiftData
 
 extension TasteProfile {
     /// What this listener is drawn to, from the log, the crate, and the
-    /// catalogue entries for the artists they kept.
+    /// catalogue entries for the artists they kept -- read from the store.
+    ///
+    /// The same profile `collected(personal:artistTags:now:)` works out from
+    /// plain values, given what the store holds; EXPLORE builds those values
+    /// itself and calls that directly.
     static func collected(context: ModelContext, now: Date = Date()) -> TasteProfile {
+        let personal = PersonalInputs.read(context: context, asOf: now)
+        return collected(
+            personal: personal,
+            artistTags: LocalKnowledgeAdapter.artistTags(for: personal.tasteArtistKeys, in: context),
+            now: now
+        )
+    }
+
+    /// The profile itself, from the listener's rows and what the catalogue
+    /// says their kept artists sound like (`artistTags`: folded styles and
+    /// genres by artist key).
+    ///
+    /// Each source is added up in an order of its own content. These are sums
+    /// of doubles, and a last-bit difference in a weight is enough to swap two
+    /// equal suggestions. `now` is the moment plays are aged from -- EXPLORE
+    /// passes its `asOf` rather than the clock.
+    static func collected(personal: PersonalInputs, artistTags: [String: [String]], now: Date) -> TasteProfile {
         var totals: [String: Double] = [:]
         var evidence: Double = 0
 
         // Listening, decayed. The same arithmetic as `build(from:)`, because
         // an event means the same thing whichever profile is reading it.
-        for event in ListeningLog(context: context).since(now.addingTimeInterval(-horizon)) {
-            let weight = event.weight
-            guard weight != 0, !event.tags.isEmpty else { continue }
-            let age = max(0, now.timeIntervalSince(event.at))
+        // `plays` is oldest first, then by id.
+        for play in personal.plays where play.at >= now.addingTimeInterval(-horizon) {
+            let weight = play.weight
+            guard weight != 0, !play.tags.isEmpty else { continue }
+            let age = max(0, now.timeIntervalSince(play.at))
             let decayed = weight * pow(0.5, age / halfLife)
             if decayed > 0 { evidence += decayed }
-            let share = decayed / Double(event.tags.count)
-            for tag in event.tags { totals[tag, default: 0] += share }
+            let share = decayed / Double(play.tags.count)
+            for tag in play.tags { totals[tag, default: 0] += share }
         }
 
         // The crate. Not decayed: keeping something is a standing statement
         // rather than a moment, and a record filed two years ago is still on
-        // the shelf.
-        let crate = CrateService(context: context)
-        let items = crate.items()
+        // the shelf. Oldest first, as the store's own order was.
         var crateArtistKeys = Set<String>()
-        for item in items {
+        for item in personal.crate.reversed() {
             let tags = ListeningLog.foldTags(item.genreTags)
             if !tags.isEmpty {
                 evidence += 0.6
                 let share = 0.6 / Double(tags.count)
                 for tag in tags { totals[tag, default: 0] += share }
             }
-            if let node = item.node, node.kind == .artist {
-                crateArtistKeys.insert(RecordingKey.normalizeArtist(node.title))
-            }
-            if let name = item.artistName {
-                crateArtistKeys.insert(RecordingKey.normalizeArtist(name))
-            }
+            crateArtistKeys.formUnion(item.tasteArtistKeys)
         }
 
         // And what the catalogue says those artists sound like. This is where
         // most of the detail comes from: a crated row carries whatever tags
         // the surface that crated it happened to have, and a Discogs entry
         // carries a dozen styles.
-        if !crateArtistKeys.isEmpty {
-            for artist in (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
-            where crateArtistKeys.contains(artist.nameKey) {
-                let tags = ListeningLog.foldTags(artist.styles + artist.genres)
-                guard !tags.isEmpty else { continue }
-                evidence += 0.4
-                let share = 0.4 / Double(tags.count)
-                for tag in tags { totals[tag, default: 0] += share }
-            }
+        for key in artistTags.keys.sorted() where crateArtistKeys.contains(key) {
+            let tags = artistTags[key] ?? []
+            guard !tags.isEmpty else { continue }
+            evidence += 0.4
+            let share = 0.4 / Double(tags.count)
+            for tag in tags { totals[tag, default: 0] += share }
         }
 
         let positive = totals.filter { $0.value > 0 }

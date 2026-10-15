@@ -1,0 +1,213 @@
+//
+//  ArtistNodeIdentity.swift
+//  Indigo
+//
+//  Who an artist node in the graph is, and how that is known.
+//
+//  A graph node is a key — the folded name it stands for — with a title and
+//  sometimes a Discogs id along for the ride. The id was not always earned.
+//  Cached artist rows are keyed by the name somebody asked for, older ones were
+//  filed by looser matching, and the graph built nodes from them: one row
+//  filed under "duenn nyantora" holds Duenn's record, and became a node keyed
+//  "duenn nyantora" and titled "Duenn". Resolve that by its title and two
+//  artists are one.
+//
+//  So a node is identified by what it stands for — its key — and an id it
+//  carries counts as verified only when a source that identifies the artist
+//  supports it: one of the records' own credits, the identity evidence
+//  (`ArtistIdentityResolver`), or a cached record filed under exactly this
+//  name. Anything else is inferred: kept, because navigation still uses it,
+//  but never taken for identity, and never over what verified evidence says.
+//
+//  Nothing here is stored. Stored graph keys stay the folded names they are —
+//  synced visits, steps and stored edges hold them — and this is read over
+//  them when the graph is walked (`IdentityGraph`).
+//
+
+import Foundation
+import SwiftData
+
+nonisolated struct ArtistNodeIdentity: Hashable, Sendable {
+    /// Where the identity came from, strongest first.
+    nonisolated enum Provenance: String, Hashable, Sendable {
+        /// A release's own credit names this spelling with this entry.
+        case credit
+        /// A Discogs entry lists this spelling, with this id, as its alias,
+        /// group or member.
+        case entryLink
+        /// Identity evidence: an explicit id, a MusicBrainz link, a verified
+        /// spelling (see `IdentityBasis`).
+        case resolver
+        /// A cached record filed under exactly this name.
+        case filedRecord
+        /// The id the node carried belongs to an entry filed under this name —
+        /// consistent, but namesakes share filing names, so not proof that this
+        /// node is that entry.
+        case consistentRecord
+        /// An id the node carried that nothing above supports.
+        case inferred
+        /// No entry at all: the artist is their name.
+        case nameOnly
+    }
+
+    /// The identity the node resolves to: a Discogs entry when verified,
+    /// otherwise its name.
+    let identity: ArtistIdentity
+    let provenance: Provenance
+    /// The id the node carried, whatever it rested on.
+    let carriedDiscogsID: Int?
+    /// What the identity evidence rested on, when it decided.
+    var basis: IdentityBasis? = nil
+    /// The entry's own name, when the evidence says it: a credit's filing name
+    /// without its marks. The node's own spelling stays its reference.
+    var entryName: String? = nil
+
+    /// Whether the identity rests on something that identifies the artist.
+    var isVerified: Bool { provenance == .credit || provenance == .entryLink || provenance == .resolver || provenance == .filedRecord }
+}
+
+/// Identifies graph nodes from the evidence DIG holds. The one place the graph
+/// asks who a node is; it reuses `ArtistIdentityStore.artistResolution` — the
+/// answer DIG's pages open by — rather than deciding anything of its own.
+///
+/// Not main-actor: the graph is walked on `DigWorker`. One identifier serves
+/// one context, on whichever actor owns it.
+nonisolated final class ArtistNodeIdentifier {
+    let context: ModelContext
+    private let identityStore: ArtistIdentityStore
+
+    /// - Parameter identityStore: where the evidence is read; by default,
+    ///   fetched per question. A walk over hundreds of nodes passes one with a
+    ///   fold (`IdentityEvidenceFold`).
+    init(context: ModelContext, identityStore: ArtistIdentityStore? = nil) {
+        self.context = context
+        self.identityStore = identityStore ?? ArtistIdentityStore(context: context)
+    }
+
+    @MainActor convenience init(store: DigStore) { self.init(context: store.context) }
+
+    // Explicit, so releasing one under XCTest does not abort the host; see
+    // the note on `DigStore`'s deinit.
+    deinit {}
+
+    /// Every spelling a kept credit names each entry under, folded. Read once:
+    /// a graph asks about hundreds of nodes.
+    private lazy var creditedKeys: [Int: Set<String>] = {
+        var keys: [Int: Set<String>] = [:]
+        for record in (try? context.fetch(FetchDescriptor<ReleaseCreditRecord>())) ?? [] {
+            for credit in record.credits {
+                guard let id = credit.discogsID else { continue }
+                keys[id, default: []].insert(RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(credit.creditedName)))
+                keys[id, default: []].insert(RecordingKey.normalizeArtist(credit.name))
+                // The entry's name as its credits file it; the least, so the
+                // answer is the same whichever release was read first.
+                let filed = DiscogsClient.withoutDisambiguator(credit.filingName)
+                if entryNames[id].map({ filed < $0 }) ?? true { entryNames[id] = filed }
+            }
+        }
+        return keys
+    }()
+
+    private var entryNames: [Int: String] = [:]
+
+    /// Every name an entry lists for another, with its id, folded: aliases,
+    /// groups and members.
+    private lazy var linkedKeys: [Int: Set<String>] = {
+        var keys: [Int: Set<String>] = [:]
+        let every = identityStore.fold.map { Array($0.facts.values) }
+            ?? ((try? context.fetch(FetchDescriptor<DiscogsIdentityRecord>())) ?? []).map(\.facts)
+        for facts in every {
+            for link in facts.aliases + facts.groups + facts.members {
+                keys[link.id, default: []].insert(RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(link.name)))
+            }
+        }
+        return keys
+    }()
+
+    /// Which entries the evidence ties to a folded name, beyond its own
+    /// verdict: credits that use the spelling with an id, and entries that
+    /// list it as an alias, group or member. Sorted; what a placement of that
+    /// name can rest on, so a digest of it changes when the answer could.
+    func support(for key: String) -> [String] { supportByKey[key] ?? [] }
+
+    private lazy var supportByKey: [String: [String]] = {
+        var found: [String: [String]] = [:]
+        for (id, keys) in creditedKeys { for key in keys { found[key, default: []].append("credit:\(id)") } }
+        for (id, keys) in linkedKeys { for key in keys { found[key, default: []].append("link:\(id)") } }
+        return found.mapValues { $0.sorted() }
+    }()
+
+    func identify(_ node: MusicNode) -> ArtistNodeIdentity {
+        precondition(node.kind == .artist, "Only artist nodes have an artist identity")
+        let key = node.key
+        // The name the node stands for. A title that folds to something else
+        // is a label put on it by a record that may not be this artist's.
+        let name = RecordingKey.normalizeArtist(node.title) == key ? node.title : key
+        let resolution = identityStore.artistResolution(ArtistReference(name: name, mbid: node.mbid))
+        // A verified spelling is called what its entry is called, as a credit
+        // is: one artist reached as "Prefuse73" and as "Prefuse 73" is one row,
+        // and which spelling arrived first must not name it.
+        let resolved: ArtistIdentityState? = resolution.isVerified
+            ? ArtistIdentityState(identity: resolution.identity,
+                                  provenance: resolution.basis == .filedRecord ? .filedRecord : .resolver,
+                                  basis: resolution.basis, entryName: resolution.canonicalName)
+            : nil
+
+        guard let carried = node.discogsID else {
+            return ArtistNodeIdentity(
+                identity: resolved?.identity ?? .name(name),
+                provenance: resolved?.provenance ?? .nameOnly,
+                carriedDiscogsID: nil, basis: resolved?.basis, entryName: resolved?.entryName
+            )
+        }
+        // Verified evidence decides; an id the node carried never overrides it.
+        if let resolved, resolved.identity.discogsID != nil, resolved.provenance != .filedRecord {
+            return ArtistNodeIdentity(identity: resolved.identity, provenance: resolved.provenance,
+                                      carriedDiscogsID: carried, basis: resolved.basis, entryName: resolved.entryName)
+        }
+        if creditsSupport(carried, for: key) {
+            return ArtistNodeIdentity(identity: .discogs(carried), provenance: .credit, carriedDiscogsID: carried,
+                                      entryName: entryNames[carried])
+        }
+        if linkedKeys[carried]?.contains(key) == true {
+            return ArtistNodeIdentity(identity: .discogs(carried), provenance: .entryLink, carriedDiscogsID: carried,
+                                      entryName: identityStore.facts(carried)?.canonicalName)
+        }
+        if identityStore.facts(carried).map({ RecordingKey.normalizeArtist($0.canonicalName) == key }) == true {
+            return ArtistNodeIdentity(identity: .discogs(carried), provenance: .consistentRecord, carriedDiscogsID: carried)
+        }
+        if let resolved {
+            // Only the record filed under the name, which says less than the
+            // id did — keep the record's answer, as filed, not as proof.
+            return ArtistNodeIdentity(identity: resolved.identity, provenance: resolved.provenance,
+                                      carriedDiscogsID: carried, basis: resolved.basis)
+        }
+        return ArtistNodeIdentity(identity: .name(name), provenance: .inferred, carriedDiscogsID: carried)
+    }
+
+    /// Whether any kept credit names this spelling with this entry.
+    private func creditsSupport(_ discogsID: Int, for key: String) -> Bool {
+        creditedKeys[discogsID]?.contains(key) == true
+    }
+
+    private struct ArtistIdentityState {
+        let identity: ArtistIdentity
+        let provenance: ArtistNodeIdentity.Provenance
+        let basis: IdentityBasis?
+        let entryName: String
+    }
+}
+
+extension DiscogsArtist {
+    /// Whether this cached record is filed under its own name — the name its
+    /// Discogs entry gives, without filing marks — or under a spelling the
+    /// identity evidence verifies as theirs. A record filed under anything
+    /// else came from looser matching than today's and says nothing about who
+    /// that name is.
+    func isFiledUnderItsOwnName(identityStore: ArtistIdentityStore? = nil) -> Bool {
+        guard discogsID > 0 else { return false }
+        if RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) == nameKey { return true }
+        guard let identityStore, let verdict = identityStore.verdict(for: nameKey) else { return false }
+        return verdict == .variation(discogsID) || verdict == .canonical([discogsID])
+    }
+}

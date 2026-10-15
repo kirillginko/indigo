@@ -19,6 +19,13 @@ import SwiftUI
 
 struct ArtistRadioSection: View {
     let artistName: String
+    /// Other spellings verified to be this artist ("Prefuse73" for Prefuse 73),
+    /// whose catalogue rows hold radio plays of their own. See
+    /// `Catalog.combinedRadio`.
+    var alsoCreditedAs: [String] = []
+    /// The artist's Discogs entry, when known: the surest way to the row filed
+    /// under it, ahead of looking the name up.
+    var discogsID: Int? = nil
     /// What the block calls itself. On an artist's own page "On radio" is the
     /// whole claim; on a track's page it has to say whose radio history this
     /// is, because it is the artist's and not that recording's.
@@ -65,14 +72,14 @@ struct ArtistRadioSection: View {
                     broadcasts
                 }
             }
-            .task(id: artistName) { await load() }
+            .task(id: loadKey) { await load() }
         } else {
             // A zero-height view that still runs the load. Without it the
             // section would need the page to know in advance whether it had
             // anything to draw.
             Color.clear
                 .frame(height: 0)
-                .task(id: artistName) { await load() }
+                .task(id: loadKey) { await load() }
         }
     }
 
@@ -173,28 +180,43 @@ struct ArtistRadioSection: View {
         guard SupabaseService.isConfigured else { return }
 
         do {
-            // Two artists can share a normalized name, and the ingest resolver
-            // refuses to guess between them for exactly that reason. Guessing
-            // here would put one artist's broadcasts on the other's page with
-            // nothing on screen to say it had happened.
-            let matches = try await ArtistRepository.shared.artists(named: artistName)
-            guard matches.count == 1, let artist = matches.first else {
+            let rows = try await artistRows()
+            guard let primary = rows.first else {
                 summary = nil
                 episodes = []
                 relations = []
                 return
             }
 
-            async let summaryTask = RadioRepository.shared.summary(forArtist: artist.id)
-            async let appearancesTask = RadioRepository.shared.appearances(
-                forArtist: artist.id, limit: Self.appearanceLimit)
-            async let relationsTask = RadioRepository.shared.relations(forArtist: artist.id)
+            if rows.count == 1 {
+                async let summaryTask = RadioRepository.shared.summary(forArtist: primary)
+                async let appearancesTask = RadioRepository.shared.appearances(
+                    forArtist: primary, limit: Self.appearanceLimit)
+                async let relationsTask = RadioRepository.shared.relations(forArtist: primary)
 
-            let (loadedSummary, appearances, loadedRelations) =
-                try await (summaryTask, appearancesTask, relationsTask)
-            summary = loadedSummary
-            episodes = Catalog.groupedByEpisode(appearances)
-            relations = loadedRelations
+                let (loadedSummary, appearances, loadedRelations) =
+                    try await (summaryTask, appearancesTask, relationsTask)
+                summary = loadedSummary
+                episodes = Catalog.groupedByEpisode(appearances)
+                relations = loadedRelations
+                return
+            }
+
+            var parts: [Catalog.ArtistRadioPart] = []
+            for row in rows {
+                async let summaryTask = RadioRepository.shared.summary(forArtist: row)
+                async let appearancesTask = RadioRepository.shared.appearances(
+                    forArtist: row, limit: Self.appearanceLimit)
+                async let relationsTask = RadioRepository.shared.relations(forArtist: row)
+                let (loadedSummary, appearances, loadedRelations) =
+                    try await (summaryTask, appearancesTask, relationsTask)
+                parts.append(Catalog.ArtistRadioPart(
+                    summary: loadedSummary, appearances: appearances, relations: loadedRelations))
+            }
+            let combined = Catalog.combinedRadio(parts)
+            summary = combined?.summary
+            episodes = Catalog.groupedByEpisode(Array((combined?.appearances ?? []).prefix(Self.appearanceLimit)))
+            relations = combined?.relations ?? []
         } catch is CancellationError {
         } catch {
             // The rest of the page is local and already drawn. A backend that
@@ -204,6 +226,41 @@ struct ArtistRadioSection: View {
             episodes = []
             relations = []
         }
+    }
+
+    private var loadKey: String {
+        ([artistName] + alsoCreditedAs).joined(separator: "|") + "|\(discogsID ?? 0)"
+    }
+
+    /// The catalogue rows holding this artist's radio, the primary first.
+    ///
+    /// The one row holding their name, as it always was; failing that, the row
+    /// filed under their Discogs entry. Not the other way round: radio is filed
+    /// by name, so the row a Discogs entry created can hold no plays at all
+    /// while the name's row holds them all. Each verified spelling adds the one
+    /// row holding it.
+    ///
+    /// A name held by more than one row adds nothing: two artists can share a
+    /// normalized name, and the ingest resolver refuses to guess between them
+    /// for exactly that reason. Guessing here would put one artist's broadcasts
+    /// on the other's page with nothing on screen to say it had happened.
+    private func artistRows() async throws -> [UUID] {
+        var rows: [UUID] = []
+        let matches = try await ArtistRepository.shared.artists(named: artistName)
+        if matches.count == 1, let artist = matches.first {
+            rows.append(artist.id)
+        } else if let discogsID,
+                  let filed = try await ArtistRepository.shared.artist(externalID: String(discogsID), provider: "discogs") {
+            rows.append(filed.id)
+        } else {
+            return []
+        }
+        for spelling in alsoCreditedAs where ArtistSpelling.key(spelling) != ArtistSpelling.key(artistName) {
+            let matches = try await ArtistRepository.shared.artists(named: spelling)
+            guard matches.count == 1, let artist = matches.first, !rows.contains(artist.id) else { continue }
+            rows.append(artist.id)
+        }
+        return rows
     }
 
     private func sinceLabel(_ summary: Catalog.ArtistRadioSummary) -> String {

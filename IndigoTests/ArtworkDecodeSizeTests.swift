@@ -8,6 +8,9 @@
 //  84 on screen.
 //
 
+// Reads pixels through AppKit, so it runs on the Mac only; without the
+// guard the whole test target would not build for an iOS simulator.
+#if canImport(AppKit)
 import XCTest
 import ImageIO
 import UniformTypeIdentifiers
@@ -69,3 +72,4 @@ final class ArtworkDecodeSizeTests: XCTestCase {
         XCTAssertEqual(RemoteArtworkStore.step(for: 300), 512)
     }
 }
+#endif

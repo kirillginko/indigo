@@ -376,4 +376,65 @@ final class HistoryObserverTests: XCTestCase {
         XCTAssertEqual(batched, try snapshot(context2))
         XCTAssertEqual(UserDataInvariants.violations(in: local), [])
     }
+    // MARK: What another writer touched
+
+    private func touched(by run: () throws -> Void) rethrows -> Set<String>? {
+        var observer = observer()
+        var found: Set<String>?
+        observer.onForeignChange = { found = $0 }
+        try run()
+        observer.process()
+        return found
+    }
+
+    /// A record crated on the other device is something EXPLORE has to look
+    /// at again; the observer is what knows it arrived.
+    func testAnInsertAnotherWriterMadeIsNamed() throws {
+        show(remote, "first", added: 1)
+        try remote.save()
+        observer().process()
+
+        let found = try touched {
+            show(remote, "second", added: 2)
+            remote.insert(ListeningEvent(node: .artist("Huerco S."), action: .played, at: Date(), seconds: 200, completion: 0.9, tags: [], source: nil))
+            try remote.save()
+        }
+        XCTAssertEqual(found, ["CrateItem", "ListeningEvent"])
+    }
+
+    /// A removal is a change to the crate too, and it never reached the
+    /// merge: the observer skipped every delete, because there is nothing to
+    /// read off a row that is gone. Its name is all that is wanted here.
+    func testARemovalAnotherWriterMadeIsNamed() throws {
+        show(remote, "gone", added: 1)
+        try remote.save()
+        observer().process()
+
+        let found = try touched {
+            for item in try remote.fetch(FetchDescriptor<CrateItem>()) { remote.delete(item) }
+            try remote.save()
+        }
+        XCTAssertEqual(found, ["CrateItem"])
+    }
+
+    /// This process's own saves already move what they need to.
+    func testItsOwnWritesAreNotNamed() throws {
+        show(remote, "first", added: 1)
+        try remote.save()
+        observer().process()
+
+        let found = try touched {
+            show(local, "mine", added: 2)
+            try local.save()
+        }
+        XCTAssertNil(found)
+    }
+
+    /// With no place to resume from it cannot say what changed, so it says
+    /// everything did, rather than nothing.
+    func testAFirstPassNamesEverySyncedModel() throws {
+        show(remote, "first", added: 1)
+        try remote.save()
+        XCTAssertEqual(touched {}, IndigoSchemaCurrent.userDataModelNames)
+    }
 }
