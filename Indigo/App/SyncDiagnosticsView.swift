@@ -28,6 +28,7 @@ struct SyncDiagnosticsView: View {
     /// The musician-first development switches, kept until turned off.
     @AppStorage(MusicianFirst.switchKey) private var digMusicianFirst = false
     @AppStorage(ForYouMusicianFirst.switchKey) private var forYouMusicianFirst = false
+    @AppStorage(DigRecommendations.switchKey) private var digRecommendations = false
 
     /// The shared things both devices act on, so their actions meet.
     static let testArtist = MusicNode.artist("\(TwoDeviceSyncRunner.marker) shared artist")
@@ -52,10 +53,11 @@ struct SyncDiagnosticsView: View {
                 Section {
                     Toggle("DIG: musicians first", isOn: $digMusicianFirst)
                     Toggle("For You: musician-first ranking", isOn: $forYouMusicianFirst)
+                    Toggle("DIG: Hear next cards", isOn: $digRecommendations)
                 } header: {
                     Text("Musician-first (development)")
                 } footer: {
-                    Text("DIG leaves engineers off artist pages (release pages still list them). For You starts from what you are into now and over time, and brings DIG's setting with it. Relaunch Indigo to apply; the first look after a change rebuilds the graph and takes a few seconds.")
+                    Text("DIG leaves engineers off artist pages (release pages still list them). For You starts from what you are into now and over time, and brings DIG's setting with it. Hear next shows a few musicians on each artist page with the record behind them and something to put on, and brings DIG's setting with it. Relaunch Indigo to apply; the first look after a change rebuilds the graph and takes a few seconds.")
                 }
                 Section("Mirroring") {
                     row("iCloud account", account)

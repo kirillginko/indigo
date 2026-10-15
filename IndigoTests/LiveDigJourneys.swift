@@ -14,11 +14,33 @@
 
 import XCTest
 import SwiftData
+import SwiftUI
 @testable import Indigo
 
 @MainActor
 final class LiveDigJourneys: XCTestCase {
     override func tearDown() { MusicianFirst.override = nil }
+
+    /// The cards as the phone draws them, to a PNG beside the report.
+    private func render(_ cards: [DigRecommendation], named name: String) {
+        let view = VStack(alignment: .leading, spacing: 14) {
+            ForEach(cards) { card in RecommendationCardView(card: card, open: {}, listen: {}) }
+        }
+        .padding(16)
+        .frame(width: 390, alignment: .leading)
+        .background(Color(red: 0.08, green: 0.1, blue: 0.09))
+        .foregroundStyle(.white)
+        .environment(\.isPhoneLayout, true)
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 2
+        #if os(macOS)
+        guard let image = renderer.nsImage, let tiff = image.tiffRepresentation,
+              let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) else { return }
+        #else
+        guard let png = renderer.uiImage?.pngData() else { return }
+        #endif
+        try? png.write(to: FileManager.default.temporaryDirectory.appendingPathComponent("\(name).png"))
+    }
 
     private static let starts: [(family: String, name: String)] = [
         ("obscure jazz", "Eric Kloss"),
@@ -126,6 +148,7 @@ final class LiveDigJourneys: XCTestCase {
                 tally.fromRecord += cards.filter { $0.listen?.isFromTheEvidence == true }.count
                 tally.direct += cards.filter { $0.relationship.isDirect }.count
 
+                if step == 0, !cards.isEmpty { render(cards, named: "cards-\(start.family.replacingOccurrences(of: " ", with: "-"))") }
                 out.append("\(step == 0 ? "start" : "step \(step)"): \(page.name)\(page.discogsID.map { " [\($0)]" } ?? "") — \(edges.count) routes")
                 out.append("  today:  " + today.map { "\($0.to.title) (\($0.reason))" }.joined(separator: "; "))
                 out.append("  cards:  " + (cards.isEmpty ? "none" : cards.map(show).joined(separator: "; ")))

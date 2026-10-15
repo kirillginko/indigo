@@ -59,6 +59,7 @@ struct ArtistDigView: View {
     @Environment(DigStore.self) private var dig
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(\.isPhoneLayout) private var isPhone
+    @Environment(\.openURL) private var openURL
 
     @State private var artistScenes: [MusicScene] = []
 
@@ -77,6 +78,8 @@ struct ArtistDigView: View {
     /// How much of the discography is on screen. Grows on request rather than
     /// rendering hundreds of sleeves nobody asked to see.
     @State private var releaseLimit = 24
+    /// What to hear next (`DigRecommendations`, development builds).
+    @State private var cards: [DigRecommendation] = []
 
     var body: some View {
         let _ = crate.revision
@@ -251,6 +254,9 @@ struct ArtistDigView: View {
                     // conditions meant the sections appeared empty under a
                     // veil that had already gone.
                     if hasEnriched || !profile.releases.isEmpty || !profile.related.isEmpty {
+                    if DigRecommendations.isEnabled, !cards.isEmpty {
+                        hearNext
+                    }
                     if let discogsURL = profile.discogsURL {
                         Link(destination: discogsURL) {
                             HStack(spacing: 7) {
@@ -488,6 +494,14 @@ struct ArtistDigView: View {
                 }
             }
         }
+        .task(id: DigRecommendations.isEnabled ? dig.revision : -1) {
+            guard DigRecommendations.isEnabled else { return }
+            // Settled first: a page being filled in writes many times a second,
+            // and the cards are worked out on the thread that draws.
+            try? await Task.sleep(for: .milliseconds(600))
+            guard !Task.isCancelled else { return }
+            cards = dig.recommendations(forArtist: artistName, discogsID: discogsID)
+        }
         .task(id: dig.revision) {
             // Writes arrive in bursts — the catalogue, then the
             // neighbourhood, then the sleeves, then Bandcamp — and each one
@@ -674,6 +688,38 @@ struct ArtistDigView: View {
 
         Task.detached(priority: .utility) {
             await RemoteArtworkStore.shared.prefetch(thumbnails)
+        }
+    }
+
+    /// What to hear next: a few musicians, the record that connects them,
+    /// why, and something to put on (`DigRecommender`).
+    private var hearNext: some View {
+        DigSection(title: "Hear next") {
+            VStack(alignment: .leading, spacing: isPhone ? 14 : 12) {
+                ForEach(cards) { card in
+                    RecommendationCardView(card: card) {
+                        if let page = card.artist.destination { appState.open(page) }
+                    } listen: {
+                        listen(to: card)
+                    }
+                }
+            }
+            .padding(.top, isPhone ? 0 : 6)
+        }
+    }
+
+    private func listen(to card: DigRecommendation) {
+        switch card.listen {
+        case .recording(let url, let title)?:
+            player.play([MediaItem(
+                id: "youtube.\(url.absoluteString)", sourceID: "youtube", kind: .track, title: title,
+                subtitle: card.artist.title, detail: card.evidence?.title ?? card.artist.title,
+                remoteArtworkURL: card.artist.artworkURL, playbackURL: url, embedProvider: .youtube
+            )], startingAt: 0)
+        case .radio(_, _, let url, let page)?:
+            if let destination = page?.destination { appState.open(destination) } else if let url { openURL(url) }
+        case nil:
+            break
         }
     }
 
