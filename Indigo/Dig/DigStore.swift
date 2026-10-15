@@ -184,6 +184,10 @@ final class DigStore {
     /// Recommendation cards per artist page, kept for a revision (`DigRecommendationSource`).
     @ObservationIgnored var recommendationCache: [String: (revision: Int, cards: [DigRecommendation])] = [:]
     @ObservationIgnored var recommendationListener: (at: Date, listener: DigRecommender.Listener)?
+    /// DIG Discover: tracks to hear (`TrackDiscovery`, development builds).
+    var discover = DiscoverState()
+    @ObservationIgnored var trackDiscoverySource = TrackDiscoverySource.live
+
     /// Verified radio episodes for Hear next cards (`RadioListenFinder`).
     @ObservationIgnored var radioListens = RadioListenCache()
     /// Settable so a test can drive it without the backend.
