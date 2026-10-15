@@ -99,6 +99,7 @@ final class StreamAudioEngine {
     @ObservationIgnored private var timeControlObservation: NSKeyValueObservation?
     @ObservationIgnored private var stallObserver: NSObjectProtocol?
     @ObservationIgnored private var failureObserver: NSObjectProtocol?
+    @ObservationIgnored private var endObserver: NSObjectProtocol?
     @ObservationIgnored private var reconnectTask: Task<Void, Never>?
     @ObservationIgnored private var connectDeadline: Task<Void, Never>?
 
@@ -337,16 +338,22 @@ final class StreamAudioEngine {
     }
 
     private func observe(_ item: AVPlayerItem) {
+        // Both observations hop to the main actor, so a report can arrive after
+        // its player has been thrown away for a new one. Each checks that it
+        // is still about the stream on the air before acting on it.
         statusObservation = item.observe(\.status, options: [.new]) { [weak self] item, _ in
             guard item.status == .failed else { return }
             let message = item.error?.localizedDescription ?? "The stream is unavailable."
-            Task { @MainActor [weak self] in self?.handleInterruption(message) }
+            Task { @MainActor [weak self] in
+                guard let self, self.player.currentItem === item else { return }
+                self.handleInterruption(message)
+            }
         }
 
         timeControlObservation = player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
             let status = player.timeControlStatus
             Task { @MainActor [weak self] in
-                guard let self, !self.isUserPaused else { return }
+                guard let self, self.player === player, !self.isUserPaused else { return }
                 switch status {
                 case .playing:
                     self.reconnect.reset()
@@ -355,6 +362,12 @@ final class StreamAudioEngine {
                 case .waitingToPlayAtSpecifiedRate:
                     if case .failed = self.state {} else { self.setState(.buffering) }
                 case .paused:
+                    // Not a state of its own. A stream that ends or fails
+                    // pauses as it goes, and the notifications below say
+                    // which; on an iPhone the system also pauses it for a
+                    // call or a lost route, which the coordinator hears
+                    // from the audio session. Answering this as well would
+                    // race the reconnect those have already begun.
                     break
                 @unknown default:
                     break
@@ -380,6 +393,25 @@ final class StreamAudioEngine {
             MainActor.assumeIsolated {
                 let error = note.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
                 self?.handleInterruption(error?.localizedDescription ?? "The stream stopped unexpectedly.")
+            }
+        }
+
+        // A live stream has no end, so reaching one means the connection
+        // closed. It is how most drops actually arrive, and nothing else
+        // reports them: against a stand-in Icecast mount, a connection the
+        // server closed — what a mount does when a show's encoder signs off —
+        // and one it reset mid-stream — what a phone changing cells looks
+        // like — were both reported as the item playing to its end, with no
+        // stall and no error. The player paused, the bar went on saying
+        // "playing", and the station stayed silent until the listener
+        // noticed. Only a connection that stays open and goes quiet stalls.
+        endObserver = NotificationCenter.default.addObserver(
+            forName: AVPlayerItem.didPlayToEndTimeNotification,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.handleInterruption("The station closed the stream.")
             }
         }
     }
@@ -415,8 +447,10 @@ final class StreamAudioEngine {
     private func removeObservers() {
         if let stallObserver { NotificationCenter.default.removeObserver(stallObserver) }
         if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
+        if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         stallObserver = nil
         failureObserver = nil
+        endObserver = nil
         statusObservation = nil
         timeControlObservation = nil
     }
