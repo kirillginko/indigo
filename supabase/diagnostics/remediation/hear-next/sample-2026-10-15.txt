@@ -1,0 +1,59 @@
+What to hear next, on the catalogue sample (3300 bundles; 3837 records read, 1393 with a recording YouTube says plays; 8817 artists with a playable radio appearance)
+
+== pilot (300): 300 pages
+musician-first top three: pages with something 95%, with three 65%; 715 cards, direct 100%, on a named record 97%, something to hear 59% (from the record 246, radio 179), first card playable 64%, leads on 33%; per page 1.08 records and 1.33 kinds of relationship
+recommendation cards  : pages with something 95%, with three 13%; 559 cards, direct 100%, on a named record 96%, something to hear 70% (from the record 186, radio 207), first card playable 84%, leads on 60%; per page 1.11 records and 1.24 kinds of relationship
+
+== batch 1 (3,000): 3000 pages
+musician-first top three: pages with something 95%, with three 63%; 7052 cards, direct 100%, on a named record 97%, something to hear 59% (from the record 2515, radio 1637), first card playable 64%, leads on 33%; per page 1.06 records and 1.31 kinds of relationship
+recommendation cards  : pages with something 95%, with three 11%; 5496 cards, direct 100%, on a named record 96%, something to hear 74% (from the record 1975, radio 2068), first card playable 86%, leads on 59%; per page 1.09 records and 1.23 kinds of relationship
+
+== journeys (follow the first direct card, never back): 3300 starts
+no step 161, one 3081, two 57, three 1; 3198 steps, 2872 with something to hear. A walk stops where the next artist has no bundle in the sample: the sample's floor, not the app's.
+  Dalibor Szuka → DOP (Voice on Asphalt Und Wald Remixes (1)) → Иван Дорн (Made Up The Boohai together) → Seven Davis Jr. (Made Numbers together, ▶)
+
+== examples
+
+Forma Tadre [15381] — ambient
+  musician-first: Andreas Meyer [Wrote or produced] — Navigator Travelogue (2020); Daniel Myer [Remixed] — Navigator Travelogue (2020); Dejan Samardzic [Remixed] — Navigator Travelogue (2020)
+  cards:          Haujobb [Remixed] — Navigator Travelogue (2020) ▶ radio: pi pi pi: pi pi pi with deep creep; Daniel Myer [Remixed] — Navigator Travelogue (2020)
+
+Soul Circuit [22043] — ambient
+  musician-first: Funk D'Void [Remixed] — One More (1997) ▶ Soul Circuit - One More (Funk D'Void Version Pt 1); Jono Podmore [Wrote or produced] — Don't Spoil The Tension (2000) ▶ Not Guilded - Soul Circuit; Paul Conboy [Wrote or produced] — Don't Spoil The Tension (2000) ▶ Not Guilded - Soul Circuit
+  cards:          Corker / Conboy [Wrote or produced] — Don't Spoil The Tension (2000) ▶ Not Guilded - Soul Circuit; M [Played on it] — One More (1997) ▶ Soul Circuit - One More (Funk D'Void Version Pt 1); Funk D'Void [Remixed] — One More (1997) ▶ Soul Circuit - One More (Funk D'Void Version Pt 1)
+
+Bang Gang [33358] — indie
+  musician-first: Daníel Ágúst [Played on it] — Something Wrong (2007) ▶ Bang Gang - Something Wrong; Holland-Dozier-Holland [Wrote or produced] — Something Wrong (2007) ▶ Bang Gang - Something Wrong; Keren Ann [Played on it] — Something Wrong (2007) ▶ Bang Gang - Something Wrong
+  cards:          Nicolette [Played on it] — Something Wrong (2007) ▶ Bang Gang - Something Wrong; Holland-Dozier-Holland [Wrote or produced] — Something Wrong (2007) ▶ Bang Gang - Something Wrong
+
+John Wall [65642] — experimental electronic
+  musician-first: Andrzej Dudek-Dürer [Played on it] — Alterstill (1995) ▶ John Wall - Stunde Null (II); Andrzej Panufnik [Played on it] — Alterstill (1995) ▶ John Wall - Stunde Null (II); Anton Webern [Played on it] — Alterstill (1995) ▶ John Wall - Stunde Null (II)
+  cards:          Andrzej Dudek-Dürer [Played on it] — Alterstill (1995) ▶ John Wall - Stunde Null (II); David Toop [Played on it] — Alterstill (1995) ▶ John Wall - Stunde Null (II)
+
+James Hyman [83333] — hip-hop
+  musician-first: Boys Noize [Remixed] — James Hyman's Super Hearing CD (2009) ▶ radio: Coast 2 Coast: Coast 2 Coast with MCMLXXXV b2b X-COAST; Deakin Scott [Remixed] — James Hyman's Super Hearing CD (2009); Diplo [Remixed] — James Hyman's Super Hearing CD (2009) ▶ radio: hopper1000 radio: hopper1000 radio w/ kreayshawn
+  cards:          Diplo [Remixed] — James Hyman's Super Hearing CD (2009) ▶ radio: hopper1000 radio: hopper1000 radio w/ kreayshawn; Soulwax [Remixed] — James Hyman's Super Hearing CD (2009)
+
+Punck [123236] — experimental electronic
+  musician-first: Formatt [Remixed] — CDR01-02 (2002); Sawako [Remixed] — CDR01-02 (2002) ▶ radio: The Early Bird Show w/ Jack Rollo: The Early Bird Show w/ Jack Rollo & Pume Orenge (Live); Nyva [Played on it] — Cdr01 (2002)
+  cards:          Sawako [Remixed] — CDR01-02 (2002) ▶ radio: The Early Bird Show w/ Jack Rollo: The Early Bird Show w/ Jack Rollo & Pume Orenge (Live); Formatt [Remixed] — CDR01-02 (2002); Nyva [Played on it] — Cdr01 (2002)
+
+The Legends [236110] — indie
+  musician-first: Club 8 [Played on it] — The Legends (2020) ▶ radio: Ian Kim Judd & Madjestic Kasual: Ian Kim Judd b2b Madjestic Kasual; Pernilla Andersson [Played on it] — The Legends (2020); Tan Cologne [Played on it] — The Legends (2020)
+  cards:          Club 8 [Played on it] — The Legends (2020) ▶ radio: Ian Kim Judd & Madjestic Kasual: Ian Kim Judd b2b Madjestic Kasual; Pernilla Andersson [Played on it] — The Legends (2020)
+
+Swoop G [239985] — hip-hop
+  musician-first: Bosko [Wrote or produced] — World Don't Take Me Personally (1998) ▶ World Don't Take Me Personally (feat. 2 Pac, 2 Scoops); Ali Malek [Wrote or produced] — World Don't Take Me Personally (1998) ▶ World Don't Take Me Personally (feat. 2 Pac, 2 Scoops); JT The Bigga Figga [Wrote or produced] — Undisputed (1997) ▶ 20 Dollars
+  cards:          3X Krazy [Played on it] — World Don't Take Me Personally (1998) ▶ World Don't Take Me Personally (feat. 2 Pac, 2 Scoops); Cydal [Played on it] — World Don't Take Me Personally (1998) ▶ World Don't Take Me Personally (feat. 2 Pac, 2 Scoops); Bart [Played on it] — Undisputed (1997) ▶ 20 Dollars
+
+Tom Chant [259754] — jazz
+  musician-first: Matt Davis [Made a record together] — Archif #17: Improvisations 7​/​09​/​1998 (2020); Rhodri Davies [Made a record together] — Archif #17: Improvisations 7​/​09​/​1998 (2020) ▶ radio: The Trilogy Tapes: The Trilogy Tapes; Richard Cochrane [Made a record together] — Archif #17: Improvisations 7​/​09​/​1998 (2020)
+  cards:          Rhodri Davies [Made a record together] — Archif #17: Improvisations 7​/​09​/​1998 (2020) ▶ radio: The Trilogy Tapes: The Trilogy Tapes; Matt Davis [Made a record together] — Archif #17: Improvisations 7​/​09​/​1998 (2020)
+
+Hakim Jami [340870] — jazz
+  musician-first: James Blood Ulmer [Made a record together] — Revealing (2003) ▶ radio: James McNew (YO LA TENGO): James McNew (YO LA TENGO); Revelation Ensemble [Made a record together] — Revealing (2003); Sean Dobbins [Played on it] — Revealing (2003)
+  cards:          James Blood Ulmer [Made a record together] — Revealing (2003) ▶ radio: James McNew (YO LA TENGO): James McNew (YO LA TENGO); Revelation Ensemble [Made a record together] — Revealing (2003)
+
+cards for all pages: 3.594081166 seconds
+
+content digest (timings excluded): f68ee12f3daa3f485464eb8de7a9617891dbb2d77ab2c6c1ca731068b4708b0e
