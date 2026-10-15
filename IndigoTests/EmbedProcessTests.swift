@@ -38,4 +38,44 @@ final class EmbedProcessTests: XCTestCase {
         XCTAssertEqual(engine.bridgeLoads, 2)
         XCTAssertEqual(engine.state, .idle)
     }
+
+    /// Lost again in the middle of recovering: what is restored is what the
+    /// listener had, not the half-recovered loading state.
+    func testASecondLossRestoresWhatTheListenerHad() async {
+        let engine = EmbedAudioEngine()
+        defer { engine.stop() }
+        engine.load(
+            provider: .soundcloud,
+            url: URL(string: "https://soundcloud.com/example/episode")!,
+            autoplay: false
+        )
+        engine.webViewWebContentProcessDidTerminate(engine.webView)
+        await waitUntil(5) { engine.bridgeLoads == 2 }
+        XCTAssertEqual(engine.recovery?.autoplay, false, "Not asked to play, so not played")
+
+        engine.webViewWebContentProcessDidTerminate(engine.webView)
+        await waitUntil(5) { engine.bridgeLoads == 3 }
+        XCTAssertEqual(engine.recovery?.autoplay, false, "Still what the listener had")
+        XCTAssertEqual(engine.state, .loading)
+    }
+
+    func testAPlayingEpisodeIsPutBackPlaying() async {
+        let engine = EmbedAudioEngine()
+        defer { engine.stop() }
+        engine.load(
+            provider: .soundcloud,
+            url: URL(string: "https://soundcloud.com/example/episode")!,
+            autoplay: true
+        )
+        engine.webViewWebContentProcessDidTerminate(engine.webView)
+        await waitUntil(5) { engine.bridgeLoads == 2 }
+        XCTAssertEqual(engine.recovery?.autoplay, true)
+
+        engine.load(
+            provider: .soundcloud,
+            url: URL(string: "https://soundcloud.com/example/other")!,
+            autoplay: false
+        )
+        XCTAssertNil(engine.recovery, "A load the listener asked for starts afresh")
+    }
 }

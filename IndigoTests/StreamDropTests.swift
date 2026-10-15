@@ -120,4 +120,76 @@ final class StreamDropTests: XCTestCase {
         engine.networkChanged(isOnline: true)
         XCTAssertEqual(engine.connections, spent + 1)
     }
+
+    // MARK: - Nothing outlives the listener's choice
+
+    /// A station that cannot be reached, so every open fails at once and the
+    /// second retry sleeps off a one-second backoff.
+    private func engineWithARetryPending() async -> StreamAudioEngine {
+        let engine = StreamAudioEngine(monitorsNetwork: false)
+        engine.setVolume(0)
+        engine.play(url: FileManager.default.temporaryDirectory.appendingPathComponent("missing-\(UUID()).caf"))
+        await waitUntil(5) { engine.connections >= 2 }
+        try? await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(engine.connections, 2, "Two opens, and a third waiting on its backoff")
+        return engine
+    }
+
+    func testPausingCancelsAPendingReconnect() async {
+        let engine = await engineWithARetryPending()
+        defer { engine.stop() }
+        engine.pause()
+        try? await Task.sleep(for: .seconds(2))
+        XCTAssertEqual(engine.connections, 2)
+        XCTAssertEqual(engine.state, .paused)
+    }
+
+    func testStoppingCancelsAPendingReconnect() async {
+        let engine = await engineWithARetryPending()
+        engine.stop()
+        try? await Task.sleep(for: .seconds(2))
+        XCTAssertEqual(engine.connections, 2)
+        XCTAssertEqual(engine.state, .idle)
+    }
+
+    /// The old station's retry must not reopen it over the new one.
+    func testChoosingAnotherStationCancelsTheOldOnesRetry() async throws {
+        let engine = await engineWithARetryPending()
+        defer { engine.stop() }
+        engine.play(url: try Self.shortStream(seconds: 30))
+        XCTAssertEqual(engine.connections, 3)
+        try await Task.sleep(for: .seconds(2))
+        XCTAssertEqual(engine.connections, 3, "Nothing reopened after the new station went on")
+        XCTAssertEqual(engine.state, .playing)
+    }
+
+    func testTheNetworkReturningDoesNotUndoAPause() async throws {
+        let engine = StreamAudioEngine(monitorsNetwork: false)
+        engine.setVolume(0)
+        defer { engine.stop() }
+        engine.play(url: try Self.shortStream())
+        await waitUntil(5) { engine.state == .playing }
+        engine.networkChanged(isOnline: false)
+        await waitUntil(5) { engine.state == .buffering }
+        engine.pause()
+        engine.networkChanged(isOnline: true)
+        try await Task.sleep(for: .milliseconds(500))
+        XCTAssertEqual(engine.connections, 1)
+        XCTAssertEqual(engine.state, .paused)
+    }
+
+    /// Waiting for a network is not playing, and does not say so forever.
+    func testWaitingForANetworkEndsAndStillComesBack() async throws {
+        let engine = StreamAudioEngine(monitorsNetwork: false, networkWaitLimit: .seconds(1))
+        engine.setVolume(0)
+        defer { engine.stop() }
+        engine.play(url: try Self.shortStream())
+        await waitUntil(5) { engine.state == .playing }
+        engine.networkChanged(isOnline: false)
+        await waitUntil(5) { if case .failed = engine.state { true } else { false } }
+        guard case .failed = engine.state else { return XCTFail("Still \(engine.state)") }
+
+        engine.networkChanged(isOnline: true)
+        XCTAssertEqual(engine.connections, 2, "Back on with the network")
+    }
 }

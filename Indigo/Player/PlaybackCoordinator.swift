@@ -238,6 +238,9 @@ final class PlaybackCoordinator {
     }
 
     func toggle() {
+        // Whatever the listener does with the transport during a call is
+        // theirs, and the call ending must not undo it.
+        resumeAfterInterruption = false
         switch source {
         case .local:
             local.isPlaying ? local.pause() : local.play()
@@ -366,6 +369,7 @@ final class PlaybackCoordinator {
 
     /// Stops everything and clears the bar. Used when the library disappears.
     func stopAll() {
+        resumeAfterInterruption = false
         endStint()
         local.stop()
         stream.stop()
@@ -386,9 +390,11 @@ final class PlaybackCoordinator {
     /// listener had to press it twice to hear anything. Pausing here makes
     /// the state say what the speaker is doing.
     func audioInterruptionBegan() {
-        resumeAfterInterruption = isPlaying
-        guard isPlaying else { return }
-        pause()
+        let wasPlaying = isPlaying
+        if wasPlaying { pause() }
+        // After the pause, which is a transport command like any other and
+        // clears this.
+        resumeAfterInterruption = wasPlaying
     }
 
     /// The session has been handed back. The system says whether playing
@@ -399,8 +405,9 @@ final class PlaybackCoordinator {
     /// pause and play would make: whatever was buffered before the call is
     /// minutes stale, and the connection may well have gone with it.
     func audioInterruptionEnded(shouldResume: Bool) {
-        defer { resumeAfterInterruption = false }
-        guard resumeAfterInterruption, shouldResume else { return }
+        let wanted = resumeAfterInterruption && shouldResume
+        resumeAfterInterruption = false
+        guard wanted else { return }
         resume()
     }
 
@@ -463,6 +470,7 @@ final class PlaybackCoordinator {
 
     private func startCurrent(autoplay: Bool) {
         guard let item = queue.current else { return }
+        resumeAfterInterruption = false
         onPlaybackStarting?()
         // Before `current` moves on, while the outgoing item is still the one
         // the stint has been measuring.

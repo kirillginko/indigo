@@ -168,14 +168,21 @@ final class StreamAudioEngine {
     /// A reconnect is scheduled and still sleeping off its backoff.
     @ObservationIgnored private var isRetryPending = false
     @ObservationIgnored private var pathMonitor: NWPathMonitor?
+    /// How long a dropped station waits for a network before it says so.
+    @ObservationIgnored private let networkWaitLimit: Duration
     /// How many times a stream has been opened. Read by tests.
     @ObservationIgnored private(set) var connections = 0
 
     /// `monitorsNetwork` is off only in tests, which say what the network
     /// is doing through `networkChanged(isOnline:)`, and use a smaller
     /// `reconnect` budget so that giving up takes seconds, not minutes.
-    init(monitorsNetwork: Bool = true, reconnect: ReconnectPolicy = ReconnectPolicy(limit: 5, sustainedLimit: 20)) {
+    init(
+        monitorsNetwork: Bool = true,
+        reconnect: ReconnectPolicy = ReconnectPolicy(limit: 5, sustainedLimit: 20),
+        networkWaitLimit: Duration = .seconds(120)
+    ) {
         self.reconnect = reconnect
+        self.networkWaitLimit = networkWaitLimit
         guard monitorsNetwork else { return }
         let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { [weak self] path in
@@ -449,6 +456,34 @@ final class StreamAudioEngine {
         }
     }
 
+    /// How long a station that was playing may sit rebuffering before it is
+    /// treated as dropped.
+    ///
+    /// AVPlayer normally says a playing stream has stalled, and the stall is
+    /// answered at once. This is for when it does not: without it a stream
+    /// waiting for data that never comes would read "buffering" — playing,
+    /// to the lock screen — for as long as the listener let it.
+    @ObservationIgnored private static let rebufferTimeout = Duration.seconds(30)
+
+    private func watchRebuffering(_ waiting: AVPlayer) {
+        connectDeadline?.cancel()
+        connectDeadline = Task { [weak self] in
+            try? await Task.sleep(for: Self.rebufferTimeout)
+            guard !Task.isCancelled, let self, self.player === waiting, !self.isUserPaused,
+                  self.state == .buffering, !self.isRetryPending, !self.isWaitingForNetwork
+            else { return }
+            self.handleInterruption("The station stopped sending.")
+        }
+    }
+
+    /// Whether a notification is about the item on the air. Notifications
+    /// are delivered through the main queue, so one posted just before its
+    /// item was discarded can still arrive after the next has opened.
+    private func isOnAir(_ note: Notification) -> Bool {
+        guard let item = note.object as? AVPlayerItem else { return false }
+        return item === player.currentItem
+    }
+
     private func observe(_ item: AVPlayerItem) {
         // Both observations hop to the main actor, so a report can arrive after
         // its player has been thrown away for a new one. Each checks that it
@@ -472,7 +507,10 @@ final class StreamAudioEngine {
                     self.connectDeadline?.cancel()
                     self.setState(.playing)
                 case .waitingToPlayAtSpecifiedRate:
-                    if case .failed = self.state {} else { self.setState(.buffering) }
+                    if case .failed = self.state { break }
+                    let wasPlaying = self.state == .playing
+                    self.setState(.buffering)
+                    if wasPlaying { self.watchRebuffering(player) }
                 case .paused:
                     // Not a state of its own. A stream that ends or fails
                     // pauses as it goes, and the notifications below say
@@ -491,9 +529,10 @@ final class StreamAudioEngine {
             forName: AVPlayerItem.playbackStalledNotification,
             object: item,
             queue: .main
-        ) { [weak self] _ in
+        ) { [weak self] note in
             MainActor.assumeIsolated {
-                self?.handleInterruption("The connection stalled.")
+                guard let self, self.isOnAir(note) else { return }
+                self.handleInterruption("The connection stalled.")
             }
         }
 
@@ -503,8 +542,9 @@ final class StreamAudioEngine {
             queue: .main
         ) { [weak self] note in
             MainActor.assumeIsolated {
+                guard let self, self.isOnAir(note) else { return }
                 let error = note.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
-                self?.handleInterruption(error?.localizedDescription ?? "The stream stopped unexpectedly.")
+                self.handleInterruption(error?.localizedDescription ?? "The stream stopped unexpectedly.")
             }
         }
 
@@ -521,9 +561,10 @@ final class StreamAudioEngine {
             forName: AVPlayerItem.didPlayToEndTimeNotification,
             object: item,
             queue: .main
-        ) { [weak self] _ in
+        ) { [weak self] note in
             MainActor.assumeIsolated {
-                self?.handleInterruption("The station closed the stream.")
+                guard let self, self.isOnAir(note) else { return }
+                self.handleInterruption("The station closed the stream.")
             }
         }
     }
@@ -543,6 +584,18 @@ final class StreamAudioEngine {
             #if os(iOS)
             holdBackgroundTime()
             #endif
+            // Not forever. Past this the bar says the station is gone rather
+            // than buffering — which the lock screen shows as playing — and
+            // it still comes back by itself when the network does: see
+            // `networkChanged(isOnline:)`.
+            reconnectTask?.cancel()
+            let limit = networkWaitLimit
+            reconnectTask = Task { [weak self] in
+                try? await Task.sleep(for: limit)
+                guard !Task.isCancelled, let self, self.isWaitingForNetwork else { return }
+                self.isWaitingForNetwork = false
+                self.setState(.failed("There is no network connection."))
+            }
         case .retry(let delay):
             Trace.note("stream.reconnect \(reconnect.attempts)/\(reconnect.currentLimit) \(message)")
             setState(.buffering)

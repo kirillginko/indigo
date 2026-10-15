@@ -82,8 +82,13 @@ final class EmbedAudioEngine: NSObject {
     @ObservationIgnored private var isBridgeReady = false
     @ObservationIgnored private var volume: Double = 1
     @ObservationIgnored private var currentRequest: (provider: EmbedProvider, url: URL)?
-    /// Where to pick up once a reloaded episode starts playing again.
-    @ObservationIgnored private var resumePosition: TimeInterval?
+    /// An episode being put back after its web process was lost: whether it
+    /// was playing, and where it had got to. Kept until it plays again, so a
+    /// second loss in the middle of the first recovery restores what the
+    /// listener had, not the half-recovered state.
+    @ObservationIgnored private(set) var recovery: (autoplay: Bool, position: TimeInterval)?
+    /// Whether the episode now loading was asked to play once it had.
+    @ObservationIgnored private var loadAutoplays = false
     /// How many times the bridge page has been loaded. Read by tests.
     @ObservationIgnored private(set) var bridgeLoads = 0
 
@@ -181,6 +186,8 @@ final class EmbedAudioEngine: NSObject {
     // MARK: - Transport
 
     func load(provider: EmbedProvider, url: URL, autoplay: Bool) {
+        recovery = nil
+        loadAutoplays = autoplay
         currentRequest = (provider, url)
         position = 0
         duration = 0
@@ -212,6 +219,7 @@ final class EmbedAudioEngine: NSObject {
     }
 
     func stop() {
+        recovery = nil
         currentRequest = nil
         position = 0
         duration = 0
@@ -317,9 +325,9 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
             setState(.loading)
         case "play":
             setState(.playing)
-            if let resume = resumePosition, self.duration > 0 {
-                resumePosition = nil
-                seek(to: resume)
+            if let recovery, self.duration > 0 {
+                self.recovery = nil
+                if recovery.position > 0 { seek(to: recovery.position) }
             }
         case "pause":
             setState(.paused)
@@ -357,12 +365,13 @@ extension EmbedAudioEngine: WKNavigationDelegate {
         Trace.note("embed: web content process ended")
         isBridgeReady = false
         pendingCommands = []
-        let wasPlaying = state == .playing || state == .loading
-        let heard = position
+        let wanted = recovery ?? (state == .playing || (state == .loading && loadAutoplays), position)
         loadBridge()
         guard let request = currentRequest else { return }
-        load(provider: request.provider, url: request.url, autoplay: wasPlaying)
-        resumePosition = heard > 0 ? heard : nil
+        // One widget, loaded once: the old page and its audio went with the
+        // process, so nothing is left to play alongside it.
+        load(provider: request.provider, url: request.url, autoplay: wanted.autoplay)
+        recovery = wanted
     }
 
     nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

@@ -63,4 +63,15 @@ final class AudioInterruptionTests: XCTestCase {
         player.audioRouteLost()
         XCTAssertFalse(player.isPlaying)
     }
+
+    /// The listener played and paused again during the call: the call
+    /// ending does not overrule them.
+    func testATapDuringTheCallIsNotUndone() async {
+        player.audioInterruptionBegan()
+        player.toggle()
+        player.toggle()
+        player.audioInterruptionEnded(shouldResume: true)
+        try? await Task.sleep(for: .milliseconds(300))
+        XCTAssertFalse(player.isPlaying)
+    }
 }
