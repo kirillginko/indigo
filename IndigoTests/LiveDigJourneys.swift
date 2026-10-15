@@ -86,6 +86,10 @@ final class LiveDigJourneys: XCTestCase {
         var verifyTimes: [Duration] = []
         DigRecommendations.override = true
         defer { DigRecommendations.override = nil }
+        var radio: [(Duration, RadioListenFinder.Report)] = []
+        var after = (cards: 0, hear: 0, radio: 0, firstBefore: 0, firstAfter: 0, changed: 0)
+        // A cold cache of its own: what a first visit would ask.
+        dig.radioListens = RadioListenCache(file: FileManager.default.temporaryDirectory.appendingPathComponent("journeys-radio-\(UUID()).json"))
         var tally = (pages: 0, todayCards: 0, todayHear: 0, cards: 0, hear: 0, fromRecord: 0, direct: 0, technicalToday: 0, steps: 0)
 
         func show(_ card: DigRecommendation) -> String {
@@ -140,6 +144,23 @@ final class LiveDigJourneys: XCTestCase {
                 let spent = ContinuousClock.now - started
                 cardTimes.append(Double(spent.components.attoseconds) / 1e15 + Double(spent.components.seconds) * 1000)
 
+                // Radio, as the page asks it: after the cards, in the
+                // background; then the cards again with what came back.
+                let asked = ContinuousClock.now
+                let report = await dig.fillRadioListens(for: cards)
+                if let report { radio.append((ContinuousClock.now - asked, report)) }
+                let withRadio = DigRecommender.recommend(
+                    from: edges, origin: origin,
+                    lookups: source.lookups(for: page.name, shelf: dig.shelfEvidence[RecordingKey.normalizeArtist(page.name)] ?? [:],
+                                            radio: dig.radioListens.found),
+                    listener: listener)
+                after.cards += withRadio.count
+                after.hear += withRadio.filter { $0.listen != nil }.count
+                after.radio += withRadio.filter { if case .radio? = $0.listen { true } else { false } }.count
+                after.firstBefore += cards.first?.listen != nil ? 1 : 0
+                after.firstAfter += withRadio.first?.listen != nil ? 1 : 0
+                after.changed += withRadio.map(\.id) == cards.map(\.id) ? 0 : 1
+
                 tally.pages += 1
                 tally.todayCards += today.count
                 tally.technicalToday += technical
@@ -152,6 +173,9 @@ final class LiveDigJourneys: XCTestCase {
                 out.append("\(step == 0 ? "start" : "step \(step)"): \(page.name)\(page.discogsID.map { " [\($0)]" } ?? "") — \(edges.count) routes")
                 out.append("  today:  " + today.map { "\($0.to.title) (\($0.reason))" }.joined(separator: "; "))
                 out.append("  cards:  " + (cards.isEmpty ? "none" : cards.map(show).joined(separator: "; ")))
+                if withRadio.map(\.listen) != cards.map(\.listen) {
+                    out.append("  +radio: " + withRadio.map(show).joined(separator: "; "))
+                }
                 guard step < 3, let next = cards.first(where: { $0.relationship.isDirect }) else {
                     if step < 3 { out.append("  (stops: no direct card left that has not been visited)") }
                     break
@@ -163,6 +187,14 @@ final class LiveDigJourneys: XCTestCase {
         }
         cardTimes.sort()
         out.insert("Live journeys, \(Self.starts.count) starts, \(tally.pages) pages, \(tally.steps) steps followed. Today's top three: \(tally.todayCards) routes, \(tally.technicalToday) of them technical. Cards: \(tally.cards), direct \(tally.direct), something to hear \(tally.hear) (from the record \(tally.fromRecord)). Cards worked out in \(String(format: "%.0f", cardTimes.isEmpty ? 0 : cardTimes[cardTimes.count / 2])) ms median, \(String(format: "%.0f", cardTimes.last ?? 0)) ms slowest. Verifying the top unverified names took \(verifyTimes.sorted().dropFirst(verifyTimes.count / 2).first.map { "\($0)" } ?? "-") median.", at: 0)
+        let spent = radio.map { Double($0.0.components.attoseconds) / 1e15 + Double($0.0.components.seconds) * 1000 }.sorted()
+        let sums = radio.map(\.1).reduce(into: RadioListenFinder.Report()) { total, r in
+            total.identityReads += r.identityReads; total.appearanceReads += r.appearanceReads; total.checks += r.checks
+            total.verified += r.verified; total.notPlayable += r.notPlayable; total.unknown += r.unknown
+            total.noAppearance += r.noAppearance; total.failures += r.failures
+        }
+        func pct(_ a: Int, _ b: Int) -> String { b == 0 ? "-" : String(format: "%.0f%%", 100 * Double(a) / Double(b)) }
+        out.insert("Radio lookup on \(radio.count) of \(tally.pages) pages (the rest had nothing to ask): \(String(format: "%.0f", spent.isEmpty ? 0 : spent[spent.count / 2])) ms median, \(String(format: "%.0f", spent.last ?? 0)) ms slowest; requests: \(sums.identityReads) identity, \(sums.appearanceReads) appearances, \(sums.checks) playability checks; episodes verified \(sums.verified), archives that do not play \(sums.notPlayable), could not tell \(sums.unknown), never on radio \(sums.noAppearance), failed reads \(sums.failures). Cards with something to hear: before \(pct(tally.hear, tally.cards)) → after \(pct(after.hear, after.cards)) (\(after.radio) radio); first card playable: \(pct(after.firstBefore, tally.pages)) → \(pct(after.firstAfter, tally.pages)); pages whose cards changed order \(after.changed).", at: 1)
         try out.joined(separator: "\n").write(to: FileManager.default.temporaryDirectory.appendingPathComponent("live-dig-journeys.txt"),
                                                atomically: true, encoding: .utf8)
     }

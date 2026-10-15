@@ -1,0 +1,77 @@
+Live journeys, 5 starts, 19 pages, 14 steps followed. Today's top three: 55 routes, 1 of them technical. Cards: 55, direct 47, something to hear 11 (from the record 11). Cards worked out in 78 ms median, 134 ms slowest. Verifying the top unverified names took 5.046133083000001 seconds median.
+Radio lookup on 18 of 19 pages (the rest had nothing to ask): 277 ms median, 3654 ms slowest; requests: 18 identity, 13 appearances, 8 playability checks; episodes verified 8, archives that do not play 0, could not tell 0, never on radio 35, failed reads 0. Cards with something to hear: before 20% → after 36% (9 radio); first card playable: 37% → 58%; pages whose cards changed order 5.
+
+== obscure jazz: Eric Kloss
+start: Eric Kloss [357122] — 246 routes
+  today:  Barry Miles (Credited together); Bobby Rodriguez (Credited together); Colin Curtis (Credited together)
+  cards:  Al Williams [Played on it] — First Class! (2004) ▶ eric kloss - grits and gravy; Billy Butler [Played on it] — First Class! (2004) ▶ eric kloss - grits and gravy; Kenny Karsh [Played on it] — Celebration (1980) ▶ Eric Kloss – The Samba Express
+step 1: Al Williams [477765] — 183 routes
+  today:  Big Joe Turner (Credited together); Buck Clayton (Credited together); Dizzy Gillespie (Credited together)
+  cards:  Dizzy Gillespie [Played on it] — Soul & Salvation (2024); Johnny Hodges Septet [Played on it] — In Concert (2023); Johnny Hodges [Played on it] — Live In Paris - 13 Mars 1961 (2021)
+  +radio: Dizzy Gillespie [On their record] — Soul & Salvation (2024) ▶ radio: “Incantation” on Beyond The Clouds w/ Masha Mar · Aug 26, 2026; Johnny Hodges [On their record] — Live In Paris - 13 Mars 1961 (2021) ▶ radio: “Day Dream” on Tommasi · Mar 22, 2026; Johnny Hodges Septet [Played on it] — In Concert (2023)
+step 2: Dizzy Gillespie [64694] — 330 routes
+  today:  Ben Ellman (Producer on Live In New Orleans); Cees Schrama (Producer [Original], Sequenced By, Assemblage on The Sesjun Radio Shows Vol. 1); Dick De Winter (Producer [Original] on The Sesjun Radio Shows Vol. 1)
+  cards:  Leo Wright [Played on it] — Live in Paris 1960-1961 (2023) ▶ Dizzy Gillespie Quintet - January 17, 1961; Cees Schrama [Played on it] — The Sesjun Radio Shows Vol. 1 (2021); Al Haig [Played on it] — Live Revisited (2023)
+step 3: Leo Wright [284700] — 191 routes
+  today:  Dizzy Gillespie (Credited together); Don Goldie (Credited together); Elly Wright (Credited together)
+  cards:  Don Goldie [Played on it] — Trumpet Caliente / Brilliant (2025); Tadd Dameron [Played on it] — Fontainebleau & Magic Touch Revisited (2024); Dizzy Gillespie Quintet [Same group] — Gillespiana In Concert (2024)
+
+== experimental electronic: Mattheis
+start: Mattheis [1612179] — 675 routes
+  today:  Abstraxion (Credited together); Annie Hall (Credited together); BNJMN (Credited together)
+  cards:  BNJMN [Remixed] — Hypnagogia Remixed (2020) ▶ BNJMN - Hypnagogia Part 2 (Efdemin Remix) (131dsr-rmx); Ripperton [Remixed] — Redesigning: Ripperton (2023); Annie Hall [Remixed] — Groove Podcast 174 (2018)
+step 1: Bnjmn [1844953] — 709 routes
+  today:  Affkt (Credited together); Fixon (Credited together); Franz Bush (Credited together)
+  cards:  Fixon [Remixed] — Destroyed Landscape (2019) ▶ Human Brutality (Original Mix); Magna Pia [Remixed] — Fertile Remixes EP (2021); Franz Bush [Remixed] — Shifting Process (2019)
+step 2: Fixon [1332630] — 414 routes
+  today:  Dig-It (Credited together); The Sixth Sense (Credited together); Modal Bank (Fixon is part of Modal Bank)
+  cards:  Dig-It [Remixed] — Unheard Path / Untrodden Path (2024) ▶ Dig-it - Unheard Path [ANA007LTD]; The Sixth Sense [Remixed] — Nobody Is Coming To Save Us (2024); Modal Bank [Same group]
+step 3: Dig-It [277244] — 677 routes
+  today:  BiLY (Credited together); DJ Saint Pierre (Credited together); Flaws (Credited together)
+  cards:  Flaws [Remixed] — Unseen World (2022); Victor Fernandez [Remixed] — Keep It Real (2024); DJ Saint Pierre [Remixed] — Ythyrlys (2019)
+
+== ambient: Huerco S.
+start: Huerco S. [2367552] — 728 routes
+  today:  Blondes (Credited together); CFCF (Credited together); Glacial23 (Credited together)
+  cards:  picnic [Remixed] — Picnic (2021) ▶ picnic 'picnic' (Daisart, 2021); CFCF [Remixed] — Outsiders (2014) ▶ CFCF - Windswept; Sir E.U [Played on it] — Plonk (2022)
+step 1: picnic [8024709] — 612 routes
+  today:  J (Credited together); Saphileaum (Credited together); Special Guest DJ (Mastered By on Picnic)
+  cards:  J [Played on it] — my seat and weep (2021); Saphileaum [Played on it] — Mysteries Of The Deep Podcast, Chapter CXXX. Serene Healing Machinery (2021); Justin Cantrell [Same group]
+  +radio: Saphileaum [On their record] — Mysteries Of The Deep Podcast, Chapter CXXX. Serene Healing Machinery (2021) ▶ radio: “Akvaveba (End Titles)” on Body Motion · Sep 28, 2026; J [Played on it] — my seat and weep (2021); Justin Cantrell [Same group]
+step 2: J [1042012] — 609 routes
+  today:  Airbag (Credited together); Alizzz (Credited together); Carolina Durante (Credited together)
+  cards:  Airbag [Played on it] — Siempre Tropical (2022); Los Planetas [Played on it] — Se Quiere Venir / La Torre De La Vela (2022); Fuerza Nueva [Played on it] — El Novio De La Muerte (2019)
+step 3: Airbag [1583671] — 475 routes
+  today:  Anders Hovdan (Makes up Airbag); Asle Tostrup (Makes up Airbag); Bjørn Riis (Makes up Airbag)
+  cards:  Bjørn Riis [Same group]; The Now [Sounds related]; X Club [Sounds related]
+  +radio: Bjørn Riis [Same group]; X Club [Sounds related] ▶ radio: “Stay With Me” on Spinee · Sep 11, 2026; The Now [Sounds related]
+
+== indie: Duster
+start: Duster [200115] — 605 routes
+  today:  Deliquecircular (Credited together); Fat Kid Wednesdays (Credited together); Girlpool (Credited together)
+  cards:  Girlpool [Played on it] — Do A Little Dance - FYF Mixtape (2015); Fat Kid Wednesdays [Played on it] — Singles (2006); Her Space Holiday [Played on it] — Ambidextrous (2001)
+  +radio: Her Space Holiday [On their record] — Ambidextrous (2001) ▶ radio: “Indie Car” on The Numero Group · Aug 13, 2026; Girlpool [Played on it] — Do A Little Dance - FYF Mixtape (2015); Fat Kid Wednesdays [Played on it] — Singles (2006)
+step 1: Girlpool [3734485] — 369 routes
+  today:  Wide Streets (Credited together); Avery Tucker (Makes up Girlpool); Harmony Tividad (Makes up Girlpool)
+  cards:  Wide Streets [Played on it] — A World Without Fear (Part 1: Summer) (2014); Avery Tucker [Same group]; Cass McCombs [Same label]
+  +radio: Wide Streets [Played on it] — A World Without Fear (Part 1: Summer) (2014); Avery Tucker [Same group]; Cass McCombs [Same label] ▶ radio: “Brighter!” on The Early Bird Show w/ Maria Somerville · Oct 12, 2026
+step 2: Wide Streets [5952896] — 161 routes
+  today:  Chris Nowak (Makes up Wide Streets); Danny Miller (Makes up Wide Streets); Jet Elfman (Makes up Wide Streets)
+  cards:  Chris Nowak [Same group]; Babybird [Sounds related]; Brandon Flowers [Sounds related]
+step 3: Chris Nowak [3062285] — 2 routes
+  today:  Against The Grain (Credited together)
+  cards:  Against The Grain [Played on it] — Cheated Death (2018)
+
+== hip-hop: Quelle Chris
+start: Quelle Chris [2561774] — 474 routes
+  today:  Cavalier (Credited together); Curly Castro (Credited together); Danny Brown (Credited together)
+  cards:  Open Mike Eagle [Wrote or produced] — Another Triumph Of Ghetto Engineering (2023); Fly Anakin [Wrote or produced] — (The) Forever Dream (2025); Maxo [Wrote or produced] — Mars Is Electric (2025)
+  +radio: Open Mike Eagle [On their record] — Another Triumph Of Ghetto Engineering (2023) ▶ radio: “Wfld 32 (Feat. Eshu Tune, Video Dave, R.A.P. Ferreira &  Still Rift)” on Ted Draws · Jul 16, 2026; Fly Anakin [On their record] — (The) Forever Dream (2025) ▶ radio: “The Times” on You'll Soon Know w/ Tim Parker · Sep 22, 2026; Maxo [Wrote or produced] — Mars Is Electric (2025)
+step 1: Open Mike Eagle [1204979] — 439 routes
+  today:  Aesop Rock (Credited together); Amanda Jones (Credited together); DJ Chong Wizard (Credited together)
+  cards:  Aesop Rock [Played on it] — Black Hole Superette (2025) ▶ Bird School; Left At London [Played on it] — Transgender Street Legend: The ACAB Anthology (Assigned Compilation at Birth) (2025) ▶ Revolution Lover; Dr. Bobby Banner, MPC [Played on it] — Odiar (2025)
+step 2: Aesop Rock [28104] — 612 routes
+  today:  Cass McCombs (Both release on Daytrotter); Drive-By Truckers (Both release on Daytrotter); Jeff The Brotherhood (Both release on Daytrotter)
+  cards:  Various Production [Same label]; Jeff The Brotherhood [Same label]; Cass McCombs [Same label]
+  +radio: Various Production [Same label]; Cass McCombs [Same label] ▶ radio: “Brighter!” on The Early Bird Show w/ Maria Somerville · Oct 12, 2026; Jeff The Brotherhood [Same label]
+  (stops: no direct card left that has not been visited)
