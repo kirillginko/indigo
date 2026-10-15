@@ -94,4 +94,14 @@ final class DigRecommenderTests: XCTestCase {
         let cards = DigRecommender.recommend(from: hub + [small], origin: origin, lookups: .init(), listener: .init())
         XCTAssertEqual(cards.map(\.artist.title), ["Labelmate"])
     }
+
+    func testTheFirstListenIsATrackTheyAreOn() throws {
+        let opener = try XCTUnwrap(URL(string: "https://www.youtube.com/watch?v=one"))
+        let theirs = try XCTUnwrap(URL(string: "https://www.youtube.com/watch?v=three"))
+        var lookups = DigRecommender.Lookups()
+        lookups.recordings = { _ in [(url: opener, title: "Eric Kloss - African Cookbook"), (url: theirs, title: "Eric Kloss - Gentle Rain")] }
+        lookups.tracks = { _ in [(position: "1", title: "African Cookbook"), (position: "3", title: "Gentle Rain")] }
+        XCTAssertEqual(DigRecommender.firstListen(release: 1, reason: "Piano on First Class! (3)", lookups: lookups)?.url, theirs)
+        XCTAssertEqual(DigRecommender.firstListen(release: 1, reason: "Piano on First Class!", lookups: lookups)?.url, opener)
+    }
 }

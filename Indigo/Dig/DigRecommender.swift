@@ -96,7 +96,14 @@ nonisolated struct DigRecommendation: Identifiable, Equatable, Sendable {
         let title: String
         let year: Int?
         let releaseID: Int?
+        /// Their record, which the page's artist worked on -- the other way
+        /// round from a credit on the page artist's own record.
+        var isTheirs = false
     }
+
+    /// What the card's chip says: the relationship, or, when the page's
+    /// artist worked on their record, that -- the reason says in what part.
+    var chip: String { evidence?.isTheirs == true ? "On their record" : relationship.label }
 
     /// Something to put on.
     nonisolated enum Listen: Equatable, Sendable {
@@ -130,6 +137,8 @@ nonisolated enum DigRecommender {
         var release: (String) -> (id: Int, year: Int?)? = { _ in nil }
         /// Recordings catalogued with a release.
         var recordings: (Int) -> [(url: URL, title: String)] = { _ in [] }
+        /// A release's tracklist: position and title.
+        var tracks: (Int) -> [(position: String, title: String)] = { _ in [] }
         /// A radio appearance of an artist, playable in Indigo.
         var radio: (MusicNode) -> DigRecommendation.Listen? = { _ in nil }
         /// Musician routes on from an artist.
@@ -256,6 +265,25 @@ nonisolated enum DigRecommender {
         return finish(best: best, origin: origin, lookups: lookups, listener: listener, limit: limit, shortlist: shortlist)
     }
 
+    /// The recording to put on first: one of the tracks the credit names
+    /// ("Piano on First Class! (1, 3, 5)"), when the tracklist and a
+    /// recording's title say which; otherwise the record's first.
+    static func firstListen(release: Int, reason: String, lookups: Lookups) -> (url: URL, title: String)? {
+        let recordings = lookups.recordings(release)
+        guard let first = recordings.first else { return nil }
+        guard reason.hasSuffix(")"), let open = reason.range(of: " (", options: .backwards) else { return first }
+        let positions = reason[open.upperBound..<reason.index(before: reason.endIndex)]
+            .split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+        let named = lookups.tracks(release)
+            .filter { positions.contains($0.position.lowercased()) }
+            .map { RecordingKey.normalize($0.title) }
+            .filter { $0.count >= 3 }
+        return recordings.first { recording in
+            let title = RecordingKey.normalize(recording.title)
+            return named.contains { title.contains($0) }
+        } ?? first
+    }
+
     /// More neighbours than this through one label, and the label is a hub.
     static let labelHub = 12
 
@@ -294,7 +322,7 @@ nonisolated enum DigRecommender {
             if relationship.isDirect, evidence == nil, let entry = lookups.shelf(artist) {
                 let role = shelfRole(entry.role)
                 guard CreditRole.contribution(of: role) != .technical else { continue }
-                evidence = .init(title: entry.title, year: entry.year, releaseID: entry.releaseID)
+                evidence = .init(title: entry.title, year: entry.year, releaseID: entry.releaseID, isTheirs: true)
                 relationship = relationship == .sameGroup ? .sameGroup : (DigRecommender.relationship(role: role) ?? .madeTogether)
                 reason = "\(origin.title): \(role) on \(entry.title)"
             }
@@ -348,7 +376,7 @@ nonisolated enum DigRecommender {
                   verified.id != origin.id, !listener.visited.contains(verified.id) else { return nil }
             var card = DigRecommendation(artist: verified, relationship: found.relationship, evidence: found.evidence,
                                          reason: found.reason, listen: nil, onward: nil, score: found.score)
-            card.listen = card.evidence?.releaseID.flatMap { lookups.recordings($0).first }
+            card.listen = card.evidence?.releaseID.flatMap { firstListen(release: $0, reason: card.reason, lookups: lookups) }
                 .map { DigRecommendation.Listen.recording($0.url, title: $0.title) }
                 ?? lookups.radio(card.artist)
             card.onward = lookups.onward(card.artist)

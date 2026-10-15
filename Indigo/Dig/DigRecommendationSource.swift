@@ -74,6 +74,10 @@ nonisolated struct DigRecommendationSource {
             ((records[id] ?? enricherForRecords.cachedRelease(id: id))?.allVideos ?? [])
                 .filter { $0.playable != 2 }.map { (url: $0.url, title: $0.title) }
         }
+        lookups.tracks = { id in
+            guard let record = records[id] ?? enricherForRecords.cachedRelease(id: id) else { return [] }
+            return zip(record.trackPositions, record.trackTitles).map { (position: $0.0, title: $0.1) }
+        }
         lookups.radio = { artist in radio(for: artist) }
         let onward = OnwardIndex(context: context)
         lookups.onward = { onward.count(for: $0) }
