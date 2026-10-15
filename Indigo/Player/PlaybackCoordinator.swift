@@ -34,7 +34,7 @@ final class PlaybackCoordinator {
 
     // MARK: Engines
 
-    private let local = LocalAudioEngine()
+    private let local: LocalAudioEngine
     private let stream = StreamAudioEngine()
     let embed = EmbedAudioEngine()
     private let nowPlaying = NowPlayingManager.shared
@@ -101,9 +101,11 @@ final class PlaybackCoordinator {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
-    /// `defaults` is injectable so tests never touch the user's real settings.
-    init(defaults: UserDefaults = .standard) {
+    /// `defaults` is injectable so tests never touch the user's real settings,
+    /// and `local` so they can stand a file in for a remote episode.
+    init(defaults: UserDefaults = .standard, local: LocalAudioEngine = LocalAudioEngine()) {
         self.defaults = defaults
+        self.local = local
         let stored = defaults.object(forKey: Self.volumeKey) as? Double
         volume = stored ?? 0.8
         local.setVolume(volume)
@@ -142,7 +144,9 @@ final class PlaybackCoordinator {
 
     var isPlaying: Bool {
         switch source {
-        case .local: local.isPlaying
+        // An episode being reopened after a drop is still on, as a station
+        // reconnecting is: pressing pause must pause it, not start it again.
+        case .local: local.isPlaying || (local.isReopening && local.wantsToPlay)
         case .stream: stream.state == .playing || stream.state == .buffering
         case .embed: embed.state == .playing || embed.state == .loading
         case .none: false
@@ -163,6 +167,7 @@ final class PlaybackCoordinator {
 
     var isBuffering: Bool {
         (source == .stream && stream.state == .buffering)
+            || (source == .local && local.isReopening)
             || (source == .embed && embed.state == .loading)
     }
 
@@ -243,7 +248,7 @@ final class PlaybackCoordinator {
         resumeAfterInterruption = false
         switch source {
         case .local:
-            local.isPlaying ? local.pause() : local.play()
+            isPlaying ? local.pause() : local.play()
         case .stream:
             switch stream.state {
             case .playing, .buffering:
@@ -570,6 +575,10 @@ final class PlaybackCoordinator {
         next()
     }
 
+    /// Reached for a remote episode only once `LocalAudioEngine` has stopped
+    /// reopening it where it dropped — and an episode cut short by a closed
+    /// connection arrives here, not at `handleTrackFinished`, because AVPlayer
+    /// calls that the end. So by now the network has had its chances.
     private func handleLocalFailure(_ message: String) {
         // A station that mirrors its archive gets one attempt at the mirror
         // before this is called a failure. Older files go missing far more
