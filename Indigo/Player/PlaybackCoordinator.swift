@@ -9,6 +9,9 @@
 
 import Foundation
 import Observation
+#if os(iOS)
+import AVFoundation
+#endif
 
 @Observable
 final class PlaybackCoordinator {
@@ -90,6 +93,11 @@ final class PlaybackCoordinator {
     @ObservationIgnored private static let marginInterval = Duration.seconds(2)
     @ObservationIgnored private var marginWatch: Task<Void, Never>?
 
+    /// Whether something was playing when the system took the audio away,
+    /// and so should play again when it is handed back.
+    @ObservationIgnored private var resumeAfterInterruption = false
+    @ObservationIgnored private var sessionObservers: [NSObjectProtocol] = []
+
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
@@ -118,6 +126,9 @@ final class PlaybackCoordinator {
         nowPlaying.onPrevious = { [weak self] in self?.previous() }
         nowPlaying.onSeek = { [weak self] position in self?.seek(to: position) }
         nowPlaying.activate()
+        #if os(iOS)
+        observeAudioSession()
+        #endif
     }
 
     /// Present so that releasing one under XCTest does not abort the host.
@@ -364,6 +375,89 @@ final class PlaybackCoordinator {
         source = .none
         publishNowPlaying()
     }
+
+    // MARK: - The system taking the audio away
+
+    /// A call, Siri, or another app's audio has taken the session.
+    ///
+    /// iOS pauses every player in the app as this arrives, and nothing told
+    /// the engines: a station went on reading "playing" through the call and
+    /// afterwards, silent. Its play button was then a pause button, so the
+    /// listener had to press it twice to hear anything. Pausing here makes
+    /// the state say what the speaker is doing.
+    func audioInterruptionBegan() {
+        resumeAfterInterruption = isPlaying
+        guard isPlaying else { return }
+        pause()
+    }
+
+    /// The session has been handed back. The system says whether playing
+    /// on is welcome — after a call it is, after another app started music
+    /// of its own it is not.
+    ///
+    /// A station resumes at the live edge, through the same reconnect a
+    /// pause and play would make: whatever was buffered before the call is
+    /// minutes stale, and the connection may well have gone with it.
+    func audioInterruptionEnded(shouldResume: Bool) {
+        defer { resumeAfterInterruption = false }
+        guard resumeAfterInterruption, shouldResume else { return }
+        resume()
+    }
+
+    /// The headphones came out, or the car's Bluetooth went away. The system
+    /// pauses rather than play from the phone's speaker, and so does the
+    /// app — this only makes the bar agree.
+    func audioRouteLost() {
+        resumeAfterInterruption = false
+        pause()
+    }
+
+    #if os(iOS)
+    private func observeAudioSession() {
+        let center = NotificationCenter.default
+        let session = AVAudioSession.sharedInstance()
+        sessionObservers.append(center.addObserver(
+            forName: AVAudioSession.interruptionNotification, object: session, queue: .main
+        ) { [weak self] note in
+            let info = note.userInfo ?? [:]
+            let type = (info[AVAudioSessionInterruptionTypeKey] as? UInt)
+                .flatMap(AVAudioSession.InterruptionType.init(rawValue:))
+            let options = (info[AVAudioSessionInterruptionOptionKey] as? UInt)
+                .map(AVAudioSession.InterruptionOptions.init(rawValue:)) ?? []
+            MainActor.assumeIsolated {
+                Trace.note("audio.interruption \(type == .began ? "began" : "ended") resume=\(options.contains(.shouldResume))")
+                switch type {
+                case .began: self?.audioInterruptionBegan()
+                case .ended: self?.audioInterruptionEnded(shouldResume: options.contains(.shouldResume))
+                default: break
+                }
+            }
+        })
+        sessionObservers.append(center.addObserver(
+            forName: AVAudioSession.routeChangeNotification, object: session, queue: .main
+        ) { [weak self] note in
+            let reason = (note.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt)
+                .flatMap(AVAudioSession.RouteChangeReason.init(rawValue:))
+            guard reason == .oldDeviceUnavailable else { return }
+            MainActor.assumeIsolated {
+                Trace.note("audio.route lost")
+                self?.audioRouteLost()
+            }
+        })
+        // The media server restarted. Every player made before it is dead,
+        // and so is the session's category; a station is reopened on new ones.
+        sessionObservers.append(center.addObserver(
+            forName: AVAudioSession.mediaServicesWereResetNotification, object: session, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                Trace.note("audio.media services reset")
+                IndigoAppDelegate.configureAudioSession()
+                guard let self, self.source == .stream, self.isPlaying else { return }
+                self.retryStream()
+            }
+        })
+    }
+    #endif
 
     // MARK: - Engine switching
 
