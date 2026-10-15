@@ -2719,7 +2719,7 @@ final class DigStore {
             keepShelfEvidence(of: name, shelf)
             announceChange()
         }
-        let edges = IdentityGraph(context: context).neighbourhood(of: origin).edges.all
+        let edges = IdentityGraph(context: context).neighbourhood(of: origin).edges.forDIG.all
         let names = DigRecommender.unverified(from: edges, origin: origin, lookups: source.lookups(for: name, shelf: shelfEvidence[shelfKey] ?? [:]),
                                               listener: source.listener(now: Date(), opened: origin,
                                                                         longTerm: recommendationListener?.listener),

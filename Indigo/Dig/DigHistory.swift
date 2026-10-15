@@ -292,7 +292,7 @@ nonisolated struct DigHistory {
             // Another name for the same person is not somewhere new. Alias
             // edges carry the highest confidence in the graph, so left in they
             // took the top of TRY every time — "AFX, via Aphex Twin".
-            let neighbours = graph.neighbors(of: originNode)
+            let neighbours = graph.neighbors(of: originNode).forDIG
             let family = originNode.kind == .artist ? neighbours.aliasKeys : []
             for connection in neighbours.byDestination
             where !seen.contains(connection.node.id) && connection.node.destination != nil

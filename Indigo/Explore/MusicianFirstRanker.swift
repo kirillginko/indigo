@@ -218,13 +218,17 @@ nonisolated enum MusicianFirstRanker {
                 guard node.destination != nil, !seen.contains(node.id), !encountered.contains(node.id) else { continue }
                 // A catalogue number is a filing detail, not somewhere to go.
                 guard node.kind != .catalogNumber else { continue }
-                guard let route = connection.edges
+                // Technical credits are left out here, in the experiment's own
+                // ranking, never by changing the graph For You shares.
+                guard let route = connection.edges.filter({ !MusicianFirst.isTechnicalCredit($0) })
                     .map({ (edge: $0, value: $0.weight * worth($0)) })
                     .filter({ $0.value > 0 })
                     .min(by: { $0.value != $1.value ? $0.value > $1.value : MusicEdge.precedes($0.edge, $1.edge) })
                 else { continue }
                 reach[node.id, default: []].insert(origin.node.id)
-                for edge in connection.edges where worth(edge) > 0 { kinds[node.id, default: []].insert(edge.kind) }
+                for edge in connection.edges where worth(edge) > 0 && !MusicianFirst.isTechnicalCredit(edge) {
+                    kinds[node.id, default: []].insert(edge.kind)
+                }
                 let score = route.value * origin.weight
                 if let existing = best[node.id], existing.score >= score { continue }
                 best[node.id] = ExploreSuggestion(

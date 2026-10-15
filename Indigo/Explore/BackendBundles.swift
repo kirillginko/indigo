@@ -290,10 +290,6 @@ nonisolated enum BundleEdges {
             let jobs = collaborator.how.filter { how in
                 how != "joint" && !Self.appearances.contains(how) && CreditRole.kind(of: how).map { $0 != .writing } == true
             }
-            // Musician-first: somebody whose only part was technical is not
-            // a route at all. See `MusicianFirst`.
-            if MusicianFirst.isEnabled, !collaborator.how.contains("joint"), !collaborator.how.isEmpty,
-               collaborator.how.allSatisfy({ CreditRole.contribution(of: $0) == .technical }) { continue }
             if collaborator.how.contains("joint") || !jobs.isEmpty {
                 out.append(MusicEdge(
                     from: origin, to: target, kind: .collaborator, source: .discogs,
@@ -316,8 +312,7 @@ nonisolated enum BundleEdges {
         for credit in bundle.credits {
             guard let target = person(credit.artist) else { continue }
             for role in credit.roles {
-                guard let kind = role.kind, MusicianFirst.isRoute(role.role),
-                      let record = headline(role.releases.map(\.id)) else { continue }
+                guard let kind = role.kind, let record = headline(role.releases.map(\.id)) else { continue }
                 let tracks = role.releases.first { $0.id == record.id }?.tracks ?? []
                 let relationship: RelationshipKind = kind == "production" ? .producer : .personnel
                 out.append(MusicEdge(

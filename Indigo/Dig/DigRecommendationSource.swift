@@ -47,7 +47,7 @@ nonisolated struct DigRecommendationSource {
                          shelf: [String: DigRecommender.ShelfEntry] = [:],
                          radio: [Int: RadioListen?] = [:]) -> [DigRecommendation] {
         let origin = MusicNode.artist(name, discogsID: discogsID)
-        let edges = IdentityGraph(context: context).neighbourhood(of: origin).edges.all
+        let edges = IdentityGraph(context: context).neighbourhood(of: origin).edges.forDIG.all
         return DigRecommender.recommend(from: edges, origin: origin, lookups: lookups(for: name, shelf: shelf, radio: radio),
                                         listener: listener(now: now, opened: origin, longTerm: longTerm))
     }

@@ -294,10 +294,10 @@ nonisolated struct GraphStore {
     /// The names are stripped at the boundary now, and every edge written
     /// before that has one of those nodes on the end of it.
     ///
-    /// Musician-first (`MusicianFirst`) walks by other rules, so it stores
-    /// under a number of its own: turning the switch either way works every
-    /// answer out again rather than reading the other rules' edges.
-    static var builderVersion: Int { MusicianFirst.isEnabled ? 1_002 : 2 }
+    /// The same for every reader: musician-first is a view DIG takes of these
+    /// edges (`EdgeSet.forDIG`), never a different graph, so For You reads
+    /// exactly what it always has whatever DIG is set to.
+    static let builderVersion = 2
 
     private func stored(for node: MusicNode) -> EdgeSet? {
         let identity = node.id
@@ -907,7 +907,7 @@ nonisolated struct GraphStore {
             // person to meet; the page is already about them.
             guard !headline.contains(RecordingKey.normalizeArtist(name)) else { continue }
             let role = index < record.creditRoles.count ? record.creditRoles[index] : ""
-            guard let kind = CreditRole.kind(of: role), MusicianFirst.isRoute(role) else { continue }
+            guard let kind = CreditRole.kind(of: role) else { continue }
             let tracks = index < record.creditTracks.count ? record.creditTracks[index] : ""
             edges.insert(MusicEdge(
                 from: node, to: .artist(name),

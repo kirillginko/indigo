@@ -31,8 +31,9 @@ nonisolated enum MusicianFirst {
 
     static var isEnabled: Bool {
         if let override { return override }
-        // For You musician-first ranks the musician-first graph.
-        if ForYouMusicianFirst.isEnabled || DigRecommendations.isEnabled { return true }
+        // Hear next is DIG, and brings DIG's view with it. For You's own
+        // experiment does not: it filters in its own ranker.
+        if DigRecommendations.isEnabled { return true }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
         #elseif INDIGO_INTERNAL
@@ -55,12 +56,33 @@ nonisolated enum MusicianFirst {
         guard CreditRole.isMusical(role) else { return false }
         return !isEnabled || CreditRole.contribution(of: role) != .technical
     }
+
+    /// A credit edge whose stated job is technical: "Mastered By on X",
+    /// "Mixed By on X (A1)". Read from the edge's own words, so it holds for
+    /// the device's credits and the catalogue's bundles alike.
+    static func isTechnicalCredit(_ edge: MusicEdge) -> Bool {
+        guard edge.kind.isCreditBacked, let role = DigRecommender.role(in: edge.reason) else { return false }
+        return CreditRole.contribution(of: role) == .technical
+    }
+}
+
+extension EdgeSet {
+    /// What DIG shows of a walk: without technical credits when musician-first
+    /// is on, everything otherwise. Only DIG's readers take this view -- the
+    /// graph itself, and For You, which reads it, are the same either way.
+    var forDIG: EdgeSet {
+        guard MusicianFirst.isEnabled else { return self }
+        var kept = EdgeSet()
+        kept.insert(contentsOf: all.filter { !MusicianFirst.isTechnicalCredit($0) })
+        return kept
+    }
 }
 
 /// For You ranked by `MusicianFirstRanker` instead of `ExploreRanker`: its
-/// own development switch (`-INDIGO_FORYOU_MUSICIAN_FIRST YES`), and it brings
-/// the musician-first graph with it. Off, For You is exactly as before. Never
-/// in a release build.
+/// own development switch (`-INDIGO_FORYOU_MUSICIAN_FIRST YES`); it leaves
+/// technical credits out in its own ranking, never by changing the graph.
+/// Off, For You is exactly as before, whatever DIG is set to. Never in a
+/// release build.
 nonisolated enum ForYouMusicianFirst {
     #if DEBUG
     static let switchKey = "INDIGO_FORYOU_MUSICIAN_FIRST"
