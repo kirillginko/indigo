@@ -142,6 +142,9 @@ final class DigStore {
             MainActor.assumeIsolated { self?.announceChange() }
         }
         if !Persistence.isRunningTests { DigEnrichmentSwitch.shared.refreshInBackgroundIfDue() }
+        #if INDIGO_INTERNAL
+        Trace.step("build", MusicianFirst.internalBuild) {}
+        #endif
     }
 
     @ObservationIgnored private var switchObserver: NSObjectProtocol?
