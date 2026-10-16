@@ -131,7 +131,46 @@ final class PlaybackWitnessTests: XCTestCase {
         let events = ListeningLog(context: context).all()
         XCTAssertFalse(events.isEmpty)
         XCTAssertTrue(events.allSatisfy { $0.action == .skipped })
-        XCTAssertTrue(events.allSatisfy { $0.tags == ["techno"] })
+        XCTAssertTrue(events.allSatisfy { $0.musicTags == ["techno"] })
+        XCTAssertTrue(events.allSatisfy { $0.surface == ListeningSurface(screen: "radio.archive", route: KioskProvider.providerID.lowercased()) },
+                      "pressed somewhere that said nothing: an archive is radio")
+    }
+
+    /// Where a listen started is written down with it, and survives the
+    /// tag folding; taste never sees it.
+    @MainActor
+    func testTheSurfaceThatStartedAListenIsWrittenDown() throws {
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
+        let context = ModelContext(container)
+        let witness = PlaybackWitness(context: context)
+        witness.record(
+            item(id: "youtube.x", source: "youtube", kind: .track, title: "Rev8617", subtitle: "Skee Mask", genres: ["Ambient / Techno"]),
+            seconds: 240, completion: 1,
+            surface: ListeningSurface(screen: "foryou.mix", via: "Burial, Kode9", route: "track")
+        )
+        let events = ListeningLog(context: context).all()
+        XCTAssertEqual(events.count, 2, "the recording and the artist")
+        for event in events {
+            XCTAssertEqual(event.surface, ListeningSurface(screen: "foryou.mix", via: RecordingKey.normalizeArtist("Burial  Kode9"), route: "track"))
+            XCTAssertEqual(event.musicTags, ["ambient", "techno"])
+        }
+        let taste = TasteProfile.build(from: events, now: Date())
+        XCTAssertFalse(taste.weights.keys.contains { ListeningSurface.isSurfaceTag($0) })
+    }
+
+    @MainActor
+    func testThePlayerRemembersWhereEachItemWasStartedFrom() {
+        let player = PlaybackCoordinator(defaults: UserDefaults(suiteName: "surface-test")!)
+        defer { player.stopAll() }
+        let a = item(id: "a", source: "nts", kind: .radioStation, title: "A")
+        let b = item(id: "b", source: "nts", kind: .radioStation, title: "B")
+        player.play([a, b], from: ListeningSurface(screen: "dig.discover", via: "x", route: "track"))
+        XCTAssertEqual(player.surface(for: "b")?.screen, "dig.discover", "a queued item keeps the surface it was queued from")
+        player.playRadio(item(id: "s", source: "nts", kind: .radioStation, title: "NTS 1"))
+        XCTAssertNil(player.surface(for: "s"))
+        player.play([a])
+        XCTAssertNil(player.surface(for: "a"), "played again from somewhere that said nothing: not the old surface")
     }
 
     // MARK: Measuring how much was heard

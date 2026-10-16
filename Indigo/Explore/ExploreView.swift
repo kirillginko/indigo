@@ -600,7 +600,7 @@ struct ExploreView: View {
     }
     private func play(_ index: Int) {
         let queue = localPicks; guard queue.indices.contains(index) else { return }
-        if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index) }
+        if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index, from: ListeningSurface(screen: "foryou.library")) }
     }
     private func play(_ item: CrateItem) {
         guard let source = SourceResolver(context: crate.context).best(item) else {
@@ -617,11 +617,11 @@ struct ExploreView: View {
         if player.isCurrent(media.id) {
             player.toggle()
         } else if media.isLive {
-            player.playRadio(media)
+            player.playRadio(media, from: ListeningSurface(screen: "foryou.crate", route: media.sourceID))
         } else if media.isEmbedded {
-            player.playEpisode(media)
+            player.playEpisode(media, from: ListeningSurface(screen: "foryou.crate", route: media.sourceID))
         } else {
-            player.play([media])
+            player.play([media], from: ListeningSurface(screen: "foryou.crate", route: media.sourceID))
         }
     }
 

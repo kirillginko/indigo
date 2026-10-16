@@ -316,6 +316,36 @@ under-served clusters beside it, judged by listening rather than by this
 replay. Recording which surface each listening event came from remains the
 missing measurement.
 
+### Attribution — which surface started a listen
+
+`Indigo/Listening/ListeningSurface.swift`. Every play and skip the
+`PlaybackWitness` writes now carries where it was started: the screen
+(`foryou.mix`, `foryou.tracks`, `foryou.crate`, `foryou.library`,
+`foryou.stations`, `dig.discover`, `dig.artist.discover`,
+`dig.artist.recommendation`, `dig.artist.listen`, `dig.release`, `crate`),
+the listener's artist it was reached through (`via`, folded), and the kind
+of recommendation (`route`: track, artist, record, or a station id).
+Anything started where the screen says nothing is inferred from the item:
+a station is `radio.live`, an archive `radio.archive`, a local file
+`library`, else `unattributed`.
+
+- **No schema change.** Stored in the event's existing `tags` under
+  reserved prefixes (`surface:`, `via:`, `route:`), which already sync.
+  `ListeningEvent.musicTags` leaves them out, and every reader of taste
+  (`TasteProfile`, `ExploreKnowledge`, `ListenerProfile`) now reads that. A
+  build from before this would see them as unknown tags that match no
+  style.
+- The player remembers the surface per item, so a queue started from DIG's
+  Discover credits every track in it; playing the same item again from a
+  screen that names nothing clears it.
+- Not covered yet: saves, page opens and dismissals (only plays and skips);
+  a page *opened* from For You and played there is credited to the page,
+  not to For You.
+- `ListenerDataAudit` reports the share of events carrying a surface and
+  each artist's first positive listen by the surface that found it — the
+  measure the replays lacked. It needs a few weeks of history from a build
+  that records it before a replay can use it.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.

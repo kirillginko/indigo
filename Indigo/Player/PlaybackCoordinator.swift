@@ -50,6 +50,18 @@ final class PlaybackCoordinator {
     /// about live streams and rewinds at the end of a track, and neither the
     /// engines nor the views see pauses and item changes in one place.
     @ObservationIgnored private var stint = ListeningStint()
+    /// Where each item was started from, by item id: the screen and the
+    /// recommendation, handed in with the play command and read back by the
+    /// listening log when the item's listening ends.
+    @ObservationIgnored private var surfaces: [String: ListeningSurface] = [:]
+
+    /// Where the item was started from, if the screen said.
+    func surface(for itemID: String) -> ListeningSurface? { surfaces[itemID] }
+
+    private func remember(_ items: [MediaItem], from surface: ListeningSurface?) {
+        if surfaces.count > 500 { surfaces = surfaces.filter { $0.key == current?.id } }
+        for item in items { surfaces[item.id] = surface }
+    }
 
     /// Told when listening to an item ends: what it was, how many seconds of
     /// it were actually heard, and how far through it got. Set by the app; the
@@ -221,22 +233,25 @@ final class PlaybackCoordinator {
     /// Plays a list, starting at `index`. Any live stream stops. Usually local
     /// tracks; the crate queues whatever it holds — files, archived shows and
     /// stations — and each is started by what it is.
-    func play(_ items: [MediaItem], startingAt index: Int = 0) {
+    func play(_ items: [MediaItem], startingAt index: Int = 0, from surface: ListeningSurface? = nil) {
         guard !items.isEmpty else { return }
+        remember(items, from: surface)
         consecutiveFailures = 0
         queue.load(items, startingAt: index)
         startCurrent(autoplay: true)
     }
 
     /// Plays a live station. The queue collapses to that single item.
-    func playRadio(_ item: MediaItem) {
+    func playRadio(_ item: MediaItem, from surface: ListeningSurface? = nil) {
+        remember([item], from: surface)
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)
     }
 
     /// Plays an archived NTS episode through its host's embed widget.
-    func playEpisode(_ item: MediaItem) {
+    func playEpisode(_ item: MediaItem, from surface: ListeningSurface? = nil) {
+        remember([item], from: surface)
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)

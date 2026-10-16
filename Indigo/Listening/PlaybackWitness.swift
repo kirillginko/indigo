@@ -37,13 +37,14 @@ final class PlaybackWitness {
     /// Starts listening to the player. Replaces any hook already installed,
     /// so watching twice logs once.
     func watch(_ player: PlaybackCoordinator) {
-        player.onListeningEnded = { [weak self] item, seconds, completion in
-            self?.record(item, seconds: seconds, completion: completion)
+        player.onListeningEnded = { [weak self, weak player] item, seconds, completion in
+            self?.record(item, seconds: seconds, completion: completion, surface: player?.surface(for: item.id))
         }
     }
 
     /// Writes one play down, as every node it was an encounter with.
-    func record(_ item: MediaItem, seconds: TimeInterval, completion: Double, at: Date = Date()) {
+    func record(_ item: MediaItem, seconds: TimeInterval, completion: Double, at: Date = Date(),
+                surface: ListeningSurface? = nil) {
         let reading = Self.reading(for: item, resolveRecording: { [log] key in
             // The recording the key names on its own, not one of the coded
             // placeholders that share it.
@@ -65,7 +66,7 @@ final class PlaybackWitness {
             log.record(
                 node, action: action, at: at,
                 seconds: seconds, completion: completion,
-                tags: item.genres, source: reading.source
+                tags: item.genres + (surface ?? .inferred(for: item)).tags, source: reading.source
             )
         }
     }

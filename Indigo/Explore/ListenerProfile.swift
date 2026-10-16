@@ -393,14 +393,14 @@ nonisolated extension ListenerProfile {
                 guard !artist.isEmpty else { continue }
                 read.evidence.append(Evidence(unit: "recording:\(event.nodeKey)", level: .recording, artist: artist, title: event.title,
                                               at: event.at, signal: signal, strength: signal == .partialListen ? max(0.25, event.weight) : 1,
-                                              tags: fold(event.tags)))
+                                              tags: fold(event.musicTags)))
             case .artist:
                 read.evidence.append(Evidence(unit: "artist:\(event.nodeKey)", level: .artist, artist: event.nodeKey, title: event.title,
-                                              at: event.at, signal: signal, tags: fold(event.tags)))
+                                              at: event.at, signal: signal, tags: fold(event.musicTags)))
             case .release:
                 let artist = RecordingKey.normalizeArtist(event.subtitle ?? "")
                 read.evidence.append(Evidence(unit: releaseUnit(event.title, artist), level: .release, artist: artist, title: event.title,
-                                              at: event.at, signal: signal, tags: fold(event.tags)))
+                                              at: event.at, signal: signal, tags: fold(event.musicTags)))
             default:
                 // Stations and shows: where something was heard, not what.
                 continue

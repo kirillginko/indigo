@@ -198,7 +198,7 @@ struct PhoneForYouView: View {
                 isOn: item.map { player.isCurrent($0.id) && player.isPlaying } ?? false
             ) {
                 guard let item else { return }
-                if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item) }
+                if player.isCurrent(item.id) { player.toggle() } else { player.playRadio(item, from: ListeningSurface(screen: "foryou.stations", route: item.sourceID)) }
             }
         }
     }
@@ -242,7 +242,7 @@ struct PhoneForYouView: View {
         switch item.payload {
         case .track(let track):
             let (media, start) = track.mediaItem
-            if !player.isCurrent(media.id) { player.play([media]) }
+            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, route: item.kind.rawValue)) }
             if let start { player.seekWhenReady(to: TimeInterval(start), in: media.id) }
         case .record(let found):
             appState.open(.digRelease(id: found.record.id, title: found.record.title))

@@ -61,6 +61,20 @@ final class ListenerDataAudit: XCTestCase {
         let skippedOnly = Set(skipped.compactMap(artistOf)).subtracting(events.filter { $0.weight > 0 }.compactMap(artistOf))
         out.append("  artists only ever skipped: \(skippedOnly.count); skips that were a station or show: \(skipped.filter { $0.kind == .station || $0.kind == .broadcast }.count) of \(skipped.count)")
 
+        // Where listens started (recorded only by builds with ListeningSurface).
+        let surfaced = events.filter { $0.surface != nil }
+        out.append("  carrying the surface that started them: \(pct(surfaced.count, events.count))" + (surfaced.isEmpty ? "" : "; by screen: "
+            + Dictionary(grouping: surfaced, by: { $0.surface!.screen }).mapValues(\.count).sorted { $0.value > $1.value }.map { "\($0.key) \($0.value)" }.joined(separator: ", ")))
+        // First positive listen of each artist, by the surface that started it:
+        // what found what.
+        var firstFound: [String: ListeningEvent] = [:]
+        for event in events where event.weight > 0 { if let key = artistOf(event), !key.isEmpty, firstFound[key] == nil { firstFound[key] = event } }
+        let credited = firstFound.values.filter { $0.surface != nil }
+        if !credited.isEmpty {
+            out.append("  artists first heard, by the surface that found them: "
+                + Dictionary(grouping: credited, by: { $0.surface!.screen }).mapValues(\.count).sorted { $0.value > $1.value }.map { "\($0.key) \($0.value)" }.joined(separator: ", "))
+        }
+
         // Crate.
         let crate = try context.fetch(FetchDescriptor<CrateItem>())
         out.append("")

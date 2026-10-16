@@ -95,7 +95,7 @@ nonisolated struct PersonalInputs: Codable, Equatable, Sendable {
         let every = ListeningLog(context: context).all()
         let horizon = asOf.addingTimeInterval(-TasteProfile.horizon)
         let plays = every.filter { $0.at >= horizon }.map {
-            Play(id: $0.id.uuidString, at: $0.at, weight: $0.weight, tags: $0.tags)
+            Play(id: $0.id.uuidString, at: $0.at, weight: $0.weight, tags: $0.musicTags)
         }
         var artistPlays: [String: Int] = [:]
         for event in every where event.kind == .artist && event.weight > 0 {

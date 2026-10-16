@@ -32,7 +32,7 @@ struct ForYouTracksSection: View {
             if !state.tracks.isEmpty || state.working {
                 DigSection(title: "Tracks to hear",
                            trailing: state.tracks.isEmpty ? "Listening around…" : "\(state.tracks.count) found") {
-                    DiscoverList(tracks: Array(state.tracks.prefix(Self.shown)), opened: opened)
+                    DiscoverList(tracks: Array(state.tracks.prefix(Self.shown)), opened: opened, surface: "foryou.tracks")
                     if state.tracks.count > Self.shown {
                         Button("All \(state.tracks.count) in DIG") { appState.select(.dig) }
                             .buttonStyle(.plain)
@@ -65,7 +65,7 @@ struct PhoneForYouTracksSlide: View {
         let tracks = dig.discover.tracks
         VStack(alignment: .leading, spacing: 14) {
             DigSection(title: "Tracks to hear", trailing: tracks.isEmpty ? "Listening around…" : nil) {
-                DiscoverList(tracks: Array(tracks.prefix(4)), opened: opened)
+                DiscoverList(tracks: Array(tracks.prefix(4)), opened: opened, surface: "foryou.tracks")
             }
             if tracks.count > 4 {
                 Button("All \(tracks.count) in DIG") { appState.select(.dig) }

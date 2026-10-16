@@ -51,7 +51,7 @@ struct ArtistDiscoverSection: View {
         Group {
             if !state.tracks.isEmpty || state.working {
                 DigSection(title: "Listen", trailing: state.working && state.tracks.isEmpty ? "Listening around…" : nil) {
-                    DiscoverList(tracks: state.tracks, opened: opened, ownArtistID: page.discogsID)
+                    DiscoverList(tracks: state.tracks, opened: opened, ownArtistID: page.discogsID, surface: "dig.artist.discover")
                 }
             }
         }
@@ -65,6 +65,8 @@ struct DiscoverList: View {
     let opened: Date
     /// On an artist page: whose page it is, so their own tracks are headed.
     var ownArtistID: Int? = nil
+    /// Where the list is, for the listening log.
+    var surface = "dig.discover"
     @Environment(AppState.self) private var appState
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(CrateService.self) private var crate
@@ -141,14 +143,15 @@ struct DiscoverList: View {
     /// Recordings as a queue, from the one pressed.
     private func play(_ queue: [DiscoveredTrack], from index: Int) {
         DiscoverDiagnostics.shared.pressed(Array(queue.dropFirst(index)), opened: opened, player: player, crate: crate)
-        player.play(queue.map(\.mediaItem.item), startingAt: index)
+        player.play(queue.map(\.mediaItem.item), startingAt: index,
+                    from: ListeningSurface(screen: surface, via: queue[index].via, route: "track"))
     }
 
     /// One track in a radio show, from the moment it was played.
     private func play(_ track: DiscoveredTrack) {
         DiscoverDiagnostics.shared.pressed([track], opened: opened, player: player, crate: crate)
         let (item, start) = track.mediaItem
-        if !player.isCurrent(item.id) { player.play([item]) }
+        if !player.isCurrent(item.id) { player.play([item], from: ListeningSurface(screen: surface, via: track.via, route: "track")) }
         if let start { player.seekWhenReady(to: TimeInterval(start), in: item.id) }
     }
 }
