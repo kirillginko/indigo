@@ -40,6 +40,18 @@ final class ForYouMixTests: XCTestCase {
                        "Burial is a track, so not also a page; Low a record, so not also a page")
     }
 
+    /// Only tracks checked to play; reasons say what each was reached through.
+    func testOnlyPlayableTracksAndReasonsSayWhereFrom() {
+        var unanswered = track(3, "Unchecked")
+        unanswered.playable = .unknown
+        var offers = ExploreOffers()
+        offers.next = [suggestion("Grouper")]
+        let mixed = ForYouMix.mix(offers: offers, tracks: [track(1, "Burial"), unanswered], records: [record(10, "Low")])
+        XCTAssertFalse(mixed.contains { $0.title == "T3" })
+        XCTAssertEqual(mixed.first { $0.title == "Grouper" }?.reason, "Credited together · via Y")
+        XCTAssertEqual(mixed.first { $0.title == "R10" }?.reason, "Like R10 · Slowcore")
+    }
+
     func testAKindThatRunsOutIsSkippedNotWaitedFor() {
         let mixed = ForYouMix.mix(offers: ExploreOffers(), tracks: [track(1, "A"), track(2, "B"), track(3, "C")], records: [])
         XCTAssertEqual(mixed.map(\.title), ["T1", "T2", "T3"])

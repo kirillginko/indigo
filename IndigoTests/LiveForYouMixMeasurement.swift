@@ -88,6 +88,70 @@ final class LiveForYouMixMeasurement: XCTestCase {
             let place = points[item.id].map { String(format: "(%.2f, %.2f) %@, %@", $0.x, $0.y, $0.heading, ForYouMixSection.closeness($0.distance)) } ?? "not placed (no tags)"
             out.append("\(index + 1). [\(item.kind.rawValue)] \(item.title) — \(item.subtitle) | \(item.reason) | via \(item.via) | \(place)")
         }
+        // Checks, item by item.
+        out.append("")
+        out.append("checks:")
+        let tracksInMix = items.compactMap { if case .track(let track) = $0.payload { track } else { nil } }
+        out.append("  tracks not checked to play: \(tracksInMix.filter { $0.playable != .yes }.count) of \(tracksInMix.count)")
+        // The listener's artists and every alias their own entries list.
+        var own = personal.tasteArtistKeys
+        for met in personal.met where met.node.kind == .artist { own.insert(met.node.key) }
+        let discogsRows = try context.fetch(FetchDescriptor<DiscogsArtist>())
+        var aliasOf: [String: String] = [:]
+        for row in discogsRows where own.contains(RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(row.name))) {
+            for alias in row.aliasNames { aliasOf[RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(alias))] = row.name }
+        }
+        for record in try context.fetch(FetchDescriptor<DiscogsIdentityRecord>()) where own.contains(RecordingKey.normalizeArtist(record.name)) {
+            for alias in record.aliasNames { aliasOf[RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(alias))] = record.name }
+        }
+        let knownHits = items.filter { !$0.artistKeys.isDisjoint(with: own) }
+        let aliasHits = items.filter { $0.artistKeys.contains { aliasOf[$0] != nil } }
+        out.append("  by an artist they keep or have played: \(knownHits.count)\(knownHits.isEmpty ? "" : " — " + knownHits.map { "\($0.title) (\($0.subtitle), \($0.kind.rawValue))" }.joined(separator: "; "))")
+        out.append("  an alias of one of theirs: \(aliasHits.count)\(aliasHits.isEmpty ? "" : " — " + aliasHits.map { "\($0.subtitle) = \($0.artistKeys.compactMap { aliasOf[$0] }.joined())" }.joined(separator: "; "))")
+        // How recent each item's starting point is.
+        func lastTouched(_ title: String) -> Date? {
+            let key = RecordingKey.normalizeArtist(title)
+            let dates = personal.crate.filter { $0.node?.title == title || $0.tasteArtistKeys.contains(key) }.map(\.addedAt)
+                + personal.met.filter { $0.node.title == title || $0.node.key == key }.map(\.lastAt)
+                + personal.haunts.filter { $0.node.title == title }.map(\.lastVisitedAt)
+            return dates.max()
+        }
+        var fresh = 0, older = 0, unknownAge = 0
+        var lines: [String] = []
+        for item in items {
+            let via: String
+            switch item.payload {
+            case .track(let track): via = track.via
+            case .record(let found): via = found.via.artistLine
+            case .suggestion(let suggestion): via = suggestion.via
+            }
+            if via == "what you listen to" { unknownAge += 1; lines.append("    \(item.title): from the shape of their listening"); continue }
+            guard let at = lastTouched(via) else { unknownAge += 1; lines.append("    \(item.title): via \(via), not found in the history"); continue }
+            let days = asOf.timeIntervalSince(at) / 86_400
+            if days <= 14 { fresh += 1 } else { older += 1 }
+            lines.append(String(format: "    %@: via %@, last touched %.0f days before", item.title, via, days))
+        }
+        out.append("  starting points: \(fresh) items from the last fortnight, \(older) from longer ago, \(unknownAge) other")
+        out += lines
+        // Explanations: a record's shared styles are on both records; a
+        // track's "next to X" names the starting point it came from.
+        var wrong: [String] = []
+        for item in items {
+            switch item.payload {
+            case .record(let found):
+                let claimed = found.reason.components(separatedBy: " · ").first ?? ""
+                for style in claimed.components(separatedBy: ", ") where !style.contains("~") && !style.isEmpty && style != "Close in sound" {
+                    if !found.record.styles.contains(style.lowercased()) || !found.via.styles.contains(style.lowercased()) {
+                        wrong.append("\(item.title): '\(style)' is not on both records")
+                    }
+                }
+            case .track(let track):
+                if track.reason.hasPrefix("Played next to ") && !track.reason.contains(track.via) { wrong.append("\(item.title): reason does not name \(track.via)") }
+            case .suggestion(let suggestion):
+                if suggestion.via != "what you listen to" && lastTouched(suggestion.via) == nil { wrong.append("\(item.title): via \(suggestion.via), not in the history") }
+            }
+        }
+        out.append("  explanations contradicted by the data: \(wrong.count)\(wrong.isEmpty ? "" : " — " + wrong.joined(separator: "; "))")
         try out.joined(separator: "\n").write(to: FileManager.default.temporaryDirectory.appendingPathComponent("live-foryou-mix.txt"),
                                               atomically: true, encoding: .utf8)
 

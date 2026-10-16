@@ -76,7 +76,10 @@ nonisolated enum ForYouMix {
     static func items(offers: ExploreOffers, tracks: [DiscoveredTrack], records: [SimilarRecord],
                       artistTags: [String: [String]] = [:]) -> (tracks: [ForYouItem], artists: [ForYouItem],
                                                                records: [ForYouItem], shows: [ForYouItem]) {
-        let trackItems = tracks.map { track in
+        // Only a track checked to play is offered; an unanswered check is
+        // not "plays" (`TrackDiscoverySource` hands over only these, and the
+        // mix does not rely on it).
+        let trackItems = tracks.filter { $0.playable == .yes }.map { track in
             ForYouItem(kind: .track, payload: .track(track), artistKeys: [RecordingKey.normalizeArtist(track.artist)],
                        title: track.title, subtitle: track.artist, reason: track.reason, via: track.via,
                        tags: track.tags ?? artistTags[RecordingKey.normalizeArtist(track.artist)] ?? [])
@@ -88,18 +91,21 @@ nonisolated enum ForYouMix {
             let key = RecordingKey.normalizeArtist(suggestion.node.title)
             return ForYouItem(kind: .artist, payload: .suggestion(suggestion), artistKeys: isArtist ? [key] : [],
                               title: suggestion.node.title, subtitle: Self.label(suggestion.node.kind),
-                              reason: suggestion.reason, via: suggestion.via,
+                              // What it was reached through, said: "Credited together · via Hype Williams".
+                              reason: suggestion.connection, via: suggestion.via,
                               tags: isArtist ? artistTags[key] ?? [] : [])
         }
         let showItems = suggestions.filter { $0.node.kind == .broadcast }.map { suggestion in
             ForYouItem(kind: .show, payload: .suggestion(suggestion), artistKeys: [], title: suggestion.node.title,
-                       subtitle: "Radio show", reason: suggestion.reason, via: suggestion.via)
+                       subtitle: "Radio show", reason: suggestion.connection, via: suggestion.via)
         }
         let recordItems = records.map { found in
             ForYouItem(kind: .record, payload: .record(found), artistKeys: found.record.artistKeys,
                        title: found.record.title,
                        subtitle: [found.record.artistLine, found.record.year.map(String.init)].compactMap { $0 }.joined(separator: " · "),
-                       reason: found.reason, via: found.via.title, tags: found.record.styles + found.record.genres)
+                       // Which of theirs it resembles, then how: "Like Stratosphere · Slowcore · both on Numero Group".
+                       reason: "Like \(found.via.title) · \(found.reason)", via: found.via.title,
+                       tags: found.record.styles + found.record.genres)
         }
         return (trackItems, artistItems, recordItems, showItems)
     }
