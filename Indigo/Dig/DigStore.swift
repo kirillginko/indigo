@@ -186,6 +186,8 @@ final class DigStore {
     @ObservationIgnored var recommendationListener: (at: Date, listener: DigRecommender.Listener)?
     /// DIG Discover: tracks to hear (`TrackDiscovery`, development builds).
     var discover = DiscoverState()
+    /// For You's "Records like yours" (`SimilarRecordsFeature`).
+    var similarRecords = SimilarRecordsState()
     /// Discover per artist page, by Discogs entry.
     var artistDiscover: [String: DiscoverState] = [:]
     @ObservationIgnored var trackDiscoverySource = TrackDiscoverySource.live

@@ -38,6 +38,8 @@ struct PhoneForYouView: View {
         case cover
         /// Tracks to hear (`ForYouTracksFeature`, development builds only).
         case tracks
+        /// Records like yours (`SimilarRecordsFeature`, development builds only).
+        case similar
         case suggestion(ExploreSuggestion)
         case onNow(StationEntry)
 
@@ -45,6 +47,7 @@ struct PhoneForYouView: View {
             switch self {
             case .cover: "cover"
             case .tracks: "tracks"
+            case .similar: "similar"
             case .suggestion(let suggestion): "suggestion." + suggestion.id
             case .onNow(let entry): "onNow." + entry.id
             }
@@ -56,7 +59,8 @@ struct PhoneForYouView: View {
             let insets = proxy.safeAreaInsets
             StationDirectory { entries, playable in
                 let suggestions = Self.slides(from: dig.exploreOffers)
-                let slides: [Slide] = [.cover] + (ForYouTracksFeature.isEnabled ? [.tracks] : []) + (suggestions.isEmpty
+                let slides: [Slide] = [.cover] + (ForYouTracksFeature.isEnabled ? [.tracks] : [])
+                    + (SimilarRecordsFeature.isEnabled ? [.similar] : []) + (suggestions.isEmpty
                     ? Self.sampler(entries).map(Slide.onNow)
                     : suggestions.map(Slide.suggestion))
                 ScrollView(.vertical) {
@@ -74,6 +78,11 @@ struct PhoneForYouView: View {
                                     }
                                 case .tracks:
                                     PhoneForYouTracksSlide(insets: insets)
+                                case .similar:
+                                    SimilarRecordsSection()
+                                        .padding(.top, insets.top)
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                                        .background(Color.black)
                                 case .suggestion(let suggestion):
                                     PhoneForYouSlide(
                                         suggestion: suggestion,

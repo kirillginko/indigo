@@ -45,6 +45,7 @@ struct ExploreView: View {
                     }
                 // Development builds only: see `ForYouTracksFeature`.
                 if ForYouTracksFeature.isEnabled { ForYouTracksSection() }
+                if SimilarRecordsFeature.isEnabled { SimilarRecordsSection() }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
                         Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }
