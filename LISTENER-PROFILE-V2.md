@@ -50,9 +50,9 @@ A pure struct, a function of the synced rows, the style space and `asOf`.
 
 - **Units at the most specific level known**: the recording played, the
   record crated or opened (editions folded by title and artist), the artist
-  only when nothing narrower exists. Aliases fold into the artist whose own
-  Discogs entry lists them (union-find, alphabetically first, so every
-  device agrees).
+  only when nothing narrower exists. An alias stays its own project; which
+  names are one person is kept apart, by Discogs id (see the alias audit
+  under Phase 3 — the first prototype folded by display name).
 - **Signals by intent**: crated 3, saved 2.5, full listen 1, partial 0.4,
   DIG page 0.15, skip 0 (counted, never subtracted), dismissed −1.
 - **Time**: long-term = log2(1 + sum), so repetition counts without
@@ -103,12 +103,114 @@ ranking — consistent with the earlier reachability audit (8 of 133 later
 artists reachable; two shared radio hops from kept artists would reach
 about half of the rest).
 
+## Phase 3 — expanded retrieval (`Indigo/Explore/ListenerRetrieval.swift`)
+
+Prototype only; nothing visible reads it. Replayed by
+`IndigoTests/ListenerRetrievalReplay.swift` (opt-in,
+`INDIGO_RETRIEVAL_REPLAY=1`; reads the shared catalogue read-only and a few
+R2 release documents) at cut-offs 21, 14 and 7 days before the last
+activity. Radio is read only from episodes aired before each cut-off.
+
+**Routes.**
+- *Seeds*: each cluster's strongest units (recording, release, artist),
+  slots in proportion to the cluster's share with a floor of three — about
+  36 seeds against For You's 12.
+- *Direct* (B): one step in the on-device identity graph — credits and
+  releases ("direct musical connection"), labels and scenes ("same label or
+  scene"); never a technical credit, never the same person.
+- *Radio*: who was played next to a seed (adjacency) and next to *them*
+  (second hop), weighted by track distance, programme focus (share of its
+  genre mentions held by its top three genres), repetition across episodes
+  and programmes, and the episode's genres against the cluster; artists
+  every programme plays are damped (√(8 / programmes)). A second hop is
+  explained as "played near X on Show; X is played near Seed" — never a
+  collaboration.
+- *Records like yours*: records on the device whose own styles (≥ 2 the
+  space knows) sit nearest a cluster's centre (fit ≥ 0.6).
+- *Merging* by verified identity: a Discogs id, else a catalogue row; a bare
+  name joins an identity only when exactly one identity has that name.
+
+**Alias audit.** Phase 2 folded aliases into one unit through a union-find
+keyed by normalised display names (alphabetically first). Now: an alias is
+its own project in the profile (one person, two sounds), and "same person"
+is a separate group keyed by the smallest Discogs id, formed only from links
+*both* entries confirm. In this history: 98 alias links between names the
+listener has met, 78 confirmed; 14 groups by name alone, 12 by confirmed id.
+
+**Results** (later = artists first acted on positively after the cut-off).
+
+| cut-off | later | pool recall A / B / C / C bounded | pool size A / B / C / C bounded |
+|---------|-------|-----------------------------------|---------------------------------|
+| 21 d    | 141   | 2% / 8% / 33% / 8%                | 163 / 784 / 7,462 / 1,198       |
+| 14 d    | 132   | 2% / 8% / 33% / 8%                | 163 / 775 / 8,295 / 1,208       |
+| 7 d     | 42    | 7% / 14% / 21% / 14%              | 160 / 736 / 7,352 / 1,120       |
+
+Later finds in the top 20 (best ranker per pool; fit to later listening):
+
+| cut-off | A (today) | B cluster-seeded | C | C bounded |
+|---------|-----------|------------------|---|-----------|
+| 21 d    | 2 (0.55)  | 6 (0.49, R2)     | 2 (0.48, R3) | 2 (0.47, R3) |
+| 14 d    | 2 (0.55)  | 3 (0.45, R2/R3)  | 1 (0.49) | 1 (0.46) |
+| 7 d     | 3 (0.65, For You order) | 3 (0.63, R1) | 1 (0.62 R2; 0.43 R3) | 2 (0.42) |
+
+- **Radio reaches, but as noise.** Unbounded, radio takes recall from 8% to
+  33%, but the pool grows to ~7,500 with ~1% precision; 45% of adjacency
+  candidates have no style anywhere, so no ranker can tell them apart. Half
+  the radio "finds" at the 21-day cut-off come from **one episode** whose
+  tracklist the listener played through in one evening — one discovery, not
+  sixteen. Bounded to 12 per seed and 4 per bridge, radio adds nothing that
+  B did not already reach.
+- **Second hop**: 2,100–2,800 candidates, 1–5 later finds; 24–38% fit a
+  taste cluster, 13–14% clearly don't, the rest unknown. Examples read as
+  plausible scene neighbours (the same label circles and programmes) but
+  rarely as what the listener went on to play.
+- **Records like yours** looked strong (17 later finds) until the pool was
+  limited to records provably on the device before the cut-off: records
+  carry no date, and ones cached by a *later* visit leaked the answer.
+  Dated, it offers ~6 records and none is a later find.
+- **B is the real gain**: cluster seeds through the on-device graph take
+  pool recall 2–7% → 8–14% and top-20 later finds up at two of three
+  cut-offs, at lower fit (0.45–0.49 vs 0.55). Caveat: the device graph
+  itself is today's, not the cut-off's, so B's numbers may be optimistic.
+- Today's taste vector (R1) collapses on the radio pools (one style, fit
+  0.30): it rewards whatever tag mass radio genres carry. v2 relevance and
+  spread hold diversity (4–5 clusters, 10–11 styles).
+
+**Stability and determinism.** Dropping one piece of evidence in twenty
+(five ways) keeps 4 clusters in four of five trials (one splits into 5),
+matched centroids at cosine ≥ 0.94, and 92–100% of seeds. The profile is
+identical from shuffled history; radio scores are identical from reordered
+input (after summing in a fixed order — the first run was not). With a
+tenth of artist styles missing, as on a device whose caches differ, the
+profile changes (95% of seeds kept): **a cached profile must be keyed on the
+style caches as well as the synced history.**
+
+**The unstyled 28%.** 25.5% of the weight belongs to artists with no Discogs
+entry on the device (14.7% artist-level, 13.2% recording-level). R2 cannot
+help them directly: its documents are releases by id, and the release ids
+come from the Discogs entry. The shared catalogue's radio episode genres
+cover 8.8% of all weight (artists with a unique catalogue row whose episodes
+carry genres the style space knows); the catalogue also knows a Discogs id
+for those same 8.8%. Of artists *with* an entry but no styles (2.3%), R2
+documents give styles for few (4 of 21 sampled). No AI enrichment or new
+collection is needed to recover the first ~9%; the rest needs each artist's
+Discogs entry, which DIG fetches on demand anyway.
+
+**Decision.** Reach improved meaningfully only by flooding the pool; bounded
+so the noise is manageable, radio adds nothing over B. That fails the bar
+set for moving on, so **Phase 4 integration is not started.** What would
+change it:
+1. Score radio candidates by evidence the listener can hear — the episode,
+   not the artist — and count one episode's tracklist as one find.
+2. Give radio candidates styles from episode genres *and* their catalogue
+   Discogs id before ranking, so relevance can separate fit from noise.
+3. Date the device's knowledge (records and graph edges) so B and records
+   like yours can be replayed without leakage.
+4. Then re-run the replay; promote B's cluster seeding (the clear win) first.
+
 ## Next
 
-1. **Retrieval from clusters** (Phase 3): seed routes from each cluster's
-   heaviest units rather than twelve recent artists, and widen the pool with
-   two shared radio hops weighted by how specific the show is, plus Records
-   like yours by cluster centroid. Replay again: later finds is the measure.
+1. **Retrieval from clusters** (Phase 3): done as a prototype, above.
 2. **Integration** (Phase 4): For You Mix uses `spread` behind a Debug-only
    switch; the profile cached per sync generation.
 3. **Evaluation** (Phase 5): replay at several cutoffs, Mac and iOS
