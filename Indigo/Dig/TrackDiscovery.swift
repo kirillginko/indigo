@@ -123,6 +123,23 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
     /// The play action, in words that say which.
     var playLabel: String { isRecording ? "Play track" : "Hear in radio show" }
 
+    /// The picture to draw, sharp, and a smaller one to show first and fall
+    /// back on. A YouTube upload's 1280x720 frame (`maxresdefault`, 16:9, no
+    /// bars), cropped square, is the cover itself for the usual "sleeve in a
+    /// video" upload, and the still at full sharpness otherwise; `mqdefault`
+    /// (320x180, also 16:9) stands in while it loads and where an upload has
+    /// no large frame. `hqdefault`, which was stored, is 4:3 with the 16:9
+    /// picture letterboxed inside it: black bars, and a third of the size.
+    /// Anything that is not a YouTube still is drawn as it is.
+    var sharpArtwork: (full: URL?, preview: URL?) {
+        guard let url = artworkURL, url.host?.hasSuffix("ytimg.com") == true else { return (artworkURL, nil) }
+        let parts = url.pathComponents
+        guard let at = parts.firstIndex(of: "vi"), at + 1 < parts.count else { return (artworkURL, nil) }
+        let id = parts[at + 1]
+        return (URL(string: "https://i.ytimg.com/vi/\(id)/maxresdefault.jpg"),
+                URL(string: "https://i.ytimg.com/vi/\(id)/mqdefault.jpg"))
+    }
+
     /// A YouTube thumbnail, for a recording that has one.
     static func thumbnail(for url: URL) -> URL? {
         guard let id = YouTubeLink.videoID(from: url) else { return nil }

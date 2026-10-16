@@ -175,7 +175,8 @@ struct DiscoverRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Button(action: play) {
-                ArtworkView(remoteURL: track.artworkURL, side: isPhone ? 64 : 52, glyphScale: 0.3)
+                ArtworkView(remoteURL: track.sharpArtwork.full, previewRemoteURL: track.sharpArtwork.preview,
+                            side: isPhone ? 64 : 52, glyphScale: 0.3)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("\(track.playLabel): \(track.title) by \(track.artist)")
@@ -232,7 +233,8 @@ struct DiscoverTile: View {
                     .aspectRatio(1, contentMode: .fit)
                     .overlay {
                         GeometryReader { proxy in
-                            ArtworkView(remoteURL: track.artworkURL, side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic)
+                            ArtworkView(remoteURL: track.sharpArtwork.full, previewRemoteURL: track.sharpArtwork.preview,
+                                        side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic)
                         }
                     }
                     .clipped()

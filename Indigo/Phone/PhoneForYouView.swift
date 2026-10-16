@@ -221,14 +221,16 @@ struct PhoneForYouView: View {
         let heading = dig.forYouMix.compass?.points.first { $0.id == item.id }?.heading
         switch item.payload {
         case .track(let track):
-            return .init(picture: track.artworkURL, kind: track.isRecording ? "Track" : "In a radio show",
+            let art = track.sharpArtwork
+            return .init(picture: art.full, kind: track.isRecording ? "Track" : "In a radio show",
                          title: track.title, subtitle: track.artist, reason: track.reason, via: nil, heading: heading,
                          button: track.isRecording ? "PLAY TRACK" : "HEAR IN RADIO SHOW",
-                         icon: track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right")
+                         icon: track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right",
+                         preview: art.preview, square: true)
         case .record(let found):
             return .init(picture: found.record.artworkURL, kind: "Record", title: found.record.title,
                          subtitle: item.subtitle, reason: item.reason, via: nil, heading: heading,
-                         button: "OPEN RECORD", icon: "arrow.down.right")
+                         button: "OPEN RECORD", icon: "arrow.down.right", square: true)
         case .suggestion(let suggestion):
             var made = card(for: suggestion)
             made.heading = heading
@@ -285,6 +287,12 @@ struct PhoneForYouSlide: View {
         var heading: String?
         var button: String
         var icon: String
+        /// A smaller picture to show first and fall back on.
+        var preview: URL? = nil
+        /// Drawn as a sharp square in the middle of the slide rather than
+        /// across all of it: a track's cover, which is a square at most a
+        /// few hundred pixels across and would blur stretched to the screen.
+        var square = false
     }
 
     let card: Card
@@ -302,7 +310,18 @@ struct PhoneForYouSlide: View {
         ZStack {
             GeometryReader { proxy in
                 Group {
-                    if let picture, isSmall {
+                    if let picture, card.square {
+                        ZStack {
+                            PlayerShaderBackdrop()
+                            // In the space above the words, which are
+                            // anchored to the bottom and can run to three
+                            // lines: about a quarter of the way down.
+                            ArtworkView(remoteURL: picture, previewRemoteURL: card.preview,
+                                        side: min(proxy.size.width - 96, proxy.size.height * 0.28), glyphScale: 0.3)
+                                .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
+                                .position(x: proxy.size.width / 2, y: proxy.size.height * 0.26)
+                        }
+                    } else if let picture, isSmall {
                         ZStack {
                             PlayerShaderBackdrop()
                             ArtworkView(remoteURL: picture, side: min(proxy.size.width * 0.62, 260), glyphScale: 0.3)
@@ -312,7 +331,9 @@ struct PhoneForYouSlide: View {
                     } else if let picture {
                         ArtworkView(remoteURL: picture, side: max(proxy.size.width, proxy.size.height), glyphScale: 0.3)
                     } else {
-                        PlayerShaderBackdrop()
+                        // Nothing to show: the wordmark's green, the one
+                        // stand-in for a missing picture on the phone.
+                        MineralSheenSurface()
                     }
                 }
                 .frame(width: proxy.size.width, height: proxy.size.height)

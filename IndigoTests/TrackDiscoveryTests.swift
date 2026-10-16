@@ -81,6 +81,20 @@ final class TrackDiscoveryTests: XCTestCase {
         XCTAssertEqual(old.id, track?.id)
     }
 
+    /// A YouTube still is drawn from its sharp 16:9 frame, with the small
+    /// 16:9 still to fall back on; anything else as it is.
+    func testATrackIsDrawnFromItsSharpFrame() {
+        var track = TrackDiscovery.rank(neighbours: [neighbour(2, "A")], appearances: [recording(2, "A", "T")],
+                                        taste: .empty, knownArtists: [], knownTracks: []).first
+        track?.artworkURL = URL(string: "https://i.ytimg.com/vi/j_JCt0jv86I/hqdefault.jpg")
+        XCTAssertEqual(track?.sharpArtwork.full?.absoluteString, "https://i.ytimg.com/vi/j_JCt0jv86I/maxresdefault.jpg")
+        XCTAssertEqual(track?.sharpArtwork.preview?.absoluteString, "https://i.ytimg.com/vi/j_JCt0jv86I/mqdefault.jpg")
+        let show = URL(string: "https://media2.ntslive.co.uk/resize/1600x1600/x.jpeg")
+        track?.artworkURL = show
+        XCTAssertEqual(track?.sharpArtwork.full, show)
+        XCTAssertNil(track?.sharpArtwork.preview)
+    }
+
     func testAnUploadIsOnlyATrackWhenItSaysSo() {
         XCTAssertTrue(TrackDiscovery.isTrackUpload(title: "Fair warning", artist: "Todd Rundgren"))
         XCTAssertFalse(TrackDiscovery.isTrackUpload(title: "Electric Circus Studio Session Footage", artist: "Common"))
