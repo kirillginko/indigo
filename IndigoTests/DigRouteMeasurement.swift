@@ -78,8 +78,10 @@ final class DigRouteMeasurement: XCTestCase {
             for (id, bundle) in bundles {
                 let origin = MusicNode.artist(bundle.artist.name, discogsID: id)
                 var found = Routes()
+                // DIG's view of the bundle's routes (`EdgeSet.forDIG`): the
+                // bundle itself is the same either way.
                 for edge in BundleEdges.edges(from: origin, bundle: bundle, ownIdentities: [id], sqlTargets: [])
-                where edge.to.kind == .artist {
+                where edge.to.kind == .artist && !(musicianFirst && MusicianFirst.isTechnicalCredit(edge)) {
                     guard let to = edge.to.discogsID, !CataloguePilot.standIns.contains(to), to != id else { continue }
                     var held = found.byID[to] ?? (edge.to.title, [], 0, edge.reason)
                     held.kinds.insert(edge.kind)

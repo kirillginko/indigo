@@ -82,6 +82,15 @@ final class EmbedAudioEngine: NSObject {
     @ObservationIgnored private var isBridgeReady = false
     @ObservationIgnored private var volume: Double = 1
     @ObservationIgnored private var currentRequest: (provider: EmbedProvider, url: URL)?
+    /// An episode being put back after its web process was lost: whether it
+    /// was playing, and where it had got to. Kept until it plays again, so a
+    /// second loss in the middle of the first recovery restores what the
+    /// listener had, not the half-recovered state.
+    @ObservationIgnored private(set) var recovery: (autoplay: Bool, position: TimeInterval)?
+    /// Whether the episode now loading was asked to play once it had.
+    @ObservationIgnored private var loadAutoplays = false
+    /// How many times the bridge page has been loaded. Read by tests.
+    @ObservationIgnored private(set) var bridgeLoads = 0
 
     private static let bridgeName = "indigo"
 
@@ -177,6 +186,8 @@ final class EmbedAudioEngine: NSObject {
     // MARK: - Transport
 
     func load(provider: EmbedProvider, url: URL, autoplay: Bool) {
+        recovery = nil
+        loadAutoplays = autoplay
         currentRequest = (provider, url)
         position = 0
         duration = 0
@@ -208,6 +219,7 @@ final class EmbedAudioEngine: NSObject {
     }
 
     func stop() {
+        recovery = nil
         currentRequest = nil
         position = 0
         duration = 0
@@ -252,6 +264,7 @@ final class EmbedAudioEngine: NSObject {
     static let origin = "https://w.soundcloud.com"
 
     private func loadBridge() {
+        bridgeLoads += 1
         webView.loadHTMLString(Self.bridgeHTML, baseURL: URL(string: Self.origin + "/indigo"))
     }
 
@@ -312,6 +325,10 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
             setState(.loading)
         case "play":
             setState(.playing)
+            if let recovery, self.duration > 0 {
+                self.recovery = nil
+                if recovery.position > 0 { seek(to: recovery.position) }
+            }
         case "pause":
             setState(.paused)
         case "progress":
@@ -332,6 +349,31 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
 }
 
 extension EmbedAudioEngine: WKNavigationDelegate {
+    nonisolated func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Task { @MainActor [weak self] in self?.contentProcessTerminated() }
+    }
+
+    /// The page's process is gone — iOS ends a background app's web
+    /// processes when it wants the memory, and they crash.
+    ///
+    /// The widget, the bridge and the music all went with it, and nothing
+    /// noticed: the bridge still counted as ready, so every command after it
+    /// was run against a blank page, failed, and the episode could not be
+    /// played again until the app was relaunched. The bridge is loaded again
+    /// and the episode put back where it was, playing if it was playing.
+    func contentProcessTerminated() {
+        Trace.note("embed: web content process ended")
+        isBridgeReady = false
+        pendingCommands = []
+        let wanted = recovery ?? (state == .playing || (state == .loading && loadAutoplays), position)
+        loadBridge()
+        guard let request = currentRequest else { return }
+        // One widget, loaded once: the old page and its audio went with the
+        // process, so nothing is left to play alongside it.
+        load(provider: request.provider, url: request.url, autoplay: wanted.autoplay)
+        recovery = wanted
+    }
+
     nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         let message = error.localizedDescription
         Task { @MainActor [weak self] in self?.setState(.failed(message)) }
@@ -456,8 +498,15 @@ extension EmbedAudioEngine {
           });
           widget.bind(SC.Widget.Events.PAUSE, function () { stopTicker(); send('pause'); });
           widget.bind(SC.Widget.Events.FINISH, function () { stopTicker(); send('finish'); });
+          // The duration is what makes the seek bar usable; when READY did
+          // not bring one (it can arrive late on a phone), ask while playing.
+          var knownDuration = 0;
           widget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
-            send('progress', e.currentPosition / 1000);
+            if (knownDuration > 0) { send('progress', e.currentPosition / 1000); return; }
+            widget.getDuration(function (ms) {
+              if (ms > 0) { knownDuration = ms; }
+              send('progress', e.currentPosition / 1000, ms > 0 ? ms / 1000 : null);
+            });
           });
           widget.bind(SC.Widget.Events.ERROR, function () {
             send('error', null, null, 'SoundCloud refused to play this episode.');

@@ -215,6 +215,19 @@ nonisolated enum SpellingCheck {
             guard ArtistSpelling.filingKey(result.title) != key else { continue }
             if ArtistSpelling.compact(result.title) == compact { ids.append(id) }
         }
+        // None match that closely: the entries sharing its surname, whose own
+        // records may list it as a spelling -- "Guillermo S. Herren" is one of
+        // Scott Herren's, and Discogs' search answers it with him. Still read,
+        // never assumed, and still no more than a few.
+        if ids.isEmpty, let surname = key.split(separator: " ").last.map(String.init), surname.count >= 4 {
+            for result in results {
+                guard let id = result.id, id > 0, !ids.contains(id),
+                      ArtistSpelling.filingKey(result.title) != key,
+                      ArtistSpelling.filingKey(result.title).split(separator: " ").map(String.init).contains(surname)
+                else { continue }
+                ids.append(id)
+            }
+        }
         return ids.count > candidateLimit ? nil : ids
     }
 

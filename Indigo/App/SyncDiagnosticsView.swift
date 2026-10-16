@@ -28,6 +28,8 @@ struct SyncDiagnosticsView: View {
     /// The musician-first development switches, kept until turned off.
     @AppStorage(MusicianFirst.switchKey) private var digMusicianFirst = false
     @AppStorage(ForYouMusicianFirst.switchKey) private var forYouMusicianFirst = false
+    @AppStorage(DigRecommendations.switchKey) private var digRecommendations = false
+    @AppStorage(TrackDiscoveryFeature.switchKey) private var digTracks = false
 
     /// The shared things both devices act on, so their actions meet.
     static let testArtist = MusicNode.artist("\(TwoDeviceSyncRunner.marker) shared artist")
@@ -52,10 +54,24 @@ struct SyncDiagnosticsView: View {
                 Section {
                     Toggle("DIG: musicians first", isOn: $digMusicianFirst)
                     Toggle("For You: musician-first ranking", isOn: $forYouMusicianFirst)
+                    Toggle("DIG: Hear next cards", isOn: $digRecommendations)
+                    Toggle("DIG: Discover tracks", isOn: $digTracks)
                 } header: {
                     Text("Musician-first (development)")
                 } footer: {
-                    Text("DIG leaves engineers off artist pages (release pages still list them). For You starts from what you are into now and over time, and brings DIG's setting with it. Relaunch Indigo to apply; the first look after a change rebuilds the graph and takes a few seconds.")
+                    Text("DIG leaves engineers off artist pages (release pages still list them). For You starts from what you are into now and over time, and brings DIG's setting with it. Hear next shows a few musicians on each artist page with the record behind them and something to put on, and brings DIG's setting with it. Relaunch Indigo to apply; the first look after a change rebuilds the graph and takes a few seconds.")
+                }
+                if digTracks {
+                    Section("Discover: what happened after Play (this device only)") {
+                        let counts = DiscoverDiagnostics.shared.counts
+                        row("pressed", "\(counts.pressed) (\(counts.recordings) tracks, \(counts.radio) radio)")
+                        row("began playing", "\(counts.began); never began \(counts.neverBegan)")
+                        row("DIG open → hearing", counts.medianSecondsToHear.map { String(format: "%.1fs median", $0) } ?? "–")
+                        row("heard out / skipped", "\(counts.completed) / \(counts.skipped)")
+                        row("went on to the next", "\(counts.continued)")
+                        row("crated", "\(counts.crated)")
+                        Button("Reset counts") { DiscoverDiagnostics.shared.reset() }
+                    }
                 }
                 Section("Mirroring") {
                     row("iCloud account", account)

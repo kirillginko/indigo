@@ -145,7 +145,7 @@ nonisolated struct DeepEngine {
         // What the page shows and what the listener keeps are by name, so each
         // destination is matched against them under every name behind it.
         let walked = identity.neighbourhood(of: origin)
-        return walked.edges.byDestination.compactMap { candidate in
+        return walked.edges.forDIG.byDestination.compactMap { candidate in
             guard walked.knownIDs(of: candidate.node).isDisjoint(with: showing) else { return nil }
             let signals = caches.signals(for: candidate.node, keys: walked.keys[candidate.node.id] ?? [], distance: distance)
             return DeepResult(

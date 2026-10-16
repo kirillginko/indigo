@@ -3,7 +3,7 @@
 # Fails when a release build could show shared DIG enrichment it should not.
 # Run before uploading any archive (DIG-REMEDIATION-PLAN.md §13).
 #
-#   Scripts/release-enrichment-guard.sh <path/to/Indigo.xcarchive>
+#   Scripts/release-enrichment-guard.sh <path/to/Indigo.xcarchive> [--internal]
 #
 # 1. The binary: the development override (-INDIGO_DIG_CATALOGUE_PILOT) is
 #    compiled into development builds only. A release binary containing its
@@ -19,7 +19,7 @@ app=$(find "$archive/Products/Applications" -maxdepth 1 -type d -name "*.app" | 
 # Every file in the bundle: a development build keeps its code in a separate
 # Indigo.debug.dylib, and a check of the main binary alone would miss it.
 # The musician-first switches (MusicianFirst.swift) are development-only too.
-for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MUSICIAN_FIRST; do
+for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MUSICIAN_FIRST INDIGO_DIG_RECOMMENDATIONS INDIGO_DIG_TRACKS; do
     found=$(find "$app" -type f -print0 | xargs -0 grep -l -a "$key" 2>/dev/null || true)
     if [ -n "$found" ]; then
         echo "FAIL: the development override $key is in: $found" >&2
@@ -27,6 +27,17 @@ for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MU
     fi
 done
 echo "ok: no development override anywhere in $(basename "$app")"
+
+# An internal archive (INDIGO_INTERNAL: musician-first DIG and Hear next on)
+# is for TestFlight internal testing only, and passes only when named as one.
+internal=$(find "$app" -type f -print0 | xargs -0 grep -l -a "INDIGO_INTERNAL_BUILD" 2>/dev/null || true)
+if [ -n "$internal" ]; then
+    if [ "${2:-}" != "--internal" ]; then
+        echo "FAIL: this is an internal build (musician-first DIG and Hear next on); not for the App Store. Pass --internal for TestFlight internal testing." >&2
+        exit 1
+    fi
+    echo "ok: internal build, accepted for TestFlight internal testing only"
+fi
 
 config=$(supabase db query --linked "select public.dig_enrichment_config() as c" 2>/dev/null)
 python3 - "$config" <<'PY'

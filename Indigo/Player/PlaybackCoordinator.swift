@@ -9,6 +9,9 @@
 
 import Foundation
 import Observation
+#if os(iOS)
+import AVFoundation
+#endif
 
 @Observable
 final class PlaybackCoordinator {
@@ -31,7 +34,7 @@ final class PlaybackCoordinator {
 
     // MARK: Engines
 
-    private let local = LocalAudioEngine()
+    private let local: LocalAudioEngine
     private let stream = StreamAudioEngine()
     let embed = EmbedAudioEngine()
     private let nowPlaying = NowPlayingManager.shared
@@ -90,12 +93,19 @@ final class PlaybackCoordinator {
     @ObservationIgnored private static let marginInterval = Duration.seconds(2)
     @ObservationIgnored private var marginWatch: Task<Void, Never>?
 
+    /// Whether something was playing when the system took the audio away,
+    /// and so should play again when it is handed back.
+    @ObservationIgnored private var resumeAfterInterruption = false
+    @ObservationIgnored private var sessionObservers: [NSObjectProtocol] = []
+
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored static let volumeKey = "player.volume"
 
-    /// `defaults` is injectable so tests never touch the user's real settings.
-    init(defaults: UserDefaults = .standard) {
+    /// `defaults` is injectable so tests never touch the user's real settings,
+    /// and `local` so they can stand a file in for a remote episode.
+    init(defaults: UserDefaults = .standard, local: LocalAudioEngine = LocalAudioEngine()) {
         self.defaults = defaults
+        self.local = local
         let stored = defaults.object(forKey: Self.volumeKey) as? Double
         volume = stored ?? 0.8
         local.setVolume(volume)
@@ -118,6 +128,9 @@ final class PlaybackCoordinator {
         nowPlaying.onPrevious = { [weak self] in self?.previous() }
         nowPlaying.onSeek = { [weak self] position in self?.seek(to: position) }
         nowPlaying.activate()
+        #if os(iOS)
+        observeAudioSession()
+        #endif
     }
 
     /// Present so that releasing one under XCTest does not abort the host.
@@ -131,7 +144,9 @@ final class PlaybackCoordinator {
 
     var isPlaying: Bool {
         switch source {
-        case .local: local.isPlaying
+        // An episode being reopened after a drop is still on, as a station
+        // reconnecting is: pressing pause must pause it, not start it again.
+        case .local: local.isPlaying || (local.isReopening && local.wantsToPlay)
         case .stream: stream.state == .playing || stream.state == .buffering
         case .embed: embed.state == .playing || embed.state == .loading
         case .none: false
@@ -152,6 +167,7 @@ final class PlaybackCoordinator {
 
     var isBuffering: Bool {
         (source == .stream && stream.state == .buffering)
+            || (source == .local && local.isReopening)
             || (source == .embed && embed.state == .loading)
     }
 
@@ -227,9 +243,12 @@ final class PlaybackCoordinator {
     }
 
     func toggle() {
+        // Whatever the listener does with the transport during a call is
+        // theirs, and the call ending must not undo it.
+        resumeAfterInterruption = false
         switch source {
         case .local:
-            local.isPlaying ? local.pause() : local.play()
+            isPlaying ? local.pause() : local.play()
         case .stream:
             switch stream.state {
             case .playing, .buffering:
@@ -294,7 +313,13 @@ final class PlaybackCoordinator {
         startCurrent(autoplay: true)
     }
 
+    /// The listener's seek: it wins over any seek still waiting to land.
     func seek(to seconds: TimeInterval) {
+        pendingSeek?.cancel()
+        applySeek(to: seconds)
+    }
+
+    private func applySeek(to seconds: TimeInterval) {
         guard canSeek else { return }
         seekActiveEngine(to: seconds)
         publishNowPlaying()
@@ -317,21 +342,34 @@ final class PlaybackCoordinator {
     /// Jumping to a track inside an archived broadcast is one gesture for the
     /// listener and two for the player: the duration a seek is clamped against
     /// does not exist until the asset has been read.
+    ///
+    /// And a seek is not landed until the player is playing near it. An
+    /// embedded SoundCloud widget can report its duration before it plays and
+    /// quietly ignore a seek made then; on a phone, the duration can take
+    /// longer than the six seconds this used to wait. So it is asked again
+    /// until the position holds near the target (up to 45 seconds, a few
+    /// tries), and given up the moment the listener moves the seek bar.
     func seekWhenReady(to seconds: TimeInterval, in itemID: String) {
         guard seconds > 0 else { return }
         pendingSeek?.cancel()
-        if canSeek, isCurrent(itemID) {
-            seek(to: seconds)
-            return
-        }
         pendingSeek = Task { [weak self] in
-            for _ in 0..<60 {
+            var lastTry: ContinuousClock.Instant?
+            var tries = 0
+            for _ in 0..<450 {
                 try? await Task.sleep(nanoseconds: 100_000_000)
                 guard !Task.isCancelled, let self, self.isCurrent(itemID) else { return }
-                if self.canSeek {
-                    self.seek(to: seconds)
-                    return
+                guard self.canSeek else { continue }
+                if let lastTry {
+                    // A seek reads as landed at once (the engine moves its
+                    // position optimistically): judge it only once the
+                    // player has had time to report where it really is.
+                    guard ContinuousClock.now - lastTry > .milliseconds(2500) else { continue }
+                    if self.isPlaying, abs(self.position - seconds) < 8 { return }
                 }
+                guard tries < 8 else { return }
+                tries += 1
+                lastTry = .now
+                self.applySeek(to: seconds)
             }
         }
     }
@@ -355,6 +393,7 @@ final class PlaybackCoordinator {
 
     /// Stops everything and clears the bar. Used when the library disappears.
     func stopAll() {
+        resumeAfterInterruption = false
         endStint()
         local.stop()
         stream.stop()
@@ -365,10 +404,97 @@ final class PlaybackCoordinator {
         publishNowPlaying()
     }
 
+    // MARK: - The system taking the audio away
+
+    /// A call, Siri, or another app's audio has taken the session.
+    ///
+    /// iOS pauses every player in the app as this arrives, and nothing told
+    /// the engines: a station went on reading "playing" through the call and
+    /// afterwards, silent. Its play button was then a pause button, so the
+    /// listener had to press it twice to hear anything. Pausing here makes
+    /// the state say what the speaker is doing.
+    func audioInterruptionBegan() {
+        let wasPlaying = isPlaying
+        if wasPlaying { pause() }
+        // After the pause, which is a transport command like any other and
+        // clears this.
+        resumeAfterInterruption = wasPlaying
+    }
+
+    /// The session has been handed back. The system says whether playing
+    /// on is welcome — after a call it is, after another app started music
+    /// of its own it is not.
+    ///
+    /// A station resumes at the live edge, through the same reconnect a
+    /// pause and play would make: whatever was buffered before the call is
+    /// minutes stale, and the connection may well have gone with it.
+    func audioInterruptionEnded(shouldResume: Bool) {
+        let wanted = resumeAfterInterruption && shouldResume
+        resumeAfterInterruption = false
+        guard wanted else { return }
+        resume()
+    }
+
+    /// The headphones came out, or the car's Bluetooth went away. The system
+    /// pauses rather than play from the phone's speaker, and so does the
+    /// app — this only makes the bar agree.
+    func audioRouteLost() {
+        resumeAfterInterruption = false
+        pause()
+    }
+
+    #if os(iOS)
+    private func observeAudioSession() {
+        let center = NotificationCenter.default
+        let session = AVAudioSession.sharedInstance()
+        sessionObservers.append(center.addObserver(
+            forName: AVAudioSession.interruptionNotification, object: session, queue: .main
+        ) { [weak self] note in
+            let info = note.userInfo ?? [:]
+            let type = (info[AVAudioSessionInterruptionTypeKey] as? UInt)
+                .flatMap(AVAudioSession.InterruptionType.init(rawValue:))
+            let options = (info[AVAudioSessionInterruptionOptionKey] as? UInt)
+                .map(AVAudioSession.InterruptionOptions.init(rawValue:)) ?? []
+            MainActor.assumeIsolated {
+                Trace.note("audio.interruption \(type == .began ? "began" : "ended") resume=\(options.contains(.shouldResume))")
+                switch type {
+                case .began: self?.audioInterruptionBegan()
+                case .ended: self?.audioInterruptionEnded(shouldResume: options.contains(.shouldResume))
+                default: break
+                }
+            }
+        })
+        sessionObservers.append(center.addObserver(
+            forName: AVAudioSession.routeChangeNotification, object: session, queue: .main
+        ) { [weak self] note in
+            let reason = (note.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt)
+                .flatMap(AVAudioSession.RouteChangeReason.init(rawValue:))
+            guard reason == .oldDeviceUnavailable else { return }
+            MainActor.assumeIsolated {
+                Trace.note("audio.route lost")
+                self?.audioRouteLost()
+            }
+        })
+        // The media server restarted. Every player made before it is dead,
+        // and so is the session's category; a station is reopened on new ones.
+        sessionObservers.append(center.addObserver(
+            forName: AVAudioSession.mediaServicesWereResetNotification, object: session, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                Trace.note("audio.media services reset")
+                IndigoAppDelegate.configureAudioSession()
+                guard let self, self.source == .stream, self.isPlaying else { return }
+                self.retryStream()
+            }
+        })
+    }
+    #endif
+
     // MARK: - Engine switching
 
     private func startCurrent(autoplay: Bool) {
         guard let item = queue.current else { return }
+        resumeAfterInterruption = false
         onPlaybackStarting?()
         // Before `current` moves on, while the outgoing item is still the one
         // the stint has been measuring.
@@ -468,6 +594,10 @@ final class PlaybackCoordinator {
         next()
     }
 
+    /// Reached for a remote episode only once `LocalAudioEngine` has stopped
+    /// reopening it where it dropped — and an episode cut short by a closed
+    /// connection arrives here, not at `handleTrackFinished`, because AVPlayer
+    /// calls that the end. So by now the network has had its chances.
     private func handleLocalFailure(_ message: String) {
         // A station that mirrors its archive gets one attempt at the mirror
         // before this is called a failure. Older files go missing far more

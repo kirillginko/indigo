@@ -77,34 +77,59 @@ final class MusicianFirstTests: XCTestCase {
     private let sleeve = [("Nana Vasconcelos", "Percussion"), ("Brian Eno", "Producer"),
                           ("Rashad Becker", "Mastered By"), ("Some Engineer", "Mixed By")]
 
-    func testOffEveryMusicalCreditIsARouteAsBefore() {
+    private var node: MusicNode { .release("Vernal Equinox", discogsID: 1) }
+
+    func testTheGraphIsTheSameWhateverDIGIsSetTo() {
+        release(sleeve)
+        MusicianFirst.override = false
+        let off = Set(GraphStore(context: context).neighbors(of: node).all.map(\.id))
+        try? context.save()
+        MusicianFirst.override = true
+        let on = Set(GraphStore(context: context).neighbors(of: node).all.map(\.id))
+        XCTAssertEqual(off, on, "Musician-first is DIG's view, never a different graph")
+        XCTAssertTrue(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" })
+    }
+
+    func testOffDIGShowsEveryMusicalCreditAsBefore() {
         MusicianFirst.override = false
         release(sleeve)
-        let titles = Set(GraphStore(context: context).compute(.release("Vernal Equinox", discogsID: 1)).all.map(\.to.title))
+        let titles = Set(GraphStore(context: context).neighbors(of: node).forDIG.all.map(\.to.title))
         XCTAssertTrue(titles.isSuperset(of: ["Nana Vasconcelos", "Brian Eno", "Rashad Becker", "Some Engineer"]))
     }
 
-    func testOnEngineersStayOffTheRoutes() {
+    func testOnDIGLeavesEngineersOut() {
         MusicianFirst.override = true
         release(sleeve)
-        let titles = Set(GraphStore(context: context).compute(.release("Vernal Equinox", discogsID: 1)).all.map(\.to.title))
+        let titles = Set(GraphStore(context: context).neighbors(of: node).forDIG.all.map(\.to.title))
         XCTAssertTrue(titles.isSuperset(of: ["Nana Vasconcelos", "Brian Eno"]))
         XCTAssertFalse(titles.contains("Rashad Becker"))
         XCTAssertFalse(titles.contains("Some Engineer"))
     }
 
-    func testTurningTheSwitchNeverReadsTheOtherRulesStoredEdges() {
-        release(sleeve)
-        let node = MusicNode.release("Vernal Equinox", discogsID: 1)
+    /// For You reads the graph through its own snapshot; DIG's switch must
+    /// not move a single candidate, score or place.
+    func testForYouIsTheSameWhateverDIGIsSetTo() {
+        release(sleeve + [("Mark Isham", "Trumpet")])
+        let kept = PersonalInputs.Kept(node: node, addedAt: Date(timeIntervalSince1970: 1_790_000_000), genreTags: ["ambient"],
+                                       tasteArtistKeys: ["jon hassell"], sceneArtistKey: "jon hassell")
+        let personal = PersonalInputs(crate: [kept], plays: [], met: [], artistPlays: [:], haunts: [])
+        let asOf = Date(timeIntervalSince1970: 1_790_000_100)
+        func forYou() -> (KnowledgeSnapshot, [ExploreSuggestion]) {
+            let knowledge = LocalKnowledgeAdapter(context: context).snapshot(for: personal, scenes: false)
+            let offers = ExploreRanker.offers(personal: personal, knowledge: knowledge, asOf: asOf)
+            return (knowledge, offers.next + offers.shows + offers.artists)
+        }
         MusicianFirst.override = false
-        XCTAssertTrue(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" })
+        let (offKnowledge, off) = forYou()
         try? context.save()
         MusicianFirst.override = true
-        XCTAssertFalse(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" },
-                       "Stored under today's rules, worked out again under musician-first")
-        try? context.save()
-        MusicianFirst.override = false
-        XCTAssertTrue(GraphStore(context: context).neighbors(of: node).all.contains { $0.to.title == "Rashad Becker" })
+        DigRecommendations.override = true
+        defer { DigRecommendations.override = nil }
+        let (onKnowledge, on) = forYou()
+        XCTAssertEqual(offKnowledge, onKnowledge)
+        XCTAssertEqual(off.map(\.id), on.map(\.id))
+        XCTAssertEqual(off.map(\.score), on.map(\.score))
+        XCTAssertTrue(off.contains { $0.node.title == "Rashad Becker" }, "For You's offers are what they always were")
     }
 
     func testOnTheReleasePageStillListsEveryone() throws {

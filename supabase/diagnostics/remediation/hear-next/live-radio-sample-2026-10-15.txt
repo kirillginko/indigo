@@ -1,0 +1,15 @@
+Radio on 150 catalogue pages (75 pilot, 75 across batch 1); asked on 96 (the rest had a recording for every card or nothing verified to ask about)
+cards with something to hear: 35% → 57% (61 radio); first card playable: 35% → 69%
+lookup: 417 ms median, 715 ms at the 90th percentile, 1415 ms slowest
+requests: 96 identity, 82 appearances, 61 playability checks (2.5 a page)
+episodes verified 61; archives that do not play 0; could not tell 0; artists never on radio 121; failed reads 0
+
+examples:
+  Apoptygma Berzerk → Ancient Methods [Remixed] — SDGXXV EPII ▶ “The House That Ideology Built” on DARK ENTRIES w/ Josh Cheon · May 28, 2026
+  DJ Mystery → Manix [Made a record together] — Alright Wid Me (DJ Mystery 2023 Bootleg Remix) ▶ “Feel Real Good” on Supporter Radio: Dancing · Sep 22, 2026
+  Snow (2) → Michael Rose [Made a record together] — Shame ▶ “Observe Life” on Prosumer · Sep 1, 2026
+  James Hyman → Boys Noize [Remixed] — James Hyman's Super Hearing CD ▶ “Kill The Kid” on Coast 2 Coast · Jun 4, 2026
+  Vitor Joaquim → Simon Fisher Turner [Made a record together] — At The Spitz London 2005 ▶ “Derek Jarman Reads White Lies” on All Trades w/ Chuggy · Oct 4, 2026
+  FNB Crew → Khia [Played on it] — My Neck, My Back (A, B1, B2) ▶ “Steer” on The Exhibition Hour w/ Dazegxd · Jul 24, 2026
+  Punck → Sawako [Remixed] — CDR01-02 ▶ “Great Voyage” on The Early Bird Show w/ Jack Rollo · Jun 19, 2026
+  DJ Lee (2) → Leviticus [Made a record together] — 2 Deep / Burial ▶ “Burial (Amen Mix)” on Chicken Foot Soup w/ Goya Gumbani and Dom P · Sep 1, 2026

@@ -953,7 +953,7 @@ nonisolated struct DigEngine {
         let origin = MusicNode.artist(name, discogsID: discogsID)
         let walked = identity.neighbourhood(of: origin)
         let family = graph.aliasKeys(of: origin)
-        return walked.edges.byDestination
+        return walked.edges.forDIG.byDestination
             .filter { candidate in
                 candidate.node.kind == .artist
                     && (walked.keys[candidate.node.id] ?? [candidate.node.key]).isDisjoint(with: family)
@@ -967,7 +967,7 @@ nonisolated struct DigEngine {
     func connections(from node: MusicNode) -> [MusicGraph.Connection] {
         var graph = MusicGraph()
         let walked = identity.neighbourhood(of: node)
-        graph.absorb(walked.edges.all)
+        graph.absorb(walked.edges.forDIG.all)
         return graph.connections(from: walked.origin)
     }
 
