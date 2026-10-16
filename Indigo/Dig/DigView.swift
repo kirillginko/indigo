@@ -145,20 +145,41 @@ struct DigView: View {
                 memory(shown)
 
                 if !entries.isEmpty, isPhone {
-                    // On the phone, the same blocks as every other section.
-                    DigSection(title: "Start from", trailing: "\(entries.count)") {
-                        LazyVStack(spacing: 0) {
+                    // On the phone, the same grid as the shelves above.
+                    VStack(alignment: .leading, spacing: 10) {
+                        DigSection(title: "Start from", trailing: "\(entries.count)") { EmptyView() }
+                            .pageGutter()
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2), count: 2), spacing: 2) {
                             ForEach(entries) { entry in
-                                DigLine(text: entry.name, detail: entry.detail) {
-                                    appState.open(.digArtist(mbid: entry.mbid, name: entry.name))
+                                Button { appState.open(.digArtist(mbid: entry.mbid, name: entry.name)) } label: {
+                                    Color.clear
+                                        .aspectRatio(1, contentMode: .fit)
+                                        .overlay {
+                                            GeometryReader { proxy in
+                                                ArtworkView(remoteURL: dig.tileImage(for: .artist(entry.name, mbid: entry.mbid)),
+                                                            side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic)
+                                            }
+                                        }
+                                        .clipped()
+                                        .overlay(alignment: .bottomLeading) {
+                                            VStack(alignment: .leading, spacing: 0) {
+                                                Chip(text: entry.name, size: 12).lineLimit(2)
+                                                Chip(text: entry.detail, tone: .lead, size: 10.5).lineLimit(1)
+                                            }
+                                            .padding(6)
+                                        }
+                                        .contentShape(Rectangle())
                                 }
-                                Rule()
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(entry.name)
+                                .accessibilityHint(entry.detail)
                             }
                         }
                     }
-                    .pageGutter()
                     .padding(.top, 26)
                     .padding(.bottom, 24)
+                    // Their faces, ahead of the background fill.
+                    .task(id: entries.count) { dig.wantPortraits(for: entries.prefix(40).map(\.name)) }
                 } else if !entries.isEmpty {
                     HStack {
                         Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
