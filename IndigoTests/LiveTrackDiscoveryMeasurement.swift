@@ -56,7 +56,12 @@ final class LiveTrackDiscoveryMeasurement: XCTestCase {
         MusicianFirst.override = true
         let listeners = try JSONDecoder().decode([Listener].self,
                                                  from: Data(contentsOf: URL(fileURLWithPath: measure).appendingPathComponent("listeners.json")))
-        let source = TrackDiscoverySource.live
+        var source = TrackDiscoverySource.live
+        let shelves = CatalogShelfSource(isEnabled: true)
+        source.releaseVideos = { id, name in
+            await ReleaseVideoTracks(shelf: { await shelves.shelf(discogsID: $0) }, release: ReleaseVideoTracks.live.release)
+                .tracks(artistID: id, artist: name)
+        }
         var lines: [String] = []
         var totals = (listeners: 0, offered: 0, recordings: 0, episodes: 0, newArtists: 0, playsChecked: 0, doesNot: 0, unknown: 0, metadata: 0)
         var times: [Double] = []
