@@ -30,7 +30,13 @@ nonisolated enum SimilarRecords {
     /// Worked out from a context: the seeds chosen and the records found.
     static func find(context: ModelContext, asOf: Date, limit: Int = 8, scenes withScenes: Bool = true)
         -> (seeds: [RecordProfile], records: [SimilarRecord], styleVectors: [String: [String: Double]]) {
-        let personal = PersonalInputs.read(context: context, asOf: asOf)
+        find(personal: PersonalInputs.read(context: context, asOf: asOf), context: context, asOf: asOf,
+             limit: limit, scenes: withScenes)
+    }
+
+    /// The same, from rows already read.
+    static func find(personal: PersonalInputs, context: ModelContext, asOf: Date, limit: Int = 8, scenes withScenes: Bool = true)
+        -> (seeds: [RecordProfile], records: [SimilarRecord], styleVectors: [String: [String: Double]]) {
         let records = (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
         let pool = records.map(RecordProfile.init(record:))
         let byID = Dictionary(pool.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })

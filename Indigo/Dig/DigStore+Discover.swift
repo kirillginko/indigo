@@ -28,8 +28,15 @@ extension DigStore {
 
     /// The same, from any context: Discover reads it off the main thread.
     nonisolated static func discoverInputs(context: ModelContext, now: Date = Date(), collaborators withCollaborators: Bool = true) -> DiscoverInputs {
+        discoverInputs(personal: PersonalInputs.read(context: context, asOf: now), context: context, now: now,
+                       collaborators: withCollaborators)
+    }
+
+    /// The same, from rows already read: a measurement's history as it was
+    /// at an earlier moment.
+    nonisolated static func discoverInputs(personal: PersonalInputs, context: ModelContext, now: Date,
+                                           collaborators withCollaborators: Bool = true) -> DiscoverInputs {
         let identityStore = ArtistIdentityStore(context: context)
-        let personal = PersonalInputs.read(context: context, asOf: now)
         var seeds: [TrackDiscovery.Seed] = []
         var seen = Set<Int>()
         for origin in MusicianFirstRanker.startingPoints(personal, asOf: now, count: 40) where seeds.count < 12 {
