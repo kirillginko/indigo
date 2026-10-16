@@ -13,8 +13,9 @@
 //
 //  - **Evidence** is kept at the most specific level the history has: the
 //    recording played, the record crated or opened, the artist only when
-//    nothing narrower is known. Aliases fold into the artist whose own
-//    entry lists them; editions of one record by title and artist.
+//    nothing narrower is known. Editions of one record fold by title and
+//    artist; an alias stays its own project (one person is known through
+//    `sameArtist`, keyed by Discogs id, never by a display name).
 //  - **Weight** follows intent: crating and saving above a full listen,
 //    a full listen above a short one, and browsing DIG pages lightest of
 //    all. A skip is ambiguous -- a station sampled, a track not now -- and is
@@ -130,9 +131,12 @@ nonisolated struct ListenerProfile: Equatable, Sendable {
     ///   - styles: a unit's styles by unit id (record, then artist), folded.
     ///   - artistStyles: by artist key, for units with none of their own.
     ///   - vectors: the style space (`RecordSimilarity.vectors`).
-    ///   - aliasOf: alias key → the artist key whose entry lists it.
+    ///
+    /// An alias is a project of its own here: Caustic Window and Aphex Twin
+    /// are one person but two sounds. `Read.sameArtist` says which names are
+    /// one person, for leaving them out of recommendations, not for merging.
     static func build(evidence: [Evidence], styles: [String: [String]], artistStyles: [String: [String]],
-                      vectors: [String: [String: Double]], aliasOf: [String: String] = [:], asOf: Date,
+                      vectors: [String: [String: Double]], asOf: Date,
                       maxClusters: Int = 8) -> ListenerProfile {
         var held: [String: Unit] = [:]
         var counts: [String: Int] = [:]
@@ -143,7 +147,7 @@ nonisolated struct ListenerProfile: Equatable, Sendable {
             ($0.at, $0.unit, $0.signal.rawValue) < ($1.at, $1.unit, $1.signal.rawValue)
         }
         for item in ordered {
-            let artist = aliasOf[item.artist] ?? item.artist
+            let artist = item.artist
             let unitID = item.level == .artist ? "artist:\(artist)" : item.unit
             if item.signal == .skipped { skips += 1 }
             if item.signal == .dismissed { dismissals += 1 }
@@ -342,7 +346,15 @@ nonisolated extension ListenerProfile {
         var evidence: [Evidence] = []
         var styles: [String: [String]] = [:]
         var artistStyles: [String: [String]] = [:]
-        var aliasOf: [String: String] = [:]
+        /// Artist key → its Discogs id, where this device holds the entry.
+        var discogsIDs: [String: Int] = [:]
+        /// Artist key → the person it is, as the smallest Discogs id of a
+        /// group whose entries list each other as aliases. Only names the
+        /// history holds; only links both entries confirm.
+        var sameArtist: [String: Int] = [:]
+        /// The audit: alias links between names in the history, how many
+        /// both entries confirm, and groups as names alone would have made.
+        var aliasLinks = 0, confirmedLinks = 0, groupsByName = 0, groupsByID = 0
     }
 
     static func read(context: ModelContext, before cutoff: Date = .distantFuture) -> Read {
@@ -425,30 +437,43 @@ nonisolated extension ListenerProfile {
                 continue
             }
         }
-        // Artists' own styles, and the aliases their own entries list.
+        // Artists' own styles and ids, and the aliases their own entries list.
         let artists = Set(read.evidence.map(\.artist))
-        // One name per alias group, whichever way round the entries list
-        // each other: the alphabetically first, so every device agrees.
-        var parent: [String: String] = [:]
-        func root(_ key: String) -> String {
-            var key = key
-            while let up = parent[key], up != key { key = up }
-            return key
-        }
-        func join(_ a: String, _ b: String) {
-            let (x, y) = (root(a), root(b))
-            guard x != y else { return }
-            if x < y { parent[y] = x } else { parent[x] = y }
-        }
-        for row in ((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []) where artists.contains(row.nameKey) {
-            if !row.styles.isEmpty { read.artistStyles[row.nameKey] = fold(row.styles) }
+        var byKey: [String: DiscogsArtist] = [:]
+        for row in ((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []) where row.discogsID > 0 { byKey[row.nameKey] = row }
+        func key(_ name: String) -> String { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) }
+        // Union by Discogs id; the smallest id names the group, so every
+        // device agrees whatever the spelling.
+        var parent: [Int: Int] = [:]
+        func root(_ id: Int) -> Int { var id = id; while let up = parent[id], up != id { id = up }; return id }
+        func join(_ a: Int, _ b: Int) { let (x, y) = (root(a), root(b)); if x != y { parent[max(x, y)] = min(x, y) } }
+        var nameParent: [String: String] = [:]
+        func nameRoot(_ k: String) -> String { var k = k; while let up = nameParent[k], up != k { k = up }; return k }
+        for artist in artists.sorted() {
+            guard let row = byKey[artist] else { continue }
+            read.discogsIDs[artist] = row.discogsID
+            if !row.styles.isEmpty { read.artistStyles[artist] = fold(row.styles) }
             guard row.isFiledUnderItsOwnName() else { continue }
             for alias in row.aliasNames {
-                let key = RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(alias))
-                if key != row.nameKey, artists.contains(key) { join(key, row.nameKey) }
+                let other = key(alias)
+                guard other != artist, artists.contains(other) else { continue }
+                read.aliasLinks += 1
+                // As names alone would have it (the old rule), for the audit.
+                let (x, y) = (nameRoot(other), nameRoot(artist))
+                if x != y { if x < y { nameParent[y] = x } else { nameParent[x] = y } }
+                // Confirmed: the other name has its own entry, a different id,
+                // and that entry lists this one back.
+                guard let entry = byKey[other], entry.discogsID != row.discogsID,
+                      entry.aliasNames.contains(where: { key($0) == artist }) else { continue }
+                read.confirmedLinks += 1
+                join(row.discogsID, entry.discogsID)
             }
         }
-        for key in parent.keys.sorted() where root(key) != key { read.aliasOf[key] = root(key) }
+        var members: [Int: [String]] = [:]
+        for (artist, id) in read.discogsIDs where parent[id] != nil || parent.values.contains(id) { members[root(id), default: []].append(artist) }
+        for (group, names) in members where names.count > 1 { for name in names { read.sameArtist[name] = group } }
+        read.groupsByID = Set(read.sameArtist.values).count
+        read.groupsByName = Set(nameParent.keys.map(nameRoot)).count
         return read
     }
 }

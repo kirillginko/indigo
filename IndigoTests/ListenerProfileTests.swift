@@ -26,9 +26,8 @@ final class ListenerProfileTests: XCTestCase {
         return ListenerProfile.Evidence(unit: unit, level: level, artist: artist, title: title, at: days(daysAgo), signal: signal, tags: tags)
     }
 
-    private func build(_ evidence: [ListenerProfile.Evidence], artistStyles: [String: [String]],
-                       aliasOf: [String: String] = [:]) -> ListenerProfile {
-        ListenerProfile.build(evidence: evidence, styles: [:], artistStyles: artistStyles, vectors: vectors, aliasOf: aliasOf, asOf: asOf)
+    private func build(_ evidence: [ListenerProfile.Evidence], artistStyles: [String: [String]]) -> ListenerProfile {
+        ListenerProfile.build(evidence: evidence, styles: [:], artistStyles: artistStyles, vectors: vectors, asOf: asOf)
     }
 
     func testIntentOutweighsBrowsing() {
@@ -53,10 +52,11 @@ final class ListenerProfileTests: XCTestCase {
         XCTAssertFalse(profile.clusters.contains { $0.label.contains("techno") }, "dismissed is not a taste")
     }
 
-    func testAnAliasFoldsIntoItsArtist() {
+    /// One person, two projects: each keeps its own weight and sound.
+    func testAnAliasStaysItsOwnProject() {
         let profile = build([evidence("alias", .fullListen, level: .artist), evidence("main", .fullListen, level: .artist)],
-                            artistStyles: ["main": ["ambient"]], aliasOf: ["alias": "main"])
-        XCTAssertEqual(profile.units.map(\.id), ["artist:main"])
+                            artistStyles: ["main": ["ambient"], "alias": ["techno"]])
+        XCTAssertEqual(profile.units.map(\.id).sorted(), ["artist:alias", "artist:main"])
     }
 
     func testDistinctTastesStayApartAndCarryTheirShares() {

@@ -61,23 +61,24 @@ final class ListenerProfileReplay: XCTestCase {
         let readTime = ContinuousClock.now - t
         t = ContinuousClock.now
         let profile = ListenerProfile.build(evidence: read.evidence, styles: read.styles, artistStyles: read.artistStyles,
-                                            vectors: vectors, aliasOf: read.aliasOf, asOf: asOf)
+                                            vectors: vectors, asOf: asOf)
         let buildTime = ContinuousClock.now - t
         let again = ListenerProfile.build(evidence: read.evidence.reversed(), styles: read.styles, artistStyles: read.artistStyles,
-                                          vectors: vectors, aliasOf: read.aliasOf, asOf: asOf)
-        out.append("read \(ms(readTime)), build \(ms(buildTime)); \(read.evidence.count) pieces of evidence; \(read.aliasOf.count) aliases folded; same profile from reversed input: \(again == profile)")
+                                          vectors: vectors, asOf: asOf)
+        out.append("read \(ms(readTime)), build \(ms(buildTime)); \(read.evidence.count) pieces of evidence; \(read.sameArtist.count) names in \(read.groupsByID) confirmed same-person groups; same profile from reversed input: \(again == profile)")
         describe(profile, "Listener Profile v2, whole history")
 
         // Rewind.
         let cutoff = last.addingTimeInterval(-21 * 86_400)
         let pastRead = ListenerProfile.read(context: context, before: cutoff)
         let past = ListenerProfile.build(evidence: pastRead.evidence, styles: pastRead.styles, artistStyles: pastRead.artistStyles,
-                                         vectors: vectors, aliasOf: pastRead.aliasOf, asOf: cutoff)
+                                         vectors: vectors, asOf: cutoff)
         describe(past, "v2 as of the cutoff (\(cutoff.formatted(date: .abbreviated, time: .omitted)))")
 
         // What happened after: positive evidence only, never in the profile.
         let future = ListenerProfile.read(context: context).evidence.filter { $0.at >= cutoff && $0.signal.weight > 0 }
-        let knownBefore = Set(pastRead.evidence.map { pastRead.aliasOf[$0.artist] ?? $0.artist })
+        let knownIDs = Set(pastRead.evidence.compactMap { pastRead.sameArtist[$0.artist] })
+        let knownBefore = Set(pastRead.evidence.map(\.artist)).union(read.sameArtist.filter { knownIDs.contains($0.value) }.keys)
         let laterFound = Set(future.map(\.artist)).subtracting(knownBefore)
         var futureTaste: [String: Double] = [:]
         for item in future {
