@@ -69,6 +69,10 @@ nonisolated struct TrackDiscoverySource: Sendable {
     struct Ask: Sendable {
         var seeds: [TrackDiscovery.Seed]
         var collaborators: [TrackDiscovery.Neighbour] = []
+        /// More collaborators, worked out on the device while the backend is
+        /// asked (a graph walk takes seconds): awaited only where they are
+        /// needed, so the first requests do not wait for them.
+        var collaboratorsLater: (@Sendable () async -> [TrackDiscovery.Neighbour])? = nil
         var taste: TasteProfile = .empty
         var knownArtists: Set<String> = []
         var knownTracks: Set<String> = []
@@ -92,6 +96,9 @@ nonisolated struct TrackDiscoverySource: Sendable {
             return Double(spent.components.seconds) * 1000 + Double(spent.components.attoseconds) / 1e15
         }
 
+        let later = ask.collaboratorsLater.map { work in Task { await work() } }
+        defer { later?.cancel() }
+
         // Starting points as the backend's rows (kept a day).
         let seedIDs = ask.seeds.map(\.discogsID)
         var seedRows = await cache.rows(for: seedIDs)
@@ -113,33 +120,30 @@ nonisolated struct TrackDiscoverySource: Sendable {
         if !missingRows.isEmpty {
             var byRow: [UUID: [Edge]] = Dictionary(uniqueKeysWithValues: missingRows.map { ($0, []) })
             // Many starting points: the stored neighbours of all of them in
-            // two reads. One or two (an artist page): straight to the live
-            // answer, which is what an obscure artist has.
-            if missingRows.count > 2 {
-                do {
-                    report.requests += 2
-                    for edge in try await neighbours(missingRows) {
-                        if byRow[edge.a] != nil { byRow[edge.a]?.append(edge) }
-                        if byRow[edge.b] != nil { byRow[edge.b]?.append(Edge(a: edge.b, b: edge.a, episodes: edge.episodes)) }
-                    }
-                } catch { report.failures += 1 }
+            // two reads, and at the same time the live answer for the first
+            // six -- which is what an obscure artist has, and what most
+            // starting points need (0078 stores only repeated adjacencies).
+            // One or two (an artist page): the live answer alone.
+            let live = Array(missingRows.prefix(6))
+            async let stored: [Edge]? = missingRows.count > 2 ? (try? await neighbours(missingRows)) : []
+            let answers = await withTaskGroup(of: (UUID, [Edge]?).self) { group in
+                for row in live { group.addTask { (row, try? await relations(row)) } }
+                var found: [UUID: [Edge]?] = [:]
+                for await (row, answer) in group { found[row] = answer }
+                return found
             }
-            // The live answer where the stored one is thin, at most six,
-            // four at a time.
-            let thin = missingRows.filter { (byRow[$0]?.count ?? 0) < 6 }.prefix(6)
-            for chunk in stride(from: 0, to: thin.count, by: 4).map({ Array(thin.dropFirst($0).prefix(4)) }) {
-                let answers = await withTaskGroup(of: (UUID, [Edge]?).self) { group in
-                    for row in chunk { group.addTask { (row, try? await relations(row)) } }
-                    var found: [UUID: [Edge]?] = [:]
-                    for await (row, answer) in group { found[row] = answer }
-                    return found
+            if missingRows.count > 2 { report.requests += 2 }
+            if let stored = await stored {
+                for edge in stored {
+                    if byRow[edge.a] != nil { byRow[edge.a]?.append(edge) }
+                    if byRow[edge.b] != nil { byRow[edge.b]?.append(Edge(a: edge.b, b: edge.a, episodes: edge.episodes)) }
                 }
-                for row in chunk {
-                    report.requests += 1
-                    guard let found = answers[row] ?? nil else { report.failures += 1; continue }
-                    let held = Set(byRow[row]?.map(\.b) ?? [])
-                    byRow[row, default: []] += found.filter { !held.contains($0.b) }
-                }
+            } else { report.failures += 1 }
+            for row in live {
+                report.requests += 1
+                guard let found = answers[row] ?? nil else { report.failures += 1; continue }
+                let held = Set(byRow[row]?.map(\.b) ?? [])
+                byRow[row, default: []] += found.filter { !held.contains($0.b) }
             }
             await cache.keep(edges: byRow)
             edges.merge(byRow) { first, _ in first }
@@ -177,15 +181,16 @@ nonisolated struct TrackDiscoverySource: Sendable {
                          reason: "Played next to \(found.seed.name) in \(found.episodes) radio episode\(found.episodes == 1 ? "" : "s")",
                          strength: 1 + log2(Double(found.episodes)))
         }
-        neighbours += ask.collaborators.filter { !seedDiscogs.contains($0.discogsID) }
-        report.neighbours = scored.count + ask.collaborators.count
+        let collaborators = ask.collaborators + (await later?.value ?? [])
+        neighbours += collaborators.filter { !seedDiscogs.contains($0.discogsID) }
+        report.neighbours = scored.count + collaborators.count
         report.verifiedNeighbours = Set(neighbours.map(\.discogsID)).count
 
         // Their tracks, and the seed's own for an artist page: one read. DIG's
         // collaborators arrive by Discogs entry and need their rows first.
         var rowOf: [UUID: Int] = [:]
         for row in shortlist { if let entry = who[row] ?? nil { rowOf[row] = entry.discogs } }
-        let collaboratorIDs = Array(Set(ask.collaborators.map(\.discogsID)).subtracting(seedDiscogs)).sorted().prefix(40)
+        let collaboratorIDs = Array(Set(collaborators.map(\.discogsID)).subtracting(seedDiscogs)).sorted().prefix(40)
         if !collaboratorIDs.isEmpty {
             var held = await cache.rows(for: Array(collaboratorIDs))
             let missing = collaboratorIDs.filter { held[$0] == nil }
@@ -218,24 +223,29 @@ nonisolated struct TrackDiscoverySource: Sendable {
             appearances.append(appearance)
         }
 
-        // Release recordings where radio has nothing of them.
+        // Release recordings where radio has nothing of them, all asked at once.
         if ask.releaseLookups > 0 {
-            var asked = 0
+            var lookups: [(Int, String)] = []
             if ask.ownTracks > 0 {
-                for seed in ask.seeds where !heardOf.contains(seed.discogsID) && asked < ask.releaseLookups {
-                    asked += 1
-                    let found = await releaseVideos(seed.discogsID, seed.name)
-                    report.requests += found.isEmpty ? 1 : 3
-                    report.releaseVideos += found.count
-                    appearances += found
+                for seed in ask.seeds where !heardOf.contains(seed.discogsID) && lookups.count < ask.releaseLookups {
+                    lookups.append((seed.discogsID, seed.name))
                 }
             }
-            for neighbour in neighbours where !heardOf.contains(neighbour.discogsID) && asked < ask.releaseLookups {
-                asked += 1
-                let found = await releaseVideos(neighbour.discogsID, neighbour.name)
-                report.requests += found.isEmpty ? 1 : 3
-                report.releaseVideos += found.count
-                appearances += found
+            for neighbour in neighbours where !heardOf.contains(neighbour.discogsID) && lookups.count < ask.releaseLookups
+                && !lookups.contains(where: { $0.0 == neighbour.discogsID }) {
+                lookups.append((neighbour.discogsID, neighbour.name))
+            }
+            let found = await withTaskGroup(of: (Int, [TrackDiscovery.Appearance]).self) { group in
+                for (index, (id, name)) in lookups.enumerated() { group.addTask { (index, await releaseVideos(id, name)) } }
+                var answers: [Int: [TrackDiscovery.Appearance]] = [:]
+                for await (index, tracks) in group { answers[index] = tracks }
+                return answers
+            }
+            for index in lookups.indices {
+                let tracks = found[index] ?? []
+                report.requests += tracks.isEmpty ? 1 : 3
+                report.releaseVideos += tracks.count
+                appearances += tracks
             }
         }
 

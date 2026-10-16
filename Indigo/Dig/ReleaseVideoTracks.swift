@@ -25,9 +25,17 @@ nonisolated struct ReleaseVideoTracks: Sendable {
             .filter { ($0.role == nil || $0.role == "Main") && !$0.isVideo }
             .sorted { ($0.year ?? 0, $0.id ?? 0) > ($1.year ?? 0, $1.id ?? 0) }
             .compactMap { $0.type == "master" ? $0.mainRelease : $0.id }
+        // Read together, matched newest first.
+        let ids = Array(own.prefix(releases))
+        let details = await withTaskGroup(of: (Int, DiscogsReleaseDetail?).self) { group in
+            for (index, id) in ids.enumerated() { group.addTask { (index, await release(id)) } }
+            var found: [Int: DiscogsReleaseDetail] = [:]
+            for await (index, detail) in group { found[index] = detail }
+            return found
+        }
         var tracks: [TrackDiscovery.Appearance] = []
-        for id in own.prefix(releases) {
-            guard let detail = await release(id) else { continue }
+        for index in ids.indices {
+            guard let detail = details[index] else { continue }
             tracks += Self.match(detail, artistID: artistID, artist: artist)
             if tracks.count >= 2 { break }
         }
