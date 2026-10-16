@@ -109,6 +109,7 @@ final class TrackDiscoverySourceTests: XCTestCase {
         return TrackDiscoverySource(
             rows: { ids in await calls.add(); return Dictionary(uniqueKeysWithValues: ids.map { ($0, $0 == 1 ? [seedRow] : [neighbourRow]) }) },
             neighbours: { _ in await calls.add(); await calls.add(); return [.init(a: seedRow, b: neighbourRow, episodes: 3)] },
+            relations: { row in await calls.add(); return [.init(a: row, b: neighbourRow, episodes: 3)] },
             artists: { rows in await calls.add(); await calls.add()
                 return Dictionary(uniqueKeysWithValues: rows.filter { $0 == neighbourRow }.map { ($0, (discogs: 2, name: "Neighbour")) }) },
             appearances: { _ in
@@ -132,7 +133,7 @@ final class TrackDiscoverySourceTests: XCTestCase {
         let ask = TrackDiscoverySource.Ask(seeds: [.init(discogsID: 1, name: "Seed", weight: 1)])
         let (tracks, report) = await source.discover(ask)
         XCTAssertEqual(tracks.map(\.title), ["Their Track"], "Never the starting point's own track, outside its page")
-        XCTAssertEqual(report.requests, 6)
+        XCTAssertEqual(report.requests, 5, "Identity, the live neighbours of one starting point, names and ids, tracks")
         let first = await calls.count
         let (_, again) = await source.discover(ask)
         XCTAssertEqual(again.requests, 1, "Identities and neighbours kept: only the tracks are read again")

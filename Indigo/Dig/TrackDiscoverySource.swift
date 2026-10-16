@@ -52,7 +52,11 @@ nonisolated struct TrackDiscoverySource: Sendable {
     struct Edge: Sendable, Equatable { let a: UUID; let b: UUID; let episodes: Int }
 
     var rows: @Sendable ([Int]) async throws -> [Int: [UUID]]
+    /// Neighbours stored for many rows at once (seen twice or more).
     var neighbours: @Sendable ([UUID]) async throws -> [Edge]
+    /// One row's neighbours as the backend works them out, single adjacencies
+    /// included (`artist_radio_relations`; 0078 stores only repeated ones).
+    var relations: @Sendable (UUID) async throws -> [Edge] = { _ in [] }
     var artists: @Sendable ([UUID]) async throws -> [UUID: (discogs: Int, name: String)]
     var appearances: @Sendable ([UUID]) async throws -> [Row]
     /// Recordings catalogued with an artist's releases, verified to be their
@@ -107,17 +111,38 @@ nonisolated struct TrackDiscoverySource: Sendable {
         var edges = await cache.edges(for: Array(seedOfRow.keys))
         let missingRows = seedOfRow.keys.filter { edges[$0] == nil }.sorted { $0.uuidString < $1.uuidString }
         if !missingRows.isEmpty {
-            do {
-                report.requests += 2
-                let found = try await neighbours(missingRows)
-                var byRow: [UUID: [Edge]] = Dictionary(uniqueKeysWithValues: missingRows.map { ($0, []) })
-                for edge in found {
-                    if byRow[edge.a] != nil { byRow[edge.a]?.append(edge) }
-                    if byRow[edge.b] != nil { byRow[edge.b]?.append(Edge(a: edge.b, b: edge.a, episodes: edge.episodes)) }
+            var byRow: [UUID: [Edge]] = Dictionary(uniqueKeysWithValues: missingRows.map { ($0, []) })
+            // Many starting points: the stored neighbours of all of them in
+            // two reads. One or two (an artist page): straight to the live
+            // answer, which is what an obscure artist has.
+            if missingRows.count > 2 {
+                do {
+                    report.requests += 2
+                    for edge in try await neighbours(missingRows) {
+                        if byRow[edge.a] != nil { byRow[edge.a]?.append(edge) }
+                        if byRow[edge.b] != nil { byRow[edge.b]?.append(Edge(a: edge.b, b: edge.a, episodes: edge.episodes)) }
+                    }
+                } catch { report.failures += 1 }
+            }
+            // The live answer where the stored one is thin, at most six,
+            // four at a time.
+            let thin = missingRows.filter { (byRow[$0]?.count ?? 0) < 6 }.prefix(6)
+            for chunk in stride(from: 0, to: thin.count, by: 4).map({ Array(thin.dropFirst($0).prefix(4)) }) {
+                let answers = await withTaskGroup(of: (UUID, [Edge]?).self) { group in
+                    for row in chunk { group.addTask { (row, try? await relations(row)) } }
+                    var found: [UUID: [Edge]?] = [:]
+                    for await (row, answer) in group { found[row] = answer }
+                    return found
                 }
-                await cache.keep(edges: byRow)
-                edges.merge(byRow) { first, _ in first }
-            } catch { report.failures += 1 }
+                for row in chunk {
+                    report.requests += 1
+                    guard let found = answers[row] ?? nil else { report.failures += 1; continue }
+                    let held = Set(byRow[row]?.map(\.b) ?? [])
+                    byRow[row, default: []] += found.filter { !held.contains($0.b) }
+                }
+            }
+            await cache.keep(edges: byRow)
+            edges.merge(byRow) { first, _ in first }
         } else { report.cachedReads += 1 }
         report.seedsOnRadio = Set(edges.filter { !$0.value.isEmpty }.keys.compactMap { seedOfRow[$0]?.discogsID }).count
 
@@ -156,9 +181,24 @@ nonisolated struct TrackDiscoverySource: Sendable {
         report.neighbours = scored.count + ask.collaborators.count
         report.verifiedNeighbours = Set(neighbours.map(\.discogsID)).count
 
-        // Their tracks, and the seed's own for an artist page: one read.
+        // Their tracks, and the seed's own for an artist page: one read. DIG's
+        // collaborators arrive by Discogs entry and need their rows first.
         var rowOf: [UUID: Int] = [:]
         for row in shortlist { if let entry = who[row] ?? nil { rowOf[row] = entry.discogs } }
+        let collaboratorIDs = Array(Set(ask.collaborators.map(\.discogsID)).subtracting(seedDiscogs)).sorted().prefix(40)
+        if !collaboratorIDs.isEmpty {
+            var held = await cache.rows(for: Array(collaboratorIDs))
+            let missing = collaboratorIDs.filter { held[$0] == nil }
+            if !missing.isEmpty {
+                do {
+                    report.requests += 1
+                    let found = try await rows(Array(missing))
+                    await cache.keep(rows: found, asked: Array(missing))
+                    held.merge(found) { first, _ in first }
+                } catch { report.failures += 1 }
+            }
+            for (id, list) in held { for row in list.prefix(2) where rowOf[row] == nil { rowOf[row] = id } }
+        }
         if ask.ownTracks > 0 { for seed in ask.seeds { for row in seedRows[seed.discogsID] ?? [] { rowOf[row] = seed.discogsID } } }
         let names = Dictionary(neighbours.map { ($0.discogsID, $0.name) } + ask.seeds.map { ($0.discogsID, $0.name) },
                                uniquingKeysWith: { first, _ in first })
@@ -260,6 +300,11 @@ nonisolated struct TrackDiscoverySource: Sendable {
                 .eq("from_entity_type", value: "artist").in("to_entity_id", values: ids)
                 .order("evidence_count", ascending: false).limit(1500).execute().value
             return try await (out + into).map { Edge(a: $0.from_entity_id, b: $0.to_entity_id, episodes: max(1, $0.episode_count ?? $0.evidence_count)) }
+        },
+        relations: { row in
+            try await RadioRepository().relations(forArtist: row, limit: 40)
+                .filter { $0.relationshipType == "radio_neighbor" && $0.entityType == "artist" }
+                .map { Edge(a: row, b: $0.entityID, episodes: max(1, $0.metadata?.episodes ?? $0.metadata?.adjacencies ?? $0.evidenceCount)) }
         },
         artists: { uuids in
             let client = try SupabaseService.requireClient()
