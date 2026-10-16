@@ -208,6 +208,66 @@ change it:
    like yours can be replayed without leakage.
 4. Then re-run the replay; promote B's cluster seeding (the clear win) first.
 
+### Phase 3, second pass — episodes, dated knowledge, sessions
+
+The four changes above, then the replay again (same three cut-offs).
+
+- **Radio by the episode.** An episode offers only its three strongest
+  artists (two on the second hop); several seeds on one episode raise it;
+  an artist's score is its best episode, raised only by *other programmes*.
+- **Dated knowledge.** A Discogs entry counts only if fetched before the
+  cut-off and its artist was not first opened after it (548–623 of 661); a
+  record only if such an entry or an earlier page lists it (1,924–2,386 of
+  2,976); the style space is learned from those records alone. A new direct
+  route (Bd) reads the dated entries and records instead of today's
+  identity graph (B, kept for reference).
+- **Styles before ranking**: the candidate's dated entry by name, else by
+  the Discogs id the catalogue gives, else its records, else episode genres.
+- **Finds as sessions**: positive actions with no gap over 45 minutes. The
+  later finds are 141 / 132 / 42 artists but only **20 / 16 / 10 sessions**:
+  discoveries come in bursts.
+
+| cut-off | pool recall, artists / sessions: A · B · Bd · E | E size | best top 20, finds (fit): A · B · Bd · E |
+|---------|------------------------------------------------|--------|------------------------------------------|
+| 21 d | 2%/15% · 7%/35% · 6%/30% · 9%/40% | 1,666 | 2 (0.65) · 2 (0.45) · 3 (0.40) · 0 (0.52) |
+| 14 d | 2%/19% · 6%/38% · 8%/38% · 9%/44% | 1,588 | 2 (0.50) · 1 (0.44) · 2 (0.39) · 0 (0.53) |
+| 7 d  | 7%/30% · 14%/40% · 17%/40% · 17%/40% | 1,714 | 3 (0.60) · 1 (0.52) · 2 (0.38) · 0 (0.59) |
+
+(A = For You's walk, which still reads today's device; B = cluster seeds
+through today's graph; Bd = the same from dated knowledge; E = Bd + episode
+radio + records like yours. Every top-20 find is its own session.)
+
+- **Radio's reach was mostly one evening.** Scored by the episode and read
+  from dated knowledge, radio's later finds fall to 3 artists in 2 sessions,
+  2 in 1, and 0. The second hop finds nothing at any cut-off, and 21–28% of
+  it clearly does not fit (vs 10–15% of adjacency).
+- **Cluster seeding holds up without leakage.** Bd's pool reaches 30–40% of
+  discovery sessions against For You's 15–30%, and its top 20 matches or
+  beats For You at two cut-offs of three (3 vs 2, 2 vs 2, 2 vs 3).
+- **But the rankers cannot see most of it.** 95% of direct and shared-label
+  candidates have no style the dated device knows, so relevance scores them
+  zero and the mixed pool (E) ranks styled radio and similarity candidates
+  above them: E's top 20 finds nothing anywhere, while Bd's own finds sink.
+  Fit to later listening is lower for Bd (0.30–0.40) for the same reason.
+- **Discogs ids did not help**: no radio candidate's catalogue Discogs id
+  matched a dated entry the device holds that its name did not.
+- **Determinism**: episode-scored radio is identical from reordered input.
+- **Attribution gap**: after the cut-off, 3 of 162 newly met artists' first
+  events record where they came from (`sourceProviderID`); the history
+  cannot say whether a discovery came from DIG, For You, Discover or a
+  station, so no replay can credit a surface.
+
+**Decision, again: Phase 4 is not started.** The retrieval win is real but
+narrow — cluster seeding through what the device already holds — and it is
+not rankable yet: its candidates are unstyled. Radio, once counted
+honestly, does not earn a place in the pool. Next, in order:
+1. Rank unstyled candidates by route evidence instead of scoring them zero
+   (relevance only where a style exists), and re-run Bd vs A.
+2. Record the surface on every listening event (which screen, which
+   recommendation), so the next replay can say what found what.
+3. Only then integrate Bd's seeding behind the Debug switch, with the
+   profile cached on synced history *and* the style caches.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.

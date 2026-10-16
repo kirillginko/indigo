@@ -104,6 +104,9 @@ nonisolated enum ListenerRetrieval {
         let cluster: Int
         /// Why, in words.
         let why: String
+        /// The one piece of evidence behind it, when it is one (an episode):
+        /// finds through the same tracklist are one find.
+        var evidence: String? = nil
     }
 
     struct Candidate: Sendable, Equatable {
@@ -200,6 +203,56 @@ nonisolated enum ListenerRetrieval {
         return out
     }
 
+    /// What a Discogs artist entry on the device lists, as of when it was
+    /// fetched: the direct route read from entries known to predate a
+    /// moment, rather than from the identity graph, which is today's.
+    struct Entry: Sendable, Equatable {
+        let key: String
+        let name: String
+        var collaborators: [String] = []
+        var members: [String] = []
+        var groups: [String] = []
+        var labelNeighbours: [String] = []
+        var styleNeighbours: [String] = []
+        var aliases: [String] = []
+    }
+
+    /// One step from each seed through its own entry and its records'
+    /// credits: credits, members and groups are direct; labels shared
+    /// context; Discogs' own same-style neighbours similarity. Never the
+    /// seed's own other names.
+    static func direct(_ seeds: [Seed], entries: [String: Entry], records: [RecordProfile]) -> [Sighting] {
+        func key(_ name: String) -> String { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) }
+        var bySeed: [String: [RecordProfile]] = [:]
+        for record in records { for artist in record.artistKeys { bySeed[artist, default: []].append(record) } }
+        var out: [Sighting] = []
+        for seed in seeds {
+            let entry = entries[seed.artist]
+            let own = Set([seed.artist] + (entry?.aliases ?? []).map(key))
+            let lift = 0.5 + 0.5 * seed.weight
+            func add(_ names: [String], _ provenance: Provenance, _ worth: Double, _ why: String) {
+                for name in names {
+                    let clean = DiscogsClient.withoutDisambiguator(name)
+                    guard !own.contains(key(clean)), !clean.isEmpty else { continue }
+                    out.append(Sighting(name: clean, discogsID: nil, catalogueRow: nil,
+                                        route: Route(provenance: provenance, score: worth * lift, seed: seed.artist, cluster: seed.cluster, why: why)))
+                }
+            }
+            if let entry {
+                add(entry.collaborators, .direct, 1, "Credited with \(seed.name)")
+                add(entry.members, .direct, 1, "A member of \(seed.name)")
+                add(entry.groups, .direct, 0.9, "\(seed.name) plays in it")
+                add(entry.labelNeighbours, .sharedContext, 0.6, "Shares a label with \(seed.name)")
+                add(entry.styleNeighbours, .musicalSimilarity, 0.5, "The same styles as \(seed.name), as Discogs files them")
+            }
+            for record in (bySeed[seed.artist] ?? []).sorted(by: { $0.id < $1.id }) {
+                let names = record.personnel.sorted().compactMap { record.personnelNames[$0] }
+                add(names, .direct, 0.9, "On \(record.title) with \(seed.name)")
+            }
+        }
+        return out
+    }
+
     // MARK: Similarity (on device)
 
     /// Records whose own styles sit nearest each cluster's centre: at least
@@ -279,8 +332,10 @@ nonisolated enum ListenerRetrieval {
         var score: Double
         var episodes: Int
         var shows: Int
-        /// The single strongest piece of evidence.
+        /// The single strongest piece of evidence: through whom, and on
+        /// which episode.
         var via: UUID
+        var episode: UUID
         var showTitle: String?
         var distance: Int
         var cluster: Int
@@ -289,23 +344,33 @@ nonisolated enum ListenerRetrieval {
         var genres: [String: Double]
     }
 
-    /// One hop: from each source, every artist on the same episodes, scored
+    /// One hop: from each source, the artists on the same episodes, scored
     /// as the type says. `sources` are catalogue rows with a weight, the seed
     /// they stand for, and its cluster.
+    ///
+    /// With `perEpisode`, an episode is the unit of evidence -- one
+    /// tracklist, one find: each episode offers only its `perEpisode`
+    /// strongest artists, an episode with several seeds on it counts for
+    /// more, and an artist's score is its best episode, raised only by
+    /// *other programmes* playing it, never by more of the same tracklist.
+    /// Without it, every adjacency adds up (the first prototype).
     static func hop(from sources: [(row: UUID, weight: Double, seed: String, cluster: Int)], radio: Radio,
                     centroids: [Int: [String: Double]], vectors: [String: [String: Double]], exclude: Set<UUID>,
-                    episodesPerSource: Int = 12) -> [UUID: RadioScore] {
+                    episodesPerSource: Int = 12, perEpisode: Int? = nil) -> [UUID: RadioScore] {
         struct Best { var contribution: Double; var via: UUID; var distance: Int; var cluster: Int; var seed: String }
-        var perEpisode: [UUID: [UUID: Best]] = [:]   // candidate → episode → best
+        var byEpisode: [UUID: [UUID: Best]] = [:]   // episode → candidate → best
+        var seedsOn: [UUID: Set<String>] = [:]
         let ordered = sources.sorted { ($0.row.uuidString, $0.seed) < ($1.row.uuidString, $1.seed) }
         for source in ordered {
             let seen = (radio.appearances[source.row] ?? [])
                 .compactMap { a in radio.episodes[a.episode].map { (a, $0) } }
-                .sorted { $0.1.aired != $1.1.aired ? $0.1.aired > $1.1.aired : $0.1.id.uuidString < $1.1.id.uuidString }
+                .sorted { $0.1.aired != $1.1.aired ? $0.1.aired > $1.1.aired
+                    : ($0.1.id.uuidString, $0.0.index) < ($1.1.id.uuidString, $1.0.index) }
             var used = Set<UUID>()
             for (appearance, episode) in seen {
                 guard used.count < episodesPerSource || used.contains(episode.id) else { break }
                 used.insert(episode.id)
+                seedsOn[episode.id, default: []].insert(source.seed)
                 let specific = specificity(episode.show.flatMap { radio.showGenres[$0] })
                 let genres = ListeningLog.foldTags(episode.genres).filter { vectors[$0] != nil }
                 let compat = genres.isEmpty ? 0.5
@@ -314,14 +379,28 @@ nonisolated enum ListenerRetrieval {
                     let distance = abs(slot.index - appearance.index)
                     guard distance > 0 else { continue }
                     let c = source.weight * proximity(distance) * (0.25 + 0.75 * specific) * (0.5 + 0.5 * compat)
-                    if let held = perEpisode[slot.artist]?[episode.id], held.contribution >= c { continue }
-                    perEpisode[slot.artist, default: [:]][episode.id] = Best(contribution: c, via: source.row, distance: distance,
+                    if let held = byEpisode[episode.id]?[slot.artist], held.contribution >= c { continue }
+                    byEpisode[episode.id, default: [:]][slot.artist] = Best(contribution: c, via: source.row, distance: distance,
                                                                              cluster: source.cluster, seed: source.seed)
                 }
             }
         }
+        // Candidate → episode → best, an episode offering only its strongest.
+        var perCandidate: [UUID: [UUID: Best]] = [:]
+        for episode in byEpisode.keys.sorted(by: { $0.uuidString < $1.uuidString }) {
+            let offered = byEpisode[episode] ?? [:]
+            var kept = offered.sorted { $0.value.contribution != $1.value.contribution ? $0.value.contribution > $1.value.contribution
+                : $0.key.uuidString < $1.key.uuidString }
+            if let perEpisode { kept = Array(kept.prefix(perEpisode)) }
+            let corroborated = perEpisode == nil ? 1 : min(2, 1 + 0.5 * Double(max(0, (seedsOn[episode]?.count ?? 1) - 1)))
+            for (artist, best) in kept {
+                var raised = best
+                raised.contribution *= corroborated
+                perCandidate[artist, default: [:]][episode] = raised
+            }
+        }
         var out: [UUID: RadioScore] = [:]
-        for (artist, episodes) in perEpisode {
+        for (artist, episodes) in perCandidate {
             // Summed in one order, so the same rows give the same bits.
             let order = episodes.keys.sorted { $0.uuidString < $1.uuidString }
             let total = order.reduce(0) { $0 + (episodes[$1]?.contribution ?? 0) }
@@ -336,8 +415,9 @@ nonisolated enum ListenerRetrieval {
                 for g in folded { genres[g, default: 0] += held.contribution / Double(folded.count) }
             }
             let repeated = min(2, 1 + 0.25 * Double(max(0, shows - 1)))
-            out[artist] = RadioScore(score: log2(1 + total) * repeated * hubDamping(radio.showsPlaying[artist]),
-                                     episodes: episodes.count, shows: shows, via: best.value.via,
+            let evidence = perEpisode == nil ? log2(1 + total) : best.value.contribution
+            out[artist] = RadioScore(score: evidence * repeated * hubDamping(radio.showsPlaying[artist]),
+                                     episodes: episodes.count, shows: shows, via: best.value.via, episode: best.key,
                                      showTitle: radio.episodes[best.key]?.showTitle, distance: best.value.distance,
                                      cluster: best.value.cluster, seed: best.value.seed, genres: genres)
         }
@@ -368,7 +448,8 @@ nonisolated enum ListenerRetrieval {
     /// second hop starts from the strongest first-hop artists that are not
     /// themselves hubs.
     static func radio(seeds: [Seed], discogsIDs: [String: Int], profile: ListenerProfile, vectors: [String: [String: Double]],
-                      knownKeys: Set<String>, before cutoff: Date, source: RadioSource, bridges bridgeLimit: Int = 30)
+                      knownKeys: Set<String>, before cutoff: Date, source: RadioSource, bridges bridgeLimit: Int = 30,
+                      perEpisode: Int? = nil)
         async -> (first: [UUID: RadioScore], second: [UUID: RadioScore], radio: Radio, rows: [String: UUID], report: RadioReport) {
         let started = ContinuousClock.now
         var report = RadioReport()
@@ -447,7 +528,7 @@ nonisolated enum ListenerRetrieval {
 
         // Rows of the listener's own artists: never candidates.
         var exclude = Set(seedRows.map(\.row))
-        var firstPass = hop(from: seedRows, radio: radio, centroids: centroids, vectors: vectors, exclude: exclude)
+        var firstPass = hop(from: seedRows, radio: radio, centroids: centroids, vectors: vectors, exclude: exclude, perEpisode: perEpisode)
         let firstRows = firstPass.keys.sorted { $0.uuidString < $1.uuidString }
         for chunk in stride(from: 0, to: firstRows.count, by: 150).map({ Array(firstRows.dropFirst($0).prefix(150)) }) {
             report.requests += 1   // a name and an id: two reads
@@ -459,7 +540,7 @@ nonisolated enum ListenerRetrieval {
         let strongest = firstPass.sorted { $0.value.score != $1.value.score ? $0.value.score > $1.value.score : $0.key.uuidString < $1.key.uuidString }
             .prefix(300).map(\.key)
         await readDegrees(strongest)
-        firstPass = hop(from: seedRows, radio: radio, centroids: centroids, vectors: vectors, exclude: exclude)
+        firstPass = hop(from: seedRows, radio: radio, centroids: centroids, vectors: vectors, exclude: exclude, perEpisode: perEpisode)
 
         // Bridges: the strongest first-hop artists that are not hubs, known
         // or not -- a known artist is still a way through.
@@ -471,7 +552,7 @@ nonisolated enum ListenerRetrieval {
         await readAppearances(bridges.map(\.row))
         await readEpisodes(for: bridges.map(\.row))
         var secondExclude = exclude.union(bridges.map(\.row))
-        var secondPass = hop(from: bridges, radio: radio, centroids: centroids, vectors: vectors, exclude: secondExclude)
+        var secondPass = hop(from: bridges, radio: radio, centroids: centroids, vectors: vectors, exclude: secondExclude, perEpisode: perEpisode.map { max(1, $0 - 1) })
         let newRows = secondPass.keys.filter { radio.names[$0] == nil }.sorted { $0.uuidString < $1.uuidString }
         for chunk in stride(from: 0, to: newRows.count, by: 150).map({ Array(newRows.dropFirst($0).prefix(150)) }) {
             report.requests += 1   // a name and an id: two reads
@@ -482,7 +563,7 @@ nonisolated enum ListenerRetrieval {
         let secondStrongest = secondPass.sorted { $0.value.score != $1.value.score ? $0.value.score > $1.value.score : $0.key.uuidString < $1.key.uuidString }
             .prefix(300).map(\.key)
         await readDegrees(secondStrongest)
-        secondPass = hop(from: bridges, radio: radio, centroids: centroids, vectors: vectors, exclude: secondExclude)
+        secondPass = hop(from: bridges, radio: radio, centroids: centroids, vectors: vectors, exclude: secondExclude, perEpisode: perEpisode.map { max(1, $0 - 1) })
         // A second hop already reached in one is the first hop's.
         for row in firstPass.keys { secondPass[row] = nil }
         for row in exclude { firstPass[row] = nil }
@@ -516,7 +597,8 @@ nonisolated enum ListenerRetrieval {
             out.append(Sighting(name: entry.name, discogsID: entry.discogs, catalogueRow: row,
                                 route: Route(provenance: .radioAdjacent, score: score.score, seed: score.seed, cluster: score.cluster,
                                              why: "Played \(near) \(seed)\(score.showTitle.map { " on \($0)" } ?? "")"
-                                                + (score.shows > 1 ? " and \(score.shows - 1) more programmes" : ""))))
+                                                + (score.shows > 1 ? " and \(score.shows - 1) more programmes" : ""),
+                                             evidence: "episode:\(score.episode.uuidString.lowercased())")))
         }
         for (row, score) in second {
             guard let entry = radio.names[row] else { continue }
@@ -524,7 +606,8 @@ nonisolated enum ListenerRetrieval {
             let bridge = radio.names[score.via]?.name ?? "another artist"
             out.append(Sighting(name: entry.name, discogsID: entry.discogs, catalogueRow: row,
                                 route: Route(provenance: .radioSecondHop, score: score.score, seed: score.seed, cluster: score.cluster,
-                                             why: "Played near \(bridge)\(score.showTitle.map { " on \($0)" } ?? ""); \(bridge) is played near \(seed)")))
+                                             why: "Played near \(bridge)\(score.showTitle.map { " on \($0)" } ?? ""); \(bridge) is played near \(seed)",
+                                             evidence: "episode:\(score.episode.uuidString.lowercased())")))
         }
         return out
     }

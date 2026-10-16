@@ -101,12 +101,32 @@ final class ListenerRetrievalTests: XCTestCase {
     func testASecondHopIsNeverCalledACollaboration() {
         var r = ListenerRetrieval.Radio()
         r.names = [next: ("Bridge", nil), far: ("Far", 7)]
-        let second = ListenerRetrieval.RadioScore(score: 1, episodes: 1, shows: 1, via: next, showTitle: "Show", distance: 1,
+        let second = ListenerRetrieval.RadioScore(score: 1, episodes: 1, shows: 1, via: next, episode: show, showTitle: "Show", distance: 1,
                                                   cluster: 0, seed: "s", genres: [:])
         let sightings = ListenerRetrieval.sightings(first: [:], second: [far: second], radio: r, seedNames: ["s": "Seed"])
         XCTAssertEqual(sightings.first?.route.provenance, .radioSecondHop)
         XCTAssertEqual(sightings.first?.route.why, "Played near Bridge on Show; Bridge is played near Seed")
         XCTAssertFalse(sightings.first?.route.why.lowercased().contains("collab") ?? true)
         XCTAssertFalse(sightings.first?.route.why.lowercased().contains("credit") ?? true)
+    }
+
+    /// One tracklist, one find: an episode offers its three strongest, and
+    /// more of the same tracklist never adds up.
+    func testAnEpisodeOffersAFewAndCountsOnce() {
+        let others = (2...8).map { UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", 100 + $0))! }
+        let r = radio([(1, seed)] + others.enumerated().map { ($0.offset + 2, $0.element) }, show: show, showGenres: ["ambient": 3])
+        let scores = ListenerRetrieval.hop(from: [(row: seed, weight: 1, seed: "s", cluster: 0)], radio: r, centroids: [:],
+                                           vectors: vectors, exclude: [], perEpisode: 3)
+        XCTAssertEqual(Set(scores.keys), Set(others.prefix(3)), "the three nearest the seed")
+        XCTAssertTrue(scores.values.allSatisfy { $0.episodes == 1 })
+    }
+
+    func testTheDatedDirectRouteNeverOffersTheSeedsOwnNames() {
+        let seed = ListenerRetrieval.Seed(artist: "seed", name: "Seed", cluster: 0, weight: 1, level: .artist, title: "Seed")
+        let entry = ListenerRetrieval.Entry(key: "seed", name: "Seed", collaborators: ["Friend (2)", "Other Name"], members: ["Member"],
+                                            labelNeighbours: ["Labelmate"], aliases: ["Other Name"])
+        let found = ListenerRetrieval.direct([seed], entries: ["seed": entry], records: [])
+        XCTAssertEqual(found.map(\.name), ["Friend", "Member", "Labelmate"])
+        XCTAssertEqual(found.map(\.route.provenance), [.direct, .direct, .sharedContext])
     }
 }
