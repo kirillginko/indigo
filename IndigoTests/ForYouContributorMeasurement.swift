@@ -63,6 +63,14 @@ final class ForYouContributorMeasurement: XCTestCase {
             let personal = PersonalInputs.read(context: context, asOf: asOf)
             try await report(label, container: container, personal: personal, asOf: asOf,
                              header: "crate \(personal.crate.count), met \(personal.met.count), haunts \(personal.haunts.count)")
+            // What the app's prefill (`DigStore.prefillStartingPointCredits`)
+            // keeps once For You is on screen: the starting points' credits
+            // by id from R2. Network, so asked for separately.
+            if ProcessInfo.processInfo.environment["INDIGO_MEASURE_CONTRIBUTORS_R2"] == "1" {
+                let kept = await keepStartingPointCredits(personal, context: context)
+                try await report("\(label)-credits", container: container, personal: personal, asOf: asOf,
+                                 header: "after keeping credits for \(kept) starting-point releases from R2")
+            }
         }
 
         let container = try copyStores(userData: development, local: development, label: "synthetic")
@@ -95,6 +103,32 @@ final class ForYouContributorMeasurement: XCTestCase {
                 .joined(separator: "; ")
             try await report(profile.name, container: container, personal: personal, asOf: asOf, header: header)
         }
+    }
+
+    /// The prefill, on the copy: the same releases, read from R2 directly
+    /// (the app's reader stands down in a test process).
+    private func keepStartingPointCredits(_ personal: PersonalInputs, context: ModelContext) async -> Int {
+        let graph = GraphStore(context: context)
+        let store = ReleaseCreditStore(context: context)
+        var ids: [Int] = []
+        for node in ExploreRanker.startingPoints(personal) {
+            if node.kind == .artist {
+                ids += graph.releaseIDs(creditedTo: RecordingKey.normalizeArtist(node.title))
+                    .filter { $0 > 0 && store.credits(releaseID: $0) == nil }.sorted().prefix(24)
+            } else if node.kind == .release, let id = node.discogsID, store.credits(releaseID: id) == nil {
+                ids.append(id)
+            }
+        }
+        var kept = 0
+        for id in Set(ids).sorted() {
+            guard let url = MetadataRepository.storedObjectURL(forPath: MetadataRepository.releasePath(id: String(id))),
+                  let (data, response) = try? await URLSession.shared.data(from: url),
+                  (response as? HTTPURLResponse)?.statusCode == 200,
+                  let detail = try? JSONDecoder().decode(DiscogsReleaseDetail.self, from: data) else { continue }
+            if store.replace(releaseID: id, from: detail, source: ReleaseCreditStore.source(storedRelease: id)) { kept += 1 }
+        }
+        try? context.save()
+        return kept
     }
 
     private func copyStores(userData: URL, local: URL, label: String) throws -> ModelContainer {
@@ -131,7 +165,7 @@ final class ForYouContributorMeasurement: XCTestCase {
             let route = MusicEdge(from: .artist(offer.via), to: offer.node, kind: offer.kind, source: .discogs,
                                   reason: offer.reason, confidence: 1)
             let contribution = ContributorRole.of(edge: route)?.rawValue ?? "-"
-            return [block, offer.node.kind.rawValue, offer.node.title, offer.kind.rawValue, contribution,
+            return [block, offer.node.kind.rawValue, offer.node.title, offer.id, offer.kind.rawValue, contribution,
                     offer.reason, "via \(offer.via)", String(format: "%.4f", offer.score)].joined(separator: " | ")
         }
         out += offers.next.map { line("next", $0) } + offers.shows.map { line("show", $0) }
@@ -158,6 +192,7 @@ final class ForYouContributorMeasurement: XCTestCase {
         let withheld = technical.filter { $0.edges.allSatisfy { !ContributorRole.canRecommend($0) } }
         let kept = technical.filter { $0.edges.contains(where: ContributorRole.canRecommend) }
         out.append("")
+        out.append("starting points: " + known.prefix(ExploreSuggestionEngine.origins).map { "\($0.node.title) [\($0.node.id)]" }.joined(separator: "; "))
         out.append("candidates reached: \(routes.count); through a technical credit: \(technical.count); only so (withheld): \(withheld.count); also another way (kept): \(kept.count)")
         for (label, list) in [("withheld", withheld), ("kept", kept)] {
             for entry in list {

@@ -80,6 +80,10 @@ nonisolated struct IdentityNeighbourhood: Sendable {
     let keys: [String: Set<String>]
     /// What the walk's identities rested on (`IdentityGraph.evidenceDigest`).
     var dependencies = IdentityDependencies()
+    /// The origin's own other names (`.sameAlias`), by every id they are
+    /// known under here -- including the entry a name row was folded into,
+    /// whose alias edge the fold removed. See `KnownArtistPolicy.ownAliases`.
+    var aliases: Set<String> = []
 
     /// The ids a destination is known by: its own, and one per name behind it.
     func knownIDs(of node: MusicNode) -> Set<String> {
@@ -231,7 +235,9 @@ nonisolated final class IdentityGraph {
             guard let id = identity.discogsID, GraphIdentityKey(nodeKey: identity.key) != nil else { continue }
             keys[identity.id, default: []].formUnion(measure("walk.names") { names(of: id, title: identity.title) }.map(RecordingKey.normalizeArtist))
         }
-        var found = measure("walk.collapse") { collapsing([IdentityNeighbourhood(origin: canonical, edges: set, keys: keys)])[0] }
+        var walk = IdentityNeighbourhood(origin: canonical, edges: set, keys: keys)
+        walk.aliases = Set(set.all.filter { $0.kind == .sameAlias && $0.to.kind == .artist }.map(\.to.id))
+        var found = measure("walk.collapse") { collapsing([walk])[0] }
         found.dependencies = dependencies
         return found
     }
@@ -357,6 +363,8 @@ nonisolated final class IdentityGraph {
         // Nothing verified here, nothing to fold into.
         guard !owners.isEmpty else { return walks }
         var dropped: Set<String> = []
+        // Which entry's row each dropped name row stands under.
+        var foldedInto: [String: String] = [:]
         // Every spelling a name row arrived under, as before: only those a
         // verified entry here answers to can be folded, so only they are read.
         var names: [String: Set<MusicNode>] = [:]
@@ -372,6 +380,7 @@ nonisolated final class IdentityGraph {
             if let page = identityStore.artistResolution(ArtistReference(name: node.title)).identity.discogsID,
                GraphIdentityKey.discogs(page).nodeID != identityID { continue }
             dropped.insert(node.id)
+            foldedInto[node.id] = identityID
             IdentityChecks.shared.note(node.title)
         }
         guard !dropped.isEmpty else { return walks }
@@ -381,6 +390,7 @@ nonisolated final class IdentityGraph {
             var kept = IdentityNeighbourhood(origin: walk.origin, edges: edges,
                                              keys: walk.keys.filter { !dropped.contains($0.key) })
             kept.dependencies = walk.dependencies
+            kept.aliases = walk.aliases.union(walk.aliases.compactMap { foldedInto[$0] })
             return kept
         }
     }

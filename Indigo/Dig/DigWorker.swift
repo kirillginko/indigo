@@ -394,6 +394,7 @@ actor DigWorker {
         let history = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
         let alsoKnown = KnownArtistPolicy.alsoKnown(
             history: history, owners: owners, namesOf: { names[$0.id] ?? [$0.key] })
+            .union(KnownArtistPolicy.ownAliases(walks: walks, owners: owners))
         return (alsoKnown, CanonicalDigest.of(mapping.sorted() + ["known"] + alsoKnown.sorted()))
     }
 
