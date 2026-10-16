@@ -18,8 +18,10 @@ app=$(find "$archive/Products/Applications" -maxdepth 1 -type d -name "*.app" | 
 [ -n "$app" ] || { echo "FAIL: no app in $archive" >&2; exit 1; }
 # Every file in the bundle: a development build keeps its code in a separate
 # Indigo.debug.dylib, and a check of the main binary alone would miss it.
-# The musician-first switches (MusicianFirst.swift) are development-only too.
-for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MUSICIAN_FIRST INDIGO_DIG_RECOMMENDATIONS INDIGO_DIG_TRACKS; do
+# The musician-first switches (MusicianFirst.swift) are development-only too,
+# and so are For You's (ForYouTracksFeature, SimilarRecordsFeature, ForYouMixFeature).
+for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MUSICIAN_FIRST INDIGO_DIG_RECOMMENDATIONS INDIGO_DIG_TRACKS \
+           INDIGO_FORYOU_TRACKS INDIGO_FORYOU_SIMILAR INDIGO_FORYOU_MIX; do
     found=$(find "$app" -type f -print0 | xargs -0 grep -l -a "$key" 2>/dev/null || true)
     if [ -n "$found" ]; then
         echo "FAIL: the development override $key is in: $found" >&2
@@ -28,7 +30,8 @@ for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MU
 done
 echo "ok: no development override anywhere in $(basename "$app")"
 
-# An internal archive (INDIGO_INTERNAL: musician-first DIG and Hear next on)
+# An internal archive (INDIGO_INTERNAL: musician-first DIG, Hear next and For You's
+# tracks, records and mix on)
 # is for TestFlight internal testing only, and passes only when named as one.
 internal=$(find "$app" -type f -print0 | xargs -0 grep -l -a "INDIGO_INTERNAL_BUILD" 2>/dev/null || true)
 if [ -n "$internal" ]; then

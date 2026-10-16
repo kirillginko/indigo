@@ -6,7 +6,7 @@
 //  on the Mac a band above the map, on the phone a slide after the cover.
 //  Each row is numbered as its point on the compass is, says what it is and
 //  why it is here, and which way it leads; a track plays, everything else
-//  opens. Development builds only (`ForYouMixFeature`).
+//  opens. Development and internal builds only (`ForYouMixFeature`).
 //
 
 import SwiftUI

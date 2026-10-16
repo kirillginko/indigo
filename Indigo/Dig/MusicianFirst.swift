@@ -47,7 +47,7 @@ nonisolated enum MusicianFirst {
     /// Written into an internal archive (`SWIFT_ACTIVE_COMPILATION_CONDITIONS`
     /// gains `INDIGO_INTERNAL` on the archive command line only), so
     /// Scripts/release-enrichment-guard.sh can refuse it for the App Store.
-    static let internalBuild = "INDIGO_INTERNAL_BUILD: musician-first DIG and Hear next on"
+    static let internalBuild = "INDIGO_INTERNAL_BUILD: musician-first DIG, Hear next and For You mix on"
     #endif
 
     /// Whether a credit leads anywhere under the switch: off, every musical

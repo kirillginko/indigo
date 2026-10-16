@@ -25,7 +25,7 @@
 //
 //  A pure function of the pool, the seed and the arguments: summed in a fixed
 //  order, so the same pool on two devices gives the same scores to the bit.
-//  Development builds only, on For You (`SimilarRecordsFeature`).
+//  Development and internal builds only, on For You (`SimilarRecordsFeature`).
 //
 
 import Foundation
@@ -40,6 +40,9 @@ nonisolated enum SimilarRecordsFeature {
         if let override { return override }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
+        #elseif INDIGO_INTERNAL
+        // An internal TestFlight archive: on, with no switch to turn.
+        return true
         #else
         return false
         #endif

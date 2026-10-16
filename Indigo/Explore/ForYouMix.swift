@@ -15,7 +15,7 @@
 //  that plays is the best way to meet somebody, then a record of theirs, then
 //  their page. Pure: the same inputs, the same list.
 //
-//  Development builds only (`ForYouMixFeature`).
+//  Development and internal builds only (`ForYouMixFeature`).
 //
 
 import Foundation
@@ -30,6 +30,9 @@ nonisolated enum ForYouMixFeature {
         if let override { return override }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
+        #elseif INDIGO_INTERNAL
+        // An internal TestFlight archive: on, with no switch to turn.
+        return true
         #else
         return false
         #endif

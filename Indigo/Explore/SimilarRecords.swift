@@ -10,7 +10,7 @@
 //  the artists they keep. Never a record they have, nor one by an artist they
 //  keep or have played: these are for finding.
 //
-//  Development builds only (`SimilarRecordsFeature`).
+//  Development and internal builds only (`SimilarRecordsFeature`).
 //
 
 import Foundation

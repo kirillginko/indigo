@@ -46,9 +46,9 @@ nonisolated enum TrackDiscoveryFeature {
 
 /// For You's "Tracks to hear": DIG Discover's own list, shown on For You
 /// (`ForYouTracksSection`). The same engine, cache and playback checks --
-/// nothing is worked out twice. Development builds only, by launch argument
-/// (`-INDIGO_FORYOU_TRACKS YES`) or in a test; never in an internal archive
-/// or a release build.
+/// nothing is worked out twice. Development builds by launch argument
+/// (`-INDIGO_FORYOU_TRACKS YES`) or in a test; on in an internal archive;
+/// never in an App Store build.
 nonisolated enum ForYouTracksFeature {
     #if DEBUG
     static let switchKey = "INDIGO_FORYOU_TRACKS"
@@ -59,6 +59,9 @@ nonisolated enum ForYouTracksFeature {
         if let override { return override }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
+        #elseif INDIGO_INTERNAL
+        // An internal TestFlight archive: on, with no switch to turn.
+        return true
         #else
         return false
         #endif

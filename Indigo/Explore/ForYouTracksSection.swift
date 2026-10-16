@@ -13,7 +13,7 @@
 //  was played, and only a track checked to play is here at all.
 //
 //  The artist and show recommendations stay as they were, beside it.
-//  Development builds only (`ForYouTracksFeature`).
+//  Development and internal builds only (`ForYouTracksFeature`).
 //
 
 import SwiftUI
