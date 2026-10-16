@@ -45,8 +45,8 @@ nonisolated enum TrackDiscoveryFeature {
 }
 
 /// A track to hear, and why.
-nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable {
-    enum Source: Equatable, Sendable {
+nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
+    enum Source: Equatable, Sendable, Codable {
         /// An upload of the track itself.
         case recording(URL, channel: String?)
         /// An episode with the track at a moment.
@@ -55,7 +55,7 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable {
 
     /// How sure Indigo is that it plays: checked and plays, checked and does
     /// not, or not yet known.
-    enum Playable: Equatable, Sendable { case yes, no, unknown }
+    enum Playable: Equatable, Sendable, Codable { case yes, no, unknown }
 
     let artist: String
     let artistDiscogsID: Int

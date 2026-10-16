@@ -27,7 +27,7 @@ extension DigStore {
     }
 
     /// The same, from any context: Discover reads it off the main thread.
-    nonisolated static func discoverInputs(context: ModelContext, now: Date = Date()) -> DiscoverInputs {
+    nonisolated static func discoverInputs(context: ModelContext, now: Date = Date(), collaborators withCollaborators: Bool = true) -> DiscoverInputs {
         let identityStore = ArtistIdentityStore(context: context)
         let personal = PersonalInputs.read(context: context, asOf: now)
         var seeds: [TrackDiscovery.Seed] = []
@@ -49,18 +49,7 @@ extension DigStore {
                 break
             }
         }
-        // DIG's verified collaborators of the strongest few: someone they made
-        // a record with, by entry.
-        var collaborators: [TrackDiscovery.Neighbour] = []
-        let identity = IdentityGraph(context: context)
-        for seed in seeds.prefix(6) {
-            for edge in identity.neighbourhood(of: .artist(seed.name, discogsID: seed.discogsID)).edges.forDIG.all
-            where [.collaborator, .personnel, .producer].contains(edge.kind) && !MusicianFirst.isTechnicalCredit(edge) {
-                guard let id = edge.to.discogsID, edge.to.kind == .artist, id != seed.discogsID else { continue }
-                collaborators.append(.init(discogsID: id, name: edge.to.title, seed: seed,
-                                           reason: "With \(seed.name): \(edge.reason)", strength: 2))
-            }
-        }
+        let collaborators = withCollaborators ? discoverCollaborators(of: seeds, context: context) : []
         var knownArtists = Set<String>(), knownTracks = Set<String>()
         for met in personal.met {
             switch met.node.kind {
@@ -79,27 +68,81 @@ extension DigStore {
                               knownArtists: knownArtists, knownTracks: knownTracks)
     }
 
+    /// DIG's verified collaborators of the strongest few starting points:
+    /// someone they made a record with, by entry. A graph walk each -- seconds
+    /// on a long history -- so Discover asks for it beside the backend.
+    nonisolated static func discoverCollaborators(of seeds: [TrackDiscovery.Seed], context: ModelContext) -> [TrackDiscovery.Neighbour] {
+        var collaborators: [TrackDiscovery.Neighbour] = []
+        let identity = IdentityGraph(context: context)
+        for seed in seeds.prefix(6) {
+            for edge in identity.neighbourhood(of: .artist(seed.name, discogsID: seed.discogsID)).edges.forDIG.all
+            where [.collaborator, .personnel, .producer].contains(edge.kind) && !MusicianFirst.isTechnicalCredit(edge) {
+                guard let id = edge.to.discogsID, edge.to.kind == .artist, id != seed.discogsID else { continue }
+                collaborators.append(.init(discogsID: id, name: edge.to.title, seed: seed,
+                                           reason: "With \(seed.name): \(edge.reason)", strength: 2))
+            }
+        }
+        return collaborators
+    }
+
+    /// The last list found, kept in Caches so DIG opens with it.
+    private nonisolated static var heldDiscoverFile: URL? {
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent("discover-landing.json")
+    }
+    private struct HeldDiscover: Codable { let tracks: [DiscoveredTrack]; let at: Date }
+
     /// Works Discover out again unless a fresh answer is held. Tracks appear
     /// as each one passes its playback check.
     func refreshDiscover(force: Bool = false) async {
         guard TrackDiscoveryFeature.isEnabled, SupabaseService.isConfigured else { return }
+        // The list from last time, at once: every track on it played within
+        // the day. A newer one replaces it whole when it is ready.
+        if discover.tracks.isEmpty, discover.at == nil, let file = Self.heldDiscoverFile,
+           let data = try? Data(contentsOf: file), let held = try? JSONDecoder().decode(HeldDiscover.self, from: data),
+           Date().timeIntervalSince(held.at) < 24 * 60 * 60, !held.tracks.isEmpty {
+            discover = DiscoverState(tracks: held.tracks, at: held.at)
+        }
         if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60, !discover.tracks.isEmpty { return }
         guard !discover.working else { return }
         discover.working = true
+        let showing = !discover.tracks.isEmpty
         let source = trackDiscoverySource
         let container = context.container
         let (tracks, report) = await Task.detached(priority: .userInitiated) { [weak self] in
-            // Read on a context of its own: two seconds of the listener's
-            // history is not something to read on the thread that draws.
-            let inputs = Trace.step("dig.discover.inputs") { DigStore.discoverInputs(context: ModelContext(container)) }
-            let ask = TrackDiscoverySource.Ask(seeds: inputs.seeds, collaborators: inputs.collaborators, taste: inputs.taste,
+            // Read on a context of its own: the listener's history is not
+            // something to read on the thread that draws.
+            let inputs = Trace.step("dig.discover.inputs") {
+                DigStore.discoverInputs(context: ModelContext(container), collaborators: false)
+            }
+            // DIG's collaborators are a graph walk each, seconds on a long
+            // history: walked on another context while the radio's tracks are
+            // found and shown, then everything ranked together once they are
+            // in -- a second pass the first one's cached reads make cheap.
+            let seeds = inputs.seeds
+            let walk = Task.detached(priority: .userInitiated) {
+                Trace.step("dig.discover.collaborators") { DigStore.discoverCollaborators(of: seeds, context: ModelContext(container)) }
+            }
+            var ask = TrackDiscoverySource.Ask(seeds: inputs.seeds, taste: inputs.taste,
                                                knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks,
                                                limit: 12, releaseLookups: 2)
-            return await source.discover(ask) { so in
+            let first = await source.discover(ask) { so in
+                // Over a held list, nothing until the new one is whole.
+                guard !showing else { return }
                 await MainActor.run { self?.discover.tracks = so }
             }
+            ask.collaborators = await walk.value
+            guard !ask.collaborators.isEmpty else { return first }
+            let joint = await source.discover(ask)
+            return joint.tracks.isEmpty ? first : joint
         }.value
+        if tracks.isEmpty, showing {
+            discover.working = false
+            return
+        }
         discover = DiscoverState(tracks: tracks, report: report, at: Date(), working: false)
+        if let file = Self.heldDiscoverFile, let data = try? JSONEncoder().encode(HeldDiscover(tracks: tracks, at: Date())) {
+            try? data.write(to: file, options: .atomic)
+        }
     }
 
     /// Discover from one artist's page: a few of their own tracks, then
@@ -114,14 +157,13 @@ extension DigStore {
         guard artistDiscover[key]?.working != true else { return }
         artistDiscover[key] = DiscoverState(working: true)
         let seed = TrackDiscovery.Seed(discogsID: id, name: page.name, weight: 1)
-        // Who DIG says they made records with, by entry.
-        let collaborators = IdentityGraph(context: context).neighbourhood(of: .artist(page.name, discogsID: id)).edges.forDIG.all
-            .filter { [.collaborator, .personnel, .producer].contains($0.kind) && !MusicianFirst.isTechnicalCredit($0) }
-            .compactMap { edge -> TrackDiscovery.Neighbour? in
-                guard let other = edge.to.discogsID, edge.to.kind == .artist, other != id else { return nil }
-                return .init(discogsID: other, name: edge.to.title, seed: seed, reason: edge.reason, strength: 2)
-            }
-        let ask = TrackDiscoverySource.Ask(seeds: [seed], collaborators: collaborators,
+        let container = context.container
+        // Who DIG says they made records with, by entry: a graph walk, on a
+        // context of its own while the backend is asked.
+        let ask = TrackDiscoverySource.Ask(seeds: [seed],
+                                           collaboratorsLater: {
+                                               DigStore.pageCollaborators(of: seed, context: ModelContext(container))
+                                           },
                                            knownArtists: [RecordingKey.normalizeArtist(page.name)],
                                            limit: 5, ownTracks: 3, releaseLookups: 3)
         let source = trackDiscoverySource
@@ -129,6 +171,18 @@ extension DigStore {
             await source.discover(ask) { so in await MainActor.run { self?.artistDiscover[key]?.tracks = so } }
         }.value
         artistDiscover[key] = DiscoverState(tracks: tracks, report: report, at: Date(), working: false)
+    }
+}
+
+extension DigStore {
+    /// An artist page's verified collaborators, as its Listen section offers them.
+    nonisolated static func pageCollaborators(of seed: TrackDiscovery.Seed, context: ModelContext) -> [TrackDiscovery.Neighbour] {
+        IdentityGraph(context: context).neighbourhood(of: .artist(seed.name, discogsID: seed.discogsID)).edges.forDIG.all
+            .filter { [.collaborator, .personnel, .producer].contains($0.kind) && !MusicianFirst.isTechnicalCredit($0) }
+            .compactMap { edge -> TrackDiscovery.Neighbour? in
+                guard let other = edge.to.discogsID, edge.to.kind == .artist, other != seed.discogsID else { return nil }
+                return .init(discogsID: other, name: edge.to.title, seed: seed, reason: edge.reason, strength: 2)
+            }
     }
 }
 
