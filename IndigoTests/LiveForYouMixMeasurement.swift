@@ -43,8 +43,26 @@ final class LiveForYouMixMeasurement: XCTestCase {
         let worker = DigWorker(modelContainer: container)
         let run = await worker.exploreRun(asOf: asOf, period: ExplorePeriod.containing(asOf), generation: 0, scenes: false,
                                           rebuild: false, now: asOf)
-        let offers = await worker.exploreRecommendations(run, asOf: asOf)
+        let visibleOffers = await worker.exploreRecommendations(run, asOf: asOf)
+        // The mix's own: deeper, producers only as artists.
+        let (unfiltered, unproven) = await worker.forYouMixOffers(run, asOf: asOf)
+        let evidenceStart = ContinuousClock.now
+        let vouched = await ForYouArtistEvidence.onRadio(unproven)
+        out.append("producer-only candidates without evidence on this device: \(unproven.map(\.title).joined(separator: ", ")); the shared catalogue vouches for \(unproven.filter { vouched.contains($0.id) }.map(\.title).joined(separator: ", ")) (\(ms(ContinuousClock.now - evidenceStart)))")
+        let offers = ForYouArtistEvidence.kept(unfiltered, unproven: unproven, vouched: vouched)
         out.append("artists and shows: \(ms(ContinuousClock.now - t))")
+        // Who the evidence rule left out: reached only by producing or
+        // remixing, with no record or radio play of their own here.
+        let plain = await worker.forYouMixOffersWithoutEvidence(run, asOf: asOf)
+        let dropped = Set((plain.next + plain.artists).map(\.id)).subtracting((offers.next + offers.artists).map(\.id))
+        out.append("left out as producers only: " + (plain.next + plain.artists).filter { dropped.contains($0.id) }
+            .map { "\($0.node.title) (\($0.reason) · via \($0.via))" }.joined(separator: "; "))
+        func origins(_ list: [ExploreSuggestion]) -> String {
+            Dictionary(grouping: list, by: \.via).mapValues(\.count).sorted { $0.value > $1.value }
+                .map { "\($0.key) \($0.value)" }.joined(separator: ", ")
+        }
+        out.append("visible For You, by starting point: " + origins(visibleOffers.next + visibleOffers.artists))
+        out.append("mix artists, by starting point: " + origins(offers.next + offers.artists))
 
         t = ContinuousClock.now
         var source = TrackDiscoverySource.live
@@ -83,6 +101,8 @@ final class LiveForYouMixMeasurement: XCTestCase {
         }
         let points = Dictionary((compass?.points ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         out.append("")
+        out.append("mix, items per starting point: " + Dictionary(grouping: items, by: \.via).mapValues(\.count)
+            .sorted { $0.value > $1.value }.map { "\($0.key) \($0.value)" }.joined(separator: ", "))
         out.append("For you, one list (\(items.count); kinds \(Dictionary(grouping: items, by: \.kind).mapValues(\.count).sorted { $0.key.rawValue < $1.key.rawValue }.map { "\($0.key.rawValue) \($0.value)" }.joined(separator: ", "))):")
         for (index, item) in items.enumerated() {
             let place = points[item.id].map { String(format: "(%.2f, %.2f) %@, %@", $0.x, $0.y, $0.heading, ForYouMixSection.closeness($0.distance)) } ?? "not placed (no tags)"

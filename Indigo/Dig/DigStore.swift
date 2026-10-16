@@ -190,6 +190,9 @@ final class DigStore {
     var similarRecords = SimilarRecordsState()
     /// For You as one list, and its compass (`ForYouMixFeature`).
     var forYouMix = ForYouMixState()
+    /// The mix's artists and shows (`DigWorker.forYouMixOffers`), worked out
+    /// beside the visible answer when the mix is on.
+    @ObservationIgnored var mixOffers = ExploreOffers()
     /// Discover per artist page, by Discogs entry.
     var artistDiscover: [String: DiscoverState] = [:]
     @ObservationIgnored var trackDiscoverySource = TrackDiscoverySource.live
@@ -1894,6 +1897,12 @@ final class DigStore {
                 let found = await self.worker.exploreRecommendations(core, asOf: asOf)
                 guard !Task.isCancelled else { return }
                 self.offersCoreStamp = core.stamp
+                if ForYouMixFeature.isEnabled {
+                    let (offers, unproven) = await self.worker.forYouMixOffers(core, asOf: asOf)
+                    let vouched = SupabaseService.isConfigured ? await ForYouArtistEvidence.onRadio(unproven) : []
+                    guard !Task.isCancelled else { return }
+                    self.mixOffers = ForYouArtistEvidence.kept(offers, unproven: unproven, vouched: vouched)
+                }
                 self.exploreOffers = found
                 self.hasExploreOffers = true
             }

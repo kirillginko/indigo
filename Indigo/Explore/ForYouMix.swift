@@ -89,7 +89,9 @@ nonisolated enum ForYouMix {
         }
         var seen = Set<String>()
         let suggestions = (offers.next + offers.artists + offers.shows).filter { seen.insert($0.id).inserted }
-        let artistItems: [ForYouItem] = suggestions.filter { $0.node.kind != .broadcast }.map { suggestion in
+        // People only: a record or a label reached from a starting point is
+        // not an artist, and records have a queue of their own.
+        let artistItems: [ForYouItem] = suggestions.filter { $0.node.kind == .artist }.map { suggestion in
             let isArtist = suggestion.node.kind == .artist
             let key = RecordingKey.normalizeArtist(suggestion.node.title)
             return ForYouItem(kind: .artist, payload: .suggestion(suggestion), artistKeys: isArtist ? [key] : [],
@@ -125,6 +127,10 @@ nonisolated enum ForYouMix {
 
     /// The woven list: the pattern above, one artist once (tracks first,
     /// then records, then pages), each source in its own order.
+    /// At most this many items reached from any one starting point, across
+    /// kinds: a list, not one artist's neighbourhood.
+    static let perOrigin = 2
+
     static func mix(offers: ExploreOffers, tracks: [DiscoveredTrack], records: [SimilarRecord],
                     artistTags: [String: [String]] = [:], limit: Int = 18) -> [ForYouItem] {
         let made = items(offers: offers, tracks: tracks, records: records, artistTags: artistTags)
@@ -141,14 +147,31 @@ nonisolated enum ForYouMix {
             .track: claim(made.tracks), .record: claim(made.records), .artist: claim(made.artists), .show: made.shows,
         ]
         var out: [ForYouItem] = []
+        var fromOrigin: [String: Int] = [:]
+        // An item's starting point, as one artist: a track's and an artist
+        // card's are named, a record's is the record of theirs it is like.
+        func origin(_ item: ForYouItem) -> String? {
+            switch item.payload {
+            case .track(let track): RecordingKey.normalizeArtist(track.via)
+            case .record(let found): found.via.artistKeys.sorted().first
+            case .suggestion(let suggestion): suggestion.via == "what you listen to" ? nil : RecordingKey.normalizeArtist(suggestion.via)
+            }
+        }
         var step = 0
         // Round the pattern until every queue is empty or the list is full;
-        // a kind with nothing left is skipped, not waited for.
+        // a kind with nothing left is skipped, not waited for, and a
+        // starting point that has had its share gives way to the next item.
         while out.count < limit, queues.values.contains(where: { !$0.isEmpty }) {
             let kind = pattern[step % pattern.count]
             step += 1
             guard var queue = queues[kind], !queue.isEmpty else { continue }
-            out.append(queue.removeFirst())
+            if let index = queue.firstIndex(where: { item in origin(item).map { fromOrigin[$0, default: 0] < perOrigin } ?? true }) {
+                let item = queue.remove(at: index)
+                if let key = origin(item) { fromOrigin[key, default: 0] += 1 }
+                out.append(item)
+            } else {
+                queue.removeAll()
+            }
             queues[kind] = queue
         }
         return out

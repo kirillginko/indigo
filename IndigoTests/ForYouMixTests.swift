@@ -11,10 +11,10 @@ import XCTest
 @testable import Indigo
 
 final class ForYouMixTests: XCTestCase {
-    private func track(_ id: Int, _ artist: String, tags: [String] = ["ambient"]) -> DiscoveredTrack {
+    private func track(_ id: Int, _ artist: String, tags: [String] = ["ambient"], via: String = "X") -> DiscoveredTrack {
         DiscoveredTrack(artist: artist, artistDiscogsID: id, title: "T\(id)",
                         source: .recording(URL(string: "https://www.youtube.com/watch?v=\(id)")!, channel: nil),
-                        tags: tags, reason: "Played next to X", via: "X", playable: .yes, score: 1)
+                        tags: tags, reason: "Played next to \(via)", via: via, playable: .yes, score: 1)
     }
 
     private func suggestion(_ title: String, kind: MusicNodeKind = .artist) -> ExploreSuggestion {
@@ -53,8 +53,27 @@ final class ForYouMixTests: XCTestCase {
     }
 
     func testAKindThatRunsOutIsSkippedNotWaitedFor() {
-        let mixed = ForYouMix.mix(offers: ExploreOffers(), tracks: [track(1, "A"), track(2, "B"), track(3, "C")], records: [])
+        let mixed = ForYouMix.mix(offers: ExploreOffers(), tracks: [track(1, "A", via: "P"), track(2, "B", via: "Q"), track(3, "C", via: "R")],
+                                  records: [])
         XCTAssertEqual(mixed.map(\.title), ["T1", "T2", "T3"])
+    }
+
+    /// At most two things reached from one starting point, whatever their kind.
+    func testOneStartingPointDoesNotFillTheList() {
+        var offers = ExploreOffers()
+        offers.next = [suggestion("Grouper")]   // via "Y"
+        let mixed = ForYouMix.mix(offers: offers,
+                                  tracks: [track(1, "A", via: "Y"), track(2, "B", via: "Y"), track(3, "C", via: "Z")],
+                                  records: [])
+        XCTAssertEqual(mixed.map(\.title), ["T1", "Grouper", "T3"])
+    }
+
+    /// A record or a label in For You's list is not an artist.
+    func testOnlyPeopleInTheArtistQueue() {
+        var offers = ExploreOffers()
+        offers.next = [ExploreSuggestion(node: .release("Their Own EP", discogsID: 9), reason: "Released Their Own EP", via: "Y",
+                                         kind: .appearsOnRelease, corroboration: 1, score: 1), suggestion("Grouper")]
+        XCTAssertEqual(ForYouMix.mix(offers: offers, tracks: [], records: []).map(\.title), ["Grouper"])
     }
 
     private let vectors: [String: [String: Double]] = [

@@ -321,6 +321,19 @@ nonisolated enum KnownArtistPolicy {
     /// Namesake-safe as the rest of this policy: a name with more than one
     /// verified owner here makes none of them known. Groups and members are
     /// other bodies of work, not other names, and stay offered.
+    /// The same for every artist in the listener's history, not only the
+    /// starting points: the aliases their own Discogs entries list, by folded
+    /// name (`DigWorker.historyAliasNames`). Caustic Window is Aphex Twin,
+    /// whether or not Aphex Twin is one of today's starting points.
+    static func historyAliases(_ names: Set<String>, owners: [String: Set<GraphIdentityKey>]) -> Set<String> {
+        var found = Set<String>()
+        for name in names where !name.isEmpty {
+            found.insert(MusicNode.canonicalID(kindRaw: MusicNodeKind.artist.rawValue, key: name))
+            if let only = owners[name], only.count == 1, let owner = only.first { found.insert(owner.nodeID) }
+        }
+        return found
+    }
+
     static func ownAliases(walks: [IdentityNeighbourhood], owners: [String: Set<GraphIdentityKey>]) -> Set<String> {
         var found = Set<String>()
         for walk in walks where walk.origin.kind == .artist {
