@@ -285,10 +285,16 @@ nonisolated struct ListenerProfile: Equatable, Sendable {
     /// small taste is not crowded out by the largest. Within a cluster the
     /// list's own order holds.
     func spread<T>(_ ranked: [T], limit: Int, styles: (T) -> [String], vectors: [String: [String: Double]]) -> [T] {
+        spread(ranked, limit: limit) { relevance(styles: styles($0), vectors: vectors)?.cluster }
+    }
+
+    /// The same, placed by a cluster the caller knows (say, the cluster of
+    /// the seed something was reached from when it has no style of its own).
+    func spread<T>(_ ranked: [T], limit: Int, cluster: (T) -> Int?) -> [T] {
         var byCluster: [Int: [T]] = [:]
         var unplaced: [T] = []
         for item in ranked {
-            if let fit = relevance(styles: styles(item), vectors: vectors) { byCluster[fit.cluster, default: []].append(item) }
+            if let id = cluster(item), clusters.contains(where: { $0.id == id }) { byCluster[id, default: []].append(item) }
             else { unplaced.append(item) }
         }
         let held = clusters.filter { byCluster[$0.id] != nil }

@@ -129,4 +129,23 @@ final class ListenerRetrievalTests: XCTestCase {
         XCTAssertEqual(found.map(\.name), ["Friend", "Member", "Labelmate"])
         XCTAssertEqual(found.map(\.route.provenance), [.direct, .direct, .sharedContext])
     }
+
+    /// A candidate with no style is ranked by how it was reached, not
+    /// buried: strong evidence and no style beats weak evidence and a fit.
+    func testTheUnstyledAreRankedByEvidenceNotBuried() {
+        let profile = profile(ambient: 6, techno: 3)
+        func candidate(_ id: String, score: Double, styles: [String]) -> ListenerRetrieval.Candidate {
+            var c = ListenerRetrieval.Candidate(identity: id, nameKey: id, name: id,
+                                                routes: [.init(provenance: .direct, score: score, seed: "amb0", cluster: 0, why: "Credited with Amb 0")],
+                                                aliases: [id])
+            c.styles = styles
+            return c
+        }
+        let pool = [candidate("weak-fit", score: 0.1, styles: ["drone"]), candidate("strong-unknown", score: 1, styles: []),
+                    candidate("mid-fit", score: 0.5, styles: ["ambient"])]
+        let ranked = ListenerRetrieval.rank(pool, profile: profile, vectors: vectors)
+        XCTAssertEqual(ranked.first?.identity, "strong-unknown")
+        XCTAssertEqual(ranked.last?.identity, "weak-fit")
+        XCTAssertEqual(ListenerRetrieval.cluster(of: pool[1], profile: profile, vectors: vectors), 0, "placed by its seed's cluster")
+    }
 }

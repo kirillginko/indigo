@@ -174,6 +174,50 @@ nonisolated enum ListenerRetrieval {
         return (candidates, surface.count, collisions)
     }
 
+    // MARK: Ranking
+
+    /// How strongly each candidate was reached, 0...1: its percentile within
+    /// each route it came by (best of them), lifted for every further seed
+    /// that reached it. Route scores are not comparable across routes;
+    /// percentiles are.
+    static func evidence(_ pool: [Candidate]) -> [String: Double] {
+        var rank: [String: Double] = [:]
+        for provenance in Provenance.allCases {
+            var scored: [(id: String, score: Double)] = []
+            for c in pool { if let best = c.routes.filter({ $0.provenance == provenance }).map(\.score).max() { scored.append((c.identity, best)) } }
+            scored.sort { $0.score != $1.score ? $0.score > $1.score : $0.id < $1.id }
+            let count = Double(max(1, scored.count))
+            for (i, item) in scored.enumerated() { rank[item.id] = max(rank[item.id] ?? 0, 1 - Double(i) / count) }
+        }
+        for c in pool {
+            let seeds = Set(c.routes.map(\.seed)).count
+            rank[c.identity] = min(1, (rank[c.identity] ?? 0) + 0.15 * Double(seeds - 1))
+        }
+        return rank
+    }
+
+    /// Ranked by route evidence first, and by taste only where there is a
+    /// style to judge: a styled candidate's evidence is scaled by how well it
+    /// fits (0.5 + relevance); an unstyled one is neither rewarded nor
+    /// punished -- it takes the pool's median fit. Scoring the unknown as
+    /// zero buried every candidate the device holds no styles for.
+    static func rank(_ pool: [Candidate], profile: ListenerProfile, vectors: [String: [String: Double]]) -> [Candidate] {
+        let ev = evidence(pool)
+        var fit: [String: Double] = [:]
+        for c in pool { if let r = profile.relevance(styles: c.styles, vectors: vectors) { fit[c.identity] = max(0, r.score) } }
+        let known = fit.values.sorted()
+        let neutral = known.isEmpty ? 0.5 : known[known.count / 2]
+        func score(_ c: Candidate) -> Double { (ev[c.identity] ?? 0) * (0.5 + (fit[c.identity] ?? neutral)) }
+        return pool.sorted { score($0) != score($1) ? score($0) > score($1) : $0.identity < $1.identity }
+    }
+
+    /// The cluster a candidate belongs to: by its style where it has one,
+    /// else the cluster of the seed it was best reached from.
+    static func cluster(of c: Candidate, profile: ListenerProfile, vectors: [String: [String: Double]]) -> Int? {
+        if let r = profile.relevance(styles: c.styles, vectors: vectors) { return r.cluster }
+        return c.best.cluster >= 0 ? c.best.cluster : nil
+    }
+
     // MARK: Direct (on device)
 
     /// One step out of each seed in the identity graph: credits and releases

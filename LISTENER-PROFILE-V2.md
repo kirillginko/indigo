@@ -268,6 +268,54 @@ honestly, does not earn a place in the pool. Next, in order:
 3. Only then integrate Bd's seeding behind the Debug switch, with the
    profile cached on synced history *and* the style caches.
 
+### Phase 3, third pass — ranking the unstyled by evidence
+
+`ListenerRetrieval.rank`: evidence first (a candidate's percentile within
+each route it came by, lifted 0.15 for every further seed that reached it),
+scaled by fit (0.5 + relevance) only where a style exists; an unstyled
+candidate takes the pool's median fit. `ListenerProfile.spread` can now
+place an unstyled candidate by its seed's cluster. Replayed by
+`IndigoTests/ListenerRankingReplay.swift` (opt-in `INDIGO_RANKING_REPLAY=1`,
+on the device only, no network) at 21, 14, 10 and 7 days, Bd against A,
+dated knowledge throughout. The weights were set before the run and not
+tuned on it.
+
+Later finds in the top 20, summed over the four cut-offs (each find was its
+own session):
+
+| ranker | A For You walk | Bd dated cluster seeds |
+|--------|----------------|------------------------|
+| For You's own order | **10** | – |
+| R1 today's taste vector | 3 | **9** |
+| R2 relevance, unknown = 0 | 3 | **9** |
+| R4 evidence first | 7 | 0 |
+| R5 evidence first, by cluster | 3 | 2 |
+
+- **Evidence-first ranking is worse, not better**, for Bd (9 → 0–2). Only
+  3% of Bd's candidates carry a dated style, and that 3% is where its finds
+  are: holding a Discogs entry for a stranger is itself a sign it sits near
+  the listener (it was fetched as a neighbour of something they opened).
+  Scoring the unknown zero was, in effect, a useful filter.
+- Evidence first also fills the list with Discogs' "same styles" lists:
+  they repeat across many seeds, so corroboration lifts them, and they are
+  broad (mainstream R&B beside ambient seeds).
+- On A, evidence first recovers most of For You's own order (7 vs 10), as
+  expected: it is mostly For You's route scores.
+- **Bd with style-first ranking ≈ For You** (9 vs 10 finds in 40 slots), at
+  lower fit, from a larger and more diverse pool (4–5 clusters vs 1–2). It
+  is not better.
+
+**Where this leaves Phase 3.** Retrieval from the listener's clusters
+reaches more of what they go on to find (pool recall of discovery sessions
+30–40% vs 15–30%), but no ranker tried here turns that into more finds in
+twenty slots than For You already makes, and two of three ways of using the
+wider pool made it worse. With ~10 independent finds per replay, smaller
+differences cannot be told from chance. Phase 4 should not replace For
+You's list; if anything, it could *add* a few cluster-seeded artists from
+under-served clusters beside it, judged by listening rather than by this
+replay. Recording which surface each listening event came from remains the
+missing measurement.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.
