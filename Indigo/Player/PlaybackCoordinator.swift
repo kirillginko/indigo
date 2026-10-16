@@ -54,13 +54,17 @@ final class PlaybackCoordinator {
     /// recommendation, handed in with the play command and read back by the
     /// listening log when the item's listening ends.
     @ObservationIgnored private var surfaces: [String: ListeningSurface] = [:]
+    /// The surface of the item now playing, fixed when it started: a new
+    /// queue that happens to hold the same item must not rewrite where the
+    /// listen still running came from.
+    @ObservationIgnored private(set) var listeningSurface: ListeningSurface?
 
-    /// Where the item was started from, if the screen said.
+    /// Where a queued item will be credited to, if the screen said.
     func surface(for itemID: String) -> ListeningSurface? { surfaces[itemID] }
 
-    private func remember(_ items: [MediaItem], from surface: ListeningSurface?) {
-        if surfaces.count > 500 { surfaces = surfaces.filter { $0.key == current?.id } }
-        for item in items { surfaces[item.id] = surface }
+    private func remember(_ items: [MediaItem], from surfaces: [ListeningSurface?]) {
+        if self.surfaces.count > 500 { self.surfaces = [:] }
+        for (index, item) in items.enumerated() { self.surfaces[item.id] = index < surfaces.count ? surfaces[index] : nil }
     }
 
     /// Told when listening to an item ends: what it was, how many seconds of
@@ -234,8 +238,14 @@ final class PlaybackCoordinator {
     /// tracks; the crate queues whatever it holds — files, archived shows and
     /// stations — and each is started by what it is.
     func play(_ items: [MediaItem], startingAt index: Int = 0, from surface: ListeningSurface? = nil) {
+        play(items, startingAt: index, surfaces: Array(repeating: surface, count: items.count))
+    }
+
+    /// The same, each item with its own surface: a list of recommendations
+    /// queued from one press, each reached its own way.
+    func play(_ items: [MediaItem], startingAt index: Int = 0, surfaces: [ListeningSurface?]) {
         guard !items.isEmpty else { return }
-        remember(items, from: surface)
+        remember(items, from: surfaces)
         consecutiveFailures = 0
         queue.load(items, startingAt: index)
         startCurrent(autoplay: true)
@@ -243,7 +253,7 @@ final class PlaybackCoordinator {
 
     /// Plays a live station. The queue collapses to that single item.
     func playRadio(_ item: MediaItem, from surface: ListeningSurface? = nil) {
-        remember([item], from: surface)
+        remember([item], from: [surface])
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)
@@ -251,7 +261,7 @@ final class PlaybackCoordinator {
 
     /// Plays an archived NTS episode through its host's embed widget.
     func playEpisode(_ item: MediaItem, from surface: ListeningSurface? = nil) {
-        remember([item], from: surface)
+        remember([item], from: [surface])
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)
@@ -415,6 +425,7 @@ final class PlaybackCoordinator {
         embed.stop()
         queue.clear()
         current = nil
+        listeningSurface = nil
         source = .none
         publishNowPlaying()
     }
@@ -516,6 +527,7 @@ final class PlaybackCoordinator {
         endStint()
         pendingSeek?.cancel()
         current = item
+        listeningSurface = surfaces[item.id]
 
         if item.isLive {
             local.stop()

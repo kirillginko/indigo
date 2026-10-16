@@ -38,7 +38,7 @@ final class PlaybackWitness {
     /// so watching twice logs once.
     func watch(_ player: PlaybackCoordinator) {
         player.onListeningEnded = { [weak self, weak player] item, seconds, completion in
-            self?.record(item, seconds: seconds, completion: completion, surface: player?.surface(for: item.id))
+            self?.record(item, seconds: seconds, completion: completion, surface: player?.listeningSurface)
         }
     }
 

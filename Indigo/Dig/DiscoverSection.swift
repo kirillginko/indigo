@@ -144,7 +144,7 @@ struct DiscoverList: View {
     private func play(_ queue: [DiscoveredTrack], from index: Int) {
         DiscoverDiagnostics.shared.pressed(Array(queue.dropFirst(index)), opened: opened, player: player, crate: crate)
         player.play(queue.map(\.mediaItem.item), startingAt: index,
-                    from: ListeningSurface(screen: surface, via: queue[index].via, route: "track"))
+                    surfaces: queue.map { ListeningSurface(screen: surface, via: $0.via, route: "track") })
     }
 
     /// One track in a radio show, from the moment it was played.

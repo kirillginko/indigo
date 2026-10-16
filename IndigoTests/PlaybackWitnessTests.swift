@@ -169,6 +169,11 @@ final class PlaybackWitnessTests: XCTestCase {
         XCTAssertEqual(player.surface(for: "b")?.screen, "dig.discover", "a queued item keeps the surface it was queued from")
         player.playRadio(item(id: "s", source: "nts", kind: .radioStation, title: "NTS 1"))
         XCTAssertNil(player.surface(for: "s"))
+        // The listen running is credited to where it started, even when a
+        // new queue holding the same item arrives before it ends.
+        player.play([b, a], startingAt: 0, surfaces: [ListeningSurface(screen: "foryou.mix", via: "y"), nil])
+        XCTAssertEqual(player.listeningSurface?.screen, "foryou.mix")
+        XCTAssertEqual(player.surface(for: "b")?.via, "y", "each queued item its own")
         player.play([a])
         XCTAssertNil(player.surface(for: "a"), "played again from somewhere that said nothing: not the old surface")
     }

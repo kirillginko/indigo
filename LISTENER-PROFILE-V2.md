@@ -336,8 +336,16 @@ a station is `radio.live`, an archive `radio.archive`, a local file
   build from before this would see them as unknown tags that match no
   style.
 - The player remembers the surface per item, so a queue started from DIG's
-  Discover credits every track in it; playing the same item again from a
-  screen that names nothing clears it.
+  Discover credits every track in it, each with its own `via`; playing the
+  same item again from a screen that names nothing clears it. A listen is
+  credited to the surface it *started* from, fixed at that moment.
+- Checked in the simulator (2026-10-16): a For You mix track
+  (`foryou.mix`, via the artist it was played next to), a DIG Discover card
+  (`dig.discover`), an artist page's own tracks (`dig.artist.listen`, the
+  next track in its queue too) and a crate item (`crate`) were each written
+  with the right tags. The first run found a bug: a Discover queue that
+  held the track still playing from For You rewrote its credit before the
+  listen was written; fixed by fixing the surface when a listen starts.
 - Not covered yet: saves, page opens and dismissals (only plays and skips);
   a page *opened* from For You and played there is credited to the page,
   not to For You.
