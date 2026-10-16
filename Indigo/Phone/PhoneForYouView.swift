@@ -40,8 +40,9 @@ struct PhoneForYouView: View {
         case tracks
         /// Records like yours (`SimilarRecordsFeature`, development builds only).
         case similar
-        /// For You as one list with its compass (`ForYouMixFeature`).
-        case mix
+        /// One thing from For You's mix (`ForYouMixFeature`): a track that
+        /// plays, a record, an artist or a show, each a slide of its own.
+        case item(ForYouItem)
         case suggestion(ExploreSuggestion)
         case onNow(StationEntry)
 
@@ -50,7 +51,7 @@ struct PhoneForYouView: View {
             case .cover: "cover"
             case .tracks: "tracks"
             case .similar: "similar"
-            case .mix: "mix"
+            case .item(let item): "item." + item.id
             case .suggestion(let suggestion): "suggestion." + suggestion.id
             case .onNow(let entry): "onNow." + entry.id
             }
@@ -62,10 +63,14 @@ struct PhoneForYouView: View {
             let insets = proxy.safeAreaInsets
             StationDirectory { entries, playable in
                 let suggestions = Self.slides(from: dig.exploreOffers)
-                let slides: [Slide] = [.cover] + (ForYouMixFeature.isEnabled ? [.mix]
-                    : (ForYouTracksFeature.isEnabled ? [.tracks] : []) + (SimilarRecordsFeature.isEnabled ? [.similar] : [])) + (suggestions.isEmpty
-                    ? Self.sampler(entries).map(Slide.onNow)
-                    : suggestions.map(Slide.suggestion))
+                let mixed = ForYouMixFeature.isEnabled ? dig.forYouMix.items : []
+                // With the mix on, the feed is the mix: tracks, records,
+                // artists and shows woven together, one to a screen. Until it
+                // is worked out, For You's own suggestions stand in.
+                let slides: [Slide] = [.cover] + (!mixed.isEmpty ? mixed.map(Slide.item)
+                    : (ForYouMixFeature.isEnabled ? [] : (ForYouTracksFeature.isEnabled ? [.tracks] : [])
+                        + (SimilarRecordsFeature.isEnabled ? [.similar] : []))
+                    + (suggestions.isEmpty ? Self.sampler(entries).map(Slide.onNow) : suggestions.map(Slide.suggestion)))
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 0) {
                         ForEach(slides) { slide in
@@ -81,24 +86,17 @@ struct PhoneForYouView: View {
                                     }
                                 case .tracks:
                                     PhoneForYouTracksSlide(insets: insets)
-                                case .mix:
-                                    ScrollView { ForYouMixSection(shown: 8).padding(.horizontal, 16) }
-                                        .padding(.top, insets.top)
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                                        .background(Color.black)
-                                        .environment(\.isPhoneLayout, true)
+                                case .item(let item):
+                                    PhoneForYouSlide(card: card(for: item), insets: insets) { act(item) }
                                 case .similar:
                                     SimilarRecordsSection()
                                         .padding(.top, insets.top)
                                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                                         .background(Color.black)
                                 case .suggestion(let suggestion):
-                                    PhoneForYouSlide(
-                                        suggestion: suggestion,
-                                        portrait: suggestion.node.kind == .artist
-                                            ? dig.portraitURL(for: suggestion.node.title, discogsID: suggestion.node.discogsID) : nil,
-                                        insets: insets
-                                    ) { Task { await open(suggestion.node) } }
+                                    PhoneForYouSlide(card: card(for: suggestion), insets: insets) {
+                                        Task { await open(suggestion.node) }
+                                    }
                                 case .onNow(let entry):
                                     PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets) {
                                         appState.select(entry.route)
@@ -119,7 +117,14 @@ struct PhoneForYouView: View {
         // Asked again when the crate moves, and when another device changed
         // something the offers are worked out from; the store decides
         // whether that is a rebuild. See `DigStore.refreshExploreOffers`.
-        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) { await dig.refreshExploreOffers() }
+        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) {
+            await dig.refreshExploreOffers()
+            await dig.refreshForYouMix()
+        }
+        // The mix again whenever a part of it arrives.
+        .task(id: "\(dig.mixOffers.next.count)|\(dig.exploreOffers.next.count)|\(dig.discover.tracks.count)|\(dig.similarRecords.records.count)") {
+            await dig.composeForYouMix()
+        }
         // The suggested artists' portraits, asked for ahead of the rest -- and
         // a small one already held replaced with the full-size picture.
         .task(id: dig.exploreOffers.artists.count + dig.exploreOffers.next.count) {
@@ -198,6 +203,52 @@ struct PhoneForYouView: View {
         }
     }
 
+    /// A suggestion as a slide.
+    private func card(for suggestion: ExploreSuggestion) -> PhoneForYouSlide.Card {
+        let isShow = suggestion.node.kind == .broadcast
+        let portrait = suggestion.node.kind == .artist
+            ? dig.portraitURL(for: suggestion.node.title, discogsID: suggestion.node.discogsID) : nil
+        return .init(picture: portrait ?? suggestion.node.artworkURL,
+                     kind: isShow ? "Radio show" : Self.kind(of: suggestion.node),
+                     title: suggestion.node.title, subtitle: suggestion.node.subtitle,
+                     reason: suggestion.reason, via: suggestion.reason.contains(suggestion.via) ? nil : suggestion.via,
+                     heading: nil, button: isShow ? "LISTEN" : "DIG IN", icon: isShow ? "play.fill" : "arrow.down.right")
+    }
+
+    /// A thing from the mix as a slide: a track plays, a record opens, an
+    /// artist or a show as above. Where it leads on the compass, when placed.
+    private func card(for item: ForYouItem) -> PhoneForYouSlide.Card {
+        let heading = dig.forYouMix.compass?.points.first { $0.id == item.id }?.heading
+        switch item.payload {
+        case .track(let track):
+            return .init(picture: track.artworkURL, kind: track.isRecording ? "Track" : "In a radio show",
+                         title: track.title, subtitle: track.artist, reason: track.reason, via: nil, heading: heading,
+                         button: track.isRecording ? "PLAY TRACK" : "HEAR IN RADIO SHOW",
+                         icon: track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right")
+        case .record(let found):
+            return .init(picture: found.record.artworkURL, kind: "Record", title: found.record.title,
+                         subtitle: item.subtitle, reason: item.reason, via: nil, heading: heading,
+                         button: "OPEN RECORD", icon: "arrow.down.right")
+        case .suggestion(let suggestion):
+            var made = card(for: suggestion)
+            made.heading = heading
+            return made
+        }
+    }
+
+    private func act(_ item: ForYouItem) {
+        switch item.payload {
+        case .track(let track):
+            let (media, start) = track.mediaItem
+            if !player.isCurrent(media.id) { player.play([media]) }
+            if let start { player.seekWhenReady(to: TimeInterval(start), in: media.id) }
+        case .record(let found):
+            appState.open(.digRelease(id: found.record.id, title: found.record.title))
+        case .suggestion(let suggestion):
+            Task { await open(suggestion.node) }
+        }
+    }
+
     static func kind(of node: MusicNode) -> String {
         switch node.kind {
         case .artist: "Artist"
@@ -220,20 +271,28 @@ struct PhoneForYouView: View {
     }
 }
 
-private struct PhoneForYouSlide: View {
-    let suggestion: ExploreSuggestion
-    let portrait: URL?
+struct PhoneForYouSlide: View {
+    /// What a slide says, whatever it is.
+    struct Card {
+        var picture: URL?
+        var kind: String
+        var title: String
+        var subtitle: String?
+        var reason: String
+        /// What it was reached through, when the reason does not say.
+        var via: String?
+        /// Where it leads on the compass ("Toward Glitch").
+        var heading: String?
+        var button: String
+        var icon: String
+    }
+
+    let card: Card
     let insets: EdgeInsets
     let open: () -> Void
     @Environment(PlaybackCoordinator.self) private var player
 
-    private var isShow: Bool { suggestion.node.kind == .broadcast }
-    /// An artist's portrait first: it is asked for at full size (and a small
-    /// one replaced while on screen); the node's own picture was saved as
-    /// Discogs' 150-pixel thumb, for rows.
-    private var picture: URL? {
-        suggestion.node.kind == .artist ? (portrait ?? suggestion.node.artworkURL) : suggestion.node.artworkURL
-    }
+    private var picture: URL? { card.picture }
 
     /// Discogs' thumb, which cannot be asked for larger: drawn as a square
     /// over the moving field at a size it holds, not blown up full-screen.
@@ -277,30 +336,32 @@ private struct PhoneForYouSlide: View {
                     // What it is and its name, why it is here, and what it
                     // was reached through, in IDA's boxes; the button last, at
                     // the bottom, as on every slide.
-                    // One row each: what it is, its name, what more it says.
                     Button(action: open) {
                         VStack(spacing: 8) {
-                            ChipFlow { Chip(text: isShow ? "Radio show" : kindLabel, tone: .lead, uppercase: true) }
-                            ChipFlow { Chip(text: suggestion.node.title, size: 19) }
-                            if let subtitle = suggestion.node.subtitle, !subtitle.isEmpty {
+                            ChipFlow { Chip(text: card.kind, tone: .lead, uppercase: true) }
+                            ChipFlow { Chip(text: card.title, size: 19) }
+                            if let subtitle = card.subtitle, !subtitle.isEmpty {
                                 ChipFlow { Chip(text: subtitle, size: 13) }
                             }
                         }
                     }
                     .buttonStyle(.plain)
                     ChipFlow {
-                        Chip(text: suggestion.reason, size: 13)
+                        Chip(text: card.reason, size: 13)
                     }
-                    if !suggestion.reason.contains(suggestion.via) {
+                    if let via = card.via {
                         ChipFlow {
                             Chip(text: "Via", tone: .sheen, size: 13, uppercase: true)
-                            Chip(text: suggestion.via, size: 13)
+                            Chip(text: via, size: 13)
                         }
+                    }
+                    if let heading = card.heading {
+                        ChipFlow { Chip(text: heading, tone: .sheen, size: 12, uppercase: true) }
                     }
                     Button(action: open) {
                         HStack(spacing: 10) {
-                            Image(systemName: isShow ? "play.fill" : "arrow.down.right")
-                            Text(isShow ? "LISTEN" : "DIG IN")
+                            Image(systemName: card.icon)
+                            Text(card.button)
                                 .font(Typeface.mono(16, weight: .medium))
                                 .tracking(2)
                         }
@@ -317,16 +378,6 @@ private struct PhoneForYouSlide: View {
             }
         }
         .foregroundStyle(.white)
-    }
-
-    private var kindLabel: String {
-        switch suggestion.node.kind {
-        case .artist: "Artist"
-        case .label: "Label"
-        case .release: "Release"
-        case .recording: "Recording"
-        default: "Suggestion"
-        }
     }
 }
 

@@ -44,6 +44,8 @@ struct ForYouTracksSection: View {
                 .padding(.horizontal, 22).padding(.vertical, 18)
                 .foregroundStyle(Palette.ink)
                 .background(Color.white.opacity(0.94))
+                // A light panel in either appearance: Ink turns light in dark mode.
+                .environment(\.colorScheme, .light)
                 .padding(.horizontal, 28).padding(.top, 18)
             }
         }

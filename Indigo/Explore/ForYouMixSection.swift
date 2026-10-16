@@ -33,7 +33,7 @@ extension DigStore {
     /// reading the listener's rows and the artists' tags off the main thread.
     func composeForYouMix() async {
         guard ForYouMixFeature.isEnabled else { return }
-        let offers = exploreOffers, tracks = discover.tracks
+        let offers = mixOffers.isEmpty ? exploreOffers : mixOffers, tracks = discover.tracks
         let records = similarRecords.records, vectors = similarRecords.styleVectors
         let container = context.container
         let (items, compass) = await Task.detached(priority: .utility) {
@@ -94,6 +94,8 @@ struct ForYouMixSection: View {
                 .padding(.horizontal, 22).padding(.vertical, 18)
                 .foregroundStyle(Palette.ink)
                 .background(Color.white.opacity(0.94))
+                // A light panel in either appearance: Ink turns light in dark mode.
+                .environment(\.colorScheme, .light)
                 .padding(.horizontal, isPhone ? 0 : 28).padding(.top, 18)
             }
         }

@@ -61,5 +61,17 @@ final class ForYouTracksRender: XCTestCase {
                   "foryou-tracks-mac.png")
         try write(environment(PhoneForYouTracksSlide(insets: EdgeInsets(top: 44, leading: 0, bottom: 34, trailing: 0))
             .frame(width: 390, height: 844)), "foryou-tracks-phone.png")
+        // The mix's slides on the phone, in the dark, as the feed draws them.
+        let insets = EdgeInsets(top: 44, leading: 0, bottom: 34, trailing: 0)
+        let trackCard = PhoneForYouSlide.Card(picture: nil, kind: "Track", title: "Near Dark", subtitle: "Burial",
+                                              reason: "Played next to Aphex Twin in 3 radio episodes", via: nil,
+                                              heading: "Close to home", button: "PLAY TRACK", icon: "play.fill")
+        let recordCard = PhoneForYouSlide.Card(picture: nil, kind: "Record", title: "Zweitondimension", subtitle: "Cellarkalt · 2013",
+                                               reason: "Like Frankenstein And Dracula Girls Tokyo Headlock · Noise, Experimental",
+                                               via: nil, heading: "Toward Noise", button: "OPEN RECORD", icon: "arrow.down.right")
+        for (card, name) in [(trackCard, "foryou-slide-track.png"), (recordCard, "foryou-slide-record.png")] {
+            try write(environment(PhoneForYouSlide(card: card, insets: insets, open: {}).frame(width: 390, height: 844)
+                .background(Color.black).environment(\.colorScheme, .dark)), name)
+        }
     }
 }
