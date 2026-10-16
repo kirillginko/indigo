@@ -54,7 +54,15 @@ final class LiveDiscoverPlaybackCheck: XCTestCase {
             if let start { player.seekWhenReady(to: TimeInterval(start), in: item.id) }
             let target = Double(start ?? 0)
             let (ok, seconds, position) = await waitPlaying(item.id, past: target > 0 ? target + 1 : 1)
-            lines.append("\(label): \(track.artist) — \(track.title): \(ok ? "playing" : "NOT playing") after \(String(format: "%.1f", seconds))s, at \(Int(position))s\(start.map { " (track at \($0)s)" } ?? "")")
+            lines.append("\(label): \(track.artist) — \(track.title): \(ok ? "playing" : "NOT playing") after \(String(format: "%.1f", seconds))s, at \(Int(position))s\(start.map { " (track at \($0)s)" } ?? ""), seek bar \(player.canSeek ? "usable" : "NOT usable")")
+            // The listener scrubs: does it go there and stay, without the
+            // pending seek pulling it back?
+            if ok, player.canSeek {
+                let scrub = min(player.duration - 30, position + 300)
+                player.seek(to: scrub)
+                try? await Task.sleep(for: .seconds(6))
+                lines.append("   scrubbed to \(Int(scrub))s: now at \(Int(player.position))s, \(abs(player.position - scrub) < 15 ? "held" : "NOT held")")
+            }
             player.pause()
             try? await Task.sleep(for: .seconds(1))
         }

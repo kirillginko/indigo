@@ -498,8 +498,15 @@ extension EmbedAudioEngine {
           });
           widget.bind(SC.Widget.Events.PAUSE, function () { stopTicker(); send('pause'); });
           widget.bind(SC.Widget.Events.FINISH, function () { stopTicker(); send('finish'); });
+          // The duration is what makes the seek bar usable; when READY did
+          // not bring one (it can arrive late on a phone), ask while playing.
+          var knownDuration = 0;
           widget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
-            send('progress', e.currentPosition / 1000);
+            if (knownDuration > 0) { send('progress', e.currentPosition / 1000); return; }
+            widget.getDuration(function (ms) {
+              if (ms > 0) { knownDuration = ms; }
+              send('progress', e.currentPosition / 1000, ms > 0 ? ms / 1000 : null);
+            });
           });
           widget.bind(SC.Widget.Events.ERROR, function () {
             send('error', null, null, 'SoundCloud refused to play this episode.');

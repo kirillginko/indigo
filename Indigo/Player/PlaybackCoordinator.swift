@@ -313,7 +313,13 @@ final class PlaybackCoordinator {
         startCurrent(autoplay: true)
     }
 
+    /// The listener's seek: it wins over any seek still waiting to land.
     func seek(to seconds: TimeInterval) {
+        pendingSeek?.cancel()
+        applySeek(to: seconds)
+    }
+
+    private func applySeek(to seconds: TimeInterval) {
         guard canSeek else { return }
         seekActiveEngine(to: seconds)
         publishNowPlaying()
@@ -336,21 +342,34 @@ final class PlaybackCoordinator {
     /// Jumping to a track inside an archived broadcast is one gesture for the
     /// listener and two for the player: the duration a seek is clamped against
     /// does not exist until the asset has been read.
+    ///
+    /// And a seek is not landed until the player is playing near it. An
+    /// embedded SoundCloud widget can report its duration before it plays and
+    /// quietly ignore a seek made then; on a phone, the duration can take
+    /// longer than the six seconds this used to wait. So it is asked again
+    /// until the position holds near the target (up to 45 seconds, a few
+    /// tries), and given up the moment the listener moves the seek bar.
     func seekWhenReady(to seconds: TimeInterval, in itemID: String) {
         guard seconds > 0 else { return }
         pendingSeek?.cancel()
-        if canSeek, isCurrent(itemID) {
-            seek(to: seconds)
-            return
-        }
         pendingSeek = Task { [weak self] in
-            for _ in 0..<60 {
+            var lastTry: ContinuousClock.Instant?
+            var tries = 0
+            for _ in 0..<450 {
                 try? await Task.sleep(nanoseconds: 100_000_000)
                 guard !Task.isCancelled, let self, self.isCurrent(itemID) else { return }
-                if self.canSeek {
-                    self.seek(to: seconds)
-                    return
+                guard self.canSeek else { continue }
+                if let lastTry {
+                    // A seek reads as landed at once (the engine moves its
+                    // position optimistically): judge it only once the
+                    // player has had time to report where it really is.
+                    guard ContinuousClock.now - lastTry > .milliseconds(2500) else { continue }
+                    if self.isPlaying, abs(self.position - seconds) < 8 { return }
                 }
+                guard tries < 8 else { return }
+                tries += 1
+                lastTry = .now
+                self.applySeek(to: seconds)
             }
         }
     }
