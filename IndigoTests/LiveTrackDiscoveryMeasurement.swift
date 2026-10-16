@@ -91,8 +91,7 @@ final class LiveTrackDiscoveryMeasurement: XCTestCase {
                 TrackDiscovery.Seed(discogsID: seed.discogs, name: seed.name, weight: 1 - Double(index) * 0.04)
             }
             let known = Set(listener.seeds.map { RecordingKey.normalizeArtist($0.name) })
-            let (tracks, report) = await source.discover(seeds: seeds, collaborators: [], taste: .empty,
-                                                         knownArtists: known, knownTracks: [])
+            let (tracks, report) = await source.discover(.init(seeds: seeds, knownArtists: known, releaseLookups: 2))
             record("\(listener.show) [\(listener.bucket)]", tracks, report, known: known)
         }
 
@@ -115,9 +114,9 @@ final class LiveTrackDiscoveryMeasurement: XCTestCase {
             let started = ContinuousClock.now
             let inputs = dig.discoverInputs()
             let inputTime = ContinuousClock.now - started
-            let (tracks, report) = await source.discover(seeds: inputs.seeds, collaborators: inputs.collaborators,
-                                                         taste: inputs.taste, knownArtists: inputs.knownArtists,
-                                                         knownTracks: inputs.knownTracks)
+            let (tracks, report) = await source.discover(.init(seeds: inputs.seeds, collaborators: inputs.collaborators,
+                                                               taste: inputs.taste, knownArtists: inputs.knownArtists,
+                                                               knownTracks: inputs.knownTracks, releaseLookups: 2))
             render(tracks, named: "discover-you")
             record("You (this Mac's history; seeds \(inputs.seeds.map(\.name).joined(separator: ", ")); inputs read in \(inputTime))",
                    tracks, report, known: inputs.knownArtists)

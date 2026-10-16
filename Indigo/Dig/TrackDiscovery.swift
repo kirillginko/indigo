@@ -59,6 +59,9 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable {
     let title: String
     let source: Source
     var artworkURL: URL?
+    /// The release it is on and its year, when a release document says so.
+    var release: String? = nil
+    var year: Int? = nil
     /// The fact behind it, in a line: "Played next to Huerco S. in 4 episodes".
     let reason: String
     /// The listener's starting point it came from.
@@ -67,6 +70,13 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable {
     var score: Double
 
     var id: String { "\(artistDiscogsID)|\(TrackDiscovery.trackKey(title))" }
+
+    /// A recording of the track itself, as opposed to the moment it was
+    /// played in a radio show: a different thing to put on, and said so.
+    var isRecording: Bool { if case .recording = source { true } else { false } }
+
+    /// The play action, in words that say which.
+    var playLabel: String { isRecording ? "Play track" : "Hear in radio show" }
 
     /// A YouTube thumbnail, for a recording that has one.
     static func thumbnail(for url: URL) -> URL? {
@@ -101,6 +111,8 @@ nonisolated enum TrackDiscovery {
         let source: DiscoveredTrack.Source
         let artworkURL: URL?
         let genres: [String]
+        var release: String? = nil
+        var year: Int? = nil
     }
 
     static func trackKey(_ title: String) -> String { RecordingKey.normalize(title) }
@@ -151,13 +163,15 @@ nonisolated enum TrackDiscovery {
             if knownArtists.contains(RecordingKey.normalizeArtist(appearance.artist)) { score *= 0.4 }
             if !taste.isEmpty, !appearance.genres.isEmpty { score *= 0.8 + 0.4 * taste.affinity(for: appearance.genres) }
             if case .episode(_, let at) = appearance.source {
-                // A moment of 0:00 is the opener or a position nobody wrote
-                // down; a real timestamp is the better promise.
-                score *= at > 0 ? 0.9 : 0.7
+                // A recording of the track is the better thing to put on
+                // than its moment in a long show, when the music is as close;
+                // and 0:00 is the opener or a position nobody wrote down.
+                score *= at > 0 ? 0.75 : 0.6
             }
             candidates.append(DiscoveredTrack(
                 artist: appearance.artist, artistDiscogsID: appearance.artistDiscogsID, title: appearance.title,
-                source: appearance.source, artworkURL: appearance.artworkURL, reason: neighbour.reason,
+                source: appearance.source, artworkURL: appearance.artworkURL, release: appearance.release,
+                year: appearance.year, reason: neighbour.reason,
                 via: neighbour.seed.name, playable: .unknown, score: score))
         }
         candidates.sort { $0.score != $1.score ? $0.score > $1.score : $0.id < $1.id }
