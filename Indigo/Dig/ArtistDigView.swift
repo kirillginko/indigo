@@ -257,6 +257,9 @@ struct ArtistDigView: View {
                     if DigRecommendations.isEnabled, !cards.isEmpty {
                         hearNext
                     }
+                    if TrackDiscoveryFeature.isEnabled {
+                        ArtistDiscoverSection(name: artistName, discogsID: discogsID)
+                    }
                     if let discogsURL = profile.discogsURL {
                         Link(destination: discogsURL) {
                             HStack(spacing: 7) {

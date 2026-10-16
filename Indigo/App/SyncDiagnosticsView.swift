@@ -61,6 +61,18 @@ struct SyncDiagnosticsView: View {
                 } footer: {
                     Text("DIG leaves engineers off artist pages (release pages still list them). For You starts from what you are into now and over time, and brings DIG's setting with it. Hear next shows a few musicians on each artist page with the record behind them and something to put on, and brings DIG's setting with it. Relaunch Indigo to apply; the first look after a change rebuilds the graph and takes a few seconds.")
                 }
+                if digTracks {
+                    Section("Discover: what happened after Play (this device only)") {
+                        let counts = DiscoverDiagnostics.shared.counts
+                        row("pressed", "\(counts.pressed) (\(counts.recordings) tracks, \(counts.radio) radio)")
+                        row("began playing", "\(counts.began); never began \(counts.neverBegan)")
+                        row("DIG open → hearing", counts.medianSecondsToHear.map { String(format: "%.1fs median", $0) } ?? "–")
+                        row("heard out / skipped", "\(counts.completed) / \(counts.skipped)")
+                        row("went on to the next", "\(counts.continued)")
+                        row("crated", "\(counts.crated)")
+                        Button("Reset counts") { DiscoverDiagnostics.shared.reset() }
+                    }
+                }
                 Section("Mirroring") {
                     row("iCloud account", account)
                     row("UserData syncs", Persistence.syncing ? "yes" : "NO")

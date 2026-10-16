@@ -79,7 +79,8 @@ extension DigStore {
                               knownArtists: knownArtists, knownTracks: knownTracks)
     }
 
-    /// Works Discover out again unless a fresh answer is held.
+    /// Works Discover out again unless a fresh answer is held. Tracks appear
+    /// as each one passes its playback check.
     func refreshDiscover(force: Bool = false) async {
         guard TrackDiscoveryFeature.isEnabled, SupabaseService.isConfigured else { return }
         if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60, !discover.tracks.isEmpty { return }
@@ -87,14 +88,47 @@ extension DigStore {
         discover.working = true
         let source = trackDiscoverySource
         let container = context.container
-        let (tracks, report) = await Task.detached(priority: .userInitiated) {
+        let (tracks, report) = await Task.detached(priority: .userInitiated) { [weak self] in
             // Read on a context of its own: two seconds of the listener's
             // history is not something to read on the thread that draws.
             let inputs = Trace.step("dig.discover.inputs") { DigStore.discoverInputs(context: ModelContext(container)) }
-            return await source.discover(seeds: inputs.seeds, collaborators: inputs.collaborators, taste: inputs.taste,
-                                  knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks)
+            let ask = TrackDiscoverySource.Ask(seeds: inputs.seeds, collaborators: inputs.collaborators, taste: inputs.taste,
+                                               knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks,
+                                               limit: 12, releaseLookups: 2)
+            return await source.discover(ask) { so in
+                await MainActor.run { self?.discover.tracks = so }
+            }
         }.value
         discover = DiscoverState(tracks: tracks, report: report, at: Date(), working: false)
+    }
+
+    /// Discover from one artist's page: a few of their own tracks, then
+    /// tracks by artists played next to them or credited with them -- for
+    /// the obscure page with nothing else to offer above all.
+    func refreshArtistDiscover(name: String, discogsID: Int?) async {
+        guard TrackDiscoveryFeature.isEnabled, SupabaseService.isConfigured else { return }
+        let page = artistPage(ArtistReference(name: name, discogsID: discogsID))
+        guard let id = page.discogsID else { return }
+        let key = "\(id)"
+        if let held = artistDiscover[key], let at = held.at, Date().timeIntervalSince(at) < 30 * 60 { return }
+        guard artistDiscover[key]?.working != true else { return }
+        artistDiscover[key] = DiscoverState(working: true)
+        let seed = TrackDiscovery.Seed(discogsID: id, name: page.name, weight: 1)
+        // Who DIG says they made records with, by entry.
+        let collaborators = IdentityGraph(context: context).neighbourhood(of: .artist(page.name, discogsID: id)).edges.forDIG.all
+            .filter { [.collaborator, .personnel, .producer].contains($0.kind) && !MusicianFirst.isTechnicalCredit($0) }
+            .compactMap { edge -> TrackDiscovery.Neighbour? in
+                guard let other = edge.to.discogsID, edge.to.kind == .artist, other != id else { return nil }
+                return .init(discogsID: other, name: edge.to.title, seed: seed, reason: edge.reason, strength: 2)
+            }
+        let ask = TrackDiscoverySource.Ask(seeds: [seed], collaborators: collaborators,
+                                           knownArtists: [RecordingKey.normalizeArtist(page.name)],
+                                           limit: 5, ownTracks: 3, releaseLookups: 3)
+        let source = trackDiscoverySource
+        let (tracks, report) = await Task.detached(priority: .userInitiated) { [weak self] in
+            await source.discover(ask) { so in await MainActor.run { self?.artistDiscover[key]?.tracks = so } }
+        }.value
+        artistDiscover[key] = DiscoverState(tracks: tracks, report: report, at: Date(), working: false)
     }
 }
 
