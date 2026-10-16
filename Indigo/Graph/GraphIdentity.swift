@@ -325,7 +325,7 @@ nonisolated enum KnownArtistPolicy {
         var found = Set<String>()
         for walk in walks where walk.origin.kind == .artist {
             found.formUnion(walk.aliases)
-            for edge in walk.edges.all where edge.kind == .sameAlias && edge.to.kind == .artist {
+            for edge in walk.edges.edges.values where edge.kind == .sameAlias && edge.to.kind == .artist {
                 found.insert(edge.to.id)
                 guard GraphIdentityKey(nodeKey: edge.to.key) == nil,
                       let only = owners[edge.to.key], only.count == 1, let owner = only.first else { continue }

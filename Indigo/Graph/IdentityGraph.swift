@@ -236,7 +236,8 @@ nonisolated final class IdentityGraph {
             keys[identity.id, default: []].formUnion(measure("walk.names") { names(of: id, title: identity.title) }.map(RecordingKey.normalizeArtist))
         }
         var walk = IdentityNeighbourhood(origin: canonical, edges: set, keys: keys)
-        walk.aliases = Set(set.all.filter { $0.kind == .sameAlias && $0.to.kind == .artist }.map(\.to.id))
+        // Unsorted: a set of ids needs no order, and `all` sorts every edge.
+        walk.aliases = Set(set.edges.values.filter { $0.kind == .sameAlias && $0.to.kind == .artist }.map(\.to.id))
         var found = measure("walk.collapse") { collapsing([walk])[0] }
         found.dependencies = dependencies
         return found
