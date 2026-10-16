@@ -11,6 +11,7 @@
 //  the host's temporary directory.
 //
 
+#if os(macOS)
 import XCTest
 import AppKit
 @testable import Indigo
@@ -95,3 +96,4 @@ final class LiveDiscoverPlaybackCheck: XCTestCase {
                                                 atomically: true, encoding: .utf8)
     }
 }
+#endif
