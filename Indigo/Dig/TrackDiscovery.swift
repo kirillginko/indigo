@@ -78,6 +78,14 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable {
     /// played in a radio show: a different thing to put on, and said so.
     var isRecording: Bool { if case .recording = source { true } else { false } }
 
+    /// The reason in a few words, for under a tile: "Next to Aphex Twin on
+    /// radio", "With Black Dog Productions", "By Burial".
+    var shortReason: String {
+        if reason.hasPrefix("Played next to ") { return "Next to \(via) on radio" }
+        if reason.hasPrefix("With ") { return "With \(via)" }
+        return reason
+    }
+
     /// The play action, in words that say which.
     var playLabel: String { isRecording ? "Play track" : "Hear in radio show" }
 

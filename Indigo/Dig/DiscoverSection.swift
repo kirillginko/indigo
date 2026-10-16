@@ -73,7 +73,44 @@ struct DiscoverList: View {
     private var recordings: [DiscoveredTrack] { tracks.filter(\.isRecording) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: isPhone ? 14 : 10) {
+        if isPhone { grid } else { list }
+    }
+
+    /// On the phone, the grid of two the rest of DIG uses: the picture,
+    /// square, is the play button; what it is (a track, or a moment in a radio
+    /// show) in a box at the top, its name in a box at the bottom, the reason
+    /// under it. A long press goes to the artist, the release or the episode.
+    private var grid: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if recordings.count > 1 {
+                Button { play(recordings, from: 0) } label: {
+                    Label("Play \(recordings.count) tracks", systemImage: "play.fill").font(Typeface.mono(12, weight: .medium))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Chip.green)
+            }
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2, alignment: .top), count: 2), spacing: 12) {
+                ForEach(tracks) { track in
+                    DiscoverTile(track: track, isOwn: ownArtistID == track.artistDiscogsID) {
+                        if track.isRecording, let at = recordings.firstIndex(where: { $0.id == track.id }) {
+                            play(recordings, from: at)
+                        } else {
+                            play(track)
+                        }
+                    } artist: {
+                        appState.open(.digArtist(mbid: nil, name: track.artist, discogsID: track.artistDiscogsID))
+                    } episode: {
+                        if case .episode(let listen, _) = track.source, let page = listen.page.destination { appState.open(page) }
+                    }
+                }
+            }
+            // The grid runs to the screen's edges, as DIG's other grids do.
+            .padding(.horizontal, -16)
+        }
+    }
+
+    private var list: some View {
+        VStack(alignment: .leading, spacing: 10) {
             if recordings.count > 1 {
                 Button { play(recordings, from: 0) } label: {
                     Label("Play \(recordings.count) tracks", systemImage: "play.fill").font(Typeface.mono(12, weight: .medium))
@@ -176,6 +213,57 @@ struct DiscoverRow: View {
             }
             .foregroundStyle(isPhone ? Color.white : Palette.ink)
             Spacer(minLength: 0)
+        }
+    }
+}
+
+/// One discovery as a square tile.
+struct DiscoverTile: View {
+    let track: DiscoveredTrack
+    var isOwn = false
+    let play: () -> Void
+    let artist: () -> Void
+    let episode: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Button(action: play) {
+                Color.clear
+                    .aspectRatio(1, contentMode: .fit)
+                    .overlay {
+                        GeometryReader { proxy in
+                            ArtworkView(remoteURL: track.artworkURL, side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic)
+                        }
+                    }
+                    .clipped()
+                    .overlay(alignment: .topLeading) {
+                        Chip(text: track.isRecording ? "▶ Track" : "((•)) Radio", tone: track.isRecording ? .lead : .plain,
+                             size: 10, uppercase: true)
+                            .padding(6)
+                    }
+                    .overlay(alignment: .bottomLeading) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Chip(text: track.title, size: 12).lineLimit(2)
+                            Chip(text: track.artist, tone: .lead, size: 10.5).lineLimit(1)
+                        }
+                        .padding(6)
+                    }
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(track.playLabel): \(track.title) by \(track.artist)")
+            .accessibilityHint(track.reason)
+            .contextMenu {
+                Button(action: play) { Label(track.playLabel, systemImage: track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right") }
+                Button(action: artist) { Label("Open \(track.artist)", systemImage: "person") }
+                if !track.isRecording { Button(action: episode) { Label("Open the radio show", systemImage: "dot.radiowaves.left.and.right") } }
+                Text(track.reason)
+            }
+            Text(isOwn ? "By \(track.artist)" : track.shortReason)
+                .font(Typeface.mono(9.5))
+                .foregroundStyle(.white.opacity(0.6))
+                .lineLimit(1)
+                .padding(.horizontal, 6)
         }
     }
 }
