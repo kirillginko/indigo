@@ -33,6 +33,52 @@ final class TrackDiscoveryTests: XCTestCase {
         XCTAssertEqual(tracks.filter { if case .recording(_, "A Channel") = $0.source { true } else { false } }.count, 2,
                        "At most two from one channel")
         XCTAssertEqual(tracks.last?.artist, "Known Artist", "A known artist is offered, never first")
+        XCTAssertEqual(tracks.last?.knownArtist, true)
+    }
+
+    /// Two artists on one compilation: one track from the record.
+    func testOneTrackPerRecord() {
+        var first = recording(2, "Todd Rundgren", "Fair Warning", channel: "One")
+        first.release = "A Wizard"; first.releaseDiscogsID = 100
+        var second = recording(3, "Grouper", "Little Gray Cat", channel: "Two")
+        second.release = "A Wizard (Remaster)"; second.releaseDiscogsID = 100
+        var third = recording(4, "Laraaji", "Being Here", channel: "Three")
+        third.release = "Day Of Radiance"
+        let tracks = TrackDiscovery.rank(neighbours: [neighbour(2, "Todd Rundgren", episodes: 4), neighbour(3, "Grouper"),
+                                                      neighbour(4, "Laraaji")],
+                                         appearances: [first, second, third], taste: .empty, knownArtists: [], knownTracks: [])
+        XCTAssertEqual(tracks.map(\.artist), ["Todd Rundgren", "Laraaji"])
+        XCTAssertEqual(tracks.first?.releaseDiscogsID, 100)
+    }
+
+    /// What they are into now steers the list, at most half of it.
+    func testRecentStartingPointsTakeAtMostHalf() {
+        let now = TrackDiscovery.Seed(discogsID: 1, name: "Now", weight: 1, signal: .recent)
+        let kept = TrackDiscovery.Seed(discogsID: 9, name: "Kept", weight: 0.5, signal: .longTerm)
+        let neighbours = (2...7).map { TrackDiscovery.Neighbour(discogsID: $0, name: "N\($0)", seed: now, reason: "r", strength: 2) }
+            + (10...13).map { TrackDiscovery.Neighbour(discogsID: $0, name: "K\($0)", seed: kept, reason: "r", strength: 1) }
+        let appearances = (Array(2...7) + Array(10...13)).map { recording($0, "A\($0)", "T\($0)", channel: "C\($0)") }
+        let tracks = TrackDiscovery.rank(neighbours: neighbours, appearances: appearances, taste: .empty,
+                                         knownArtists: ["a13"], knownTracks: [], limit: 6, perSeed: 6)
+        XCTAssertEqual(tracks.count, 6)
+        XCTAssertEqual(tracks.filter { $0.signal == .recent }.count, 3)
+        XCTAssertEqual(tracks.filter { $0.signal == .longTerm }.count, 3)
+        XCTAssertEqual(tracks.first?.signal, .recent, "Now still leads")
+        XCTAssertFalse(tracks.contains { $0.artist == "A13" }, "A known artist is the first left out")
+        XCTAssertTrue(tracks.allSatisfy { $0.knownArtist == false })
+    }
+
+    /// A list held from before the new fields still reads.
+    func testAHeldListFromBeforeStillDecodes() throws {
+        var track = TrackDiscovery.rank(neighbours: [neighbour(2, "A")], appearances: [recording(2, "A", "T")],
+                                        taste: .empty, knownArtists: [], knownTracks: []).first
+        track?.signal = .recent
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(XCTUnwrap(track))) as? [String: Any])
+        for key in ["signal", "knownArtist", "releaseDiscogsID"] { object[key] = nil }
+        let old = try JSONDecoder().decode(DiscoveredTrack.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(old.signal)
+        XCTAssertNil(old.knownArtist)
+        XCTAssertEqual(old.id, track?.id)
     }
 
     func testAnUploadIsOnlyATrackWhenItSaysSo() {

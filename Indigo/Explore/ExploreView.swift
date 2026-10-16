@@ -43,6 +43,8 @@ struct ExploreView: View {
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         scroll.headerHeight = height
                     }
+                // Development builds only: see `ForYouTracksFeature`.
+                if ForYouTracksFeature.isEnabled { ForYouTracksSection() }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
                         Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }

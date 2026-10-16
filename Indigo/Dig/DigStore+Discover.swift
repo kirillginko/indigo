@@ -45,7 +45,8 @@ extension DigStore {
                 let resolution = identityStore.artistResolution(
                     ArtistReference(name: name, discogsID: origin.node.kind == .artist ? origin.node.discogsID : nil))
                 guard resolution.isVerified, let id = resolution.identity.discogsID, seen.insert(id).inserted else { continue }
-                seeds.append(.init(discogsID: id, name: resolution.canonicalName, weight: origin.weight))
+                seeds.append(.init(discogsID: id, name: resolution.canonicalName, weight: origin.weight,
+                                   signal: origin.half == .now ? .recent : .longTerm))
                 break
             }
         }
@@ -94,7 +95,7 @@ extension DigStore {
     /// Works Discover out again unless a fresh answer is held. Tracks appear
     /// as each one passes its playback check.
     func refreshDiscover(force: Bool = false) async {
-        guard TrackDiscoveryFeature.isEnabled, SupabaseService.isConfigured else { return }
+        guard TrackDiscoveryFeature.isEnabled || ForYouTracksFeature.isEnabled, SupabaseService.isConfigured else { return }
         // The list from last time, at once: every track on it played within
         // the day. A newer one replaces it whole when it is ready.
         if discover.tracks.isEmpty, discover.at == nil, let file = Self.heldDiscoverFile,

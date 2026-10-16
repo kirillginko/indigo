@@ -36,12 +36,15 @@ struct PhoneForYouView: View {
     /// One screen of the feed.
     enum Slide: Identifiable {
         case cover
+        /// Tracks to hear (`ForYouTracksFeature`, development builds only).
+        case tracks
         case suggestion(ExploreSuggestion)
         case onNow(StationEntry)
 
         var id: String {
             switch self {
             case .cover: "cover"
+            case .tracks: "tracks"
             case .suggestion(let suggestion): "suggestion." + suggestion.id
             case .onNow(let entry): "onNow." + entry.id
             }
@@ -53,7 +56,7 @@ struct PhoneForYouView: View {
             let insets = proxy.safeAreaInsets
             StationDirectory { entries, playable in
                 let suggestions = Self.slides(from: dig.exploreOffers)
-                let slides: [Slide] = [.cover] + (suggestions.isEmpty
+                let slides: [Slide] = [.cover] + (ForYouTracksFeature.isEnabled ? [.tracks] : []) + (suggestions.isEmpty
                     ? Self.sampler(entries).map(Slide.onNow)
                     : suggestions.map(Slide.suggestion))
                 ScrollView(.vertical) {
@@ -69,6 +72,8 @@ struct PhoneForYouView: View {
                                         guard slides.count > 1 else { return }
                                         withAnimation(.easeInOut(duration: 0.4)) { feeds.forYouID = slides[1].id }
                                     }
+                                case .tracks:
+                                    PhoneForYouTracksSlide(insets: insets)
                                 case .suggestion(let suggestion):
                                     PhoneForYouSlide(
                                         suggestion: suggestion,

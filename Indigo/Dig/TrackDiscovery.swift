@@ -44,6 +44,27 @@ nonisolated enum TrackDiscoveryFeature {
     }
 }
 
+/// For You's "Tracks to hear": DIG Discover's own list, shown on For You
+/// (`ForYouTracksSection`). The same engine, cache and playback checks --
+/// nothing is worked out twice. Development builds only, by launch argument
+/// (`-INDIGO_FORYOU_TRACKS YES`) or in a test; never in an internal archive
+/// or a release build.
+nonisolated enum ForYouTracksFeature {
+    #if DEBUG
+    static let switchKey = "INDIGO_FORYOU_TRACKS"
+    #endif
+    nonisolated(unsafe) static var override: Bool?
+
+    static var isEnabled: Bool {
+        if let override { return override }
+        #if DEBUG
+        return UserDefaults.standard.bool(forKey: switchKey)
+        #else
+        return false
+        #endif
+    }
+}
+
 /// A track to hear, and why.
 nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
     enum Source: Equatable, Sendable, Codable {
@@ -65,6 +86,14 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
     /// The release it is on and its year, when a release document says so.
     var release: String? = nil
     var year: Int? = nil
+    /// That release's Discogs entry, when the document it came from is one.
+    var releaseDiscogsID: Int? = nil
+    /// Which half of the listener's taste the starting point came from: what
+    /// they are into now, or what they have kept and played over time.
+    var signal: TrackDiscovery.Signal? = nil
+    /// Whether the artist is one the listener already keeps or has played:
+    /// offered rarely, never first. Nil on a list held from before.
+    var knownArtist: Bool? = nil
     /// The fact behind it, in a line: "Played next to Huerco S. in 4 episodes".
     let reason: String
     /// The listener's starting point it came from.
@@ -97,11 +126,17 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
 }
 
 nonisolated enum TrackDiscovery {
+    /// Which half of the listener's taste a starting point stands for
+    /// (`MusicianFirstRanker.Half`), as a track carries it.
+    enum Signal: String, Equatable, Sendable, Codable { case recent, longTerm }
+
     /// A starting point: one of the listener's artists, by Discogs entry.
     struct Seed: Equatable, Sendable {
         let discogsID: Int
         let name: String
         let weight: Double
+        /// Nil for an artist page, which is not the listener's taste.
+        var signal: Signal? = nil
     }
 
     /// An artist the record connects to a seed.
@@ -124,6 +159,7 @@ nonisolated enum TrackDiscovery {
         let genres: [String]
         var release: String? = nil
         var year: Int? = nil
+        var releaseDiscogsID: Int? = nil
     }
 
     static func trackKey(_ title: String) -> String { RecordingKey.normalize(title) }
@@ -159,6 +195,9 @@ nonisolated enum TrackDiscovery {
         neighbours: [Neighbour], appearances: [Appearance], taste: TasteProfile,
         knownArtists: Set<String>, knownTracks: Set<String>, limit: Int = 12, perSeed: Int = 3, perSource: Int = 2
     ) -> [DiscoveredTrack] {
+        // What the listener is into now leads, but at most half the list:
+        // recent activity steers it without crowding out the collection.
+        let recentShare = (limit + 1) / 2
         var best: [Int: Neighbour] = [:]
         for neighbour in neighbours where best[neighbour.discogsID].map({ $0.strength * $0.seed.weight < neighbour.strength * neighbour.seed.weight }) ?? true {
             best[neighbour.discogsID] = neighbour
@@ -171,7 +210,8 @@ nonisolated enum TrackDiscovery {
             guard !trackKey(appearance.title).isEmpty, !knownTracks.contains(knownTrackKey(appearance.artist, appearance.title)),
                   seenTracks.insert(key).inserted else { continue }
             var score = neighbour.seed.weight * neighbour.strength
-            if knownArtists.contains(RecordingKey.normalizeArtist(appearance.artist)) { score *= 0.4 }
+            let known = knownArtists.contains(RecordingKey.normalizeArtist(appearance.artist))
+            if known { score *= 0.4 }
             if !taste.isEmpty, !appearance.genres.isEmpty { score *= 0.8 + 0.4 * taste.affinity(for: appearance.genres) }
             if case .episode(_, let at) = appearance.source {
                 // A recording of the track is the better thing to put on
@@ -182,24 +222,39 @@ nonisolated enum TrackDiscovery {
             candidates.append(DiscoveredTrack(
                 artist: appearance.artist, artistDiscogsID: appearance.artistDiscogsID, title: appearance.title,
                 source: appearance.source, artworkURL: appearance.artworkURL, release: appearance.release,
-                year: appearance.year, reason: neighbour.reason,
+                year: appearance.year, releaseDiscogsID: appearance.releaseDiscogsID,
+                signal: neighbour.seed.signal, knownArtist: known, reason: neighbour.reason,
                 via: neighbour.seed.name, playable: .unknown, score: score))
         }
         candidates.sort { $0.score != $1.score ? $0.score > $1.score : $0.id < $1.id }
-        // One track per artist, a few per starting point, a couple per show
-        // or channel: a list, not one person's catalogue or one DJ's set.
+        // One track per artist and per record, a few per starting point, a
+        // couple per show or channel: a list, not one person's catalogue, one
+        // compilation or one DJ's set.
         var chosen: [DiscoveredTrack] = []
-        var artists = Set<Int>(), perVia: [String: Int] = [:], perPlace: [String: Int] = [:]
+        var artists = Set<Int>(), releases = Set<String>(), perVia: [String: Int] = [:], perPlace: [String: Int] = [:]
+        var recent = 0
         for candidate in candidates where chosen.count < limit {
             let place = sourceKey(candidate.source)
+            let record = releaseKey(candidate)
             guard !artists.contains(candidate.artistDiscogsID), perVia[candidate.via, default: 0] < perSeed,
-                  perPlace[place, default: 0] < perSource else { continue }
+                  perPlace[place, default: 0] < perSource, record.map({ !releases.contains($0) }) ?? true,
+                  candidate.signal != .recent || recent < recentShare else { continue }
             artists.insert(candidate.artistDiscogsID)
+            if let record { releases.insert(record) }
+            if candidate.signal == .recent { recent += 1 }
             perVia[candidate.via, default: 0] += 1
             perPlace[place, default: 0] += 1
             chosen.append(candidate)
         }
         return chosen
+    }
+
+    /// The record a track is on, by entry or by folded title; nil when
+    /// nothing says.
+    private static func releaseKey(_ track: DiscoveredTrack) -> String? {
+        if let id = track.releaseDiscogsID { return "id|\(id)" }
+        guard let title = track.release.map(RecordingKey.normalize), !title.isEmpty else { return nil }
+        return "title|\(title)"
     }
 
     private static func sourceKey(_ source: DiscoveredTrack.Source) -> String {
