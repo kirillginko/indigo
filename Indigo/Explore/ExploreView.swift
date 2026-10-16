@@ -44,8 +44,13 @@ struct ExploreView: View {
                         scroll.headerHeight = height
                     }
                 // Development builds only: see `ForYouTracksFeature`.
-                if ForYouTracksFeature.isEnabled { ForYouTracksSection() }
-                if SimilarRecordsFeature.isEnabled { SimilarRecordsSection() }
+                if ForYouMixFeature.isEnabled {
+                    // One list instead of the separate bands below.
+                    ForYouMixSection()
+                } else {
+                    if ForYouTracksFeature.isEnabled { ForYouTracksSection() }
+                    if SimilarRecordsFeature.isEnabled { SimilarRecordsSection() }
+                }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
                         Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }

@@ -188,6 +188,8 @@ final class DigStore {
     var discover = DiscoverState()
     /// For You's "Records like yours" (`SimilarRecordsFeature`).
     var similarRecords = SimilarRecordsState()
+    /// For You as one list, and its compass (`ForYouMixFeature`).
+    var forYouMix = ForYouMixState()
     /// Discover per artist page, by Discogs entry.
     var artistDiscover: [String: DiscoverState] = [:]
     @ObservationIgnored var trackDiscoverySource = TrackDiscoverySource.live

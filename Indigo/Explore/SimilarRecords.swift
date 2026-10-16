@@ -29,7 +29,7 @@ nonisolated struct SimilarRecord: Identifiable, Equatable, Sendable {
 nonisolated enum SimilarRecords {
     /// Worked out from a context: the seeds chosen and the records found.
     static func find(context: ModelContext, asOf: Date, limit: Int = 8, scenes withScenes: Bool = true)
-        -> (seeds: [RecordProfile], records: [SimilarRecord]) {
+        -> (seeds: [RecordProfile], records: [SimilarRecord], styleVectors: [String: [String: Double]]) {
         let personal = PersonalInputs.read(context: context, asOf: asOf)
         let records = (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
         let pool = records.map(RecordProfile.init(record:))
@@ -51,7 +51,8 @@ nonisolated enum SimilarRecords {
         }
         let similarity = RecordSimilarity(pool: pool, scenes: scenes)
         let found = similarity.similar(to: seeds, limit: limit, perSeed: 2, excluding: held, excludingArtists: knownArtists)
-        return (seeds, found.map { SimilarRecord(record: $0.match.record, via: $0.seed, reason: $0.match.reason, score: $0.match.score) })
+        return (seeds, found.map { SimilarRecord(record: $0.match.record, via: $0.seed, reason: $0.match.reason, score: $0.match.score) },
+                similarity.vectors)
     }
 
     /// Up to eight records of theirs with two styles or more, at most two by one artist: the crate's
@@ -97,6 +98,8 @@ nonisolated enum SimilarRecords {
 /// What "Records like yours" is showing.
 struct SimilarRecordsState: Sendable {
     var records: [SimilarRecord] = []
+    /// The pool's style embedding, kept for the musical compass.
+    var styleVectors: [String: [String: Double]] = [:]
     var at: Date?
     var working = false
 }
@@ -144,14 +147,17 @@ extension DigStore {
     /// Works "Records like yours" out again unless a fresh answer is held:
     /// off the main thread, from the store alone, kept half an hour.
     func refreshSimilarRecords(force: Bool = false) async {
-        guard SimilarRecordsFeature.isEnabled else { return }
+        guard SimilarRecordsFeature.isEnabled || ForYouMixFeature.isEnabled else { return }
         if !force, let at = similarRecords.at, Date().timeIntervalSince(at) < 30 * 60 { return }
         guard !similarRecords.working else { return }
         similarRecords.working = true
         let container = context.container
         let found = await Task.detached(priority: .utility) {
-            Trace.step("foryou.similar") { SimilarRecords.find(context: ModelContext(container), asOf: Date()).records }
+            Trace.step("foryou.similar") {
+                let found = SimilarRecords.find(context: ModelContext(container), asOf: Date())
+                return (found.records, found.styleVectors)
+            }
         }.value
-        similarRecords = SimilarRecordsState(records: found, at: Date(), working: false)
+        similarRecords = SimilarRecordsState(records: found.0, styleVectors: found.1, at: Date(), working: false)
     }
 }

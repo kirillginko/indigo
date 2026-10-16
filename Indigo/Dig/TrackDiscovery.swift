@@ -94,6 +94,8 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
     /// Whether the artist is one the listener already keeps or has played:
     /// offered rarely, never first. Nil on a list held from before.
     var knownArtist: Bool? = nil
+    /// What the show or release it came from says it sounds like, folded.
+    var tags: [String]? = nil
     /// The fact behind it, in a line: "Played next to Huerco S. in 4 episodes".
     let reason: String
     /// The listener's starting point it came from.
@@ -223,7 +225,8 @@ nonisolated enum TrackDiscovery {
                 artist: appearance.artist, artistDiscogsID: appearance.artistDiscogsID, title: appearance.title,
                 source: appearance.source, artworkURL: appearance.artworkURL, release: appearance.release,
                 year: appearance.year, releaseDiscogsID: appearance.releaseDiscogsID,
-                signal: neighbour.seed.signal, knownArtist: known, reason: neighbour.reason,
+                signal: neighbour.seed.signal, knownArtist: known,
+                tags: appearance.genres.isEmpty ? nil : appearance.genres, reason: neighbour.reason,
                 via: neighbour.seed.name, playable: .unknown, score: score))
         }
         candidates.sort { $0.score != $1.score ? $0.score > $1.score : $0.id < $1.id }

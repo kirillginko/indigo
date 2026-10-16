@@ -40,6 +40,8 @@ struct PhoneForYouView: View {
         case tracks
         /// Records like yours (`SimilarRecordsFeature`, development builds only).
         case similar
+        /// For You as one list with its compass (`ForYouMixFeature`).
+        case mix
         case suggestion(ExploreSuggestion)
         case onNow(StationEntry)
 
@@ -48,6 +50,7 @@ struct PhoneForYouView: View {
             case .cover: "cover"
             case .tracks: "tracks"
             case .similar: "similar"
+            case .mix: "mix"
             case .suggestion(let suggestion): "suggestion." + suggestion.id
             case .onNow(let entry): "onNow." + entry.id
             }
@@ -59,8 +62,8 @@ struct PhoneForYouView: View {
             let insets = proxy.safeAreaInsets
             StationDirectory { entries, playable in
                 let suggestions = Self.slides(from: dig.exploreOffers)
-                let slides: [Slide] = [.cover] + (ForYouTracksFeature.isEnabled ? [.tracks] : [])
-                    + (SimilarRecordsFeature.isEnabled ? [.similar] : []) + (suggestions.isEmpty
+                let slides: [Slide] = [.cover] + (ForYouMixFeature.isEnabled ? [.mix]
+                    : (ForYouTracksFeature.isEnabled ? [.tracks] : []) + (SimilarRecordsFeature.isEnabled ? [.similar] : [])) + (suggestions.isEmpty
                     ? Self.sampler(entries).map(Slide.onNow)
                     : suggestions.map(Slide.suggestion))
                 ScrollView(.vertical) {
@@ -78,6 +81,12 @@ struct PhoneForYouView: View {
                                     }
                                 case .tracks:
                                     PhoneForYouTracksSlide(insets: insets)
+                                case .mix:
+                                    ScrollView { ForYouMixSection(shown: 8).padding(.horizontal, 16) }
+                                        .padding(.top, insets.top)
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                                        .background(Color.black)
+                                        .environment(\.isPhoneLayout, true)
                                 case .similar:
                                     SimilarRecordsSection()
                                         .padding(.top, insets.top)

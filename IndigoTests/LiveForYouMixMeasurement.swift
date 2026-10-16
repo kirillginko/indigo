@@ -1,0 +1,119 @@
+//
+//  LiveForYouMixMeasurement.swift
+//  IndigoTests
+//
+//  For You as one list, with its compass, on this Mac's real history: the
+//  artists and shows as `DigWorker` ranks them, the tracks DIG Discover finds
+//  (live, read-only), the records like the crate's, then the mix and the
+//  compass as `DigStore.composeForYouMix` works them out -- and the result
+//  drawn, Mac and phone, to PNGs.
+//
+//  Opt-in: `INDIGO_LIVE_FORYOU_MIX=1`. Report (private): `live-foryou-mix.txt`
+//  and `foryou-mix-{mac,phone}.png` in the host's temporary directory.
+//
+
+import XCTest
+import SwiftUI
+import SwiftData
+@testable import Indigo
+
+@MainActor
+final class LiveForYouMixMeasurement: XCTestCase {
+    func testTheMixAndTheCompassOnTheRealHistory() async throws {
+        try XCTSkipUnless(ProcessInfo.processInfo.environment["INDIGO_LIVE_FORYOU_MIX"] == "1", "Live: set INDIGO_LIVE_FORYOU_MIX=1.")
+        let support = try XCTUnwrap(FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first)
+        let copy = FileManager.default.temporaryDirectory.appendingPathComponent("Mix-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: copy, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: copy) }
+        for (folder, name) in [(support, "UserData.store"), (support.appendingPathComponent("Development"), "Local.store")] {
+            for suffix in ["", "-wal", "-shm"] {
+                let from = folder.appendingPathComponent(name + suffix)
+                if FileManager.default.fileExists(atPath: from.path) { try FileManager.default.copyItem(at: from, to: copy.appendingPathComponent(name + suffix)) }
+            }
+        }
+        let container = try Persistence.makeSplitContainer(userData: copy.appendingPathComponent("UserData.store"),
+                                                           local: copy.appendingPathComponent("Local.store"))
+        let context = ModelContext(container)
+        let probe = PersonalInputs.read(context: context, asOf: .distantFuture)
+        let asOf = ((probe.crate.map(\.addedAt) + probe.met.map(\.lastAt)).max() ?? Date()).addingTimeInterval(3_600)
+        var out: [String] = []
+        func ms(_ d: Duration) -> String { String(format: "%.0f ms", Double(d.components.seconds) * 1000 + Double(d.components.attoseconds) / 1e15) }
+
+        var t = ContinuousClock.now
+        let worker = DigWorker(modelContainer: container)
+        let run = await worker.exploreRun(asOf: asOf, period: ExplorePeriod.containing(asOf), generation: 0, scenes: false,
+                                          rebuild: false, now: asOf)
+        let offers = await worker.exploreRecommendations(run, asOf: asOf)
+        out.append("artists and shows: \(ms(ContinuousClock.now - t))")
+
+        t = ContinuousClock.now
+        var source = TrackDiscoverySource.live
+        source.cache = TrackDiscoveryCache()
+        let inputs = DigStore.discoverInputs(context: ModelContext(container), now: asOf)
+        let tracks = await source.discover(.init(seeds: inputs.seeds, collaborators: inputs.collaborators, taste: inputs.taste,
+                                                 knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks,
+                                                 limit: 12, releaseLookups: 2)).tracks
+        out.append("tracks (live, cold): \(ms(ContinuousClock.now - t))")
+
+        t = ContinuousClock.now
+        let similar = SimilarRecords.find(context: context, asOf: asOf)
+        out.append("records: \(ms(ContinuousClock.now - t))")
+
+        t = ContinuousClock.now
+        let personal = PersonalInputs.read(context: context, asOf: asOf)
+        let offered = Set(tracks.map { RecordingKey.normalizeArtist($0.artist) }
+            + (offers.next + offers.artists).filter { $0.node.kind == .artist }.map { RecordingKey.normalizeArtist($0.node.title) })
+        let tags = LocalKnowledgeAdapter.artistTags(for: offered.union(personal.tasteArtistKeys), in: context)
+        let items = ForYouMix.mix(offers: offers, tracks: tracks, records: similar.records, artistTags: tags)
+        let longTerm = TasteProfile.collected(personal: personal, artistTags: tags, now: asOf).weights
+        let recent = MusicalCompass.recentTaste(personal, artistTags: tags, asOf: asOf)
+        let compass = MusicalCompass.draw(longTerm: longTerm, recent: recent, items: items.map { (id: $0.id, tags: $0.tags) },
+                                          vectors: similar.styleVectors)
+        out.append("mix and compass: \(ms(ContinuousClock.now - t))")
+        let again = ForYouMix.mix(offers: offers, tracks: tracks, records: similar.records, artistTags: tags)
+        out.append("mix worked out twice, same list: \(again.map(\.id) == items.map(\.id))")
+
+        out.append("")
+        out.append("long-term taste: " + longTerm.sorted { $0.value > $1.value }.prefix(10).map { "\($0.key) \(String(format: "%.2f", $0.value))" }.joined(separator: ", "))
+        out.append("last fortnight: " + recent.sorted { $0.value > $1.value }.prefix(8).map { "\($0.key) \(String(format: "%.2f", $0.value))" }.joined(separator: ", "))
+        if let compass {
+            out.append("compass: across \(compass.horizontal.0) ↔ \(compass.horizontal.1); up \(compass.vertical.0) ↔ \(compass.vertical.1); now at (\(String(format: "%.2f", compass.now?.x ?? 0)), \(String(format: "%.2f", compass.now?.y ?? 0))) \(compass.now?.heading ?? "-")")
+        } else {
+            out.append("compass: none (too little taste)")
+        }
+        let points = Dictionary((compass?.points ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        out.append("")
+        out.append("For you, one list (\(items.count); kinds \(Dictionary(grouping: items, by: \.kind).mapValues(\.count).sorted { $0.key.rawValue < $1.key.rawValue }.map { "\($0.key.rawValue) \($0.value)" }.joined(separator: ", "))):")
+        for (index, item) in items.enumerated() {
+            let place = points[item.id].map { String(format: "(%.2f, %.2f) %@, %@", $0.x, $0.y, $0.heading, ForYouMixSection.closeness($0.distance)) } ?? "not placed (no tags)"
+            out.append("\(index + 1). [\(item.kind.rawValue)] \(item.title) — \(item.subtitle) | \(item.reason) | via \(item.via) | \(place)")
+        }
+        try out.joined(separator: "\n").write(to: FileManager.default.temporaryDirectory.appendingPathComponent("live-foryou-mix.txt"),
+                                              atomically: true, encoding: .utf8)
+
+        // Drawn, as the app draws it.
+        ForYouMixFeature.override = true
+        defer { ForYouMixFeature.override = nil }
+        let dig = DigStore(context: ModelContext(try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(
+            schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none))))
+        dig.forYouMix = ForYouMixState(items: items, compass: compass, at: Date())
+        func environment(_ view: some View) -> some View {
+            view.environment(dig).environment(AppState()).environment(PlaybackCoordinator())
+                .environment(NTSBrowseStore()).environment(LotBrowseStore()).environment(DublabBrowseStore())
+                .environment(Radio80000BrowseStore()).environment(N10ASBrowseStore())
+        }
+        func write(_ view: some View, _ name: String) throws {
+            let renderer = ImageRenderer(content: view)
+            renderer.scale = 2
+            #if os(macOS)
+            let png = try XCTUnwrap(renderer.nsImage.flatMap { $0.tiffRepresentation }.flatMap { NSBitmapImageRep(data: $0)?.representation(using: .png, properties: [:]) })
+            #else
+            let png = try XCTUnwrap(renderer.uiImage?.pngData())
+            #endif
+            try png.write(to: FileManager.default.temporaryDirectory.appendingPathComponent(name))
+        }
+        try write(environment(ForYouMixSection().frame(width: 1000).padding(.bottom, 24).background(MosaicColor.cobalt)), "foryou-mix-mac.png")
+        try write(environment(ForYouMixSection(shown: 8).padding(.horizontal, 16).frame(width: 390).background(Color.black)
+            .environment(\.isPhoneLayout, true)), "foryou-mix-phone.png")
+    }
+}
