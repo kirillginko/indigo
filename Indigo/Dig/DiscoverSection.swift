@@ -22,6 +22,14 @@ struct DiscoverSection: View {
         DigSection(title: "Discover", trailing: state.working && state.tracks.isEmpty ? "Listening around…"
                    : state.tracks.isEmpty ? nil : "\(state.tracks.count) tracks") {
             DiscoverList(tracks: state.tracks, opened: opened)
+            #if DEBUG || INDIGO_INTERNAL
+            // What happened after Play, on this device only: for judging it.
+            let counts = DiscoverDiagnostics.shared.counts
+            if counts.pressed > 0 {
+                Text("Played \(counts.pressed) · began \(counts.began) · \(counts.medianSecondsToHear.map { String(format: "%.0fs", $0) } ?? "–") from opening DIG · heard out \(counts.completed) · skipped \(counts.skipped) · went on \(counts.continued) · crated \(counts.crated)")
+                    .font(Typeface.mono(9.5)).opacity(0.5).padding(.top, 8)
+            }
+            #endif
         }
         .pageGutter()
         .padding(.top, 22)

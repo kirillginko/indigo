@@ -35,6 +35,9 @@ nonisolated enum TrackDiscoveryFeature {
         if let override { return override }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
+        #elseif INDIGO_INTERNAL
+        // An internal TestFlight archive: on, with no switch to turn.
+        return true
         #else
         return false
         #endif
