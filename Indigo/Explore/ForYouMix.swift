@@ -63,6 +63,9 @@ nonisolated struct ForYouItem: Identifiable, Equatable, Sendable {
     var viaID: String? = nil
     /// Tags it can be placed by on the compass, folded.
     var tags: [String] = []
+    /// What the listening log calls the recommendation when it is played:
+    /// the kind, unless the item says otherwise ("cluster-seed").
+    var route: String? = nil
 
     var id: String {
         switch payload {

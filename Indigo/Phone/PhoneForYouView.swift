@@ -242,12 +242,12 @@ struct PhoneForYouView: View {
         switch item.payload {
         case .track(let track):
             let (media, start) = track.mediaItem
-            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue)) }
+            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.route ?? item.kind.rawValue)) }
             if let start { player.seekWhenReady(to: TimeInterval(start), in: media.id) }
         case .record(let found):
-            appState.open(.digRelease(id: found.record.id, title: found.record.title), from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue).asOrigin)
+            appState.open(.digRelease(id: found.record.id, title: found.record.title), from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.route ?? item.kind.rawValue).asOrigin)
         case .suggestion(let suggestion):
-            Task { await open(suggestion.node, from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue).asOrigin) }
+            Task { await open(suggestion.node, from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.route ?? item.kind.rawValue).asOrigin) }
         }
     }
 

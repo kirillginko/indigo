@@ -27,6 +27,29 @@ extension DigStore {
         async let records: Void = refreshSimilarRecords()
         _ = await (tracks, records)
         await composeForYouMix()
+        if ForYouClusterSeedsFeature.isEnabled {
+            await refreshClusterSeedPicks()
+            await composeForYouMix()
+        }
+    }
+
+    /// Cluster-seed picks, worked out off the main thread at most every half
+    /// hour: building the profile reads the whole history (seconds), and the
+    /// seeds' releases and every pick's recording are asked about.
+    func refreshClusterSeedPicks() async {
+        guard ForYouClusterSeedsFeature.isEnabled else { return }
+        if let at = clusterSeedPicksAt, Date().timeIntervalSince(at) < 30 * 60 { return }
+        clusterSeedPicksAt = Date()
+        let container = context.container, vectors = similarRecords.styleVectors
+        let offered = Set(forYouMix.items.flatMap(\.artistKeys))
+        let picks = await Task.detached(priority: .utility) { () -> [DiscoveredTrack] in
+            let started = Date()
+            guard let inputs = ClusterSeedPicks.inputs(context: ModelContext(container), vectors: vectors) else { return [] }
+            let picks = await ClusterSeedPicks.live.picks(inputs, excluding: offered)
+            Trace.note("foryou.clusterSeeds \(inputs.seeds.count) seeds over \(inputs.profile.clusters.count) clusters, \(picks.count) picks in \(Int(Date().timeIntervalSince(started) * 1000))ms")
+            return picks
+        }.value
+        clusterSeedPicks = picks
     }
 
     /// The mix and its compass from what is on hand now: pure, apart from
@@ -35,6 +58,7 @@ extension DigStore {
         guard ForYouMixFeature.isEnabled else { return }
         let offers = mixOffers.isEmpty ? exploreOffers : mixOffers, tracks = discover.tracks
         let records = similarRecords.records, vectors = similarRecords.styleVectors
+        let seeded = ForYouClusterSeedsFeature.isEnabled ? clusterSeedPicks : []
         let container = context.container
         let (items, compass) = await Task.detached(priority: .utility) {
             Trace.step("foryou.mix") { () -> ([ForYouItem], MusicalCompass?) in
@@ -44,7 +68,17 @@ extension DigStore {
                 let offered = Set(tracks.map { RecordingKey.normalizeArtist($0.artist) }
                     + (offers.next + offers.artists).filter { $0.node.kind == .artist }.map { RecordingKey.normalizeArtist($0.node.title) })
                 let tags = LocalKnowledgeAdapter.artistTags(for: offered.union(personal.tasteArtistKeys), in: context)
-                let items = ForYouMix.mix(offers: offers, tracks: tracks, records: records, artistTags: tags)
+                var items = ForYouMix.mix(offers: offers, tracks: tracks, records: records, artistTags: tags)
+                // For You's list first; the cluster seeds after it, nobody twice.
+                var claimed = Set(items.flatMap(\.artistKeys))
+                for track in seeded {
+                    let key = RecordingKey.normalizeArtist(track.artist)
+                    guard claimed.insert(key).inserted else { continue }
+                    items.append(ForYouItem(kind: .track, payload: .track(track), artistKeys: [key], title: track.title,
+                                            subtitle: track.artist, reason: track.reason, via: track.via,
+                                            viaID: ListeningSurface.discogsArtist(track.viaDiscogsID), tags: track.tags ?? [],
+                                            route: track.reason.hasPrefix("Chosen by") ? "cluster-selection" : "cluster-seed"))
+                }
                 let longTerm = TasteProfile.collected(personal: personal, artistTags: tags, now: now).weights
                 let recent = MusicalCompass.recentTaste(personal, artistTags: tags, asOf: now)
                 let compass = MusicalCompass.draw(longTerm: longTerm, recent: recent,
@@ -70,7 +104,11 @@ struct ForYouMixSection: View {
 
     var body: some View {
         let state = dig.forYouMix
-        let items = Array(state.items.prefix(shown))
+        // The cluster seeds come after For You's own list: shown beside it,
+        // not cut off by it.
+        let own = state.items.filter { $0.route?.hasPrefix("cluster") != true }
+        let seeded = state.items.filter { $0.route?.hasPrefix("cluster") == true }
+        let items = Array(own.prefix(shown)) + seeded
         let points = Dictionary((state.compass?.points ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         Group {
             if !items.isEmpty {
@@ -155,16 +193,16 @@ struct ForYouMixSection: View {
         switch item.payload {
         case .track(let track):
             let (media, start) = track.mediaItem
-            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue)) }
+            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.route ?? item.kind.rawValue)) }
             if let start { player.seekWhenReady(to: TimeInterval(start), in: media.id) }
         case .record(let found):
-            appState.open(.digRelease(id: found.record.id, title: found.record.title), from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue).asOrigin)
+            appState.open(.digRelease(id: found.record.id, title: found.record.title), from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.route ?? item.kind.rawValue).asOrigin)
         case .suggestion(let suggestion):
             Task {
                 let stations = KeptShow.Stations(nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
                                                  radio80000: radio80000Browse, n10as: n10asBrowse)
                 switch await KeptShow.destination(for: suggestion.node, stations: stations) {
-                case .page(let page): appState.open(page, from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue).asOrigin)
+                case .page(let page): appState.open(page, from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.route ?? item.kind.rawValue).asOrigin)
                 case .section(let route): appState.select(route)
                 case nil: break
                 }

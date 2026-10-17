@@ -389,8 +389,12 @@ nonisolated enum ListenerRetrieval {
         var bySeed: [String: [RecordProfile]] = [:]
         for record in records { for artist in record.artistKeys { bySeed[artist, default: []].append(record) } }
         var out: [Sighting] = []
-        for seed in seeds {
-            let entry = entries[seed.artist]
+        for found in seeds {
+            let entry = entries[found.artist]
+            // Said as the entry spells it: a seed read from a recording
+            // carries only its folded key.
+            let seed = Seed(artist: found.artist, name: entry?.name ?? found.name, cluster: found.cluster, weight: found.weight,
+                            level: found.level, title: found.title)
             let own = Set([seed.artist] + (entry?.aliases ?? []).map(key))
             let lift = 0.5 + 0.5 * seed.weight
             let credited = credits[seed.artist] ?? []

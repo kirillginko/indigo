@@ -190,6 +190,10 @@ final class DigStore {
     var similarRecords = SimilarRecordsState()
     /// For You as one list, and its compass (`ForYouMixFeature`).
     var forYouMix = ForYouMixState()
+    /// After For You's own list, behind `ForYouClusterSeedsFeature`: tracks
+    /// by artists one step from each taste cluster (`ClusterSeedPicks`).
+    var clusterSeedPicks: [DiscoveredTrack] = []
+    @ObservationIgnored var clusterSeedPicksAt: Date?
     /// The mix's artists and shows (`DigWorker.forYouMixOffers`), worked out
     /// beside the visible answer when the mix is on.
     @ObservationIgnored var mixOffers = ExploreOffers()

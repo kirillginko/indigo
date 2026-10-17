@@ -592,6 +592,52 @@ names. Nothing is matched by name beyond the seed's own records.
   the totals are unchanged (76 of 80 playable slots, 9 later finds): only
   the labels and a little of the order move.
 
+### Debug-only For You with cluster seeds (2026-10-17)
+
+`ForYouClusterSeedsFeature`, key `INDIGO_FORYOU_CLUSTER_SEEDS`: Debug
+switch only. It is off in every archived build, and the release guard
+refuses the key.
+
+**How it builds the list** (`ClusterSeedPicks`):
+- For You's own list stays first, unchanged.
+- After it, up to 8 picks. Each is someone credited on a seed's own
+  releases, or chosen by a seed for a mix or compilation.
+- Every pick has a verified Discogs id and nobody the listener has met.
+  Nobody already in the mix appears twice.
+- Each pick is confirmed to play. Own recordings come first, in rank order,
+  from release videos or radio-tracklist uploads. Radio moments come only
+  after every recording.
+
+**How it runs:**
+- Off the main thread, at most every 30 minutes.
+- In the simulator it took 21–26 seconds (35 seeds over 5 clusters, 7–8
+  picks). It reads the whole history and up to 6 release documents per
+  seed, then checks each pick's recording.
+- On the phone the picks are slides after For You's own. On the Mac they
+  show after its first 12 items.
+- When played, a pick's listen is attributed `surface:foryou.mix` with
+  `route:cluster-seed` or `route:cluster-selection`, and the seed's verified
+  Discogs id as `viaid` (Debug builds, Development store).
+
+**Checked in the simulator (iPhone 16 Pro):**
+- Yu Su, "Melaleuca", "On Waken Remixes with Cuushe": played and recorded
+  as `cluster-seed`.
+- Henry Mancini, "First job", "Chosen by Eric Kloss for First Class!":
+  recorded as `cluster-selection`.
+- Wes Montgomery, "Bumpin' On Sunset", "On Alone Together With Bobby Rose
+  with Pat Martino".
+- Poly Styrene, "Essence", "Chosen by Anika for A Mixed Tape Made By
+  Anika": a radio moment, after the recordings.
+- Seeds read from a recording were first named by their folded key ("eric
+  kloss"). Fixed to use the entry's spelling.
+
+**Not yet:**
+- The Mac layout has not been looked at.
+- 20+ seconds of work is too slow for anything but a Debug switch; the
+  profile and credits want caching (keyed on history and style caches).
+- "On <release> with <seed>" reads oddly when the release title already
+  says "With".
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.
