@@ -218,6 +218,64 @@ nonisolated enum ListenerRetrieval {
         return c.best.cluster >= 0 ? c.best.cluster : nil
     }
 
+    // MARK: Styles
+
+    /// What the device knows of artists' sound, keyed by identity.
+    struct StyleBook: Sendable {
+        /// A Discogs entry's own styles, by its id.
+        var byID: [Int: [String]] = [:]
+        /// The device's entry for an exact folded name: the identity DIG
+        /// gives that name.
+        var idOfName: [String: Int] = [:]
+        /// Styles of the records credited to an artist by Discogs id.
+        var recordsByID: [Int: [String]] = [:]
+        /// Styles of records whose documents name the artist without an id.
+        var recordsByName: [String: [String]] = [:]
+
+        init() {}
+
+        init(entries: [(key: String, id: Int, styles: [String])], records: [RecordProfile], vectors: [String: [String: Double]]) {
+            for entry in entries where entry.id > 0 {
+                idOfName[entry.key] = entry.id
+                let known = ListeningLog.foldTags(entry.styles).filter { vectors[$0] != nil }
+                if !known.isEmpty { byID[entry.id] = known }
+            }
+            for record in records.sorted(by: { $0.id < $1.id }) {
+                let known = record.styles.filter { vectors[$0] != nil }
+                guard !known.isEmpty else { continue }
+                if record.artistIDs.isEmpty {
+                    for key in record.artistKeys.sorted() { recordsByName[key, default: []] += known }
+                } else {
+                    for id in record.artistIDs.sorted() { recordsByID[id, default: []] += known }
+                }
+            }
+            func unique(_ list: [String]) -> [String] { var seen = Set<String>(); return list.filter { seen.insert($0).inserted } }
+            recordsByID = recordsByID.mapValues { Array(unique($0).prefix(6)) }
+            recordsByName = recordsByName.mapValues { Array(unique($0).prefix(6)) }
+        }
+    }
+
+    /// A candidate's styles, only through its identity: a Discogs id reads
+    /// that entry and the records credited to that id, never anything filed
+    /// under a name it shares. A candidate known by name alone (a credit on
+    /// an entry or a record) reads the device's entry for that exact name,
+    /// as DIG would open it. A catalogue row with no Discogs id gets none:
+    /// its name could be anyone's.
+    static func style(_ c: inout Candidate, book: StyleBook) {
+        let id: Int?
+        if c.identity.hasPrefix("discogs:") { id = Int(c.identity.dropFirst("discogs:".count)) }
+        else if c.identity.hasPrefix("name:") { id = book.idOfName[c.nameKey] }
+        else { id = nil }
+        if let id {
+            if let own = book.byID[id], !own.isEmpty { c.styles = own; c.styleSource = "entry"; return }
+            if let records = book.recordsByID[id], !records.isEmpty { c.styles = records; c.styleSource = "records"; return }
+            return
+        }
+        if c.identity.hasPrefix("name:"), let records = book.recordsByName[c.nameKey], !records.isEmpty {
+            c.styles = records; c.styleSource = "records by name"
+        }
+    }
+
     // MARK: Direct (on device)
 
     /// One step out of each seed in the identity graph: credits and releases
@@ -368,6 +426,17 @@ nonisolated enum ListenerRetrieval {
         return sqrt(8 / Double(shows))
     }
 
+    /// Radio leads up as easily as across: next to a seed a few programmes
+    /// play sits a star every programme plays. A step to something far more
+    /// played than what led there says little about the listener and much
+    /// about the charts, so it is damped by how much more -- the square
+    /// root of the ratio, past a margin of five programmes. Unknown counts
+    /// change nothing.
+    static func popularityStep(from source: Int?, to candidate: Int?) -> Double {
+        guard let source, let candidate, candidate > source else { return 1 }
+        return min(1, sqrt(Double(source + 5) / Double(candidate + 5)))
+    }
+
     static func proximity(_ distance: Int) -> Double {
         switch distance { case 1: 1; case 2: 0.6; case 3: 0.4; default: 0.15 }
     }
@@ -416,6 +485,7 @@ nonisolated enum ListenerRetrieval {
                 used.insert(episode.id)
                 seedsOn[episode.id, default: []].insert(source.seed)
                 let specific = specificity(episode.show.flatMap { radio.showGenres[$0] })
+                let sourceShows = radio.showsPlaying[source.row]
                 let genres = ListeningLog.foldTags(episode.genres).filter { vectors[$0] != nil }
                 let compat = genres.isEmpty ? 0.5
                     : max(0, MusicalCompass.dot(centroids[source.cluster] ?? [:], ListenerProfile.vector(genres, vectors)))
@@ -423,6 +493,7 @@ nonisolated enum ListenerRetrieval {
                     let distance = abs(slot.index - appearance.index)
                     guard distance > 0 else { continue }
                     let c = source.weight * proximity(distance) * (0.25 + 0.75 * specific) * (0.5 + 0.5 * compat)
+                        * popularityStep(from: sourceShows, to: radio.showsPlaying[slot.artist])
                     if let held = byEpisode[episode.id]?[slot.artist], held.contribution >= c { continue }
                     byEpisode[episode.id, default: [:]][slot.artist] = Best(contribution: c, via: source.row, distance: distance,
                                                                              cluster: source.cluster, seed: source.seed)
@@ -569,6 +640,7 @@ nonisolated enum ListenerRetrieval {
         let centroids = Dictionary(uniqueKeysWithValues: profile.clusters.map { ($0.id, $0.centroid) })
         await readAppearances(seedRows.map(\.row))
         await readEpisodes(for: seedRows.map(\.row))
+        await readDegrees(seedRows.map(\.row))
 
         // Rows of the listener's own artists: never candidates.
         var exclude = Set(seedRows.map(\.row))

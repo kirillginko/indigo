@@ -500,6 +500,56 @@ Pool recall of later artists: A 2–10%; AB 7–24%; ABR and ABRS 9–24%.
    fills the remaining slots from AB/ABR. Judge it by the attributed
    listens it gets (Debug builds only, Development store).
 
+### The three fixes, and the replay again (2026-10-17)
+
+- **Styles only through identity** (`ListenerRetrieval.StyleBook`, `style`):
+  - A candidate with a Discogs id reads that entry, or the records credited
+    to that id.
+  - A credit known by name alone reads the device's entry for that exact
+    name.
+  - A catalogue row with no id gets nothing from names.
+  - Fallback: the genres of the programmes that played that very catalogue
+    artist.
+- **Popularity damped relative to the seed** (`popularityStep`): a radio
+  step to an artist played on more programmes than the seed is damped by
+  √((seed + 5) / (candidate + 5)).
+- **Own recordings first:** the list takes recordings, in rank order,
+  before radio moments.
+- **For You keeps its routes:** they stay first, in For You's order, and the
+  wider pool fills what is left, each half with its own 60 looked at. The
+  first replay ranked everything together; with genre styling, radio then
+  crowded out For You and every later find (0 finds), so this is the
+  integration design, not a tuning.
+
+Summed over four cut-offs (80 slots):
+
+| list | playable slots filled | later finds | fit to later listening |
+|------|------|------|------|
+| For You today | 22 | 4 | 0.50–0.65 |
+| For You + cluster seeds | 25 | 7 | 0.39–0.65 |
+| For You + cluster seeds + bounded radio | 60 | 4 | 0.36–0.39 |
+| … + album similarity | 57 | 4 | 0.36–0.41 |
+
+- The first run's "every slot filled, 10 finds" leaned on two things
+  removed here: styles borrowed through shared names, and undamped
+  popularity. With them gone, radio still fills the list with playable
+  things (40 of the 60), but adds no later finds, and fit falls.
+- Cluster seeds add finds (7 against 4) but few playable slots. Their
+  candidates are mostly known by name only, and only 8 of 120 looked at
+  have a verified id to find a recording by.
+- Fred Again.., Sampha and similar are gone from radio. ASAP Rocky remains,
+  through For You's own route.
+- "Gas" is still styled as alternative rock: the shared catalogue links
+  the radio "Gas" to a different Discogs artist. A catalogue identity
+  error, outside this work.
+
+**So, before anything visible:** the useful expansion is cluster seeds plus
+a way to verify them. Resolving name-only credits to Discogs ids would let
+their recordings be found. Radio is a source of *playable moments*, not of
+better recommendations, at least on this history. A Debug-only For You
+should keep For You's list and add cluster-seeded artists that verify and
+play, with radio filling only the slots still empty, labelled as radio.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.

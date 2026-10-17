@@ -148,4 +148,28 @@ final class ListenerRetrievalTests: XCTestCase {
         XCTAssertEqual(ranked.last?.identity, "weak-fit")
         XCTAssertEqual(ListenerRetrieval.cluster(of: pool[1], profile: profile, vectors: vectors), 0, "placed by its seed's cluster")
     }
+
+    /// A candidate with a Discogs id is styled by that id alone: another
+    /// artist the device files under the same name lends it nothing.
+    func testStylesComeOnlyThroughIdentity() {
+        let book = ListenerRetrieval.StyleBook(entries: [(key: "gas", id: 1, styles: ["Alternative Rock"]),
+                                                         (key: "credited", id: 3, styles: ["Ambient"])],
+                                               records: [], vectors: vectors.merging(["alternative rock": ["alternative rock": 1]]) { a, _ in a })
+        let route = ListenerRetrieval.Route(provenance: .radioAdjacent, score: 1, seed: "s", cluster: 0, why: "")
+        var radio = ListenerRetrieval.Candidate(identity: "discogs:2", nameKey: "gas", name: "Gas", routes: [route], aliases: ["gas"])
+        ListenerRetrieval.style(&radio, book: book)
+        XCTAssertTrue(radio.styles.isEmpty, "the device's Gas is someone else")
+        var credit = ListenerRetrieval.Candidate(identity: "name:credited", nameKey: "credited", name: "Credited", routes: [route], aliases: ["credited"])
+        ListenerRetrieval.style(&credit, book: book)
+        XCTAssertEqual(credit.styles, ["ambient"], "a credit by name: the device's entry for that name")
+        var row = ListenerRetrieval.Candidate(identity: "catalogue:x", nameKey: "credited", name: "Credited", routes: [route], aliases: ["credited"])
+        ListenerRetrieval.style(&row, book: book)
+        XCTAssertTrue(row.styles.isEmpty, "a catalogue row without an id could be anyone")
+    }
+
+    func testAStepUpInPopularityIsDamped() {
+        XCTAssertEqual(ListenerRetrieval.popularityStep(from: 10, to: 5), 1)
+        XCTAssertEqual(ListenerRetrieval.popularityStep(from: nil, to: 500), 1)
+        XCTAssertEqual(ListenerRetrieval.popularityStep(from: 3, to: 315), sqrt(8.0 / 320), accuracy: 1e-12)
+    }
 }

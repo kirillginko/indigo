@@ -130,11 +130,8 @@ final class ListenerExpansionReplay: XCTestCase {
             for row in datedRows { onDevice.formUnion(row.releaseDiscogsIDs) }
             let datedPool = allRecords.filter { onDevice.contains($0.id) }
             let vectors = RecordSimilarity(pool: datedPool).vectors
-            var styleByKey: [String: [String]] = [:]
-            for row in datedRows where !row.styles.isEmpty { styleByKey[row.nameKey] = ListeningLog.foldTags(row.styles).filter { vectors[$0] != nil } }
-            let rowByID = Dictionary(datedRows.filter { $0.discogsID > 0 }.map { ($0.discogsID, $0) }, uniquingKeysWith: { a, _ in a })
-            var recordStyles: [String: [String]] = [:]
-            for record in datedPool { for k in record.artistKeys { recordStyles[k, default: []] += record.styles.filter { vectors[$0] != nil } } }
+            let book = ListenerRetrieval.StyleBook(entries: datedRows.map { (key: $0.nameKey, id: $0.discogsID, styles: $0.styles) },
+                                                   records: datedPool, vectors: vectors)
 
             var pastRead = ListenerProfile.read(context: context, before: cutoff)
             pastRead.artistStyles = pastRead.artistStyles.filter { rowByKey[$0.key] != nil }
@@ -203,15 +200,33 @@ final class ListenerExpansionReplay: XCTestCase {
             let similar = ListenerRetrieval.similar(past, pool: datedPool, vectors: vectors, known: known, seeds: seeds)
             out.append("seeds \(seeds.count) over \(Set(seeds.map(\.cluster)).count) clusters vs For You's \(ExploreRanker.startingPoints(run.personal).count) starting points; radio \(radio.report.requests) requests, \(radio.report.episodes) episodes")
 
+            // Episode genres by candidate identity, from the radio rows read.
+            var radioGenres: [String: [String]] = [:]
+            for (row, entry) in radio.radio.names {
+                var weights: [String: Double] = [:]
+                for (g, w) in (radio.first[row]?.genres ?? [:]) { weights[g, default: 0] += w }
+                for (g, w) in (radio.second[row]?.genres ?? [:]) { weights[g, default: 0] += w }
+                guard !weights.isEmpty else { continue }
+                let identity = entry.discogs.map { "discogs:\($0)" } ?? "catalogue:\(row.uuidString.lowercased())"
+                radioGenres[identity] = weights.sorted { $0.value != $1.value ? $0.value > $1.value : $0.key < $1.key }.prefix(4).map(\.key)
+            }
+            var nameConflicts = 0
             func pool(_ sightings: [ListenerRetrieval.Sighting]) -> [ListenerRetrieval.Candidate] {
                 var kept = ListenerRetrieval.merge(sightings).candidates.filter { c in !c.aliases.contains(where: known.contains) && !known.contains(c.nameKey) }
                 for i in kept.indices {
-                    let keys = [kept[i].nameKey] + kept[i].aliases.sorted()
-                    let id = kept[i].identity.hasPrefix("discogs:") ? Int(kept[i].identity.dropFirst(8)) : nil
-                    if let own = keys.lazy.compactMap({ styleByKey[$0] }).first(where: { !$0.isEmpty }) { kept[i].styles = own; kept[i].styleSource = "entry" }
-                    else if let id, let row = rowByID[id], case let own = ListeningLog.foldTags(row.styles).filter({ vectors[$0] != nil }), !own.isEmpty { kept[i].styles = own; kept[i].styleSource = "entry by id" }
-                    else if let r = keys.lazy.compactMap({ recordStyles[$0] }).first(where: { !$0.isEmpty }) { kept[i].styles = Array(Array(NSOrderedSet(array: r).array as! [String]).prefix(6)); kept[i].styleSource = "records" }
+                    ListenerRetrieval.style(&kept[i], book: book)
+                    // Else what the programmes that played this very
+                    // catalogue artist call themselves: identity-safe, if coarse.
+                    if kept[i].styles.isEmpty, let genres = radioGenres[kept[i].identity], !genres.isEmpty {
+                        kept[i].styles = genres; kept[i].styleSource = "episode genres"
+                    }
                 }
+                // Candidates whose name the device files under another
+                // artist: styled by name, they took that artist's sound.
+                nameConflicts = kept.filter { c in
+                    guard c.identity.hasPrefix("discogs:"), let other = book.idOfName[c.nameKey] else { return false }
+                    return "discogs:\(other)" != c.identity
+                }.count
                 return kept
             }
             func isFind(_ c: ListenerRetrieval.Candidate) -> Bool { later.contains(c.nameKey) || c.aliases.contains(where: later.contains) }
@@ -235,27 +250,36 @@ final class ListenerExpansionReplay: XCTestCase {
                 let candidates = pool(sightings)
                 let hits = candidates.filter(isFind)
                 let ev = ListenerRetrieval.evidence(candidates)
-                let ranked: [ListenerRetrieval.Candidate]
-                if label.hasPrefix("A ") {
-                    ranked = candidates.sorted { (forYouOrder[$0.nameKey] ?? .max, $0.identity) < (forYouOrder[$1.nameKey] ?? .max, $1.identity) }
-                } else {
-                    let v2: (ListenerRetrieval.Candidate) -> Double = { c in (past.relevance(styles: c.styles, vectors: vectors)?.score ?? 0) * (0.5 + (ev[c.identity] ?? 0)) }
-                    let r2 = candidates.sorted { v2($0) != v2($1) ? v2($0) > v2($1) : $0.identity < $1.identity }
-                    ranked = past.spread(r2, limit: 60, styles: \.styles, vectors: vectors)
-                }
+                // For You's own routes keep their place, in For You's order;
+                // the wider pool fills what is left, by relevance and
+                // evidence with slots by cluster. Each half has its own sixty
+                // looked at, so the fill is never crowded out by For You's
+                // unplayable ones, nor For You by the fill.
+                let forYouPart = candidates.filter { $0.provenances.contains(.forYou) }
+                    .sorted { (forYouOrder[$0.nameKey] ?? .max, $0.identity) < (forYouOrder[$1.nameKey] ?? .max, $1.identity) }
+                let v2: (ListenerRetrieval.Candidate) -> Double = { c in (past.relevance(styles: c.styles, vectors: vectors)?.score ?? 0) * (0.5 + (ev[c.identity] ?? 0)) }
+                let rest = past.spread(candidates.filter { !$0.provenances.contains(.forYou) }
+                    .sorted { v2($0) != v2($1) ? v2($0) > v2($1) : $0.identity < $1.identity }, limit: 60, styles: \.styles, vectors: vectors)
+                let ranked = forYouPart + rest
+                let checkList = Array(forYouPart.prefix(60)) + Array(rest.prefix(60))
                 // The first twenty that can be played, from the first sixty.
-                var offered: [(ListenerRetrieval.Candidate, Playable.Found)] = []
+                // Every candidate of the first sixty that can be heard; then
+                // the list: their own recordings first, in rank order, and
+                // radio moments only for the slots left.
+                var heard: [(ListenerRetrieval.Candidate, Playable.Found)] = []
                 var unplayable: [Int] = []
-                var kinds: [String: Int] = [:]
-                var checked = 0, withID = 0, played = 0
-                for c in ranked.prefix(60) where played < 20 {
+                var checked = 0, withID = 0
+                for c in checkList {
                     checked += 1
                     guard let id = verifiedID(c) else { continue }
                     withID += 1
-                    if let found = await playable.check(id, c.name) {
-                        offered.append((c, found)); played += 1
-                        switch found { case .recording(_, _, let from): kinds[from, default: 0] += 1; case .moment: kinds["radio moment", default: 0] += 1 }
-                    } else { unplayable.append(id) }
+                    if let found = await playable.check(id, c.name) { heard.append((c, found)) } else { unplayable.append(id) }
+                }
+                func isRecording(_ found: Playable.Found) -> Bool { if case .recording = found { true } else { false } }
+                let offered = Array((heard.filter { isRecording($0.1) } + heard.filter { !isRecording($0.1) }).prefix(20))
+                var kinds: [String: Int] = [:]
+                for (_, found) in offered {
+                    switch found { case .recording(_, _, let from): kinds[from, default: 0] += 1; case .moment: kinds["radio moment", default: 0] += 1 }
                 }
                 let top = Array(ranked.prefix(20))
                 let topHits = top.filter(isFind)
@@ -268,7 +292,7 @@ final class ListenerExpansionReplay: XCTestCase {
                 let kindLine = kinds.sorted { $0.key < $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", ")
                 let whyLine = because.sorted { $0.value > $1.value }.map { "\($0.key) \($0.value)" }.joined(separator: "; ")
                 if days == 0 {
-                    out.append(String(format: "%-26@ pool %5d; top 20 playable %2d; playable list of %2d from the first %2d (%2d with a verified id); %d clusters [%@]",
+                    out.append(String(format: "%-26@ pool %5d; top 20 playable %2d; playable list of %2d from %2d looked at (%2d with a verified id); %d clusters [%@]",
                                       label as NSString, candidates.count, topPlayable, offered.count, checked, withID, clusters, routes as NSString))
                     out.append("    heard as: \(kindLine.isEmpty ? "–" : kindLine); not playable because: \(whyLine.isEmpty ? "–" : whyLine)")
                 } else {
@@ -276,7 +300,7 @@ final class ListenerExpansionReplay: XCTestCase {
                                       label as NSString, candidates.count, hits.count, pct(hits.count, later.count) as NSString, sessions(hits), laterSessions,
                                       topHits.count, topPlayable, offeredHits.count, sessions(offeredHits),
                                       fits.isEmpty ? 0 : fits.reduce(0, +) / Double(fits.count), clusters, routes as NSString))
-                    out.append("    heard as: \(kindLine.isEmpty ? "–" : kindLine); not playable because: \(whyLine.isEmpty ? "–" : whyLine)")
+                    out.append("    heard as: \(kindLine.isEmpty ? "–" : kindLine); not playable because: \(whyLine.isEmpty ? "–" : whyLine); names filed under another artist, not styled by name: \(nameConflicts)")
                     var t = totals[label] ?? [0, 0, 0, 0]
                     t[0] += offeredHits.count; t[1] += sessions(offeredHits); t[2] += offered.count; t[3] += 20
                     totals[label] = t
