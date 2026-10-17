@@ -319,11 +319,53 @@ nonisolated enum ListenerRetrieval {
         var aliases: [String] = []
     }
 
+    /// Somebody a seed's own release names, with their Discogs entry.
+    struct Credit: Sendable, Equatable {
+        let id: Int
+        let name: String
+        /// Every spelling this release used for them, folded.
+        let keys: Set<String>
+        let role: String
+        let release: String
+    }
+
+    /// Everyone the seed's own release documents credit with an entry --
+    /// co-headliners, track artists and the musical and creative credits --
+    /// never the seed itself and never a technical credit. These are the
+    /// ids a credit by name on the seed's entry can be resolved to.
+    static func credits(seedID: Int?, releases: [DiscogsReleaseDetail]) -> [Credit] {
+        var out: [Credit] = []
+        func add(_ id: Int?, _ name: String?, _ anv: String?, role: String, release: String) {
+            guard let id, id > 0, id != seedID, let name = name.map(DiscogsClient.withoutDisambiguator), ArtistName.isRealArtist(name) else { return }
+            let keys = Set([name, anv].compactMap { $0 }.map { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator($0)) }.filter { !$0.isEmpty })
+            out.append(Credit(id: id, name: name, keys: keys, role: role, release: release))
+        }
+        for release in releases.sorted(by: { $0.id < $1.id }) {
+            for artist in release.artists ?? [] { add(artist.id, artist.name, artist.anv, role: "Artist", release: release.title) }
+            for credit in release.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true {
+                add(credit.id, credit.name, credit.anv, role: credit.role ?? "", release: release.title)
+            }
+            for track in release.tracklist ?? [] {
+                for artist in track.artists ?? [] { add(artist.id, artist.name, artist.anv, role: "Artist", release: release.title) }
+                for credit in track.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true {
+                    add(credit.id, credit.name, credit.anv, role: credit.role ?? "", release: release.title)
+                }
+            }
+        }
+        return out
+    }
+
     /// One step from each seed through its own entry and its records'
     /// credits: credits, members and groups are direct; labels shared
     /// context; Discogs' own same-style neighbours similarity. Never the
     /// seed's own other names.
-    static func direct(_ seeds: [Seed], entries: [String: Entry], records: [RecordProfile]) -> [Sighting] {
+    ///
+    /// `credits` -- what the seed's own release documents say, by entry --
+    /// are offered with their ids, and a name on the seed's entry takes an id
+    /// only when exactly one entry its releases credit goes by that name.
+    /// Nothing is matched by name beyond the seed's own records.
+    static func direct(_ seeds: [Seed], entries: [String: Entry], records: [RecordProfile],
+                       credits: [String: [Credit]] = [:]) -> [Sighting] {
         func key(_ name: String) -> String { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) }
         var bySeed: [String: [RecordProfile]] = [:]
         for record in records { for artist in record.artistKeys { bySeed[artist, default: []].append(record) } }
@@ -332,20 +374,33 @@ nonisolated enum ListenerRetrieval {
             let entry = entries[seed.artist]
             let own = Set([seed.artist] + (entry?.aliases ?? []).map(key))
             let lift = 0.5 + 0.5 * seed.weight
-            func add(_ names: [String], _ provenance: Provenance, _ worth: Double, _ why: String) {
+            let credited = credits[seed.artist] ?? []
+            var idsByName: [String: Set<Int>] = [:]
+            for credit in credited { for k in credit.keys { idsByName[k, default: []].insert(credit.id) } }
+            func resolved(_ name: String) -> Int? {
+                guard let ids = idsByName[key(name)], ids.count == 1 else { return nil }
+                return ids.first
+            }
+            func add(_ names: [String], _ provenance: Provenance, _ worth: Double, _ why: String, resolve: Bool = true) {
                 for name in names {
                     let clean = DiscogsClient.withoutDisambiguator(name)
                     guard !own.contains(key(clean)), !clean.isEmpty else { continue }
-                    out.append(Sighting(name: clean, discogsID: nil, catalogueRow: nil,
+                    out.append(Sighting(name: clean, discogsID: resolve ? resolved(clean) : nil, catalogueRow: nil,
                                         route: Route(provenance: provenance, score: worth * lift, seed: seed.artist, cluster: seed.cluster, why: why)))
                 }
+            }
+            var offered = Set<Int>()
+            for credit in credited where !own.contains(where: credit.keys.contains) && offered.insert(credit.id).inserted {
+                out.append(Sighting(name: credit.name, discogsID: credit.id, catalogueRow: nil,
+                                    route: Route(provenance: .direct, score: 0.9 * lift, seed: seed.artist, cluster: seed.cluster,
+                                                 why: "On \(credit.release) with \(seed.name)")))
             }
             if let entry {
                 add(entry.collaborators, .direct, 1, "Credited with \(seed.name)")
                 add(entry.members, .direct, 1, "A member of \(seed.name)")
                 add(entry.groups, .direct, 0.9, "\(seed.name) plays in it")
-                add(entry.labelNeighbours, .sharedContext, 0.6, "Shares a label with \(seed.name)")
-                add(entry.styleNeighbours, .musicalSimilarity, 0.5, "The same styles as \(seed.name), as Discogs files them")
+                add(entry.labelNeighbours, .sharedContext, 0.6, "Shares a label with \(seed.name)", resolve: false)
+                add(entry.styleNeighbours, .musicalSimilarity, 0.5, "The same styles as \(seed.name), as Discogs files them", resolve: false)
             }
             for record in (bySeed[seed.artist] ?? []).sorted(by: { $0.id < $1.id }) {
                 let names = record.personnel.sorted().compactMap { record.personnelNames[$0] }

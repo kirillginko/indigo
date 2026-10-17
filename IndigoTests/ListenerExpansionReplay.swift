@@ -89,6 +89,20 @@ final class ListenerExpansionReplay: XCTestCase {
         }
     }
 
+    /// A seed's own release documents, from R2, read once.
+    actor Releases {
+        var held: [Int: DiscogsReleaseDetail?] = [:]
+        var reads = 0
+        func documents(_ ids: [Int]) async -> [DiscogsReleaseDetail] {
+            var out: [DiscogsReleaseDetail] = []
+            for id in ids {
+                if held[id] == nil { reads += 1; held[id] = .some(await ReleaseVideoTracks.live.release(id)) }
+                if let found = held[id] ?? nil { out.append(found) }
+            }
+            return out
+        }
+    }
+
     func testExpandedPoolsAgainstForYou() async throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["INDIGO_EXPANSION_REPLAY"] == "1", "Set INDIGO_EXPANSION_REPLAY=1.")
         let support = try XCTUnwrap(FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first)
@@ -118,6 +132,7 @@ final class ListenerExpansionReplay: XCTestCase {
         let last = (everything.crate.map(\.addedAt) + everything.met.map(\.lastAt)).max() ?? Date()
         let whole = ListenerProfile.read(context: context)
         let playable = Playable()
+        let releases = Releases()
         var totals: [String: [Int]] = [:]   // label → [finds, sessions, playable, slots]
 
         for days in [21, 14, 10, 7, 0] {
@@ -192,7 +207,22 @@ final class ListenerExpansionReplay: XCTestCase {
                                              groups: row.groupNames, labelNeighbours: row.labelNeighbourNames,
                                              styleNeighbours: row.styleNeighbourNames, aliases: row.aliasNames)
             }
-            let direct = ListenerRetrieval.direct(seeds, entries: entries, records: datedPool)
+            // What each seed's own releases credit, by entry: up to eight of
+            // its releases the dated entry lists.
+            var credits: [String: [ListenerRetrieval.Credit]] = [:]
+            for seed in seeds {
+                guard let row = rowByKey[seed.artist] else { continue }
+                let documents = await releases.documents(Array(row.releaseDiscogsIDs.prefix(8)))
+                credits[seed.artist] = ListenerRetrieval.credits(seedID: row.discogsID, releases: documents)
+            }
+            let unresolved = ListenerRetrieval.direct(seeds, entries: entries, records: datedPool)
+            let direct = ListenerRetrieval.direct(seeds, entries: entries, records: datedPool, credits: credits)
+            func identified(_ list: [ListenerRetrieval.Sighting]) -> (Int, Int) {
+                let merged = ListenerRetrieval.merge(list).candidates.filter { c in !c.aliases.contains(where: known.contains) && !known.contains(c.nameKey) }
+                return (merged.filter { $0.identity.hasPrefix("discogs:") }.count, merged.count)
+            }
+            let before = identified(unresolved), after = identified(direct)
+            out.append("cluster-seed candidates with a verified Discogs id: \(before.0) of \(before.1) by name alone -> \(after.0) of \(after.1) with the seeds' own release credits (\(credits.values.reduce(0) { $0 + $1.count }) credits from \(await releases.reads) R2 documents read so far)")
             let radio = await ListenerRetrieval.radio(seeds: seeds, discogsIDs: pastRead.discogsIDs, profile: past, vectors: vectors,
                                                       knownKeys: known, before: cutoff, source: ListenerRetrieval.liveRadio, perEpisode: 3)
             let seedNames = Dictionary(seeds.map { ($0.artist, $0.name) }, uniquingKeysWith: { a, _ in a })

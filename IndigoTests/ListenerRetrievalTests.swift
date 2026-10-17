@@ -172,4 +172,30 @@ final class ListenerRetrievalTests: XCTestCase {
         XCTAssertEqual(ListenerRetrieval.popularityStep(from: nil, to: 500), 1)
         XCTAssertEqual(ListenerRetrieval.popularityStep(from: 3, to: 315), sqrt(8.0 / 320), accuracy: 1e-12)
     }
+
+    /// A credit by name on the seed's entry takes the id its own releases
+    /// give that name -- only when one entry goes by it -- and the releases'
+    /// credits are offered with their ids. Engineers, and the seed itself,
+    /// never.
+    func testCreditsResolveThroughTheSeedsOwnReleases() throws {
+        let json = """
+        [{"id": 1, "title": "First", "artists": [{"id": 100, "name": "Seed"}, {"id": 7, "name": "Partner (2)"}],
+          "extraartists": [{"id": 8, "name": "Player", "role": "Bass"}, {"id": 9, "name": "Desk", "role": "Mastered By"},
+                           {"id": 100, "name": "Seed", "role": "Producer"}]},
+         {"id": 2, "title": "Second", "artists": [{"id": 100, "name": "Seed"}],
+          "extraartists": [{"id": 10, "name": "Twin", "role": "Vocals"}, {"id": 11, "name": "Twin", "role": "Drums"}]}]
+        """
+        let releases = try JSONDecoder().decode([DiscogsReleaseDetail].self, from: Data(json.utf8))
+        let credits = ListenerRetrieval.credits(seedID: 100, releases: releases)
+        XCTAssertEqual(Set(credits.map(\.id)), [7, 8, 10, 11], "no mastering engineer, not the seed")
+        let seed = ListenerRetrieval.Seed(artist: "seed", name: "Seed", cluster: 0, weight: 1, level: .artist, title: "Seed")
+        let entry = ListenerRetrieval.Entry(key: "seed", name: "Seed", collaborators: ["Partner", "Twin", "Stranger"], labelNeighbours: ["Player"])
+        let found = ListenerRetrieval.direct([seed], entries: ["seed": entry], records: [], credits: ["seed": credits])
+        let ids = Dictionary(found.map { ($0.name + "|" + $0.route.why, $0.discogsID) }, uniquingKeysWith: { a, _ in a })
+        XCTAssertEqual(ids["Partner|Credited with Seed"], 7)
+        XCTAssertEqual(ids["Twin|Credited with Seed"], .some(nil), "two entries called Twin: left by name")
+        XCTAssertEqual(ids["Stranger|Credited with Seed"], .some(nil), "not on the seed's releases")
+        XCTAssertEqual(ids["Player|Shares a label with Seed"], .some(nil), "a label's roster is not a credit")
+        XCTAssertEqual(ids["Player|On First with Seed"], 8)
+    }
 }

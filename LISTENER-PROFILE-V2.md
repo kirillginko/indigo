@@ -550,6 +550,39 @@ better recommendations, at least on this history. A Debug-only For You
 should keep For You's list and add cluster-seeded artists that verify and
 play, with radio filling only the slots still empty, labelled as radio.
 
+### Cluster-seed credits resolved through the seeds' own releases (2026-10-17)
+
+`ListenerRetrieval.credits` reads the people a seed's own release documents
+credit by entry: co-headliners, track artists, and musical or creative
+credits, never technical ones. It reads up to eight of the releases the
+dated entry lists, from R2. Those credits are offered with their Discogs
+ids. A name on the seed's entry takes an id only when exactly one entry on
+those releases goes by it. Label rosters and Discogs' same-style lists stay
+names. Nothing is matched by name beyond the seed's own records.
+
+- Cluster-seed candidates with a verified id: **0 → 33–36%** (392 of
+  1,264 at 21 days; 456 of 1,380 today). That took 942–1,147 credits from
+  about 400 R2 documents over the whole run.
+- Playable list, summed over four cut-offs (80 slots):
+
+  | list | playable slots | later finds | fit |
+  |------|------|------|------|
+  | For You today | 22 | 4 | 0.50–0.65 |
+  | For You + cluster seeds | **76** (was 25) | **9** (was 7) | 0.28–0.45 |
+  | … + bounded radio | 66 | 4 | 0.35–0.39 |
+  | … + album similarity | 60 | 4 | 0.33–0.39 |
+
+- **Cluster seeds are now the expansion to build on.** With For You's
+  routes kept first, they fill the list with things that play and reach
+  more later artists than For You alone. Radio and album similarity on top
+  still add slots, not finds.
+- **Fit to later listening falls.** Many credited people have no dated
+  style, and those that do range wider than the listener's recent sound.
+- **Mislabelled route, to fix before anything visible:** artists on a DJ
+  mix or compilation a seed made ("A Mixed Tape Made By …", "DJ-Kicks") are
+  offered as "direct musical connection". They are the seed's *selections*,
+  not collaborators, and need their own route and wording.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.
