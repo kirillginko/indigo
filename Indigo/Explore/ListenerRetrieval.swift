@@ -32,11 +32,12 @@ import Supabase
 
 nonisolated enum ListenerRetrieval {
     enum Provenance: String, Sendable, CaseIterable, Codable {
-        case direct, sharedContext, radioAdjacent, radioSecondHop, musicalSimilarity, forYou
+        case direct, selection, sharedContext, radioAdjacent, radioSecondHop, musicalSimilarity, forYou
 
         var label: String {
             switch self {
             case .direct: "direct musical connection"
+            case .selection: "chosen by an artist you play"
             case .sharedContext: "same label or scene"
             case .radioAdjacent: "played next to on radio"
             case .radioSecondHop: "second-hop radio"
@@ -327,6 +328,22 @@ nonisolated enum ListenerRetrieval {
         let keys: Set<String>
         let role: String
         let release: String
+        /// On a record the seed chose rather than made -- a DJ mix, a
+        /// compilation they put together: a selection, not a collaboration.
+        var selection = false
+    }
+
+    /// A record of other people's music the seed chose: its formats say
+    /// compilation or mixed, it is filed under Various, or the seed's own
+    /// credit on it is the DJ mix, the compiling or the selecting.
+    static func isSelection(_ release: DiscogsReleaseDetail, seedID: Int?) -> Bool {
+        let descriptions = (release.formats ?? []).flatMap { $0.descriptions ?? [] }.map { $0.lowercased() }
+        if descriptions.contains(where: { $0 == "compilation" || $0 == "mixed" }) { return true }
+        if (release.artists ?? []).contains(where: { ($0.name ?? "").lowercased().hasPrefix("various") }) { return true }
+        let chose = ["dj mix", "compiled by", "selected by", "curated by"]
+        return (release.extraartists ?? []).contains { credit in
+            (seedID != nil && credit.id == seedID) && chose.contains { (credit.role ?? "").lowercased().contains($0) }
+        }
     }
 
     /// Everyone the seed's own release documents credit with an entry --
@@ -335,12 +352,14 @@ nonisolated enum ListenerRetrieval {
     /// ids a credit by name on the seed's entry can be resolved to.
     static func credits(seedID: Int?, releases: [DiscogsReleaseDetail]) -> [Credit] {
         var out: [Credit] = []
+        var selection = false
         func add(_ id: Int?, _ name: String?, _ anv: String?, role: String, release: String) {
             guard let id, id > 0, id != seedID, let name = name.map(DiscogsClient.withoutDisambiguator), ArtistName.isRealArtist(name) else { return }
             let keys = Set([name, anv].compactMap { $0 }.map { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator($0)) }.filter { !$0.isEmpty })
-            out.append(Credit(id: id, name: name, keys: keys, role: role, release: release))
+            out.append(Credit(id: id, name: name, keys: keys, role: role, release: release, selection: selection))
         }
         for release in releases.sorted(by: { $0.id < $1.id }) {
+            selection = isSelection(release, seedID: seedID)
             for artist in release.artists ?? [] { add(artist.id, artist.name, artist.anv, role: "Artist", release: release.title) }
             for credit in release.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true {
                 add(credit.id, credit.name, credit.anv, role: credit.role ?? "", release: release.title)
@@ -390,10 +409,16 @@ nonisolated enum ListenerRetrieval {
                 }
             }
             var offered = Set<Int>()
-            for credit in credited where !own.contains(where: credit.keys.contains) && offered.insert(credit.id).inserted {
+            // Made with them first: someone both on a record they made and on
+            // one they chose is a collaborator.
+            let ordered = credited.filter { !$0.selection } + credited.filter(\.selection)
+            for credit in ordered where !own.contains(where: credit.keys.contains) && offered.insert(credit.id).inserted {
                 out.append(Sighting(name: credit.name, discogsID: credit.id, catalogueRow: nil,
-                                    route: Route(provenance: .direct, score: 0.9 * lift, seed: seed.artist, cluster: seed.cluster,
-                                                 why: "On \(credit.release) with \(seed.name)")))
+                                    route: credit.selection
+                                        ? Route(provenance: .selection, score: 0.5 * lift, seed: seed.artist, cluster: seed.cluster,
+                                                why: "Chosen by \(seed.name) for \(credit.release)")
+                                        : Route(provenance: .direct, score: 0.9 * lift, seed: seed.artist, cluster: seed.cluster,
+                                                why: "On \(credit.release) with \(seed.name)")))
             }
             if let entry {
                 add(entry.collaborators, .direct, 1, "Credited with \(seed.name)")

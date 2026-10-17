@@ -198,4 +198,32 @@ final class ListenerRetrievalTests: XCTestCase {
         XCTAssertEqual(ids["Player|Shares a label with Seed"], .some(nil), "a label's roster is not a credit")
         XCTAssertEqual(ids["Player|On First with Seed"], 8)
     }
+
+    /// What a seed chose is not what they made: the artists on their DJ mix
+    /// or compilation are offered as their selection, never as a
+    /// collaboration; someone on both kinds of record is a collaborator.
+    func testAMixTheSeedMadeIsASelection() throws {
+        let json = """
+        [{"id": 1, "title": "DJ-Kicks", "artists": [{"id": 100, "name": "Seed"}],
+          "formats": [{"name": "CD", "descriptions": ["Compilation", "Mixed"]}],
+          "tracklist": [{"title": "One", "artists": [{"id": 20, "name": "Picked"}]},
+                        {"title": "Two", "artists": [{"id": 21, "name": "Both"}]}]},
+         {"id": 2, "title": "Own Album", "artists": [{"id": 100, "name": "Seed"}],
+          "extraartists": [{"id": 21, "name": "Both", "role": "Keyboards"}]},
+         {"id": 3, "title": "Tape", "artists": [{"id": 100, "name": "Seed"}],
+          "extraartists": [{"id": 100, "name": "Seed", "role": "DJ Mix"}],
+          "tracklist": [{"title": "Three", "artists": [{"id": 22, "name": "Also Picked"}]}]}]
+        """
+        let releases = try JSONDecoder().decode([DiscogsReleaseDetail].self, from: Data(json.utf8))
+        XCTAssertEqual(releases.map { ListenerRetrieval.isSelection($0, seedID: 100) }, [true, false, true])
+        let credits = ListenerRetrieval.credits(seedID: 100, releases: releases)
+        let seed = ListenerRetrieval.Seed(artist: "seed", name: "Seed", cluster: 0, weight: 1, level: .artist, title: "Seed")
+        let found = ListenerRetrieval.direct([seed], entries: [:], records: [], credits: ["seed": credits])
+        let byName = Dictionary(found.map { ($0.name, $0.route) }, uniquingKeysWith: { a, _ in a })
+        XCTAssertEqual(byName["Picked"]?.provenance, .selection)
+        XCTAssertEqual(byName["Picked"]?.why, "Chosen by Seed for DJ-Kicks")
+        XCTAssertEqual(byName["Also Picked"]?.provenance, .selection)
+        XCTAssertEqual(byName["Both"]?.provenance, .direct)
+        XCTAssertFalse(found.filter { $0.route.provenance == .selection }.contains { $0.route.why.lowercased().contains("with") })
+    }
 }

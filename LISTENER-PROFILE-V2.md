@@ -578,10 +578,19 @@ names. Nothing is matched by name beyond the seed's own records.
   still add slots, not finds.
 - **Fit to later listening falls.** Many credited people have no dated
   style, and those that do range wider than the listener's recent sound.
-- **Mislabelled route, to fix before anything visible:** artists on a DJ
-  mix or compilation a seed made ("A Mixed Tape Made By …", "DJ-Kicks") are
-  offered as "direct musical connection". They are the seed's *selections*,
-  not collaborators, and need their own route and wording.
+- **Selections have their own route** (fixed the same day). A release is
+  the seed's selection when any of these holds:
+  - its formats say Compilation or Mixed;
+  - it is filed under Various;
+  - the seed's own credit on it is DJ Mix, Compiled, Selected or Curated
+    By.
+
+  Its track artists are offered as `selection`, "chosen by an artist you
+  play", worded "Chosen by Anika for A Mixed Tape Made By Anika". They are
+  never "with", and weigh 0.5 against a collaboration's 0.9. Someone on both
+  a record the seed made and one they chose is a collaborator. Replayed,
+  the totals are unchanged (76 of 80 playable slots, 9 later finds): only
+  the labels and a little of the order move.
 
 ## Next
 
