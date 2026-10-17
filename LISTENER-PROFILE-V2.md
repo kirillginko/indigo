@@ -354,6 +354,57 @@ a station is `radio.live`, an archive `radio.archive`, a local file
   measure the replays lacked. It needs a few weeks of history from a build
   that records it before a replay can use it.
 
+### Attribution validation pass (2026-10-17)
+
+- **Off in the App Store build.** `ListeningAttributionFeature` (key
+  `INDIGO_LISTENING_ATTRIBUTION`, refused in release binaries by
+  `Scripts/release-enrichment-guard.sh`): on in internal builds, a Debug
+  switch otherwise. Reason, measured by `ListeningAttributionAudit`: a build
+  from before attribution reads every tag as an interest. The surface tag
+  rides on every attributed row and becomes its strongest "interest". That
+  scales every music interest to 1–3% of its weight, and all 25–28
+  interests above the 0.15 a scene needs fall below it, even with only the
+  last 30 days attributed. Reading is safe everywhere. Writing for everyone
+  waits until builds that read tags as music are gone.
+- **Verified ids beside names.** `viaid:` carries `discogs-artist:<id>` or
+  `discogs-release:<id>` only where the source already holds a verified id:
+  Discover seeds, artist pages, records. A For You route names its origin
+  only, so it carries no id. No name is ever resolved to an id.
+- **Surface vs origin.** The surface is where playback started. `origin:` is
+  the recommendation that opened the page it started on (For You → artist →
+  track). It is carried only by that page while it is on top, plus the queue
+  started there. Opening another page, going back past it, searching or
+  changing section drops it. Both are fixed when a listen starts and never
+  rewritten.
+- **One playback.** The witness writes a recording row and an artist row
+  (or a show and a station) for one listen. They already share the moment,
+  action, seconds, completion and surface, which is the key in
+  `ListeningPlayback`; no field was added. Grouping is checked on both
+  histories: 687 and 656 listens from 1,155 and 1,124 rows, 0 listens whose
+  rows disagree.
+- **Read-only summary.** `AttributionSummary` counts each listen once by
+  surface and by origin; `ListeningAttributionAudit` reports it for a
+  store.
+- **Simulator** (iPhone 16 Pro, attribution on), each written as expected:
+  - For You → artist page → track: `dig.artist.listen` with the page's id
+    and origin `foryou.mix` via the artist it was credited with.
+  - The page's next track keeps both.
+  - Unrelated navigation (an alias page opened from that page): no origin.
+  - DIG Discover → queue advancement: each track its own `via` and id.
+  - A 12-second play is a skip with its surface.
+  - Crate, including queue advancement: `crate`.
+  - Live radio pressed where the screen says nothing: `radio.live`.
+  - Pausing excluded the paused time.
+- **Not covered:**
+  - Audio interruption: it can't be driven in the simulator.
+  - For You → record → play: the record had no playable recordings.
+  - Killing the app mid-listen loses that listen (existing behaviour: a
+    listen is written when the next item starts or playback stops). Nothing
+    is restored on relaunch, so nothing is misattributed.
+  - An embedded track left playing overnight recorded 22,010 seconds heard
+    at 13% complete, a heard-time bug in the embed path, separate from
+    attribution.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.

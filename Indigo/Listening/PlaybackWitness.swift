@@ -66,7 +66,8 @@ final class PlaybackWitness {
             log.record(
                 node, action: action, at: at,
                 seconds: seconds, completion: completion,
-                tags: item.genres + (surface ?? .inferred(for: item)).tags, source: reading.source
+                tags: item.genres + (ListeningAttributionFeature.isEnabled ? (surface ?? .inferred(for: item)).tags : []),
+                source: reading.source
             )
         }
     }

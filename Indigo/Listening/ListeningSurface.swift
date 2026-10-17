@@ -17,53 +17,121 @@
 
 import Foundation
 
+/// Whether listens are written down with where they started. Off in the App
+/// Store build: a build from before attribution reads every tag as an
+/// interest, and the attribution tags -- on every attributed row -- become
+/// its strongest interest, scaling every real one down to a few hundredths
+/// (`ListeningAttributionAudit`). Reading them is always safe; writing them
+/// waits until the builds that read them as music are gone.
+nonisolated enum ListeningAttributionFeature {
+    #if DEBUG
+    static let switchKey = "INDIGO_LISTENING_ATTRIBUTION"
+    #endif
+    nonisolated(unsafe) static var override: Bool?
+
+    static var isEnabled: Bool {
+        if let override { return override }
+        #if DEBUG
+        return UserDefaults.standard.bool(forKey: switchKey)
+        #elseif INDIGO_INTERNAL
+        return true
+        #else
+        return false
+        #endif
+    }
+}
+
 nonisolated struct ListeningSurface: Hashable, Sendable {
     /// Dotted, lower case: "foryou.mix", "dig.discover", "dig.artist.listen",
     /// "crate", "radio.live" …
     var screen: String
-    /// What of the listener's it was reached through, as a folded artist key
-    /// ("played next to X" → x).
+    /// What of the listener's it was reached through, for reading: a folded
+    /// artist key ("played next to X" → x).
     var via: String?
+    /// The same, as a verified identity when one is known --
+    /// "discogs-artist:45", "discogs-release:1234" -- and nil otherwise. Never
+    /// worked out from the name.
+    var viaID: String?
     /// What kind of recommendation it was: "track", "artist", "record", or a
     /// station's id for radio.
     var route: String?
+    /// The recommendation that led here, when the listen started on a page
+    /// opened from one (For You → an artist → their track): carried only by
+    /// that page, and dropped by anything else the listener does.
+    var origin: Origin?
 
-    init(screen: String, via: String? = nil, route: String? = nil) {
+    nonisolated struct Origin: Hashable, Sendable {
+        var screen: String
+        var via: String?
+        var viaID: String?
+        var route: String?
+    }
+
+    init(screen: String, via: String? = nil, viaID: String? = nil, route: String? = nil, origin: Origin? = nil) {
         self.screen = screen
         self.via = via
+        self.viaID = viaID
         self.route = route
+        self.origin = origin
     }
+
+    /// As the origin of what is opened from it.
+    var asOrigin: Origin { Origin(screen: screen, via: via, viaID: viaID, route: route) }
+
+    static func discogsArtist(_ id: Int?) -> String? { id.flatMap { $0 > 0 ? "discogs-artist:\($0)" : nil } }
+    static func discogsRelease(_ id: Int?) -> String? { id.flatMap { $0 > 0 ? "discogs-release:\($0)" : nil } }
 
     static let screenPrefix = "surface:"
     static let viaPrefix = "via:"
+    static let viaIDPrefix = "viaid:"
     static let routePrefix = "route:"
+    static let originPrefix = "origin:"
+    static let originViaPrefix = "originvia:"
+    static let originViaIDPrefix = "originviaid:"
+    static let originRoutePrefix = "originroute:"
+    static let prefixes = [screenPrefix, viaPrefix, viaIDPrefix, routePrefix, originPrefix, originViaPrefix, originViaIDPrefix, originRoutePrefix]
+
+    private static func clean(_ text: String) -> String {
+        text.lowercased().map { $0 == "/" || $0 == "," ? " " : $0 }
+            .reduce(into: "") { $0.append($1) }
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     /// As tags, spelled so `ListeningLog.foldTags` keeps each whole: lower
     /// case, no slash or comma (which it splits on).
     var tags: [String] {
-        func clean(_ text: String) -> String {
-            text.lowercased().map { $0 == "/" || $0 == "," ? " " : $0 }
-                .reduce(into: "") { $0.append($1) }
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+        var out = [Self.screenPrefix + Self.clean(screen)]
+        func add(_ prefix: String, _ value: String?, key: Bool = false) {
+            guard let value, case let cleaned = Self.clean(key ? RecordingKey.normalizeArtist(value) : value), !cleaned.isEmpty else { return }
+            out.append(prefix + cleaned)
         }
-        var out = [Self.screenPrefix + clean(screen)]
-        if let via, !clean(via).isEmpty { out.append(Self.viaPrefix + clean(RecordingKey.normalizeArtist(via))) }
-        if let route, !clean(route).isEmpty { out.append(Self.routePrefix + clean(route)) }
+        add(Self.viaPrefix, via, key: true)
+        add(Self.viaIDPrefix, viaID)
+        add(Self.routePrefix, route)
+        if let origin {
+            add(Self.originPrefix, origin.screen)
+            add(Self.originViaPrefix, origin.via, key: true)
+            add(Self.originViaIDPrefix, origin.viaID)
+            add(Self.originRoutePrefix, origin.route)
+        }
         return out
     }
 
     /// Read back from an event's tags; nil when it carries none (every event
     /// from before this existed).
     init?(tags: [String]) {
-        guard let screen = tags.first(where: { $0.hasPrefix(Self.screenPrefix) }) else { return nil }
-        self.screen = String(screen.dropFirst(Self.screenPrefix.count))
-        via = tags.first { $0.hasPrefix(Self.viaPrefix) }.map { String($0.dropFirst(Self.viaPrefix.count)) }
-        route = tags.first { $0.hasPrefix(Self.routePrefix) }.map { String($0.dropFirst(Self.routePrefix.count)) }
+        func value(_ prefix: String) -> String? { tags.first { $0.hasPrefix(prefix) }.map { String($0.dropFirst(prefix.count)) } }
+        guard let screen = value(Self.screenPrefix) else { return nil }
+        self.screen = screen
+        via = value(Self.viaPrefix)
+        viaID = value(Self.viaIDPrefix)
+        route = value(Self.routePrefix)
+        origin = value(Self.originPrefix).map {
+            Origin(screen: $0, via: value(Self.originViaPrefix), viaID: value(Self.originViaIDPrefix), route: value(Self.originRoutePrefix))
+        }
     }
 
-    static func isSurfaceTag(_ tag: String) -> Bool {
-        tag.hasPrefix(screenPrefix) || tag.hasPrefix(viaPrefix) || tag.hasPrefix(routePrefix)
-    }
+    static func isSurfaceTag(_ tag: String) -> Bool { prefixes.contains { tag.hasPrefix($0) } }
 
     /// The tags that describe the music.
     static func musicTags(_ tags: [String]) -> [String] { tags.filter { !isSurfaceTag($0) } }

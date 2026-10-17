@@ -118,6 +118,8 @@ final class PlaybackWitnessTests: XCTestCase {
 
     @MainActor
     func testARejectionIsWrittenDownAsOne() throws {
+        ListeningAttributionFeature.override = true
+        defer { ListeningAttributionFeature.override = nil }
         let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
@@ -138,8 +140,22 @@ final class PlaybackWitnessTests: XCTestCase {
 
     /// Where a listen started is written down with it, and survives the
     /// tag folding; taste never sees it.
+    /// Off, as in the App Store build: nothing but the music in the tags.
+    @MainActor
+    func testWithAttributionOffOnlyTheMusicIsWritten() throws {
+        ListeningAttributionFeature.override = false
+        defer { ListeningAttributionFeature.override = nil }
+        let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let context = ModelContext(try ModelContainer(for: Persistence.schema, configurations: configuration))
+        PlaybackWitness(context: context).record(item(id: "y", source: "youtube", kind: .track, title: "T", subtitle: "A", genres: ["Dub"]),
+                                                 seconds: 60, completion: 1, surface: ListeningSurface(screen: "foryou.mix"))
+        XCTAssertTrue(ListeningLog(context: context).all().allSatisfy { $0.tags == ["dub"] })
+    }
+
     @MainActor
     func testTheSurfaceThatStartedAListenIsWrittenDown() throws {
+        ListeningAttributionFeature.override = true
+        defer { ListeningAttributionFeature.override = nil }
         let configuration = ModelConfiguration(schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Persistence.schema, configurations: configuration)
         let context = ModelContext(container)
@@ -168,14 +184,14 @@ final class PlaybackWitnessTests: XCTestCase {
         player.play([a, b], from: ListeningSurface(screen: "dig.discover", via: "x", route: "track"))
         XCTAssertEqual(player.surface(for: "b")?.screen, "dig.discover", "a queued item keeps the surface it was queued from")
         player.playRadio(item(id: "s", source: "nts", kind: .radioStation, title: "NTS 1"))
-        XCTAssertNil(player.surface(for: "s"))
+        XCTAssertEqual(player.surface(for: "s")?.screen, "radio.live", "the screen said nothing: the item says radio")
         // The listen running is credited to where it started, even when a
         // new queue holding the same item arrives before it ends.
         player.play([b, a], startingAt: 0, surfaces: [ListeningSurface(screen: "foryou.mix", via: "y"), nil])
         XCTAssertEqual(player.listeningSurface?.screen, "foryou.mix")
         XCTAssertEqual(player.surface(for: "b")?.via, "y", "each queued item its own")
         player.play([a])
-        XCTAssertNil(player.surface(for: "a"), "played again from somewhere that said nothing: not the old surface")
+        XCTAssertEqual(player.surface(for: "a")?.screen, "radio.live", "played again from somewhere that said nothing: not the old surface")
     }
 
     // MARK: Measuring how much was heard

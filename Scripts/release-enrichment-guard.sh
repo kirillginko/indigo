@@ -19,9 +19,10 @@ app=$(find "$archive/Products/Applications" -maxdepth 1 -type d -name "*.app" | 
 # Every file in the bundle: a development build keeps its code in a separate
 # Indigo.debug.dylib, and a check of the main binary alone would miss it.
 # The musician-first switches (MusicianFirst.swift) are development-only too,
-# and so are For You's (ForYouTracksFeature, SimilarRecordsFeature, ForYouMixFeature).
+# and so are For You's (ForYouTracksFeature, SimilarRecordsFeature, ForYouMixFeature)
+# and listening attribution (ListeningAttributionFeature).
 for key in INDIGO_DIG_CATALOGUE_PILOT INDIGO_DIG_MUSICIAN_FIRST INDIGO_FORYOU_MUSICIAN_FIRST INDIGO_DIG_RECOMMENDATIONS INDIGO_DIG_TRACKS \
-           INDIGO_FORYOU_TRACKS INDIGO_FORYOU_SIMILAR INDIGO_FORYOU_MIX; do
+           INDIGO_FORYOU_TRACKS INDIGO_FORYOU_SIMILAR INDIGO_FORYOU_MIX INDIGO_LISTENING_ATTRIBUTION; do
     found=$(find "$app" -type f -print0 | xargs -0 grep -l -a "$key" 2>/dev/null || true)
     if [ -n "$found" ]; then
         echo "FAIL: the development override $key is in: $found" >&2

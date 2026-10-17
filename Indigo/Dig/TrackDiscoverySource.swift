@@ -419,7 +419,7 @@ extension TrackDiscovery {
                 DiscoveredTrack(artist: appearance.artist, artistDiscogsID: appearance.artistDiscogsID, title: appearance.title,
                                 source: appearance.source, artworkURL: appearance.artworkURL, release: appearance.release,
                                 year: appearance.year, reason: "By \(appearance.artist)", via: appearance.artist,
-                                playable: .unknown, score: 0)
+                                viaDiscogsID: appearance.artistDiscogsID, playable: .unknown, score: 0)
             }
     }
 }

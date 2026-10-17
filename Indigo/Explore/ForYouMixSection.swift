@@ -155,16 +155,16 @@ struct ForYouMixSection: View {
         switch item.payload {
         case .track(let track):
             let (media, start) = track.mediaItem
-            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, route: item.kind.rawValue)) }
+            if !player.isCurrent(media.id) { player.play([media], from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue)) }
             if let start { player.seekWhenReady(to: TimeInterval(start), in: media.id) }
         case .record(let found):
-            appState.open(.digRelease(id: found.record.id, title: found.record.title))
+            appState.open(.digRelease(id: found.record.id, title: found.record.title), from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue).asOrigin)
         case .suggestion(let suggestion):
             Task {
                 let stations = KeptShow.Stations(nts: ntsBrowse, lot: lotBrowse, dublab: dublabBrowse,
                                                  radio80000: radio80000Browse, n10as: n10asBrowse)
                 switch await KeptShow.destination(for: suggestion.node, stations: stations) {
-                case .page(let page): appState.open(page)
+                case .page(let page): appState.open(page, from: ListeningSurface(screen: "foryou.mix", via: item.via, viaID: item.viaID, route: item.kind.rawValue).asOrigin)
                 case .section(let route): appState.select(route)
                 case nil: break
                 }

@@ -59,12 +59,24 @@ final class PlaybackCoordinator {
     /// listen still running came from.
     @ObservationIgnored private(set) var listeningSurface: ListeningSurface?
 
+    /// The recommendation that led to the page now on top, asked once, when
+    /// something is put on: set by the app, which knows the navigation.
+    @ObservationIgnored var originNow: (() -> ListeningSurface.Origin?)?
+
     /// Where a queued item will be credited to, if the screen said.
     func surface(for itemID: String) -> ListeningSurface? { surfaces[itemID] }
 
+    /// Each item's surface, settled when it is queued: the screen's own, or
+    /// what the item says it is; with the origin, if a recommendation led to
+    /// the page it was put on from.
     private func remember(_ items: [MediaItem], from surfaces: [ListeningSurface?]) {
         if self.surfaces.count > 500 { self.surfaces = [:] }
-        for (index, item) in items.enumerated() { self.surfaces[item.id] = index < surfaces.count ? surfaces[index] : nil }
+        let origin = originNow?()
+        for (index, item) in items.enumerated() {
+            var surface = (index < surfaces.count ? surfaces[index] : nil) ?? .inferred(for: item)
+            if surface.origin == nil { surface.origin = origin }
+            self.surfaces[item.id] = surface
+        }
     }
 
     /// Told when listening to an item ends: what it was, how many seconds of

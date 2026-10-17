@@ -103,6 +103,8 @@ nonisolated struct DiscoveredTrack: Identifiable, Equatable, Sendable, Codable {
     let reason: String
     /// The listener's starting point it came from.
     let via: String
+    /// Its Discogs id: every seed is a verified Discogs artist.
+    var viaDiscogsID: Int? = nil
     var playable: Playable
     var score: Double
 
@@ -247,7 +249,7 @@ nonisolated enum TrackDiscovery {
                 year: appearance.year, releaseDiscogsID: appearance.releaseDiscogsID,
                 signal: neighbour.seed.signal, knownArtist: known,
                 tags: appearance.genres.isEmpty ? nil : appearance.genres, reason: neighbour.reason,
-                via: neighbour.seed.name, playable: .unknown, score: score))
+                via: neighbour.seed.name, viaDiscogsID: neighbour.seed.discogsID, playable: .unknown, score: score))
         }
         candidates.sort { $0.score != $1.score ? $0.score > $1.score : $0.id < $1.id }
         // One track per artist and per record, a few per starting point, a

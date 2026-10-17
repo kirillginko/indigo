@@ -721,7 +721,7 @@ struct ArtistDigView: View {
                 id: "youtube.\(url.absoluteString)", sourceID: "youtube", kind: .track, title: title,
                 subtitle: card.artist.title, detail: card.evidence?.title ?? card.artist.title,
                 remoteArtworkURL: card.artist.artworkURL, playbackURL: url, embedProvider: .youtube
-            )], startingAt: 0, from: ListeningSurface(screen: "dig.artist.recommendation", via: artistName, route: "artist"))
+            )], startingAt: 0, from: ListeningSurface(screen: "dig.artist.recommendation", via: artistName, viaID: ListeningSurface.discogsArtist(discogsID), route: "artist"))
         case .radio(let episode)?:
             // The episode's own page, which plays it.
             if let destination = episode.page.destination { appState.open(destination) } else { openURL(episode.archiveURL) }
@@ -844,7 +844,7 @@ struct ArtistDigView: View {
             )
         }
         let index = profile.listen.firstIndex { $0.id == line.id } ?? 0
-        player.play(items, startingAt: index, from: ListeningSurface(screen: "dig.artist.listen", via: artistName))
+        player.play(items, startingAt: index, from: ListeningSurface(screen: "dig.artist.listen", via: artistName, viaID: ListeningSurface.discogsArtist(discogsID)))
     }
 
     /// Where this artist sits. More than one is normal — people move, and a

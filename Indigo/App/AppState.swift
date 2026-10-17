@@ -197,7 +197,16 @@ final class AppState {
     /// Detail pages stacked on top of the current route. NTS browsing goes two
     /// deep (show → episode), so this is a stack rather than a single slot.
     private(set) var path: [DetailPage] = []
-    var searchText: String = ""
+    var searchText: String = "" {
+        // Searching is something else: a page opened from a recommendation
+        // no longer speaks for what is played next.
+        didSet { if !searchText.isEmpty { recommendationOrigin = nil } }
+    }
+    /// The recommendation the page on top was opened from (For You → an
+    /// artist), so a listen started on that page can say what led to it.
+    /// Only ever that page's: opening anything else, going back past it,
+    /// changing section or searching drops it.
+    @ObservationIgnored private var recommendationOrigin: (page: DetailPage, origin: ListeningSurface.Origin)?
     /// Bumped by ⌘F; SearchField watches it and takes focus.
     private(set) var searchFocusRequests = 0
 
@@ -209,7 +218,15 @@ final class AppState {
         path.count > 1 ? path[path.count - 2] : nil
     }
 
+    /// What led to the page on top, if it was opened from a recommendation
+    /// and is still the page on top.
+    var originOfTopPage: ListeningSurface.Origin? {
+        guard let held = recommendationOrigin, path.last == held.page else { return nil }
+        return held.origin
+    }
+
     func select(_ route: Route) {
+        recommendationOrigin = nil
         searchText = ""
         path = []
         self.route = route
@@ -222,8 +239,11 @@ final class AppState {
         searchText = query
     }
 
-    func open(_ page: DetailPage) {
+    /// Opens a page; `origin` when the listener got here by taking a
+    /// recommendation, nil for every other way in.
+    func open(_ page: DetailPage, from origin: ListeningSurface.Origin? = nil) {
         path.append(page)
+        recommendationOrigin = origin.map { (page, $0) }
     }
 
     func popDetail() {

@@ -58,6 +58,9 @@ nonisolated struct ForYouItem: Identifiable, Equatable, Sendable {
     let reason: String
     /// What of theirs it came from.
     let via: String
+    /// Its verified identity, when the source knows one (a seed's Discogs
+    /// id, a record's); nil for a For You route, which names its origin only.
+    var viaID: String? = nil
     /// Tags it can be placed by on the compass, folded.
     var tags: [String] = []
 
@@ -85,6 +88,7 @@ nonisolated enum ForYouMix {
         let trackItems = tracks.filter { $0.playable == .yes }.map { track in
             ForYouItem(kind: .track, payload: .track(track), artistKeys: [RecordingKey.normalizeArtist(track.artist)],
                        title: track.title, subtitle: track.artist, reason: track.reason, via: track.via,
+                       viaID: ListeningSurface.discogsArtist(track.viaDiscogsID),
                        tags: track.tags ?? artistTags[RecordingKey.normalizeArtist(track.artist)] ?? [])
         }
         var seen = Set<String>()
@@ -109,7 +113,7 @@ nonisolated enum ForYouMix {
                        title: found.record.title,
                        subtitle: [found.record.artistLine, found.record.year.map(String.init)].compactMap { $0 }.joined(separator: " · "),
                        // Which of theirs it resembles, then how: "Like Stratosphere · Slowcore · both on Numero Group".
-                       reason: "Like \(found.via.title) · \(found.reason)", via: found.via.title,
+                       reason: "Like \(found.via.title) · \(found.reason)", via: found.via.title, viaID: ListeningSurface.discogsRelease(found.via.id),
                        tags: found.record.styles + found.record.genres)
         }
         return (trackItems, artistItems, recordItems, showItems)

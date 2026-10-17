@@ -420,7 +420,7 @@ struct DigReleaseView: View {
             )
         }
         let index = profile.listen.firstIndex { $0.id == line.id } ?? 0
-        player.play(items, startingAt: index, from: ListeningSurface(screen: "dig.release", route: "record"))
+        player.play(items, startingAt: index, from: ListeningSurface(screen: "dig.release", viaID: ListeningSurface.discogsRelease(profile.id), route: "record"))
     }
 
     /// What can be said about a record no catalogue has an entry for.

@@ -217,7 +217,7 @@ struct ExploreView: View {
                 let at = place(i, below: nextTop, in: size, frontier: suggestion.frontier)
                 if ExploreScroll.builds(at, in: band) {
                 Button {
-                    if let page = suggestion.node.destination { appState.open(page) }
+                    if let page = suggestion.node.destination { appState.open(page, from: ListeningSurface.Origin(screen: "foryou.list", via: suggestion.via, route: suggestion.kind.rawValue)) }
                 } label: {
                     MapLabel(suggestion.node.title, suggestion.node.kind.label,
                              MosaicColor.lavender, artwork(for: suggestion),
@@ -269,7 +269,7 @@ struct ExploreView: View {
                                    frontier: suggestion.frontier)
                     if ExploreScroll.builds(at, in: band) {
                     Button {
-                        if let page = suggestion.node.destination { appState.open(page) }
+                        if let page = suggestion.node.destination { appState.open(page, from: ListeningSurface.Origin(screen: "foryou.list", via: suggestion.via, route: suggestion.kind.rawValue)) }
                     } label: {
                         MapLabel(suggestion.node.title, suggestion.node.kind.label,
                                  MosaicColor.lavender, artwork(for: suggestion),

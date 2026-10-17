@@ -179,6 +179,7 @@ struct IndigoApp: App {
                 #endif
                 .task {
                     witness.watch(player)
+                    player.originNow = { [appState] in appState.originOfTopPage }
                     // Keep the picture backlog out of the way while a stream
                     // opens. See `DigStore.holdBackgroundWork`.
                     player.onPlaybackStarting = { [dig] in dig.holdBackgroundWork() }
