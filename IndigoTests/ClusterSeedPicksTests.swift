@@ -11,6 +11,11 @@ import XCTest
 @testable import Indigo
 
 final class ClusterSeedPicksTests: XCTestCase {
+    actor Counter {
+        var counts: [String: Int] = [:]
+        func add(_ name: String) { counts[name, default: 0] += 1 }
+    }
+
     private let vectors: [String: [String: Double]] = ["ambient": ["ambient": 1], "drone": ["drone": 0.8, "ambient": 0.6]]
 
     private func inputs() -> ClusterSeedPicks.Inputs {
@@ -31,7 +36,7 @@ final class ClusterSeedPicksTests: XCTestCase {
                      releaseIDs: ["seed0": (seed: 100, releases: [10, 11])], book: book, known: ["seed1", "known"])
     }
 
-    private func source() throws -> ClusterSeedPicks {
+    private func source(store: ClusterSeedStore? = nil, asked: Counter = Counter()) throws -> ClusterSeedPicks {
         let json = """
         {"10": {"id": 10, "title": "Own Album", "artists": [{"id": 100, "name": "Seed 0"}],
                 "extraartists": [{"id": 1, "name": "Made", "role": "Bass"}, {"id": 3, "name": "Known", "role": "Drums"},
@@ -49,7 +54,7 @@ final class ClusterSeedPicksTests: XCTestCase {
         """
         let decodedEpisode = try JSONDecoder().decode(TrackDiscoverySource.Row.Episode.self, from: Data(episode.utf8))
         return ClusterSeedPicks(
-            release: { releases[String($0)] },
+            release: { id in await asked.add("release"); return releases[String(id)] },
             videos: ReleaseVideoTracks(shelf: { _ in nil }, release: { _ in nil }),
             rows: { ids in Dictionary(uniqueKeysWithValues: ids.compactMap { id in rowOf[id].map { (id, [$0]) } }) },
             appearances: { rows in
@@ -62,7 +67,8 @@ final class ClusterSeedPicksTests: XCTestCase {
                                                    media_url: nil, radio_episodes: decodedEpisode)
                 }
             },
-            plays: { _ in true })
+            plays: { _ in await asked.add("plays"); return true },
+            store: store)
     }
 
     func testOnlyVerifiedUnknownPeopleThatPlayRecordingsFirst() async throws {
@@ -80,5 +86,31 @@ final class ClusterSeedPicksTests: XCTestCase {
         ForYouClusterSeedsFeature.override = nil
         UserDefaults.standard.removeObject(forKey: ForYouClusterSeedsFeature.switchKey)
         XCTAssertFalse(ForYouClusterSeedsFeature.isEnabled)
+    }
+
+    /// Kept: the same history and caches give back the same picks without
+    /// asking anything; a release's credits and an artist's recording are
+    /// not asked for twice.
+    func testWhatWasWorkedOutIsKept() async throws {
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("cluster-seed-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: file) }
+        let store = ClusterSeedStore(file: file)
+        let first = Counter(), second = Counter()
+        let picks = try await source(store: store, asked: first).picks(inputs(), excluding: [])
+        await store.keep(picks: picks, for: "history-1")
+        let again = try await source(store: store, asked: second).picks(inputs(), excluding: [])
+        XCTAssertEqual(again.map(\.artist), picks.map(\.artist))
+        let asked = await second.counts
+        XCTAssertNil(asked["release"], "credits kept per release document")
+        XCTAssertNil(asked["plays"], "each artist's recording kept")
+        let firstAsked = await first.counts
+        XCTAssertGreaterThan(firstAsked["release"] ?? 0, 0)
+
+        // From disk, by another store: the picks for the same fingerprint only.
+        let reopened = ClusterSeedStore(file: file)
+        let kept = await reopened.picks(for: "history-1")
+        XCTAssertEqual(kept?.map(\.artist), picks.map(\.artist))
+        let other = await reopened.picks(for: "history-2")
+        XCTAssertNil(other, "another history: worked out again")
     }
 }

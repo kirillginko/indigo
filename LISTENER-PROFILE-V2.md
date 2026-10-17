@@ -633,8 +633,26 @@ refuses the key.
 
 **Not yet:**
 - The Mac layout has not been looked at.
-- 20+ seconds of work is too slow for anything but a Debug switch; the
-  profile and credits want caching (keyed on history and style caches).
+- Cached since (`ClusterSeedStore`, in Caches; nothing synced):
+  - **The picks**, under a fingerprint of the synced history (events, crate
+    and DIG pages, each by count and newest) and of the style caches
+    (entries by count and newest fetch, records by count). Kept for a day.
+  - **Each release document's credits**, read once and without a seed, so
+    any seed can reuse them.
+  - **Each artist's confirmed recording**, or that nothing played, for a
+    week.
+
+  In the simulator:
+
+  | case | time | breakdown |
+  |------|------|-----------|
+  | cold | 20.7 s | history and profile 7.7 s; credits, ranking and recordings 13.0 s |
+  | same history and caches | 2 ms | kept picks loaded |
+  | after a DIG visit changed the history | 9.6 s | profile 7.6 s; credits, ranking and recordings 2.0 s |
+
+  What is left is building the profile: it reads the whole history and
+  clusters it on every change. Speeding up that build is the next lever,
+  not more caching.
 - "On <release> with <seed>" reads oddly when the release title already
   says "With".
 

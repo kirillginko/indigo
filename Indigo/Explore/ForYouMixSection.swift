@@ -44,9 +44,23 @@ extension DigStore {
         let offered = Set(forYouMix.items.flatMap(\.artistKeys))
         let picks = await Task.detached(priority: .utility) { () -> [DiscoveredTrack] in
             let started = Date()
-            guard let inputs = ClusterSeedPicks.inputs(context: ModelContext(container), vectors: vectors) else { return [] }
+            func ms(_ from: Date) -> Int { Int(Date().timeIntervalSince(from) * 1000) }
+            let context = ModelContext(container)
+            let key = ClusterSeedPicks.fingerprint(context: context)
+            let keyed = ms(started)
+            // The same history and the same style caches: the same picks.
+            if let kept = await ClusterSeedStore.shared.picks(for: key) {
+                Trace.note("foryou.clusterSeeds kept: \(kept.count) picks, fingerprint \(keyed)ms")
+                return kept
+            }
+            var t = Date()
+            guard let inputs = ClusterSeedPicks.inputs(context: context, vectors: vectors) else { return [] }
+            let read = ms(t)
+            t = Date()
             let picks = await ClusterSeedPicks.live.picks(inputs, excluding: offered)
-            Trace.note("foryou.clusterSeeds \(inputs.seeds.count) seeds over \(inputs.profile.clusters.count) clusters, \(picks.count) picks in \(Int(Date().timeIntervalSince(started) * 1000))ms")
+            let found = ms(t)
+            await ClusterSeedStore.shared.keep(picks: picks, for: key)
+            Trace.note("foryou.clusterSeeds \(inputs.seeds.count) seeds over \(inputs.profile.clusters.count) clusters, \(picks.count) picks in \(ms(started))ms (fingerprint \(keyed), history + profile \(read), credits + ranking + recordings \(found))")
             return picks
         }.value
         clusterSeedPicks = picks

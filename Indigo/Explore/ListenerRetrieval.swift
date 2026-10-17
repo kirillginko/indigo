@@ -321,7 +321,7 @@ nonisolated enum ListenerRetrieval {
     }
 
     /// Somebody a seed's own release names, with their Discogs entry.
-    struct Credit: Sendable, Equatable {
+    struct Credit: Sendable, Equatable, Codable {
         let id: Int
         let name: String
         /// Every spelling this release used for them, folded.
@@ -340,9 +340,12 @@ nonisolated enum ListenerRetrieval {
         let descriptions = (release.formats ?? []).flatMap { $0.descriptions ?? [] }.map { $0.lowercased() }
         if descriptions.contains(where: { $0 == "compilation" || $0 == "mixed" }) { return true }
         if (release.artists ?? []).contains(where: { ($0.name ?? "").lowercased().hasPrefix("various") }) { return true }
+        // Read without a seed (once per document), the one who chose is the
+        // record's own artist.
         let chose = ["dj mix", "compiled by", "selected by", "curated by"]
+        let own = seedID.map { [$0] } ?? Set((release.artists ?? []).compactMap(\.id))
         return (release.extraartists ?? []).contains { credit in
-            (seedID != nil && credit.id == seedID) && chose.contains { (credit.role ?? "").lowercased().contains($0) }
+            credit.id.map(own.contains) == true && chose.contains { (credit.role ?? "").lowercased().contains($0) }
         }
     }
 

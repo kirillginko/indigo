@@ -35,6 +35,75 @@ nonisolated enum ForYouClusterSeedsFeature {
     }
 }
 
+/// What working out the picks costs, kept: the picks themselves under the
+/// fingerprint of what they were made from, each release document's credits,
+/// and each artist's confirmed recording. On disk, in Caches: it can all be
+/// worked out again, and none of it is the listener's.
+actor ClusterSeedStore {
+    struct Heard: Codable, Sendable {
+        var title: String
+        var source: DiscoveredTrack.Source
+        var artworkURL: URL?
+        var release: String?
+        var year: Int?
+        var releaseDiscogsID: Int?
+        var at: Date
+    }
+    struct Disk: Codable {
+        var key: String?
+        var picks: [DiscoveredTrack] = []
+        var at: Date?
+        var credits: [String: [ListenerRetrieval.Credit]] = [:]
+        /// By Discogs id; nil when nothing of theirs played when asked.
+        var heard: [String: Heard?] = [:]
+        var heardAt: [String: Date] = [:]
+    }
+
+    static let shared = ClusterSeedStore(file: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+        .appendingPathComponent("cluster-seed-picks.json"))
+
+    private let file: URL?
+    private var disk = Disk()
+    private var loaded = false
+    /// A pick list is reused while what it was made from is unchanged, for a day.
+    static let picksLifetime: TimeInterval = 24 * 3600
+    /// Whether something plays is asked again after a week.
+    static let heardLifetime: TimeInterval = 7 * 24 * 3600
+
+    init(file: URL?) { self.file = file }
+
+    private func load() {
+        guard !loaded else { return }
+        loaded = true
+        if let file, let data = try? Data(contentsOf: file), let found = try? JSONDecoder().decode(Disk.self, from: data) { disk = found }
+    }
+    private func save() {
+        guard let file, let data = try? JSONEncoder().encode(disk) else { return }
+        try? data.write(to: file, options: .atomic)
+    }
+
+    func picks(for key: String, now: Date = Date()) -> [DiscoveredTrack]? {
+        load()
+        guard disk.key == key, let at = disk.at, now.timeIntervalSince(at) < Self.picksLifetime else { return nil }
+        return disk.picks
+    }
+    func keep(picks: [DiscoveredTrack], for key: String, now: Date = Date()) {
+        load(); disk.key = key; disk.picks = picks; disk.at = now; save()
+    }
+    func credits(release id: Int) -> [ListenerRetrieval.Credit]? { load(); return disk.credits[String(id)] }
+    func keep(credits: [ListenerRetrieval.Credit], release id: Int) { load(); disk.credits[String(id)] = credits }
+    /// `.some(nil)`: asked recently, nothing played.
+    func heard(_ id: Int, now: Date = Date()) -> Heard?? {
+        load()
+        guard let at = disk.heardAt[String(id)], now.timeIntervalSince(at) < Self.heardLifetime else { return nil }
+        return .some(disk.heard[String(id)] ?? nil)
+    }
+    func keep(heard: Heard?, for id: Int, now: Date = Date()) {
+        load(); disk.heard[String(id)] = .some(heard); disk.heardAt[String(id)] = now
+    }
+    func flush() { save() }
+}
+
 nonisolated struct ClusterSeedPicks: Sendable {
     /// What the listener's rows and the device's entries say, read once.
     struct Inputs: Sendable {
@@ -55,7 +124,28 @@ nonisolated struct ClusterSeedPicks: Sendable {
     var appearances: @Sendable ([UUID]) async throws -> [TrackDiscoverySource.Row] = TrackDiscoverySource.live.appearances
     var plays: @Sendable (DiscoveredTrack.Source) async -> Bool? = TrackDiscoverySource.live.plays
 
+    var store: ClusterSeedStore? = .shared
+
     static let live = ClusterSeedPicks()
+
+    /// What the picks are made from, in a line: the synced history (events,
+    /// crate, DIG pages) and the style caches (entries, records), each by
+    /// count and newest. Cheap: counts and one row each.
+    static func fingerprint(context: ModelContext) -> String {
+        func count<T: PersistentModel>(_ type: T.Type) -> Int { (try? context.fetchCount(FetchDescriptor<T>())) ?? -1 }
+        func newest<T: PersistentModel>(_ descriptor: FetchDescriptor<T>, _ date: (T) -> Date) -> String {
+            var d = descriptor; d.fetchLimit = 1
+            return ((try? context.fetch(d))?.first).map { String(Int(date($0).timeIntervalSinceReferenceDate)) } ?? "-"
+        }
+        let parts = [
+            "e\(count(ListeningEvent.self)):" + newest(FetchDescriptor<ListeningEvent>(sortBy: [SortDescriptor(\.at, order: .reverse)]), \.at),
+            "c\(count(CrateItem.self)):" + newest(FetchDescriptor<CrateItem>(sortBy: [SortDescriptor(\.addedAt, order: .reverse)]), \.addedAt),
+            "v\(count(DigVisit.self)):" + newest(FetchDescriptor<DigVisit>(sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]), \.lastVisitedAt),
+            "a\(count(DiscogsArtist.self)):" + newest(FetchDescriptor<DiscogsArtist>(sortBy: [SortDescriptor(\.fetchedAt, order: .reverse)]), \.fetchedAt),
+            "r\(count(DiscogsReleaseRecord.self))",
+        ]
+        return parts.joined(separator: "|")
+    }
 
     /// Reads the store: a few seconds, so never on the main thread.
     static func inputs(context: ModelContext, vectors given: [String: [String: Double]], now: Date = Date()) -> Inputs? {
@@ -108,10 +198,16 @@ nonisolated struct ClusterSeedPicks: Sendable {
     /// Up to `limit` tracks to hear, each confirmed to play: recordings of
     /// the artists' own first, in rank order, then moments in archived shows.
     func picks(_ inputs: Inputs, excluding: Set<String>, limit: Int = 8) async -> [DiscoveredTrack] {
-        // The seeds' own releases, read together.
-        let wanted = inputs.releaseIDs.values.flatMap(\.releases)
+        // The seeds' own releases: credits kept per document, the rest read
+        // together.
+        var byRelease: [Int: [ListenerRetrieval.Credit]] = [:]
+        var missing: [Int] = []
+        for (_, held) in inputs.releaseIDs { for id in held.releases {
+            if byRelease[id] != nil { continue }
+            if let kept = await store?.credits(release: id) { byRelease[id] = kept } else { missing.append(id) }
+        } }
         let documents = await withTaskGroup(of: (Int, DiscogsReleaseDetail?).self) { group in
-            var pending = Set(wanted).sorted().makeIterator()
+            var pending = Set(missing).sorted().makeIterator()
             for _ in 0..<8 { if let id = pending.next() { group.addTask { (id, await release(id)) } } }
             var found: [Int: DiscogsReleaseDetail] = [:]
             while let (id, detail) = await group.next() {
@@ -122,7 +218,20 @@ nonisolated struct ClusterSeedPicks: Sendable {
         }
         var credits: [String: [ListenerRetrieval.Credit]] = [:]
         for (artist, held) in inputs.releaseIDs {
-            credits[artist] = ListenerRetrieval.credits(seedID: held.seed, releases: held.releases.compactMap { documents[$0] })
+            var all: [ListenerRetrieval.Credit] = []
+            for id in held.releases {
+                if let kept = byRelease[id] { all += kept; continue }
+                guard let document = documents[id] else { continue }
+                // Per document and without the seed's id, so it keeps for
+                // whichever seed reads it; the seed is taken out below.
+                let found = ListenerRetrieval.credits(seedID: nil, releases: [document])
+                byRelease[id] = found
+                await store?.keep(credits: found, release: id)
+                all += found
+            }
+            // Read per document, a record's own artist is a credit on it;
+            // the seed is not one of its own.
+            credits[artist] = all.filter { $0.id != held.seed }
         }
         let ranked = Self.ranked(inputs, credits: credits, excluding: excluding)
         let seedNames = Dictionary(inputs.seeds.map { ($0.artist, (inputs.entries[$0.artist]?.name ?? $0.name, inputs.releaseIDs[$0.artist]?.seed)) },
@@ -139,23 +248,41 @@ nonisolated struct ClusterSeedPicks: Sendable {
                                 tags: candidate.styles.isEmpty ? nil : candidate.styles, reason: candidate.best.why,
                                 via: via, viaDiscogsID: viaID, playable: .yes, score: 0)
             }
+            func kept(_ h: ClusterSeedStore.Heard) -> TrackDiscovery.Appearance {
+                .init(artistDiscogsID: id, artist: candidate.name, title: h.title, source: h.source, artworkURL: h.artworkURL, genres: [],
+                      release: h.release, year: h.year, releaseDiscogsID: h.releaseDiscogsID)
+            }
+            func keep(_ a: TrackDiscovery.Appearance?) async {
+                await store?.keep(heard: a.map { .init(title: $0.title, source: $0.source, artworkURL: $0.artworkURL, release: $0.release,
+                                                       year: $0.year, releaseDiscogsID: $0.releaseDiscogsID, at: Date()) }, for: id)
+            }
+            if let asked = await store?.heard(id) {
+                guard let h = asked else { continue }
+                let appearance = kept(h)
+                if case .recording = appearance.source { recordings.append(track(appearance)) } else if moments.count < limit { moments.append(track(appearance)) }
+                continue
+            }
             var heard: DiscoveredTrack?
             for appearance in await videos.tracks(artistID: id, artist: candidate.name) {
-                if await plays(appearance.source) == true { heard = track(appearance); break }
+                if await plays(appearance.source) == true { heard = track(appearance); await keep(appearance); break }
             }
             if let heard { recordings.append(heard); continue }
             // Radio: a linked recording, else the moment in the show.
             let found = ((try? await rows([id]))?[id]).map { $0 } ?? []
-            guard !found.isEmpty, let lines = try? await appearances(found) else { continue }
+            guard !found.isEmpty, let lines = try? await appearances(found) else { await keep(nil); continue }
             var report = TrackDiscoverySource.Report()
             let radio = lines.compactMap { TrackDiscovery.appearance(from: $0, artistID: id, artist: candidate.name, report: &report) }
             func isRecording(_ a: TrackDiscovery.Appearance) -> Bool { if case .recording = a.source { true } else { false } }
+            var played: TrackDiscovery.Appearance?
             for appearance in (radio.filter(isRecording) + radio.filter { !isRecording($0) }).prefix(4) {
                 guard await plays(appearance.source) == true else { continue }
+                played = appearance
                 if isRecording(appearance) { recordings.append(track(appearance)) } else if moments.count < limit { moments.append(track(appearance)) }
                 break
             }
+            await keep(played)
         }
+        await store?.flush()
         return Array((recordings + moments).prefix(limit))
     }
 }
