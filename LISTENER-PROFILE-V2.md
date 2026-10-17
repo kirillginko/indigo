@@ -435,6 +435,71 @@ a station is `radio.live`, an archive `radio.archive`, a local file
   listen is the rows sharing moment, action, seconds, completion and
   surface. Checked on both histories, with no listen whose rows disagree.
 
+### Phase 3 resumed: a bigger pool, judged by what can be played (2026-10-17)
+
+`IndigoTests/ListenerExpansionReplay.swift` (opt-in `INDIGO_EXPANSION_REPLAY=1`;
+read-only against the catalogue, R2 and YouTube oEmbed). Dated knowledge
+throughout; cut-offs 21, 14, 10 and 7 days, plus today for examples.
+Pools are cumulative, so For You's own routes stay in every one:
+
+- **A**: For You today.
+- **AB**: plus one step from every taste cluster through dated entries and
+  records.
+- **ABR**: plus bounded radio (episode-scored, three artists per tracklist).
+- **ABRS**: plus records near each cluster's centre.
+
+A is in its own order; the others use relevance × evidence with slots by
+cluster. The list a listener would see is **the first 20 that can be
+played**, taken from each ranking's first 60. Playable means confirmed to
+play, in this order of preference:
+
+- a recording of their own from a release's catalogued videos;
+- a recording a radio tracklist links;
+- the moment in an archived show where they were played.
+
+Each needs a verified Discogs id: the catalogue's, or the device's entry for
+that exact name.
+
+Summed over the four cut-offs (80 slots each):
+
+| pool | slots filled with something playable | of those, own recordings | later finds (sessions) |
+|------|------|------|------|
+| A For You today | 22 | 4 | 4 (4) |
+| AB + cluster seeds | 49 | ~19 | 6 (6) |
+| ABR + bounded radio | 80 | ~25 | 10 (10) |
+| ABRS + album similarity | 77 | ~25 | 9 (9) |
+
+Pool recall of later artists: A 2–10%; AB 7–24%; ABR and ABRS 9–24%.
+
+- **Playability is For You's binding limit.** Of For You's first 60
+  candidates today, only 8 have a verified Discogs id and 6 can be played.
+  Its list cannot fill 20 slots at any cut-off.
+- **The wider pool fills the list:** ABR fills every slot, at lower fit to
+  later listening (0.49–0.56 against For You's 0.50–0.65 over its 5–6
+  playable items).
+- **The later finds** in the playable lists came through cluster-seeded
+  direct routes, a shared label and For You's own routes. Radio mainly
+  makes the list *playable*: most of what it adds is heard as a radio
+  moment, not a recording.
+- **Most failures are unverifiable, not broken:** a candidate with no
+  verified id, or one the radio catalogue doesn't hold and no stored shelf
+  covers. The shelf cache also expires after 30 days.
+- **Seen in the examples:**
+  - A styling error from a shared name. "Gas" was styled as alternative
+    rock from another artist's entry, so styling by name needs the same
+    one-identity rule as merging.
+  - Radio adjacency to a popular seed brings in well-known names (Fred
+    Again.., Sampha, ASAP Rocky). Hub damping is not enough for an
+    R&B/pop cluster.
+
+**Before integrating anything visible**, in this order:
+1. Style candidates only through a verified identity, never a bare name.
+2. Damp popularity in the radio route for pop-adjacent clusters.
+3. Prefer own recordings over radio moments when filling the list.
+4. Then an internal, Debug-only For You that keeps For You's routes and
+   fills the remaining slots from AB/ABR. Judge it by the attributed
+   listens it gets (Debug builds only, Development store).
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.
