@@ -131,4 +131,41 @@ final class ListenerProfileTests: XCTestCase {
         XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 2400, completion: 0), 1, accuracy: 1e-9, "a long radio mix is still a full listen")
         XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 10, completion: 0), 0)
     }
+
+    /// The dense style space gives the dictionary arithmetic's numbers to
+    /// the bit, so a faster build is the same build.
+    func testTheDenseSpaceIsTheSameArithmetic() {
+        var generator = SystemRandomNumberGenerator()
+        _ = generator
+        let styles = (0..<40).map { "s\(String(format: "%02d", $0))" }
+        var vectors: [String: [String: Double]] = [:]
+        var seed: UInt64 = 7
+        func next() -> Double { seed = seed &* 6364136223846793005 &+ 1442695040888963407; return Double(seed >> 11) / Double(1 << 53) }
+        for style in styles {
+            var row: [String: Double] = [:]
+            for other in styles where next() < 0.2 || other == style { row[other] = next() }
+            vectors[style] = MusicalCompass.normalised(row)
+        }
+        let space = StyleSpace(vectors)
+        for trial in 0..<200 {
+            let pick = styles.filter { _ in next() < 0.1 } + (trial % 3 == 0 ? [styles[trial % 40]] : [])
+            guard !pick.isEmpty, let dense = space.embed(pick) else { continue }
+            let sparse = ListenerProfile.vector(pick, vectors)
+            XCTAssertEqual(space.sparse(dense), sparse)
+            let other = ListenerProfile.vector([styles[(trial * 7) % 40], styles[(trial * 11) % 40]], vectors)
+            XCTAssertEqual(StyleSpace.dot(dense, space.dense(other)).bitPattern, MusicalCompass.dot(sparse, other).bitPattern)
+        }
+        // And the scorer agrees with relevance.
+        var items: [ListenerProfile.Evidence] = []
+        for i in 0..<30 { items.append(evidence("a\(i)", .crated, title: "T\(i)")) }
+        let artistStyles = Dictionary(uniqueKeysWithValues: (0..<30).map { ("a\($0)", [styles[$0], styles[($0 * 3) % 40]]) })
+        let profile = ListenerProfile.build(evidence: items, styles: [:], artistStyles: artistStyles, vectors: vectors, asOf: asOf)
+        let scorer = ListenerProfile.Scorer(profile, vectors: vectors)
+        for i in 0..<40 {
+            let query = [styles[i], styles[(i * 13) % 40]]
+            let a = profile.relevance(styles: query, vectors: vectors), b = scorer.relevance(query)
+            XCTAssertEqual(a?.cluster, b?.cluster)
+            XCTAssertEqual(a?.score.bitPattern, b?.score.bitPattern)
+        }
+    }
 }

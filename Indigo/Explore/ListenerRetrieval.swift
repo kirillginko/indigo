@@ -74,8 +74,9 @@ nonisolated enum ListenerRetrieval {
         }
         func strength(_ unit: ListenerProfile.Unit) -> Double { unit.longTerm + 2 * max(0, unit.recent) }
         var byCluster: [Int: [ListenerProfile.Unit]] = [:]
+        let scorer = ListenerProfile.Scorer(profile, vectors: vectors)
         for unit in profile.units where unit.longTerm > 0 && !unit.styles.isEmpty {
-            guard let fit = profile.relevance(styles: unit.styles, vectors: vectors) else { continue }
+            guard let fit = scorer.relevance(unit.styles) else { continue }
             byCluster[fit.cluster, default: []].append(unit)
         }
         var chosen = Set<String>()
@@ -236,6 +237,14 @@ nonisolated enum ListenerRetrieval {
         init() {}
 
         init(entries: [(key: String, id: Int, styles: [String])], records: [RecordProfile], vectors: [String: [String: Double]]) {
+            self.init(entries: entries, recordParts: records.map { (id: $0.id, keys: $0.artistKeys, ids: $0.artistIDs, styles: $0.styles) },
+                      vectors: vectors)
+        }
+
+        /// From records as plain parts: no need to make similarity profiles
+        /// of three thousand records to know whose sound each is.
+        init(entries: [(key: String, id: Int, styles: [String])], recordParts records: [(id: Int, keys: Set<String>, ids: Set<Int>, styles: [String])],
+             vectors: [String: [String: Double]]) {
             for entry in entries where entry.id > 0 {
                 idOfName[entry.key] = entry.id
                 let known = ListeningLog.foldTags(entry.styles).filter { vectors[$0] != nil }
@@ -244,10 +253,10 @@ nonisolated enum ListenerRetrieval {
             for record in records.sorted(by: { $0.id < $1.id }) {
                 let known = record.styles.filter { vectors[$0] != nil }
                 guard !known.isEmpty else { continue }
-                if record.artistIDs.isEmpty {
-                    for key in record.artistKeys.sorted() { recordsByName[key, default: []] += known }
+                if record.ids.isEmpty {
+                    for key in record.keys.sorted() { recordsByName[key, default: []] += known }
                 } else {
-                    for id in record.artistIDs.sorted() { recordsByID[id, default: []] += known }
+                    for id in record.ids.sorted() { recordsByID[id, default: []] += known }
                 }
             }
             func unique(_ list: [String]) -> [String] { var seen = Set<String>(); return list.filter { seen.insert($0).inserted } }

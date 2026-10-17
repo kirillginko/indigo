@@ -220,20 +220,32 @@ nonisolated struct ListenerProfile: Equatable, Sendable {
     /// enough to, else starts one while there is room, else joins the
     /// nearest; clusters with under 4% of the weight are folded into their
     /// nearest neighbour. Ordered input, ordered output.
+    ///
+    /// In a dense style space (`StyleSpace`): the same keys in the same
+    /// order as the dictionary arithmetic it replaced, so the same numbers to
+    /// the bit -- a cluster's normalised centre is worked out once per change,
+    /// not once per unit per cluster.
     private static func cluster(_ units: [Unit], vectors: [String: [String: Double]], counts: [String: Int],
                                 totalLong: Double, totalRecent: Double, emerging: Set<String>, maxClusters: Int) -> [Cluster] {
-        struct Draft { var sum: [String: Double]; var members: [Unit] }
-        func normal(_ v: [String: Double]) -> [String: Double] { MusicalCompass.normalised(v) }
+        let space = StyleSpace(vectors)
+        struct Draft { var sum: [Double]; var normal: [Double]; var members: [Unit] }
         var drafts: [Draft] = []
+        var memo: [[String]: [Double]?] = [:]
         for unit in units {
-            let v = vector(unit.styles, vectors)
-            guard !v.isEmpty else { continue }
-            let scored = drafts.indices.map { ($0, MusicalCompass.dot(normal($0 < drafts.count ? drafts[$0].sum : [:]), v)) }
-            let best = scored.max { $0.1 != $1.1 ? $0.1 < $1.1 : $0.0 > $1.0 }
+            let key = Array(Set(unit.styles)).sorted()
+            let found: [Double]?
+            if let held = memo[key] { found = held } else { found = space.embed(key); memo[key] = found }
+            guard let v = found else { continue }
+            var best: (index: Int, fit: Double)?
+            for (index, draft) in drafts.enumerated() {
+                let fit = StyleSpace.dot(draft.normal, v)
+                if best.map({ fit > $0.fit }) ?? true { best = (index, fit) }
+            }
             let index: Int
-            if let best, best.1 >= 0.45 || drafts.count >= maxClusters { index = best.0 }
-            else { drafts.append(Draft(sum: [:], members: [])); index = drafts.count - 1 }
-            for key in v.keys.sorted() { drafts[index].sum[key, default: 0] += unit.longTerm * (v[key] ?? 0) }
+            if let best, best.fit >= 0.45 || drafts.count >= maxClusters { index = best.index }
+            else { drafts.append(Draft(sum: [Double](repeating: 0, count: space.count), normal: [], members: [])); index = drafts.count - 1 }
+            for i in 0..<space.count where v[i] != 0 { drafts[index].sum[i] += unit.longTerm * v[i] }
+            drafts[index].normal = StyleSpace.normalised(drafts[index].sum)
             drafts[index].members.append(unit)
         }
         // Fold the small into their nearest.
@@ -245,15 +257,16 @@ nonisolated struct ListenerProfile: Equatable, Sendable {
                   weight(drafts[smallest]) < 0.04 * totalLong else { break }
             let small = drafts.remove(at: smallest)
             let target = drafts.indices.max { a, b in
-                let x = MusicalCompass.dot(normal(drafts[a].sum), normal(small.sum)), y = MusicalCompass.dot(normal(drafts[b].sum), normal(small.sum))
+                let x = StyleSpace.dot(drafts[a].normal, small.normal), y = StyleSpace.dot(drafts[b].normal, small.normal)
                 return x != y ? x < y : a > b
             } ?? 0
-            for key in small.sum.keys.sorted() { drafts[target].sum[key, default: 0] += small.sum[key] ?? 0 }
+            for i in 0..<space.count where small.sum[i] != 0 { drafts[target].sum[i] += small.sum[i] }
+            drafts[target].normal = StyleSpace.normalised(drafts[target].sum)
             drafts[target].members += small.members
             changed = true
         }
         let built = drafts.map { draft -> Cluster in
-            let centroid = normal(draft.sum)
+            let centroid = space.sparse(draft.normal)
             let members = draft.members.sorted { $0.longTerm != $1.longTerm ? $0.longTerm > $1.longTerm : $0.id < $1.id }
             // Named by the styles its members actually carry, by weight --
             // not by the space's dimensions, which favour rare styles.
@@ -325,6 +338,36 @@ nonisolated struct ListenerProfile: Equatable, Sendable {
         return out
     }
 
+    /// Relevance for many lists at once: the style space made dense once, each
+    /// cluster's centre with it, and each set of styles placed once.
+    final class Scorer {
+        let space: StyleSpace
+        private let centres: [(id: Int, centre: [Double], held: Double)]
+        private var memo: [[String]: (score: Double, cluster: Int)?] = [:]
+
+        init(_ profile: ListenerProfile, vectors: [String: [String: Double]]) {
+            let space = StyleSpace(vectors)
+            self.space = space
+            centres = profile.clusters.map { ($0.id, space.dense($0.centroid), 0.5 + 0.5 * sqrt(max($0.longTermShare, $0.recentShare))) }
+        }
+
+        /// The same answer as `ListenerProfile.relevance(styles:vectors:)`.
+        func relevance(_ styles: [String]) -> (score: Double, cluster: Int)? {
+            let key = Array(Set(styles.filter { space.index[$0] != nil })).sorted()
+            if let held = memo[key] { return held }
+            var best: (Double, Int)?
+            if !centres.isEmpty, let v = space.embed(key) {
+                for c in centres {
+                    let score = StyleSpace.dot(c.centre, v) * c.held
+                    if best.map({ score > $0.0 }) ?? true { best = (score, c.id) }
+                }
+            }
+            let found = best.map { (score: $0.0, cluster: $0.1) }
+            memo[key] = .some(found)
+            return found
+        }
+    }
+
     /// How well something with these styles fits the listener: its nearest
     /// cluster's similarity, weighted toward clusters that hold time, with a
     /// floor so a small taste is still served. Nil when it has no style the
@@ -380,9 +423,10 @@ nonisolated extension ListenerProfile {
         return max(min(1, seconds / ListeningEvent.fullListenSeconds), completion)
     }
 
-    static func read(context: ModelContext, before cutoff: Date = .distantFuture) -> Read {
+    static func read(context: ModelContext, before cutoff: Date = .distantFuture,
+                     records: [DiscogsReleaseRecord]? = nil, artists artistRows: [DiscogsArtist]? = nil) -> Read {
         var read = Read()
-        let releases = (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
+        let releases = records ?? (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
         var releaseByTitleArtist: [String: DiscogsReleaseRecord] = [:]
         var releaseByID: [Int: DiscogsReleaseRecord] = [:]
         for record in releases {
@@ -467,7 +511,7 @@ nonisolated extension ListenerProfile {
         // Artists' own styles and ids, and the aliases their own entries list.
         let artists = Set(read.evidence.map(\.artist))
         var byKey: [String: DiscogsArtist] = [:]
-        for row in ((try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []) where row.discogsID > 0 { byKey[row.nameKey] = row }
+        for row in (artistRows ?? (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []) where row.discogsID > 0 { byKey[row.nameKey] = row }
         func key(_ name: String) -> String { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) }
         // Union by Discogs id; the smallest id names the group, so every
         // device agrees whatever the spelling.
@@ -502,5 +546,70 @@ nonisolated extension ListenerProfile {
         read.groupsByID = Set(read.sameArtist.values).count
         read.groupsByName = Set(nameParent.keys.map(nameRoot)).count
         return read
+    }
+}
+
+/// The style space as dense rows, keys in sorted order: the same sums, in
+/// the same order, as `MusicalCompass`'s dictionary arithmetic over the same
+/// space (whose keys it sorts each time), without the sorting or the
+/// dictionaries.
+nonisolated struct StyleSpace: Sendable {
+    let keys: [String]
+    let index: [String: Int]
+    let rows: [[Double]]
+
+    init(_ vectors: [String: [String: Double]]) {
+        keys = Set(vectors.keys).union(vectors.values.flatMap(\.keys)).sorted()
+        var index: [String: Int] = [:]
+        for (i, key) in keys.enumerated() { index[key] = i }
+        self.index = index
+        rows = keys.map { key in
+            var row = [Double](repeating: 0, count: index.count)
+            for (other, value) in vectors[key] ?? [:] { if let i = index[other] { row[i] = value } }
+            return row
+        }
+    }
+
+    var count: Int { keys.count }
+
+    /// Styles (each once, weight one) in the space, normalised; nil when
+    /// none is in it or they come to nothing.
+    func embed(_ styles: [String]) -> [Double]? {
+        var sum = [Double](repeating: 0, count: count)
+        var any = false
+        for style in Array(Set(styles)).sorted() {
+            guard let i = index[style] else { continue }
+            any = true
+            let row = rows[i]
+            for j in 0..<count where row[j] != 0 { sum[j] += 1 * row[j] }
+        }
+        guard any else { return nil }
+        let normal = Self.normalised(sum)
+        return normal.contains(where: { $0 != 0 }) ? normal : nil
+    }
+
+    static func normalised(_ v: [Double]) -> [Double] {
+        var total = 0.0
+        for x in v where x != 0 { total += x * x }
+        let length = total.squareRoot()
+        return length > 0 ? v.map { $0 / length } : v
+    }
+
+    static func dot(_ a: [Double], _ b: [Double]) -> Double {
+        var total = 0.0
+        for i in 0..<min(a.count, b.count) where a[i] != 0 && b[i] != 0 { total += a[i] * b[i] }
+        return total
+    }
+
+    func dense(_ v: [String: Double]) -> [Double] {
+        var out = [Double](repeating: 0, count: count)
+        for (key, value) in v { if let i = index[key] { out[i] = value } }
+        return out
+    }
+
+    func sparse(_ v: [Double]) -> [String: Double] {
+        var out: [String: Double] = [:]
+        for (i, x) in v.enumerated() where x != 0 { out[keys[i]] = x }
+        return out
     }
 }

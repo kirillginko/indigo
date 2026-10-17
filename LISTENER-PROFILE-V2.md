@@ -650,9 +650,37 @@ refuses the key.
   | same history and caches | 2 ms | kept picks loaded |
   | after a DIG visit changed the history | 9.6 s | profile 7.6 s; credits, ranking and recordings 2.0 s |
 
-  What is left is building the profile: it reads the whole history and
-  clusters it on every change. Speeding up that build is the next lever,
-  not more caching.
+  The profile build was then made faster (`IndigoTests/ClusterSeedInputsTiming.swift`,
+  opt-in `INDIGO_CLUSTER_TIMING=1`, stage by stage on this Mac's stores):
+  - **A dense style space** (`StyleSpace`): rows in sorted-key order,
+    replacing dictionary arithmetic that sorted keys on every embed,
+    normalise and dot. It is the same sums in the same order, checked to
+    the bit by a unit test. A cluster's centre is re-normalised once per
+    change, not once per unit per cluster.
+  - **One scorer** (`ListenerProfile.Scorer`) places each set of styles
+    once, for seeds and for ranking.
+  - **Release records and Discogs entries are read once** and shared with
+    the profile's own read. Record styles are read directly instead of
+    making 3,000 similarity profiles.
+
+  On the Mac:
+
+  | stage | before | after |
+  |-------|--------|-------|
+  | build | 3.8 s | 0.68 s |
+  | seeds | 1.24 s | 0.39 s |
+  | whole inputs | 8.2 s | 2.65 s |
+
+  The same profile either way. In the simulator:
+
+  | case | before | after |
+  |------|--------|-------|
+  | after a history change | 9.6 s (profile 7.6) | **3.2 s** (profile 2.4, the rest 0.8) |
+  | cold | 20.7 s | 14.8 s (12.4 of it first-time network: release documents and playability, then kept) |
+  | unchanged history | 2 ms | 2 ms |
+
+  What remains in the 2.4 s is reading the history tables (1.3 s on the
+  Mac).
 - "On <release> with <seed>" reads oddly when the release title already
   says "With".
 

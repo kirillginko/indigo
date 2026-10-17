@@ -149,14 +149,15 @@ nonisolated struct ClusterSeedPicks: Sendable {
 
     /// Reads the store: a few seconds, so never on the main thread.
     static func inputs(context: ModelContext, vectors given: [String: [String: Double]], now: Date = Date()) -> Inputs? {
-        let records = ((try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []).map(RecordProfile.init(record:))
-        let vectors = given.isEmpty ? RecordSimilarity(pool: records).vectors : given
-        let read = ListenerProfile.read(context: context)
+        // Each table read once, and shared with the profile's own read.
+        let releaseRows = (try? context.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? []
+        let rows = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
+        let vectors = given.isEmpty ? RecordSimilarity(pool: releaseRows.map(RecordProfile.init(record:))).vectors : given
+        let read = ListenerProfile.read(context: context, records: releaseRows, artists: rows)
         let profile = ListenerProfile.build(evidence: read.evidence, styles: read.styles, artistStyles: read.artistStyles,
                                             vectors: vectors, asOf: now)
         guard !profile.clusters.isEmpty else { return nil }
         let seeds = ListenerRetrieval.seeds(profile, vectors: vectors)
-        let rows = (try? context.fetch(FetchDescriptor<DiscogsArtist>())) ?? []
         let byKey = Dictionary(rows.map { ($0.nameKey, $0) }, uniquingKeysWith: { a, _ in a })
         var entries: [String: ListenerRetrieval.Entry] = [:]
         var releaseIDs: [String: (seed: Int, releases: [Int])] = [:]
@@ -167,8 +168,15 @@ nonisolated struct ClusterSeedPicks: Sendable {
                                          styleNeighbours: row.styleNeighbourNames, aliases: row.aliasNames)
             if row.discogsID > 0 { releaseIDs[seed.artist] = (row.discogsID, Array(row.releaseDiscogsIDs.prefix(6))) }
         }
+        // As `RecordProfile(record:)` reads a record: folded styles, and the
+        // headline artists by name (a device record carries no artist ids).
+        let records = releaseRows.map { record -> (id: Int, keys: Set<String>, ids: Set<Int>, styles: [String]) in
+            var seen = Set<String>()
+            let styles = record.styles.map { $0.trimmingCharacters(in: .whitespaces).lowercased() }.filter { !$0.isEmpty && seen.insert($0).inserted }
+            return (record.discogsID, Set(record.artistNames.map { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator($0)) }), [], styles)
+        }
         let book = ListenerRetrieval.StyleBook(entries: rows.map { (key: $0.nameKey, id: $0.discogsID, styles: $0.styles) },
-                                               records: records, vectors: vectors)
+                                               recordParts: records, vectors: vectors)
         var known = Set(read.evidence.map(\.artist))
         let people = Set(read.evidence.compactMap { read.sameArtist[$0.artist] })
         known.formUnion(read.sameArtist.filter { people.contains($0.value) }.keys)
@@ -188,11 +196,11 @@ nonisolated struct ClusterSeedPicks: Sendable {
         }
         for i in candidates.indices { ListenerRetrieval.style(&candidates[i], book: inputs.book) }
         let evidence = ListenerRetrieval.evidence(candidates)
-        func score(_ c: ListenerRetrieval.Candidate) -> Double {
-            (inputs.profile.relevance(styles: c.styles, vectors: inputs.vectors)?.score ?? 0) * (0.5 + (evidence[c.identity] ?? 0))
-        }
-        let sorted = candidates.sorted { score($0) != score($1) ? score($0) > score($1) : $0.identity < $1.identity }
-        return inputs.profile.spread(sorted, limit: limit, styles: \.styles, vectors: inputs.vectors)
+        let scorer = ListenerProfile.Scorer(inputs.profile, vectors: inputs.vectors)
+        var scores: [String: Double] = [:]
+        for c in candidates { scores[c.identity] = (scorer.relevance(c.styles)?.score ?? 0) * (0.5 + (evidence[c.identity] ?? 0)) }
+        let sorted = candidates.sorted { (scores[$0.identity] ?? 0) != (scores[$1.identity] ?? 0) ? (scores[$0.identity] ?? 0) > (scores[$1.identity] ?? 0) : $0.identity < $1.identity }
+        return inputs.profile.spread(sorted, limit: limit) { scorer.relevance($0.styles)?.cluster }
     }
 
     /// Up to `limit` tracks to hear, each confirmed to play: recordings of
