@@ -1,0 +1,38 @@
+{
+  "data": {
+    "id": 900004,
+    "documentId": "synthetic0000000000000004",
+    "title": "SYNTHETIC 04 MALFORMED",
+    "releaseDate": "2023-07-18T04:00:00.000Z",
+    "scheduleDate": "2023-07-18T04:00:00.000Z",
+    "curator": "not an object",
+    "aiMood": "a key the observed shape never had",
+    "playlistProcessedAudioDuration": 2000,
+    "stitchedTracksMetadata": { "tracks_cues": [
+      { "track_index": 0, "start": 10, "end": 200, "cue": 190 },
+      { "track_index": 1, "start": 190, "end": 400, "cue": 210 },
+      { "track_index": 1, "start": 999, "end": 1100, "cue": 101 },
+      { "track_index": 2, "start": -5, "end": 600, "cue": 605 },
+      { "track_index": 3, "start": 700, "end": 650, "cue": -50 },
+      { "track_index": 4, "start": 150, "end": 800, "cue": 650 },
+      { "track_index": 5, "start": "abc", "end": 900, "cue": 0 },
+      { "track_index": 99, "start": 1900, "end": 2000, "cue": 100 },
+      { "start": 1, "end": 2 }
+    ] },
+    "tracks": [
+      { "id": 4001, "documentId": "synthtrack000000000000041", "artist": "Orrin Vale", "title": "Salt Lines", "isrc": "zz-x0y-09-00004", "year": "2009" },
+      { "id": 4002, "documentId": "synthtrack000000000000042", "artist": "Orrin Vale", "title": "Salt Lines", "isrc": "ZZX0Y0900004", "year": "2009" },
+      { "id": 4003, "documentId": "synthtrack000000000000043", "artist": "Calder Moss", "title": "Grey Water", "isrc": "12345", "year": "19xx" },
+      { "id": 4004, "documentId": "synthtrack000000000000044", "artist": "Calder Moss", "title": "Grey Water", "isrc": "ZZX0Y20000431", "duration": -5 },
+      { "id": 4005, "documentId": "synthtrack000000000000045", "artist": "Wren Abbot", "title": "Low Season", "isrc": null, "youtube": "not a url" },
+      { "id": 4006, "documentId": "synthtrack000000000000046", "artist": "Wren Abbot", "title": "Low Season", "isrc": null, "bpm": 122 },
+      { "id": 4007, "documentId": "synthtrack000000000000047", "artist": "Wren Abbot", "title": "Low Season", "isrc": "ZZX0Y1600047" },
+      { "id": 4008, "documentId": "synthtrack000000000000048", "artist": "Wren Abbot", "title": "Low Season", "isrc": "ZZX0Y1600048" },
+      null,
+      "Halvard Oste - Glass Harbour",
+      { "id": 4011, "documentId": "synthtrack000000000000051", "artist": ["Mira Quell"], "title": 1, "isrc": 123456789012 },
+      { "id": 4012, "documentId": "synthtrack000000000000052", "artist": "Mira Quell", "title": "Copper Field", "isrc": "ISRC: ZZ-X0Y-21-00002" }
+    ]
+  },
+  "meta": {}
+}

@@ -1,0 +1,1465 @@
+{
+ "data": {
+  "id": 900005,
+  "documentId": "synthetic0000000000000005",
+  "title": "SYNTHETIC 05 MIXED",
+  "releaseDate": "2026-06-04T04:00:00.000Z",
+  "scheduleDate": "2026-06-04T04:00:00.000Z",
+  "curator": {
+   "name": "Synthetic Curator Five"
+  },
+  "show": null,
+  "hasVoiceOver": false,
+  "playlistProcessedAudioDuration": 15899.23,
+  "playlistStatus": "processed",
+  "progress": 100,
+  "soundcloudPermalinkUrl": "https://soundcloud.com/synthetic/archive-05",
+  "stitchedTracksMetadata": {
+   "tracks_cues": [
+    {
+     "track_index": 0,
+     "start": 8.0,
+     "end": 199.886,
+     "cue": 191.886
+    },
+    {
+     "track_index": 1,
+     "start": 190.697,
+     "end": 341.354,
+     "cue": 150.657
+    },
+    {
+     "track_index": 2,
+     "start": 339.174,
+     "end": 835.417,
+     "cue": 496.243
+    },
+    {
+     "track_index": 3,
+     "start": 831.744,
+     "end": 1329.178,
+     "cue": 497.434
+    },
+    {
+     "track_index": 4,
+     "start": 1321.693,
+     "end": 1511.673,
+     "cue": 189.98
+    },
+    {
+     "track_index": 5,
+     "start": 1508.365,
+     "end": 1890.283,
+     "cue": 381.918
+    },
+    {
+     "track_index": 6,
+     "start": 1880.367,
+     "end": 2340.586,
+     "cue": 460.219
+    },
+    {
+     "track_index": 7,
+     "start": 2330.449,
+     "end": 2629.851,
+     "cue": 299.402
+    },
+    {
+     "track_index": 8,
+     "start": 2623.669,
+     "end": 3054.735,
+     "cue": 431.066
+    },
+    {
+     "track_index": 9,
+     "start": 3049.043,
+     "end": 3330.974,
+     "cue": 281.931
+    },
+    {
+     "track_index": 10,
+     "start": 3319.496,
+     "end": 3735.78,
+     "cue": 416.284
+    },
+    {
+     "track_index": 11,
+     "start": 3733.433,
+     "end": 3944.759,
+     "cue": 211.326
+    },
+    {
+     "track_index": 12,
+     "start": 3937.677,
+     "end": 4290.157,
+     "cue": 352.48
+    },
+    {
+     "track_index": 13,
+     "start": 4285.128,
+     "end": 4611.63,
+     "cue": 326.502
+    },
+    {
+     "track_index": 14,
+     "start": 4605.157,
+     "end": 5017.227,
+     "cue": 412.07
+    },
+    {
+     "track_index": 15,
+     "start": 5013.537,
+     "end": 5519.044,
+     "cue": 505.507
+    },
+    {
+     "track_index": 16,
+     "start": 5516.096,
+     "end": 5997.247,
+     "cue": 481.151
+    },
+    {
+     "track_index": 17,
+     "start": 5989.066,
+     "end": 6392.787,
+     "cue": 403.721
+    },
+    {
+     "track_index": 18,
+     "start": 6382.693,
+     "end": 6692.836,
+     "cue": 310.143
+    },
+    {
+     "track_index": 19,
+     "start": 6686.339,
+     "end": 7081.872,
+     "cue": 395.533
+    },
+    {
+     "track_index": 20,
+     "start": 7074.123,
+     "end": 7520.883,
+     "cue": 446.76
+    },
+    {
+     "track_index": 21,
+     "start": 7516.101,
+     "end": 7847.195,
+     "cue": 331.094
+    },
+    {
+     "track_index": 22,
+     "start": 7840.536,
+     "end": 8040.035,
+     "cue": 199.499
+    },
+    {
+     "track_index": 23,
+     "start": 8029.674,
+     "end": 8376.034,
+     "cue": 346.36
+    },
+    {
+     "track_index": 24,
+     "start": 8368.053,
+     "end": 8745.143,
+     "cue": 377.09
+    },
+    {
+     "track_index": 25,
+     "start": 8744.707,
+     "end": 8909.305,
+     "cue": 164.598
+    },
+    {
+     "track_index": 26,
+     "start": 8907.006,
+     "end": 9159.656,
+     "cue": 252.65
+    },
+    {
+     "track_index": 27,
+     "start": 9151.57,
+     "end": 9571.41,
+     "cue": 419.84
+    },
+    {
+     "track_index": 28,
+     "start": 9567.072,
+     "end": 9733.323,
+     "cue": 166.251
+    },
+    {
+     "track_index": 29,
+     "start": 9726.541,
+     "end": 10114.912,
+     "cue": 388.371
+    },
+    {
+     "track_index": 30,
+     "start": 10112.578,
+     "end": 10439.08,
+     "cue": 326.502
+    },
+    {
+     "track_index": 31,
+     "start": 10432.223,
+     "end": 10952.105,
+     "cue": 519.882
+    },
+    {
+     "track_index": 32,
+     "start": 10946.446,
+     "end": 11114.218,
+     "cue": 167.772
+    },
+    {
+     "track_index": 33,
+     "start": 11105.101,
+     "end": 11294.52,
+     "cue": 189.419
+    },
+    {
+     "track_index": 34,
+     "start": 11285.355,
+     "end": 11596.658,
+     "cue": 311.303
+    },
+    {
+     "track_index": 35,
+     "start": 11594.7,
+     "end": 11788.435,
+     "cue": 193.735
+    },
+    {
+     "track_index": 36,
+     "start": 11788.416,
+     "end": 11950.578,
+     "cue": 162.162
+    },
+    {
+     "track_index": 37,
+     "start": 11941.565,
+     "end": 12105.53,
+     "cue": 163.965
+    },
+    {
+     "track_index": 38,
+     "start": 12098.053,
+     "end": 12477.802,
+     "cue": 379.749
+    },
+    {
+     "track_index": 39,
+     "start": 12472.405,
+     "end": 12815.622,
+     "cue": 343.217
+    },
+    {
+     "track_index": 40,
+     "start": 12803.998,
+     "end": 13201.876,
+     "cue": 397.878
+    },
+    {
+     "track_index": 41,
+     "start": 13191.122,
+     "end": 13568.212,
+     "cue": 377.09
+    },
+    {
+     "track_index": 42,
+     "start": 13564.686,
+     "end": 13783.298,
+     "cue": 218.612
+    },
+    {
+     "track_index": 43,
+     "start": 13772.441,
+     "end": 14130.594,
+     "cue": 358.153
+    },
+    {
+     "track_index": 44,
+     "start": 14124.778,
+     "end": 14608.48,
+     "cue": 483.702
+    },
+    {
+     "track_index": 45,
+     "start": 14599.355,
+     "end": 14980.642,
+     "cue": 381.287
+    },
+    {
+     "track_index": 46,
+     "start": 14968.788,
+     "end": 15474.764,
+     "cue": 505.976
+    },
+    {
+     "track_index": 47,
+     "start": 15469.016,
+     "end": 15902.483,
+     "cue": 433.467
+    }
+   ]
+  },
+  "tracks": [
+   {
+    "id": 5000,
+    "documentId": "synthtrack500000000000000000000",
+    "title": "Ferry Slow Harbour",
+    "artist": "Ruben Oste",
+    "label": null,
+    "album": "Night Signal",
+    "duration": 191.886,
+    "isrc": "ZZX0Y0700900",
+    "tuc": null,
+    "year": "1974",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500000",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5001,
+    "documentId": "synthtrack500000000000000000001",
+    "title": "Tide Hollow",
+    "artist": "The Placeholder Ensemble",
+    "label": null,
+    "album": "Night Garden",
+    "duration": 150.657,
+    "isrc": "ZZX0Y0600901",
+    "tuc": null,
+    "year": "1978",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500001",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5002,
+    "documentId": "synthtrack500000000000000000002",
+    "title": "Glass Season",
+    "artist": "Ilse Ré",
+    "label": null,
+    "album": "Pale Low",
+    "duration": 496.243,
+    "isrc": "ZZX0Y1000902",
+    "tuc": null,
+    "year": "2006",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500002",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-52",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5003,
+    "documentId": "synthtrack500000000000000000003",
+    "title": "Pale Lines Harbour",
+    "artist": "Sunna Dorn",
+    "label": "Self-released",
+    "album": "Iron Glass",
+    "duration": 497.434,
+    "isrc": null,
+    "tuc": null,
+    "year": "1993",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500003",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5004,
+    "documentId": "synthtrack500000000000000000004",
+    "title": "Season Static Grey",
+    "artist": "Wren Ferro",
+    "label": "Fictional Records",
+    "album": "Static Tide",
+    "duration": 189.98,
+    "isrc": "ZZX0Y2500904",
+    "tuc": null,
+    "year": "1986",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500004",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-54",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5005,
+    "documentId": "synthtrack500000000000000000005",
+    "title": "Water Lines",
+    "artist": "Orrin Lune",
+    "label": "Placeholder Sound",
+    "album": "Bent Harbour",
+    "duration": 381.918,
+    "isrc": "ZZX0Y0900905",
+    "tuc": null,
+    "year": "None",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500005",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5006,
+    "documentId": "synthtrack500000000000000000006",
+    "title": "Slow (Pell Okafor Remix)",
+    "artist": "Jory Moss",
+    "label": null,
+    "album": "Field Lines",
+    "duration": 460.219,
+    "isrc": "ZZX0Y2300906",
+    "tuc": null,
+    "year": "1976",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500006",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-56",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5007,
+    "documentId": "synthtrack500000000000000000007",
+    "title": "Bloom Grey",
+    "artist": "Ama Lóa & Ama Dorn",
+    "label": "Self-released",
+    "album": null,
+    "duration": 299.402,
+    "isrc": "ZZX0Y1200907",
+    "tuc": null,
+    "year": null,
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500007",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5008,
+    "documentId": "synthtrack500000000000000000008",
+    "title": "Pale Iron",
+    "artist": "Ruben Vale",
+    "label": "Null Label",
+    "album": "Low Slow",
+    "duration": 431.066,
+    "isrc": "ZZX0Y2200908",
+    "tuc": null,
+    "year": "2021",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500008",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5009,
+    "documentId": "synthtrack500000000000000000009",
+    "title": "Water Static Slow",
+    "artist": "Kesi Haddad",
+    "label": "Imaginary Tapes",
+    "album": null,
+    "duration": 281.931,
+    "isrc": "ZZX0Y1100909",
+    "tuc": null,
+    "year": "2021",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500009",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5010,
+    "documentId": "synthtrack500000000000000000010",
+    "title": "Bloom Water",
+    "artist": "Sunna Brandt",
+    "label": "Self-released",
+    "album": "Garden Slow",
+    "duration": 416.284,
+    "isrc": "ZZX0Y0500910",
+    "tuc": null,
+    "year": "2005",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500010",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5011,
+    "documentId": "synthtrack500000000000000000011",
+    "title": "Slow Pale (Pell Ferro Remix)",
+    "artist": "Sunna Ferro",
+    "label": "Placeholder Sound",
+    "album": "Hollow Season",
+    "duration": 211.326,
+    "isrc": "ZZX0Y0300911",
+    "tuc": null,
+    "year": "1979",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500011",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5012,
+    "documentId": "synthtrack500000000000000000012",
+    "title": "Signal Field",
+    "artist": "Ruben Oste & Ruben Ré",
+    "label": "Placeholder Sound",
+    "album": "Iron Water",
+    "duration": 352.48,
+    "isrc": null,
+    "tuc": null,
+    "year": "1987",
+    "youtube": null,
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5013,
+    "documentId": "synthtrack500000000000000000013",
+    "title": "Lines Tide",
+    "artist": "Ruben Mensah",
+    "label": null,
+    "album": "Bent Field",
+    "duration": 326.502,
+    "isrc": "ZZX0Y0400913",
+    "tuc": null,
+    "year": "1990",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500013",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5014,
+    "documentId": "synthtrack500000000000000000014",
+    "title": "Ferry Bloom Water",
+    "artist": "Lina Kask",
+    "label": null,
+    "album": "Grey Signal",
+    "duration": 412.07,
+    "isrc": "ZZX0Y0500914",
+    "tuc": null,
+    "year": "1984",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500014",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5015,
+    "documentId": "synthtrack500000000000000000015",
+    "title": "Field",
+    "artist": "Calder Dorn",
+    "label": "Self-released",
+    "album": "Grey Ferry",
+    "duration": 505.507,
+    "isrc": "ZZX0Y0100915",
+    "tuc": null,
+    "year": "2020",
+    "youtube": null,
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5016,
+    "documentId": "synthtrack500000000000000000016",
+    "title": "Static Slow Tide",
+    "artist": "Calder Lune & Abel Dorn",
+    "label": null,
+    "album": "Echo Static",
+    "duration": 481.151,
+    "isrc": "ZZX0Y0400916",
+    "tuc": null,
+    "year": "2002",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500016",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-516",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5017,
+    "documentId": "synthtrack500000000000000000017",
+    "title": "Grey",
+    "artist": "Calder Quell",
+    "label": "Self-released",
+    "album": "Pale Slow",
+    "duration": 403.721,
+    "isrc": "ZZX0Y2100917",
+    "tuc": null,
+    "year": "1968",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500017",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5018,
+    "documentId": "synthtrack500000000000000000018",
+    "title": "Copper Water Glass",
+    "artist": "Ilse Lune",
+    "label": "Self-released",
+    "album": "Bloom Low",
+    "duration": 310.143,
+    "isrc": "ZZX0Y2400918",
+    "tuc": null,
+    "year": "1987",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500018",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-518",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5019,
+    "documentId": "synthtrack500000000000000000019",
+    "title": "Grey Copper",
+    "artist": "Ensemble Nil",
+    "label": null,
+    "album": "Harbour Field",
+    "duration": 395.533,
+    "isrc": "ZZX0Y2300919",
+    "tuc": null,
+    "year": "1972",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500019",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-519",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5020,
+    "documentId": "synthtrack500000000000000000020",
+    "title": "Salt Lines Tide",
+    "artist": "Calder Lune",
+    "label": null,
+    "album": "Grey Harbour",
+    "duration": 446.76,
+    "isrc": "ZZX0Y0600920",
+    "tuc": null,
+    "year": "1974",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500020",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-520",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5021,
+    "documentId": "synthtrack500000000000000000021",
+    "title": "Low",
+    "artist": "Halvard Kask",
+    "label": "Nowhere Audio",
+    "album": "Slow Orbit",
+    "duration": 331.094,
+    "isrc": "ZZX0Y2000921",
+    "tuc": null,
+    "year": "1971",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500021",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5022,
+    "documentId": "synthtrack500000000000000000022",
+    "title": "Grey Water",
+    "artist": "Noor Vale",
+    "label": "Null Label",
+    "album": "Low Copper",
+    "duration": 199.499,
+    "isrc": "ZZX0Y1100922",
+    "tuc": null,
+    "year": "1992",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500022",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-522",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5023,
+    "documentId": "synthtrack500000000000000000023",
+    "title": "Hollow Bloom Low",
+    "artist": "Ama Ferro",
+    "label": null,
+    "album": "Ferry Echo",
+    "duration": 346.36,
+    "isrc": "ZZX0Y1200923",
+    "tuc": null,
+    "year": "1977",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500023",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5024,
+    "documentId": "synthtrack500000000000000000024",
+    "title": "Ferry Water",
+    "artist": "Calder Ré",
+    "label": null,
+    "album": "Slow Signal",
+    "duration": 377.09,
+    "isrc": "ZZX0Y1200924",
+    "tuc": null,
+    "year": "2014",
+    "youtube": null,
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-524",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5025,
+    "documentId": "synthtrack500000000000000000025",
+    "title": "Copper Field Harbour (Ilse Brandt Remix)",
+    "artist": "Ilse Lóa",
+    "label": "Self-released",
+    "album": "Tide Signal",
+    "duration": 164.598,
+    "isrc": "ZZX0Y1500925",
+    "tuc": null,
+    "year": "1990",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500025",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5026,
+    "documentId": "synthtrack500000000000000000026",
+    "title": "Bloom Salt Garden",
+    "artist": "Orrin Strand",
+    "label": "Fictional Records",
+    "album": "Season Low",
+    "duration": 252.65,
+    "isrc": "ZZX0Y0900926",
+    "tuc": null,
+    "year": "1970",
+    "youtube": null,
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5027,
+    "documentId": "synthtrack500000000000000000027",
+    "title": "Water Hollow",
+    "artist": "Calder Abbot",
+    "label": "Fictional Records",
+    "album": "Pale Season",
+    "duration": 419.84,
+    "isrc": "ZZX0Y0600927",
+    "tuc": null,
+    "year": "2004",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500027",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-527",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5028,
+    "documentId": "synthtrack500000000000000000028",
+    "title": "Lines Ferry Orbit",
+    "artist": "Ensemble Nil",
+    "label": "Null Label",
+    "album": "Harbour Garden",
+    "duration": 166.251,
+    "isrc": "ZZX0Y2300928",
+    "tuc": null,
+    "year": "None",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500028",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5029,
+    "documentId": "synthtrack500000000000000000029",
+    "title": "Copper Bloom Harbour",
+    "artist": "Orrin Ferro",
+    "label": null,
+    "album": "Slow Harbour",
+    "duration": 388.371,
+    "isrc": "ZZX0Y2500929",
+    "tuc": null,
+    "year": "1984",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500029",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5030,
+    "documentId": "synthtrack500000000000000000030",
+    "title": "Lines Tide",
+    "artist": "Ruben Mensah",
+    "label": null,
+    "album": "Glass Hollow",
+    "duration": 326.502,
+    "isrc": "ZZX0Y0400913",
+    "tuc": null,
+    "year": "1972",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500030",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5031,
+    "documentId": "synthtrack500000000000000000031",
+    "title": "Pale Hollow",
+    "artist": "Calder Oste",
+    "label": null,
+    "album": "Bent Low",
+    "duration": 519.882,
+    "isrc": "ZZX0Y0400931",
+    "tuc": null,
+    "year": "1973",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500031",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5032,
+    "documentId": "synthtrack500000000000000000032",
+    "title": "Harbour Bloom",
+    "artist": "Jory Ferro",
+    "label": "Nowhere Audio",
+    "album": "Garden Glass",
+    "duration": 167.772,
+    "isrc": "ZZX0Y0900932",
+    "tuc": null,
+    "year": null,
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500032",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5033,
+    "documentId": "synthtrack500000000000000000033",
+    "title": "Echo (Jory Haddad Remix)",
+    "artist": "Ama Moss",
+    "label": "Imaginary Tapes",
+    "album": "Orbit Low",
+    "duration": 189.419,
+    "isrc": "ZZX0Y1700933",
+    "tuc": null,
+    "year": "1972",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500033",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-533",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5034,
+    "documentId": "synthtrack500000000000000000034",
+    "title": "Salt",
+    "artist": "Halvard Abbot",
+    "label": "Nowhere Audio",
+    "album": "Season Glass",
+    "duration": 311.303,
+    "isrc": "ZZX0Y1900934",
+    "tuc": null,
+    "year": "2001",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500034",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5035,
+    "documentId": "synthtrack500000000000000000035",
+    "title": "Hollow Signal",
+    "artist": "Noor Lóa",
+    "label": "Fictional Records",
+    "album": "Lines Garden",
+    "duration": 193.735,
+    "isrc": "ZZX0Y0700935",
+    "tuc": null,
+    "year": "1995",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500035",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5036,
+    "documentId": "synthtrack500000000000000000036",
+    "title": "Night",
+    "artist": "Copper Sun",
+    "label": "Imaginary Tapes",
+    "album": "Night Water",
+    "duration": 162.162,
+    "isrc": "ZZX0Y1500936",
+    "tuc": null,
+    "year": "1990",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500036",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-536",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5037,
+    "documentId": "synthtrack500000000000000000037",
+    "title": "Season Salt Ferry",
+    "artist": "Ruben Ferro & Mira Dorn",
+    "label": null,
+    "album": "Low Bloom",
+    "duration": 163.965,
+    "isrc": "ZZX0Y0300937",
+    "tuc": null,
+    "year": "1986",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500037",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5038,
+    "documentId": "synthtrack500000000000000000038",
+    "title": "Static",
+    "artist": "Lina Oste",
+    "label": null,
+    "album": "Static Bloom",
+    "duration": 379.749,
+    "isrc": "ZZX0Y0000938",
+    "tuc": null,
+    "year": "1969",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500038",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5039,
+    "documentId": "synthtrack500000000000000000039",
+    "title": "Season Iron Glass",
+    "artist": "Mira Moss",
+    "label": "Placeholder Sound",
+    "album": null,
+    "duration": 343.217,
+    "isrc": "ZZX0Y0200939",
+    "tuc": null,
+    "year": "2017",
+    "youtube": null,
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-539",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5040,
+    "documentId": "synthtrack500000000000000000040",
+    "title": "Copper Harbour",
+    "artist": "Ensemble Nil",
+    "label": null,
+    "album": "Tide Garden",
+    "duration": 397.878,
+    "isrc": null,
+    "tuc": null,
+    "year": null,
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500040",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5041,
+    "documentId": "synthtrack500000000000000000041",
+    "title": "Ferry Water",
+    "artist": "Calder Ré",
+    "label": null,
+    "album": "Pale Season",
+    "duration": 377.09,
+    "isrc": "ZZX0Y1200924",
+    "tuc": null,
+    "year": "2021",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500041",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-541",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5042,
+    "documentId": "synthtrack500000000000000000042",
+    "title": "Slow",
+    "artist": "Orrin Lóa",
+    "label": null,
+    "album": "Signal Ferry",
+    "duration": 218.612,
+    "isrc": "ZZX0Y1800942",
+    "tuc": null,
+    "year": "2021",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500042",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5043,
+    "documentId": "synthtrack500000000000000000043",
+    "title": "Lines Signal (Wren Lune Remix)",
+    "artist": "Noor Vale",
+    "label": null,
+    "album": "Pale Low",
+    "duration": 358.153,
+    "isrc": "ZZX0Y0500943",
+    "tuc": null,
+    "year": "1988",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500043",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-543",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5044,
+    "documentId": "synthtrack500000000000000000044",
+    "title": "Hollow Slow",
+    "artist": "Orrin Okafor",
+    "label": "Imaginary Tapes",
+    "album": "Field Copper",
+    "duration": 483.702,
+    "isrc": "ZZX0Y1900944",
+    "tuc": null,
+    "year": "None",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500044",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-544",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5045,
+    "documentId": "synthtrack500000000000000000045",
+    "title": "Pale Garden",
+    "artist": "Ama Okafor",
+    "label": null,
+    "album": "Low Season",
+    "duration": 381.287,
+    "isrc": null,
+    "tuc": null,
+    "year": "1974",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500045",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5046,
+    "documentId": "synthtrack500000000000000000046",
+    "title": "Bent Glass Field",
+    "artist": "Teodor Ré",
+    "label": null,
+    "album": "Echo Pale",
+    "duration": 505.976,
+    "isrc": "ZZX0Y0000946",
+    "tuc": null,
+    "year": "1989",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500046",
+    "spotify": null,
+    "apple": null,
+    "discogs": "https://www.discogs.com/release/0-synthetic-546",
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   },
+   {
+    "id": 5047,
+    "documentId": "synthtrack500000000000000000047",
+    "title": "Salt Water Bloom",
+    "artist": "Ilse Okafor",
+    "label": null,
+    "album": "Signal Harbour",
+    "duration": 433.467,
+    "isrc": "ZZX0Y0300947",
+    "tuc": null,
+    "year": "1989",
+    "youtube": "https://www.youtube.com/watch?v=SYNTH500047",
+    "spotify": null,
+    "apple": null,
+    "discogs": null,
+    "aiDetectedGenresData": [
+     {
+      "label": "ELECTRONIC",
+      "score": 0.5
+     }
+    ],
+    "albumCoverUrl": null,
+    "owner": null
+   }
+  ]
+ },
+ "meta": {}
+}
