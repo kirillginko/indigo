@@ -17,12 +17,18 @@
 
 import Foundation
 
-/// Whether listens are written down with where they started. Off in the App
-/// Store build: a build from before attribution reads every tag as an
-/// interest, and the attribution tags -- on every attributed row -- become
-/// its strongest interest, scaling every real one down to a few hundredths
-/// (`ListeningAttributionAudit`). Reading them is always safe; writing them
-/// waits until the builds that read them as music are gone.
+/// Whether listens are written down with where they started.
+///
+/// Only where the rows stay in CloudKit's Development environment. A build
+/// from before attribution reads every tag as an interest, and the
+/// attribution tags -- on every attributed row -- become its strongest,
+/// scaling every real one down to a few hundredths
+/// (`ListeningAttributionAudit`). Every archived build, internal TestFlight
+/// included, is Production-signed and syncs the listener's real store, which
+/// any older build on the same Apple ID also reads; a Debug build syncs its
+/// own Development store and zone (`CloudKitEnvironment`,
+/// `PersistenceLayout`). So: a Debug switch, and never in Production,
+/// whatever the build says. Reading the tags is always safe.
 nonisolated enum ListeningAttributionFeature {
     #if DEBUG
     static let switchKey = "INDIGO_LISTENING_ATTRIBUTION"
@@ -31,10 +37,9 @@ nonisolated enum ListeningAttributionFeature {
 
     static var isEnabled: Bool {
         if let override { return override }
+        guard CloudKitEnvironment.current == .development else { return false }
         #if DEBUG
         return UserDefaults.standard.bool(forKey: switchKey)
-        #elseif INDIGO_INTERNAL
-        return true
         #else
         return false
         #endif

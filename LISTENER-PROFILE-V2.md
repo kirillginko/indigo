@@ -405,6 +405,36 @@ a station is `radio.live`, an archive `radio.archive`, a local file
     at 13% complete, a heard-time bug in the embed path, separate from
     attribution.
 
+### Before Phase 3 resumed (2026-10-17)
+
+- **Builds and CloudKit.** Debug builds (Xcode, the simulator) are signed
+  for CloudKit's Development environment and keep their own store
+  (`Application Support/Development/`) and zone. Every archived build is
+  Production-signed and syncs the listener's real store, which any older
+  build on the same Apple ID also reads. That includes internal TestFlight
+  builds (`INDIGO_INTERNAL`) and the App Store build. So attribution is now
+  written only when `CloudKitEnvironment.current` is Development, and only
+  with the Debug switch on. Internal TestFlight builds no longer write it.
+  Real-outcome evaluation runs on Debug builds, whose rows never reach
+  Production.
+- **Embedded heard time** (2b0757c, plus tests here). Seeks bank what was
+  heard and re-anchor where they land. Loading, buffering and reopening are
+  not audible. A stall or a frozen widget moves the clock, not the
+  playhead, so it is not credited. A loop between samples reads as the
+  playhead going backwards and credits that stretch nothing. A failure
+  followed by recovery credits only the playing on both sides. Pause banks.
+  A finished item is closed at its end before the engine rewinds. A skip
+  closes one stint and starts the next. All of these err toward
+  under-crediting.
+- **Old rows read defensively.** `ListenerProfile.plausibleWeight` ignores
+  a recorded length over four hours, or one that makes the item longer than
+  six hours by its own completion, and reads the completion instead. The
+  overnight 22,010-second row counts as a 13% listen. Synced rows are never
+  changed.
+- **Pairing** stays heuristic (limits in `ListeningPlayback.swift`): one
+  listen is the rows sharing moment, action, seconds, completion and
+  surface. Checked on both histories, with no listen whose rows disagree.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.

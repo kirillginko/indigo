@@ -14,6 +14,22 @@
 //
 //  Read-only: a view over events, for diagnostics and replays.
 //
+//  It is a heuristic, and its limits are these:
+//  - Two different listens with the same millisecond, action, seconds,
+//    completion and surface would merge. One device writes one listen at a
+//    time, so only two devices' clocks could collide -- and then the seconds
+//    would have to match to the bit.
+//  - It trusts every row of a listen to carry the same moment. The witness
+//    hands one `Date` to all of them, and a restore or a sync copies the
+//    field whole (`EventValue`); a writer that stamped each row with its own
+//    `Date()` would split one listen into several.
+//  - Rows from before attribution group the same way, without a surface.
+//  - A listen whose artist could not be named wrote a recording alone, and
+//    one listen to a show writes the show and its station; both count once.
+//  - Saves, page opens and dismissals are not playback and are not grouped.
+//  - It cannot tell a listen from a duplicated row; `UserDataDedupe`, by
+//    event id, is what removes those.
+//
 
 import Foundation
 

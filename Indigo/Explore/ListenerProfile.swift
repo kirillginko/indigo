@@ -358,9 +358,26 @@ nonisolated extension ListenerProfile {
         /// group whose entries list each other as aliases. Only names the
         /// history holds; only links both entries confirm.
         var sameArtist: [String: Int] = [:]
+        /// Plays whose recorded length could not have been heard, read by
+        /// their completion instead (the rows themselves are left alone).
+        var implausibleDurations = 0
         /// The audit: alias links between names in the history, how many
         /// both entries confirm, and groups as names alone would have made.
         var aliasLinks = 0, confirmedLinks = 0, groupsByName = 0, groupsByID = 0
+    }
+
+    /// What a play is worth, reading its length defensively. Rows written
+    /// before heard time followed the playhead can carry the wall clock --
+    /// one logged 22,010 seconds at 13% through. A length that would make
+    /// the item longer than six hours (seconds / completion), or any length
+    /// over four hours, is not taken: the completion alone speaks for it.
+    /// The synced row is never changed.
+    static func plausibleWeight(seconds: Double, completion: Double) -> Double {
+        let implausible = (completion > 0 && completion < 1 && seconds / completion > 6 * 3600) || seconds > 4 * 3600
+        if implausible { return min(1, max(0, completion)) }
+        // As `ListeningEvent.weight` reads a play.
+        guard seconds >= ListeningEvent.accidentSeconds else { return 0 }
+        return max(min(1, seconds / ListeningEvent.fullListenSeconds), completion)
     }
 
     static func read(context: ModelContext, before cutoff: Date = .distantFuture) -> Read {
@@ -380,19 +397,23 @@ nonisolated extension ListenerProfile {
 
         for event in ((try? context.fetch(FetchDescriptor<ListeningEvent>())) ?? []) where event.at < cutoff {
             let signal: Signal
+            var weight = event.weight
             switch event.action {
             case .saved: signal = .saved
             case .skipped: signal = .skipped
             case .dismissed: signal = .dismissed
             case .opened: signal = .pageVisit
-            case .played: signal = event.weight >= 0.6 ? .fullListen : .partialListen
+            case .played:
+                weight = Self.plausibleWeight(seconds: event.seconds, completion: event.completion)
+                if weight != event.weight { read.implausibleDurations += 1 }
+                signal = weight >= 0.6 ? .fullListen : .partialListen
             }
             switch event.kind {
             case .recording:
                 let artist = RecordingKey.normalizeArtist(event.subtitle ?? "")
                 guard !artist.isEmpty else { continue }
                 read.evidence.append(Evidence(unit: "recording:\(event.nodeKey)", level: .recording, artist: artist, title: event.title,
-                                              at: event.at, signal: signal, strength: signal == .partialListen ? max(0.25, event.weight) : 1,
+                                              at: event.at, signal: signal, strength: signal == .partialListen ? max(0.25, weight) : 1,
                                               tags: fold(event.musicTags)))
             case .artist:
                 read.evidence.append(Evidence(unit: "artist:\(event.nodeKey)", level: .artist, artist: event.nodeKey, title: event.title,

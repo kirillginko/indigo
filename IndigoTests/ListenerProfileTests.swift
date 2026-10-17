@@ -120,4 +120,15 @@ final class ListenerProfileTests: XCTestCase {
         XCTAssertTrue(spread.contains("h1"))
         XCTAssertEqual(spread.filter { $0.hasPrefix("d") }, ["d1", "d2", "d3"], "within a cluster, the list's order holds")
     }
+
+    /// A length that could not have been heard is read by its completion;
+    /// an ordinary one is read as before.
+    func testAnImplausibleLengthIsReadByItsCompletion() {
+        XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 22_010, completion: 0.134), 0.134, accuracy: 1e-9,
+                       "the overnight row: 45 hours long by its own numbers")
+        XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 5 * 3600, completion: 0), 0, "five hours with no playhead: nothing")
+        XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 600, completion: 0.5), 0.5, accuracy: 1e-9)
+        XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 2400, completion: 0), 1, accuracy: 1e-9, "a long radio mix is still a full listen")
+        XCTAssertEqual(ListenerProfile.plausibleWeight(seconds: 10, completion: 0), 0)
+    }
 }

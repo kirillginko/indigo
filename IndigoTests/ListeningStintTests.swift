@@ -133,4 +133,43 @@ final class ListeningStintTests: XCTestCase {
 
         XCTAssertEqual(stint.finish(now: at(60)).seconds, 40, accuracy: 0.001)
     }
+
+    /// A widget that loops back to the start on its own, between samples,
+    /// reads as the playhead going backwards: nothing is credited for that
+    /// stretch rather than the clock -- never more than was heard.
+    func testALoopBetweenSamplesNeverCreditsUnheardTime() {
+        var stint = ListeningStint()
+        stint.update(isPlaying: true, position: 0, now: at(0))
+        stint.update(isPlaying: true, position: 170, now: at(170))
+        // Looped at 180 and is now 20 seconds into the second pass.
+        stint.update(isPlaying: true, position: 20, now: at(200))
+        let heard = stint.finish(now: at(200))
+        XCTAssertLessThanOrEqual(heard.seconds, 200)
+        XCTAssertEqual(heard.seconds, 170, accuracy: 0.001)
+    }
+
+    /// The network drops (the engine fails, so not audible), then the item
+    /// is reopened where it was and plays again: the dead time is not heard,
+    /// and the playing on both sides is.
+    func testRecoveryAfterAFailureCreditsOnlyThePlaying() {
+        var stint = ListeningStint()
+        stint.update(isPlaying: true, position: 0, now: at(0))
+        stint.update(isPlaying: false, position: 40, now: at(40))      // failed
+        stint.update(isPlaying: false, position: 40, now: at(100))     // reopening
+        stint.update(isPlaying: true, position: 40, now: at(130))      // playing again
+        stint.update(isPlaying: false, position: 70, now: at(160))
+        XCTAssertEqual(stint.finish(now: at(160)).seconds, 70, accuracy: 0.001)
+    }
+
+    /// Skipped to the next item mid-track: the outgoing stint closes on what
+    /// was heard, and the next starts from nothing.
+    func testQueueAdvanceClosesOneStintAndStartsTheNext() {
+        var stint = ListeningStint()
+        stint.update(isPlaying: true, position: 0, now: at(0))
+        stint.update(isPlaying: true, position: 45, now: at(45))
+        XCTAssertEqual(stint.finish(now: at(45)).seconds, 45, accuracy: 0.001)
+        stint.update(isPlaying: true, position: 0, now: at(46))
+        stint.update(isPlaying: false, position: 10, now: at(56))
+        XCTAssertEqual(stint.finish(now: at(56)).seconds, 10, accuracy: 0.001)
+    }
 }
