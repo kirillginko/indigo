@@ -634,7 +634,7 @@ broadcasts and only updates pairs it wants, so it cannot re-create a
 deleted row; `merge_artist_halves` re-points and sums existing rows only.
 A pair that becomes ≥ 2 later is inserted then, as it should be.
 
-## 11. P2 readiness (2026-10-18 15:30 UTC) — GO, awaiting approval
+## 11. P2 readiness (2026-10-18 15:30 UTC) — GO, approved and executed (§12)
 
 ### The first rebuild after 0087
 
@@ -752,4 +752,48 @@ block 4; a rebuild or merge running; within 10 minutes of a :23 slot or
 | Rollback readiness | **PASS** (with the note above) | in-transaction rollback automatic; export restore rehearsed locally; derived restore available |
 | Migration safety | **PASS** | P2 is no migration; 0087 idempotent and equal to live; reconciliation separate |
 
-**GO — ready for explicit production approval.** Not executed.
+**GO — ready for explicit production approval.** Approved 2026-10-18; executed, §12.
+
+## 12. P2 executed (2026-10-18, 16:57–17:06 UTC)
+
+Block by block per `p2/runbook.sql`; no abort criterion met.
+
+| Block | UTC | Result |
+|---|---|---|
+| 0 Backup | 16:57–16:59 | `backups/p2-live/export` (local, outside git): 192,303 rows, 16 slices; restored into a throwaway Postgres, all 16 equal live by rows and md5; the full rehearsal on it passed, rollback included (`p2/rehearsal-live-export.txt`) |
+| 1 Preflight | 16:59 | every `ok_*` true; eligible 161,819, retained 30,484; dashboard 455.1 MB |
+| 2 Pause | 16:59:31 | jobs 6 and 34 inactive, none running; reader capture taken |
+| 3 Delete | 17:01:37–17:01:47 | the guarded `DO` block committed: **161,819 deleted**, 30,484 kept, kept-row fingerprint equal before and after inside the transaction |
+| 4a Snapshots | 17:02 | old snapshots 0, slots holding xmin 0, prepared 0 |
+| 4b `CLUSTER` | 17:02:10–17:02:15 | 4.7 s including the round trip; no lock wait |
+| 5 Verify | 17:02–17:05 | below |
+| 6 Resume | 17:05:54 | both jobs active on their schedules; writers paused 6 min 23 s |
+
+| | Before | After |
+|---|---|---|
+| `music_relationships` | 51.93 MiB (heap 28.98, indexes 22.91), 192,303 rows | **8.66 MiB** (heap 4.59, indexes 4.06), 30,484 rows |
+| `postgres` | 419.4 MiB | **376.2 MiB (−43.2)** |
+| Dashboard (all databases) | 455.1 MB | **409.7 MB** — 82% of 0.5 GB |
+
+**Verified**: 0 single-broadcast `played_by` left; primary key, unique
+`edge_idx`, `to_idx`, trigger, RLS, 1 policy and 28 grants as in the
+backup's definition; clustered flag cleared. Kept rows **identical to the
+export** (id, endpoints, type, evidence, episodes: md5 equal over all
+30,484). Readers (`p2/compare-live-2026-10-18.json`): the DIG page 60/60
+identical; `explore_knowledge` and `knowledge_answers` 114/114 identical
+on every edge kind once artist names are compared by their letters and
+digits — `indigo-relabel-credits` renamed 262 artists at 17:00:00.58
+("YOUNG THUG" → "Young Thug", "Bnyx" → "BNYX®"), between the two
+captures, which is not P2. The 26 single-broadcast pairs and Archie
+Whitewater are still served by every reader (26/26).
+
+**Observed, not P2's**: the non-radio edges of the sample went back at
+17:03 to exactly their 10:06 state, after reading a second state from
+10:19 to 17:01 — artist display names appear to alternate between two
+spellings across relabel runs.
+
+**Still to watch**: the 18:23 UTC rebuild — succeeded, and 0
+single-broadcast rows created.
+
+**Backups kept**: `backups/p2-live/export` and
+`backups/p2-preflight-2026-10-18/export` (local, outside git).

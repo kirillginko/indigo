@@ -1,0 +1,28 @@
+== schema from the migrations
+empty database: 9.4 MiB
+== 1. restore from the export
+restored in 2374 ms
+restore: all 16 slices match live (rows and md5)
+restored: 192303 rows, 161819 single-broadcast played_by, 0 played_by without episode_count
+table 57.9 MiB = heap 29.3 + indexes 28.6
+database with the table: 67.2 MiB (the table is 57.8 MiB of it)
+== 2. the window, step by step
+3 record checksums: 82 ms, database 67.2 MiB
+4 delete single-broadcast played_by: 96 ms, database 67.2 MiB
+5 vacuum full analyze: 202 ms, database 18.0 MiB
+Scripts/p2-rehearsal.sh: line 117: 68777 Terminated: 15          ( while true; do
+    psql -h "$SOCKET" -p "$PORT" -U postgres -qAt -c "select pg_database_size(current_database())" 2> /dev/null >> "$DATA/sizes.txt" || true; sleep 0.05;
+done )
+peak during the window: 72.8 MiB (start 67.2); after: 18.0 MiB; freed 49.2 MiB
+table after: 8.66 MiB = heap 4.59 + indexes 4.06
+music_relationships_edge_idx: 2.52 MiB
+music_relationships_pkey: 0.93 MiB
+music_relationships_to_idx: 0.61 MiB
+== 3. integrity
+kept rows unchanged (ids, endpoints, counts, episodes, confidence, updated_at, source): 30484
+single-broadcast played_by left: 0; played_by kept: 20114; radio_neighbor kept: 10370
+primary key present: t; edge_idx unique: t; trigger present: t; RLS on: t
+rebuild after the window: 0 rows written (no appearances here, so none expected)
+== 4. rollback: the deleted rows back from the export
+restored the deleted rows in 2513 ms; database 70.6 MiB
+rollback: all 16 slices equal live again (rows and md5, every column)
