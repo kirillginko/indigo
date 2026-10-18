@@ -495,6 +495,28 @@ begin
         raise exception 'a second pass renamed something that was already correct';
     end if;
 
+    -- MARK: 0088 — two spellings settle on the one used most
+
+    -- The lines now spell the primary two ways, "Rrawun Maymuru" twice and
+    -- "RRAWUN MAYMURU" once. 0032 renamed to whichever spelling was not the
+    -- current one, so this artist flipped on every run.
+    insert into public.radio_appearances
+        (radio_episode_id, track_index, raw_artist_name, normalized_artist_name,
+         credited_artist_names, credited_artist_keys)
+    values (v_episode, 91, 'RRAWUN MAYMURU, NICK WALES', 'rrawun maymuru',
+            array['RRAWUN MAYMURU', 'NICK WALES'], array['rrawun maymuru', 'nick wales']),
+           (v_episode, 92, 'Rrawun Maymuru, Nick Wales', 'rrawun maymuru',
+            array['Rrawun Maymuru', 'Nick Wales'], array['rrawun maymuru', 'nick wales']);
+
+    if public.relabel_credited_artists(500) <> 0
+       or public.relabel_credited_artists(500) <> 0 then
+        raise exception 'an artist with two spellings was renamed back and forth';
+    end if;
+    if (select name from public.artists where id = v_id) <> 'Rrawun Maymuru' then
+        raise exception 'the spelling used most did not win: %',
+            (select name from public.artists where id = v_id);
+    end if;
+
     -- A line crediting one artist is never touched by any of this.
     if (select count(*) from public.artists where normalized_name = 'skee mask') <> 1 then
         raise exception 'a single credit was disturbed';
