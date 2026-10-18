@@ -792,8 +792,10 @@ Whitewater are still served by every reader (26/26).
 10:19 to 17:01 — artist display names appear to alternate between two
 spellings across relabel runs.
 
-**Still to watch**: the 18:23 UTC rebuild — succeeded, and 0
-single-broadcast rows created.
+**First rebuild after P2** (18:23:00–18:23:13 UTC): **succeeded**.
+1 `played_by` row created (Fllux Quartet on Lise & Vito, 2 broadcasts), 5
+updated, 0 single-broadcast rows created or left; 0 `radio_neighbor`
+created. Table 8.66 MiB, 30,485 rows; dashboard 409.8 MB.
 
 **Backups kept**: `backups/p2-live/export` and
 `backups/p2-preflight-2026-10-18/export` (local, outside git).
