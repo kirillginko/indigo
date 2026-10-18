@@ -1,0 +1,225 @@
+{
+ "relations/playedInShow": {
+  "same": 60,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "relations/everything else": {
+  "same": 56,
+  "changed": 4,
+  "rows_only_before": 82,
+  "rows_only_after": 82,
+  "examples": [
+   {
+    "key": "57dd7219-75f9-4771-b761-6cf8f619c5da",
+    "rows_before": 154,
+    "rows_after": 154,
+    "only_before": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2d11bde1-bd97-41c7-af69-264715c7b8cd\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2d48a2a3-297b-436d-b240-4967d5bbde7d\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2ffb4325-0640-4568-af0c-07974d7f4834\", \"t\": \"radio_neighbor\"}"
+    ],
+    "only_after": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"78ba2330-fd43-495b-8e4b-402f9b17fbc4\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"7bbbec4a-6d6a-4409-b112-12d5bcfb6c15\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"7c9bc9c3-66ee-4e07-b1c7-fb2bf088d3e6\", \"t\": \"radio_neighbor\"}"
+    ]
+   },
+   {
+    "key": "868c3d4e-c65e-4e69-a140-9ad583b8a7d9",
+    "rows_before": 154,
+    "rows_after": 154,
+    "only_before": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2cdfa40f-0746-41c5-853f-81720cb04110\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2e5047bf-7e5c-4781-8790-65ee284344fb\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"30c008f8-6da3-4dd8-bc77-6b1ef92ac4a9\", \"t\": \"radio_neighbor\"}"
+    ],
+    "only_after": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"55f4082b-e5f1-453b-911b-d624c4dcc151\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"58d4b002-b62d-42c7-9b0f-1bf9155a9941\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"58f8df69-ae32-45c9-aea4-43d511bb57f2\", \"t\": \"radio_neighbor\"}"
+    ]
+   },
+   {
+    "key": "bfaf3732-7663-4054-85af-2c56304e48ea",
+    "rows_before": 132,
+    "rows_after": 132,
+    "only_before": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"270e0dc5-c731-4edc-95c6-3661bc2e9aad\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"274c5fbd-ab52-4e18-9f85-a2c2b2e18a64\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"28139224-62ce-4e27-a423-a681d763f1f0\", \"t\": \"radio_neighbor\"}"
+    ],
+    "only_after": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"4f0d1324-f640-49de-8d2f-4e473c31696e\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"4fad3a3d-08ac-4f79-84a3-1008493030ea\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"50762961-288f-4276-952e-c4b05f499ac1\", \"t\": \"radio_neighbor\"}"
+    ]
+   },
+   {
+    "key": "d182206e-d956-49cd-9ce3-0e28e45fe9ac",
+    "rows_before": 161,
+    "rows_after": 161,
+    "only_before": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"0180234a-8678-4ef2-967c-81bda86a800d\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"01dbbb38-9c1d-4d6f-a338-44dfa5efc755\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"02503174-dd58-404f-87eb-c780ff10b90b\", \"t\": \"radio_neighbor\"}"
+    ],
+    "only_after": [
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2a935cf1-0c48-4082-9ee7-e350cf551d04\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2b71b74a-cf5a-461c-a4a0-49aeb2ad2146\", \"t\": \"radio_neighbor\"}",
+     "{\"c\": 0.65, \"m\": {\"adjacencies\": 1, \"episodes\": 1}, \"n\": 1, \"other\": \"2c68c790-a79b-48ca-8edd-904bbdf92ea9\", \"t\": \"radio_neighbor\"}"
+    ]
+   }
+  ]
+ },
+ "explore/playedInShow": {
+  "same": 106,
+  "changed": 8,
+  "rows_only_before": 11,
+  "rows_only_after": 4,
+  "examples": [
+   {
+    "key": "artist:speedy j",
+    "rows_before": 21,
+    "rows_after": 19,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on F K S\", \"to\": {\"handle\": \"UCxEMo0SDaLWRpA50h0pxPXg\", \"kind\": \"broadcast\", \"name\": \"F K S\", \"providerID\": \"youtube\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on TheIDMMaster\", \"to\": {\"handle\": \"UChS0SPpEqGMGRim7mebedPg\", \"kind\": \"broadcast\", \"name\": \"TheIDMMaster\", \"providerID\": \"youtube\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:lotradio|guests/gi-gi",
+    "rows_before": 35,
+    "rows_after": 34,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Gi Gi\", \"to\": {\"kind\": \"artist\", \"name\": \"Dillinger\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:lotradio|patienceimpatience",
+    "rows_before": 148,
+    "rows_after": 147,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Patience / Impatience\", \"to\": {\"kind\": \"artist\", \"name\": \"Mbo Essone Nang\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:lotradio|sorry-records",
+    "rows_before": 358,
+    "rows_after": 357,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Sorry Records\", \"to\": {\"kind\": \"artist\", \"name\": \"ZELIAC\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:youtube|UCKif-hj_9Vf_Ia2cQwXA-zA",
+    "rows_before": 817,
+    "rows_after": 820,
+    "only_before": [],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"playedInShow\", \"occurrences\": 2, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"Bob Degen\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"playedInShow\", \"occurrences\": 2, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"James Williams\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"playedInShow\", \"occurrences\": 2, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"Lisle Atkinson\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:youtube|UCY8_y20lxQhhBe8GZl5A9rw",
+    "rows_before": 2020,
+    "rows_after": 2015,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Music for empty rooms\", \"to\": {\"kind\": \"artist\", \"name\": \"Chain Reaction\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Music for empty rooms\", \"to\": {\"kind\": \"artist\", \"name\": \"DD#8\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Music for empty rooms\", \"to\": {\"kind\": \"artist\", \"name\": \"De\\u0301ja\\u0300 Vu\"}}"
+    ],
+    "only_after": []
+   }
+  ]
+ },
+ "explore/everything else": {
+  "same": 114,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "answers/playedInShow": {
+  "same": 106,
+  "changed": 8,
+  "rows_only_before": 11,
+  "rows_only_after": 4,
+  "examples": [
+   {
+    "key": "artist:speedy j",
+    "rows_before": 21,
+    "rows_after": 19,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on F K S\", \"to\": {\"handle\": \"UCxEMo0SDaLWRpA50h0pxPXg\", \"kind\": \"broadcast\", \"name\": \"F K S\", \"providerID\": \"youtube\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on TheIDMMaster\", \"to\": {\"handle\": \"UChS0SPpEqGMGRim7mebedPg\", \"kind\": \"broadcast\", \"name\": \"TheIDMMaster\", \"providerID\": \"youtube\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:lotradio|guests/gi-gi",
+    "rows_before": 35,
+    "rows_after": 34,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Gi Gi\", \"to\": {\"discogsID\": \"21763\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Dillinger\", \"rowID\": \"daabcc6d-b9b7-41fd-8487-0805c23c46c2\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:lotradio|patienceimpatience",
+    "rows_before": 148,
+    "rows_after": 147,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Patience / Impatience\", \"to\": {\"kind\": \"artist\", \"name\": \"Mbo Essone Nang\", \"rowID\": \"790ed034-e5a4-4a9b-9e44-f4a40529d418\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:lotradio|sorry-records",
+    "rows_before": 358,
+    "rows_after": 357,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Sorry Records\", \"to\": {\"kind\": \"artist\", \"name\": \"ZELIAC\", \"rowID\": \"95650d58-782b-4311-a8cb-6697b139f711\"}}"
+    ],
+    "only_after": []
+   },
+   {
+    "key": "broadcast:youtube|UCKif-hj_9Vf_Ia2cQwXA-zA",
+    "rows_before": 817,
+    "rows_after": 820,
+    "only_before": [],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"playedInShow\", \"occurrences\": 2, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"Bob Degen\", \"rowID\": \"8f12f8ee-1f05-4088-94fa-110b69da554a\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"playedInShow\", \"occurrences\": 2, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"James Williams\", \"rowID\": \"09198bf9-825f-4f64-9778-95aed0c888d8\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"playedInShow\", \"occurrences\": 2, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"Lisle Atkinson\", \"rowID\": \"c8072ac6-7b5c-4d62-8d20-4efebc1acb3f\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:youtube|UCY8_y20lxQhhBe8GZl5A9rw",
+    "rows_before": 2020,
+    "rows_after": 2015,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Music for empty rooms\", \"to\": {\"kind\": \"artist\", \"name\": \"Chain Reaction\", \"rowID\": \"17466d35-9b34-4b1d-ac80-835d6cf00973\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Music for empty rooms\", \"to\": {\"kind\": \"artist\", \"name\": \"DD#8\", \"rowID\": \"a51572e3-d570-4dfc-82c2-1d4ec8a39df3\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Music for empty rooms\", \"to\": {\"kind\": \"artist\", \"name\": \"De\\u0301ja\\u0300 Vu\", \"rowID\": \"bd8bdf7f-6f29-42b9-a2d3-b0fd5db56c68\"}}"
+    ],
+    "only_after": []
+   }
+  ]
+ },
+ "answers/everything else": {
+  "same": 114,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ }
+}

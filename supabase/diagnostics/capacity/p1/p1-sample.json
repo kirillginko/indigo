@@ -1,0 +1,722 @@
+[
+ {
+  "id": "785fa052-f495-4dbd-9253-cbc39ea286d8",
+  "key": "john coltrane",
+  "kind": "artist",
+  "n": 251,
+  "name": "John Coltrane",
+  "r": 1
+ },
+ {
+  "id": "61d2d619-9d1a-4276-b947-786b85e394a2",
+  "key": "miles davis",
+  "kind": "artist",
+  "n": 243,
+  "name": "Miles Davis",
+  "r": 2
+ },
+ {
+  "id": "57dd7219-75f9-4771-b761-6cf8f619c5da",
+  "key": "sun ra",
+  "kind": "artist",
+  "n": 231,
+  "name": "Sun Ra",
+  "r": 3
+ },
+ {
+  "id": "bfaf3732-7663-4054-85af-2c56304e48ea",
+  "key": "d angelo",
+  "kind": "artist",
+  "n": 190,
+  "name": "D'Angelo",
+  "r": 4
+ },
+ {
+  "id": "d182206e-d956-49cd-9ce3-0e28e45fe9ac",
+  "key": "ennio morricone",
+  "kind": "artist",
+  "n": 138,
+  "name": "Ennio Morricone",
+  "r": 5
+ },
+ {
+  "id": "58539bda-1f4b-4a6a-a561-a33713b6bef2",
+  "key": "sade",
+  "kind": "artist",
+  "n": 133,
+  "name": "Sade",
+  "r": 6
+ },
+ {
+  "id": "c3bf07ff-567f-4f22-a161-bece1411d391",
+  "key": "pharoah sanders",
+  "kind": "artist",
+  "n": 133,
+  "name": "Pharoah Sanders",
+  "r": 7
+ },
+ {
+  "id": "bfe15208-c772-4862-8a8c-1045eab01084",
+  "key": "ahmad jamal",
+  "kind": "artist",
+  "n": 132,
+  "name": "Ahmad Jamal",
+  "r": 8
+ },
+ {
+  "id": "8dbba6d5-026c-4c73-857d-75fd605e8963",
+  "key": "prince",
+  "kind": "artist",
+  "n": 130,
+  "name": "Prince",
+  "r": 9
+ },
+ {
+  "id": "a2347d9c-4ff8-4c9e-9727-96546ae7f9ca",
+  "key": "aphex twin",
+  "kind": "artist",
+  "n": 129,
+  "name": "Aphex Twin",
+  "r": 10
+ },
+ {
+  "id": "868c3d4e-c65e-4e69-a140-9ad583b8a7d9",
+  "key": "herbie hancock",
+  "kind": "artist",
+  "n": 121,
+  "name": "Herbie Hancock",
+  "r": 11
+ },
+ {
+  "id": "e4145285-fbd6-40c3-9d08-26bfbed0ff9e",
+  "key": "madonna",
+  "kind": "artist",
+  "n": 121,
+  "name": "Madonna",
+  "r": 12
+ },
+ {
+  "id": "8d2dccf4-3c8e-42f9-a812-b0845808ab64",
+  "key": "dagga",
+  "kind": "artist",
+  "n": 8,
+  "name": "Dagga",
+  "r": 5078
+ },
+ {
+  "id": "8d44e21c-fa5d-45be-aab6-892e0b90a46d",
+  "key": "john wright",
+  "kind": "artist",
+  "n": 8,
+  "name": "John Wright",
+  "r": 5079
+ },
+ {
+  "id": "8d673b41-4724-4bfd-b853-143cc1508624",
+  "key": "joe bushkin",
+  "kind": "artist",
+  "n": 8,
+  "name": "Joe Bushkin",
+  "r": 5080
+ },
+ {
+  "id": "8d7e530d-8158-402c-a441-4c6ac7e62390",
+  "key": "kalamu chache",
+  "kind": "artist",
+  "n": 8,
+  "name": "Kalamu Chach\u00e9",
+  "r": 5081
+ },
+ {
+  "id": "8f05f724-c28a-4481-830a-3550d5159a67",
+  "key": "solar",
+  "kind": "artist",
+  "n": 8,
+  "name": "Solar",
+  "r": 5082
+ },
+ {
+  "id": "8f3585da-a20d-45bf-91f2-3d7d5db5e993",
+  "key": "the four tops",
+  "kind": "artist",
+  "n": 8,
+  "name": "The Four Tops",
+  "r": 5083
+ },
+ {
+  "id": "9028383c-f04e-4d18-b37a-ebcb55b632da",
+  "key": "bernard wright",
+  "kind": "artist",
+  "n": 8,
+  "name": "Bernard Wright",
+  "r": 5084
+ },
+ {
+  "id": "9058e600-66af-46af-968e-c25a3ab2c67b",
+  "key": "black eyed peas",
+  "kind": "artist",
+  "n": 8,
+  "name": "Black Eyed Peas",
+  "r": 5085
+ },
+ {
+  "id": "90636b8a-9102-4017-b04d-8982f1ba905a",
+  "key": "osamu kitajima",
+  "kind": "artist",
+  "n": 8,
+  "name": "Osamu Kitajima",
+  "r": 5086
+ },
+ {
+  "id": "9065c92f-6868-4c22-abd7-d5a4ede26df5",
+  "key": "madvillain",
+  "kind": "artist",
+  "n": 8,
+  "name": "Madvillain",
+  "r": 5087
+ },
+ {
+  "id": "90ffcb41-ec8e-4832-813c-8fef66015abe",
+  "key": "sophia stel",
+  "kind": "artist",
+  "n": 8,
+  "name": "Sophia Stel",
+  "r": 5088
+ },
+ {
+  "id": "911a06e0-1f62-4bf3-a8a7-ed256c8d9055",
+  "key": "gil evans",
+  "kind": "artist",
+  "n": 8,
+  "name": "Gil Evans",
+  "r": 5089
+ },
+ {
+  "id": "460af2f3-3ef1-4882-bc24-134ac448903d",
+  "key": "\u043e\u0440\u043a\u0435\u0441\u0442\u0440 \u043a\u0438\u043d\u0435\u043c\u0430\u0442\u043e\u0433\u0440\u0430\u0444\u0438\u0438",
+  "kind": "artist",
+  "n": 2,
+  "name": "\u041e\u0440\u043a\u0435\u0441\u0442\u0440 \u041a\u0438\u043d\u0435\u043c\u0430\u0442\u043e\u0433\u0440\u0430\u0444\u0438\u0438",
+  "r": 25391
+ },
+ {
+  "id": "4611e17e-19d7-4b54-9d48-41e4ee7a6104",
+  "key": "biel pdr",
+  "kind": "artist",
+  "n": 2,
+  "name": "Biel PDR",
+  "r": 25392
+ },
+ {
+  "id": "46128a2a-d549-415b-a3e9-ecb203925275",
+  "key": "barbara howard",
+  "kind": "artist",
+  "n": 2,
+  "name": "barbara howard",
+  "r": 25393
+ },
+ {
+  "id": "461b1787-accc-4157-b5c5-cfa5b269163a",
+  "key": "hunter",
+  "kind": "artist",
+  "n": 2,
+  "name": "Hunter",
+  "r": 25394
+ },
+ {
+  "id": "461c0892-b4ce-4d31-9fa6-343258f9c987",
+  "key": "kinectic electronix",
+  "kind": "artist",
+  "n": 2,
+  "name": "Kinectic Electronix",
+  "r": 25395
+ },
+ {
+  "id": "4628afdd-4e96-494d-8a90-ad9506e88da4",
+  "key": "kv5",
+  "kind": "artist",
+  "n": 2,
+  "name": "Kv5",
+  "r": 25396
+ },
+ {
+  "id": "463118de-9a6c-44d9-839f-97fd54e795c0",
+  "key": "benedek tom carruthers",
+  "kind": "artist",
+  "n": 2,
+  "name": "Benedek, Tom Carruthers",
+  "r": 25397
+ },
+ {
+  "id": "463d3a54-76d7-40b0-bfb1-f17a9fd39f1e",
+  "key": "spangle call lilli line",
+  "kind": "artist",
+  "n": 2,
+  "name": "Spangle call Lilli line",
+  "r": 25398
+ },
+ {
+  "id": "4649ecb3-cd7c-4369-99aa-4b8cc98dc06f",
+  "key": "bead game",
+  "kind": "artist",
+  "n": 2,
+  "name": "Bead Game",
+  "r": 25399
+ },
+ {
+  "id": "464cc8d3-4093-4d18-b080-ce8d0495a890",
+  "key": "hermes",
+  "kind": "artist",
+  "n": 2,
+  "name": "HERMES",
+  "r": 25400
+ },
+ {
+  "id": "465998fc-8082-46cc-b726-9460a6cf3756",
+  "key": "kynlary",
+  "kind": "artist",
+  "n": 2,
+  "name": "Kynlary",
+  "r": 25401
+ },
+ {
+  "id": "46674ab9-f99f-44b2-aaf5-8f33fbfe0907",
+  "key": "dead butterflies",
+  "kind": "artist",
+  "n": 2,
+  "name": "Dead Butterflies",
+  "r": 25402
+ },
+ {
+  "id": "3789d1c3-f149-4c49-90a1-14b3aa556252",
+  "key": "radio dept",
+  "kind": "artist",
+  "n": 1,
+  "name": "Radio Dept",
+  "r": 50781
+ },
+ {
+  "id": "378a9de1-41e7-4476-92f8-bbf724fa6d93",
+  "key": "achille",
+  "kind": "artist",
+  "n": 1,
+  "name": "Achille",
+  "r": 50782
+ },
+ {
+  "id": "378b4351-f690-4888-a378-2ccb9094a242",
+  "key": "seine trance parenz fredi alberti",
+  "kind": "artist",
+  "n": 1,
+  "name": "Seine Trance-Parenz Fredi Alberti",
+  "r": 50783
+ },
+ {
+  "id": "378ca585-190e-4929-9c32-7015470bc762",
+  "key": "chris lake armand van helden",
+  "kind": "artist",
+  "n": 1,
+  "name": "Chris Lake & Armand Van Helden",
+  "r": 50784
+ },
+ {
+  "id": "378cf0bb-ee89-45d9-bce5-fa2783c8c85e",
+  "key": "teething pains",
+  "kind": "artist",
+  "n": 1,
+  "name": "Teething Pains",
+  "r": 50785
+ },
+ {
+  "id": "378cf514-216f-4cc4-9c42-0a2204e0a15e",
+  "key": "chopin",
+  "kind": "artist",
+  "n": 1,
+  "name": "Chopin",
+  "r": 50786
+ },
+ {
+  "id": "378d16cc-785f-4e98-bff7-8de984b07ccf",
+  "key": "the pat mcmanus band",
+  "kind": "artist",
+  "n": 1,
+  "name": "The Pat McManus Band",
+  "r": 50787
+ },
+ {
+  "id": "378d3247-1012-485d-8cbf-ea89f8989893",
+  "key": "yaviah",
+  "kind": "artist",
+  "n": 1,
+  "name": "Yaviah",
+  "r": 50788
+ },
+ {
+  "id": "378d6719-151b-4b4f-8db9-05224c4d98c2",
+  "key": "fauna ghislain poirier",
+  "kind": "artist",
+  "n": 1,
+  "name": "Fauna, Ghislain Poirier",
+  "r": 50789
+ },
+ {
+  "id": "378e0d72-b2d1-42c4-9cb0-a1e63038593f",
+  "key": "7 side a the immortals",
+  "kind": "artist",
+  "n": 1,
+  "name": "7\" Side A: The Immortals",
+  "r": 50790
+ },
+ {
+  "id": "378e42b8-c167-49c0-91bc-ba4ae07f900c",
+  "key": "eleanore mills",
+  "kind": "artist",
+  "n": 1,
+  "name": "Eleanore Mills",
+  "r": 50791
+ },
+ {
+  "id": "378e8b7b-2664-40b2-ac1c-a381fa5d9cd7",
+  "key": "truth hurts",
+  "kind": "artist",
+  "n": 1,
+  "name": "Truth Hurts",
+  "r": 50792
+ },
+ {
+  "id": "ebdd53b5-63da-4dbf-8ac6-4b583f06bbf1",
+  "key": "adriano pappalardo",
+  "kind": "artist",
+  "n": 1,
+  "name": "Adriano Pappalardo",
+  "r": 96484
+ },
+ {
+  "id": "ebdd82be-d9f9-40bf-9271-f84c4b1a205a",
+  "key": "el chamber benfika remix",
+  "kind": "artist",
+  "n": 1,
+  "name": "El Chamber (BENFIKA REMIX) \u22c6",
+  "r": 96485
+ },
+ {
+  "id": "ebdd84bd-9f04-4728-a7ae-0e4ad38da47e",
+  "key": "colman brothers",
+  "kind": "artist",
+  "n": 1,
+  "name": "Colman Brothers",
+  "r": 96486
+ },
+ {
+  "id": "ebde5b9e-5b91-49a3-a51e-438892eba38f",
+  "key": "los dutis freebot",
+  "kind": "artist",
+  "n": 1,
+  "name": "Los Dutis, Freebot",
+  "r": 96487
+ },
+ {
+  "id": "ebe139d7-86e1-4d52-8225-1ba1d996c6c2",
+  "key": "milt dickley",
+  "kind": "artist",
+  "n": 1,
+  "name": "Milt Dickley",
+  "r": 96488
+ },
+ {
+  "id": "ebe1b90a-1686-4803-83ec-8b05b13c60dc",
+  "key": "acid lab ahmad",
+  "kind": "artist",
+  "n": 1,
+  "name": "Acid Lab & Ahmad",
+  "r": 96489
+ },
+ {
+  "id": "ebe2dcee-10b5-491e-8a6f-a3c5c1f6bff3",
+  "key": "jamal khe",
+  "kind": "artist",
+  "n": 1,
+  "name": "Jamal Khe",
+  "r": 96490
+ },
+ {
+  "id": "ebe2e8c2-e4fd-4d1d-b9a3-793b9034dd0d",
+  "key": "termites",
+  "kind": "artist",
+  "n": 1,
+  "name": "Termites",
+  "r": 96491
+ },
+ {
+  "id": "ebe30a3e-3dda-4d47-811b-0e964ce171a4",
+  "key": "uv p\u00f8p",
+  "kind": "artist",
+  "n": 1,
+  "name": "UV P\u00f8p",
+  "r": 96492
+ },
+ {
+  "id": "ebe45b1d-24a5-4dd8-bb8b-0d4537a9c30a",
+  "key": "vaskular",
+  "kind": "artist",
+  "n": 1,
+  "name": "Vaskular",
+  "r": 96493
+ },
+ {
+  "id": "ebe5c23e-38e3-4d98-badb-ec449a6c09d5",
+  "key": "carey harris and michael orr",
+  "kind": "artist",
+  "n": 1,
+  "name": "Carey Harris And Michael Orr",
+  "r": 96494
+ },
+ {
+  "id": "ebe7111b-25a3-49c8-b770-3209ebc61748",
+  "key": "john saucer",
+  "kind": "artist",
+  "n": 1,
+  "name": "JOHN SAUCER",
+  "r": 96495
+ },
+ {
+  "id": "3da3cc76-649f-46d5-9af4-7c84ca99f87f",
+  "key": "youtube|UC47qc6t2RelhfvI-OjgIY2A",
+  "kind": "show",
+  "n": 13016,
+  "name": "Rare Samples & Songs Oleg Tsoy",
+  "r": 1
+ },
+ {
+  "id": "393512b4-3261-424d-adb2-3efd5c8be3cf",
+  "key": "youtube|UCY8_y20lxQhhBe8GZl5A9rw",
+  "kind": "show",
+  "n": 8536,
+  "name": "Music for empty rooms",
+  "r": 2
+ },
+ {
+  "id": "ffa1c581-5d52-41c3-9804-88fa12d1c751",
+  "key": "youtube|UCv5OAW45h67CJEY6kJLyisg",
+  "kind": "show",
+  "n": 5479,
+  "name": "Andr\u00e9 Navarro II",
+  "r": 3
+ },
+ {
+  "id": "a781fb16-3cf9-4c36-887a-c6cb8b73e78c",
+  "key": "youtube|UCKif-hj_9Vf_Ia2cQwXA-zA",
+  "kind": "show",
+  "n": 4250,
+  "name": "Vinyl Life - Piano Trio",
+  "r": 4
+ },
+ {
+  "id": "d7d98b99-74f3-471e-87f3-a3773205e2b2",
+  "key": "youtube|UCxEMo0SDaLWRpA50h0pxPXg",
+  "kind": "show",
+  "n": 3015,
+  "name": "F K S",
+  "r": 5
+ },
+ {
+  "id": "ea26b612-027c-48eb-8058-db7f18867a4f",
+  "key": "youtube|UC-g-sYmtdxN8EMJX01uagJA",
+  "kind": "show",
+  "n": 2253,
+  "name": "Andrew Mats74",
+  "r": 6
+ },
+ {
+  "id": "cd5e136d-bb3e-41a1-ac78-73d50d829d33",
+  "key": "nts|theslip",
+  "kind": "show",
+  "n": 415,
+  "name": "The Slip",
+  "r": 85
+ },
+ {
+  "id": "ef5400ee-e7bf-464f-8a72-2b71b88a9ba6",
+  "key": "lotradio|black-rave-culture",
+  "kind": "show",
+  "n": 415,
+  "name": "Black Rave Culture",
+  "r": 86
+ },
+ {
+  "id": "bcc7acbd-d7ec-44bd-adb4-1f11740b7f25",
+  "key": "lotradio|sorry-records",
+  "kind": "show",
+  "n": 410,
+  "name": "Sorry Records",
+  "r": 87
+ },
+ {
+  "id": "b050947a-3307-4c18-a41e-1a08999bdd62",
+  "key": "nts|naafi",
+  "kind": "show",
+  "n": 406,
+  "name": "CDMX Tapes",
+  "r": 88
+ },
+ {
+  "id": "cf25d077-0cee-4dd5-8077-3d9816222c46",
+  "key": "lotradio|misc",
+  "kind": "show",
+  "n": 403,
+  "name": "misc.",
+  "r": 89
+ },
+ {
+  "id": "b54a1e16-acf5-4ef6-9d88-dccbb82ff1ba",
+  "key": "nts|early-bird-show-maria-somerville",
+  "kind": "show",
+  "n": 402,
+  "name": "The Early Bird Show w/ Maria Somerville",
+  "r": 90
+ },
+ {
+  "id": "b7d8122c-b10d-474e-b5cd-95022430dbd7",
+  "key": "lotradio|part-time-punk",
+  "kind": "show",
+  "n": 197,
+  "name": "Part Time Punk",
+  "r": 425
+ },
+ {
+  "id": "d63585c6-d704-4e54-b0a2-4429f396c9a6",
+  "key": "nts|sofay-ribeka",
+  "kind": "show",
+  "n": 197,
+  "name": "Sofay & Ribeka",
+  "r": 426
+ },
+ {
+  "id": "18a4ce3c-ff08-4905-84b6-e5b2beaac69d",
+  "key": "nts|system-olympia",
+  "kind": "show",
+  "n": 196,
+  "name": "System Olympia",
+  "r": 427
+ },
+ {
+  "id": "6c48a6ad-a3ea-4b30-9e6b-49bdda15ab2f",
+  "key": "nts|marylou",
+  "kind": "show",
+  "n": 196,
+  "name": "Mountain Cry w/ Marylou",
+  "r": 428
+ },
+ {
+  "id": "93db0243-74f7-4ef5-b947-1dc794e0332f",
+  "key": "lotradio|patienceimpatience",
+  "kind": "show",
+  "n": 196,
+  "name": "Patience / Impatience",
+  "r": 429
+ },
+ {
+  "id": "216dfdf3-8b16-4164-a25a-3dac39754194",
+  "key": "nts|danielle",
+  "kind": "show",
+  "n": 195,
+  "name": "Danielle",
+  "r": 430
+ },
+ {
+  "id": "2df27b69-fab9-4d58-aa51-82023bcdc4b3",
+  "key": "nts|munib",
+  "kind": "show",
+  "n": 35,
+  "name": "Merkato Tunes w/ Munib",
+  "r": 849
+ },
+ {
+  "id": "3939e170-204e-4bbd-9d5c-c964b1f1a172",
+  "key": "youtube|UCfnH9uGrnYRbUT6kM-wSOQw",
+  "kind": "show",
+  "n": 35,
+  "name": "Jazz Obscurities",
+  "r": 850
+ },
+ {
+  "id": "826213a0-b897-4c38-a957-5722adcf5f33",
+  "key": "lotradio|guests/gi-gi",
+  "kind": "show",
+  "n": 35,
+  "name": "Gi Gi",
+  "r": 851
+ },
+ {
+  "id": "9375fc83-e443-427d-80b3-f8a16b243e02",
+  "key": "lotradio|guests/ian-kim-judd+bianca-lexis",
+  "kind": "show",
+  "n": 35,
+  "name": "Ian Kim Judd & Bianca Lexis",
+  "r": 852
+ },
+ {
+  "id": "c822c070-7fef-4086-8c08-19bbba54ffd6",
+  "key": "lotradio|guests/yu-su",
+  "kind": "show",
+  "n": 35,
+  "name": "Yu Su",
+  "r": 853
+ },
+ {
+  "id": "e52fc10d-0ea3-4af9-a718-c3a150764205",
+  "key": "lotradio|guests/hu-dat",
+  "kind": "show",
+  "n": 35,
+  "name": "HU DAT",
+  "r": 854
+ },
+ {
+  "id": "8f2faad5-7f3e-453f-ae67-e53ffb3d9db0",
+  "key": "lotradio|guests/rincon-tropical-ft-gio-and-loco-bembe",
+  "kind": "show",
+  "n": 7,
+  "name": "Rinc\u00f3n Tropical ft. Gio and Loco Bemb\u00e9",
+  "r": 1613
+ },
+ {
+  "id": "a28387e6-d625-48ef-80f9-f34f027025c4",
+  "key": "lotradio|guests/tito-deler",
+  "kind": "show",
+  "n": 7,
+  "name": "Tito Deler",
+  "r": 1614
+ },
+ {
+  "id": "a734b764-28c3-4eea-8aaf-f631cfa76253",
+  "key": "nts|georgia",
+  "kind": "show",
+  "n": 7,
+  "name": "GEORGIA: All Kind Music",
+  "r": 1615
+ },
+ {
+  "id": "a7ed5368-3bd2-4092-a638-9104a6f2a53e",
+  "key": "lotradio|guests/armand-hammer",
+  "kind": "show",
+  "n": 7,
+  "name": "Armand Hammer",
+  "r": 1616
+ },
+ {
+  "id": "b46a691f-ec81-41ba-a11c-85040680bffb",
+  "key": "lotradio|guests/maximum-overdub-hour-with-dave-harrington-michael-hentz",
+  "kind": "show",
+  "n": 7,
+  "name": "Maximum Overdub Hour with Dave Harrington & Michael Hentz",
+  "r": 1617
+ },
+ {
+  "id": "b5de873b-279a-4fe7-9118-bb119160fa8a",
+  "key": "lotradio|guests/youandewan",
+  "kind": "show",
+  "n": 7,
+  "name": "Youandewan",
+  "r": 1618
+ }
+]

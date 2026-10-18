@@ -432,3 +432,115 @@ window. DIG page timings on the busiest artists: cold first call 0.36–0.78 s
 and column of the table before the window, with its manifest; checksums in
 `supabase/diagnostics/capacity/b2/`.
 
+
+## 9. P — single-broadcast `played_by` on demand (proposed 2026-10-18)
+
+The same move as B for the other radio edge. **P1 applied 2026-10-18
+14:20 UTC** (progress at the end of this section); For You's read and P2 not.
+
+### What is redundant
+
+On 2026-10-18 `music_relationships` holds 192,297 rows (heap 29.0 MiB,
+indexes 22.9, total 51.9 MiB; 150 B a tuple, indexes 89–93% dense).
+**161,819 of 181,930 `played_by` edges have `episode_count = 1`**: a show
+played an artist in one broadcast. Catalogue-wide against
+`radio_appearances` (`p1/recon.sql`):
+
+| Stored single-broadcast edges | |
+|---|---|
+| Reproduced exactly (appearances, episodes, confidence) | **161,553 (99.84%)** |
+| Stale: the pair is in no appearance now (the rebuild never deletes) | 266 |
+| Became stronger unseen | 0 |
+
+### Readers of `played_by`
+
+| Reader | Reads | Change |
+|---|---|---|
+| `artist_radio_relations` (DIG artist page) | artist → shows | P1: stored ≥ 2 broadcasts + the rest derived |
+| `explore_knowledge` (app), `knowledge_answers` (worker, via `knowledge_cut`) | artist → shows **and** show → artists (broadcast nodes) | P1: both ends, same rule |
+| `dig_radio_for_artists` | appearances directly, not `played_by` | none |
+| **`ListenerRetrieval.showsPlaying` (app, For You)** | `music_relationships` rows per artist, counted: shows playing the artist (`popularityStep`, `hubDamping`, the ≤ 40 bridge cut) | **Must move before P2** — see below |
+| `rebuild_radio_dig_edges` (writer) | — | P1: store only ≥ 2 broadcasts |
+| `merge_artist_halves` (writer) | — | none: it re-points and sums; the next rebuild corrects counts |
+| `enrichment_status.radio_edges` | a diagnostic count | none; the number drops after P2 |
+
+**For You dependency (flagged, not changed).** If the app keeps counting
+table rows after P2, **94,247 of 101,710 artists read a different show
+count and 85,990 read zero** — every hub-damping and popularity step in
+radio retrieval would move. The draft adds `artist_show_counts(uuid[])`
+(the same count from the appearances; equal to today's table count for
+101,434 artists catalogue-wide and for 60/60 sampled, the rest stale or
+newer than the last rebuild). Switching `showsPlaying`'s fetch to it is a
+one-closure change in `ListenerRetrieval.swift` — a For You file, so it
+needs the owner's approval. Installed builds that still read the table
+would degrade after P2; P2 waits until the builds that matter have the
+change.
+
+### P1 (migration, no space change)
+
+`0087_shows_played_once_on_demand`: the writer adds `having count(distinct re.id) >= 2`
+to its `played_by` branch; the three readers read stored edges with
+`episode_count >= 2` and derive every other artist–show pair from the
+appearances with the rebuild's counting (appearances, distinct episodes)
+and confidence (`least(0.95, 0.5 + 0.45 * (1 - 1/(1 + episodes)))`); plus
+`artist_show_counts` in `app_callable_functions()`. Built from the live
+definitions (equal to 0078); everything else byte-for-byte.
+
+**Validated** (`Scripts/p1-capture.py`, the B1 method extended to the show's
+end; the proposed bodies loaded as session-local `pg_temp` functions, so
+nothing shared was written; 60 artists — top, p5, p25, p50, p95 by radio
+plays — 30 shows the same way, and the pilot demand set; `p1/`):
+
+- `artist_radio_relations`, `played_by` rows: **60/60 identical**. The
+  neighbour rows differ on 4 of the most-played pages only by which tied
+  (evidence 1, 0.65) single adjacencies fill the 200-row limit — the tie B1
+  documented.
+- `explore_knowledge` / `knowledge_answers`, `playedInShow`: **106/114
+  nodes identical**; every other edge type identical on all 114. Of the 15
+  differing edges, the 11 gone are all stale stored pairs, the 4 new are
+  pairs newer than the last rebuild. No current pair lost, none invented.
+- Throwaway Postgres (`Scripts/test-migrations.sh` on a copy with the draft
+  as 0087): every migration and smoke test passes.
+- Timing (warm, three runs): DIG page unchanged (Coltrane 72–74 ms, median
+  artists ~2 ms); `explore_knowledge` for the busiest show (13,016
+  appearances) 163 → 250–365 ms, second busiest 75–99 → 148–176 ms; a
+  12-artist batch 1.25–1.3 s either way. Inside anon's 3 s.
+
+Rollback: re-create the four functions from `pg_get_functiondef` as captured
+(they equal 0078's text); drop `artist_show_counts`, restore the allowlist.
+
+### P2 (deletion window, after P1 has run one rebuild cycle and the app reads `artist_show_counts`)
+
+Simpler than B2: `metadata` is already null and `episode_count` filled, so
+no column rewrite is needed and at 419 MiB a plain `VACUUM FULL` fits.
+
+1. Export (`Scripts/b2-export.py`, whole table, ~50 MB, outside git); verify.
+2. Pause `indigo-rebuild-edges` (6) and `indigo-merge-split-artists` (34);
+   gates as in §7 (not near :23 of a third hour or 04:23 UTC).
+3. Checksums of the rows kept; the P1 capture.
+4. `delete from music_relationships where relationship_type = 'played_by'
+   and coalesce(episode_count, 0) < 2` — 161,819 rows.
+5. `vacuum full analyze music_relationships` — copies 30,478 rows and
+   rebuilds the three indexes; ACCESS EXCLUSIVE for a few seconds.
+6. Verify checksums, zero stored single-broadcast edges, the capture
+   identical to step 3; resume cron; watch one rebuild.
+
+| | `postgres` MiB | Dashboard (all DBs, decimal) |
+|---|---|---|
+| Now | 419.4 | 455.1 MB (91%) |
+| Peak (old + new copy) | ~428 | |
+| After | **≈ 376 (−43.5)**; table 51.9 → ~8.5 MiB | **≈ 410 MB (82%)** |
+
+### To decide
+
+1. Approve P1 (the migration; no space change).
+2. Approve moving `showsPlaying` to `artist_show_counts` (For You).
+3. Approve P2's window, separately, once 1 and 2 are live.
+
+### Progress (2026-10-18)
+
+| | Status |
+|---|---|
+| P1 — 0087 | **Applied** 14:20 UTC with `db query -f` in one transaction — not `db push`, which would also have applied 0086 (committed, not yet applied, another session's). 0087 is idempotent, so a later push that records both is harmless. Grants unchanged; `artist_show_counts` listed and executable by anon. Live capture before vs after (`p1/compare-live-2026-10-18.json`) **exactly as predicted**: `played_by` on the DIG page 60/60 identical; `playedInShow` 106/114, the 11 gone stale and the 4 new not yet rebuilt; nothing else changed. Rollback: `p1/rollback-0087.sql`. Still to watch: one rebuild (15:23 UTC) inserting no single-broadcast edge. |
+| `showsPlaying` → `artist_show_counts` | Awaiting For You approval |
+| P2 — deletion window | Awaiting approval; after both rows above |
