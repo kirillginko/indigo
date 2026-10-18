@@ -1,0 +1,44 @@
+== schema from the migrations
+empty database: 9.4 MiB
+== 1. restore from the export
+restored in 2426 ms
+-- 0 11992 b820ae8dca667dc56e3a1dea8b17164b
+-- 1 12118 76f98827543a4c99de42fb47f4ab3288
+-- 2 12091 dd02d0fe2b34c33f70718a6751b8fe76
+-- 3 12127 1bccfd19191151dbafe4110b85813cce
+-- 4 11894 15a33041c46fa68fc4a38def4456dd6b
+-- 5 11993 3e608915915f726b62eb5d464a9b0b6f
+-- 6 12031 316cc304d17ce76d70f030c6f7c952b3
+-- 7 11895 27d4cd82924cbedb7bc257bed110ff63
+-- 8 11965 4d5f65e57c06ed31e618031e5cdbcdea
+-- 9 12125 b5e09f0ac0b105d629c455c6645c3744
+-- a 11994 77ad108d0f288c25d3e5e58ba46f7722
+-- b 12059 77408ddcf51b2fed8750cf64bf8e599a
+-- c 12069 79880c4a2366df75dba13866ce16c11b
+-- d 12051 47d9dcdd981c929fd3a046810a2d8f2d
+-- e 12001 ff0192e7649d3dcb3c8436684d11b78b
+-- f 11892 aa0f940afa7c20499a5238c15b664dd4
+restore: all 16 slices match live (rows and md5)
+restored: 192297 rows, 161819 single-broadcast played_by, 0 played_by without episode_count
+table 57.9 MiB = heap 29.3 + indexes 28.6
+database with the table: 67.2 MiB (the table is 57.8 MiB of it)
+== 2. the window, step by step
+3 record checksums: 83 ms, database 67.2 MiB
+4 delete single-broadcast played_by: 95 ms, database 67.2 MiB
+5 vacuum full analyze: 206 ms, database 18.0 MiB
+Scripts/p2-rehearsal.sh: line 117: 57266 Terminated: 15          ( while true; do
+    psql -h "$SOCKET" -p "$PORT" -U postgres -qAt -c "select pg_database_size(current_database())" 2> /dev/null >> "$DATA/sizes.txt" || true; sleep 0.05;
+done )
+peak during the window: 75.9 MiB (start 67.2); after: 18.0 MiB; freed 49.2 MiB
+table after: 8.66 MiB = heap 4.59 + indexes 4.06
+music_relationships_edge_idx: 2.52 MiB
+music_relationships_pkey: 0.93 MiB
+music_relationships_to_idx: 0.61 MiB
+== 3. integrity
+kept rows unchanged (ids, endpoints, counts, episodes, confidence, updated_at, source): 30478
+single-broadcast played_by left: 0; played_by kept: 20111; radio_neighbor kept: 10367
+primary key present: t; edge_idx unique: t; trigger present: t; RLS on: t
+rebuild after the window: 0 rows written (no appearances here, so none expected)
+== 4. rollback: the deleted rows back from the export
+restored the deleted rows in 2556 ms; database 70.7 MiB
+rollback: all 16 slices equal live again (rows and md5, every column)

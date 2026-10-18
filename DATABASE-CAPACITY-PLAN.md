@@ -544,3 +544,212 @@ no column rewrite is needed and at 419 MiB a plain `VACUUM FULL` fits.
 | P1 — 0087 | **Applied** 14:20 UTC with `db query -f` in one transaction — not `db push`, which would also have applied 0086 (committed, not yet applied, another session's). 0087 is idempotent, so a later push that records both is harmless. Grants unchanged; `artist_show_counts` listed and executable by anon. Live capture before vs after (`p1/compare-live-2026-10-18.json`) **exactly as predicted**: `played_by` on the DIG page 60/60 identical; `playedInShow` 106/114, the 11 gone stale and the 4 new not yet rebuilt; nothing else changed. Rollback: `p1/rollback-0087.sql`. Still to watch: one rebuild (15:23 UTC) inserting no single-broadcast edge. |
 | `showsPlaying` → `artist_show_counts` | Awaiting For You approval |
 | P2 — deletion window | Awaiting approval; after both rows above |
+
+## 10. P follow-up (2026-10-18): For You's read, older builds, P2 preflight
+
+### For You's show counts → `artist_show_counts` (`979ab23`, not pushed)
+
+`ListenerRetrieval.showsPlaying` now calls `artist_show_counts` instead of
+counting `played_by` rows. Scoring (`popularityStep`, `hubDamping`, the ≤ 40
+bridge cut) is untouched. Same chunks of ten, one request per chunk, rows
+asked once per build of the pool.
+
+- **Semantics** — the same number: shows that played the row. Old and new,
+  as `anon` (the app's role), against today's table:
+
+  | Group | Artists | Same | Old read wrong after P2 |
+  |---|---|---|---|
+  | Sample (top, p5, p25, p50, p95) | 60 | **60** | 55 |
+  | Single-broadcast only | 15 | **15** | 15 (all would read 0) |
+  | Most shows (62–87) | 10 | **10** | 10 |
+  | No appearances | 10 | **10** (0) | 0 |
+  | Aliases (MusicBrainz→Discogs links, shared names) | 6 | **6** | 4 |
+
+  Catalogue-wide: equal for 101,434 of 101,710 artists; the 276 others
+  are stale stored pairs or pairs newer than the last rebuild. The count is
+  per catalogue row, as before: two rows for one person are counted apart
+  under both (Discogs ids are never shared across rows: 0).
+- **Zero vs failure — one deliberate change, failure path only.** A row
+  the answer leaves out is 0, as before. A *failed* request used to record
+  0 for its rows; it now leaves them unknown (nil) and asks again the next
+  time they are wanted. Downstream that differs in one place: a failed
+  *source* used to damp a step to a more-played candidate
+  (`popularityStep(from: 0, …)`), and now does not (`nil` → 1). Identical
+  whenever requests succeed.
+- **Over HTTP** (publishable key, warm): 0.17–0.39 s vs the old read's
+  0.34–0.43 s for ten artists.
+- **Who runs it**: `ListenerRetrieval.radio` is called only by the replay
+  measurements in `IndigoTests` (`ListenerRetrievalReplay`,
+  `ListenerExpansionReplay`); no app code path calls it today.
+- Tests: `ListenerRetrievalTests` 13/13 on macOS, including
+  `testAFailedDegreeReadIsUnknownNotZero`.
+
+### Older builds
+
+| Build | Reads `played_by` | After P2 |
+|---|---|---|
+| App Store 1.0 (`production-ios-1.0-1`, `production-macos-1.0-1`, 2026-10-03) | only through `artist_radio_relations` (RPC); no direct read of `music_relationships` (its table reads: `metadata_cache`, `scene_members`, `scene_rosters`) | **unaffected**: the server-side reader already derives (0087) and never reads a single-broadcast row |
+| Internal TestFlight 2026101502–2026101603 | `artist_radio_relations`, `explore_knowledge` (RPCs); direct `music_relationships` reads in `TrackDiscoverySource` are `radio_neighbor` only, already without singles since B2 | **unaffected** |
+| Any build with `showsPlaying` | the direct count | never shipped on a path users reach (replay tests only) |
+| Edge Functions (worker, publisher) | none read `music_relationships`; `knowledge_cut` goes through `knowledge_answers` | unaffected |
+
+Every server function that names `played_by` was listed from the live
+catalogue (`pg_proc`): the three readers and the rebuild, all on 0087. No
+view or materialised view reads the table. Old clients cache radio
+relations only as answers to RPCs, which do not change.
+
+### P2 preflight
+
+**Rehearsal** (`Scripts/p2-rehearsal.sh` on a throwaway Postgres 17 built
+from every migration, the live table restored from a read-only export of
+2026-10-18, all 16 slices equal to live by rows and md5;
+`p2/rehearsal-2026-10-18.txt`):
+
+| | Result |
+|---|---|
+| Selection | `relationship_type = 'played_by' and coalesce(episode_count, 0) < 2`: **161,819** rows; 0 `played_by` without `episode_count`; includes the 266 stale ones |
+| Delete | 95 ms locally |
+| `vacuum full analyze` | 206 ms locally; peak +8.7 MiB over the start (the new copy), then the old files go |
+| Table after | **8.66 MiB** (heap 4.59, `edge_idx` 2.52, pkey 0.93, `to_idx` 0.61); 30,478 rows |
+| Integrity | kept rows identical (id, endpoints, counts, episodes, confidence, `updated_at`, source); 0 single-broadcast left; pkey, unique `edge_idx`, trigger, RLS present; the rebuild runs |
+| Rollback | deleted rows re-inserted from the export in 2.6 s; all 16 slices equal live again, every column |
+
+**Live projection**: table 51.9 → 8.7 MiB, **−43.3 MiB**; `postgres` 419.4
+→ ~376 MiB; peak ~428 MiB. Dashboard (all databases, decimal): 455.1 → ~410
+MB of 500; peak ~464. Allowing 10–20× local times, the exclusive lock of
+`VACUUM FULL` is 2–4 s.
+
+**Migration order.** `schema_migrations` ends at 0085. 0086 (NTS backfill
+pause) is committed and **not applied** — `indigo-discover-backfill` is
+still active — and 0087 was applied out of band and is **not recorded**.
+So: the next `supabase db push` will apply 0086 and re-run 0087, in order;
+re-running 0087 is harmless (`create or replace`, grants). Do not record
+0087 by hand: that would put 0086 behind the last remote version and make
+the push need `--include-all`. A migration after 0087 that redefines the
+same functions must start from 0087's text. P2 is a window, not a
+migration, as B2 was; it does not depend on 0086.
+
+**Rebuild after the deletion.** The writer only inserts pairs with ≥ 2
+broadcasts and only updates pairs it wants, so it cannot re-create a
+deleted row; `merge_artist_halves` re-points and sums existing rows only.
+A pair that becomes ≥ 2 later is inserted then, as it should be.
+
+## 11. P2 readiness (2026-10-18 15:30 UTC) — GO, awaiting approval
+
+### The first rebuild after 0087
+
+`indigo-rebuild-edges` 15:23:00.12–15:23:21.84 UTC, **succeeded**, no
+error. Source data did not move in between (262,478 appearances, 0 new
+since 14:49). Baseline at 14:49 vs after:
+
+| Check | Expected | Observed | |
+|---|---|---|---|
+| Run completed | succeeded | succeeded, 21.7 s | PASS |
+| Pairs newly at ≥ 2 broadcasts inserted | 3 | **3**: Bob Degen, Lisle Atkinson, James Williams on Vinyl Life – Piano Trio, 2 broadcasts each | PASS |
+| Stored pairs with changed counts updated | 4 | **4** updated; stored multi-broadcast rows that differ from the tracklists 4 → **0** (e.g. Cedar Walton 3 → 5) | PASS |
+| Single-broadcast rows inserted | 0 | **0**; rows updated into a single 0; stored singles still 161,819 | PASS |
+| Archie Whitewater / André Navarro II (1 broadcast) | not stored | **not stored**; derived 1 broadcast | PASS |
+| Multi-broadcast rows | 20,111 + 3 | **20,114**: 20,107 exactly as the tracklists say, 7 stale (pair gone; the rebuild never deletes) | PASS |
+| Pairs at ≥ 2 broadcasts not stored | 0 | 3 → **0** | PASS |
+| `radio_neighbor` | only ≥ 2 | 3 inserted, all 2 adjacencies in 2 episodes | PASS |
+| Row count | +3 played_by | 192,297 → **192,303** (+3 played_by, +3 radio_neighbor) | PASS |
+
+**Readers after the rebuild** (`p1/compare-rebuild-2026-10-18.json`, the
+same capture as before it): DIG page 60/60 identical, every edge type;
+knowledge answers 113/114 identical, the one change being Cedar Walton's
+count update. **Single-broadcast pairs are still served**: 26 random
+stored single-broadcast pairs plus Archie Whitewater, called as `anon`,
+appear on the DIG page (1 broadcast, confidence 0.725), in
+`explore_knowledge` from the artist's end and from the show's, and in
+`artist_show_counts` — **26/26** on every reader, before and after the
+rebuild.
+
+### Fresh measurements (15:26 UTC)
+
+| | Rehearsal (export 14:30) | Now |
+|---|---|---|
+| Rows | 192,297 | **192,303** |
+| Eligible (`played_by`, `coalesce(episode_count, 0) < 2`) | 161,819 | **161,819** (0 with null `episode_count`) |
+| Retained | 30,478 | **30,484** |
+| Table | 51.93 MiB | 51.93 MiB |
+| `postgres` / all databases | 419.4 MiB / 455.1 MB | 419.4 MiB / **455.1 MB** |
+| Indexes, constraints, trigger | pkey, unique `edge_idx`, `to_idx`; 3 checks; `touch_updated_at` | unchanged; no FKs into the table, no publication |
+| Replication slots, prepared, old snapshots | | **0 / 0 / 0** |
+
+The six extra rows are 0.003% of the retained set: the rehearsal still
+represents production. **Expected**: delete 161,819, keep 30,484; table
+51.93 → ~8.7 MiB (**−43.3 MiB**); `postgres` 419.4 → ~376 MiB; dashboard
+455.1 → **~410 MB**; peak during compaction **~464 MB** (+~9 MB, the new
+copy; local peak +8.7 MiB).
+
+### Migration order (0086 now applied)
+
+`schema_migrations` ends at **0086** (applied with the new worker by the
+NTS session; `indigo-discover-backfill` is gone). 0087 is applied but not
+recorded.
+
+1. The next `supabase db push` would execute **0087 only**.
+2. **0087 is idempotent, demonstrated**: in a throwaway Postgres built from
+   every migration, the six functions' definitions equal live by md5;
+   re-running 0087 there leaves definitions and grants identical.
+3. Hazards: re-running 0087 rewrites `app_callable_functions()` with its
+   list — identical to live today, but a migration that adds a name before
+   0087 is recorded must carry 0087's list forward (as every allowlist
+   migration does). A later migration redefining the three readers or the
+   rebuild must start from 0087's text, or it silently re-reads stored
+   singles (none would exist after P2) or re-stores them.
+4. Reconcile — a separate decision: either `supabase migration repair
+   --status applied 0087` (writes one history row, runs nothing), or let the
+   next push re-run it (harmless, shown above). Not done.
+
+### Runbook
+
+`p2/runbook.sql`, rehearsed block by block on a copy of the live table
+(`p2/runbook-rehearsal-2026-10-18.txt`). Two corrections over §9 came from
+rehearsing it:
+
+- **`VACUUM FULL` is out.** The CLI sends one call as one implicit
+  transaction, where `VACUUM` fails (25001, checked live), and the CLI
+  session has no `lock_timeout` (0) to bound it. `CLUSTER … USING
+  music_relationships_pkey` rewrites the heap and every index the same way
+  and may run in a transaction, so it carries `set local lock_timeout =
+  '5s'`: same result (8.66 MiB, 190 ms locally); under a held lock it gives
+  up after 5 s with nothing changed; the clustered flag is cleared after.
+- **Delete and compaction must be separate calls.** In one transaction
+  CLUSTER copies the rows that transaction deleted and frees nothing
+  (rehearsed: 52.30 MiB before and after).
+
+The delete is a single `DO` block: counts the eligible rows live, refuses
+outside 150,000–161,819, fingerprints the kept rows before and after, and
+raises — rolling everything back — if the deleted count or the fingerprint
+differ (rehearsed: a wrong range deletes nothing).
+
+**Rollback vs restore.** Until block 3 commits, any failure rolls back by
+itself. After it commits, undoing is a restore: (a) exact, from the block-0
+export, every column and id (rehearsed locally in 2.6 s); sending ~40 MB of
+rows through the CLI has not been tried on live — over psql `\copy` it is
+the rehearsed path; (b) derived: `p1/rollback-0087.sql` plus one rebuild
+re-materialises every current single-broadcast pair (new ids; not the 266
+stale ones, which are in the export). If the compaction fails after the
+delete committed: readers are correct (they never read these rows); retry
+block 4; until it succeeds the space stays allocated and autovacuum makes
+it reusable.
+
+**Abort**: any preflight `ok_*` false; dashboard ≥ 470 MB; eligible
+outside the range; any old snapshot, slot or prepared transaction before
+block 4; a rebuild or merge running; within 10 minutes of a :23 slot or
+04:23 UTC.
+
+### GO / NO-GO
+
+| Gate | | Evidence |
+|---|---|---|
+| Post-P1 rebuild | **PASS** | 15:23 run: 3 inserted, 4 updated, 0 singles, Archie absent; readers unchanged |
+| For You compatibility | **PASS** | `979ab23`: counts equal for 110 artists + 6 alias rows; 13/13 tests |
+| Older app compatibility | **PASS** | App Store 1.0 and every TestFlight build read `played_by` only through RPCs on 0087 |
+| Deletion eligibility | **PASS** | 161,819 live = rehearsal; every one reproduced from the tracklists or stale; served by all readers when derived |
+| Storage headroom | **PASS** | 455.1 MB now, peak ~464 MB, after ~410 MB of 500 |
+| Rollback readiness | **PASS** (with the note above) | in-transaction rollback automatic; export restore rehearsed locally; derived restore available |
+| Migration safety | **PASS** | P2 is no migration; 0087 idempotent and equal to live; reconciliation separate |
+
+**GO — ready for explicit production approval.** Not executed.

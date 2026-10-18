@@ -1,0 +1,18 @@
+== A: delete (DO block, own call), then compact (own call)
+start: 52.30 MiB, rows 192297, db 61.6
+  NOTICE:  P2: deleted 161819, kept 30478 (fingerprint c21512d030b547bd9afa17a1ea063bd9)
+after delete: 52.30 MiB, rows 30478, db 61.6
+  compact rc=0 in 190 ms
+after compact: 8.66 MiB, rows 30478, db 18.0
+clustered flag left: false
+== B: delete and compact in one call
+start: 52.30 MiB, rows 192297, db 61.7
+  NOTICE:  P2: deleted 161819, kept 30478 (fingerprint c21512d030b547bd9afa17a1ea063bd9)
+after: 52.30 MiB, rows 30478, db 61.7
+== C: the DO block's guard (expected range violated -> nothing deleted)
+  ERROR:  P2: 161819 eligible rows, outside the rehearsed range
+  CONTEXT:  PL/pgSQL function inline_code_block line 13 at RAISE
+after failed guard: 52.30 MiB, rows 192297, db 61.7
+== D: compact while a reader holds the table 10 s -> lock timeout, nothing changed
+  ERROR:  canceling statement due to lock timeout
+after timeout: 52.30 MiB, rows 192297, db 61.7
