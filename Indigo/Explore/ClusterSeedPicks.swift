@@ -125,8 +125,23 @@ nonisolated struct ClusterSeedPicks: Sendable {
     var plays: @Sendable (DiscoveredTrack.Source) async -> Bool? = TrackDiscoverySource.live.plays
 
     var store: ClusterSeedStore? = .shared
+    /// The seeds' R2 artist bundles: read through their own cache file, so
+    /// the backend shadow's is never written from here. Nil reads none.
+    var bundles: (@Sendable ([Int]) async -> [Int: ArtistBundle])? = ClusterSeedPicks.liveBundles
+
+    static let liveBundles: @Sendable ([Int]) async -> [Int: ArtistBundle] = { ids in
+        let file = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent("cluster-seed-bundles.json")
+        var cache = BundleCache.load(from: file)
+        _ = await BundleFetcher.refresh(&cache, discogsIDs: ids, now: Date())
+        cache.save(to: file)
+        var out: [Int: ArtistBundle] = [:]
+        for id in ids { if let digest = cache.refs[String(id)]?.ref?.digest, let bundle = cache.bundles[digest] { out[id] = bundle } }
+        return out
+    }
 
     static let live = ClusterSeedPicks()
+    /// Raised whenever the picking changes, so kept picks are not reused.
+    static let version = 4
 
     /// What the picks are made from, in a line: the synced history (events,
     /// crate, DIG pages) and the style caches (entries, records), each by
@@ -138,6 +153,8 @@ nonisolated struct ClusterSeedPicks: Sendable {
             return ((try? context.fetch(d))?.first).map { String(Int(date($0).timeIntervalSinceReferenceDate)) } ?? "-"
         }
         let parts = [
+            // How the picks are worked out: a new way, new picks.
+            "v\(Self.version)",
             "e\(count(ListeningEvent.self)):" + newest(FetchDescriptor<ListeningEvent>(sortBy: [SortDescriptor(\.at, order: .reverse)]), \.at),
             "c\(count(CrateItem.self)):" + newest(FetchDescriptor<CrateItem>(sortBy: [SortDescriptor(\.addedAt, order: .reverse)]), \.addedAt),
             "v\(count(DigVisit.self)):" + newest(FetchDescriptor<DigVisit>(sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]), \.lastVisitedAt),
@@ -187,8 +204,9 @@ nonisolated struct ClusterSeedPicks: Sendable {
     /// The candidates, ranked: verified ids only, styled through identity,
     /// by relevance and how strongly they were reached, slots by cluster.
     static func ranked(_ inputs: Inputs, credits: [String: [ListenerRetrieval.Credit]], excluding: Set<String>,
-                       limit: Int = 40) -> [ListenerRetrieval.Candidate] {
+                       bundles: [String: (id: Int, bundle: ArtistBundle)] = [:], limit: Int = 40) -> [ListenerRetrieval.Candidate] {
         let sightings = ListenerRetrieval.direct(inputs.seeds, entries: inputs.entries, records: [], credits: credits)
+            + ListenerRetrieval.bundled(inputs.seeds, bundles: bundles, names: inputs.entries.mapValues(\.name))
         var candidates = ListenerRetrieval.merge(sightings).candidates.filter { c in
             c.identity.hasPrefix("discogs:")
                 && !inputs.known.contains(c.nameKey) && !c.aliases.contains(where: inputs.known.contains)
@@ -198,7 +216,12 @@ nonisolated struct ClusterSeedPicks: Sendable {
         let evidence = ListenerRetrieval.evidence(candidates)
         let scorer = ListenerProfile.Scorer(inputs.profile, vectors: inputs.vectors)
         var scores: [String: Double] = [:]
-        for c in candidates { scores[c.identity] = (scorer.relevance(c.styles)?.score ?? 0) * (0.5 + (evidence[c.identity] ?? 0)) }
+        // Fit where there is a style to judge; below every styled one, the
+        // unstyled by how strongly they were reached -- never by their id.
+        for c in candidates {
+            let reached = evidence[c.identity] ?? 0
+            scores[c.identity] = (scorer.relevance(c.styles)?.score ?? 0) * (0.5 + reached) + 0.001 * reached
+        }
         let sorted = candidates.sorted { (scores[$0.identity] ?? 0) != (scores[$1.identity] ?? 0) ? (scores[$0.identity] ?? 0) > (scores[$1.identity] ?? 0) : $0.identity < $1.identity }
         return inputs.profile.spread(sorted, limit: limit) { scorer.relevance($0.styles)?.cluster }
     }
@@ -241,13 +264,31 @@ nonisolated struct ClusterSeedPicks: Sendable {
             // the seed is not one of its own.
             credits[artist] = all.filter { $0.id != held.seed }
         }
-        let ranked = Self.ranked(inputs, credits: credits, excluding: excluding)
+        var held: [String: (id: Int, bundle: ArtistBundle)] = [:]
+        if let bundles {
+            let found = await bundles(inputs.releaseIDs.values.map(\.seed).sorted())
+            for (artist, ids) in inputs.releaseIDs { if let bundle = found[ids.seed] { held[artist] = (ids.seed, bundle) } }
+        }
+        let ranked = Self.ranked(inputs, credits: credits, excluding: excluding, bundles: held)
+        // No taste cluster takes more than its share of the picks while
+        // another still has something to offer.
+        let clusterCount = max(1, Set(ranked.map(\.best.cluster)).count)
+        let perCluster = max(2, Int((Double(limit) / Double(clusterCount)).rounded(.up)))
+        var fromCluster: [Int: Int] = [:]
         let seedNames = Dictionary(inputs.seeds.map { ($0.artist, (inputs.entries[$0.artist]?.name ?? $0.name, inputs.releaseIDs[$0.artist]?.seed)) },
                                    uniquingKeysWith: { a, _ in a })
 
         var recordings: [DiscoveredTrack] = [], moments: [DiscoveredTrack] = []
+        // First each cluster up to its share; then, if slots are left because
+        // a cluster had nothing that plays, the rest in rank order.
+        var looked = Set<String>()
+        for capped in [true, false] where recordings.count < limit {
         for candidate in ranked where recordings.count < limit {
-            guard let id = Int(candidate.identity.dropFirst("discogs:".count)) else { continue }
+            guard let id = Int(candidate.identity.dropFirst("discogs:".count)), !looked.contains(candidate.identity) else { continue }
+            if capped, fromCluster[candidate.best.cluster, default: 0] >= perCluster { continue }
+            looked.insert(candidate.identity)
+            let countedBefore = recordings.count + moments.count
+            defer { if recordings.count + moments.count > countedBefore { fromCluster[candidate.best.cluster, default: 0] += 1 } }
             let (via, viaID) = seedNames[candidate.best.seed] ?? (candidate.best.seed, nil)
             func track(_ appearance: TrackDiscovery.Appearance) -> DiscoveredTrack {
                 DiscoveredTrack(artist: candidate.name, artistDiscogsID: id, title: appearance.title, source: appearance.source,
@@ -289,6 +330,7 @@ nonisolated struct ClusterSeedPicks: Sendable {
                 break
             }
             await keep(played)
+        }
         }
         await store?.flush()
         return Array((recordings + moments).prefix(limit))

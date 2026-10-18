@@ -254,4 +254,37 @@ final class ListenerRetrievalTests: XCTestCase {
         XCTAssertEqual(asked, [[a, b], [a, b]], "deduplicated, ordered, and nothing known asked again")
         XCTAssertEqual(report.requests, 2)
     }
+
+    /// An R2 bundle read as the backend reads it: made together is direct, a
+    /// record both are merely on is shared context, a technical credit and
+    /// the seed's own other names are nobody; every target keeps its id.
+    func testABundleGivesVerifiedPeopleOnly() throws {
+        let json = """
+        {"format": "indigo.artist-knowledge/1", "artist": {"discogsID": 100, "name": "Seed"},
+         "releases": [{"id": 1, "masterID": null, "title": "Together", "year": 2020, "relation": "Main", "compilation": false},
+                      {"id": 2, "masterID": null, "title": "Various Things", "year": 2019, "relation": "TrackAppearance", "compilation": true}],
+         "styles": [], "genres": [], "stylesAround": [], "labels": [],
+         "collaborators": [{"artist": {"discogsID": 7, "name": "Partner (2)", "anv": null}, "how": ["joint"], "releases": [1]},
+                           {"artist": {"discogsID": 8, "name": "Neighbour", "anv": null}, "how": ["TrackAppearance"], "releases": [2]},
+                           {"artist": {"discogsID": 100, "name": "Seed Real Name", "anv": null}, "how": ["joint"], "releases": [1]}],
+         "credits": [{"artist": {"discogsID": 9, "name": "Desk", "anv": null},
+                      "roles": [{"role": "Mastered By", "kind": "technical", "releases": [{"id": 1, "tracks": []}]}]},
+                     {"artist": {"discogsID": 10, "name": "Player", "anv": null},
+                      "roles": [{"role": "Bass", "kind": "performance", "releases": [{"id": 1, "tracks": []}]}]}],
+         "source": null}
+        """
+        let bundle = try JSONDecoder().decode(ArtistBundle.self, from: Data(json.utf8))
+        let seed = ListenerRetrieval.Seed(artist: "seed", name: "seed", cluster: 0, weight: 1, level: .artist, title: "Seed")
+        let found = ListenerRetrieval.bundled([seed], bundles: ["seed": (id: 100, bundle: bundle)], names: ["seed": "Seed"])
+        let byID = Dictionary(found.map { ($0.discogsID ?? -1, $0.route) }, uniquingKeysWith: { a, _ in a })
+        XCTAssertEqual(byID[7]?.provenance, .direct)
+        XCTAssertEqual(byID[7]?.why, "Made Together together with Seed")
+        XCTAssertEqual(byID[8]?.provenance, .sharedContext)
+        XCTAssertEqual(byID[10]?.provenance, .direct)
+        XCTAssertNil(byID[9], "a mastering engineer is not somebody to recommend")
+        XCTAssertTrue(ListenerRetrieval.isSongwriting("Written-By on Bodies' Warmth (B1)"))
+        XCTAssertFalse(ListenerRetrieval.isSongwriting("Bass on Together"))
+        XCTAssertNil(byID[100], "the seed under another name")
+        XCTAssertTrue(found.allSatisfy { $0.discogsID != nil })
+    }
 }

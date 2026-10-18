@@ -122,6 +122,7 @@ final class ListenerExpansionReplay: XCTestCase {
         var summary: [String] = []
         var examples: [String] = []
         func pct(_ a: Int, _ b: Int) -> String { b == 0 ? "–" : String(format: "%.0f%%", 100 * Double(a) / Double(b)) }
+        func ms(_ d: Duration) -> Double { Double(d.components.seconds) * 1000 + Double(d.components.attoseconds) / 1e15 }
         func key(_ name: String) -> String { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) }
 
         let allRecords = try context.fetch(FetchDescriptor<DiscogsReleaseRecord>()).map(RecordProfile.init(record:))
@@ -134,6 +135,9 @@ final class ListenerExpansionReplay: XCTestCase {
         let playable = Playable()
         let releases = Releases()
         var totals: [String: [Int]] = [:]   // label → [finds, sessions, playable, slots]
+        var bundleCache = BundleCache()
+        var previousOffered: [String: Set<String>] = [:]
+        var repeated: [String: [Int]] = [:]  // label → [kept from the cut-off before, offered]
 
         for days in [21, 14, 10, 7, 0] {
             let cutoff = days == 0 ? last.addingTimeInterval(3_600) : last.addingTimeInterval(-Double(days) * 86_400)
@@ -223,6 +227,19 @@ final class ListenerExpansionReplay: XCTestCase {
             }
             let before = identified(unresolved), after = identified(direct)
             out.append("cluster-seed candidates with a verified Discogs id: \(before.0) of \(before.1) by name alone -> \(after.0) of \(after.1) with the seeds' own release credits (\(credits.values.reduce(0) { $0 + $1.count }) credits from \(await releases.reads) R2 documents read so far)")
+            // R2 artist bundles for the seeds with a Discogs id: the whole
+            // discography's collaborators and credits, by entry.
+            var t0 = ContinuousClock.now
+            let seedIDs = seeds.compactMap { seed in pastRead.discogsIDs[seed.artist].map { (seed.artist, $0) } }
+            let bundleRead = await BundleFetcher.refresh(&bundleCache, discogsIDs: seedIDs.map(\.1), now: Date())
+            var bundles: [String: (id: Int, bundle: ArtistBundle)] = [:]
+            for (artist, id) in seedIDs {
+                if let digest = bundleCache.refs[String(id)]?.ref?.digest, let bundle = bundleCache.bundles[digest] { bundles[artist] = (id, bundle) }
+            }
+            let bundled = ListenerRetrieval.bundled(seeds, bundles: bundles,
+                                                    names: entries.mapValues(\.name))
+            out.append("bundles: \(bundles.count) of \(seedIDs.count) seeds with a Discogs id have one; \(bundleRead.reads) reads, \(bundleRead.errors.count) errors, \(ms(ContinuousClock.now - t0)) ms; \(identified(bundled).0) verified candidates from them")
+            t0 = ContinuousClock.now
             let radio = await ListenerRetrieval.radio(seeds: seeds, discogsIDs: pastRead.discogsIDs, profile: past, vectors: vectors,
                                                       knownKeys: known, before: cutoff, source: ListenerRetrieval.liveRadio, perEpisode: 3)
             let seedNames = Dictionary(seeds.map { ($0.artist, $0.name) }, uniquingKeysWith: { a, _ in a })
@@ -272,11 +289,13 @@ final class ListenerExpansionReplay: XCTestCase {
 
             let pools: [(String, [ListenerRetrieval.Sighting])] = [
                 ("A  For You today", forYou),
-                ("AB + cluster seeds", forYou + direct),
-                ("ABR + bounded radio", forYou + direct + radioSightings),
-                ("ABRS + album similarity", forYou + direct + radioSightings + similar),
+                ("B- + cluster seeds, no bundles", forYou + direct),
+                ("B  + cluster seeds and bundles", forYou + direct + bundled),
+                ("C  B + radio + album similarity", forYou + direct + bundled + radioSightings + similar),
             ]
             for (label, sightings) in pools {
+                let started = ContinuousClock.now
+                let requestsBefore = await playable.requests
                 let candidates = pool(sightings)
                 let hits = candidates.filter(isFind)
                 let ev = ListenerRetrieval.evidence(candidates)
@@ -287,7 +306,9 @@ final class ListenerExpansionReplay: XCTestCase {
                 // unplayable ones, nor For You by the fill.
                 let forYouPart = candidates.filter { $0.provenances.contains(.forYou) }
                     .sorted { (forYouOrder[$0.nameKey] ?? .max, $0.identity) < (forYouOrder[$1.nameKey] ?? .max, $1.identity) }
-                let v2: (ListenerRetrieval.Candidate) -> Double = { c in (past.relevance(styles: c.styles, vectors: vectors)?.score ?? 0) * (0.5 + (ev[c.identity] ?? 0)) }
+                let v2: (ListenerRetrieval.Candidate) -> Double = { c in
+                    (past.relevance(styles: c.styles, vectors: vectors)?.score ?? 0) * (0.5 + (ev[c.identity] ?? 0)) + 0.001 * (ev[c.identity] ?? 0)
+                }
                 let rest = past.spread(candidates.filter { !$0.provenances.contains(.forYou) }
                     .sorted { v2($0) != v2($1) ? v2($0) > v2($1) : $0.identity < $1.identity }, limit: 60, styles: \.styles, vectors: vectors)
                 let ranked = forYouPart + rest
@@ -318,6 +339,17 @@ final class ListenerExpansionReplay: XCTestCase {
                 let clusters = Set(offered.compactMap { past.relevance(styles: $0.0.styles, vectors: vectors)?.cluster }).count
                 let routes = Dictionary(grouping: offered, by: { $0.0.best.provenance.rawValue }).mapValues(\.count).sorted { $0.key < $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", ")
                 let topPlayable = top.filter { c in offered.contains { $0.0.identity == c.identity } }.count
+                let verified = candidates.filter { $0.identity.hasPrefix("discogs:") }.count
+                let sources = Dictionary(grouping: candidates, by: { $0.best.provenance.rawValue }).mapValues(\.count).sorted { $0.key < $1.key }
+                    .map { "\($0.key) \($0.value)" }.joined(separator: ", ")
+                let offeredIDs = Set(offered.map(\.0.identity))
+                let kept = offeredIDs.intersection(previousOffered[label] ?? []).count
+                if days != 0, previousOffered[label] != nil { repeated[label, default: [0, 0]][0] += kept; repeated[label, default: [0, 0]][1] += offered.count }
+                previousOffered[label] = offeredIDs
+                let elapsed = ms(ContinuousClock.now - started)
+                let asked = await playable.requests - requestsBefore
+                out.append(String(format: "    reach: %d candidates, %d with a verified Discogs id (none known to the listener); sources: %@; same as the cut-off before: %d of %d; ranking + playability %.0f ms, %d requests",
+                                  candidates.count, verified, sources as NSString, kept, offered.count, elapsed, asked))
                 let because = await playable.reasons(unplayable)
                 let kindLine = kinds.sorted { $0.key < $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", ")
                 let whyLine = because.sorted { $0.value > $1.value }.map { "\($0.key) \($0.value)" }.joined(separator: "; ")
@@ -351,6 +383,9 @@ final class ListenerExpansionReplay: XCTestCase {
         for (label, t) in totals.sorted(by: { $0.key < $1.key }) {
             summary.append(String(format: "%-26@ playable lists over 4 cut-offs: finds %d (%d sessions); %d of %d slots filled with a playable recording",
                                   label as NSString, t[0], t[1], t[2], t[3]))
+        }
+        for (label, r) in repeated.sorted(by: { $0.key < $1.key }) {
+            summary.append(String(format: "%-26@ repetition: %d of %d playable picks were also offered at the cut-off before", label as NSString, r[0], r[1]))
         }
         summary.append("playability: \(await playable.requests) requests (shelf + R2 + oEmbed)")
         var lines: [String] = ["== summary"]

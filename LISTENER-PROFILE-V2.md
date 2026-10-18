@@ -684,6 +684,102 @@ refuses the key.
 - "On <release> with <seed>" reads oddly when the release title already
   says "With".
 
+### Milestone phases 1, 4 and 5: retrieval, the mix, and the comparison (2026-10-18)
+
+**Added to retrieval** (`ListenerRetrieval`):
+- **R2 artist bundles** (`bundled`). The worker folds each artist's whole
+  discography into one bundle. Read as the backend reads it
+  (`BundleEdges.edges`):
+  - a collaboration or musical credit is direct;
+  - a record both are merely on is shared context;
+  - technical credits, songwriting credits and the seed's own other names
+    are dropped.
+- **Songwriters out** (`isSongwriting`). Writing a song somebody else
+  recorded is not making music with them; the first run offered Paul Simon
+  for writing a song Eric Kloss covered.
+- **Label-mates capped** at 8 per seed, so a generic label's roster cannot
+  flood the pool. Engineers stay out through `ContributorRole`, radio hubs
+  through the popularity step and hub damping.
+- **Unstyled candidates** are ordered by how strongly they were reached,
+  below every styled one. Before, ties fell to Discogs id order, which is
+  arbitrary.
+
+**Replay** (`ListenerExpansionReplay`): dated knowledge, four cut-offs plus
+today, the same rankers for every pool, For You's own routes kept first,
+lists cut to the first 20 that play. Over 80 slots:
+
+| pool | reach (candidates) | verified ids | playable slots | later finds (sessions) | fit | taste clusters | repeated from the cut-off before |
+|------|------|------|------|------|------|------|------|
+| A For You today | 158–169 | 31–35 | 22 | 4 (4) | 0.50–0.65 | 1–2 | 16 of 17 |
+| B + cluster seeds and bundles | 1,219–1,431 | ~430–630 | **80** | **13 (13)** | 0.30–0.45 | 3–4 | 37 of 60 |
+| B without bundles | 1,203–1,485 | ~350–530 | 72 | 11 (11) | 0.28–0.45 | 3–4 | 38 of 56 |
+| C = B + radio + album similarity | 1,813–2,056 | ~570–770 | 72 | 6 (6) | 0.35–0.39 | 3–5 | 28 of 55 |
+
+- **B is the engine to test.** It reaches 8–9 times as many candidates,
+  fills every playable slot (For You fills 22 of 80), and reaches 13 later
+  artists in 13 separate listening sessions against For You's 4, across 3–4
+  taste clusters instead of 1–2.
+- **Fit is lower:** 0.30–0.45 against 0.50–0.65. For You's few playable
+  items sit close to the listener's centre; B's reach further out. Later
+  finds, counted as sessions, are the measure that rewards that.
+- **Radio and album similarity on top (C) halve the finds** and still lower
+  fit. They are left out of the picks. The radio route remains a source of
+  playable moments for the artists B reaches.
+- **Bundles help (11 → 13 finds), but exist for only 3–5 of ~35 seeds.**
+  Building bundles for the listener's seeds is a backend task and needs
+  approval.
+- **Later finds the lists reached**, with their paths:
+  - Dave Clarke: For You's credited-together route, via Anika.
+  - Jim O'Rourke: "On Antigone with Eiko Ishibashi" (seed release credit).
+  - Blue Iverson: For You, via Dean Blunt.
+  - Ariel Pink: "Credited with Tim Koh" (seed entry, id resolved through
+    the seed's releases).
+  - feeo: "Made Blurrr / Goodness together with Joanne Robertson" (bundle)
+    and a shared label.
+
+**The For You candidate** (Debug only: `INDIGO_FORYOU_MIX` and
+`INDIGO_FORYOU_CLUSTER_SEEDS`):
+- For You's own list first, unchanged.
+- Then up to 8 cluster-seed picks, built from:
+  - the seeds' entries and their own release credits;
+  - bundles;
+  - verified ids only;
+  - nobody already met, nor their other names.
+- A taste cluster gets at most its share of the picks while another still
+  has something that plays.
+- Own recordings come first ("Play track"); radio moments ("Hear in radio
+  show") only after them.
+- Every reason names the relationship and the seed.
+
+Picks in the simulator today:
+- Jam City, a recording: "Chosen by LOGIC1000 for DJ-Kicks".
+- Vic Juris, a recording: "Credited with Eric Kloss".
+- Radio moments:
+  - a.s.o.: "Credited with Purelink".
+  - Ela Minus: "On Visions EP with José González".
+  - Loraine James: "Credited with Tirzah".
+  - MJ Nebreda: "On Mother with LOGIC1000".
+  - Speakers Corner Quartet: "Credited with Tirzah".
+  - Oliver Coates: "Credited with Joanne Robertson".
+
+The picks come from six different seeds.
+
+**Time and requests per refresh (simulator):**
+
+| case | time | requests |
+|------|------|----------|
+| nothing changed | 2 ms | none |
+| history changed | 3.1 s | none new where release credits, bundles and recordings are kept |
+| cold | 12–15 s | ~200 reads (R2 documents, bundle references, oEmbed and radio rows), then kept |
+
+For You's own list appears first and is never held up by this.
+
+**Not yet done:**
+- The Mac layout of the picks has not been looked at (the phone has).
+- Most picks are radio moments because few of these artists have a
+  verified upload. More bundles and release documents are what would turn
+  moments into recordings.
+
 ## Next
 
 1. **Retrieval from clusters** (Phase 3): done as a prototype, above.

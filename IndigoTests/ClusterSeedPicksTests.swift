@@ -68,7 +68,7 @@ final class ClusterSeedPicksTests: XCTestCase {
                 }
             },
             plays: { _ in await asked.add("plays"); return true },
-            store: store)
+            store: store, bundles: nil)
     }
 
     func testOnlyVerifiedUnknownPeopleThatPlayRecordingsFirst() async throws {

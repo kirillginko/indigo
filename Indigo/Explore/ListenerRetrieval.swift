@@ -329,6 +329,15 @@ nonisolated enum ListenerRetrieval {
         var aliases: [String] = []
     }
 
+    static let labelMatesPerSeed = 8
+
+    /// Writing a song somebody else recorded -- a standard covered, a sample
+    /// cleared -- is not making music with them.
+    static func isSongwriting(_ reason: String) -> Bool {
+        let folded = reason.lowercased()
+        return ["written-by", "written by", "composed by", "lyrics by", "music by", "songwriter", "words by"].contains { folded.hasPrefix($0) }
+    }
+
     /// Somebody a seed's own release names, with their Discogs entry.
     struct Credit: Sendable, Equatable, Codable {
         let id: Int
@@ -373,12 +382,14 @@ nonisolated enum ListenerRetrieval {
         for release in releases.sorted(by: { $0.id < $1.id }) {
             selection = isSelection(release, seedID: seedID)
             for artist in release.artists ?? [] { add(artist.id, artist.name, artist.anv, role: "Artist", release: release.title) }
-            for credit in release.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true {
+            for credit in release.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true
+                && !Self.isSongwriting(credit.role ?? "") {
                 add(credit.id, credit.name, credit.anv, role: credit.role ?? "", release: release.title)
             }
             for track in release.tracklist ?? [] {
                 for artist in track.artists ?? [] { add(artist.id, artist.name, artist.anv, role: "Artist", release: release.title) }
-                for credit in track.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true {
+                for credit in track.extraartists ?? [] where ContributorRole.of(credit: credit.role)?.leadsToSomebody == true
+                    && !Self.isSongwriting(credit.role ?? "") {
                     add(credit.id, credit.name, credit.anv, role: credit.role ?? "", release: release.title)
                 }
             }
@@ -440,12 +451,47 @@ nonisolated enum ListenerRetrieval {
                 add(entry.collaborators, .direct, 1, "Credited with \(seed.name)")
                 add(entry.members, .direct, 1, "A member of \(seed.name)")
                 add(entry.groups, .direct, 0.9, "\(seed.name) plays in it")
-                add(entry.labelNeighbours, .sharedContext, 0.6, "Shares a label with \(seed.name)", resolve: false)
+                // A generic label's roster is everyone: a few label-mates per
+                // seed, as Discogs orders them, never the whole list.
+                add(Array(entry.labelNeighbours.prefix(Self.labelMatesPerSeed)), .sharedContext, 0.6, "Shares a label with \(seed.name)", resolve: false)
                 add(entry.styleNeighbours, .musicalSimilarity, 0.5, "The same styles as \(seed.name), as Discogs files them", resolve: false)
             }
             for record in (bySeed[seed.artist] ?? []).sorted(by: { $0.id < $1.id }) {
                 let names = record.personnel.sorted().compactMap { record.personnelNames[$0] }
                 add(names, .direct, 0.9, "On \(record.title) with \(seed.name)")
+            }
+        }
+        return out
+    }
+
+    /// One step from each seed through its R2 artist bundle -- the worker's
+    /// fold of every release document of theirs -- read as the backend reads
+    /// it (`BundleEdges.edges`): collaborations and musical credits are
+    /// direct, a record both are only on is shared context, a technical
+    /// credit and the seed's own other names are nothing. Every target has
+    /// the Discogs id the bundle names, or none.
+    static func bundled(_ seeds: [Seed], bundles: [String: (id: Int, bundle: ArtistBundle)], names: [String: String] = [:]) -> [Sighting] {
+        var out: [Sighting] = []
+        for seed in seeds {
+            guard let held = bundles[seed.artist] else { continue }
+            let name = names[seed.artist] ?? seed.name
+            let lift = 0.5 + 0.5 * seed.weight
+            let edges = BundleEdges.edges(from: .artist(held.bundle.artist.name, discogsID: held.id), bundle: held.bundle,
+                                          ownIdentities: [held.id], sqlTargets: [])
+            for edge in edges where edge.to.kind == .artist && ContributorRole.canRecommend(edge) && !Self.isSongwriting(edge.reason) {
+                let target = DiscogsClient.withoutDisambiguator(edge.to.title)
+                switch edge.kind {
+                case .collaborator, .producer, .personnel:
+                    out.append(Sighting(name: target, discogsID: edge.to.discogsID, catalogueRow: nil,
+                                        route: Route(provenance: .direct, score: 0.9 * lift, seed: seed.artist, cluster: seed.cluster,
+                                                     why: "\(edge.reason) with \(name)")))
+                case .sameRelease:
+                    out.append(Sighting(name: target, discogsID: edge.to.discogsID, catalogueRow: nil,
+                                        route: Route(provenance: .sharedContext, score: 0.5 * lift, seed: seed.artist, cluster: seed.cluster,
+                                                     why: "\(edge.reason.replacingOccurrences(of: "Appears on", with: "Both on")) with \(name)")))
+                default:
+                    continue
+                }
             }
         }
         return out
