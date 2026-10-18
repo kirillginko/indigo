@@ -654,6 +654,21 @@ nonisolated enum ListenerRetrieval {
         var milliseconds = 0.0
     }
 
+    /// How many programmes play each row, ten rows a request, each row asked
+    /// once. A row the answer leaves out is played by none: 0. A request that
+    /// fails says nothing, so its rows stay unknown (nil, which damps nothing)
+    /// and are asked again the next time they are wanted, rather than being
+    /// remembered as played by none.
+    static func readDegrees(_ rows: [UUID], into radio: inout Radio, report: inout RadioReport,
+                            fetch: @Sendable ([UUID]) async throws -> [UUID: Int]) async {
+        let missing = Set(rows.filter { radio.showsPlaying[$0] == nil }).sorted { $0.uuidString < $1.uuidString }
+        for chunk in stride(from: 0, to: missing.count, by: 10).map({ Array(missing.dropFirst($0).prefix(10)) }) {
+            report.requests += 1
+            guard let found = try? await fetch(chunk) else { report.failures += 1; continue }
+            for id in chunk { radio.showsPlaying[id] = found[id] ?? 0 }
+        }
+    }
+
     /// Both hops for a set of seeds, reading only what each needs. `known`
     /// rows are never candidates (the listener's own artists, by row); the
     /// second hop starts from the strongest first-hop artists that are not
@@ -724,11 +739,7 @@ nonisolated enum ListenerRetrieval {
             report.episodes = radio.tracklists.count
         }
         func readDegrees(_ rows: [UUID]) async {
-            let missing = rows.filter { radio.showsPlaying[$0] == nil }.sorted { $0.uuidString < $1.uuidString }
-            for chunk in stride(from: 0, to: missing.count, by: 10).map({ Array(missing.dropFirst($0).prefix(10)) }) {
-                let found = await call({ try await source.showsPlaying(chunk) }, [:])
-                for id in chunk { radio.showsPlaying[id] = found[id] ?? 0 }
-            }
+            await Self.readDegrees(rows, into: &radio, report: &report, fetch: source.showsPlaying)
         }
 
         let seedRows = seeds.compactMap { seed in rowOf[seed.artist].map { (row: $0, weight: 0.5 + 0.5 * seed.weight, seed: seed.artist, cluster: seed.cluster) } }
@@ -877,15 +888,14 @@ nonisolated enum ListenerRetrieval {
             for r in raw { for g in ListeningLog.foldTags(r.genres ?? []) { out[r.radio_show_id, default: [:]][g, default: 0] += 1 } }
             return out
         },
+        // Shows that played each row, counted from the appearances (0087):
+        // `played_by` rows stop at shows that played an artist twice or more.
         showsPlaying: { rows in
             let client = try SupabaseService.requireClient()
-            struct Raw: Decodable { let from_entity_id: UUID }
-            let raw: [Raw] = try await client.from("music_relationships").select("from_entity_id")
-                .eq("relationship_type", value: "played_by").in("from_entity_id", values: rows.map(\.uuidString))
-                .order("from_entity_id").limit(1000).execute().value
-            var out: [UUID: Int] = [:]
-            for r in raw { out[r.from_entity_id, default: 0] += 1 }
-            return out
+            struct Params: Encodable { let p_artists: [UUID] }
+            struct Raw: Decodable { let artist_id: UUID; let shows: Int }
+            let raw: [Raw] = try await client.rpc("artist_show_counts", params: Params(p_artists: rows)).execute().value
+            return Dictionary(raw.map { ($0.artist_id, $0.shows) }, uniquingKeysWith: max)
         },
         names: { rows in
             let client = try SupabaseService.requireClient()

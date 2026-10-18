@@ -226,4 +226,32 @@ final class ListenerRetrievalTests: XCTestCase {
         XCTAssertEqual(byName["Both"]?.provenance, .direct)
         XCTAssertFalse(found.filter { $0.route.provenance == .selection }.contains { $0.route.why.lowercased().contains("with") })
     }
+
+    /// Degrees (shows playing each row): an artist the answer leaves out is
+    /// played by none, a failed request leaves its rows unknown and asks
+    /// again next time, and a row already known is never asked twice.
+    func testAFailedDegreeReadIsUnknownNotZero() async {
+        actor Log { var asked: [[UUID]] = []; var fail = true
+            func record(_ rows: [UUID]) -> Bool { asked.append(rows); defer { fail = false }; return fail } }
+        let log = Log()
+        let a = UUID(uuidString: "00000000-0000-0000-0000-00000000000A")!
+        let b = UUID(uuidString: "00000000-0000-0000-0000-00000000000B")!
+        let fetch: @Sendable ([UUID]) async throws -> [UUID: Int] = { rows in
+            if await log.record(rows) { throw URLError(.timedOut) }
+            return [a: 1]
+        }
+        var radio = ListenerRetrieval.Radio()
+        var report = ListenerRetrieval.RadioReport()
+        await ListenerRetrieval.readDegrees([b, a, a], into: &radio, report: &report, fetch: fetch)
+        XCTAssertNil(radio.showsPlaying[a], "a failure is not a zero")
+        XCTAssertNil(radio.showsPlaying[b])
+        XCTAssertEqual(report.failures, 1)
+        await ListenerRetrieval.readDegrees([a, b], into: &radio, report: &report, fetch: fetch)
+        XCTAssertEqual(radio.showsPlaying[a], 1, "played in one broadcast of one show: one show")
+        XCTAssertEqual(radio.showsPlaying[b], 0, "left out of the answer: played by none")
+        await ListenerRetrieval.readDegrees([a, b], into: &radio, report: &report, fetch: fetch)
+        let asked = await log.asked
+        XCTAssertEqual(asked, [[a, b], [a, b]], "deduplicated, ordered, and nothing known asked again")
+        XCTAssertEqual(report.requests, 2)
+    }
 }
