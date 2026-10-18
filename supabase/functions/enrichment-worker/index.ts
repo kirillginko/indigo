@@ -14,6 +14,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import type { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { ingestNTSEpisode, ingestNTSShow, NTS_API, USER_AGENT } from "../_shared/nts.ts";
+import { discoverNTS } from "../_shared/nts_discovery.ts";
 import { discoverLotRadio } from "../_shared/lotradio.ts";
 import { crawlChannel } from "../_shared/youtube.ts";
 import { fetchArtistOrigin, fillSceneRoster } from "../_shared/musicbrainz.ts";
@@ -271,7 +272,7 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
     }
 
     case "discover_nts": {
-      await discoverNTS(supabase, String(job.payload?.mode ?? "fresh"));
+      await discoverNTS({ rpc: (fn, args) => supabase.rpc(fn, args), fetch }, String(job.payload?.mode ?? "fresh"));
       return;
     }
 
@@ -593,63 +594,6 @@ async function perform(supabase: SupabaseClient, job: Job, pending: PendingWrite
 
     default:
       throw new Error(`unknown job type ${job.job_type}`);
-  }
-}
-
-/// NTS publishes its whole archive newest-first as `recently-added`, so one
-/// feed serves both jobs: `fresh` re-reads the top of it for what was broadcast
-/// today, and `backfill` walks steadily further back.
-///
-/// Discovery only ever enqueues. Fetching the twelve episodes it finds here
-/// would turn one job into thirteen upstream requests in a single invocation,
-/// which is how a polite crawler becomes an impolite one.
-const DISCOVERY_COLLECTION = "recently-added";
-const DISCOVERY_PAGE = 12;
-const CURSOR = `nts.${DISCOVERY_COLLECTION}`;
-
-async function discoverNTS(supabase: SupabaseClient, mode: string): Promise<void> {
-  let offset = 0;
-
-  if (mode === "backfill") {
-    const { data, error } = await supabase.rpc("advance_enrichment_cursor", {
-      p_name: CURSOR,
-      p_by: DISCOVERY_PAGE,
-    });
-    if (error) throw new Error(error.message);
-    offset = Number(data ?? 0);
-  }
-
-  const page = await fetchJSON(
-    `${NTS_API}collections/${DISCOVERY_COLLECTION}?offset=${offset}&limit=${DISCOVERY_PAGE}`,
-  );
-  const results = Array.isArray(page.results) ? page.results as Record<string, unknown>[] : [];
-
-  if (results.length === 0) {
-    // Walked off the end. Start again: the archive has grown since we began,
-    // and everything already ingested is deduped on the way back through.
-    if (mode === "backfill") {
-      await supabase.rpc("reset_enrichment_cursor", { p_name: CURSOR });
-    }
-    return;
-  }
-
-  for (const episode of results) {
-    const show = typeof episode.show_alias === "string" ? episode.show_alias : null;
-    const alias = typeof episode.episode_alias === "string" ? episode.episode_alias : null;
-    if (!show || !alias) continue;
-
-    const { error } = await supabase.rpc("enqueue_enrichment_job", {
-      p_provider: "nts",
-      p_job_type: "fetch_nts_episode",
-      p_dedupe_key: `${show}/${alias}`,
-      p_payload: { show, episode: alias },
-      // What was broadcast today is worth having before what was broadcast in
-      // 2019, so the fresh pass jumps the queue.
-      p_priority: mode === "fresh" ? 5 : 0,
-      p_entity_type: null,
-      p_entity_id: null,
-    });
-    if (error) console.error("discover: enqueue failed", error.message);
   }
 }
 
