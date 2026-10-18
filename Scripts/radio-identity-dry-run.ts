@@ -21,7 +21,8 @@
 // per-artist results in one local file.
 //
 //   deno run --allow-read=<dir> --allow-net=musicbrainz.org [--allow-write=<out>] \
-//       Scripts/radio-identity-dry-run.ts --recording <route2.json> --artist-mbid <route1.json> [--out <file>]
+//       Scripts/radio-identity-dry-run.ts [--recording <route2.json>] [--artist-mbid <route1.json>] \
+//       [--title <titles.json>] [--out <file>]
 
 import { discogsArtistIDs } from "../supabase/functions/_shared/identity.ts";
 import { MB_USER_AGENT, MUSICBRAINZ_API, pacedFetch } from "../supabase/functions/_shared/musicbrainz.ts";
@@ -37,8 +38,8 @@ const option = (name: string) => {
 const recordingFile = option("--recording");
 const mbidFile = option("--artist-mbid");
 const out = option("--out");
-if (!recordingFile && !mbidFile) {
-  console.error("usage: radio-identity-dry-run.ts --recording <file> --artist-mbid <file> [--out <file>]");
+if (!recordingFile && !mbidFile && !option("--title")) {
+  console.error("usage: radio-identity-dry-run.ts [--recording <file>] [--artist-mbid <file>] [--title <file>] [--out <file>]");
   Deno.exit(2);
 }
 
@@ -162,6 +163,80 @@ for (const row of mbidFile ? rows(mbidFile) : []) {
 }
 
 // ---------------------------------------------------------------------------
+// Title route: name + the titles the stations played, for artists with no
+// recording id (86k of the 92.7k)
+// ---------------------------------------------------------------------------
+//
+// A name alone is a namesake lottery. A name together with a title the station
+// played under it is two facts: MusicBrainz must hold a recording of that title
+// credited to exactly that name. Two different titles landing on the same one
+// MusicBrainz artist, and on no other, is the strongest evidence available
+// without an id. One title is weaker ("Intro", "Untitled") and is counted apart.
+// Credit names only -- aliases are not consulted, so other scripts are missed
+// rather than guessed.
+
+type TitleOutcome =
+  | "strong" // one MusicBrainz artist, two or more of the played titles
+  | "single_title" // one MusicBrainz artist, one played title
+  | "ambiguous" // more than one MusicBrainz artist of this name holds a played title
+  | "no_match" // no recording of a played title credited to this name
+  | "lookup_failed"; // a search failed: not evidence either way
+
+/// "Track (Original Mix)" and "Track" are one title; ISRCs typed into the
+/// title field are none.
+const titleKey = (title: string) => normalizeName(title.replace(/[\(\[][^\)\]]*[\)\]]/g, " "));
+const usableTitle = (title: string) =>
+  titleKey(title).length > 0 && !/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/.test(title.trim());
+const lucene = (value: string) => value.replace(/([+\-!(){}\[\]^"~*?:\\\/]|&&|\|\|)/g, " ").replace(/\s+/g, " ").trim();
+
+const titleFile = option("--title");
+const titleResults: Row[] = [];
+for (const row of titleFile ? rows(titleFile) : []) {
+  const wanted = String(row.normalized_name ?? normalizeName(String(row.name ?? "")));
+  const titles = ((row.sample_titles ?? []) as string[]).filter(usableTitle).slice(0, 3);
+  const matched = new Map<string, Set<string>>(); // mbid -> played titles it holds
+  let failed = false;
+  for (const title of titles) {
+    const search = await mb("recording", {
+      query: `recording:"${lucene(title)}" AND artist:"${lucene(String(row.name ?? ""))}"`,
+      limit: "25",
+    });
+    if (search.status !== 200) {
+      failed = true;
+      continue;
+    }
+    for (const recording of (search.body?.recordings ?? []) as { title?: string; "artist-credit"?: { name?: string; artist?: { id?: string; name?: string } }[] }[]) {
+      if (titleKey(recording.title ?? "") !== titleKey(title)) continue;
+      for (const part of recording["artist-credit"] ?? []) {
+        if (!part.artist?.id) continue;
+        if (normalizeName(part.name ?? "") !== wanted && normalizeName(part.artist.name ?? "") !== wanted) continue;
+        if (!matched.has(part.artist.id)) matched.set(part.artist.id, new Set());
+        matched.get(part.artist.id)!.add(titleKey(title));
+      }
+    }
+  }
+  let outcome: TitleOutcome;
+  let mbid: string | null = null;
+  let discogs: number[] = [];
+  if (matched.size > 1) outcome = "ambiguous";
+  else if (matched.size === 0) outcome = failed || titles.length === 0 ? (failed ? "lookup_failed" : "no_match") : "no_match";
+  else {
+    const [[id, held]] = [...matched];
+    mbid = id;
+    outcome = held.size >= 2 ? "strong" : "single_title";
+    const entry = await mb(`artist/${id}`, { inc: "url-rels" });
+    if (entry.status === 200) discogs = discogsArtistIDs(entry.body);
+    else outcome = "lookup_failed";
+  }
+  titleResults.push({
+    artist_id: row.artist_id, name: row.name, seg: row.seg, eps: row.eps, lines: row.lines,
+    titles, outcome, mbid, discogs, candidates: [...matched.keys()],
+    stored_mbid: row.musicbrainz_id ?? null,
+    titles_matched: mbid ? matched.get(mbid)!.size : 0,
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Report
 // ---------------------------------------------------------------------------
 
@@ -180,8 +255,18 @@ const report = {
     wouldLinkIfTrusted: mbidResults.filter((row) => (row.discogs as number[]).length > 0).length,
     wouldLinkButNamesakes: mbidResults.filter((row) => row.outcome === "namesakes" && (row.discogs as number[]).length > 0).length,
   },
+  titleRoute: Object.fromEntries(
+    [...new Set(titleResults.map((row) => String(row.seg)))].map((seg) => {
+      const list = titleResults.filter((row) => String(row.seg) === seg);
+      return [seg, {
+        sampled: list.length,
+        outcomes: tally(list),
+        withDiscogs: tally(list.filter((row) => (row.discogs as number[]).length > 0)),
+      }];
+    }),
+  ),
   linkableDiscogsIDs: [...new Set(recordingResults.flatMap((row) => row.discogs as number[]))].sort((a, b) => a - b),
 };
 
-if (out) Deno.writeTextFileSync(out, JSON.stringify({ report, recordingResults, mbidResults }, null, 2) + "\n");
+if (out) Deno.writeTextFileSync(out, JSON.stringify({ report, recordingResults, mbidResults, titleResults }, null, 2) + "\n");
 console.log(JSON.stringify(report, null, 2));
