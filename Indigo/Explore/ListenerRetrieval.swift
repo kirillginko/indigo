@@ -683,7 +683,8 @@ nonisolated enum ListenerRetrieval {
 
     /// The shared catalogue, read-only, one request per call.
     struct RadioSource: Sendable {
-        /// Discogs artist ids → catalogue rows.
+        /// Discogs artist ids → catalogue rows (switched on, directly linked
+        /// rows first: `DiscogsIdentityRows.rows(byDiscogs:)`).
         var rows: @Sendable ([Int]) async throws -> [Int: [UUID]]
         /// Normalised names → the one row with that name (none when several).
         var rowsByName: @Sendable ([String]) async throws -> [String: UUID]
@@ -735,7 +736,11 @@ nonisolated enum ListenerRetrieval {
         let ids = seeds.compactMap { discogsIDs[$0.artist] }
         for chunk in stride(from: 0, to: ids.count, by: 40).map({ Array(ids.dropFirst($0).prefix(40)) }) {
             let found = await call({ try await source.rows(chunk) }, [:])
-            for seed in seeds { if let id = discogsIDs[seed.artist], let row = found[id]?.sorted(by: { $0.uuidString < $1.uuidString }).first { rowOf[seed.artist] = row } }
+            // Switched on, in the reader's order: a directly linked row before a MusicBrainz-linked one.
+            for seed in seeds {
+                guard let id = discogsIDs[seed.artist], let list = found[id] else { continue }
+                if let row = DiscogsIdentityRows.isEnabled ? list.first : list.sorted(by: { $0.uuidString < $1.uuidString }).first { rowOf[seed.artist] = row }
+            }
         }
         let unnamed = seeds.filter { rowOf[$0.artist] == nil }.map(\.artist)
         for chunk in stride(from: 0, to: unnamed.count, by: 40).map({ Array(unnamed.dropFirst($0).prefix(40)) }) {
@@ -945,15 +950,15 @@ nonisolated enum ListenerRetrieval {
         },
         names: { rows in
             let client = try SupabaseService.requireClient()
-            struct ID: Decodable { let entity_id: UUID; let external_id: String }
             struct Name: Decodable { let id: UUID; let name: String }
             let values = rows.map(\.uuidString)
-            async let ids: [ID] = client.from("external_ids").select("entity_id,external_id")
-                .eq("provider", value: "discogs").eq("entity_type", value: "artist")
+            let on = DiscogsIdentityRows.isEnabled
+            async let links: [DiscogsIdentityRows.Link] = DiscogsIdentityRows.providerFilter(
+                client.from("external_ids").select("entity_id,provider,external_id"), enabled: on).eq("entity_type", value: "artist")
                 .in("entity_id", values: values).limit(1000).execute().value
             async let names: [Name] = client.from("artists").select("id,name").in("id", values: values).limit(1000).execute().value
-            var discogs: [UUID: Int] = [:]
-            for row in try await ids { if let id = Int(row.external_id) { discogs[row.entity_id] = min(id, discogs[row.entity_id] ?? id) } }
+            let linked = try await links
+            let discogs = on ? DiscogsIdentityRows.discogs(byRow: linked) : DiscogsIdentityRows.smallestDiscogs(byRow: linked)
             var out: [UUID: (name: String, discogs: Int?)] = [:]
             for row in try await names { out[row.id] = (row.name, discogs[row.id]) }
             return out

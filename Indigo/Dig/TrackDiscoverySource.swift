@@ -318,18 +318,18 @@ nonisolated struct TrackDiscoverySource: Sendable {
         },
         artists: { uuids in
             let client = try SupabaseService.requireClient()
-            struct ID: Decodable { let entity_id: UUID; let external_id: String }
             struct Name: Decodable { let id: UUID; let name: String }
             let values = uuids.map(\.uuidString)
-            async let ids: [ID] = client.from("external_ids").select("entity_id,external_id")
-                .eq("provider", value: "discogs").eq("entity_type", value: "artist")
+            let on = DiscogsIdentityRows.isEnabled
+            async let links: [DiscogsIdentityRows.Link] = DiscogsIdentityRows.providerFilter(
+                client.from("external_ids").select("entity_id,provider,external_id"), enabled: on).eq("entity_type", value: "artist")
                 .in("entity_id", values: values).limit(400).execute().value
             async let names: [Name] = client.from("artists").select("id,name").in("id", values: values).limit(400).execute().value
             let named = Dictionary(try await names.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
             var found: [UUID: (discogs: Int, name: String)] = [:]
-            for row in try await ids {
-                guard found[row.entity_id] == nil, let id = Int(row.external_id), let name = named[row.entity_id] else { continue }
-                found[row.entity_id] = (id, name)
+            let linked = try await links
+            for (row, id) in on ? DiscogsIdentityRows.discogs(byRow: linked) : DiscogsIdentityRows.firstDiscogs(byRow: linked) {
+                if let name = named[row] { found[row] = (id, name) }
             }
             return found
         },

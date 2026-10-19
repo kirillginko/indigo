@@ -30,6 +30,7 @@ struct SyncDiagnosticsView: View {
     @AppStorage(ForYouMusicianFirst.switchKey) private var forYouMusicianFirst = false
     @AppStorage(DigRecommendations.switchKey) private var digRecommendations = false
     @AppStorage(TrackDiscoveryFeature.switchKey) private var digTracks = false
+    @AppStorage(DiscogsIdentityRows.switchKey) private var musicBrainzDiscogs = false
 
     /// The shared things both devices act on, so their actions meet.
     static let testArtist = MusicNode.artist("\(TwoDeviceSyncRunner.marker) shared artist")
@@ -56,6 +57,7 @@ struct SyncDiagnosticsView: View {
                     Toggle("For You: musician-first ranking", isOn: $forYouMusicianFirst)
                     Toggle("DIG: Hear next cards", isOn: $digRecommendations)
                     Toggle("DIG: Discover tracks", isOn: $digTracks)
+                    Toggle("DIG and For You: MusicBrainz-verified Discogs ids", isOn: $musicBrainzDiscogs)
                 } header: {
                     Text("Musician-first (development)")
                 } footer: {
