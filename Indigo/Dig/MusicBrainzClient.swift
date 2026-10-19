@@ -154,6 +154,28 @@ nonisolated struct MusicBrainzClient: Sendable {
         ])
     }
 
+    /// What an artist makes, as MusicBrainz knows it: curated genres, tags
+    /// and the release groups.
+    func artistProfile(id: String) async throws -> MBArtist {
+        try await get("artist/\(id)", query: [
+            URLQueryItem(name: "inc", value: "genres+tags+release-groups")
+        ])
+    }
+
+    /// The MusicBrainz artists whose own Discogs link is this Discogs
+    /// artist: by id, never by name. None is a 404.
+    func artists(discogsArtistID id: Int) async throws -> [MBArtist] {
+        do {
+            let found: MBURLLookup = try await get("url", query: [
+                URLQueryItem(name: "resource", value: "https://www.discogs.com/artist/\(id)"),
+                URLQueryItem(name: "inc", value: "artist-rels")
+            ])
+            return (found.relations ?? []).filter { $0.type == "discogs" }.compactMap(\.artist)
+        } catch MusicBrainzError.badStatus(404) {
+            return []
+        }
+    }
+
     func label(id: String) async throws -> MBLabel {
         try await get("label/\(id)")
     }

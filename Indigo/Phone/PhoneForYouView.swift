@@ -20,6 +20,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct PhoneForYouView: View {
     @Environment(AppState.self) private var appState
@@ -33,6 +34,7 @@ struct PhoneForYouView: View {
     @Environment(PlaybackCoordinator.self) private var player
     @Bindable private var feeds = PhoneFeeds.shared
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(RadioDiscoverFeature.switchKey) private var radioDiscoverEnabled = false
     @State private var recommendationTurn = RecommendationRotation.period(at: Date())
 
     /// One screen of the feed.
@@ -40,6 +42,7 @@ struct PhoneForYouView: View {
         case cover
         /// Tracks to hear (`ForYouTracksFeature`, development builds only).
         case tracks
+        case radioDiscover(RadioDiscoverPick)
         /// Records like yours (`SimilarRecordsFeature`, development builds only).
         case similar
         /// One thing from For You's mix (`ForYouMixFeature`): a track that
@@ -52,6 +55,7 @@ struct PhoneForYouView: View {
             switch self {
             case .cover: "cover"
             case .tracks: "tracks"
+            case .radioDiscover(let pick): "radio-discover.\(pick.id)"
             case .similar: "similar"
             case .item(let item): "item." + item.id
             case .suggestion(let suggestion): "suggestion." + suggestion.id
@@ -69,10 +73,12 @@ struct PhoneForYouView: View {
                 // With the mix on, the feed is the mix: tracks, records,
                 // artists and shows woven together, one to a screen. Until it
                 // is worked out, For You's own suggestions stand in.
+                let radioSlides = radioDiscoverEnabled && RadioDiscoverFeature.isEnabled
+                    ? dig.radioDiscover.picks.map(Slide.radioDiscover) : []
                 let slides: [Slide] = [.cover] + (!mixed.isEmpty ? mixed.map(Slide.item)
                     : (ForYouMixFeature.isEnabled ? [] : (ForYouTracksFeature.isEnabled ? [.tracks] : [])
                         + (SimilarRecordsFeature.isEnabled ? [.similar] : []))
-                    + (suggestions.isEmpty ? Self.sampler(entries).map(Slide.onNow) : suggestions.map(Slide.suggestion)))
+                    + (suggestions.isEmpty ? Self.sampler(entries).map(Slide.onNow) : suggestions.map(Slide.suggestion))) + radioSlides
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 0) {
                         ForEach(slides) { slide in
@@ -86,6 +92,8 @@ struct PhoneForYouView: View {
                                         guard slides.count > 1 else { return }
                                         withAnimation(.easeInOut(duration: 0.4)) { feeds.forYouID = slides[1].id }
                                     }
+                                case .radioDiscover(let pick):
+                                    PhoneRadioDiscoverSlide(pick: pick, insets: insets)
                                 case .tracks:
                                     PhoneForYouTracksSlide(insets: insets)
                                 case .item(let item):
@@ -100,7 +108,7 @@ struct PhoneForYouView: View {
                                         Task { await open(suggestion.node, from: ListeningSurface.Origin(screen: "foryou.slides", via: suggestion.via, route: suggestion.kind.rawValue)) }
                                     }
                                 case .onNow(let entry):
-                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets) {
+                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets, usesForYouArtworkSizing: true) {
                                         appState.select(entry.route)
                                     }
                                 }
@@ -130,6 +138,10 @@ struct PhoneForYouView: View {
                     try await Task.sleep(for: .seconds(RecommendationRotation.delayUntilNextPeriod(from: Date())))
                 } catch { return }
             }
+        }
+        .task(id: radioDiscoverEnabled) {
+            guard radioDiscoverEnabled && RadioDiscoverFeature.isEnabled else { return }
+            await dig.radioDiscover.refresh(container: dig.context.container)
         }
         // The mix again whenever a part of it arrives.
         .task(id: dig.forYouMixInputIDs) {
@@ -236,11 +248,11 @@ struct PhoneForYouView: View {
                          title: track.artist, subtitle: track.title, reason: track.reason, via: nil, heading: heading,
                          button: track.isRecording ? "PLAY TRACK" : "HEAR IN RADIO SHOW",
                          icon: track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right",
-                         preview: art.preview, square: true)
+                         preview: art.preview)
         case .record(let found):
             return .init(picture: found.record.artworkURL, kind: "Record", title: found.record.title,
                          subtitle: item.subtitle, reason: item.reason, via: nil, heading: heading,
-                         button: "OPEN RECORD", icon: "arrow.down.right", square: true)
+                         button: "OPEN RECORD", icon: "arrow.down.right")
         case .suggestion(let suggestion):
             var made = card(for: suggestion)
             made.heading = heading
@@ -299,10 +311,6 @@ struct PhoneForYouSlide: View {
         var icon: String
         /// A smaller picture to show first and fall back on.
         var preview: URL? = nil
-        /// Drawn as a sharp square in the middle of the slide rather than
-        /// across all of it: a track's cover, which is a square at most a
-        /// few hundred pixels across and would blur stretched to the screen.
-        var square = false
     }
 
     let card: Card
@@ -312,41 +320,11 @@ struct PhoneForYouSlide: View {
 
     private var picture: URL? { card.picture }
 
-    /// Discogs' thumb, which cannot be asked for larger: drawn as a square
-    /// over the moving field at a size it holds, not blown up full-screen.
-    private var isSmall: Bool { DiscogsClient.isSmallCut(picture?.absoluteString) }
-
     var body: some View {
         ZStack {
             GeometryReader { proxy in
-                Group {
-                    if let picture, card.square {
-                        ZStack {
-                            PlayerShaderBackdrop()
-                            // In the space above the words, which are
-                            // anchored to the bottom and can run to three
-                            // lines: about a quarter of the way down.
-                            ArtworkView(remoteURL: picture, previewRemoteURL: card.preview,
-                                        side: min(proxy.size.width - 96, proxy.size.height * 0.28), glyphScale: 0.3)
-                                .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
-                                .position(x: proxy.size.width / 2, y: proxy.size.height * 0.26)
-                        }
-                    } else if let picture, isSmall {
-                        ZStack {
-                            PlayerShaderBackdrop()
-                            ArtworkView(remoteURL: picture, side: min(proxy.size.width * 0.62, 260), glyphScale: 0.3)
-                                .shadow(color: .black.opacity(0.4), radius: 20, y: 10)
-                                .offset(y: -proxy.size.height * 0.16)
-                        }
-                    } else if let picture {
-                        ArtworkView(remoteURL: picture, side: max(proxy.size.width, proxy.size.height), glyphScale: 0.3)
-                    } else {
-                        // Nothing to show: the wordmark's green, the one
-                        // stand-in for a missing picture on the phone.
-                        MineralSheenSurface()
-                    }
-                }
-                .frame(width: proxy.size.width, height: proxy.size.height)
+                PhoneSlideArtwork(picture: picture, preview: card.preview, viewport: proxy.size)
+                    .frame(width: proxy.size.width, height: proxy.size.height)
             }
             .clipped()
             .contentShape(Rectangle())

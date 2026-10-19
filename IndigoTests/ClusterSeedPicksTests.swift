@@ -113,4 +113,86 @@ final class ClusterSeedPicksTests: XCTestCase {
         let other = await reopened.picks(for: "history-2")
         XCTAssertNil(other, "another history: worked out again")
     }
+
+    /// Radio candidates: from the seed's own row, reached by its Discogs id;
+    /// only rows with a verified Discogs id, nobody the listener knows, and
+    /// an artist with no styles on the device placed by its episodes' genres.
+    func testRadioCandidatesAreVerifiedRowsNextToTheSeed() async throws {
+        let seedRow = UUID(), neighbour = UUID(), stranger = UUID(), known = UUID(), far = UUID(), episode = UUID()
+        let names: [UUID: (name: String, discogs: Int?)] = [neighbour: ("Neighbour", 7), stranger: ("Stranger", nil), known: ("Known", 8), far: ("Far", 9)]
+        let asked = Counter()
+        var picker = try source()
+        picker.radio = ListenerRetrieval.RadioSource(
+            rows: { ids in Dictionary(uniqueKeysWithValues: ids.filter { $0 == 100 }.map { ($0, [seedRow]) }) },
+            rowsByName: { _ in await asked.add("name"); return [:] },
+            appearances: { row, _ in
+                row == seedRow ? [(ListenerRetrieval.Radio.Episode(id: episode, show: nil, showTitle: "Show", aired: Date(timeIntervalSinceReferenceDate: 790_000_000),
+                                                                   genres: ["Ambient"]), 1)] : []
+            },
+            tracklists: { _ in [episode: [.init(index: 0, artist: known), .init(index: 1, artist: seedRow),
+                                          .init(index: 2, artist: neighbour), .init(index: 3, artist: far), .init(index: 4, artist: stranger)]] },
+            showGenres: { _ in [:] }, showsPlaying: { _ in [:] },
+            names: { rows in names.filter { rows.contains($0.key) } })
+        let inputs = inputs()
+        let radio = await picker.radioCandidates(inputs, now: Date(timeIntervalSinceReferenceDate: 800_000_000))
+        XCTAssertEqual(radio.sightings.map(\.name), ["Neighbour"], "a row without a Discogs id is nobody yet; a known name is out; a one-off two slots away is too weak")
+        XCTAssertEqual(radio.unverified, 1)
+        XCTAssertEqual(radio.weak, 1)
+        let names0 = await asked.counts["name"]
+        XCTAssertNil(names0, "a seed reaches radio by Discogs id only")
+        let ranked = ClusterSeedPicks.ranked(inputs, credits: [:], excluding: [], radio: radio)
+        let found = try XCTUnwrap(ranked.first { $0.identity == "discogs:7" })
+        XCTAssertEqual(found.styleSource, "none", "a programme's genres are context, not the artist's styles")
+        XCTAssertTrue(found.styles.isEmpty)
+        XCTAssertEqual(found.best.provenance, .radioAdjacent)
+        XCTAssertNil(ranked.first { $0.name == "Known" || $0.name == "Stranger" })
+        // Off, as everywhere: the mix never asks radio for candidates.
+        ForYouRadioCandidatesFeature.override = nil
+        UserDefaults.standard.removeObject(forKey: ForYouRadioCandidatesFeature.switchKey)
+        XCTAssertFalse(ForYouRadioCandidatesFeature.isEnabled)
+        let byName = try await ClusterSeedPicks().radio.rowsByName(["seed 0"])
+        XCTAssertTrue(byName.isEmpty, "the live source never resolves a seed by name")
+    }
+
+    /// Fill only, the default: the picks without radio stay exactly as they
+    /// were, radio is read only when they leave a slot empty, and what it
+    /// finds comes after them.
+    func testRadioOnlyFillsWhatTheCreditsLeave() async throws {
+        defer { ForYouRadioCandidatesFeature.override = nil }
+        let asked = Counter()
+        let seedRow = UUID(), neighbour = UUID(), episode = UUID()
+        var picker = try source()
+        let rows = picker.rows, appearances = picker.appearances
+        let show = try JSONDecoder().decode(TrackDiscoverySource.Row.Episode.self, from: Data("""
+        {"provider": "nts", "external_id": "show/ep2", "archive_url": "https://www.mixcloud.com/x/z/", "title": "Ep",
+         "aired_at": null, "image_url": null, "genres": ["Ambient"], "radio_shows": {"title": "Show"}}
+        """.utf8))
+        // Neighbour (Discogs 7) is reached, and plays, only through radio.
+        picker.rows = { ids in var found = try await rows(ids); if ids.contains(7) { found[7] = [neighbour] }; return found }
+        picker.appearances = { list in
+            try await appearances(list.filter { $0 != neighbour }) + (list.contains(neighbour)
+                ? [TrackDiscoverySource.Row(artist_id: neighbour, raw_track_title: "Neighbour Track", offset_seconds: 30,
+                                            media_url: nil, radio_episodes: show)] : [])
+        }
+        picker.radio = ListenerRetrieval.RadioSource(
+            rows: { ids in await asked.add("radio"); return Dictionary(uniqueKeysWithValues: ids.filter { $0 == 100 }.map { ($0, [seedRow]) }) },
+            rowsByName: { _ in [:] },
+            appearances: { row, _ in
+                row == seedRow ? [(ListenerRetrieval.Radio.Episode(id: episode, show: nil, showTitle: "Show", aired: Date(timeIntervalSinceReferenceDate: 790_000_000),
+                                                                   genres: ["Ambient"]), 1)] : []
+            },
+            tracklists: { _ in [episode: [.init(index: 1, artist: seedRow), .init(index: 2, artist: neighbour)]] },
+            showGenres: { _ in [:] }, showsPlaying: { _ in [:] },
+            names: { rows in rows.contains(neighbour) ? [neighbour: ("Neighbour", 7)] : [:] })
+        ForYouRadioCandidatesFeature.override = false
+        let off = await picker.picks(inputs(), excluding: [], limit: 8)
+        ForYouRadioCandidatesFeature.override = true
+        let full = await picker.picks(inputs(), excluding: [], limit: 2)
+        let radioWhenFull = await asked.counts["radio"]
+        XCTAssertNil(radioWhenFull, "nothing left to fill: radio is never read")
+        XCTAssertEqual(full.map(\.artist), Array(off.map(\.artist).prefix(2)))
+        let filled = await picker.picks(inputs(), excluding: [], limit: 8)
+        XCTAssertEqual(Array(filled.prefix(off.count)).map(\.id), off.map(\.id), "the picks without radio, unchanged and first")
+        XCTAssertEqual(filled.dropFirst(off.count).map(\.artist), ["Neighbour"])
+    }
 }

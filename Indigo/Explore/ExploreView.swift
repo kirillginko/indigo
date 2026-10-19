@@ -27,6 +27,7 @@ struct ExploreView: View {
     @Environment(LotProvider.self) private var lot
     @Environment(RovrProvider.self) private var rovr
     @Query(sort: [SortDescriptor(\Track.addedAt, order: .reverse)]) private var tracks: [Track]
+    @AppStorage(RadioDiscoverFeature.switchKey) private var radioDiscoverEnabled = false
     @State private var filter = ExploreFilter.all
     @State private var scroll = ExploreScroll()
     @State private var artworkKeyMemo = ExploreArtworkKeyMemo()
@@ -86,6 +87,10 @@ struct ExploreView: View {
         }
         .background(MosaicColor.cobalt)
         .task { crate.backfillLocalGenres() }
+        .task(id: radioDiscoverEnabled) {
+            guard radioDiscoverEnabled && RadioDiscoverFeature.isEnabled else { return }
+            await dig.radioDiscover.refresh(container: dig.context.container)
+        }
         .task {
             await KeptShow.fillMissingArtwork(crate: crate, stations: stations)
         }
@@ -166,8 +171,6 @@ struct ExploreView: View {
             ? ExploreView.expectedSuggestions : suggestions.count
         let showCrate = filter == .all || filter == .crate
         let showShows = (filter == .all || filter == .shows) && !offers.shows.isEmpty
-        let showLibrary = filter == .all || filter == .library
-        let local = localPicks
         let crateSections = recommendationSections(from: kept, adding: offers.artists)
         // The direction is one card and arrives later still, so it keeps its
         // row from the start for the same reason.
@@ -178,20 +181,12 @@ struct ExploreView: View {
         let crateTop = nextTop + (showNext ? sectionHeight(for: nextCount, in: size) : 0)
         let sceneTop = crateTop + (showCrate ? crateSections.reduce(0) { $0 + sectionHeight(for: $1.count, in: size) } : 0)
         let showsTop = sceneTop + (hasScene ? sectionHeight(for: 1, in: size) : 0)
-        let libraryTop = showsTop + (showShows ? sectionHeight(for: offers.shows.count, in: size) : 0)
-
-        // Directly over the trunk, which `ExploreGraphLines` roots at half the
-        // width. It was offset to the right of it, so it read as a caption
-        // for whatever happened to be under it rather than as the head of the
-        // line everything hangs from.
-        ExploreStartLabel()
+        let radioTop = showsTop + (showShows ? sectionHeight(for: offers.shows.count, in: size) : 0)
+        let radio = visibleRadioPicks
+        Button("Find something to start with") { appState.select(.dig) }
+            .buttonStyle(MapHeaderButtonStyle())
             .graphNode("start", section: "start", connects: false)
             .position(x: size.width * 0.5, y: 46)
-
-        if kept.isEmpty && tracks.isEmpty {
-            Button("Find something to start with") { appState.select(.dig) }
-                .buttonStyle(MapHeaderButtonStyle()).position(x: size.width * 0.58, y: 170)
-        }
         // First, because it is the only block here that is not already yours.
         // Everything below is the crate, the stations and the library — things
         // this listener has already decided about — and a page that opens on
@@ -340,23 +335,24 @@ struct ExploreView: View {
                 }
             }
         }
-        if showLibrary {
-            ExploreSectionLabel(
-                title: "Back in your library",
-                description: "Recent local tracks worth reopening"
-            )
-                .graphNode("section.library", section: "library", connects: false)
-                .position(x: size.width * 0.5, y: libraryTop + 24)
-            ForEach(Array(local.enumerated()), id: \.element.persistentModelID) { i, track in
-                let at = place(i, below: libraryTop, in: size)
+        if !radio.isEmpty {
+            ExploreSectionLabel(title: "Radio Discover", description: "Recordings selected by programmes that play your music")
+                .graphNode("section.radioDiscover", section: "radioDiscover", connects: false)
+                .position(x: size.width * 0.5, y: radioTop + 24)
+            ForEach(Array(radio.enumerated()), id: \.element.id) { i, pick in
+                let at = place(i, below: radioTop, in: size)
                 if ExploreScroll.builds(at, in: band) {
-                Button { play(i) } label: {
-                    MapLabel(track.title, track.artist, MosaicColor.blue, nil,
-                             stableSeed(track.path), cardWidth(in: size))
-                        .localArtwork(track.artworkKey)
-                }.buttonStyle(ExploreCardButtonStyle())
-                    .graphNode("local.\(track.path)", section: "library")
-                    .position(at).zIndex(2)
+                    Button { pick.play(using: player) } label: {
+                        MapLabel(pick.track.artist, pick.track.title, MosaicColor.lavender,
+                                 pick.track.sharpArtwork.full, pick.track.artistDiscogsID, cardWidth(in: size),
+                                 connection: pick.track.reason)
+                    }
+                    .buttonStyle(ExploreCardButtonStyle())
+                    .help("\(pick.episode)\n\(pick.track.reason)\n\(pick.timing.label)")
+                    .accessibilityLabel("\(pick.track.playLabel): \(pick.track.artist) — \(pick.track.title). \(pick.track.reason)")
+                    .contextMenu { RadioDiscoverMenu(pick: pick) }
+                    .graphNode("radioDiscover.\(pick.id)", section: "radioDiscover", legend: true)
+                    .position(at).zIndex(3)
                 }
             }
         }
@@ -372,31 +368,6 @@ struct ExploreView: View {
     /// `ExploreSuggestion.frontier` — so the honest guess is well out towards
     /// the margin rather than on the trunk.
     static let expectedFrontier = 0.75
-
-    /// How many of the library to show at once.
-    private static let localPickCount = 8
-
-    /// Which local tracks to offer, moved along a little each day.
-    ///
-    /// It used to be the newest eight, forever — which meant somebody with a
-    /// library of twelve thousand files was shown the same eight of them every
-    /// time they opened the page, and the block quietly became furniture. The
-    /// window walks through the library instead, so a record filed two years
-    /// ago comes back around.
-    ///
-    /// Rotated by the day rather than shuffled: within a day the page is the
-    /// same page, which matters because a card that moves between two glances
-    /// is one nobody can point at. Recency still decides the order the window
-    /// travels in, so the walk starts at the newest and works back.
-    private var localPicks: [Track] {
-        let all = tracks
-        guard all.count > Self.localPickCount else { return all }
-        let day = Int(Date().timeIntervalSince1970 / 86_400)
-        let start = (day * Self.localPickCount) % all.count
-        // Wrapping, so the last day of the cycle is a full block rather than
-        // whatever happened to be left at the end of the list.
-        return (0..<Self.localPickCount).map { all[(start + $0) % all.count] }
-    }
 
     /// A face for a suggestion, where one has already been found.
     ///
@@ -547,8 +518,7 @@ struct ExploreView: View {
             ("shows", "Shows", "Broadcasts and episodes you saved", { $0.kind == .broadcast }),
             ("releases", "Releases", "Records to return to", { $0.kind == .release }),
             ("labels", "Labels", "Catalogues connected to your taste", { $0.kind == .label }),
-            ("artists", "Artists", "People you keep, and people to meet", { $0.kind == .artist }),
-            ("tracks", "Saved tracks", "Individual recordings in your crate", { $0.kind == .recording })
+            ("artists", "Artists", "People you keep, and people to meet", { $0.kind == .artist })
         ]
         return definitions.compactMap { id, title, description, includes in
             let matches = items.filter(includes)
@@ -567,40 +537,27 @@ struct ExploreView: View {
     }
 
     private var crateItems: [CrateItem] { let _ = crate.revision; return crate.items() }
+    private var visibleRadioPicks: [RadioDiscoverPick] {
+        guard radioDiscoverEnabled && RadioDiscoverFeature.isEnabled,
+              filter == .all || filter == .next || filter == .shows else { return [] }
+        return dig.radioDiscover.picks
+    }
+
     private func recommendationHeight(_ kept: [CrateItem]) -> CGFloat {
-        // Two columns is the narrowest supported layout, so this estimate is
-        // conservative without leaving one full row of whitespace per card.
         let offers = dig.exploreOffers
         let sections = recommendationSections(from: kept, adding: offers.artists)
-        let rows: Int
-        switch filter {
-        case .all:
-            rows = (max(offers.next.count, dig.hasExploreOffers ? 0 : ExploreView.expectedSuggestions) + 1) / 2
-                + (offers.movingToward == nil && dig.hasExploreDirection ? 0 : 1)
-                + sections.reduce(0) { $0 + ($1.count + 1) / 2 }
-                + (offers.shows.count + 1) / 2 + (localPicks.count + 1) / 2
-        case .next:
-            rows = (max(offers.next.count,
-                        dig.hasExploreOffers ? 0 : ExploreView.expectedSuggestions) + 1) / 2
-        case .crate:
-            rows = sections.reduce(0) { $0 + ($1.count + 1) / 2 }
-        case .shows:
-            rows = (offers.shows.count + 1) / 2
-        case .library:
-            rows = (localPicks.count + 1) / 2
+        let next = !offers.next.isEmpty ? offers.next.count
+            : (!dig.hasExploreOffers && !kept.isEmpty ? Self.expectedSuggestions : 0)
+        let scene = offers.movingToward != nil || (!dig.hasExploreDirection && !kept.isEmpty)
+        var counts: [Int] = []
+        if filter == .all || filter == .next {
+            counts.append(next)
         }
-        return max(760, 112 + CGFloat(rows) * 142 + CGFloat(visibleSectionCount(kept)) * 154)
-    }
-    private func visibleSectionCount(_ kept: [CrateItem]) -> Int {
-        switch filter {
-        case .all: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count + 4
-        case .crate: recommendationSections(from: kept, adding: dig.exploreOffers.artists).count
-        case .next, .shows, .library: 1
-        }
-    }
-    private func play(_ index: Int) {
-        let queue = localPicks; guard queue.indices.contains(index) else { return }
-        if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index, from: ListeningSurface(screen: "foryou.library")) }
+        if filter == .all || filter == .crate { counts += sections.map(\.count) }
+        if (filter == .all || filter == .next) && scene { counts.append(1) }
+        if filter == .all || filter == .shows { counts.append(offers.shows.count) }
+        counts.append(visibleRadioPicks.count)
+        return max(760, 112 + counts.filter { $0 > 0 }.reduce(0) { $0 + sectionHeight(for: $1, in: CGSize(width: 900, height: 0)) })
     }
     private func play(_ item: CrateItem) {
         guard let source = SourceResolver(context: crate.context).best(item) else {
@@ -677,7 +634,7 @@ struct ExploreView: View {
 }
 
 private enum ExploreFilter: String, CaseIterable, Identifiable {
-    case all, next, crate, shows, library
+    case all, next, crate, shows
     var id: String { rawValue }
     var label: String {
         switch self {
@@ -685,7 +642,6 @@ private enum ExploreFilter: String, CaseIterable, Identifiable {
         case .next: "Where to go next"
         case .crate: "From your crate"
         case .shows: "Radio shows to check out"
-        case .library: "Your library"
         }
     }
     var color: Color {
@@ -694,7 +650,6 @@ private enum ExploreFilter: String, CaseIterable, Identifiable {
         case .next: MosaicColor.lavender
         case .crate: MosaicColor.green
         case .shows: MosaicColor.paleGreen
-        case .library: MosaicColor.blue
         }
     }
 }
@@ -762,16 +717,7 @@ private struct ExploreSectionLabel: View {
     }
 }
 
-private struct ExploreStartLabel: View {
-    var body: some View {
-        Text("Start your search here")
-            .font(Typeface.body(11.5))
-            .foregroundStyle(Color.black)
-            .allowsHitTesting(false)
-    }
-}
-
-private struct MapLabel: View {
+struct MapLabel: View {
     let title: String; let subtitle: String?; let color: Color; let imageURL: URL?; let seed: Int
     var localArtworkKey: String?
     /// What the card is allowed to grow to. Sized to its text instead, a long
@@ -827,7 +773,7 @@ private struct MapLabel: View {
     }
 }
 
-private struct ExploreCardButtonStyle: ButtonStyle {
+struct ExploreCardButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         ExploreCardInteraction(isPressed: configuration.isPressed) {
             configuration.label
@@ -1284,7 +1230,7 @@ struct ExploreShaderField: View {
 
 /// Drawn in one ink or the other, because the same button sits on the black
 /// header and on the field, and a single colour is invisible on one of them.
-private struct MapHeaderButtonStyle: ButtonStyle {
+struct MapHeaderButtonStyle: ButtonStyle {
     var ink: Color = .black
     private var ground: Color { ink == .black ? .white : .black }
     func makeBody(configuration: Configuration) -> some View {
