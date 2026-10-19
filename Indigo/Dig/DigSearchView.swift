@@ -74,7 +74,7 @@ struct DigSearchView: View {
             // missing for a reason that is nobody's fault and will pass.
             if results.discogsRefused {
                 NoticeStrip(
-                    text: "Discogs is busy — showing what Indigo already holds.",
+                    text: "Discogs is busy — showing what Mineral already holds.",
                     tone: Palette.inkFaint
                 )
                 Rule()
@@ -90,7 +90,7 @@ struct DigSearchView: View {
         if !DigSearchIndex.isSearchable(query) {
             EmptyStateView(
                 headline: "Search everything Dig can reach",
-                message: "An artist, a record, or a label — your own shelves first, then Indigo's catalogue and Discogs."
+                message: "An artist, a record, or a label — your own shelves first, then Mineral's catalogue and Discogs."
             ) { EmptyView() }
         } else if rows.isEmpty && (!settled || isLooking) {
             LoadingPane(label: "Searching")
@@ -99,7 +99,7 @@ struct DigSearchView: View {
             // exist because the catalogue holding it declined to answer.
             EmptyStateView(
                 headline: "Discogs is busy",
-                message: "It allows sixty requests a minute and Indigo has just spent them. Nothing here holds “\(query)” either — try again in a moment."
+                message: "It allows sixty requests a minute and Mineral has just spent them. Nothing here holds “\(query)” either — try again in a moment."
             ) {
                 Button("Try Again") { Task { await look() } }
                     .buttonStyle(OutlineButtonStyle())
@@ -130,7 +130,7 @@ struct DigSearchView: View {
 
     private var emptyMessage: String {
         let where_ = scope == .all ? "" : " under \(scope.title.lowercased())"
-        return "Nothing in your library, Indigo's catalogue or Discogs answers to “\(query)”\(where_)."
+        return "Nothing in your library, Mineral's catalogue or Discogs answers to “\(query)”\(where_)."
     }
 
     /// Local first, then the two that need the network.

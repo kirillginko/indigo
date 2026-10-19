@@ -66,10 +66,19 @@ extension DigStore {
         clusterSeedPicks = picks
     }
 
+    /// Counts alone miss a replacement list with the same number of items.
+    var forYouMixInputIDs: [[String]] {
+        [mixOffers.next.map(\.id), mixOffers.artists.map(\.id), mixOffers.shows.map(\.id),
+         exploreOffers.next.map(\.id), exploreOffers.artists.map(\.id), exploreOffers.shows.map(\.id),
+         discover.tracks.map(\.id), similarRecords.records.map { String($0.id) }, clusterSeedPicks.map(\.id)]
+    }
+
     /// The mix and its compass from what is on hand now: pure, apart from
     /// reading the listener's rows and the artists' tags off the main thread.
     func composeForYouMix() async {
         guard ForYouMixFeature.isEnabled else { return }
+        forYouMixComposition &+= 1
+        let composition = forYouMixComposition
         let offers = mixOffers.isEmpty ? exploreOffers : mixOffers, tracks = discover.tracks
         let records = similarRecords.records, vectors = similarRecords.styleVectors
         let seeded = ForYouClusterSeedsFeature.isEnabled ? clusterSeedPicks : []
@@ -82,7 +91,7 @@ extension DigStore {
                 let offered = Set(tracks.map { RecordingKey.normalizeArtist($0.artist) }
                     + (offers.next + offers.artists).filter { $0.node.kind == .artist }.map { RecordingKey.normalizeArtist($0.node.title) })
                 let tags = LocalKnowledgeAdapter.artistTags(for: offered.union(personal.tasteArtistKeys), in: context)
-                var items = ForYouMix.mix(offers: offers, tracks: tracks, records: records, artistTags: tags)
+                var items = ForYouMix.mix(offers: offers, tracks: tracks, records: records, artistTags: tags, turn: RecommendationRotation.period(at: now))
                 // For You's list first; the cluster seeds after it, nobody twice.
                 var claimed = Set(items.flatMap(\.artistKeys))
                 for track in seeded {
@@ -100,6 +109,7 @@ extension DigStore {
                 return (items, compass)
             }
         }.value
+        guard !Task.isCancelled, composition == forYouMixComposition else { return }
         forYouMix = ForYouMixState(items: items, compass: compass, at: Date())
     }
 }
@@ -152,7 +162,7 @@ struct ForYouMixSection: View {
             }
         }
         .task { await dig.refreshForYouMix() }
-        .task(id: "\(dig.exploreOffers.next.count)|\(dig.exploreOffers.artists.count)|\(dig.discover.tracks.count)|\(dig.similarRecords.records.count)") {
+        .task(id: dig.forYouMixInputIDs) {
             await dig.composeForYouMix()
         }
     }

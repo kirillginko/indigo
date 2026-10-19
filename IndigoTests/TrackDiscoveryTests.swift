@@ -187,6 +187,33 @@ final class TrackDiscoverySourceTests: XCTestCase {
             cache: TrackDiscoveryCache())
     }
 
+    func testANewPeriodSelectsADifferentTrackBeforePlaybackChecks() async {
+        let seedRow = UUID(), firstRow = UUID(), secondRow = UUID()
+        let source = TrackDiscoverySource(
+            rows: { _ in [1: [seedRow]] },
+            neighbours: { _ in [.init(a: seedRow, b: firstRow, episodes: 3), .init(a: seedRow, b: secondRow, episodes: 3)] },
+            relations: { row in [.init(a: row, b: firstRow, episodes: 3), .init(a: row, b: secondRow, episodes: 3)] },
+            artists: { _ in [firstRow: (discogs: 2, name: "First Artist"), secondRow: (discogs: 3, name: "Second Artist")] },
+            appearances: { _ in
+                let episode = TrackDiscoverySource.Row.Episode(provider: "nts", external_id: "show/episode", archive_url: nil,
+                                                               title: "Episode", aired_at: nil, image_url: nil, genres: nil, radio_shows: nil)
+                return [
+                    .init(artist_id: firstRow, raw_track_title: "First Track", offset_seconds: nil,
+                          media_url: "https://www.youtube.com/watch?v=nnnnnnnnnn1", radio_episodes: episode),
+                    .init(artist_id: secondRow, raw_track_title: "Second Track", offset_seconds: nil,
+                          media_url: "https://www.youtube.com/watch?v=nnnnnnnnnn2", radio_episodes: episode)
+                ]
+            }, plays: { _ in true }, cache: TrackDiscoveryCache())
+        var ask = TrackDiscoverySource.Ask(seeds: [.init(discogsID: 1, name: "Seed", weight: 1)], limit: 1)
+        let first = await source.discover(ask).tracks
+        ask.turn = 1
+        let next = await source.discover(ask).tracks
+        XCTAssertEqual(first.count, 1)
+        XCTAssertEqual(next.count, 1)
+        XCTAssertNotEqual(first.first?.id, next.first?.id)
+        XCTAssertEqual(next.first?.playable, .yes)
+    }
+
     func testOneLookIsAFewBatchedReadsAndASecondReusesThem() async {
         let calls = Calls()
         let source = fake(calls: calls)

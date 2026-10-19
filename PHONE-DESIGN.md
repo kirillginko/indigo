@@ -16,8 +16,9 @@ own.** If a page needs something none of them do, add it here first.
 1. **One fact, one row.** Each fact gets its own row, in the same order
    wherever it appears. Nothing is squeezed beside something else.
 2. **Boxes touch only when they are one statement.** A title over its
-   artist; a time and its label (`22:00` + `NEXT UP`); a count and its
-   label. Anything else is its own row, 8 pt apart.
+   artist; a slide's kind/location above its name (ARTIST + artist name,
+   RECORD + record name, IN A RADIO SHOW + artist + track); a time and its
+   label (`22:00` + `NEXT UP`); a count and its label. Anything else is its own row, 8 pt apart.
 3. **Colour says what a box is** (§2), never decorates.
 4. **Square content, round controls.** What you read or open is square;
    what moves you around is round (§5).

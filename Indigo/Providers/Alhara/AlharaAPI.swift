@@ -27,7 +27,7 @@ nonisolated enum AlharaError: LocalizedError, Equatable {
         case .badStatus(let code):
             "Radio alHara returned an unexpected response (\(code))."
         case .malformedResponse:
-            "Radio alHara sent something Indigo couldn't read."
+            "Radio alHara sent something Mineral couldn't read."
         case .transport(let message):
             message
         }

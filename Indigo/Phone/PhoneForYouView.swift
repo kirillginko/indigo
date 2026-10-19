@@ -32,6 +32,8 @@ struct PhoneForYouView: View {
     @Environment(N10ASBrowseStore.self) private var n10asBrowse
     @Environment(PlaybackCoordinator.self) private var player
     @Bindable private var feeds = PhoneFeeds.shared
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var recommendationTurn = RecommendationRotation.period(at: Date())
 
     /// One screen of the feed.
     enum Slide: Identifiable {
@@ -62,7 +64,7 @@ struct PhoneForYouView: View {
         GeometryReader { proxy in
             let insets = proxy.safeAreaInsets
             StationDirectory { entries, playable in
-                let suggestions = Self.slides(from: dig.exploreOffers)
+                let suggestions = Self.slides(from: dig.exploreOffers, turn: recommendationTurn)
                 let mixed = ForYouMixFeature.isEnabled ? dig.forYouMix.items : []
                 // With the mix on, the feed is the mix: tracks, records,
                 // artists and shows woven together, one to a screen. Until it
@@ -117,12 +119,20 @@ struct PhoneForYouView: View {
         // Asked again when the crate moves, and when another device changed
         // something the offers are worked out from; the store decides
         // whether that is a rebuild. See `DigStore.refreshExploreOffers`.
-        .task(id: [crate.revision, UserDataImports.shared.exploreRevision]) {
-            await dig.refreshExploreOffers()
-            await dig.refreshForYouMix()
+        .task(id: "\(crate.revision)|\(UserDataImports.shared.exploreRevision)|\(scenePhase)") {
+            guard scenePhase == .active else { return }
+            while !Task.isCancelled {
+                recommendationTurn = RecommendationRotation.period(at: Date())
+                await dig.refreshExploreOffers()
+                guard !Task.isCancelled else { return }
+                await dig.refreshForYouMix()
+                do {
+                    try await Task.sleep(for: .seconds(RecommendationRotation.delayUntilNextPeriod(from: Date())))
+                } catch { return }
+            }
         }
         // The mix again whenever a part of it arrives.
-        .task(id: "\(dig.mixOffers.next.count)|\(dig.exploreOffers.next.count)|\(dig.discover.tracks.count)|\(dig.similarRecords.records.count)") {
+        .task(id: dig.forYouMixInputIDs) {
             await dig.composeForYouMix()
         }
         // The suggested artists' portraits, asked for ahead of the rest -- and
@@ -149,10 +159,10 @@ struct PhoneForYouView: View {
     }
 
     /// Artists and next steps, a show every third slide, nothing twice.
-    static func slides(from offers: ExploreOffers) -> [ExploreSuggestion] {
+    static func slides(from offers: ExploreOffers, turn: Int = 0) -> [ExploreSuggestion] {
         var seen = Set<String>()
-        let main = (offers.next + offers.artists).filter { seen.insert($0.id).inserted }
-        let shows = offers.shows.filter { seen.insert($0.id).inserted }
+        let main = RecommendationRotation.rotate((offers.next + offers.artists).filter { seen.insert($0.id).inserted }, turn: turn)
+        let shows = RecommendationRotation.rotate(offers.shows.filter { seen.insert($0.id).inserted }, turn: turn)
         var slides: [ExploreSuggestion] = []
         var showIndex = 0
         for (index, suggestion) in main.enumerated() {
@@ -223,7 +233,7 @@ struct PhoneForYouView: View {
         case .track(let track):
             let art = track.sharpArtwork
             return .init(picture: art.full, kind: track.isRecording ? "Track" : "In a radio show",
-                         title: track.title, subtitle: track.artist, reason: track.reason, via: nil, heading: heading,
+                         title: track.artist, subtitle: track.title, reason: track.reason, via: nil, heading: heading,
                          button: track.isRecording ? "PLAY TRACK" : "HEAR IN RADIO SHOW",
                          icon: track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right",
                          preview: art.preview, square: true)
@@ -358,13 +368,7 @@ struct PhoneForYouSlide: View {
                     // was reached through, in IDA's boxes; the button last, at
                     // the bottom, as on every slide.
                     Button(action: open) {
-                        VStack(spacing: 8) {
-                            ChipFlow { Chip(text: card.kind, tone: .lead, uppercase: true) }
-                            ChipFlow { Chip(text: card.title, size: 19) }
-                            if let subtitle = card.subtitle, !subtitle.isEmpty {
-                                ChipFlow { Chip(text: subtitle, size: 13) }
-                            }
-                        }
+                        PhoneSlideHeading(label: card.kind, title: card.title, subtitle: card.subtitle)
                     }
                     .buttonStyle(.plain)
                     ChipFlow {
@@ -377,7 +381,7 @@ struct PhoneForYouSlide: View {
                         }
                     }
                     if let heading = card.heading {
-                        ChipFlow { Chip(text: heading, tone: .sheen, size: 12, uppercase: true) }
+                        ChipFlow { Chip(text: heading == "Close to home" ? "Similar to your taste" : heading, tone: .sheen, size: 12, uppercase: true) }
                     }
                     Button(action: open) {
                         HStack(spacing: 10) {

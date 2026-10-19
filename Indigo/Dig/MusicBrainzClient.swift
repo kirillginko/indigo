@@ -20,9 +20,9 @@ nonisolated enum MusicBrainzError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .offline: "No internet connection."
-        case .rateLimited: "MusicBrainz is busy. Indigo will try again shortly."
+        case .rateLimited: "MusicBrainz is busy. Mineral will try again shortly."
         case .badStatus(let code): "MusicBrainz returned an unexpected response (\(code))."
-        case .malformedResponse: "MusicBrainz sent something Indigo couldn't read."
+        case .malformedResponse: "MusicBrainz sent something Mineral couldn't read."
         case .transport(let message): message
         }
     }

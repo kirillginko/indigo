@@ -310,7 +310,7 @@ struct ArtistDigView: View {
                             Text("Nothing to dig into yet.")
                                 .font(Typeface.body(12.5))
                                 .foregroundStyle(Palette.inkMuted)
-                            Text("Indigo knows this name but hasn't found releases or label connections yet.")
+                            Text("Mineral knows this name but hasn't found releases or label connections yet.")
                                 .font(Typeface.mono(10))
                                 .foregroundStyle(Palette.inkFaint)
                                 .fixedSize(horizontal: false, vertical: true)

@@ -42,7 +42,70 @@ struct LiveShowReader<Content: View>: View {
     @Environment(RovrProvider.self) private var rovr
     @Environment(N10ASProvider.self) private var n10as
 
-    var body: some View { content(show, next) }
+    @Environment(CashmereBrowseStore.self) private var cashmereBrowse
+    @Environment(Radio80000BrowseStore.self) private var radio80000Browse
+    @Environment(N10ASBrowseStore.self) private var n10asBrowse
+    @Environment(LYLBrowseStore.self) private var lylBrowse
+    @Environment(PanikBrowseStore.self) private var panikBrowse
+
+    var body: some View {
+        content(illustratedShow, next)
+            .task(id: show) { await loadArtwork() }
+    }
+
+    /// Live metadata often carries only text. Use the same programme's
+    /// directory picture, keeping any artwork supplied by the live feed.
+    private var illustratedShow: RadioShow? {
+        guard let show else { return nil }
+        return show.withArtwork(archiveArtwork(for: show))
+    }
+
+    private func archiveArtwork(for show: RadioShow) -> URL? {
+        switch providerID {
+        case CashmereProvider.providerID:
+            let match = cashmereBrowse.shows.first {
+                $0.slug == show.detailID || RadioShowArtwork.matches($0.name, show.title)
+            }
+            return match.flatMap { cashmereBrowse.preview(forShow: $0.slug)?.artworkURL }
+        case Radio80000Provider.providerID:
+            let match = radio80000Browse.shows.first { RadioShowArtwork.matches($0.title, show.title) }
+            return match?.imageURL ?? match?.thumbnailURL
+        case N10ASProvider.providerID:
+            return n10asBrowse.shows.first { N10ASTitle.matchKey($0.title) == N10ASTitle.matchKey(show.title) }?.imageURL
+        case LYLProvider.providerID:
+            if let slug = show.detailID, let image = lylBrowse.episode(slug: slug)?.imageURL { return image }
+            return lylBrowse.shows.first { RadioShowArtwork.matches($0.title, show.title) }?.imageURL
+        case PanikProvider.providerID:
+            if let slug = show.detailID, let image = panikBrowse.show(slug: slug)?.imageURL { return image }
+            return panikBrowse.shows.first { RadioShowArtwork.matches($0.title, show.title) }?.imageURL
+        default:
+            return nil
+        }
+    }
+
+    private func loadArtwork() async {
+        guard let show, show.artworkURL == nil else { return }
+        switch providerID {
+        case CashmereProvider.providerID:
+            await cashmereBrowse.loadShowsIfNeeded()
+            if let match = cashmereBrowse.shows.first(where: {
+                $0.slug == show.detailID || RadioShowArtwork.matches($0.name, show.title)
+            }) {
+                await cashmereBrowse.loadShowPreviewIfNeeded(slug: match.slug)
+            }
+        case Radio80000Provider.providerID:
+            await radio80000Browse.loadShowsIfNeeded()
+        case N10ASProvider.providerID:
+            await n10asBrowse.loadShowsIfNeeded()
+        case LYLProvider.providerID:
+            if let slug = show.detailID { await lylBrowse.loadDetailIfNeeded(slug: slug) }
+            if archiveArtwork(for: show) == nil { await lylBrowse.loadShowsIfNeeded() }
+        case PanikProvider.providerID:
+            await panikBrowse.loadShowsIfNeeded()
+        default:
+            break
+        }
+    }
 
     /// What comes on after, where the station publishes it as a show.
     private var next: RadioShow? {
@@ -70,5 +133,22 @@ struct LiveShowReader<Content: View>: View {
         case N10ASProvider.providerID: n10as.now
         default: nil
         }
+    }
+}
+
+/// Exact programme names only: a loosely related archive hit is not evidence
+/// that its photograph belongs to what is on air.
+nonisolated enum RadioShowArtwork {
+    static func matches(_ candidate: String, _ title: String) -> Bool {
+        let key = RecordingKey.normalize(title)
+        return !key.isEmpty && RecordingKey.normalize(candidate) == key
+    }
+}
+
+extension RadioShow {
+    func withArtwork(_ fallback: URL?) -> RadioShow {
+        RadioShow(title: title, host: host, summary: summary, location: location,
+                  genres: genres, moods: moods, artworkURL: artworkURL ?? fallback,
+                  startsAt: startsAt, endsAt: endsAt, detailID: detailID)
     }
 }

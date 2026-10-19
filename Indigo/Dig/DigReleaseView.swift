@@ -457,7 +457,7 @@ struct DigReleaseView: View {
                             }
                             Spacer(minLength: 0)
                         }
-                        Text("No catalogue has an entry for this record. It is named in \(credit.map { "\($0)'s" } ?? "the artist's") own listing and nowhere else Indigo can reach.")
+                        Text("No catalogue has an entry for this record. It is named in \(credit.map { "\($0)'s" } ?? "the artist's") own listing and nowhere else Mineral can reach.")
                             .font(Typeface.body(12))
                             .foregroundStyle(Palette.inkMuted)
                             .fixedSize(horizontal: false, vertical: true)

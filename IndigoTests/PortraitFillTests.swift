@@ -510,6 +510,52 @@ final class CataloguePortraitTests: XCTestCase {
     /// The faces on a page come from the backend in one request, are written
     /// down so they outlast the session, and leave only what it had nothing for
     /// to be searched for. A redraw reporting the same rows does not ask again.
+    func testVisibleTilesShareACatalogueRequest() async throws {
+        let dig = DigStore(context: context)
+        let asks = CatalogueAsks()
+        dig.cataloguePortraits = { keys in
+            asks.record(keys)
+            return Dictionary(uniqueKeysWithValues: keys.map {
+                ($0, DigWorker.CataloguePortrait(state: "unresolved", url: "https://images.test/\($0.replacingOccurrences(of: " ", with: "-")).jpg"))
+            })
+        }
+        dig.wantPortraits(for: ["Aphex Twin"])
+        dig.wantPortraits(for: ["Boards of Canada"])
+        for _ in 0..<300 where dig.portraitURL(for: "Aphex Twin") == nil || dig.portraitURL(for: "Boards of Canada") == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertNotNil(dig.portraitURL(for: "Aphex Twin"))
+        XCTAssertNotNil(dig.portraitURL(for: "Boards of Canada"))
+        XCTAssertEqual(asks.count, 1, "Lazy tiles should be batched, not one network request per tile")
+    }
+
+    func testAVisibleThumbnailAsksTheCatalogueForTheFullPortrait() async throws {
+        let thumb = "https://i.discogs.com/old/rs:fit/h:150/w:150/artist.jpg"
+        let full = "https://i.discogs.com/full/rs:fit/h:600/w:600/artist.jpg"
+        let portrait = ArtistPortrait(nameKey: "aphex twin", name: "Aphex Twin")
+        portrait.imageURLString = thumb
+        context.insert(portrait)
+        try context.save()
+        let dig = DigStore(context: context)
+        await dig.loadPortraitIndex()
+        XCTAssertEqual(dig.portraitURL(for: "Aphex Twin")?.absoluteString, thumb)
+        let asks = CatalogueAsks()
+        dig.cataloguePortraits = { keys in
+            asks.record(keys)
+            return ["aphex twin": .init(state: "verified", url: full, discogsID: 45)]
+        }
+
+        dig.wantPortraits(for: ["Aphex Twin"])
+        for _ in 0..<300 where dig.portraitURL(for: "Aphex Twin")?.absoluteString != full {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(dig.tileImage(for: .artist("Aphex Twin", mbid: nil))?.absoluteString, full)
+        XCTAssertEqual(dig.portraitURL(for: "Aphex Twin", discogsID: 45)?.absoluteString, full)
+        dig.wantPortraits(for: ["Aphex Twin"])
+        try await Task.sleep(for: .milliseconds(50))
+        XCTAssertEqual(asks.count, 1)
+    }
+
     func testTheRowsOnScreenTakeTheBackendsPicturesFirst() async throws {
         let asks = CatalogueAsks()
         let dig = DigStore(context: context)

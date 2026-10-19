@@ -111,7 +111,9 @@ extension DigStore {
            Date().timeIntervalSince(held.at) < 24 * 60 * 60, !held.tracks.isEmpty {
             discover = DiscoverState(tracks: held.tracks, at: held.at)
         }
-        if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60, !discover.tracks.isEmpty { return }
+        if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60,
+           RecommendationRotation.period(at: at) == RecommendationRotation.period(at: Date()),
+           !discover.tracks.isEmpty { return }
         guard !discover.working else { return }
         discover.working = true
         let showing = !discover.tracks.isEmpty
@@ -133,7 +135,7 @@ extension DigStore {
             }
             var ask = TrackDiscoverySource.Ask(seeds: inputs.seeds, taste: inputs.taste,
                                                knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks,
-                                               limit: 12, releaseLookups: 2)
+                                               limit: 12, turn: RecommendationRotation.period(at: Date()), releaseLookups: 2)
             let first = await source.discover(ask) { so in
                 // Over a held list, nothing until the new one is whole.
                 guard !showing else { return }

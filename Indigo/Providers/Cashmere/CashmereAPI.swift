@@ -30,7 +30,7 @@ nonisolated enum CashmereError: LocalizedError, Equatable {
         case .badStatus(let code):
             "Cashmere Radio returned an unexpected response (\(code))."
         case .malformedResponse:
-            "Cashmere Radio sent something Indigo couldn't read."
+            "Cashmere Radio sent something Mineral couldn't read."
         case .graphQL(let message):
             message
         case .transport(let message):

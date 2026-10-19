@@ -190,13 +190,14 @@ final class DigStore {
     var similarRecords = SimilarRecordsState()
     /// For You as one list, and its compass (`ForYouMixFeature`).
     var forYouMix = ForYouMixState()
+    @ObservationIgnored var forYouMixComposition = 0
     /// After For You's own list, behind `ForYouClusterSeedsFeature`: tracks
     /// by artists one step from each taste cluster (`ClusterSeedPicks`).
     var clusterSeedPicks: [DiscoveredTrack] = []
     @ObservationIgnored var clusterSeedPicksAt: Date?
     /// The mix's artists and shows (`DigWorker.forYouMixOffers`), worked out
     /// beside the visible answer when the mix is on.
-    @ObservationIgnored var mixOffers = ExploreOffers()
+    var mixOffers = ExploreOffers()
     /// Discover per artist page, by Discogs entry.
     var artistDiscover: [String: DiscoverState] = [:]
     @ObservationIgnored var trackDiscoverySource = TrackDiscoverySource.live
@@ -1058,7 +1059,11 @@ final class DigStore {
     @ObservationIgnored private var portraitPriority: [String] = []
 
     func wantPortraits(for names: [String]) {
-        portraitPriority = names.filter { ArtistName.isRealArtist($0) }
+        let requested = names.filter { ArtistName.isRealArtist($0) }
+        var seen = Set<String>()
+        portraitPriority = (requested + portraitPriority).filter {
+            seen.insert(RecordingKey.normalizeArtist($0)).inserted
+        }
         // The backend first, for all of them at once.
         //
         // These went straight to the fill, which searches Discogs for one name
@@ -1066,12 +1071,17 @@ final class DigStore {
         // one set of pictures that never asked the backend, which had often
         // already found them. Asked here, a page's rows fill in from a single
         // request and the fill is left only what the backend had nothing for.
-        let wanted = portraitPriority.filter { isPortraitWanted($0) }
+        let wanted = requested.filter { wantsPortraitRequest(for: $0) }
         guard !wanted.isEmpty else { return }
         let previous = onScreenAdoption
         onScreenAdoption = Task { [weak self] in
             await previous?.value
-            await self?.adoptCataloguePortraits(for: wanted, onScreen: true)
+            // Lazy grid tiles report independently. Collect the names queued
+            // in this render pass before making a single catalogue request.
+            await Task.yield()
+            guard let self else { return }
+            let batch = self.portraitPriority.filter { self.wantsPortraitRequest(for: $0) }
+            await self.adoptCataloguePortraits(for: batch, onScreen: true)
         }
     }
 
@@ -1614,7 +1624,9 @@ final class DigStore {
     /// Whether a name would cost a request now: it has no face and is not
     /// settled, or holds only the 150-pixel cut. Read-only.
     func wantsPortraitRequest(for name: String) -> Bool {
-        isPortraitWanted(name) || wantsSharperPortrait(name)
+        // A verified thumbnail can still be upgraded by the catalogue.
+        // The background Discogs search keeps its stricter identity guard.
+        isPortraitWanted(name) || DiscogsClient.isSmallCut(portraitURL(for: name)?.absoluteString)
     }
 
     private func wantsSharperPortrait(_ name: String) -> Bool {
@@ -1897,7 +1909,8 @@ final class DigStore {
                 asOf: asOf, period: period, generation: asked, scenes: false, rebuild: rebuildKnowledge, now: now
             )
             guard !Task.isCancelled else { return }
-            if core.stamp != self.offersCoreStamp || !self.hasExploreOffers || self.exploreOffers.isEmpty {
+            if core.stamp != self.offersCoreStamp || !self.hasExploreOffers || self.exploreOffers.isEmpty
+                || (ForYouMixFeature.isEnabled && self.mixOffers.isEmpty) {
                 let found = await self.worker.exploreRecommendations(core, asOf: asOf)
                 guard !Task.isCancelled else { return }
                 self.offersCoreStamp = core.stamp

@@ -218,7 +218,7 @@ struct DeepSectionView: View {
     private func emptyMessage(_ level: DeepLevel) -> String {
         switch level {
         case .unknown:
-            "Nothing unidentified here yet. Unknown recordings appear once Indigo has heard something it can't name."
+            "Nothing unidentified here yet. Unknown recordings appear once Mineral has heard something it can't name."
         default:
             "Nothing at this depth."
         }

@@ -77,6 +77,8 @@ nonisolated struct TrackDiscoverySource: Sendable {
         var knownArtists: Set<String> = []
         var knownTracks: Set<String> = []
         var limit = 12
+        /// For You rotates through the ranked candidates before playback checks.
+        var turn = 0
         /// For an artist page: a few of the seed's own tracks first.
         var ownTracks = 0
         /// Release recordings for up to this many neighbours radio has
@@ -260,7 +262,7 @@ nonisolated struct TrackDiscoverySource: Sendable {
         // Checked four at a time; each that plays is handed over at once.
         var offered: [DiscoveredTrack] = []
         var ownOffered = 0
-        let queue = own + ranked
+        let queue = own + RecommendationRotation.rotate(ranked, turn: ask.turn)
         for chunk in stride(from: 0, to: queue.count, by: 4).map({ Array(queue.dropFirst($0).prefix(4)) }) {
             guard offered.count - ownOffered < ask.limit || ownOffered < ask.ownTracks else { break }
             let checked = await withTaskGroup(of: (Int, Bool?).self) { group in

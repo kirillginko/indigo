@@ -8,6 +8,7 @@
 //
 
 import XCTest
+import SwiftData
 @testable import Indigo
 
 final class ForYouMixTests: XCTestCase {
@@ -74,6 +75,54 @@ final class ForYouMixTests: XCTestCase {
         offers.next = [ExploreSuggestion(node: .release("Their Own EP", discogsID: 9), reason: "Released Their Own EP", via: "Y",
                                          kind: .appearsOnRelease, corroboration: 1, score: 1), suggestion("Grouper")]
         XCTAssertEqual(ForYouMix.mix(offers: offers, tracks: [], records: []).map(\.title), ["Grouper"])
+    }
+
+    func testSixHourRefreshPeriodsStayStableUntilTheBoundary() {
+        let start = Date(timeIntervalSince1970: 0)
+        XCTAssertEqual(RecommendationRotation.period(at: start), 0)
+        XCTAssertEqual(RecommendationRotation.period(at: start.addingTimeInterval(6 * 60 * 60 - 1)), 0)
+        XCTAssertEqual(RecommendationRotation.period(at: start.addingTimeInterval(6 * 60 * 60)), 1)
+        XCTAssertEqual(RecommendationRotation.delayUntilNextPeriod(from: start.addingTimeInterval(6 * 60 * 60 - 10)), 10)
+    }
+
+    func testRotationDoesNotRepeatTheSameFourWindowsEveryDay() {
+        let pool = Array(0..<24)
+        let starts = (0..<24).compactMap { RecommendationRotation.rotate(pool, turn: $0).first }
+        XCTAssertEqual(Set(starts).count, 24)
+        XCTAssertNotEqual(RecommendationRotation.rotate(pool, turn: 0), RecommendationRotation.rotate(pool, turn: 4))
+        XCTAssertEqual(RecommendationRotation.rotate([Int](), turn: 100), [])
+        XCTAssertEqual(RecommendationRotation.rotate([1], turn: 100), [1])
+    }
+
+    func testTheNextPeriodOffersNewArtistsFromTheRankedPool() {
+        var offers = ExploreOffers()
+        offers.next = (0..<30).map { index in
+            ExploreSuggestion(node: .artist("Artist \(index)"), reason: "Credited together", via: "Origin \(index)",
+                              kind: .collaborator, corroboration: 1, score: 1)
+        }
+        let first = ForYouMix.mix(offers: offers, tracks: [], records: [], limit: 6, turn: 0)
+        let next = ForYouMix.mix(offers: offers, tracks: [], records: [], limit: 6, turn: 1)
+        XCTAssertEqual(first.count, 6)
+        XCTAssertEqual(next.count, 6)
+        XCTAssertTrue(Set(first.map(\.id)).isDisjoint(with: Set(next.map(\.id))), "New candidates, not just a shuffle of the same six")
+        XCTAssertEqual(next, ForYouMix.mix(offers: offers, tracks: [], records: [], limit: 6, turn: 1))
+    }
+
+    @MainActor
+    func testAReplacementWithTheSameCountChangesTheRefreshKey() throws {
+        let container = try ModelContainer(for: Persistence.schema, configurations: ModelConfiguration(
+            schema: Persistence.schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none))
+        let dig = DigStore(context: ModelContext(container))
+        dig.discover = DiscoverState(tracks: [track(1, "A")])
+        let before = dig.forYouMixInputIDs
+        dig.discover = DiscoverState(tracks: [track(2, "B")])
+        XCTAssertNotEqual(before, dig.forYouMixInputIDs)
+        let tracksReplaced = dig.forYouMixInputIDs
+        dig.mixOffers.next = [suggestion("Grouper")]
+        XCTAssertNotEqual(tracksReplaced, dig.forYouMixInputIDs)
+        let firstArtist = dig.forYouMixInputIDs
+        dig.mixOffers.next = [suggestion("Low")]
+        XCTAssertNotEqual(firstArtist, dig.forYouMixInputIDs)
     }
 
     private let vectors: [String: [String: Double]] = [

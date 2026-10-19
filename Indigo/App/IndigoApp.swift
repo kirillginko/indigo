@@ -121,7 +121,7 @@ struct IndigoApp: App {
     @State private var witness = PlaybackWitness(context: Persistence.container.mainContext)
 
     var body: some Scene {
-        WindowGroup(id: IndigoWindow.main) {
+        WindowGroup("Mineral", id: IndigoWindow.main) {
             AdaptiveRootView()
                 .environment(appState)
                 .environment(player)

@@ -133,7 +133,7 @@ struct AlharaStationView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 if state.videoURL != nil {
-                    Text("A video feed is running alongside this channel; Indigo plays the sound.")
+                    Text("A video feed is running alongside this channel; Mineral plays the sound.")
                         .microLabel(1.1, size: 9.5)
                         .foregroundStyle(Palette.inkFaint)
                         .fixedSize(horizontal: false, vertical: true)

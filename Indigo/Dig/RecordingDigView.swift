@@ -35,7 +35,7 @@ struct RecordingDigView: View {
             } else {
                 EmptyStateView(
                     headline: fallbackTitle,
-                    message: "Indigo does not have this recording on this device."
+                    message: "Mineral does not have this recording on this device."
                 ) { EmptyView() }
             }
         }

@@ -24,7 +24,7 @@ nonisolated enum LYLError: LocalizedError, Equatable {
         case .badStatus(let code):
             "LYL Radio returned an unexpected response (\(code))."
         case .malformedResponse:
-            "LYL Radio sent something Indigo couldn't read."
+            "LYL Radio sent something Mineral couldn't read."
         case .graphQL(let message):
             message
         case .transport(let message):

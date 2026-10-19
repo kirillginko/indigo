@@ -29,7 +29,7 @@ nonisolated enum RovrError: LocalizedError, Equatable {
         case .badStatus(let code):
             "ROVR returned an unexpected response (\(code))."
         case .malformedResponse:
-            "ROVR sent something Indigo couldn't read."
+            "ROVR sent something Mineral couldn't read."
         case .notFound:
             "ROVR no longer publishes this."
         case .transport(let message):

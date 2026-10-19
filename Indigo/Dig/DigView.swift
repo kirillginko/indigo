@@ -87,7 +87,7 @@ struct DigView: View {
             PageHeader(
                 title: "Dig",
                 subtitle: isSearching
-                    ? "Your shelves, Indigo and Discogs"
+                    ? "Your shelves, Mineral and Discogs"
                     : (entries.isEmpty ? "Follow the music" : "\(entries.count) artists to follow")
             ) {
                 SearchField(
@@ -173,13 +173,12 @@ struct DigView: View {
                                 .buttonStyle(.plain)
                                 .accessibilityLabel(entry.name)
                                 .accessibilityHint(entry.detail)
+                                .task(id: entry.name) { dig.wantPortraits(for: [entry.name]) }
                             }
                         }
                     }
                     .padding(.top, 26)
                     .padding(.bottom, 24)
-                    // Their faces, ahead of the background fill.
-                    .task(id: entries.count) { dig.wantPortraits(for: entries.prefix(40).map(\.name)) }
                 } else if !entries.isEmpty {
                     HStack {
                         Text("Start from").microLabel(1.8).foregroundStyle(Palette.inkFaint)
@@ -772,6 +771,9 @@ private struct DigShelf: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(pick.node.title)
                     .accessibilityHint(caption(pick))
+                    .task(id: pick.id) {
+                        if pick.node.kind == .artist { dig.wantPortraits(for: [pick.node.title]) }
+                    }
                 }
             }
         }

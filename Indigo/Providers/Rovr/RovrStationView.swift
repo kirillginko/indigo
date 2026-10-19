@@ -38,7 +38,7 @@ struct RovrStationView: View {
 
     private var subtitle: String {
         let base = isRadio
-            ? "Radio reinvented · \(station.offsetLabel)"
+            ? "Radio reinvented · \(RovrProvider.location)"
             : "Continuous · \(channel.name)"
         guard let updated = station.lastUpdated else { return base }
         let formatter = DateFormatter()

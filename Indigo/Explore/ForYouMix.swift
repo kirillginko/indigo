@@ -7,7 +7,7 @@
 //  the records that resemble the crate's (`SimilarRecords`), woven together
 //  rather than shown as four blocks that repeat one another.
 //
-//  Each source keeps its own order -- this does not re-rank anything. It
+//  Each source keeps its ranked order within a rotating window. It
 //  takes the next of each kind in a fixed pattern (a track, an artist, a
 //  record, a track, an artist, a show, a record...), so the list opens on
 //  something to hear and keeps a mix of things to hear, people to follow and
@@ -78,6 +78,35 @@ nonisolated struct ForYouItem: Identifiable, Equatable, Sendable {
     static func == (left: ForYouItem, right: ForYouItem) -> Bool { left.id == right.id && left.tags == right.tags }
 }
 
+/// A stable selection for six hours, then another part of the ranked pool.
+/// This changes what is offered without changing the listener's taste scores.
+nonisolated enum RecommendationRotation {
+    static let interval: TimeInterval = 6 * 60 * 60
+
+    static func period(at date: Date) -> Int {
+        Int(floor(date.timeIntervalSince1970 / interval))
+    }
+
+    static func delayUntilNextPeriod(from date: Date) -> TimeInterval {
+        max(1, Double(period(at: date) + 1) * interval - date.timeIntervalSince1970)
+    }
+
+    static func rotate<T>(_ ranked: [T], turn: Int) -> [T] {
+        guard ranked.count > 1 else { return ranked }
+        var step = min(6, max(1, ranked.count / 3))
+        // Visit every starting position rather than cycling through four
+        // windows that would put the same tracks back every morning.
+        func gcd(_ a: Int, _ b: Int) -> Int {
+            var a = a, b = b
+            while b != 0 { (a, b) = (b, a % b) }
+            return a
+        }
+        while gcd(step, ranked.count) != 1 { step += 1 }
+        let offset = ((turn % ranked.count + ranked.count) % ranked.count * step) % ranked.count
+        return Array(ranked.dropFirst(offset)) + Array(ranked.prefix(offset))
+    }
+}
+
 nonisolated enum ForYouMix {
     /// The order kinds are taken in, repeated.
     static let pattern: [ForYouItem.Kind] = [.track, .artist, .record, .track, .artist, .show, .record]
@@ -133,13 +162,13 @@ nonisolated enum ForYouMix {
     }
 
     /// The woven list: the pattern above, one artist once (tracks first,
-    /// then records, then pages), each source in its own order.
+    /// then records, then pages), each source in its rotating window.
     /// At most this many items reached from any one starting point, across
     /// kinds: a list, not one artist's neighbourhood.
     static let perOrigin = 2
 
     static func mix(offers: ExploreOffers, tracks: [DiscoveredTrack], records: [SimilarRecord],
-                    artistTags: [String: [String]] = [:], limit: Int = 18) -> [ForYouItem] {
+                    artistTags: [String: [String]] = [:], limit: Int = 18, turn: Int = 0) -> [ForYouItem] {
         let made = items(offers: offers, tracks: tracks, records: records, artistTags: artistTags)
         // Who is spoken for, by priority: a playable track, then a record.
         var claimed = Set<String>()
@@ -151,7 +180,10 @@ nonisolated enum ForYouMix {
             }
         }
         var queues: [ForYouItem.Kind: [ForYouItem]] = [
-            .track: claim(made.tracks), .record: claim(made.records), .artist: claim(made.artists), .show: made.shows,
+            .track: claim(RecommendationRotation.rotate(made.tracks, turn: turn)),
+            .record: claim(RecommendationRotation.rotate(made.records, turn: turn)),
+            .artist: claim(RecommendationRotation.rotate(made.artists, turn: turn)),
+            .show: RecommendationRotation.rotate(made.shows, turn: turn),
         ]
         var out: [ForYouItem] = []
         var fromOrigin: [String: Int] = [:]

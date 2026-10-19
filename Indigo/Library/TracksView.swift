@@ -37,8 +37,8 @@ struct TracksView: View {
 
             if tracks.isEmpty {
                 NoLibraryView(context: library.hasLibrary
-                              ? "Nothing indexed in \(library.rootDisplayName) yet. Indigo reads MP3, AAC, ALAC, FLAC and WAV."
-                              : "Point Indigo at a folder and it will index everything inside.")
+                              ? "Nothing indexed in \(library.rootDisplayName) yet. Mineral reads MP3, AAC, ALAC, FLAC and WAV."
+                              : "Point Mineral at a folder and it will index everything inside.")
             } else if visible.isEmpty {
                 EmptyStateView(headline: "No matches",
                                message: "Nothing in the library matches “\(appState.searchText)”.") {

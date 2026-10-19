@@ -18,11 +18,11 @@ nonisolated enum DiscogsError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .notConfigured: "Add a Discogs personal access token in Indigo Settings to enable fast DIG enrichment."
+        case .notConfigured: "Add a Discogs personal access token in Mineral Settings to enable fast DIG enrichment."
         case .offline: "Discogs is unavailable while offline."
-        case .rateLimited: "Discogs is busy. Indigo will use its cached data."
+        case .rateLimited: "Discogs is busy. Mineral will use its cached data."
         case .badStatus(let code): "Discogs returned an unexpected response (\(code))."
-        case .malformedResponse: "Discogs sent something Indigo couldn't read."
+        case .malformedResponse: "Discogs sent something Mineral couldn't read."
         case .transport(let detail): detail
         }
     }

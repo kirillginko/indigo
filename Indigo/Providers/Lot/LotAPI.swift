@@ -31,7 +31,7 @@ nonisolated enum LotError: LocalizedError, Equatable {
         case .badStatus(let code):
             "The Lot Radio returned an unexpected response (\(code))."
         case .malformedResponse:
-            "The Lot Radio sent something Indigo couldn't read."
+            "The Lot Radio sent something Mineral couldn't read."
         case .transport(let message):
             message
         }

@@ -61,7 +61,7 @@ struct YouTubeChannelDetailView: View {
             } else {
                 EmptyStateView(
                     headline: "Archive unavailable",
-                    message: store.error(channelID) ?? "Indigo no longer follows this archive."
+                    message: store.error(channelID) ?? "Mineral no longer follows this archive."
                 ) {
                     Button("Back") { appState.popDetail() }
                         .buttonStyle(OutlineButtonStyle())
@@ -340,7 +340,7 @@ private struct ArchivePhonePage: View {
             episodes: tracks.map { episode($0, in: tracks) },
             isLoading: isLoading || shelf.map { store.isLoading($0.id) } ?? false,
             emptyMessage: shelf.flatMap { store.error($0.id) }
-                ?? (channel == nil ? "Indigo no longer follows this archive." : "Nothing in this list."),
+                ?? (channel == nil ? "Mineral no longer follows this archive." : "Nothing in this list."),
             accessory: shelves.count > 1 ? AnyView(picker) : nil
         )
     }
