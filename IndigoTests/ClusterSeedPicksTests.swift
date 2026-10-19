@@ -113,4 +113,43 @@ final class ClusterSeedPicksTests: XCTestCase {
         let other = await reopened.picks(for: "history-2")
         XCTAssertNil(other, "another history: worked out again")
     }
+
+    /// Radio candidates: from the seed's own row, reached by its Discogs id;
+    /// only rows with a verified Discogs id, nobody the listener knows, and
+    /// an artist with no styles on the device placed by its episodes' genres.
+    func testRadioCandidatesAreVerifiedRowsNextToTheSeed() async throws {
+        let seedRow = UUID(), neighbour = UUID(), stranger = UUID(), known = UUID(), far = UUID(), episode = UUID()
+        let names: [UUID: (name: String, discogs: Int?)] = [neighbour: ("Neighbour", 7), stranger: ("Stranger", nil), known: ("Known", 8), far: ("Far", 9)]
+        let asked = Counter()
+        var picker = try source()
+        picker.radio = ListenerRetrieval.RadioSource(
+            rows: { ids in Dictionary(uniqueKeysWithValues: ids.filter { $0 == 100 }.map { ($0, [seedRow]) }) },
+            rowsByName: { _ in await asked.add("name"); return [:] },
+            appearances: { row, _ in
+                row == seedRow ? [(ListenerRetrieval.Radio.Episode(id: episode, show: nil, showTitle: "Show", aired: Date(timeIntervalSinceReferenceDate: 790_000_000),
+                                                                   genres: ["Ambient"]), 1)] : []
+            },
+            tracklists: { _ in [episode: [.init(index: 0, artist: known), .init(index: 1, artist: seedRow),
+                                          .init(index: 2, artist: neighbour), .init(index: 3, artist: far), .init(index: 4, artist: stranger)]] },
+            showGenres: { _ in [:] }, showsPlaying: { _ in [:] },
+            names: { rows in names.filter { rows.contains($0.key) } })
+        let inputs = inputs()
+        let radio = await picker.radioCandidates(inputs, now: Date(timeIntervalSinceReferenceDate: 800_000_000))
+        XCTAssertEqual(radio.sightings.map(\.name), ["Neighbour"], "a row without a Discogs id is nobody yet; a known name is out; a one-off two slots away is too weak")
+        XCTAssertEqual(radio.unverified, 1)
+        XCTAssertEqual(radio.weak, 1)
+        let names0 = await asked.counts["name"]
+        XCTAssertNil(names0, "a seed reaches radio by Discogs id only")
+        let ranked = ClusterSeedPicks.ranked(inputs, credits: [:], excluding: [], radio: radio)
+        let found = try XCTUnwrap(ranked.first { $0.identity == "discogs:7" })
+        XCTAssertEqual(found.styleSource, "episode genres")
+        XCTAssertEqual(found.best.provenance, .radioAdjacent)
+        XCTAssertNil(ranked.first { $0.name == "Known" || $0.name == "Stranger" })
+        // Off, as everywhere: the mix never asks radio for candidates.
+        ForYouRadioCandidatesFeature.override = nil
+        UserDefaults.standard.removeObject(forKey: ForYouRadioCandidatesFeature.switchKey)
+        XCTAssertFalse(ForYouRadioCandidatesFeature.isEnabled)
+        let byName = try await ClusterSeedPicks().radio.rowsByName(["seed 0"])
+        XCTAssertTrue(byName.isEmpty, "the live source never resolves a seed by name")
+    }
 }
