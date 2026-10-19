@@ -22,7 +22,7 @@ nonisolated enum KioskError: LocalizedError, Equatable {
         case .badStatus(let code):
             "Kiosk Radio returned an unexpected response (\(code))."
         case .malformedResponse:
-            "Kiosk Radio sent something Indigo couldn't read."
+            "Kiosk Radio sent something Mineral couldn't read."
         case .transport(let message):
             message
         }

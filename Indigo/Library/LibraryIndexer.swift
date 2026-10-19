@@ -38,7 +38,7 @@ nonisolated enum LibraryError: LocalizedError {
         switch self {
         case .folderMissing: "The music folder could not be found. Choose it again."
         case .folderUnreadable: "The music folder could not be read."
-        case .accessDenied: "Indigo no longer has permission to read that folder. Choose it again."
+        case .accessDenied: "Mineral no longer has permission to read that folder. Choose it again."
         }
     }
 }

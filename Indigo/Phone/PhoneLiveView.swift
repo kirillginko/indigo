@@ -154,10 +154,7 @@ struct PhoneLiveSlide: View {
         let title = show?.title ?? (entry.station.strapline.caseInsensitiveCompare(city) == .orderedSame
                                      ? nil : entry.station.strapline)
         return VStack(spacing: 8) {
-            ChipFlow { Chip(text: city, tone: .lead, size: 13, uppercase: true) }
-            if let title {
-                ChipFlow { Chip(text: title, size: 19) }
-            }
+            PhoneSlideHeading(label: city, title: title, labelSize: 13)
             if !genres.isEmpty {
                 ChipFlow {
                     ForEach(genres, id: \.self) { Chip.genre($0, size: 12.5) }

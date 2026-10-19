@@ -78,7 +78,22 @@ final class DublabProvider: RadioProvider {
         schedule.filter { $0.endsAt > referenceDate }
     }
 
-    var now: RadioShow? { onAir?.asRadioShow() }
+    var now: RadioShow? {
+        let slot = schedule.first { $0.contains(referenceDate) }
+        guard let onAir else {
+            return slot.map {
+                RadioShow(title: $0.title, host: nil, summary: $0.summary,
+                          location: "Los Angeles", genres: [], moods: [], artworkURL: $0.artworkURL,
+                          startsAt: $0.startsAt, endsAt: $0.endsAt, detailID: nil)
+            }
+        }
+        // Airtime can override the calendar; only borrow the picture when
+        // both feeds name the same programme.
+        let artwork = slot.flatMap {
+            RecordingKey.normalize($0.title) == RecordingKey.normalize(onAir.showName ?? "") ? $0.artworkURL : nil
+        }
+        return onAir.asRadioShow(artworkURL: artwork)
+    }
     var next: RadioShow? { nil }
 
     /// The provider-independent item the player consumes.

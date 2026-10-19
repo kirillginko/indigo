@@ -77,6 +77,8 @@ nonisolated struct TrackDiscoverySource: Sendable {
         var knownArtists: Set<String> = []
         var knownTracks: Set<String> = []
         var limit = 12
+        /// For You rotates through the ranked candidates before playback checks.
+        var turn = 0
         /// For an artist page: a few of the seed's own tracks first.
         var ownTracks = 0
         /// Release recordings for up to this many neighbours radio has
@@ -260,7 +262,7 @@ nonisolated struct TrackDiscoverySource: Sendable {
         // Checked four at a time; each that plays is handed over at once.
         var offered: [DiscoveredTrack] = []
         var ownOffered = 0
-        let queue = own + ranked
+        let queue = own + RecommendationRotation.rotate(ranked, turn: ask.turn)
         for chunk in stride(from: 0, to: queue.count, by: 4).map({ Array(queue.dropFirst($0).prefix(4)) }) {
             guard offered.count - ownOffered < ask.limit || ownOffered < ask.ownTracks else { break }
             let checked = await withTaskGroup(of: (Int, Bool?).self) { group in
@@ -318,18 +320,18 @@ nonisolated struct TrackDiscoverySource: Sendable {
         },
         artists: { uuids in
             let client = try SupabaseService.requireClient()
-            struct ID: Decodable { let entity_id: UUID; let external_id: String }
             struct Name: Decodable { let id: UUID; let name: String }
             let values = uuids.map(\.uuidString)
-            async let ids: [ID] = client.from("external_ids").select("entity_id,external_id")
-                .eq("provider", value: "discogs").eq("entity_type", value: "artist")
+            let on = DiscogsIdentityRows.isEnabled
+            async let links: [DiscogsIdentityRows.Link] = DiscogsIdentityRows.providerFilter(
+                client.from("external_ids").select("entity_id,provider,external_id"), enabled: on).eq("entity_type", value: "artist")
                 .in("entity_id", values: values).limit(400).execute().value
             async let names: [Name] = client.from("artists").select("id,name").in("id", values: values).limit(400).execute().value
             let named = Dictionary(try await names.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
             var found: [UUID: (discogs: Int, name: String)] = [:]
-            for row in try await ids {
-                guard found[row.entity_id] == nil, let id = Int(row.external_id), let name = named[row.entity_id] else { continue }
-                found[row.entity_id] = (id, name)
+            let linked = try await links
+            for (row, id) in on ? DiscogsIdentityRows.discogs(byRow: linked) : DiscogsIdentityRows.firstDiscogs(byRow: linked) {
+                if let name = named[row] { found[row] = (id, name) }
             }
             return found
         },
@@ -419,7 +421,7 @@ extension TrackDiscovery {
                 DiscoveredTrack(artist: appearance.artist, artistDiscogsID: appearance.artistDiscogsID, title: appearance.title,
                                 source: appearance.source, artworkURL: appearance.artworkURL, release: appearance.release,
                                 year: appearance.year, reason: "By \(appearance.artist)", via: appearance.artist,
-                                playable: .unknown, score: 0)
+                                viaDiscogsID: appearance.artistDiscogsID, playable: .unknown, score: 0)
             }
     }
 }

@@ -306,4 +306,45 @@ nonisolated enum KnownArtistPolicy {
         }
         return known
     }
+
+    /// The listener's own artists under their other names: each alias a
+    /// starting point's own Discogs entry lists (`.sameAlias`), and the one
+    /// verified entry that name belongs to here.
+    ///
+    /// Speedy J's records credit "Jochem Paap" and Anika's "Annika Henderson";
+    /// their own entries list those as aliases, so a credit under that name
+    /// is the artist the listener keeps, not somebody to discover -- AFX is
+    /// not a recommendation for somebody who keeps Aphex Twin. Once a credit
+    /// names a verified entry, the name row and its alias edge fold into that
+    /// entry's row, and the walk keeps which (`IdentityNeighbourhood.aliases`).
+    ///
+    /// Namesake-safe as the rest of this policy: a name with more than one
+    /// verified owner here makes none of them known. Groups and members are
+    /// other bodies of work, not other names, and stay offered.
+    /// The same for every artist in the listener's history, not only the
+    /// starting points: the aliases their own Discogs entries list, by folded
+    /// name (`DigWorker.historyAliasNames`). Caustic Window is Aphex Twin,
+    /// whether or not Aphex Twin is one of today's starting points.
+    static func historyAliases(_ names: Set<String>, owners: [String: Set<GraphIdentityKey>]) -> Set<String> {
+        var found = Set<String>()
+        for name in names where !name.isEmpty {
+            found.insert(MusicNode.canonicalID(kindRaw: MusicNodeKind.artist.rawValue, key: name))
+            if let only = owners[name], only.count == 1, let owner = only.first { found.insert(owner.nodeID) }
+        }
+        return found
+    }
+
+    static func ownAliases(walks: [IdentityNeighbourhood], owners: [String: Set<GraphIdentityKey>]) -> Set<String> {
+        var found = Set<String>()
+        for walk in walks where walk.origin.kind == .artist {
+            found.formUnion(walk.aliases)
+            for edge in walk.edges.edges.values where edge.kind == .sameAlias && edge.to.kind == .artist {
+                found.insert(edge.to.id)
+                guard GraphIdentityKey(nodeKey: edge.to.key) == nil,
+                      let only = owners[edge.to.key], only.count == 1, let owner = only.first else { continue }
+                found.insert(owner.nodeID)
+            }
+        }
+        return found
+    }
 }

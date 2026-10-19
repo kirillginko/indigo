@@ -1,0 +1,35 @@
+{
+  "data": {
+    "id": 900001,
+    "documentId": "synthetic0000000000000001",
+    "title": "SYNTHETIC 01 COMPLETE",
+    "releaseDate": "2026-09-01T04:00:00.000Z",
+    "scheduleDate": "2026-09-01T04:00:00.000Z",
+    "curator": { "id": 1, "documentId": "SYNTHETICCURATOR0001", "name": "Synthetic Curator One" },
+    "show": null,
+    "aiDescription": "Synthetic fixture: every field filled.",
+    "hasVoiceOver": false,
+    "playlistProcessedAudioDuration": 1500.25,
+    "playlistStatus": "processed",
+    "progress": 100,
+    "soundcloudPermalinkUrl": "https://soundcloud.com/synthetic/archive-01",
+    "soundcloudEmbedUrl": null,
+    "stitchedTracksMetadata": {
+      "tracks_cues": [
+        { "track_index": 0, "start": 12.5004, "end": 310.25, "cue": 297.75 },
+        { "track_index": 1, "start": 300.1, "end": 620.875, "cue": 320.775 },
+        { "track_index": 2, "start": 612.0, "end": 905.333333, "cue": 293.333 },
+        { "track_index": 3, "start": 900.0, "end": 1190.0, "cue": 290.0 },
+        { "track_index": 4, "start": 1185.5, "end": 1500.25, "cue": 314.75 }
+      ]
+    },
+    "tracks": [
+      { "id": 1001, "documentId": "synthtrack000000000000001", "title": "Glass Harbour", "artist": "Halvard Oste", "label": "Fictional Records", "album": "Low Tides", "duration": 297.75, "isrc": "ZZX0Y2500001", "tuc": null, "year": "2019", "youtube": "https://www.youtube.com/watch?v=SYNTHETIC01", "spotify": null, "apple": null, "discogs": "https://www.discogs.com/release/0-synthetic", "aiDetectedGenresData": [{ "label": "AMBIENT", "score": 0.9 }], "albumCoverUrl": "https://example.invalid/cover/1.jpg", "owner": { "id": 1, "name": "Synthetic Curator One" } },
+      { "id": 1002, "documentId": "synthtrack000000000000002", "title": "Copper Field", "artist": "Mira Quell", "label": "Imaginary Tapes", "album": "Fieldwork", "duration": 320.775, "isrc": "ZZX0Y2500002", "tuc": null, "year": "2021", "youtube": "https://www.youtube.com/watch?v=SYNTHETIC02", "spotify": null, "apple": null, "discogs": null, "aiDetectedGenresData": [], "albumCoverUrl": null, "owner": null },
+      { "id": 1003, "documentId": "synthtrack000000000000003", "title": "Night Ferry", "artist": "The Placeholder Ensemble", "label": "Fictional Records", "album": "Crossings", "duration": 293.333, "isrc": "ZZX0Y1800003", "tuc": null, "year": 2018, "youtube": "https://www.youtube.com/watch?v=SYNTHETIC03", "spotify": "https://open.spotify.com/track/SYNTHETIC03", "apple": null, "discogs": null, "aiDetectedGenresData": [], "albumCoverUrl": null, "owner": null },
+      { "id": 1004, "documentId": "synthtrack000000000000004", "title": "Salt Lines", "artist": "Orrin Vale", "label": "Nowhere Audio", "album": "Salt Lines EP", "duration": 290.0, "isrc": "ZZX0Y0900004", "tuc": null, "year": "2009", "youtube": null, "spotify": null, "apple": null, "discogs": "https://www.discogs.com/release/0-synthetic-b", "aiDetectedGenresData": [], "albumCoverUrl": null, "owner": null },
+      { "id": 1005, "documentId": "synthtrack000000000000005", "title": "Last Light", "artist": "Halvard Oste", "label": "Fictional Records", "album": "Low Tides", "duration": 314.75, "isrc": "ZZX0Y2500005", "tuc": null, "year": "2019", "youtube": "https://www.youtube.com/watch?v=SYNTHETIC05", "spotify": null, "apple": null, "discogs": null, "aiDetectedGenresData": [], "albumCoverUrl": null, "owner": null }
+    ]
+  },
+  "meta": {}
+}

@@ -47,7 +47,7 @@ struct CatalogDigView: View {
                     } else if issued.isEmpty, nearby.isEmpty {
                         EmptyStateView(
                             headline: number.uppercased(),
-                            message: "Indigo hasn't catalogued anything under this number yet. Dig into the label that issued it and it will fill in."
+                            message: "Mineral hasn't catalogued anything under this number yet. Dig into the label that issued it and it will fill in."
                         ) { EmptyView() }
                     }
 

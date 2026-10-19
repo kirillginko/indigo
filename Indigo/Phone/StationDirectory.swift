@@ -73,7 +73,7 @@ struct StationDirectory<Content: View>: View {
             + each(ida.stations, "Tallinn, Estonia") { .idaStation($0.id) }
             + each(radio80000.stations, "Munich, Germany") { _ in .radio80000Station }
             + each(panik.stations, "Brussels, Belgium") { _ in .panikStation }
-            + each(rovr.stations, rovr.offsetLabel) { .rovrStation($0.id) }
+            + each(rovr.stations, RovrProvider.location) { .rovrStation($0.id) }
             + each(n10as.stations, "Montréal, Canada") { _ in .n10asStation }
     }
 }

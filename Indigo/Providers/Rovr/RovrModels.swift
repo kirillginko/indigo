@@ -341,7 +341,7 @@ nonisolated struct RovrOnAir: Hashable, Sendable {
             title: title,
             host: curatorName,
             summary: summary,
-            location: nil,
+            location: RovrProvider.location,
             genres: [],
             moods: [],
             artworkURL: imageURL,

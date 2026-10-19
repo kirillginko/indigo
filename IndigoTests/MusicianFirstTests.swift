@@ -27,16 +27,15 @@ final class MusicianFirstTests: XCTestCase {
 
     // MARK: The taxonomy
 
-    func testPlayersAndSingersArePerforming() {
+    func testPlayersSingersAndWritersAreMusical() {
         for role in ["Bass", "Double Bass", "Drums", "Piano", "Vocals", "Featuring", "Tenor Saxophone",
-                     "Conductor", "Programmed By", "Synthesizer"] {
-            XCTAssertEqual(CreditRole.contribution(of: role), .performing, role)
+                     "Conductor", "Synthesizer", "Written-By", "Composed By", "Arranged By", "Lyrics By"] {
+            XCTAssertEqual(CreditRole.contribution(of: role), .musical, role)
         }
     }
 
-    func testMakingTheMusicIsCreativeAndAProducerIsNeverTechnical() {
-        for role in ["Producer", "Co-producer", "Remix", "DJ Mix", "Written-By", "Composed By",
-                     "Arranged By", "Lyrics By"] {
+    func testMakingTheRecordIsCreativeAndAProducerIsNeverTechnical() {
+        for role in ["Producer", "Co-producer", "Remix", "DJ Mix", "Programmed By"] {
             XCTAssertEqual(CreditRole.contribution(of: role), .creative, role)
         }
     }
@@ -50,9 +49,9 @@ final class MusicianFirstTests: XCTestCase {
     }
 
     func testTheStrongestJobWins() {
-        XCTAssertEqual(CreditRole.contribution(of: "Bass, Engineer"), .performing)
+        XCTAssertEqual(CreditRole.contribution(of: "Bass, Engineer"), .musical)
         XCTAssertEqual(CreditRole.contribution(of: "Mixed By, Producer"), .creative)
-        XCTAssertNil(CreditRole.contribution(of: "Design"))
+        XCTAssertEqual(CreditRole.contribution(of: "Design"), .technical)
         XCTAssertNil(CreditRole.contribution(of: nil))
     }
 
@@ -129,7 +128,10 @@ final class MusicianFirstTests: XCTestCase {
         XCTAssertEqual(offKnowledge, onKnowledge)
         XCTAssertEqual(off.map(\.id), on.map(\.id))
         XCTAssertEqual(off.map(\.score), on.map(\.score))
-        XCTAssertTrue(off.contains { $0.node.title == "Rashad Becker" }, "For You's offers are what they always were")
+        XCTAssertTrue(off.contains { $0.node.title == "Mark Isham" })
+        // For You never recommends somebody for mastering a record, whatever
+        // DIG is set to. See `ContributorRole`.
+        XCTAssertFalse(off.contains { $0.node.title == "Rashad Becker" })
     }
 
     func testOnTheReleasePageStillListsEveryone() throws {

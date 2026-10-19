@@ -1,0 +1,23 @@
+{
+  "data": {
+    "id": 900002,
+    "documentId": "synthetic0000000000000002",
+    "title": "SYNTHETIC 02 MISSING FIELDS",
+    "releaseDate": "2025-03-14T04:00:00.000Z",
+    "scheduleDate": null,
+    "curator": { "name": "Synthetic Curator Two" },
+    "show": null,
+    "playlistProcessedAudioDuration": 0,
+    "soundcloudPermalinkUrl": null,
+    "stitchedTracksMetadata": null,
+    "tracks": [
+      { "id": 2001, "documentId": "synthtrack000000000000011", "title": "Untraced", "artist": "Wren Abbot", "label": null, "album": null, "duration": 240.0, "isrc": null, "year": "None", "youtube": null, "spotify": null, "apple": null, "discogs": null },
+      { "id": 2002, "documentId": "synthtrack000000000000012", "title": "Second Hand Dub", "artist": "", "label": "", "album": "", "duration": null, "isrc": "", "year": "" },
+      { "id": 2003, "documentId": "synthtrack000000000000013", "title": null, "artist": "Calder Moss", "isrc": "ZZX0Y2000013" },
+      { "id": 2004, "documentId": "synthtrack000000000000014", "title": "", "artist": "   ", "isrc": null },
+      { "id": 2005, "documentId": "synthtrack000000000000015" },
+      { "id": 2006, "documentId": "synthtrack000000000000016", "title": "Low Season", "artist": "Wren Abbot", "label": "Self-released", "year": "2016" }
+    ]
+  },
+  "meta": {}
+}

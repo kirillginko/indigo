@@ -116,7 +116,7 @@ struct SceneDigView: View {
             } else if hasGathered {
                 EmptyStateView(
                     headline: city.uppercased(),
-                    message: "Indigo hasn't gathered enough from here yet. Dig into a few artists and the scene fills in."
+                    message: "Mineral hasn't gathered enough from here yet. Dig into a few artists and the scene fills in."
                 ) { EmptyView() }
             } else {
                 // Not yet looked is not the same as nothing found. Saying the

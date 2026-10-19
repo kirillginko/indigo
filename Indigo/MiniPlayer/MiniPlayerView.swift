@@ -701,7 +701,7 @@ private struct MiniCrateRow: View {
         .onTapGesture(perform: play)
         .onHover { isHovering = $0 }
         .contextMenu {
-            Button("Open in Indigo", action: open)
+            Button("Open in Mineral", action: open)
             Button("Remove from Crate", role: .destructive, action: remove)
         }
     }

@@ -56,7 +56,7 @@ final class LibraryStore {
         guard !saved.isEmpty else {
             if defaults.string(forKey: Keys.displayPath) != nil
                 || defaults.stringArray(forKey: Keys.displayPaths) != nil {
-                notice = "Indigo needs permission to read your music folders again. Add them to continue."
+                notice = "Mineral needs permission to read your music folders again. Add them to continue."
             }
             return
         }
@@ -93,7 +93,7 @@ final class LibraryStore {
         panel.allowsMultipleSelection = true
         panel.canCreateDirectories = false
         panel.prompt = "Add Folders"
-        panel.message = "Choose one or more folders to add to Indigo."
+        panel.message = "Choose one or more folders to add to Mineral."
         panel.directoryURL = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask).first
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
         adopt(panel.urls)
@@ -226,7 +226,7 @@ final class LibraryStore {
                     relativeTo: nil
                 ))
             } catch {
-                notice = "Indigo can index \(url.lastPathComponent) now, but may need permission again later."
+                notice = "Mineral can index \(url.lastPathComponent) now, but may need permission again later."
             }
         }
         defaults.set(bookmarks, forKey: Keys.bookmarks)

@@ -186,6 +186,18 @@ final class DigStore {
     @ObservationIgnored var recommendationListener: (at: Date, listener: DigRecommender.Listener)?
     /// DIG Discover: tracks to hear (`TrackDiscovery`, development builds).
     var discover = DiscoverState()
+    /// For You's "Records like yours" (`SimilarRecordsFeature`).
+    var similarRecords = SimilarRecordsState()
+    /// For You as one list, and its compass (`ForYouMixFeature`).
+    var forYouMix = ForYouMixState()
+    @ObservationIgnored var forYouMixComposition = 0
+    /// After For You's own list, behind `ForYouClusterSeedsFeature`: tracks
+    /// by artists one step from each taste cluster (`ClusterSeedPicks`).
+    var clusterSeedPicks: [DiscoveredTrack] = []
+    @ObservationIgnored var clusterSeedPicksAt: Date?
+    /// The mix's artists and shows (`DigWorker.forYouMixOffers`), worked out
+    /// beside the visible answer when the mix is on.
+    var mixOffers = ExploreOffers()
     /// Discover per artist page, by Discogs entry.
     var artistDiscover: [String: DiscoverState] = [:]
     @ObservationIgnored var trackDiscoverySource = TrackDiscoverySource.live
@@ -404,7 +416,8 @@ final class DigStore {
     /// version missed exactly that one among 52 -- read from R2 (no Discogs
     /// budget) six at a time after the page is up, and the page's routes
     /// worked out again once, if anything arrived.
-    func backfillReleaseCredits(forArtist name: String, limit: Int = 60) async {
+    @discardableResult
+    func backfillReleaseCredits(forArtist name: String, limit: Int = 60, announce: Bool = true) async -> Bool {
         let store = ReleaseCreditStore(context: context)
         let enricher = discogsEnricher
         let ids = GraphStore(context: context).releaseIDs(creditedTo: RecordingKey.normalizeArtist(name))
@@ -414,11 +427,11 @@ final class DigStore {
             }
             .sorted()
             .prefix(limit)
-        guard !ids.isEmpty else { return }
+        guard !ids.isEmpty else { return false }
         let read = readStoredRelease
         var documents: [(Int, StoredReleaseRead)] = []
         for batch in stride(from: 0, to: ids.count, by: 6).map({ Array(ids.dropFirst($0).prefix(6)) }) {
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled else { return false }
             documents += await withTaskGroup(of: (Int, StoredReleaseRead).self) { group in
                 for id in batch { group.addTask { (id, await read(id)) } }
                 var found: [(Int, StoredReleaseRead)] = []
@@ -440,10 +453,50 @@ final class DigStore {
             case .unavailable: break
             }
         }
-        guard filled else { return }
+        guard filled else { return false }
         saveContext()
         forgetGraph(for: .artist(name))
-        announceChange()
+        if announce { announceChange() }
+        return true
+    }
+
+    /// For You's starting points already worked through this session.
+    @ObservationIgnored private var creditsPrefilled: Set<String> = []
+    @ObservationIgnored private var creditsPrefillTask: Task<Void, Never>?
+
+    /// Gives For You's starting points their credits by id, after the answer
+    /// is on screen, and works For You out again once if any arrived.
+    ///
+    /// The identity graph places a credited spelling under the entry its
+    /// release document names (`CreditEdgeIdentity`), but only for credits
+    /// kept by id, and those were kept only when somebody opened the artist's
+    /// page. So Hype Williams' *Untitled* credited "Blunt", nothing said that
+    /// was Dean Blunt -- whom the listener keeps -- and For You offered him
+    /// back under his surname. Read from R2 like a page's backfill (no Discogs
+    /// budget), at most 24 records an artist, each release once ever: credits
+    /// held are never read again, so a second look asks for nothing.
+    private func prefillStartingPointCredits(_ run: ExploreRun) {
+        guard creditsPrefillTask == nil else { return }
+        let points = ExploreRanker.startingPoints(run.personal).filter {
+            ($0.kind == .artist || ($0.kind == .release && $0.discogsID != nil)) && !creditsPrefilled.contains($0.id)
+        }
+        guard !points.isEmpty else { return }
+        creditsPrefilled.formUnion(points.map(\.id))
+        creditsPrefillTask = Task { [weak self] in
+            guard let self else { return }
+            var filled = false
+            for node in points {
+                guard !Task.isCancelled else { break }
+                if node.kind == .artist {
+                    filled = await self.backfillReleaseCredits(forArtist: node.title, limit: 24, announce: false) || filled
+                } else if let id = node.discogsID {
+                    filled = await self.backfillReleaseCredits(id: id, announce: false) || filled
+                }
+            }
+            self.creditsPrefillTask = nil
+            guard filled, !Task.isCancelled else { return }
+            await self.invalidateExploreOffers()
+        }
     }
 
     /// Entries whose identity could not be read this session. Not stored: a
@@ -1006,7 +1059,11 @@ final class DigStore {
     @ObservationIgnored private var portraitPriority: [String] = []
 
     func wantPortraits(for names: [String]) {
-        portraitPriority = names.filter { ArtistName.isRealArtist($0) }
+        let requested = names.filter { ArtistName.isRealArtist($0) }
+        var seen = Set<String>()
+        portraitPriority = (requested + portraitPriority).filter {
+            seen.insert(RecordingKey.normalizeArtist($0)).inserted
+        }
         // The backend first, for all of them at once.
         //
         // These went straight to the fill, which searches Discogs for one name
@@ -1014,12 +1071,17 @@ final class DigStore {
         // one set of pictures that never asked the backend, which had often
         // already found them. Asked here, a page's rows fill in from a single
         // request and the fill is left only what the backend had nothing for.
-        let wanted = portraitPriority.filter { isPortraitWanted($0) }
+        let wanted = requested.filter { wantsPortraitRequest(for: $0) }
         guard !wanted.isEmpty else { return }
         let previous = onScreenAdoption
         onScreenAdoption = Task { [weak self] in
             await previous?.value
-            await self?.adoptCataloguePortraits(for: wanted, onScreen: true)
+            // Lazy grid tiles report independently. Collect the names queued
+            // in this render pass before making a single catalogue request.
+            await Task.yield()
+            guard let self else { return }
+            let batch = self.portraitPriority.filter { self.wantsPortraitRequest(for: $0) }
+            await self.adoptCataloguePortraits(for: batch, onScreen: true)
         }
     }
 
@@ -1562,7 +1624,9 @@ final class DigStore {
     /// Whether a name would cost a request now: it has no face and is not
     /// settled, or holds only the 150-pixel cut. Read-only.
     func wantsPortraitRequest(for name: String) -> Bool {
-        isPortraitWanted(name) || wantsSharperPortrait(name)
+        // A verified thumbnail can still be upgraded by the catalogue.
+        // The background Discogs search keeps its stricter identity guard.
+        isPortraitWanted(name) || DiscogsClient.isSmallCut(portraitURL(for: name)?.absoluteString)
     }
 
     private func wantsSharperPortrait(_ name: String) -> Bool {
@@ -1845,10 +1909,17 @@ final class DigStore {
                 asOf: asOf, period: period, generation: asked, scenes: false, rebuild: rebuildKnowledge, now: now
             )
             guard !Task.isCancelled else { return }
-            if core.stamp != self.offersCoreStamp || !self.hasExploreOffers || self.exploreOffers.isEmpty {
+            if core.stamp != self.offersCoreStamp || !self.hasExploreOffers || self.exploreOffers.isEmpty
+                || (ForYouMixFeature.isEnabled && self.mixOffers.isEmpty) {
                 let found = await self.worker.exploreRecommendations(core, asOf: asOf)
                 guard !Task.isCancelled else { return }
                 self.offersCoreStamp = core.stamp
+                if ForYouMixFeature.isEnabled {
+                    let (offers, unproven) = await self.worker.forYouMixOffers(core, asOf: asOf)
+                    let vouched = SupabaseService.isConfigured ? await ForYouArtistEvidence.onRadio(unproven) : []
+                    guard !Task.isCancelled else { return }
+                    self.mixOffers = ForYouArtistEvidence.kept(offers, unproven: unproven, vouched: vouched)
+                }
                 self.exploreOffers = found
                 self.hasExploreOffers = true
             }
@@ -1881,6 +1952,7 @@ final class DigStore {
                 stamp: full.stamp, ranked: ExploreDiagnostics.Entry.ranked(self.exploreOffers), report: report
             ))
             self.shadow(full, asOf: asOf, turn: period, now: now)
+            self.prefillStartingPointCredits(core)
         }
         offersTask = task
         await task.value

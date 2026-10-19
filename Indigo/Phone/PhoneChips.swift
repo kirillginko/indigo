@@ -60,6 +60,28 @@ struct Chip: View {
     }
 }
 
+/// A slide's kind/location and name form one statement: their boxes touch.
+/// Every slide uses this stack, including tracks, records and live radio.
+struct PhoneSlideHeading: View {
+    let label: String
+    let title: String?
+    var subtitle: String? = nil
+    var labelSize: CGFloat = 15
+    var titleSize: CGFloat = 19
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ChipFlow { Chip(text: label, tone: .lead, size: labelSize, uppercase: true) }
+            if let title {
+                ChipFlow { Chip(text: title, size: titleSize) }
+            }
+            if let subtitle, !subtitle.isEmpty {
+                ChipFlow { Chip(text: subtitle, size: 13) }
+            }
+        }
+    }
+}
+
 /// What comes on next, set out the same everywhere: the time and NEXT UP
 /// as one row of two boxes touching -- they are one statement -- then, as a
 /// row of its own with the ordinary gap, the next show's name. See

@@ -33,6 +33,66 @@ final class TrackDiscoveryTests: XCTestCase {
         XCTAssertEqual(tracks.filter { if case .recording(_, "A Channel") = $0.source { true } else { false } }.count, 2,
                        "At most two from one channel")
         XCTAssertEqual(tracks.last?.artist, "Known Artist", "A known artist is offered, never first")
+        XCTAssertEqual(tracks.last?.knownArtist, true)
+    }
+
+    /// Two artists on one compilation: one track from the record.
+    func testOneTrackPerRecord() {
+        var first = recording(2, "Todd Rundgren", "Fair Warning", channel: "One")
+        first.release = "A Wizard"; first.releaseDiscogsID = 100
+        var second = recording(3, "Grouper", "Little Gray Cat", channel: "Two")
+        second.release = "A Wizard (Remaster)"; second.releaseDiscogsID = 100
+        var third = recording(4, "Laraaji", "Being Here", channel: "Three")
+        third.release = "Day Of Radiance"
+        let tracks = TrackDiscovery.rank(neighbours: [neighbour(2, "Todd Rundgren", episodes: 4), neighbour(3, "Grouper"),
+                                                      neighbour(4, "Laraaji")],
+                                         appearances: [first, second, third], taste: .empty, knownArtists: [], knownTracks: [])
+        XCTAssertEqual(tracks.map(\.artist), ["Todd Rundgren", "Laraaji"])
+        XCTAssertEqual(tracks.first?.releaseDiscogsID, 100)
+    }
+
+    /// What they are into now steers the list, at most half of it.
+    func testRecentStartingPointsTakeAtMostHalf() {
+        let now = TrackDiscovery.Seed(discogsID: 1, name: "Now", weight: 1, signal: .recent)
+        let kept = TrackDiscovery.Seed(discogsID: 9, name: "Kept", weight: 0.5, signal: .longTerm)
+        let neighbours = (2...7).map { TrackDiscovery.Neighbour(discogsID: $0, name: "N\($0)", seed: now, reason: "r", strength: 2) }
+            + (10...13).map { TrackDiscovery.Neighbour(discogsID: $0, name: "K\($0)", seed: kept, reason: "r", strength: 1) }
+        let appearances = (Array(2...7) + Array(10...13)).map { recording($0, "A\($0)", "T\($0)", channel: "C\($0)") }
+        let tracks = TrackDiscovery.rank(neighbours: neighbours, appearances: appearances, taste: .empty,
+                                         knownArtists: ["a13"], knownTracks: [], limit: 6, perSeed: 6)
+        XCTAssertEqual(tracks.count, 6)
+        XCTAssertEqual(tracks.filter { $0.signal == .recent }.count, 3)
+        XCTAssertEqual(tracks.filter { $0.signal == .longTerm }.count, 3)
+        XCTAssertEqual(tracks.first?.signal, .recent, "Now still leads")
+        XCTAssertFalse(tracks.contains { $0.artist == "A13" }, "A known artist is the first left out")
+        XCTAssertTrue(tracks.allSatisfy { $0.knownArtist == false })
+    }
+
+    /// A list held from before the new fields still reads.
+    func testAHeldListFromBeforeStillDecodes() throws {
+        var track = TrackDiscovery.rank(neighbours: [neighbour(2, "A")], appearances: [recording(2, "A", "T")],
+                                        taste: .empty, knownArtists: [], knownTracks: []).first
+        track?.signal = .recent
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(XCTUnwrap(track))) as? [String: Any])
+        for key in ["signal", "knownArtist", "releaseDiscogsID"] { object[key] = nil }
+        let old = try JSONDecoder().decode(DiscoveredTrack.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(old.signal)
+        XCTAssertNil(old.knownArtist)
+        XCTAssertEqual(old.id, track?.id)
+    }
+
+    /// A YouTube still is drawn from its sharp 16:9 frame, with the small
+    /// 16:9 still to fall back on; anything else as it is.
+    func testATrackIsDrawnFromItsSharpFrame() {
+        var track = TrackDiscovery.rank(neighbours: [neighbour(2, "A")], appearances: [recording(2, "A", "T")],
+                                        taste: .empty, knownArtists: [], knownTracks: []).first
+        track?.artworkURL = URL(string: "https://i.ytimg.com/vi/j_JCt0jv86I/hqdefault.jpg")
+        XCTAssertEqual(track?.sharpArtwork.full?.absoluteString, "https://i.ytimg.com/vi/j_JCt0jv86I/maxresdefault.jpg")
+        XCTAssertEqual(track?.sharpArtwork.preview?.absoluteString, "https://i.ytimg.com/vi/j_JCt0jv86I/mqdefault.jpg")
+        let show = URL(string: "https://media2.ntslive.co.uk/resize/1600x1600/x.jpeg")
+        track?.artworkURL = show
+        XCTAssertEqual(track?.sharpArtwork.full, show)
+        XCTAssertNil(track?.sharpArtwork.preview)
     }
 
     func testAnUploadIsOnlyATrackWhenItSaysSo() {
@@ -125,6 +185,33 @@ final class TrackDiscoverySourceTests: XCTestCase {
             },
             plays: { _ in true },
             cache: TrackDiscoveryCache())
+    }
+
+    func testANewPeriodSelectsADifferentTrackBeforePlaybackChecks() async {
+        let seedRow = UUID(), firstRow = UUID(), secondRow = UUID()
+        let source = TrackDiscoverySource(
+            rows: { _ in [1: [seedRow]] },
+            neighbours: { _ in [.init(a: seedRow, b: firstRow, episodes: 3), .init(a: seedRow, b: secondRow, episodes: 3)] },
+            relations: { row in [.init(a: row, b: firstRow, episodes: 3), .init(a: row, b: secondRow, episodes: 3)] },
+            artists: { _ in [firstRow: (discogs: 2, name: "First Artist"), secondRow: (discogs: 3, name: "Second Artist")] },
+            appearances: { _ in
+                let episode = TrackDiscoverySource.Row.Episode(provider: "nts", external_id: "show/episode", archive_url: nil,
+                                                               title: "Episode", aired_at: nil, image_url: nil, genres: nil, radio_shows: nil)
+                return [
+                    .init(artist_id: firstRow, raw_track_title: "First Track", offset_seconds: nil,
+                          media_url: "https://www.youtube.com/watch?v=nnnnnnnnnn1", radio_episodes: episode),
+                    .init(artist_id: secondRow, raw_track_title: "Second Track", offset_seconds: nil,
+                          media_url: "https://www.youtube.com/watch?v=nnnnnnnnnn2", radio_episodes: episode)
+                ]
+            }, plays: { _ in true }, cache: TrackDiscoveryCache())
+        var ask = TrackDiscoverySource.Ask(seeds: [.init(discogsID: 1, name: "Seed", weight: 1)], limit: 1)
+        let first = await source.discover(ask).tracks
+        ask.turn = 1
+        let next = await source.discover(ask).tracks
+        XCTAssertEqual(first.count, 1)
+        XCTAssertEqual(next.count, 1)
+        XCTAssertNotEqual(first.first?.id, next.first?.id)
+        XCTAssertEqual(next.first?.playable, .yes)
     }
 
     func testOneLookIsAFewBatchedReadsAndASecondReusesThem() async {

@@ -142,19 +142,32 @@ nonisolated struct RadioListenFinder: Sendable {
     static let live = RadioListenFinder(
         rows: { ids in
             let client = try SupabaseService.requireClient()
-            struct Row: Decodable { let entity_id: UUID; let external_id: String }
-            let rows: [Row] = try await client
+            let on = DiscogsIdentityRows.isEnabled
+            let links: [DiscogsIdentityRows.Link] = try await DiscogsIdentityRows.providerFilter(client
                 .from("external_ids")
-                .select("entity_id,external_id")
-                .eq("provider", value: "discogs")
+                .select("entity_id,provider,external_id"), enabled: on)
                 .eq("entity_type", value: "artist")
                 .in("external_id", values: ids.map(String.init))
                 .limit(200)
                 .execute()
                 .value
-            var mapped: [Int: [UUID]] = [:]
-            for row in rows { if let id = Int(row.external_id) { mapped[id, default: []].append(row.entity_id) } }
-            return mapped
+            guard on else { return DiscogsIdentityRows.arrivingRows(byDiscogs: links) }
+            // A MusicBrainz-linked row's other such links, asked for by id
+            // above or not: two of them and it reads neither.
+            let linked = Set(links.filter { $0.provider != "discogs" }.map(\.entity_id))
+            guard !linked.isEmpty else { return DiscogsIdentityRows.rows(byDiscogs: links) }
+            let others: [DiscogsIdentityRows.Link] = try await client
+                .from("external_ids")
+                .select("entity_id,provider,external_id")
+                .eq("provider", value: "musicbrainz_discogs")
+                .eq("entity_type", value: "artist")
+                .in("entity_id", values: linked.map(\.uuidString))
+                .limit(400)
+                .execute()
+                .value
+            let asked = Set(ids)
+            let extra = others.filter { !links.contains($0) }
+            return DiscogsIdentityRows.rows(byDiscogs: links + extra).filter { asked.contains($0.key) }
         },
         appearances: { row in try await RadioRepository().appearances(forArtist: row, limit: 12) },
         plays: { provider, url in await playable(provider: provider, url: url) }

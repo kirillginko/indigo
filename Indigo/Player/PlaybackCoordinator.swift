@@ -50,6 +50,34 @@ final class PlaybackCoordinator {
     /// about live streams and rewinds at the end of a track, and neither the
     /// engines nor the views see pauses and item changes in one place.
     @ObservationIgnored private var stint = ListeningStint()
+    /// Where each item was started from, by item id: the screen and the
+    /// recommendation, handed in with the play command and read back by the
+    /// listening log when the item's listening ends.
+    @ObservationIgnored private var surfaces: [String: ListeningSurface] = [:]
+    /// The surface of the item now playing, fixed when it started: a new
+    /// queue that happens to hold the same item must not rewrite where the
+    /// listen still running came from.
+    @ObservationIgnored private(set) var listeningSurface: ListeningSurface?
+
+    /// The recommendation that led to the page now on top, asked once, when
+    /// something is put on: set by the app, which knows the navigation.
+    @ObservationIgnored var originNow: (() -> ListeningSurface.Origin?)?
+
+    /// Where a queued item will be credited to, if the screen said.
+    func surface(for itemID: String) -> ListeningSurface? { surfaces[itemID] }
+
+    /// Each item's surface, settled when it is queued: the screen's own, or
+    /// what the item says it is; with the origin, if a recommendation led to
+    /// the page it was put on from.
+    private func remember(_ items: [MediaItem], from surfaces: [ListeningSurface?]) {
+        if self.surfaces.count > 500 { self.surfaces = [:] }
+        let origin = originNow?()
+        for (index, item) in items.enumerated() {
+            var surface = (index < surfaces.count ? surfaces[index] : nil) ?? .inferred(for: item)
+            if surface.origin == nil { surface.origin = origin }
+            self.surfaces[item.id] = surface
+        }
+    }
 
     /// Told when listening to an item ends: what it was, how many seconds of
     /// it were actually heard, and how far through it got. Set by the app; the
@@ -221,22 +249,31 @@ final class PlaybackCoordinator {
     /// Plays a list, starting at `index`. Any live stream stops. Usually local
     /// tracks; the crate queues whatever it holds — files, archived shows and
     /// stations — and each is started by what it is.
-    func play(_ items: [MediaItem], startingAt index: Int = 0) {
+    func play(_ items: [MediaItem], startingAt index: Int = 0, from surface: ListeningSurface? = nil) {
+        play(items, startingAt: index, surfaces: Array(repeating: surface, count: items.count))
+    }
+
+    /// The same, each item with its own surface: a list of recommendations
+    /// queued from one press, each reached its own way.
+    func play(_ items: [MediaItem], startingAt index: Int = 0, surfaces: [ListeningSurface?]) {
         guard !items.isEmpty else { return }
+        remember(items, from: surfaces)
         consecutiveFailures = 0
         queue.load(items, startingAt: index)
         startCurrent(autoplay: true)
     }
 
     /// Plays a live station. The queue collapses to that single item.
-    func playRadio(_ item: MediaItem) {
+    func playRadio(_ item: MediaItem, from surface: ListeningSurface? = nil) {
+        remember([item], from: [surface])
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)
     }
 
     /// Plays an archived NTS episode through its host's embed widget.
-    func playEpisode(_ item: MediaItem) {
+    func playEpisode(_ item: MediaItem, from surface: ListeningSurface? = nil) {
+        remember([item], from: [surface])
         consecutiveFailures = 0
         queue.loadSingle(item)
         startCurrent(autoplay: true)
@@ -326,11 +363,15 @@ final class PlaybackCoordinator {
     }
 
     private func seekActiveEngine(to seconds: TimeInterval) {
+        // Bank what was heard up to the jump, then measure on from where it
+        // landed: the playhead moving is not, this once, the music playing.
+        sampleStint()
         switch source {
         case .local: local.seek(to: seconds)
         case .embed: embed.seek(to: seconds)
         default: break
         }
+        stint.moved(to: stintPosition)
     }
 
     func seek(fraction: Double) {
@@ -400,6 +441,7 @@ final class PlaybackCoordinator {
         embed.stop()
         queue.clear()
         current = nil
+        listeningSurface = nil
         source = .none
         publishNowPlaying()
     }
@@ -501,6 +543,7 @@ final class PlaybackCoordinator {
         endStint()
         pendingSeek?.cancel()
         current = item
+        listeningSurface = surfaces[item.id]
 
         if item.isLive {
             local.stop()
@@ -589,7 +632,10 @@ final class PlaybackCoordinator {
         consecutiveFailures = 0
         // Said now rather than read later: by the time `next` closes the
         // stint the engine has rewound, and a track played to its end would
-        // be logged as one nobody stayed for.
+        // be logged as one nobody stayed for. The playhead is put at the end
+        // for the same reason: read after the rewind, it would say the last
+        // stretch moved backwards and credit none of it.
+        stint.update(isPlaying: false, progress: 1, position: duration > 0 ? duration : stintPosition)
         stint.complete()
         next()
     }
@@ -687,16 +733,41 @@ final class PlaybackCoordinator {
         // the listener skipped three-quarters of the way through gets no
         // state change to announce that, so without this the only evidence
         // left would be the clock.
-        stint.update(isPlaying: isPlaying, progress: progress)
+        sampleStint()
         let heard = stint.finish()
         guard let item = current, heard.seconds > 0 else { return }
         onListeningEnded?(item, heard.seconds, heard.completion)
     }
 
+    /// Whether sound is coming out, which is narrower than `isPlaying`: that
+    /// is what the play button shows, and it stays on through loading,
+    /// buffering and a reopen, none of which anyone hears.
+    private var isAudible: Bool {
+        switch source {
+        case .local: local.isPlaying
+        case .stream: stream.state == .playing
+        case .embed: embed.state == .playing
+        case .none: false
+        }
+    }
+
+    /// The playhead the stint checks its clock against. Nil for a live
+    /// stream, which has none and is measured by the clock alone.
+    private var stintPosition: TimeInterval? {
+        switch source {
+        case .local, .embed: position
+        case .stream, .none: nil
+        }
+    }
+
+    private func sampleStint() {
+        stint.update(isPlaying: isAudible, progress: progress, position: stintPosition)
+    }
+
     private func publishNowPlaying() {
         // Every transport change lands here, which makes it the one place that
         // sees a pause, a resume and a stall alike.
-        stint.update(isPlaying: isPlaying, progress: progress)
+        sampleStint()
         nowPlaying.update(
             item: current,
             isPlaying: isPlaying,

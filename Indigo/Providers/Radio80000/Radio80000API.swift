@@ -31,7 +31,7 @@ nonisolated enum Radio80000Error: LocalizedError, Equatable {
         case .badStatus(let code):
             "Radio 80000 returned an unexpected response (\(code))."
         case .malformedResponse:
-            "Radio 80000 sent something Indigo couldn't read."
+            "Radio 80000 sent something Mineral couldn't read."
         case .notFound:
             "Radio 80000 no longer publishes this."
         case .transport(let message):

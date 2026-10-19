@@ -47,5 +47,5 @@ nonisolated enum SyncGeneration {
     }
 
     static let notice =
-        "Your library was updated by a newer version of Indigo. Update Indigo on this device to keep saving and syncing."
+        "Your library was updated by a newer version of Mineral. Update Mineral on this device to keep saving and syncing."
 }

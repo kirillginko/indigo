@@ -19,6 +19,7 @@ import Observation
 @Observable
 final class RovrProvider: RadioProvider {
     nonisolated static let providerID = "rovr"
+    nonisolated static let location = "London"
     let displayName = "ROVR"
 
     enum LoadState: Equatable {
@@ -77,7 +78,7 @@ final class RovrProvider: RadioProvider {
             id: RovrChannel.radioID,
             name: "ROVR",
             shortName: "ROVR",
-            strapline: offsetLabel,
+            strapline: Self.location,
             streamURL: radioStreamURL,
             kind: .radio,
             imageURL: nil,

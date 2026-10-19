@@ -30,7 +30,7 @@ struct ArtistsView: View {
             Rule(color: Palette.outline)
 
             if tracks.isEmpty {
-                NoLibraryView(context: "Artists appear once Indigo has indexed a folder.")
+                NoLibraryView(context: "Artists appear once Mineral has indexed a folder.")
             } else if visible.isEmpty {
                 EmptyStateView(headline: "No matches",
                                message: "No artist matches “\(appState.searchText)”.") {

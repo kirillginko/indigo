@@ -28,7 +28,7 @@ nonisolated enum DublabError: LocalizedError, Equatable {
         case .badStatus(let code):
             "dublab returned an unexpected response (\(code))."
         case .malformedResponse:
-            "dublab sent something Indigo couldn't read."
+            "dublab sent something Mineral couldn't read."
         case .transport(let message):
             message
         }

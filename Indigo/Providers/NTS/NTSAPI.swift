@@ -20,7 +20,7 @@ nonisolated enum NTSError: LocalizedError, Equatable {
         case .badStatus(let code):
             "NTS returned an unexpected response (\(code))."
         case .malformedResponse:
-            "NTS sent something Indigo couldn't read."
+            "NTS sent something Mineral couldn't read."
         case .transport(let message):
             message
         }

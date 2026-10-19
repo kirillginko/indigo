@@ -1,0 +1,18 @@
+relations John Coltrane                          public.         2759.4     71.5       72
+relations John Coltrane                          pg_temp.p87_        77     73.8     72.8
+relations Miles Davis                            public.          589.9     42.3     42.1
+relations Miles Davis                            pg_temp.p87_      61.5     44.3     43.9
+relations Sun Ra                                 public.         1092.8       77       75
+relations Sun Ra                                 pg_temp.p87_      91.5     76.7     76.3
+relations Benedek, Tom Carruthers                public.           13.2      1.8      1.5
+relations Benedek, Tom Carruthers                pg_temp.p87_       2.4      2.3      2.2
+explore show Rare Samples & Songs Oleg Tsoy      public.         1998.5    164.9    162.6
+explore show Rare Samples & Songs Oleg Tsoy      pg_temp.p87_       911    365.9    253.3
+explore show Music for empty rooms               public.          500.7     75.1     99.1
+explore show Music for empty rooms               pg_temp.p87_     698.4    148.4    176.4
+explore show André Navarro II                    public.          155.2     71.4     71.3
+explore show André Navarro II                    pg_temp.p87_       235    116.3    116.3
+explore show Mountain Cry w/ Marylou             public.           77.7     19.3     18.9
+explore show Mountain Cry w/ Marylou             pg_temp.p87_      57.9     24.2     24.3
+explore 12 top artists                           public.        10999.7   3749.3     1348
+explore 12 top artists                           pg_temp.p87_    1840.4   1290.8   1247.4

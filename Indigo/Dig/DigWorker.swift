@@ -269,7 +269,8 @@ actor DigWorker {
         } else {
             let collapsed = timed("identity.collapse") { identity.collapsing(walks) }
             let known = timed("identity.known") {
-                Self.knownArtists(rows: rows, personal: personal, walks: collapsed, identity: identity)
+                Self.knownArtists(rows: rows, personal: personal, walks: collapsed, identity: identity,
+                                  aliasNames: historyAliasNames(personal))
             }
             var split: [MusicNode: LocalKnowledgeAdapter.Walked] = [:]
             var destinations = Set<String>()
@@ -371,7 +372,8 @@ actor DigWorker {
     /// so the same rows and walks give the same answer whatever was asked
     /// first.
     static func knownArtists(
-        rows: PersonalInputs, personal: PersonalInputs, walks: [IdentityNeighbourhood], identity: IdentityGraph
+        rows: PersonalInputs, personal: PersonalInputs, walks: [IdentityNeighbourhood], identity: IdentityGraph,
+        aliasNames: Set<String> = []
     ) -> (alsoKnown: Set<String>, digest: String) {
         var owners: [String: Set<GraphIdentityKey>] = [:]
         var names: [String: Set<String>] = [:]
@@ -394,6 +396,8 @@ actor DigWorker {
         let history = personal.crate.compactMap(\.node) + personal.met.map(\.node) + personal.haunts.map(\.node)
         let alsoKnown = KnownArtistPolicy.alsoKnown(
             history: history, owners: owners, namesOf: { names[$0.id] ?? [$0.key] })
+            .union(KnownArtistPolicy.ownAliases(walks: walks, owners: owners))
+            .union(KnownArtistPolicy.historyAliases(aliasNames, owners: owners))
         return (alsoKnown, CanonicalDigest.of(mapping.sorted() + ["known"] + alsoKnown.sorted()))
     }
 
@@ -500,6 +504,75 @@ actor DigWorker {
     /// For You musician-first: ranked once to find the candidates, their
     /// styles and whether they lead on read from what is held (never a walk,
     /// see `OnwardIndex`), then ranked with both.
+    /// The aliases the listener's own artists' Discogs entries list, folded:
+    /// each artist they keep or have met, by the record DIG holds filed
+    /// under that very name (a namesake's row lists somebody else's).
+    func historyAliasNames(_ personal: PersonalInputs) -> Set<String> {
+        var keys = personal.tasteArtistKeys
+        for met in personal.met where met.node.kind == .artist { keys.insert(met.node.key) }
+        for haunt in personal.haunts where haunt.node.kind == .artist { keys.insert(haunt.node.key) }
+        guard !keys.isEmpty else { return [] }
+        let wanted = Array(keys)
+        let rows = (try? modelContext.fetch(FetchDescriptor<DiscogsArtist>(predicate: #Predicate { wanted.contains($0.nameKey) }))) ?? []
+        var names = Set<String>()
+        for row in rows where row.isFiledUnderItsOwnName() {
+            for alias in row.aliasNames {
+                let key = RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(alias))
+                if !keys.contains(key) { names.insert(key) }
+            }
+        }
+        return names
+    }
+
+    /// For You's mix (`ForYouMixFeature`): For You's own ranking, deeper
+    /// than its blocks -- the mix takes at most two from a starting point, so
+    /// it has to reach past the strongest two or three -- and, apart, the
+    /// artists whose best route is a producer's or remixer's credit and whom
+    /// nothing on this device shows to be an artist too (`artistEvidence`).
+    /// `DigStore` asks the shared catalogue about those before they are shown
+    /// (`ForYouArtistEvidence`).
+    ///
+    /// Not the musician-first ranker: its starting points are not the ones
+    /// the knowledge snapshot holds neighbourhoods for, so it draws on the
+    /// two or three both share.
+    func forYouMixOffers(_ run: ExploreRun, asOf: Date) -> (offers: ExploreOffers, unproven: [MusicNode]) {
+        let offers = forYouMixOffersWithoutEvidence(run, asOf: asOf)
+        let creative = (offers.next + offers.artists).filter(ForYouArtistEvidence.isCreativeRoute)
+        let held = artistEvidence(for: Set(creative.map(\.node.key)))
+        var seen = Set<String>()
+        let unproven = creative.map(\.node).filter { !held.contains($0.key) && seen.insert($0.id).inserted }
+        return (offers, unproven)
+    }
+
+    /// The mix's list without the artist evidence, for measuring what the
+    /// evidence leaves out.
+    func forYouMixOffersWithoutEvidence(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
+        ExploreRanker.recommendations(
+            personal: run.personal, knowledge: run.knowledge,
+            taste: ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf),
+            next: 48, alsoKnown: run.alsoKnown)
+    }
+
+    /// Of these artist keys, the ones this device can show are artists in
+    /// their own right: the main artist of a record DIG holds, or the artist
+    /// of a recording heard on radio.
+    func artistEvidence(for keys: Set<String>) -> Set<String> {
+        guard !keys.isEmpty else { return [] }
+        var found = Set<String>()
+        for record in (try? modelContext.fetch(FetchDescriptor<DiscogsReleaseRecord>())) ?? [] {
+            for name in record.artistNames {
+                let key = RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name))
+                if keys.contains(key) { found.insert(key) }
+            }
+        }
+        for recording in (try? modelContext.fetch(FetchDescriptor<Recording>())) ?? [] {
+            if let name = recording.artistName, keys.contains(RecordingKey.normalizeArtist(name)) {
+                found.insert(RecordingKey.normalizeArtist(name))
+            }
+        }
+        return found
+    }
+
     private func musicianFirstRecommendations(_ run: ExploreRun, asOf: Date) -> ExploreOffers {
         Trace.step("explore.rank.musicianFirst") {
             let taste = ExploreRanker.taste(personal: run.personal, knowledge: run.knowledge, asOf: asOf)

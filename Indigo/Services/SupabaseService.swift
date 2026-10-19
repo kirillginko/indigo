@@ -19,10 +19,10 @@ nonisolated enum SupabaseError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .notConfigured: "Indigo's backend is not configured for this build."
-        case .offline: "Indigo's backend is unavailable while offline."
-        case .badStatus(let code): "Indigo's backend returned an unexpected response (\(code))."
-        case .malformedResponse: "Indigo's backend sent something the app couldn't read."
+        case .notConfigured: "Mineral's backend is not configured for this build."
+        case .offline: "Mineral's backend is unavailable while offline."
+        case .badStatus(let code): "Mineral's backend returned an unexpected response (\(code))."
+        case .malformedResponse: "Mineral's backend sent something the app couldn't read."
         case .transport(let detail): detail
         }
     }

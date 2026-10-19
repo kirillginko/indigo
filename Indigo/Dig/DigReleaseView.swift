@@ -420,7 +420,7 @@ struct DigReleaseView: View {
             )
         }
         let index = profile.listen.firstIndex { $0.id == line.id } ?? 0
-        player.play(items, startingAt: index)
+        player.play(items, startingAt: index, from: ListeningSurface(screen: "dig.release", viaID: ListeningSurface.discogsRelease(profile.id), route: "record"))
     }
 
     /// What can be said about a record no catalogue has an entry for.
@@ -457,7 +457,7 @@ struct DigReleaseView: View {
                             }
                             Spacer(minLength: 0)
                         }
-                        Text("No catalogue has an entry for this record. It is named in \(credit.map { "\($0)'s" } ?? "the artist's") own listing and nowhere else Indigo can reach.")
+                        Text("No catalogue has an entry for this record. It is named in \(credit.map { "\($0)'s" } ?? "the artist's") own listing and nowhere else Mineral can reach.")
                             .font(Typeface.body(12))
                             .foregroundStyle(Palette.inkMuted)
                             .fixedSize(horizontal: false, vertical: true)

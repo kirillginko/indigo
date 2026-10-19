@@ -66,7 +66,8 @@ nonisolated struct ReleaseVideoTracks: Sendable {
             tracks.append(.init(artistDiscogsID: artistID, artist: artist, title: named.title,
                                 source: .recording(url, channel: nil), artworkURL: DiscoveredTrack.thumbnail(for: url),
                                 genres: ListeningLog.foldTags((detail.styles ?? []) + (detail.genres ?? [])),
-                                release: detail.title, year: (detail.year ?? 0) > 0 ? detail.year : nil))
+                                release: detail.title, year: (detail.year ?? 0) > 0 ? detail.year : nil,
+                                releaseDiscogsID: detail.id))
         }
         return tracks
     }

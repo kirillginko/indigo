@@ -1,0 +1,356 @@
+{
+ "relations/playedInShow": {
+  "same": 60,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "relations/everything else": {
+  "same": 60,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "explore/playedInShow": {
+  "same": 96,
+  "changed": 18,
+  "rows_only_before": 86,
+  "rows_only_after": 86,
+  "examples": [
+   {
+    "key": "broadcast:lotradio|black-rave-culture",
+    "rows_before": 336,
+    "rows_after": 336,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"DJ SWISHA\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"El Blanco Nino\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"FELIXCW\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"DJ Swisha\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"EL BLANCO NINO\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"Felixcw\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|guests/armand-hammer",
+    "rows_before": 4,
+    "rows_after": 4,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Armand Hammer\", \"to\": {\"kind\": \"artist\", \"name\": \"Billy Woods\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Armand Hammer\", \"to\": {\"kind\": \"artist\", \"name\": \"billy woods\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|guests/ian-kim-judd+bianca-lexis",
+    "rows_before": 35,
+    "rows_after": 35,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Ian Kim Judd & Bianca Lexis\", \"to\": {\"kind\": \"artist\", \"name\": \"Bambinodj\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Ian Kim Judd & Bianca Lexis\", \"to\": {\"kind\": \"artist\", \"name\": \"bambinodj\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|guests/maximum-overdub-hour-with-dave-harrington-michael-hentz",
+    "rows_before": 6,
+    "rows_after": 6,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Maximum Overdub Hour with Dave Harrington & Michael Hentz\", \"to\": {\"kind\": \"artist\", \"name\": \"G\\u00e1bor Szab\\u00f3\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Maximum Overdub Hour with Dave Harrington & Michael Hentz\", \"to\": {\"kind\": \"artist\", \"name\": \"Gabor Szabo\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|misc",
+    "rows_before": 334,
+    "rows_after": 334,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"EARTH\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"EVEHIVE\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"Make\\u0300z\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"Earth\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"EveHive\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"MIKE\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|part-time-punk",
+    "rows_before": 167,
+    "rows_after": 167,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Part Time Punk\", \"to\": {\"kind\": \"artist\", \"name\": \"Peter Br\\u00f6tzmann\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Part Time Punk\", \"to\": {\"kind\": \"artist\", \"name\": \"Peter Bro\\u0308tzmann\"}}"
+    ]
+   }
+  ]
+ },
+ "explore/everything else": {
+  "same": 89,
+  "changed": 25,
+  "rows_only_before": 82,
+  "rows_only_after": 82,
+  "examples": [
+   {
+    "key": "artist:anika",
+    "rows_before": 328,
+    "rows_after": 328,
+    "only_before": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"YOUNG THUG\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on FACT Magazine\", \"to\": {\"kind\": \"artist\", \"name\": \"HIMERA\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Sacred Bones Records\", \"to\": {\"kind\": \"artist\", \"name\": \"DJ Muggs\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Young Thug\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on FACT Magazine\", \"to\": {\"kind\": \"artist\", \"name\": \"Himera\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Sacred Bones Records\", \"to\": {\"kind\": \"artist\", \"name\": \"DJ MUGGS\"}}"
+    ]
+   },
+   {
+    "key": "artist:aphex twin",
+    "rows_before": 433,
+    "rows_after": 433,
+    "only_before": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"MOESHA 13\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"SALEM\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"zayok\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"MOESHA  13\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Salem\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Zayok\"}}"
+    ]
+   },
+   {
+    "key": "artist:bernard wright",
+    "rows_before": 243,
+    "rows_after": 243,
+    "only_before": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Capitol Records\", \"to\": {\"kind\": \"artist\", \"name\": \"Bnyx\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Capitol Records\", \"to\": {\"kind\": \"artist\", \"name\": \"BNYX\\u00ae\"}}"
+    ]
+   },
+   {
+    "key": "artist:black eyed peas",
+    "rows_before": 319,
+    "rows_after": 319,
+    "only_before": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"kind\": \"artist\", \"name\": \"Bjork\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"kind\": \"artist\", \"name\": \"Mike Will Made-It\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"kind\": \"artist\", \"name\": \"Bj\\u00f6rk\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"kind\": \"artist\", \"name\": \"Mike WiLL Made-It\"}}"
+    ]
+   },
+   {
+    "key": "artist:ciro vitiello",
+    "rows_before": 106,
+    "rows_after": 106,
+    "only_before": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Hundebiss\", \"to\": {\"kind\": \"artist\", \"name\": \"Abdullah Miniawy\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Hundebiss\", \"to\": {\"kind\": \"artist\", \"name\": \"ABDULLAH MINIAWY\"}}"
+    ]
+   },
+   {
+    "key": "artist:d angelo",
+    "rows_before": 522,
+    "rows_after": 522,
+    "only_before": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Bjork\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Mike\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"VHOOR\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Bj\\u00f6rk\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"MIKE\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Vhoor\"}}"
+    ]
+   }
+  ]
+ },
+ "answers/playedInShow": {
+  "same": 96,
+  "changed": 18,
+  "rows_only_before": 86,
+  "rows_only_after": 86,
+  "examples": [
+   {
+    "key": "broadcast:lotradio|black-rave-culture",
+    "rows_before": 336,
+    "rows_after": 336,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"discogsID\": \"229071\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"VYBZ KARTEL\", \"rowID\": \"e0fe0206-7525-4009-98e6-68ebfef1eeaf\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"discogsID\": \"3984130\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"El Blanco Nino\", \"rowID\": \"dfcd1056-6889-4472-855c-96dc34500c53\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"DJ SWISHA\", \"rowID\": \"b2c56110-4115-4c62-b3ad-fd4cc043b8de\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"discogsID\": \"229071\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Vybz Kartel\", \"rowID\": \"e0fe0206-7525-4009-98e6-68ebfef1eeaf\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"discogsID\": \"3984130\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"EL BLANCO NINO\", \"rowID\": \"dfcd1056-6889-4472-855c-96dc34500c53\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Black Rave Culture\", \"to\": {\"kind\": \"artist\", \"name\": \"DJ Swisha\", \"rowID\": \"b2c56110-4115-4c62-b3ad-fd4cc043b8de\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|guests/armand-hammer",
+    "rows_before": 4,
+    "rows_after": 4,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Armand Hammer\", \"to\": {\"discogsID\": \"886729\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Billy Woods\", \"rowID\": \"2dc483ef-3c70-44fa-8ae3-0352856e95b5\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Armand Hammer\", \"to\": {\"discogsID\": \"886729\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"billy woods\", \"rowID\": \"2dc483ef-3c70-44fa-8ae3-0352856e95b5\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|guests/ian-kim-judd+bianca-lexis",
+    "rows_before": 35,
+    "rows_after": 35,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Ian Kim Judd & Bianca Lexis\", \"to\": {\"discogsID\": \"16315045\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Bambinodj\", \"rowID\": \"0a6a0091-06f2-4820-9592-8bbc5bb917a8\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Ian Kim Judd & Bianca Lexis\", \"to\": {\"discogsID\": \"16315045\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"bambinodj\", \"rowID\": \"0a6a0091-06f2-4820-9592-8bbc5bb917a8\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|guests/maximum-overdub-hour-with-dave-harrington-michael-hentz",
+    "rows_before": 6,
+    "rows_after": 6,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Maximum Overdub Hour with Dave Harrington & Michael Hentz\", \"to\": {\"kind\": \"artist\", \"name\": \"G\\u00e1bor Szab\\u00f3\", \"rowID\": \"909f9196-844e-4817-b942-5be0b767a5fd\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Maximum Overdub Hour with Dave Harrington & Michael Hentz\", \"to\": {\"kind\": \"artist\", \"name\": \"Gabor Szabo\", \"rowID\": \"909f9196-844e-4817-b942-5be0b767a5fd\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|misc",
+    "rows_before": 334,
+    "rows_after": 334,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"discogsID\": \"7433561\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Make\\u0300z\", \"rowID\": \"51ff2f24-0259-4160-9c75-a242e988a01c\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"EARTH\", \"rowID\": \"ff1fc8fe-068d-4719-9d8d-759e25ff44ec\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"EVEHIVE\", \"rowID\": \"e74cabca-4ed4-46f2-a7f9-26af25181c53\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"discogsID\": \"7433561\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Mak\\u00e8z\", \"rowID\": \"51ff2f24-0259-4160-9c75-a242e988a01c\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"Earth\", \"rowID\": \"ff1fc8fe-068d-4719-9d8d-759e25ff44ec\"}}",
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on misc.\", \"to\": {\"kind\": \"artist\", \"name\": \"EveHive\", \"rowID\": \"e74cabca-4ed4-46f2-a7f9-26af25181c53\"}}"
+    ]
+   },
+   {
+    "key": "broadcast:lotradio|part-time-punk",
+    "rows_before": 167,
+    "rows_after": 167,
+    "only_before": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Part Time Punk\", \"to\": {\"discogsID\": \"120328\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Peter Br\\u00f6tzmann\", \"rowID\": \"4ed1ee84-87c6-4c24-af90-8eecfa5cfbe5\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.725, \"kind\": \"playedInShow\", \"occurrences\": 1, \"reason\": \"Played on Part Time Punk\", \"to\": {\"discogsID\": \"120328\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Peter Bro\\u0308tzmann\", \"rowID\": \"4ed1ee84-87c6-4c24-af90-8eecfa5cfbe5\"}}"
+    ]
+   }
+  ]
+ },
+ "answers/everything else": {
+  "same": 89,
+  "changed": 25,
+  "rows_only_before": 82,
+  "rows_only_after": 82,
+  "examples": [
+   {
+    "key": "artist:anika",
+    "rows_before": 328,
+    "rows_after": 328,
+    "only_before": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"YOUNG THUG\", \"rowID\": \"cff307bb-ca07-46c5-8ea6-8dce96cbb8d8\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on FACT Magazine\", \"to\": {\"discogsID\": \"7003021\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"HIMERA\", \"rowID\": \"6aec20ad-9359-48e3-9178-fe2b732ca832\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Sacred Bones Records\", \"to\": {\"discogsID\": \"22935\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"DJ Muggs\", \"rowID\": \"0651c452-8d2c-4284-8723-ac8619dcf5b4\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Young Thug\", \"rowID\": \"cff307bb-ca07-46c5-8ea6-8dce96cbb8d8\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on FACT Magazine\", \"to\": {\"discogsID\": \"7003021\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Himera\", \"rowID\": \"6aec20ad-9359-48e3-9178-fe2b732ca832\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Sacred Bones Records\", \"to\": {\"discogsID\": \"22935\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"DJ MUGGS\", \"rowID\": \"0651c452-8d2c-4284-8723-ac8619dcf5b4\"}}"
+    ]
+   },
+   {
+    "key": "artist:aphex twin",
+    "rows_before": 433,
+    "rows_after": 433,
+    "only_before": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"discogsID\": \"13553914\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"zayok\", \"rowID\": \"31635cdd-d1df-49f3-af5e-672525d8fc84\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"MOESHA 13\", \"rowID\": \"f9a02218-ff1a-4a7a-93db-2c012e1820c8\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"SALEM\", \"rowID\": \"f9250721-b691-4571-8ef5-4cdf3165bcd1\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"discogsID\": \"13553914\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Zayok\", \"rowID\": \"31635cdd-d1df-49f3-af5e-672525d8fc84\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"MOESHA  13\", \"rowID\": \"f9a02218-ff1a-4a7a-93db-2c012e1820c8\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Salem\", \"rowID\": \"f9250721-b691-4571-8ef5-4cdf3165bcd1\"}}"
+    ]
+   },
+   {
+    "key": "artist:bernard wright",
+    "rows_before": 243,
+    "rows_after": 243,
+    "only_before": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Capitol Records\", \"to\": {\"discogsID\": \"10713046\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Bnyx\", \"rowID\": \"2b212828-34ad-4c0d-92c8-621d5b66a124\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Capitol Records\", \"to\": {\"discogsID\": \"10713046\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"BNYX\\u00ae\", \"rowID\": \"2b212828-34ad-4c0d-92c8-621d5b66a124\"}}"
+    ]
+   },
+   {
+    "key": "artist:black eyed peas",
+    "rows_before": 319,
+    "rows_after": 319,
+    "only_before": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"discogsID\": \"1373\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Bjork\", \"rowID\": \"96e516dc-0332-41c5-8bc8-69f3e0dc9960\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"discogsID\": \"3269862\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Mike Will Made-It\", \"rowID\": \"7c08e749-414f-402b-a9af-b20010cc7b2a\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"discogsID\": \"1373\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Bj\\u00f6rk\", \"rowID\": \"96e516dc-0332-41c5-8bc8-69f3e0dc9960\"}}",
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Polydor\", \"to\": {\"discogsID\": \"3269862\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Mike WiLL Made-It\", \"rowID\": \"7c08e749-414f-402b-a9af-b20010cc7b2a\"}}"
+    ]
+   },
+   {
+    "key": "artist:ciro vitiello",
+    "rows_before": 106,
+    "rows_after": 106,
+    "only_before": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Hundebiss\", \"to\": {\"discogsID\": \"3296169\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"Abdullah Miniawy\", \"rowID\": \"61a50228-f0dd-4e02-9ed2-4fb8251b8b06\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.8, \"kind\": \"sharedLabel\", \"occurrences\": 1, \"reason\": \"Both release on Hundebiss\", \"to\": {\"discogsID\": \"3296169\", \"idEvidence\": \"discogs-document\", \"kind\": \"artist\", \"name\": \"ABDULLAH MINIAWY\", \"rowID\": \"61a50228-f0dd-4e02-9ed2-4fb8251b8b06\"}}"
+    ]
+   },
+   {
+    "key": "artist:d angelo",
+    "rows_before": 522,
+    "rows_after": 522,
+    "only_before": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"discogsID\": \"1373\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Bjork\", \"rowID\": \"96e516dc-0332-41c5-8bc8-69f3e0dc9960\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Mike\", \"rowID\": \"91f7756c-10c2-47f9-ad29-87b4790ae413\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"VHOOR\", \"rowID\": \"d3defff5-bc7e-4679-8036-8009ec5e2553\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"discogsID\": \"1373\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Bj\\u00f6rk\", \"rowID\": \"96e516dc-0332-41c5-8bc8-69f3e0dc9960\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"MIKE\", \"rowID\": \"91f7756c-10c2-47f9-ad29-87b4790ae413\"}}",
+     "{\"confidence\": 0.65, \"kind\": \"frequentlyPlayedNearby\", \"occurrences\": 1, \"reason\": \"Played next to each other on the radio\", \"to\": {\"kind\": \"artist\", \"name\": \"Vhoor\", \"rowID\": \"d3defff5-bc7e-4679-8036-8009ec5e2553\"}}"
+    ]
+   }
+  ]
+ }
+}

@@ -80,7 +80,8 @@ nonisolated struct TasteProfile: Sendable {
 
         for event in events {
             let weight = event.weight
-            guard weight != 0, !event.tags.isEmpty else { continue }
+            let tags = event.musicTags
+            guard weight != 0, !tags.isEmpty else { continue }
             let age = now.timeIntervalSince(event.at)
             // An event logged in the future is a clock that moved, not
             // evidence from tomorrow; treat it as having just happened.
@@ -91,8 +92,8 @@ nonisolated struct TasteProfile: Sendable {
             // Split evenly across the tags, so tagging a show with twelve
             // styles does not make it count twelve times as much as one
             // tagged "dub".
-            let share = decayed / Double(event.tags.count)
-            for tag in event.tags {
+            let share = decayed / Double(tags.count)
+            for tag in tags {
                 totals[tag, default: 0] += share
             }
         }

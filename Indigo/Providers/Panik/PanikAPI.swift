@@ -34,7 +34,7 @@ nonisolated enum PanikError: LocalizedError, Equatable {
         case .badStatus(let code):
             "Radio Panik returned an unexpected response (\(code))."
         case .malformedResponse:
-            "Radio Panik sent something Indigo couldn't read."
+            "Radio Panik sent something Mineral couldn't read."
         case .notFound:
             "Radio Panik no longer publishes this."
         case .transport(let message):

@@ -43,6 +43,14 @@ struct ExploreView: View {
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         scroll.headerHeight = height
                     }
+                // Development builds only: see `ForYouTracksFeature`.
+                if ForYouMixFeature.isEnabled {
+                    // One list instead of the separate bands below.
+                    ForYouMixSection()
+                } else {
+                    if ForYouTracksFeature.isEnabled { ForYouTracksSection() }
+                    if SimilarRecordsFeature.isEnabled { SimilarRecordsSection() }
+                }
                 GeometryReader { proxy in
                     ZStack(alignment: .topLeading) {
                         Trace.slowStep("explore.objects") { objects(kept, in: proxy.size) }
@@ -209,7 +217,7 @@ struct ExploreView: View {
                 let at = place(i, below: nextTop, in: size, frontier: suggestion.frontier)
                 if ExploreScroll.builds(at, in: band) {
                 Button {
-                    if let page = suggestion.node.destination { appState.open(page) }
+                    if let page = suggestion.node.destination { appState.open(page, from: ListeningSurface.Origin(screen: "foryou.list", via: suggestion.via, route: suggestion.kind.rawValue)) }
                 } label: {
                     MapLabel(suggestion.node.title, suggestion.node.kind.label,
                              MosaicColor.lavender, artwork(for: suggestion),
@@ -261,7 +269,7 @@ struct ExploreView: View {
                                    frontier: suggestion.frontier)
                     if ExploreScroll.builds(at, in: band) {
                     Button {
-                        if let page = suggestion.node.destination { appState.open(page) }
+                        if let page = suggestion.node.destination { appState.open(page, from: ListeningSurface.Origin(screen: "foryou.list", via: suggestion.via, route: suggestion.kind.rawValue)) }
                     } label: {
                         MapLabel(suggestion.node.title, suggestion.node.kind.label,
                                  MosaicColor.lavender, artwork(for: suggestion),
@@ -592,7 +600,7 @@ struct ExploreView: View {
     }
     private func play(_ index: Int) {
         let queue = localPicks; guard queue.indices.contains(index) else { return }
-        if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index) }
+        if player.isCurrent(queue[index].path) { player.toggle() } else { player.play(queue.mediaItems(), startingAt: index, from: ListeningSurface(screen: "foryou.library")) }
     }
     private func play(_ item: CrateItem) {
         guard let source = SourceResolver(context: crate.context).best(item) else {
@@ -609,11 +617,11 @@ struct ExploreView: View {
         if player.isCurrent(media.id) {
             player.toggle()
         } else if media.isLive {
-            player.playRadio(media)
+            player.playRadio(media, from: ListeningSurface(screen: "foryou.crate", route: media.sourceID))
         } else if media.isEmbedded {
-            player.playEpisode(media)
+            player.playEpisode(media, from: ListeningSurface(screen: "foryou.crate", route: media.sourceID))
         } else {
-            player.play([media])
+            player.play([media], from: ListeningSurface(screen: "foryou.crate", route: media.sourceID))
         }
     }
 

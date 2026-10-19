@@ -28,8 +28,15 @@ extension DigStore {
 
     /// The same, from any context: Discover reads it off the main thread.
     nonisolated static func discoverInputs(context: ModelContext, now: Date = Date(), collaborators withCollaborators: Bool = true) -> DiscoverInputs {
+        discoverInputs(personal: PersonalInputs.read(context: context, asOf: now), context: context, now: now,
+                       collaborators: withCollaborators)
+    }
+
+    /// The same, from rows already read: a measurement's history as it was
+    /// at an earlier moment.
+    nonisolated static func discoverInputs(personal: PersonalInputs, context: ModelContext, now: Date,
+                                           collaborators withCollaborators: Bool = true) -> DiscoverInputs {
         let identityStore = ArtistIdentityStore(context: context)
-        let personal = PersonalInputs.read(context: context, asOf: now)
         var seeds: [TrackDiscovery.Seed] = []
         var seen = Set<Int>()
         for origin in MusicianFirstRanker.startingPoints(personal, asOf: now, count: 40) where seeds.count < 12 {
@@ -45,7 +52,8 @@ extension DigStore {
                 let resolution = identityStore.artistResolution(
                     ArtistReference(name: name, discogsID: origin.node.kind == .artist ? origin.node.discogsID : nil))
                 guard resolution.isVerified, let id = resolution.identity.discogsID, seen.insert(id).inserted else { continue }
-                seeds.append(.init(discogsID: id, name: resolution.canonicalName, weight: origin.weight))
+                seeds.append(.init(discogsID: id, name: resolution.canonicalName, weight: origin.weight,
+                                   signal: origin.half == .now ? .recent : .longTerm))
                 break
             }
         }
@@ -94,7 +102,8 @@ extension DigStore {
     /// Works Discover out again unless a fresh answer is held. Tracks appear
     /// as each one passes its playback check.
     func refreshDiscover(force: Bool = false) async {
-        guard TrackDiscoveryFeature.isEnabled, SupabaseService.isConfigured else { return }
+        guard TrackDiscoveryFeature.isEnabled || ForYouTracksFeature.isEnabled || ForYouMixFeature.isEnabled,
+              SupabaseService.isConfigured else { return }
         // The list from last time, at once: every track on it played within
         // the day. A newer one replaces it whole when it is ready.
         if discover.tracks.isEmpty, discover.at == nil, let file = Self.heldDiscoverFile,
@@ -102,7 +111,9 @@ extension DigStore {
            Date().timeIntervalSince(held.at) < 24 * 60 * 60, !held.tracks.isEmpty {
             discover = DiscoverState(tracks: held.tracks, at: held.at)
         }
-        if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60, !discover.tracks.isEmpty { return }
+        if !force, let at = discover.at, Date().timeIntervalSince(at) < 30 * 60,
+           RecommendationRotation.period(at: at) == RecommendationRotation.period(at: Date()),
+           !discover.tracks.isEmpty { return }
         guard !discover.working else { return }
         discover.working = true
         let showing = !discover.tracks.isEmpty
@@ -124,7 +135,7 @@ extension DigStore {
             }
             var ask = TrackDiscoverySource.Ask(seeds: inputs.seeds, taste: inputs.taste,
                                                knownArtists: inputs.knownArtists, knownTracks: inputs.knownTracks,
-                                               limit: 12, releaseLookups: 2)
+                                               limit: 12, turn: RecommendationRotation.period(at: Date()), releaseLookups: 2)
             let first = await source.discover(ask) { so in
                 // Over a held list, nothing until the new one is whole.
                 guard !showing else { return }

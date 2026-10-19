@@ -37,7 +37,7 @@ struct AlbumsView: View {
             if !availableGenres.isEmpty { Rule() }
 
             if tracks.isEmpty {
-                NoLibraryView(context: "Albums appear once Indigo has indexed a folder.")
+                NoLibraryView(context: "Albums appear once Mineral has indexed a folder.")
             } else if visible.isEmpty {
                 EmptyStateView(headline: "No matches",
                                message: "No album matches “\(appState.searchText)”.") {

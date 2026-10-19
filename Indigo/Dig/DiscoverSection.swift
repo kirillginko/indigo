@@ -51,7 +51,7 @@ struct ArtistDiscoverSection: View {
         Group {
             if !state.tracks.isEmpty || state.working {
                 DigSection(title: "Listen", trailing: state.working && state.tracks.isEmpty ? "Listening around…" : nil) {
-                    DiscoverList(tracks: state.tracks, opened: opened, ownArtistID: page.discogsID)
+                    DiscoverList(tracks: state.tracks, opened: opened, ownArtistID: page.discogsID, surface: "dig.artist.discover")
                 }
             }
         }
@@ -65,6 +65,8 @@ struct DiscoverList: View {
     let opened: Date
     /// On an artist page: whose page it is, so their own tracks are headed.
     var ownArtistID: Int? = nil
+    /// Where the list is, for the listening log.
+    var surface = "dig.discover"
     @Environment(AppState.self) private var appState
     @Environment(PlaybackCoordinator.self) private var player
     @Environment(CrateService.self) private var crate
@@ -141,14 +143,15 @@ struct DiscoverList: View {
     /// Recordings as a queue, from the one pressed.
     private func play(_ queue: [DiscoveredTrack], from index: Int) {
         DiscoverDiagnostics.shared.pressed(Array(queue.dropFirst(index)), opened: opened, player: player, crate: crate)
-        player.play(queue.map(\.mediaItem.item), startingAt: index)
+        player.play(queue.map(\.mediaItem.item), startingAt: index,
+                    surfaces: queue.map { ListeningSurface(screen: surface, via: $0.via, viaID: ListeningSurface.discogsArtist($0.viaDiscogsID), route: "track") })
     }
 
     /// One track in a radio show, from the moment it was played.
     private func play(_ track: DiscoveredTrack) {
         DiscoverDiagnostics.shared.pressed([track], opened: opened, player: player, crate: crate)
         let (item, start) = track.mediaItem
-        if !player.isCurrent(item.id) { player.play([item]) }
+        if !player.isCurrent(item.id) { player.play([item], from: ListeningSurface(screen: surface, via: track.via, viaID: ListeningSurface.discogsArtist(track.viaDiscogsID), route: "track")) }
         if let start { player.seekWhenReady(to: TimeInterval(start), in: item.id) }
     }
 }
@@ -175,7 +178,8 @@ struct DiscoverRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Button(action: play) {
-                ArtworkView(remoteURL: track.artworkURL, side: isPhone ? 64 : 52, glyphScale: 0.3)
+                ArtworkView(remoteURL: track.sharpArtwork.full, previewRemoteURL: track.sharpArtwork.preview,
+                            side: isPhone ? 64 : 52, glyphScale: 0.3)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("\(track.playLabel): \(track.title) by \(track.artist)")
@@ -232,7 +236,8 @@ struct DiscoverTile: View {
                     .aspectRatio(1, contentMode: .fit)
                     .overlay {
                         GeometryReader { proxy in
-                            ArtworkView(remoteURL: track.artworkURL, side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic)
+                            ArtworkView(remoteURL: track.sharpArtwork.full, previewRemoteURL: track.sharpArtwork.preview,
+                                        side: proxy.size.width, glyphScale: 0.26, placeholder: .mosaic)
                         }
                     }
                     .clipped()

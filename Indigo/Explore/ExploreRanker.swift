@@ -156,7 +156,14 @@ nonisolated enum ExploreRanker {
                 // are told apart by what they say, not by which the walk
                 // listed first: the route is the reason printed and the kind
                 // the block spreads across.
+                //
+                // Only routes that are a reason to go to somebody: a credit for
+                // mixing or mastering the listener's record is true, stays on
+                // the release page, and recommends nobody. Classified by the
+                // relationship, never the person -- whoever also played on it
+                // is reached as the player. See `ContributorRole`.
                 guard let route = connection.edges
+                    .filter(ContributorRole.canRecommend)
                     .map({ (edge: $0, value: $0.weight * ExploreSuggestionEngine.worth($0)) })
                     .filter({ $0.value > 0 })
                     .min(by: { $0.value != $1.value ? $0.value > $1.value : MusicEdge.precedes($0.edge, $1.edge) })

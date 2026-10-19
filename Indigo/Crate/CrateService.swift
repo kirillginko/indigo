@@ -255,7 +255,7 @@ final class CrateService {
             }
         }
         if queue.isEmpty { queue = [media] }
-        player.play(queue, startingAt: index)
+        player.play(queue, startingAt: index, from: ListeningSurface(screen: "crate"))
     }
 
     // MARK: - Writing

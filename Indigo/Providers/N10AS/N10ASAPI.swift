@@ -33,7 +33,7 @@ nonisolated enum N10ASError: LocalizedError, Equatable {
         case .badStatus(let code):
             "n10.as returned an unexpected response (\(code))."
         case .malformedResponse:
-            "n10.as sent something Indigo couldn't read."
+            "n10.as sent something Mineral couldn't read."
         case .notFound:
             "n10.as no longer publishes this."
         case .transport(let message):

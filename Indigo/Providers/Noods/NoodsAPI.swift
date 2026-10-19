@@ -24,7 +24,7 @@ nonisolated enum NoodsError: LocalizedError, Equatable {
         case .offline: "No internet connection."
         case .badStatus(404): "Noods has nothing at that address."
         case .badStatus(let code): "Noods Radio returned an unexpected response (\(code))."
-        case .malformedResponse: "Noods Radio sent something Indigo couldn't read."
+        case .malformedResponse: "Noods Radio sent something Mineral couldn't read."
         case .transport(let message): message
         }
     }

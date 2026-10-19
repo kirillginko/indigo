@@ -1,0 +1,68 @@
+{
+ "relations/playedInShow": {
+  "same": 60,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "relations/everything else": {
+  "same": 60,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "explore/playedInShow": {
+  "same": 113,
+  "changed": 1,
+  "rows_only_before": 1,
+  "rows_only_after": 1,
+  "examples": [
+   {
+    "key": "broadcast:youtube|UCKif-hj_9Vf_Ia2cQwXA-zA",
+    "rows_before": 820,
+    "rows_after": 820,
+    "only_before": [
+     "{\"confidence\": 0.8375, \"kind\": \"playedInShow\", \"occurrences\": 3, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"Cedar Walton\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.875, \"kind\": \"playedInShow\", \"occurrences\": 5, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"kind\": \"artist\", \"name\": \"Cedar Walton\"}}"
+    ]
+   }
+  ]
+ },
+ "explore/everything else": {
+  "same": 114,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ },
+ "answers/playedInShow": {
+  "same": 113,
+  "changed": 1,
+  "rows_only_before": 1,
+  "rows_only_after": 1,
+  "examples": [
+   {
+    "key": "broadcast:youtube|UCKif-hj_9Vf_Ia2cQwXA-zA",
+    "rows_before": 820,
+    "rows_after": 820,
+    "only_before": [
+     "{\"confidence\": 0.8375, \"kind\": \"playedInShow\", \"occurrences\": 3, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"discogsID\": \"135873\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Cedar Walton\", \"rowID\": \"5d0a63e3-b3e0-42cc-a69f-312bccf7c12d\"}}"
+    ],
+    "only_after": [
+     "{\"confidence\": 0.875, \"kind\": \"playedInShow\", \"occurrences\": 5, \"reason\": \"Played on Vinyl Life - Piano Trio\", \"to\": {\"discogsID\": \"135873\", \"idEvidence\": \"adopted-by-name\", \"kind\": \"artist\", \"name\": \"Cedar Walton\", \"rowID\": \"5d0a63e3-b3e0-42cc-a69f-312bccf7c12d\"}}"
+    ]
+   }
+  ]
+ },
+ "answers/everything else": {
+  "same": 114,
+  "changed": 0,
+  "rows_only_before": 0,
+  "rows_only_after": 0,
+  "examples": []
+ }
+}

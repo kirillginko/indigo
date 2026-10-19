@@ -245,7 +245,7 @@ nonisolated enum DigRecommender {
     static func relationship(role: String) -> DigRecommendation.Relationship? {
         switch CreditRole.contribution(of: role) {
         case .technical?: return nil
-        case .performing?: return .playedOn
+        case .musical?: return CreditRole.kind(of: role) == .writing ? .wroteOrProduced : .playedOn
         case .creative?: return role.lowercased().contains("remix") ? .remixed : .wroteOrProduced
         case nil: return .madeTogether
         }

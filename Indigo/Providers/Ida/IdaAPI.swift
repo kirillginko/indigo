@@ -30,7 +30,7 @@ nonisolated enum IdaError: LocalizedError, Equatable {
         case .badStatus(let code):
             "IDA Radio returned an unexpected response (\(code))."
         case .malformedResponse:
-            "IDA Radio sent something Indigo couldn't read."
+            "IDA Radio sent something Mineral couldn't read."
         case .notFound:
             "IDA Radio no longer publishes this."
         case .transport(let message):
