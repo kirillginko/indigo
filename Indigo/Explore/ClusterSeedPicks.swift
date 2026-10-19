@@ -40,8 +40,10 @@ nonisolated enum ForYouClusterSeedsFeature {
 /// row (reached by its Discogs id, never by name) in the seeds' recent
 /// episodes, one hop. Only those whose row has a verified Discogs id are
 /// candidates (with `DiscogsIdentityRows` on, a MusicBrainz-verified one
-/// counts); an artist the device has no styles for is placed by the genres of
-/// the episodes it was heard in. Off everywhere else.
+/// counts). By default they only fill slots the credits and selections leave
+/// empty, after those picks and without moving them, and radio is read only
+/// then. Styled only by their own verified entries; the programmes' genres
+/// are weak context. Off everywhere else.
 nonisolated enum ForYouRadioCandidatesFeature {
     #if DEBUG
     static let switchKey = "INDIGO_FORYOU_RADIO_CANDIDATES"
@@ -180,7 +182,7 @@ nonisolated struct ClusterSeedPicks: Sendable {
         }
         let parts = [
             // How the picks are worked out: a new way, new picks.
-            "v\(Self.version)" + (ForYouRadioCandidatesFeature.isEnabled ? "+radio" : ""),
+            "v\(Self.version)" + (ForYouRadioCandidatesFeature.isEnabled ? "+radio\(Self.radioShare)\(Self.radioGenreStyles ? "g" : "")" : ""),
             "e\(count(ListeningEvent.self)):" + newest(FetchDescriptor<ListeningEvent>(sortBy: [SortDescriptor(\.at, order: .reverse)]), \.at),
             "c\(count(CrateItem.self)):" + newest(FetchDescriptor<CrateItem>(sortBy: [SortDescriptor(\.addedAt, order: .reverse)]), \.addedAt),
             "v\(count(DigVisit.self)):" + newest(FetchDescriptor<DigVisit>(sortBy: [SortDescriptor(\.lastVisitedAt, order: .reverse)]), \.lastVisitedAt),
@@ -242,8 +244,15 @@ nonisolated struct ClusterSeedPicks: Sendable {
     }
     static let radioPerSeed = 12
     /// The most of the ranked list, and of the picks while anything else
-    /// plays, that radio alone may take. A measurement can change it.
-    nonisolated(unsafe) static var radioShare = 0.5
+    /// plays, that radio alone may take. 0, the default: radio only fills
+    /// the slots the credits and selections leave empty, and is read only
+    /// then. Over four dated cut-offs, a share of radio displaced the picks
+    /// the listener later met (6 finds at 20 slots → 2 at half, 0 uncapped).
+    /// A measurement can change it.
+    nonisolated(unsafe) static var radioShare = 0.0
+    /// Measurement only: style an unstyled radio artist by its episodes'
+    /// genres, as the first version did. Off: its own verified styles, or none.
+    nonisolated(unsafe) static var radioGenreStyles = false
     static func radioSlots(_ limit: Int, share: Double) -> Int { Int((Double(limit) * share).rounded(.down)) }
 
     static func isRadioOnly(_ c: ListenerRetrieval.Candidate) -> Bool { c.provenances == [.radioAdjacent] }
@@ -282,9 +291,9 @@ nonisolated struct ClusterSeedPicks: Sendable {
         }
         for i in candidates.indices {
             ListenerRetrieval.style(&candidates[i], book: inputs.book)
-            // Else what the programmes that played this very row call
-            // their episodes: identity-safe, if coarse.
-            if candidates[i].styles.isEmpty, let genres = radio.genres[candidates[i].identity] {
+            // The programmes' genres are the seeds' own shows', so as an
+            // artist's styles they fit by construction: only when measuring.
+            if Self.radioGenreStyles, candidates[i].styles.isEmpty, let genres = radio.genres[candidates[i].identity] {
                 candidates[i].styles = genres; candidates[i].styleSource = "episode genres"
             }
         }
@@ -295,19 +304,25 @@ nonisolated struct ClusterSeedPicks: Sendable {
         // unstyled by how strongly they were reached -- never by their id.
         for c in candidates {
             let reached = evidence[c.identity] ?? 0
-            scores[c.identity] = (scorer.relevance(c.styles)?.score ?? 0) * (0.5 + reached) + 0.001 * reached
+            // An unstyled radio artist's programmes: weak context, a tie-break
+            // among the unstyled, never a style.
+            let context = c.styles.isEmpty ? (radio.genres[c.identity].flatMap { scorer.relevance($0)?.score } ?? 0) : 0
+            scores[c.identity] = (scorer.relevance(c.styles)?.score ?? 0) * (0.5 + reached) + 0.001 * reached + 0.0005 * max(0, context)
         }
         var sorted = candidates.sorted { (scores[$0.identity] ?? 0) != (scores[$1.identity] ?? 0) ? (scores[$0.identity] ?? 0) > (scores[$1.identity] ?? 0) : $0.identity < $1.identity }
         // Radio alone takes at most its share of the list: styled by the
         // genres of the seeds' own episodes, it fits by construction, and
         // in one common ranking it crowded out every credit and selection.
-        var radioOnly = 0
+        // At a share of 0, radio comes after everything else, as filling.
+        var radioOnly = 0, filling: [ListenerRetrieval.Candidate] = []
         sorted.removeAll { c in
             guard Self.isRadioOnly(c) else { return false }
             radioOnly += 1
-            return radioOnly > Self.radioSlots(limit, share: radioShare)
+            guard radioOnly > Self.radioSlots(limit, share: radioShare) else { return false }
+            if radioShare == 0 { filling.append(c) }
+            return true
         }
-        return inputs.profile.spread(sorted, limit: limit) { scorer.relevance($0.styles)?.cluster }
+        return inputs.profile.spread(sorted, limit: limit) { scorer.relevance($0.styles)?.cluster } + filling.prefix(limit)
     }
 
     /// Up to `limit` tracks to hear, each confirmed to play: recordings of
@@ -353,18 +368,43 @@ nonisolated struct ClusterSeedPicks: Sendable {
             let found = await bundles(inputs.releaseIDs.values.map(\.seed).sorted())
             for (artist, ids) in inputs.releaseIDs { if let bundle = found[ids.seed] { held[artist] = (ids.seed, bundle) } }
         }
-        let radioFound = ForYouRadioCandidatesFeature.isEnabled ? await radioCandidates(inputs) : RadioCandidates()
         let share = Self.radioShare
-        let ranked = Self.ranked(inputs, credits: credits, excluding: excluding, bundles: held, radio: radioFound, radioShare: share)
+        let radioOn = ForYouRadioCandidatesFeature.isEnabled
+        let seedNames = Dictionary(inputs.seeds.map { ($0.artist, (inputs.entries[$0.artist]?.name ?? $0.name, inputs.releaseIDs[$0.artist]?.seed)) },
+                                   uniquingKeysWith: { a, _ in a })
+        // At a share of 0, the picks are exactly those without radio, and
+        // radio fills only the slots they leave, after them.
+        guard radioOn, share == 0 else {
+            let radio = radioOn ? await radioCandidates(inputs) : RadioCandidates()
+            let ranked = Self.ranked(inputs, credits: credits, excluding: excluding, bundles: held, radio: radio, radioShare: share)
+            let picks = await collect(ranked, limit: limit, radioSlots: Self.radioSlots(limit, share: share), seedNames: seedNames)
+            await store?.flush()
+            return picks
+        }
+        let ranked = Self.ranked(inputs, credits: credits, excluding: excluding, bundles: held)
+        let picks = await collect(ranked, limit: limit, radioSlots: 0, seedNames: seedNames)
+        let empty = limit - picks.count
+        guard empty > 0 else { await store?.flush(); return picks }
+        let radio = await radioCandidates(inputs)
+        let filling = Self.ranked(inputs, credits: credits, excluding: excluding, bundles: held, radio: radio, radioShare: 0).filter(Self.isRadioOnly)
+        let taken = Set(picks.map(\.artistDiscogsID))
+        let fill = await collect(filling.filter { !taken.contains(Int($0.identity.dropFirst("discogs:".count)) ?? 0) }, limit: empty,
+                                 radioSlots: empty, seedNames: seedNames)
+        await store?.flush()
+        return picks + fill
+    }
+
+    /// Up to `limit` of the ranked candidates' tracks: recordings in rank
+    /// order, then moments; radio alone at most `radioSlots` of them while
+    /// anything else plays.
+    private func collect(_ ranked: [ListenerRetrieval.Candidate], limit: Int, radioSlots: Int,
+                         seedNames: [String: (String, Int?)]) async -> [DiscoveredTrack] {
         // No taste cluster takes more than its share of the picks while
         // another still has something to offer.
         let clusterCount = max(1, Set(ranked.map(\.best.cluster)).count)
         let perCluster = max(2, Int((Double(limit) / Double(clusterCount)).rounded(.up)))
         var fromCluster: [Int: Int] = [:]
-        // Nor radio alone more than half, while anything else plays.
         var fromRadioOnly = 0
-        let seedNames = Dictionary(inputs.seeds.map { ($0.artist, (inputs.entries[$0.artist]?.name ?? $0.name, inputs.releaseIDs[$0.artist]?.seed)) },
-                                   uniquingKeysWith: { a, _ in a })
 
         var recordings: [DiscoveredTrack] = [], moments: [DiscoveredTrack] = []
         // First each cluster up to its share; then, if slots are left because
@@ -374,7 +414,7 @@ nonisolated struct ClusterSeedPicks: Sendable {
         for candidate in ranked where recordings.count < limit {
             guard let id = Int(candidate.identity.dropFirst("discogs:".count)), !looked.contains(candidate.identity) else { continue }
             if capped, fromCluster[candidate.best.cluster, default: 0] >= perCluster { continue }
-            if capped, Self.isRadioOnly(candidate), fromRadioOnly >= Self.radioSlots(limit, share: share) { continue }
+            if capped, Self.isRadioOnly(candidate), fromRadioOnly >= radioSlots { continue }
             looked.insert(candidate.identity)
             let countedBefore = recordings.count + moments.count
             defer {
@@ -426,7 +466,6 @@ nonisolated struct ClusterSeedPicks: Sendable {
             await keep(played)
         }
         }
-        await store?.flush()
         return Array((recordings + moments).prefix(limit))
     }
 }

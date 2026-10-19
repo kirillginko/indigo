@@ -108,7 +108,7 @@ final class LiveMusicBrainzIdentityReach: XCTestCase {
     }
 
     override func tearDown() {
-        DiscogsIdentityRows.override = nil; ForYouRadioCandidatesFeature.override = nil; ClusterSeedPicks.radioShare = 0.5
+        DiscogsIdentityRows.override = nil; ForYouRadioCandidatesFeature.override = nil; ClusterSeedPicks.radioShare = 0; ClusterSeedPicks.radioGenreStyles = false
     }
 
     private static func ms(since started: ContinuousClock.Instant) -> Double {
@@ -116,91 +116,86 @@ final class LiveMusicBrainzIdentityReach: XCTestCase {
         return Double(d.components.seconds) * 1000 + Double(d.components.attoseconds) / 1e15
     }
 
-    /// The mix's arms, on one listener's inputs: A today's mix (radio off),
-    /// B radio candidates with the identity switch off, C with it on, and C
-    /// at a quarter and at a whole radio share (one common ranking). Play
-    /// checks shared, so arms differ by candidates only. `later`: artists the
-    /// listener met after the inputs' cut-off, for finds.
+    /// Counts each request a radio source makes.
+    private actor Requests {
+        var count = 0
+        func add() { count += 1 }
+    }
+    private static func counted(_ source: ListenerRetrieval.RadioSource, _ requests: Requests) -> ListenerRetrieval.RadioSource {
+        var out = source
+        out.rows = { await requests.add(); return try await source.rows($0) }
+        out.rowsByName = { await requests.add(); return try await source.rowsByName($0) }
+        out.appearances = { await requests.add(); return try await source.appearances($0, $1) }
+        out.tracklists = { await requests.add(); return try await source.tracklists($0) }
+        out.showGenres = { await requests.add(); return try await source.showGenres($0) }
+        out.showsPlaying = { await requests.add(); return try await source.showsPlaying($0) }
+        out.names = { await requests.add(); return try await source.names($0) }
+        return out
+    }
+
+    /// The mix's arms, on one listener's inputs, radio as fill only: A the
+    /// mix without radio; F1 radio filling empty slots, styled by its
+    /// episodes' genres (the first version); F2 the same, styled only by
+    /// verified entries (the default); F2- F2 with the identity switch off.
+    /// Play checks shared, so arms differ by candidates only. `later`:
+    /// artists the listener met after the inputs' cut-off, for finds.
     private func radioArms(inputs: ClusterSeedPicks.Inputs, credits: [String: [ListenerRetrieval.Credit]],
                            bundles held: [String: (id: Int, bundle: ArtistBundle)],
                            fetchBundles: @escaping @Sendable ([Int]) async -> [Int: ArtistBundle],
                            linkedIDs: Set<Int>, plays: Plays, source: (Bool) -> ListenerRetrieval.RadioSource,
                            later: Set<String>?) async -> (lines: [String], finds: [String: [Int: Int]]) {
-        struct Arm { let name: String; let radio: Bool; let identity: Bool; let share: Double }
-        let armList = [Arm(name: "A  today's mix", radio: false, identity: false, share: 0.5),
-                       Arm(name: "B  radio, no MB links", radio: true, identity: false, share: 0.5),
-                       Arm(name: "C  radio + MB links", radio: true, identity: true, share: 0.5),
-                       Arm(name: "C¼ radio share 0.25", radio: true, identity: true, share: 0.25),
-                       Arm(name: "C1 one common ranking", radio: true, identity: true, share: 1.0)]
-        func idOf(_ c: ListenerRetrieval.Candidate) -> Int? { Int(c.identity.dropFirst("discogs:".count)) }
+        struct Arm { let name: String; let radio: Bool; let identity: Bool; let genreStyles: Bool }
+        let armList = [Arm(name: "A   baseline", radio: false, identity: true, genreStyles: false),
+                       Arm(name: "F1  fill, episode-genre styles", radio: true, identity: true, genreStyles: true),
+                       Arm(name: "F2  fill, own styles", radio: true, identity: true, genreStyles: false),
+                       Arm(name: "F2- fill, own styles, no MB links", radio: true, identity: false, genreStyles: false)]
         func key(_ name: String) -> String { RecordingKey.normalizeArtist(DiscogsClient.withoutDisambiguator(name)) }
+        func kind(_ t: DiscoveredTrack) -> String {
+            switch t.source { case .recording(_, let channel): channel == nil ? "release" : "radio rec"; case .episode: "moment" }
+        }
         var lines: [String] = [], finds: [String: [Int: Int]] = [:]
-        var basePool = Set<Int>(), baseTop20: [String] = [], basePicks: [Int: [String]] = [:]
-        var radioMemo: [String: (ClusterSeedPicks.RadioCandidates, Double)] = [:]
+        var base: [Int: [DiscoveredTrack]] = [:]
         for arm in armList {
             DiscogsIdentityRows.override = arm.identity
             ForYouRadioCandidatesFeature.override = arm.radio
-            ClusterSeedPicks.radioShare = arm.share
-            var picker = ClusterSeedPicks()
-            picker.store = nil
-            picker.plays = { await plays.check($0) }
-            picker.bundles = fetchBundles
-            picker.radio = source(arm.identity)
-            var radio = ClusterSeedPicks.RadioCandidates(), radioMs = 0.0
-            if arm.radio {
-                if let held = radioMemo["\(arm.identity)"] { (radio, radioMs) = held } else {
-                    let started = ContinuousClock.now
-                    radio = await picker.radioCandidates(inputs)
-                    radioMs = Self.ms(since: started)
-                    radioMemo["\(arm.identity)"] = (radio, radioMs)
-                }
-            }
-            let pool = ClusterSeedPicks.ranked(inputs, credits: credits, excluding: [], bundles: held, radio: radio, radioShare: 1, limit: 10_000)
-            let ranked = ClusterSeedPicks.ranked(inputs, credits: credits, excluding: [], bundles: held, radio: radio, radioShare: arm.share)
-            let poolIDs = Set(pool.compactMap(idOf))
-            let top20 = ranked.prefix(20).map(\.name)
-            if !arm.radio { basePool = poolIDs; baseTop20 = top20 }
-            let sightingIDs = Set(radio.sightings.compactMap(\.discogsID))
-            let rowsPerID = Dictionary(grouping: radio.sightings.filter { $0.discogsID != nil }, by: { $0.discogsID! }).filter { Set($0.value.compactMap(\.catalogueRow)).count > 1 }
-            let nameClashes = Dictionary(grouping: pool, by: \.nameKey).filter { $0.value.count > 1 }.count
+            ClusterSeedPicks.radioShare = 0
+            ClusterSeedPicks.radioGenreStyles = arm.genreStyles
             lines.append(arm.name + ":")
-            if arm.radio {
-                lines.append(String(format: "    radio: seeds on radio %d; sightings %d (%d Discogs ids, %d linked); left out: %d rows without a Discogs id, %d one-offs at a distance; requests %d, failures %d; %.0f ms",
-                                    radio.report.seedsOnRadio, radio.sightings.count, sightingIDs.count, sightingIDs.filter(linkedIDs.contains).count,
-                                    radio.unverified, radio.weak, radio.report.requests, radio.report.failures, radioMs))
-            }
-            let radioTop = ranked.filter { ClusterSeedPicks.isRadioOnly($0) }
-            lines.append("    pool \(pool.count) (new musicians vs A \(poolIDs.subtracting(basePool).count), linked \(poolIDs.filter(linkedIDs.contains).count)); ranked 40: \(ranked.count), radio alone \(radioTop.count), linked \(ranked.filter { idOf($0).map(linkedIDs.contains) ?? false }.count); Discogs ids on two rows \(rowsPerID.count), names on two identities \(nameClashes)")
-            if arm.radio {
-                let added = top20.filter { !baseTop20.contains($0) }, dropped = baseTop20.filter { !top20.contains($0) }
-                lines.append("    top 20 vs A: \(added.count) in (\(added.joined(separator: ", "))); out: \(dropped.joined(separator: ", "))")
-            }
-            let clusterOf = Dictionary(ranked.compactMap { c in idOf(c).map { ($0, c.best.cluster) } }, uniquingKeysWith: { a, _ in a })
             for limit in [8, 20] {
+                let requests = Requests()
+                var picker = ClusterSeedPicks()
+                picker.store = nil
+                picker.plays = { await plays.check($0) }
+                picker.bundles = fetchBundles
+                picker.radio = Self.counted(source(arm.identity), requests)
                 let started = ContinuousClock.now
                 let before = await plays.asked
                 let picks = await picker.picks(inputs, excluding: [], limit: limit)
                 let ms = Self.ms(since: started)
-                let again = arm.radio && arm.share == 0.5 ? await picker.picks(inputs, excluding: [], limit: limit) : picks
-                let recordings = picks.filter(\.isRecording).count
-                let artists = picks.map(\.artistDiscogsID)
-                let ids = picks.map(\.id)
+                let radioRequests = await requests.count
+                let again = arm.radio ? await picker.picks(inputs, excluding: [], limit: limit) : picks
+                if !arm.radio { base[limit] = picks }
+                let baseline = base[limit] ?? []
+                let preserved = Array(picks.prefix(baseline.count)).map(\.id) == baseline.map(\.id)
+                let fill = Array(picks.dropFirst(baseline.count))
+                let artists = picks.map(\.artistDiscogsID), ids = picks.map(\.id)
+                let kinds = Dictionary(grouping: picks, by: kind).mapValues(\.count)
                 let found = later.map { set in Set(picks.map { key($0.artist) }).intersection(set) } ?? []
+                let fillFound = later.map { set in Set(fill.map { key($0.artist) }).intersection(set) } ?? []
                 finds[arm.name, default: [:]][limit] = found.count
-                if !arm.radio { basePicks[limit] = ids }
-                let kept = Set(ids).intersection(basePicks[limit] ?? []).count
-                lines.append(String(format: "    limit %2d: %d picks (%d recordings, %d radio moments); linked %d; reached by radio %d; new musicians vs A's pool %d; clusters %d; repeated artists %d, repeated tracks %d; kept from A %d; deterministic %@; play checks +%d; %.0f ms",
-                                    limit, picks.count, recordings, picks.count - recordings, artists.filter(linkedIDs.contains).count,
-                                    picks.filter { $0.reason.hasPrefix("Played ") }.count, Set(artists).subtracting(basePool).count,
-                                    Set(artists.compactMap { clusterOf[$0] }).count, artists.count - Set(artists).count, ids.count - Set(ids).count,
-                                    kept, ids == again.map(\.id) ? "yes" : "NO", await plays.asked - before, ms)
-                             + (later == nil ? "" : "; finds \(found.count): \(found.sorted().joined(separator: ", "))"))
-                lines.append("      " + picks.map { "\(linkedIDs.contains($0.artistDiscogsID) ? "◆ " : "")\($0.artist) — \($0.title) [\($0.isRecording ? "Play Track" : "Hear in Radio Show")] \($0.reason)" }.joined(separator: " | "))
+                lines.append(String(format: "  limit %2d: %d picks (release %d, radio rec %d, moments %d); baseline kept in place %@; filled %d (recordings %d); linked %d; distinct artists %d; repeated artists %d, tracks %d; deterministic %@; radio requests %d; play checks +%d; %.0f ms",
+                                    limit, picks.count, kinds["release"] ?? 0, kinds["radio rec"] ?? 0, kinds["moment"] ?? 0,
+                                    arm.radio ? (preserved ? "yes" : "NO") : "-", fill.count, fill.filter(\.isRecording).count,
+                                    artists.filter(linkedIDs.contains).count, Set(artists).count, artists.count - Set(artists).count,
+                                    ids.count - Set(ids).count, ids == again.map(\.id) ? "yes" : "NO", radioRequests, await plays.asked - before, ms)
+                             + (later == nil ? "" : "; finds \(found.count) (in the fill \(fillFound.count)): \(found.sorted().joined(separator: ", "))"))
+                lines.append("      " + (arm.radio ? fill : picks).map { "\(linkedIDs.contains($0.artistDiscogsID) ? "◆ " : "")\($0.artist) — \($0.title) [\($0.isRecording ? "Play Track" : "Hear in Radio Show")] \($0.reason)\($0.tags.map { " {\($0.prefix(3).joined(separator: ", "))}" } ?? "")" }.joined(separator: " | "))
             }
         }
         DiscogsIdentityRows.override = nil
         ForYouRadioCandidatesFeature.override = nil
-        ClusterSeedPicks.radioShare = 0.5
+        ClusterSeedPicks.radioShare = 0
+        ClusterSeedPicks.radioGenreStyles = false
         return (lines, finds)
     }
 
@@ -674,31 +669,34 @@ final class LiveMusicBrainzIdentityReach: XCTestCase {
             lines.append("  limit \(limit): list changed \(off.picks.map(\.id) != on.picks.map(\.id)); on twice identical \(on.picks.map(\.id) == again.picks.map(\.id))")
         }
 
-        // Radio candidates in the mix: A today's mix, B radio without the
-        // MusicBrainz links, C radio with them (and C at other radio shares).
+        // Radio as fill only: A, F1, F2, F2- (see `radioArms`).
         let arms = await radioArms(inputs: inputs, credits: credits, bundles: heldBundles, fetchBundles: { await bundles.bundles($0) },
                                    linkedIDs: linkedIDs, plays: plays, source: { _ in ClusterSeedPicks().radio }, later: nil)
         lines += arms.lines
-        // Cold and warm: C on a fresh store and fresh play checks, then again on that store.
-        let storeFile = dir.appendingPathComponent("radio-arms-\(UUID().uuidString).json")
-        defer { try? FileManager.default.removeItem(at: storeFile) }
-        let store = ClusterSeedStore(file: storeFile)
+        // Cold and warm, limit 20: each arm on a fresh store and fresh play
+        // checks, then again on that store.
         DiscogsIdentityRows.override = true
-        ForYouRadioCandidatesFeature.override = true
-        ClusterSeedPicks.radioShare = 0.5
-        for (name, limit) in [("cold", 20), ("warm", 20)] {
-            let fresh = Plays()
-            var picker = ClusterSeedPicks()
-            picker.store = store
-            picker.plays = { await fresh.check($0) }
-            picker.bundles = { await bundles.bundles($0) }
-            let started = ContinuousClock.now
-            let picks = await picker.picks(inputs, excluding: [], limit: limit)
-            lines.append(String(format: "  C %@ (limit %d): %d picks; play checks %d; %.0f ms (radio is read every time; the store keeps credits and play checks)",
-                                name, limit, picks.count, await fresh.asked, Self.ms(since: started)))
+        ClusterSeedPicks.radioShare = 0
+        for (arm, radioOn) in [("A ", false), ("F2", true)] {
+            let storeFile = dir.appendingPathComponent("radio-arms-\(UUID().uuidString).json")
+            defer { try? FileManager.default.removeItem(at: storeFile) }
+            let store = ClusterSeedStore(file: storeFile)
+            ForYouRadioCandidatesFeature.override = radioOn
+            for name in ["cold", "warm"] {
+                let fresh = Plays(), requests = Requests()
+                var picker = ClusterSeedPicks()
+                picker.store = store
+                picker.plays = { await fresh.check($0) }
+                picker.bundles = { await bundles.bundles($0) }
+                picker.radio = Self.counted(picker.radio, requests)
+                let started = ContinuousClock.now
+                let picks = await picker.picks(inputs, excluding: [], limit: 20)
+                lines.append(String(format: "  %@ %@: %d picks; play checks %d; radio requests %d; %.0f ms",
+                                    arm, name, picks.count, await fresh.asked, await requests.count, Self.ms(since: started)))
+            }
         }
         ForYouRadioCandidatesFeature.override = nil
-        ClusterSeedPicks.radioShare = 0.5
+        DiscogsIdentityRows.override = nil
         lines.append("Play checks asked: \(await plays.asked)")
         let report = lines.joined(separator: "\n")
         print(report)
