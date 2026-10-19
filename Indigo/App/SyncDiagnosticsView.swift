@@ -29,6 +29,7 @@ struct SyncDiagnosticsView: View {
     @AppStorage(MusicianFirst.switchKey) private var digMusicianFirst = false
     @AppStorage(ForYouMusicianFirst.switchKey) private var forYouMusicianFirst = false
     @AppStorage(DigRecommendations.switchKey) private var digRecommendations = false
+    @AppStorage(RadioDiscoverFeature.switchKey) private var radioDiscover = false
     @AppStorage(TrackDiscoveryFeature.switchKey) private var digTracks = false
     @AppStorage(DiscogsIdentityRows.switchKey) private var musicBrainzDiscogs = false
 
@@ -57,6 +58,7 @@ struct SyncDiagnosticsView: View {
                     Toggle("For You: musician-first ranking", isOn: $forYouMusicianFirst)
                     Toggle("DIG: Hear next cards", isOn: $digRecommendations)
                     Toggle("DIG: Discover tracks", isOn: $digTracks)
+                    Toggle("For You: Radio Discover (curators)", isOn: $radioDiscover)
                     Toggle("DIG and For You: MusicBrainz-verified Discogs ids", isOn: $musicBrainzDiscogs)
                 } header: {
                     Text("Musician-first (development)")

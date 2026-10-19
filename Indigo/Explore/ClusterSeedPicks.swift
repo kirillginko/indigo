@@ -151,6 +151,9 @@ nonisolated struct ClusterSeedPicks: Sendable {
     /// The shared catalogue for radio candidates: seeds reach their rows by
     /// Discogs id only -- a name is never a way onto radio here.
     var radio: ListenerRetrieval.RadioSource = { var source = ListenerRetrieval.liveRadio; source.rowsByName = { _ in [:] }; return source }()
+    /// Independent profiles for radio artists the device has no styles for
+    /// (`RadioArtistProfiles.live.profiles`). Nil, the default: none read.
+    var radioProfiles: (@Sendable ([Int]) async -> [Int: RadioArtistProfile])? = nil
 
     var store: ClusterSeedStore? = .shared
     /// The seeds' R2 artist bundles: read through their own cache file, so
@@ -241,6 +244,9 @@ nonisolated struct ClusterSeedPicks: Sendable {
         var report = ListenerRetrieval.RadioReport()
         /// Left out: rows without a Discogs id (or whose name was not read), and one-offs at a distance.
         var unverified = 0, weak = 0
+        /// By identity, styles from an independent verified profile
+        /// (`RadioArtistProfiles`), and where they came from.
+        var styles: [String: (styles: [String], source: String)] = [:]
     }
     static let radioPerSeed = 12
     /// The most of the ranked list, and of the picks while anything else
@@ -291,6 +297,9 @@ nonisolated struct ClusterSeedPicks: Sendable {
         }
         for i in candidates.indices {
             ListenerRetrieval.style(&candidates[i], book: inputs.book)
+            if candidates[i].styles.isEmpty, let own = radio.styles[candidates[i].identity], !own.styles.isEmpty {
+                candidates[i].styles = own.styles; candidates[i].styleSource = own.source
+            }
             // The programmes' genres are the seeds' own shows', so as an
             // artist's styles they fit by construction: only when measuring.
             if Self.radioGenreStyles, candidates[i].styles.isEmpty, let genres = radio.genres[candidates[i].identity] {
@@ -385,13 +394,25 @@ nonisolated struct ClusterSeedPicks: Sendable {
         let picks = await collect(ranked, limit: limit, radioSlots: 0, seedNames: seedNames)
         let empty = limit - picks.count
         guard empty > 0 else { await store?.flush(); return picks }
-        let radio = await radioCandidates(inputs)
+        var radio = await radioCandidates(inputs)
+        await profile(&radio, inputs: inputs)
         let filling = Self.ranked(inputs, credits: credits, excluding: excluding, bundles: held, radio: radio, radioShare: 0).filter(Self.isRadioOnly)
         let taken = Set(picks.map(\.artistDiscogsID))
         let fill = await collect(filling.filter { !taken.contains(Int($0.identity.dropFirst("discogs:".count)) ?? 0) }, limit: empty,
                                  radioSlots: empty, seedNames: seedNames)
         await store?.flush()
         return picks + fill
+    }
+
+    /// Styles for the radio artists the device knows nothing of, from their
+    /// independent profiles, when a profile source is set.
+    func profile(_ radio: inout RadioCandidates, inputs: Inputs) async {
+        guard let radioProfiles else { return }
+        let ids = Set(radio.sightings.compactMap(\.discogsID)).filter { inputs.book.byID[$0] == nil && inputs.book.recordsByID[$0] == nil }
+        for (id, found) in await radioProfiles(ids.sorted()) {
+            let (styles, source) = found.styles(known: inputs.vectors)
+            if !styles.isEmpty { radio.styles["discogs:\(id)"] = (styles, source.rawValue) }
+        }
     }
 
     /// Up to `limit` of the ranked candidates' tracks: recordings in rank

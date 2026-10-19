@@ -42,6 +42,16 @@ nonisolated struct MBTag: Decodable, Sendable {
     let count: Int?
 }
 
+/// A URL's MusicBrainz page: the entities that link to it.
+nonisolated struct MBURLLookup: Decodable, Sendable {
+    struct Relation: Decodable, Sendable {
+        let type: String?
+        let artist: MBArtist?
+    }
+    let resource: String?
+    let relations: [Relation]?
+}
+
 nonisolated struct MBReleaseGroup: Decodable, Sendable {
     let id: String?
     let title: String?
@@ -141,9 +151,11 @@ nonisolated struct MBArtist: Decodable, Sendable {
     let lifeSpan: MBLifeSpan?
     let releaseGroups: [MBReleaseGroup]?
     let tags: [MBTag]?
+    /// MusicBrainz's curated genres (a fixed vocabulary), when asked for.
+    var genres: [MBTag]? = nil
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, disambiguation, type, country, area, tags
+        case id, name, disambiguation, type, country, area, tags, genres
         case sortName = "sort-name"
         case beginArea = "begin-area"
         case lifeSpan = "life-span"

@@ -48,6 +48,7 @@ struct PhoneLiveSlide: View {
     let entry: StationEntry
     let item: MediaItem?
     let insets: EdgeInsets
+    var usesForYouArtworkSizing = false
     let openStation: () -> Void
 
     @Environment(PlaybackCoordinator.self) private var player
@@ -64,8 +65,14 @@ struct PhoneLiveSlide: View {
                 // and cropped at the other: full-bleed, as the station's
                 // picture should be, not a square with bands above and below.
                 GeometryReader { proxy in
-                    picture(show, side: max(proxy.size.width, proxy.size.height))
-                        .frame(width: proxy.size.width, height: proxy.size.height)
+                    Group {
+                        if usesForYouArtworkSizing, let artwork = show?.artworkURL {
+                            PhoneSlideArtwork(picture: artwork, preview: nil, viewport: proxy.size)
+                        } else {
+                            picture(show, side: max(proxy.size.width, proxy.size.height))
+                        }
+                    }
+                    .frame(width: proxy.size.width, height: proxy.size.height)
                 }
                 .clipped()
                 // Dark at the top and the bottom, where the words are.

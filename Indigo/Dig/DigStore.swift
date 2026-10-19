@@ -188,6 +188,8 @@ final class DigStore {
     var discover = DiscoverState()
     /// For You's "Records like yours" (`SimilarRecordsFeature`).
     var similarRecords = SimilarRecordsState()
+    /// The standalone Debug-only curator recording section.
+    let radioDiscover = RadioDiscoverState()
     /// For You as one list, and its compass (`ForYouMixFeature`).
     var forYouMix = ForYouMixState()
     @ObservationIgnored var forYouMixComposition = 0
