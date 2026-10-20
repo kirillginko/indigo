@@ -91,10 +91,25 @@ final class EmbedAudioEngine: NSObject {
     @ObservationIgnored private var loadAutoplays = false
     /// How many times the bridge page has been loaded. Read by tests.
     @ObservationIgnored private(set) var bridgeLoads = 0
+    /// Which load the page's messages must belong to, to be listened to.
+    ///
+    /// Commands reach the page asynchronously, and its messages come back the
+    /// same way, so switching shows leaves a gap in which the outgoing widget
+    /// is still reporting: its half-second progress ticks were read as news
+    /// about the item just put on, and a show that had not made a sound — and
+    /// sometimes never did — read "playing". Every load and stop takes a new
+    /// number, the page stamps each message with the one it is on, and a
+    /// message stamped with any other is dropped.
+    @ObservationIgnored private(set) var generation = 0
+    /// Calls an item that never starts what it is. See `watchStart`.
+    @ObservationIgnored private var startWatch: Task<Void, Never>?
+    @ObservationIgnored private let startTimeout: Duration
 
     private static let bridgeName = "indigo"
 
-    override init() {
+    /// `startTimeout` is shorter only in tests.
+    init(startTimeout: Duration = .seconds(30)) {
+        self.startTimeout = startTimeout
         super.init()
 
         let configuration = WKWebViewConfiguration()
@@ -189,9 +204,11 @@ final class EmbedAudioEngine: NSObject {
         recovery = nil
         loadAutoplays = autoplay
         currentRequest = (provider, url)
+        generation += 1
         position = 0
         duration = 0
         setState(.loading)
+        if autoplay { watchStart() } else { startWatch?.cancel() }
 
         // YouTube's player takes a video id, not an address. Extracted here
         // rather than in the page so the bridge stays a transport and every
@@ -199,10 +216,11 @@ final class EmbedAudioEngine: NSObject {
         let address = provider == .youtube
             ? (YouTubeLink.videoID(from: url) ?? url.absoluteString)
             : url.absoluteString
-        let payload = [
+        let payload: [String: Any] = [
             "provider": provider.rawValue,
             "url": address,
-            "autoplay": autoplay ? "1" : "0"
+            "autoplay": autoplay ? "1" : "0",
+            "generation": generation
         ]
         guard let json = try? JSONSerialization.data(withJSONObject: payload),
               let string = String(data: json, encoding: .utf8) else { return }
@@ -211,20 +229,59 @@ final class EmbedAudioEngine: NSObject {
 
     func play() {
         guard currentRequest != nil else { return }
+        // Loading until the widget says it is playing, and held to the same
+        // deadline as a first start: a play the widget quietly ignores must
+        // not leave the button reading pause.
+        setState(.loading)
+        watchStart()
         run("indigoPlay()")
     }
 
     func pause() {
+        startWatch?.cancel()
+        // An item still loading is told not to start when it is ready, and
+        // says so at once: it was reading "playing", and pausing it used to
+        // change nothing until the widget began playing regardless.
+        if state == .loading { setState(.paused) }
         run("indigoPause()")
     }
 
     func stop() {
+        startWatch?.cancel()
         recovery = nil
         currentRequest = nil
+        generation += 1
         position = 0
         duration = 0
-        run("indigoStop()")
+        run("indigoStop(\(generation))")
         setState(.idle)
+    }
+
+    /// Gives an item the listener asked to hear a deadline to make a sound.
+    ///
+    /// The stream engine has had one for a long while; this never did, and
+    /// loading counts as playing, so a widget that never started — a YouTube
+    /// upload left cued, a play accepted and ignored — showed a pause button
+    /// over silence for as long as the listener let it. Nudged once halfway,
+    /// for the widget that was ready and simply did not begin, then called a
+    /// failure, which the transport answers like any other.
+    private func watchStart() {
+        startWatch?.cancel()
+        let half = startTimeout / 2
+        let loadGeneration = generation
+        startWatch = Task { [weak self] in
+            try? await Task.sleep(for: half)
+            guard !Task.isCancelled, let self, self.generation == loadGeneration,
+                  self.state == .loading else { return }
+            Trace.note("embed: not started after \(half), asking again")
+            self.run("indigoPlay()")
+            try? await Task.sleep(for: half)
+            guard !Task.isCancelled, self.generation == loadGeneration,
+                  self.state == .loading else { return }
+            Trace.note("embed: never started")
+            self.lastFailureIsRecordingSpecific = false
+            self.setState(.failed("It never started playing."))
+        }
     }
 
     func seek(to seconds: TimeInterval) {
@@ -306,13 +363,19 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
         let position = body["position"] as? Double
         let duration = body["duration"] as? Double
         let detail = body["detail"] as? String
+        let generation = (body["generation"] as? NSNumber)?.intValue ?? -1
 
         Task { @MainActor [weak self] in
-            self?.handle(event: event, position: position, duration: duration, detail: detail)
+            self?.handle(event: event, generation: generation,
+                         position: position, duration: duration, detail: detail)
         }
     }
 
-    private func handle(event: String, position: Double?, duration: Double?, detail: String?) {
+    /// One message from the page. Internal so tests can stand in for it.
+    func handle(event: String, generation: Int, position: Double?, duration: Double?, detail: String?) {
+        // The page announcing itself belongs to no load; everything else
+        // belongs to the one it was sent about.
+        guard event == "ready" || generation == self.generation else { return }
         if let duration, duration > 0 { self.duration = duration }
         if let position, position >= 0 { self.position = position }
 
@@ -322,8 +385,11 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
             setVolume(volume)
             flushPending()
         case "loading":
-            setState(.loading)
+            // A widget finishing its load is not a reason to undo a pause
+            // the listener made while it was still loading.
+            if state != .paused { setState(.loading) }
         case "play":
+            startWatch?.cancel()
             setState(.playing)
             if let recovery, self.duration > 0 {
                 self.recovery = nil
@@ -332,12 +398,16 @@ extension EmbedAudioEngine: WKScriptMessageHandler {
         case "pause":
             setState(.paused)
         case "progress":
-            if state != .playing, state != .paused { setState(.playing) }
+            if state != .playing, state != .paused {
+                startWatch?.cancel()
+                setState(.playing)
+            }
         case "finish":
             self.position = self.duration
             setState(.paused)
             onFinished?()
         case "error":
+            startWatch?.cancel()
             let reported = detail ?? "This episode could not be played."
             let failure = EmbedFailure(reported: reported)
             lastFailureIsRecordingSpecific = failure.isRecordingSpecific
@@ -417,6 +487,17 @@ extension EmbedAudioEngine {
         var current = null;
         var volume = 1;
         var ticker = null;
+        // The load every message is about; see `generation` in Swift.
+        var generation = 0;
+        // Whether the listener wants sound once the widget is ready. Read
+        // when it gets there rather than fixed at load, so a pause made while
+        // it loads is kept.
+        var wantsPlay = false;
+
+        // Whether a widget is still the one on the page. One being replaced
+        // can still answer a question asked of it, or report an event that
+        // was already on its way.
+        function live(widget) { return current !== null && current.widget === widget; }
 
         function stopTicker() {
           if (ticker) { clearInterval(ticker); ticker = null; }
@@ -428,20 +509,21 @@ extension EmbedAudioEngine {
           stopTicker();
           ticker = setInterval(function () {
             if (!current) { return; }
+            var widget = current.widget;
             if (current.provider === 'soundcloud') {
-              current.widget.getPosition(function (ms) {
-                current.widget.getDuration(function (total) {
-                  send('progress', ms / 1000, total / 1000);
+              widget.getPosition(function (ms) {
+                widget.getDuration(function (total) {
+                  if (live(widget)) { send('progress', ms / 1000, total / 1000); }
                 });
               });
             } else if (current.provider === 'youtube') {
               // YouTube answers synchronously, unlike the other two.
               try {
-                send('progress', current.widget.getCurrentTime(), current.widget.getDuration());
+                send('progress', widget.getCurrentTime(), widget.getDuration());
               } catch (e) {}
             } else {
-              Promise.all([current.widget.getPosition(), current.widget.getDuration()])
-                .then(function (values) { send('progress', values[0], values[1]); })
+              Promise.all([widget.getPosition(), widget.getDuration()])
+                .then(function (values) { if (live(widget)) { send('progress', values[0], values[1]); } })
                 .catch(function () {});
             }
           }, 500);
@@ -451,6 +533,7 @@ extension EmbedAudioEngine {
           try {
             window.webkit.messageHandlers.indigo.postMessage({
               event: event,
+              generation: generation,
               position: (position === undefined || position === null) ? -1 : position,
               duration: (duration === undefined || duration === null) ? -1 : duration,
               detail: detail || ""
@@ -488,20 +571,26 @@ extension EmbedAudioEngine {
           current = { provider: 'soundcloud', widget: widget };
 
           widget.bind(SC.Widget.Events.READY, function () {
+            if (!live(widget)) { return; }
             widget.setVolume(volume * 100);
-            widget.getDuration(function (ms) { send('loading', 0, ms / 1000); });
-            if (autoplay) { widget.play(); }
+            widget.getDuration(function (ms) { if (live(widget)) { send('loading', 0, ms / 1000); } });
+            if (wantsPlay) { widget.play(); }
           });
           widget.bind(SC.Widget.Events.PLAY, function () {
+            if (!live(widget)) { return; }
+            // `auto_play` in the address starts it whatever has been said
+            // since; a pause made while it loaded still stands.
+            if (!wantsPlay) { widget.pause(); return; }
             startTicker();
-            widget.getDuration(function (ms) { send('play', null, ms / 1000); });
+            widget.getDuration(function (ms) { if (live(widget)) { send('play', null, ms / 1000); } });
           });
-          widget.bind(SC.Widget.Events.PAUSE, function () { stopTicker(); send('pause'); });
-          widget.bind(SC.Widget.Events.FINISH, function () { stopTicker(); send('finish'); });
+          widget.bind(SC.Widget.Events.PAUSE, function () { if (live(widget)) { stopTicker(); send('pause'); } });
+          widget.bind(SC.Widget.Events.FINISH, function () { if (live(widget)) { stopTicker(); send('finish'); } });
           // The duration is what makes the seek bar usable; when READY did
           // not bring one (it can arrive late on a phone), ask while playing.
           var knownDuration = 0;
           widget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
+            if (!live(widget)) { return; }
             if (knownDuration > 0) { send('progress', e.currentPosition / 1000); return; }
             widget.getDuration(function (ms) {
               if (ms > 0) { knownDuration = ms; }
@@ -509,6 +598,7 @@ extension EmbedAudioEngine {
             });
           });
           widget.bind(SC.Widget.Events.ERROR, function () {
+            if (!live(widget)) { return; }
             send('error', null, null, 'SoundCloud refused to play this episode.');
           });
         }
@@ -556,15 +646,16 @@ extension EmbedAudioEngine {
             current = { provider: 'mixcloud', widget: widget };
 
             widget.ready.then(function () {
+              if (!live(widget)) { return; }
               widget.setVolume(volume);
-              widget.events.play.on(function () { startTicker(); send('play'); });
-              widget.events.pause.on(function () { stopTicker(); send('pause'); });
-              widget.events.ended.on(function () { stopTicker(); send('finish'); });
+              widget.events.play.on(function () { if (live(widget)) { startTicker(); send('play'); } });
+              widget.events.pause.on(function () { if (live(widget)) { stopTicker(); send('pause'); } });
+              widget.events.ended.on(function () { if (live(widget)) { stopTicker(); send('finish'); } });
               widget.events.progress.on(function (position, duration) {
-                send('progress', position, duration);
+                if (live(widget)) { send('progress', position, duration); }
               });
               widget.events.error.on(function (error) {
-                send('error', null, null, String(error));
+                if (live(widget)) { send('error', null, null, String(error)); }
               });
 
               whenMixcloudLoaded(widget, function (duration) {
@@ -575,10 +666,10 @@ extension EmbedAudioEngine {
                   send('error', null, null, 'Mixcloud never loaded this show.');
                   return;
                 }
-                if (autoplay) { widget.play(); }
+                if (wantsPlay) { widget.play(); }
               });
             }).catch(function (error) {
-              send('error', null, null, String(error));
+              if (live(widget)) { send('error', null, null, String(error)); }
             });
           });
         }
@@ -587,8 +678,10 @@ extension EmbedAudioEngine {
 
         window.indigoLoad = function (config) {
           clear();
-          send('loading', 0, 0);
+          generation = config.generation;
           var autoplay = config.autoplay === '1';
+          wantsPlay = autoplay;
+          send('loading', 0, 0);
           if (config.provider === 'mixcloud') {
             loadMixcloud(config.url, autoplay);
           } else if (config.provider === 'youtube') {
@@ -614,7 +707,10 @@ extension EmbedAudioEngine {
         }
 
         function loadYouTube(videoID, autoplay) {
+          var asked = generation;
           ensureYouTube(function () {
+            // The API arrived after the listener had moved on.
+            if (generation !== asked) { return; }
             var host = document.createElement('div');
             document.getElementById('host').appendChild(host);
             var player = new YT.Player(host, {
@@ -634,12 +730,16 @@ extension EmbedAudioEngine {
               },
               events: {
                 onReady: function (event) {
+                  if (!live(player)) { return; }
                   event.target.setVolume(volume * 100);
                   send('loading', 0, event.target.getDuration());
-                  if (autoplay) { event.target.playVideo(); }
+                  if (wantsPlay) { event.target.playVideo(); }
                 },
                 onStateChange: function (event) {
+                  if (!live(player)) { return; }
                   if (event.data === YT.PlayerState.PLAYING) {
+                    // The `autoplay` player variable, as SoundCloud's.
+                    if (!wantsPlay) { event.target.pauseVideo(); return; }
                     startTicker();
                     send('play', null, event.target.getDuration());
                   } else if (event.data === YT.PlayerState.PAUSED) {
@@ -651,6 +751,7 @@ extension EmbedAudioEngine {
                   }
                 },
                 onError: function (event) {
+                  if (!live(player)) { return; }
                   // Reported by code rather than as one message, because they
                   // are not the same problem: 100 is a video that no longer
                   // exists, 101 and 150 are a frame that was refused, and 2 is
@@ -674,21 +775,35 @@ extension EmbedAudioEngine {
           });
         }
 
+        // A command can arrive before the widget is ready — YouTube's player
+        // has no playVideo until then — and a throw here reached Swift as the
+        // episode failing. The widget plays on ready if it is still wanted.
         window.indigoPlay = function () {
+          wantsPlay = true;
           if (!current) { return; }
-          if (current.provider === 'youtube') { current.widget.playVideo(); }
-          else { current.widget.play(); }
+          try {
+            if (current.provider === 'youtube') { current.widget.playVideo(); }
+            else { current.widget.play(); }
+          } catch (e) {}
         };
 
         window.indigoPause = function () {
+          wantsPlay = false;
           if (!current) { return; }
-          if (current.provider === 'youtube') { current.widget.pauseVideo(); return; }
-          current.widget.pause();
+          try {
+            if (current.provider === 'youtube') { current.widget.pauseVideo(); }
+            else { current.widget.pause(); }
+          } catch (e) {}
         };
 
-        window.indigoStop = function () {
-          try { if (current) { current.widget.pause(); } } catch (e) {}
+        window.indigoStop = function (stopped) {
+          wantsPlay = false;
+          try {
+            if (current && current.provider === 'youtube') { current.widget.stopVideo(); }
+            else if (current) { current.widget.pause(); }
+          } catch (e) {}
           clear();
+          if (stopped !== undefined) { generation = stopped; }
         };
 
         window.indigoSeek = function (seconds) {
