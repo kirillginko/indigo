@@ -1,0 +1,60 @@
+{
+  "url": "https://api.discogs.com/artists/4304488",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:22.720610+00:00",
+  "body": {
+    "name": "Lolina (2)",
+    "id": 4304488,
+    "resource_url": "https://api.discogs.com/artists/4304488",
+    "uri": "https://www.discogs.com/artist/4304488-Lolina-2",
+    "releases_url": "https://api.discogs.com/artists/4304488/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/jA8Np07NQySaaZ7aLb1gPZphn7_xmJA1BmBuMP52QXY/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQzMDQ0/ODgtMTQ5NTAzNDEx/My02ODUwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/jA8Np07NQySaaZ7aLb1gPZphn7_xmJA1BmBuMP52QXY/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQzMDQ0/ODgtMTQ5NTAzNDEx/My02ODUwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Vuc56nCYKonazeRLPk1ETO9aeiqGYMNQO9yqZFpmidc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQzMDQ0/ODgtMTQ5NTAzNDEx/My02ODUwLmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/kUPF1FVgRQRX8SWTz4J_bW5KMscLKFj6JRD2AGT5-98/rs:fit/g:sm/q:90/h:500/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQzMDQ0/ODgtMTQ3NzgzMDA4/NC05ODE2LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/kUPF1FVgRQRX8SWTz4J_bW5KMscLKFj6JRD2AGT5-98/rs:fit/g:sm/q:90/h:500/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQzMDQ0/ODgtMTQ3NzgzMDA4/NC05ODE2LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/2_8LjbLtad0mNnJY29gMERM7c4zpPbhJdgblxZO7Pek/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQzMDQ0/ODgtMTQ3NzgzMDA4/NC05ODE2LmpwZWc.jpeg",
+        "width": 500,
+        "height": 500
+      }
+    ],
+    "realname": "Alina Astrova",
+    "profile": "",
+    "urls": [
+      "https://twitter.com/lolina_relaxin",
+      "https://lolina.bandcamp.com",
+      "https://www.youtube.com/user/copeland657",
+      "https://vimeo.com/lolinamusic",
+      "https://en.wikipedia.org/wiki/Lolina"
+    ],
+    "namevariations": [
+      "Lolina Relaxin"
+    ],
+    "aliases": [
+      {
+        "id": 2365200,
+        "name": "Inga Copeland",
+        "resource_url": "https://api.discogs.com/artists/2365200"
+      },
+      {
+        "id": 3967747,
+        "name": "Alina Astrova",
+        "resource_url": "https://api.discogs.com/artists/3967747"
+      },
+      {
+        "id": 16633052,
+        "name": "Balmainjeans",
+        "resource_url": "https://api.discogs.com/artists/16633052"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

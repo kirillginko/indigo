@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F4304488&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:22.422344+00:00",
+  "body": {
+    "id": "aee92142-88e9-45ae-9e6e-046a418ee9da",
+    "relations": [
+      {
+        "source-credit": "",
+        "attributes": [],
+        "type": "discogs",
+        "direction": "backward",
+        "target-type": "artist",
+        "ended": false,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "artist": {
+          "disambiguation": "Inga Copeland / Alina Astrova",
+          "id": "54492185-df45-494f-b133-f52da3fba781",
+          "name": "Lolina",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "Lolina"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "target-credit": "",
+        "end": null
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/4304488"
+  }
+}

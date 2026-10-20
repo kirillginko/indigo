@@ -1,0 +1,914 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/fd1a2d9d-9bb6-44de-83a3-41560658aba9?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:59.640865+00:00",
+  "body": {
+    "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+    "ipis": [
+      "00056633080",
+      "00056633178"
+    ],
+    "sort-name": "Withers, Bill",
+    "begin-area": {
+      "sort-name": "Slab Fork",
+      "type-id": null,
+      "name": "Slab Fork",
+      "type": null,
+      "id": "2f2f8ffc-65b8-42cf-8c10-a5dabb7f0644",
+      "disambiguation": ""
+    },
+    "life-span": {
+      "end": "2020-03-30",
+      "begin": "1938-07-04",
+      "ended": true
+    },
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "fe12b346-a10e-450f-bf81-fa20894b5ea2",
+        "count": 1,
+        "name": "blues"
+      },
+      {
+        "disambiguation": "",
+        "id": "9d180bd4-f0a8-4062-b306-196b6c4539e1",
+        "count": 1,
+        "name": "deep soul"
+      },
+      {
+        "name": "funk",
+        "count": 2,
+        "disambiguation": "",
+        "id": "fe4ba6a1-9873-4fd0-a12b-a70c81818514"
+      },
+      {
+        "id": "0c44a04f-f7ba-46a0-9dbe-1a21359cfa1e",
+        "disambiguation": "",
+        "count": 1,
+        "name": "motown"
+      },
+      {
+        "name": "pop soul",
+        "count": 2,
+        "disambiguation": "",
+        "id": "64e0bd76-822f-4549-a6fe-9858561282d1"
+      },
+      {
+        "name": "singer-songwriter",
+        "id": "455f264b-db00-4716-991d-fbd32dc24523",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "name": "smooth soul",
+        "count": 1,
+        "id": "d4eafdc7-1a86-422b-b598-79e6bb81745c",
+        "disambiguation": ""
+      },
+      {
+        "count": 5,
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827",
+        "disambiguation": "",
+        "name": "soul"
+      }
+    ],
+    "isnis": [
+      "000000006309931X"
+    ],
+    "country": "US",
+    "type": "Person",
+    "area": {
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "sort-name": "United States",
+      "type-id": null,
+      "name": "United States",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "disambiguation": "",
+      "type": null
+    },
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "relations": [
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "direction": "forward",
+        "target-type": "artist",
+        "artist": {
+          "type": "Group",
+          "disambiguation": "",
+          "country": "US",
+          "sort-name": "Creative Source",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Creative Source",
+          "id": "7cf7c106-14e1-4c22-9341-7e7eb73b26a2"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {}
+      },
+      {
+        "type": "allmusic",
+        "source-credit": "",
+        "url": {
+          "id": "c2861a25-1bed-4219-b350-26c0b9e579a0",
+          "resource": "https://www.allmusic.com/artist/mn0000078044"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "BBC Music page",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": true,
+        "begin": null,
+        "url": {
+          "id": "1eb4b1d5-8216-42a4-bc53-c35833e6006b",
+          "resource": "https://www.bbc.co.uk/music/artists/fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+        },
+        "direction": "forward",
+        "end": "2020-11-19",
+        "attributes": []
+      },
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.discogs.com/artist/59249",
+          "id": "55ca4f27-62b5-4341-a0ba-296681e5a80e"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "discogs"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.spotify.com/artist/1ThoqLcyIYvZn7iWbj8fsj",
+          "id": "7bc21b5f-0e1f-4124-a67c-89db2b084fa1"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.deezer.com/artist/1118",
+          "id": "67164781-73e6-440c-a511-abdd9db696ea"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "source-credit": "",
+        "type": "image",
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://commons.wikimedia.org/wiki/File:Bill_Withers_1976.JPG",
+          "id": "b2f99588-3446-4e03-9e0b-b9b0380c1510"
+        },
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://commons.wikimedia.org/wiki/File:Bill_Withers_at_the_Rock_and_Roll_Hall_of_Fame_02.jpg",
+          "id": "41f8cb73-c514-451a-87c6-9802eab6c4f5"
+        },
+        "direction": "forward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "image",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "IMDb",
+        "target-type": "url",
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attribute-values": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.imdb.com/name/nm0936719/",
+          "id": "28ff991e-a0ba-4c8a-b61f-7b6c60a1191b"
+        },
+        "direction": "forward"
+      },
+      {
+        "type": "last.fm",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "a135c406-4620-48fd-b72d-ac038ed43391",
+          "resource": "https://www.last.fm/music/Bill+Withers"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "lyrics",
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "de42f063-1956-4099-9af0-e5d6dd8291f4",
+          "resource": "http://muzikum.eu/en/122-3856/bill-withers/lyrics.html"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "type": "lyrics",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "id": "337417c4-de77-49dc-b18b-fac0e6a9543b",
+          "resource": "https://genius.com/artists/Bill-withers"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed"
+      },
+      {
+        "type": "myspace",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://myspace.com/billwitherslegacy",
+          "id": "07af204f-f846-4c43-ab0e-ea55a93d3a26"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "official homepage",
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "5073638e-659c-4f91-b494-fa94f87e69be",
+          "resource": "https://billwithers.com/"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "url": {
+          "id": "8c1d4db0-1547-4814-a9c3-af45efb44400",
+          "resource": "http://id.loc.gov/authorities/names/n93043947"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb139215601",
+          "id": "5a9af479-6b43-47b7-be6e-4c79c7ad935d"
+        },
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "url": {
+          "id": "acb4edde-57af-479b-8ac8-d72ba3f8da6c",
+          "resource": "https://d-nb.info/gnd/134559509"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/bill-withers",
+          "id": "e9902daa-6f83-4ada-b14b-1295a0c09fdf"
+        },
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.ibdb.com/person.php?id=73098",
+          "id": "d01df862-4967-40ae-9ee4-e48ed77fa2c7"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.musik-sammler.de/artist/bill-withers/",
+          "id": "ac06b515-a342-4e59-9623-24b6cc4c09ad"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-n93043947",
+          "id": "2d48c715-3f3c-4d1c-962f-bdace2d0be3a"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {}
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "url": {
+          "id": "88c25327-2d95-4817-8ed1-2489a6bb1eaf",
+          "resource": "https://itunes.apple.com/us/artist/id339834"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url"
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "4a5def9c-adb9-4f82-a054-cd491b921875",
+          "resource": "https://open.qobuz.com/artist/42265"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url"
+      },
+      {
+        "type": "purchase for mail-order",
+        "source-credit": "",
+        "url": {
+          "id": "d50199f2-b4ce-4041-9ec5-99c2e047dc5d",
+          "resource": "https://tower.jp/artist/174771"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "611b1862-67af-4253-a64f-34adba305d1d",
+        "target-type": "url"
+      },
+      {
+        "target-type": "url",
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "attribute-values": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://secondhandsongs.com/artist/1570",
+          "id": "8dc564ec-57e1-4b26-b01d-57fad4f3eb69"
+        },
+        "source-credit": "",
+        "type": "secondhandsongs"
+      },
+      {
+        "source-credit": "",
+        "type": "social network",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "88aee267-1053-42f8-a5d1-b310133adc13",
+          "resource": "https://twitter.com/RealBillWithers"
+        },
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "resource": "https://www.facebook.com/BillWithers",
+          "id": "7b19ce0d-9fe6-4bc1-aced-99c2d4f704ac"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "social network"
+      },
+      {
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "resource": "https://www.instagram.com/RealBillWithers/",
+          "id": "34c02164-ef22-482a-8fd8-69aa59631ffb"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "songkick",
+        "target-type": "url",
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.songkick.com/artists/295965",
+          "id": "0c6d89f2-b27b-4a84-8b8d-cd533bccf944"
+        }
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "url": {
+          "id": "e10dbf16-8653-4b23-982c-392f64f210e5",
+          "resource": "https://music.apple.com/gb/artist/339834"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "id": "8bfd6ba7-6e65-4856-96ab-a9ec3fb1b55b",
+          "resource": "https://music.apple.com/us/artist/339834"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/42265",
+          "id": "4a5def9c-adb9-4f82-a054-cd491b921875"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://tidal.com/artist/73",
+          "id": "34d04f24-6a94-42db-9d85-029ee512a221"
+        },
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "source-credit": "",
+        "type": "VIAF",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "id": "9dea28c8-61e3-4bda-9017-053bfe7c419a",
+          "resource": "http://viaf.org/viaf/42027228"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q346565",
+          "id": "6d148dc5-bf19-47fd-b697-60c809492678"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "type": "wikidata"
+      },
+      {
+        "source-credit": "",
+        "type": "youtube",
+        "attribute-values": {},
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "372b533b-1c7c-4689-b038-5e71a64d7b16",
+          "resource": "https://www.youtube.com/channel/UCBTrTXbSiv4Pq7As_tcB0UA"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false
+      }
+    ],
+    "name": "Bill Withers",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "disambiguation": "",
+    "aliases": [
+      {
+        "end": null,
+        "type": null,
+        "primary": false,
+        "locale": "en",
+        "ended": false,
+        "begin": null,
+        "name": "B. Withers",
+        "type-id": null,
+        "sort-name": "Withers, B."
+      },
+      {
+        "begin": null,
+        "ended": false,
+        "locale": null,
+        "end": null,
+        "primary": null,
+        "type": null,
+        "sort-name": "Bill Whinters",
+        "type-id": null,
+        "name": "Bill Whinters"
+      },
+      {
+        "sort-name": "Bill Whiters",
+        "type-id": null,
+        "name": "Bill Whiters",
+        "primary": null,
+        "end": null,
+        "type": null,
+        "begin": null,
+        "ended": false,
+        "locale": null
+      },
+      {
+        "sort-name": "Bill Whithers",
+        "type-id": null,
+        "name": "Bill Whithers",
+        "type": null,
+        "end": null,
+        "primary": null,
+        "ended": false,
+        "begin": null,
+        "locale": null
+      },
+      {
+        "name": "Bill Witners",
+        "type-id": null,
+        "sort-name": "Bill Witners",
+        "end": null,
+        "primary": null,
+        "type": null,
+        "begin": null,
+        "ended": false,
+        "locale": null
+      },
+      {
+        "primary": null,
+        "end": null,
+        "type": null,
+        "begin": null,
+        "ended": false,
+        "locale": null,
+        "name": "William Harrison Withers",
+        "type-id": null,
+        "sort-name": "Withers, William Harrison"
+      },
+      {
+        "type": "Legal name",
+        "end": null,
+        "primary": null,
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "sort-name": "Withers, William Harrison, Jr.",
+        "name": "William Harrison Withers Jr.",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf"
+      },
+      {
+        "end": null,
+        "primary": false,
+        "type": null,
+        "begin": null,
+        "ended": false,
+        "locale": "en",
+        "sort-name": "Withers",
+        "type-id": null,
+        "name": "Withers"
+      },
+      {
+        "sort-name": "ビル・ウィザース",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "ビル・ウィザース",
+        "ended": false,
+        "begin": null,
+        "locale": "ja",
+        "end": null,
+        "primary": true,
+        "type": "Artist name"
+      },
+      {
+        "type-id": null,
+        "name": "ビル・ウィザーズ",
+        "sort-name": "ビル・ウィザーズ",
+        "end": null,
+        "type": null,
+        "primary": null,
+        "begin": null,
+        "ended": false,
+        "locale": null
+      }
+    ],
+    "gender": "Male",
+    "end-area": {
+      "id": "1f40c6e1-47ba-4e35-996f-fe6ee5840e62",
+      "disambiguation": "",
+      "sort-name": "Los Angeles",
+      "name": "Los Angeles",
+      "type": null,
+      "type-id": null
+    },
+    "tags": [
+      {
+        "name": "1970s",
+        "count": 1
+      },
+      {
+        "name": "blues",
+        "count": 1
+      },
+      {
+        "name": "deep soul",
+        "count": 1
+      },
+      {
+        "name": "funk",
+        "count": 2
+      },
+      {
+        "name": "motown",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "pop soul"
+      },
+      {
+        "name": "rhythm & blues",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "singer-songwriter"
+      },
+      {
+        "count": 1,
+        "name": "smooth soul"
+      },
+      {
+        "count": 5,
+        "name": "soul"
+      }
+    ]
+  }
+}

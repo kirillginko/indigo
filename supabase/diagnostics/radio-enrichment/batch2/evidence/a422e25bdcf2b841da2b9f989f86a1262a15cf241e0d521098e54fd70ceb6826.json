@@ -1,0 +1,791 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/fcbb5068-2666-4938-8bb1-903929b285b2?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:58.240270+00:00",
+  "body": {
+    "video": false,
+    "disambiguation": "",
+    "releases": [
+      {
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "date": "1974",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "disambiguation": "",
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            },
+            "date": "1974"
+          }
+        ],
+        "id": "a103f371-eb10-4adc-8456-a1b10a48d710",
+        "packaging": "Cardboard/Paper Sleeve",
+        "barcode": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "disambiguation": "",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Withers, Bill",
+              "type": "Person"
+            },
+            "name": "Bill Withers",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "title": "+'Justments"
+      },
+      {
+        "country": "DE",
+        "disambiguation": "",
+        "packaging-id": null,
+        "status-id": null,
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "status": null,
+        "id": "ae782440-259f-4c41-a8ef-fc46d46aeb3e",
+        "release-events": [
+          {
+            "date": "1976",
+            "area": {
+              "type-id": null,
+              "sort-name": "Germany",
+              "type": null,
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "disambiguation": "",
+              "name": "Germany",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad"
+            }
+          }
+        ],
+        "date": "1976",
+        "title": "Black Magic",
+        "quality": "normal",
+        "packaging": null,
+        "barcode": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Bill Withers",
+            "artist": {
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "disambiguation": "",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Withers, Bill",
+              "type": "Person"
+            }
+          }
+        ]
+      },
+      {
+        "country": "FR",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "release-events": [
+          {
+            "area": {
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "name": "France",
+              "disambiguation": "",
+              "type": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "sort-name": "France",
+              "type-id": null
+            },
+            "date": "2008-07-25"
+          }
+        ],
+        "date": "2008-07-25",
+        "id": "343e6289-0f32-4dad-b08c-0dbcbab19388",
+        "title": "+'Justments",
+        "barcode": "884977276909",
+        "packaging": "None",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Bill Withers",
+            "artist": {
+              "country": "US",
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "disambiguation": "",
+              "sort-name": "Withers, Bill",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "id": "781194e7-29b5-4381-a710-20a10397cdad",
+        "date": "2010-02-16",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "disambiguation": ""
+            },
+            "date": "2010-02-16"
+          }
+        ],
+        "quality": "normal",
+        "packaging": null,
+        "barcode": "667487802222",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Bill Withers",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Withers, Bill",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers"
+            }
+          }
+        ],
+        "title": "+’Justments",
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "title": "+’Justments",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Bill Withers",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "type": "Person",
+              "sort-name": "Withers, Bill",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "packaging": "Cardboard/Paper Sleeve",
+        "barcode": "4547366053753",
+        "id": "b07f4794-b7bb-4793-9d2f-8ce8712009a1",
+        "date": "2010-06-09",
+        "release-events": [
+          {
+            "area": {
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "name": "Japan",
+              "disambiguation": "",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type": null,
+              "sort-name": "Japan"
+            },
+            "date": "2010-06-09"
+          }
+        ],
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "JP",
+        "disambiguation": ""
+      },
+      {
+        "title": "+'Justments... Expanded",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Withers, Bill"
+            },
+            "joinphrase": "",
+            "name": "Bill Withers"
+          }
+        ],
+        "barcode": null,
+        "packaging": null,
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "2010",
+            "area": {
+              "name": "Australia",
+              "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "Australia",
+              "iso-3166-1-codes": [
+                "AU"
+              ],
+              "type": null
+            }
+          }
+        ],
+        "date": "2010",
+        "id": "15cbb925-d70c-4d8a-9dc7-5a18d3e97752",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "status": "Official",
+        "country": "AU",
+        "disambiguation": ""
+      },
+      {
+        "id": "a3de5552-fb50-477e-8c74-8416d48a3300",
+        "date": "2012-11-05",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type": null,
+              "sort-name": "Europe",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe"
+            },
+            "date": "2012-11-05"
+          }
+        ],
+        "title": "The Complete Sussex and Columbia Albums",
+        "quality": "normal",
+        "packaging": "Box",
+        "barcode": "886978946720",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Withers, Bill",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "disambiguation": ""
+            },
+            "joinphrase": "",
+            "name": "Bill Withers"
+          }
+        ],
+        "country": "XE",
+        "disambiguation": "",
+        "packaging-id": "c1668fc7-8944-4a00-bc3e-46e8d861d211",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status": "Official"
+      },
+      {
+        "id": "11f15223-8bd4-46de-91fb-7cc0addda8e0",
+        "date": "2012-11-06",
+        "release-events": [
+          {
+            "date": "2012-11-06",
+            "area": {
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Bill Withers",
+            "artist": {
+              "sort-name": "Withers, Bill",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "",
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+            }
+          }
+        ],
+        "barcode": "886978946720",
+        "packaging": null,
+        "title": "Bill Withers: The Complete Sussex and Columbia Albums",
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "country": "XW",
+        "disambiguation": "",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "9837a80f-e896-475c-a1f4-b71d64b43ce4",
+        "release-events": [
+          {
+            "date": "2012-11-06",
+            "area": {
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "2012-11-06",
+        "title": "Complete Sussex & Columbia Album Masters",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Bill Withers",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "disambiguation": "",
+              "sort-name": "Withers, Bill",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "packaging": "None",
+        "barcode": "886444095853"
+      },
+      {
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "XE",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Bill Withers",
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Withers, Bill",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": null,
+        "title": "+'Justments",
+        "id": "5a5b16a2-e247-407c-8d28-7441b8d6aa23",
+        "date": "2012",
+        "release-events": [
+          {
+            "area": {
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe",
+              "disambiguation": "",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "sort-name": "Europe",
+              "type-id": null
+            },
+            "date": "2012"
+          }
+        ]
+      },
+      {
+        "title": "The Essential Bill Withers",
+        "quality": "normal",
+        "packaging": "Jewel Case",
+        "barcode": "888837715720",
+        "artist-credit": [
+          {
+            "name": "Bill Withers",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "name": "Bill Withers",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "sort-name": "Withers, Bill",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "id": "fbfb931e-4f98-4f1b-b6d9-be0b6e6d6c96",
+        "date": "2013-08-20",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "disambiguation": ""
+            },
+            "date": "2013-08-20"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status": "Official",
+        "country": "US",
+        "disambiguation": ""
+      },
+      {
+        "country": "XW",
+        "disambiguation": "",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "cbe8b684-275c-473a-972f-96a83c933dc7",
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "type-id": null
+            },
+            "date": "2013-08-20"
+          }
+        ],
+        "date": "2013-08-20",
+        "title": "The Essential Bill Withers",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "type": "Person",
+              "sort-name": "Withers, Bill",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "Bill Withers",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": "None",
+        "barcode": "886444178860"
+      },
+      {
+        "country": "US",
+        "disambiguation": "",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "text-representation": {
+          "script": null,
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "ce0bc424-262b-42fb-8341-50720fdbc49d",
+        "release-events": [
+          {
+            "date": "2013",
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "type-id": null
+            }
+          }
+        ],
+        "date": "2013",
+        "title": "The Essential Bill Withers",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "type": "Person",
+              "sort-name": "Withers, Bill",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": "",
+            "name": "Bill Withers"
+          }
+        ],
+        "barcode": "888837422024",
+        "packaging": "Jewel Case"
+      },
+      {
+        "country": null,
+        "disambiguation": "24-bit 96 kHz high definition",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "2623a1aa-606c-4e6c-845e-83c0c8010a8b",
+        "date": "2015",
+        "release-events": [
+          {
+            "date": "2015",
+            "area": null
+          }
+        ],
+        "title": "+’Justments",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Bill Withers",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Withers, Bill",
+              "disambiguation": "",
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "country": "US"
+            }
+          }
+        ],
+        "packaging": "None",
+        "barcode": null
+      },
+      {
+        "status": "Official",
+        "packaging-id": "147a2320-e485-4220-beab-35f85da3b9d7",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "country": "NL",
+        "quality": "normal",
+        "barcode": "889854567422",
+        "packaging": "Clamshell Case",
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "disambiguation": "",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Withers, Bill"
+            },
+            "name": "Bill Withers",
+            "joinphrase": ""
+          }
+        ],
+        "title": "Top 40 Bill Withers. His Ultimate Top 40 Collection",
+        "id": "fb91030b-a990-4b1b-8d20-ea99d4aca6b6",
+        "date": "2017",
+        "release-events": [
+          {
+            "date": "2017",
+            "area": {
+              "disambiguation": "",
+              "name": "Netherlands",
+              "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+              "sort-name": "Netherlands",
+              "iso-3166-1-codes": [
+                "NL"
+              ],
+              "type": null,
+              "type-id": null
+            }
+          }
+        ]
+      },
+      {
+        "status": "Official",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "VMP Classics",
+        "country": "US",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Bill Withers",
+            "joinphrase": "",
+            "artist": {
+              "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+              "name": "Bill Withers",
+              "disambiguation": "",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Withers, Bill"
+            }
+          }
+        ],
+        "barcode": null,
+        "packaging": "Cardboard/Paper Sleeve",
+        "title": "+'Justments",
+        "id": "f485218e-c5b0-49db-bee2-b2cc3d8bf6c7",
+        "date": "2021-08",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": ""
+            },
+            "date": "2021-08"
+          }
+        ]
+      }
+    ],
+    "id": "fcbb5068-2666-4938-8bb1-903929b285b2",
+    "isrcs": [
+      "USSM10903736"
+    ],
+    "title": "Make a Smile for Me",
+    "first-release-date": "1974",
+    "artist-credit": [
+      {
+        "artist": {
+          "sort-name": "Withers, Bill",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "name": "Bill Withers",
+          "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+          "disambiguation": ""
+        },
+        "name": "Bill Withers",
+        "joinphrase": ""
+      }
+    ],
+    "length": 196706
+  }
+}

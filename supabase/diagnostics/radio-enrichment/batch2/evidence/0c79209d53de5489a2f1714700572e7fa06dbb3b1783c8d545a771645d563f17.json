@@ -1,0 +1,177 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Blood+in+My+Mouth%22+AND+artist%3A%22Djrum%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:58.621226+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:58.550Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "1578a07e-2051-4a27-8139-6af6919074b4",
+        "score": 100,
+        "artist-credit-id": "377b71b7-19a8-384d-96d0-6004e8b4c0f6",
+        "title": "Blood in My Mouth",
+        "length": 180165,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Djrum",
+            "artist": {
+              "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+              "name": "Djrum",
+              "sort-name": "Djrum"
+            }
+          }
+        ],
+        "first-release-date": "2018-08-17",
+        "releases": [
+          {
+            "id": "8c15d612-07a1-4cde-b9f2-e4b4b22329c5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Portrait With Firewood",
+            "status": "Official",
+            "release-group": {
+              "id": "ceb6396a-f183-4efa-9278-4589991d425f",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Portrait With Firewood",
+              "primary-type": "Album"
+            },
+            "date": "2018-08-17",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2018-08-17",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "737a0c55-623a-3ad1-8bcf-f796e1885617",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "c19ff992-ab1a-4675-91ae-deef9cd281d6",
+                    "number": "9",
+                    "title": "Blood in My Mouth",
+                    "length": 180165
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "2bd535ed-1467-4de5-a2e8-ce9ada90150c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 2,
+            "title": "Portrait With Firewood",
+            "status": "Official",
+            "release-group": {
+              "id": "ceb6396a-f183-4efa-9278-4589991d425f",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Portrait With Firewood",
+              "primary-type": "Album"
+            },
+            "date": "2018-08",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "2018-08",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "9fa9bddf-0186-355d-9cc7-f43a75741908",
+                "position": 2,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "be8903c4-1467-420f-8d5a-b3066fa98b7b",
+                    "number": "D2",
+                    "title": "Blood in My Mouth",
+                    "length": 180000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "7035faf2-973e-43fa-a98c-7d137d43e857",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Portrait With Firewood",
+            "status": "Official",
+            "release-group": {
+              "id": "ceb6396a-f183-4efa-9278-4589991d425f",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Portrait With Firewood",
+              "primary-type": "Album"
+            },
+            "date": "2018-08-17",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2018-08-17",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "34557527-2e8e-3910-a0e2-f451c13b69aa",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "9ac24a37-37c6-4bfc-adca-00000d982fe7",
+                    "number": "9",
+                    "title": "Blood in My Mouth",
+                    "length": 180165
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 8
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "BEZ351800133"
+        ]
+      }
+    ]
+  }
+}

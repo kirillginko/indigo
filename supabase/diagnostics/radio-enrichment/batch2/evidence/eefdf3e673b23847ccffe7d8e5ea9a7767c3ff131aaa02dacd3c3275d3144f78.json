@@ -1,0 +1,1645 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Abele+Dance%22+AND+artist%3A%22Manu+Dibango%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:09.877667+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:09.696Z",
+    "count": 10,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "99688798-6fd5-42c0-b275-ec50e57a57bc",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance",
+        "length": 179000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2008",
+        "releases": [
+          {
+            "id": "b2506791-fd03-43c3-871f-d74ab97b2142",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Poplife™ Presents Poplife Sucks",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7b923573-04d4-3043-844f-fdf00a2400a7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Poplife™ Presents Poplife Sucks",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2008",
+            "country": "BE",
+            "release-events": [
+              {
+                "date": "2008",
+                "area": {
+                  "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+                  "name": "Belgium",
+                  "sort-name": "Belgium",
+                  "iso-3166-1-codes": [
+                    "BE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 19,
+            "media": [
+              {
+                "id": "be24ccb2-419b-3330-8386-89fa8cc5ba25",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3b42ef3c-db78-3c6b-94a9-6886bed0b35c",
+                    "number": "9",
+                    "title": "Abele Dance",
+                    "length": 179000
+                  }
+                ],
+                "track-count": 19,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a6e04925-5e41-448b-86ef-576fb7eed48b",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance",
+        "length": 215560,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-11-20",
+        "releases": [
+          {
+            "id": "68f0b29f-81f8-4085-9f07-a843d0e1a55d",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Mind Fair Present \"A Journey To The Places In Between\"",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3ba5aa52-b8dc-4530-aded-d03786eff9c6",
+              "type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "primary-type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "title": "Mind Fair Present \"A Journey To The Places In Between\"",
+              "primary-type": "Other",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2014-11-20",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2014-11-20",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "e842c908-0bb7-39d4-ab7c-cb884e3da173",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "66c3c3b5-635f-4dda-beb5-e0d816f02dbf",
+                    "number": "7",
+                    "title": "Abele Dance",
+                    "length": 215560
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "59956f55-6a43-4c6d-99e0-1fc5bed1b6fb",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance",
+        "length": 263000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2008",
+        "releases": [
+          {
+            "id": "309337e7-4792-41f5-968d-a9eaac2559cc",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 10,
+            "title": "L’Intégrale Année 80",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "83ef4751-e0a9-423e-a1e9-96c316baede3",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "L’Intégrale Année 80",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2008",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2008",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 189,
+            "media": [
+              {
+                "id": "c71627e7-5583-36ad-a13a-083e9088c487",
+                "position": 9,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "901ff8a8-c70d-39ba-93ff-c90fee126cb9",
+                    "number": "9",
+                    "title": "Abele Dance",
+                    "length": 263000
+                  }
+                ],
+                "track-count": 19,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d372c1a7-d510-4339-a9a2-d32912e264c1",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance",
+        "length": 220000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1985",
+        "releases": [
+          {
+            "id": "b3f8189b-39b9-3754-b20b-3e96ecd81a75",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "New Africa",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "732227a2-5f1e-43cb-90fa-b78e8e830aee",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "New Africa",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 7,
+            "media": [
+              {
+                "id": "7f28abec-bbc3-33be-9a52-b9a0758bdd67",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "260be856-bd45-3db0-b871-b6a7e2ba1c2a",
+                    "number": "2",
+                    "title": "Abele Dance",
+                    "length": 220000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 1
+              }
+            ]
+          },
+          {
+            "id": "3d8817b5-03e9-49de-9874-d05e9174d2e9",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "New Africa",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "732227a2-5f1e-43cb-90fa-b78e8e830aee",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "New Africa",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1985",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1985",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "fccff427-6745-3b0a-bd27-e321d37caf15",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "492104f4-b533-3fa3-931b-799e951679a0",
+                    "number": "A2",
+                    "title": "Abele Dance",
+                    "length": 220000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cdfab4b5-2620-4991-b96d-8d6ca31bed40",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1984",
+        "releases": [
+          {
+            "id": "ba1cef83-e7e3-44e3-98c7-d7e6c4f7b271",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Raging Spool",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6f07f636-6350-4932-948e-6794e20d3f97",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Raging Spool",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1984",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 22,
+            "media": [
+              {
+                "id": "616cdaed-0345-4728-9069-7eb3790459d3",
+                "position": 1,
+                "format": "Cassette",
+                "track": [
+                  {
+                    "id": "24ced431-a4f1-4bf1-bafd-8cd0e869d443",
+                    "number": "A8",
+                    "title": "Abele Dance"
+                  }
+                ],
+                "track-count": 22,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "77f06f7f-d6a8-48d9-9343-28924fc341e9",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance",
+        "length": 413000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1984",
+        "releases": [
+          {
+            "id": "a5b3eef9-f3f8-43d4-ad71-6a671a10422e",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Abele Dance",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "edb531f9-4aa0-44a0-b9f3-5d79b9140e8c",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Abele Dance",
+              "primary-type": "Single"
+            },
+            "date": "1984",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "9f26119f-857a-35e8-8219-0b48fbb897d5",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "d08bed26-2d74-4e8a-a4c8-fee611b7b36a",
+                    "number": "A",
+                    "title": "Abele Dance",
+                    "length": 410000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "2775b7ca-0336-4caf-a87e-49586683badb",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 2,
+            "title": "Essential Recordings",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0b6d61c3-086f-4e71-901b-3bb85137955b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Essential Recordings",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-04-17",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2006-04-17",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "de5e2a39-fcaa-34be-8047-14a21cb3801c",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "af4294bf-712f-3233-94ff-1db5269b0d9d",
+                    "number": "4",
+                    "title": "Abele Dance",
+                    "length": 415000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "72aa738c-a4c8-4353-a16f-8255546fcec5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Ethno Beats - Rhythms... From the Jungle and the Desert to the Dancefloor...",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58a3e9ec-0f9e-3ed4-b9c3-b04ec672a5f0",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Ethno Beats - Rhythms... From the Jungle and the Desert to the Dancefloor...",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1988",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1988",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "5e7f6ed9-dd56-30b1-94ac-9dd8406f4740",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e0af8490-bca0-47ea-a4c8-0e80ee0dcfba",
+                    "number": "1",
+                    "title": "Abele Dance",
+                    "length": 413000
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "accf01a4-ed55-49de-9144-2701e9127233",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Ethno Beats - Rhythms... From the Jungle and the Desert to the Dancefloor...",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58a3e9ec-0f9e-3ed4-b9c3-b04ec672a5f0",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Ethno Beats - Rhythms... From the Jungle and the Desert to the Dancefloor...",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1988",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1988",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "920895b4-a3ee-372f-bf59-3b6a0ea0d0aa",
+                "position": 2,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "da9bec23-e120-36df-a77e-bb2a89032f0f",
+                    "number": "C1",
+                    "title": "Abele Dance",
+                    "length": 413000
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "818f7365-2298-4174-9ef2-7f3c1ed4c41c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Club Wave 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0d67694d-458f-35dc-88c7-a39c29a5175d",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Club Wave 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1999",
+            "country": "BE",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+                  "name": "Belgium",
+                  "sort-name": "Belgium",
+                  "iso-3166-1-codes": [
+                    "BE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "b88a350c-7f11-3114-9818-9a568d3e3a7f",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ea8c2793-0067-33af-abb1-e84422b6a697",
+                    "number": "3",
+                    "title": "Abele Dance",
+                    "length": 412586
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "7211a96d-28b0-4b4c-b35b-12d678e20407",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "The Very Best of Manu Dibango: Afro Soul Jazz from the Original Makossa Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e29d4909-ef09-328d-8601-716073f283cb",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Very Best of Manu Dibango",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2018-10-19",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2018-10-19",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "49e9179e-e31f-3ff3-9504-fe22439dc4c1",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "70b4a621-e4f0-4ac3-9fc4-26a62e000bcf",
+                    "number": "8",
+                    "title": "Abele Dance",
+                    "length": 414000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "d1542edd-2c76-424e-8518-99b95ea4a800",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "The Very Best of Manu Dibango",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e29d4909-ef09-328d-8601-716073f283cb",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Very Best of Manu Dibango",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "1ad503c4-ec14-37c6-956b-045bcc01e9e0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ea7f0658-71fb-36d0-8225-4b1bc5782982",
+                    "number": "8",
+                    "title": "Abele Dance",
+                    "length": 414000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ebbc6065-e071-43f7-bf7f-bea9dd386cd0",
+        "score": 93,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance Dub",
+        "length": 495000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1984",
+        "releases": [
+          {
+            "id": "a5b3eef9-f3f8-43d4-ad71-6a671a10422e",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Abele Dance",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "edb531f9-4aa0-44a0-b9f3-5d79b9140e8c",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Abele Dance",
+              "primary-type": "Single"
+            },
+            "date": "1984",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "9f26119f-857a-35e8-8219-0b48fbb897d5",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "1ae01d5f-2df3-41a2-a85e-a2a91a7004f0",
+                    "number": "B",
+                    "title": "Abele Dance Dub",
+                    "length": 495000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e2b3c6e2-c876-468e-b27b-f2b11059ab39",
+        "score": 88,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance ('85 remix)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1985",
+        "releases": [
+          {
+            "id": "34704fe2-3d53-4915-b5ff-47fbe3f364b2",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Pata Piya",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "31862127-948a-4216-b2ec-88ad6be6046c",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Pata Piya",
+              "primary-type": "Single"
+            },
+            "date": "1985",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1985",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 3,
+            "media": [
+              {
+                "id": "54bd72c4-31a8-3ca3-8c74-298526bcbfd3",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "edec48e1-e60c-3984-b0bc-dbd119c10d67",
+                    "number": "B2",
+                    "title": "Abele Dance ('85 remix)"
+                  }
+                ],
+                "track-count": 3,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e7fac4d2-96bb-4888-ab3a-e8743a1c02f9",
+        "score": 88,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance (85 remix)",
+        "length": 376200,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2012-02-19",
+        "releases": [
+          {
+            "id": "f9203c6d-4383-426f-87dd-55d8cbc6abf3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Change the Beat: The Celluloid Records Story 1979–1987",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "207a342a-d9f3-4a35-b12d-201578a3f95a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Change the Beat: The Celluloid Records Story 1979–1987",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2012-02-19",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2012-02-19",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 30,
+            "media": [
+              {
+                "id": "aba66bfa-0e75-3da0-9564-fbbdfc11eb35",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "8a9fcee3-06ee-3119-ad38-507ddf681525",
+                    "number": "20",
+                    "title": "Abele Dance (85 remix)",
+                    "length": 376200
+                  }
+                ],
+                "track-count": 30,
+                "track-offset": 19
+              }
+            ]
+          },
+          {
+            "id": "0c5f8cb4-a42b-4c10-a0fa-d9ac9cb024b1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Change the Beat: The Celluloid Records Story 1979–1987",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "207a342a-d9f3-4a35-b12d-201578a3f95a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Change the Beat: The Celluloid Records Story 1979–1987",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013-02-25",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2013-02-25",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "4e6c31a3-4c16-3b32-af33-843b0ce86601",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "fd330b76-969e-472f-9d1c-7ac5823eb0d4",
+                    "number": "7",
+                    "title": "Abele Dance (’85 remix)",
+                    "length": 377320
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "6eeb6c74-50ee-4227-82cf-64f4b0fcf1d0",
+        "score": 84,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "Abele Dance (original 12″ version)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006",
+        "releases": [
+          {
+            "id": "8aad68d2-4688-477a-93a7-f2e51455330d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "The Celluloid Years",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "84ca4ddc-5e29-4489-89f4-0b323a021422",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Celluloid Years",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2006",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "0620847d-e236-376d-8a3a-3be817bf1a02",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "84243f3d-9274-4567-9a1c-2c20af500baf",
+                    "number": "10",
+                    "title": "Abele Dance (original 12″ version)"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/3f1140d3-d01c-40d9-b09b-f13a470de4cc?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:22.216661+00:00",
+  "body": {
+    "first-release-date": "2015-11-25",
+    "releases": [
+      {
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "date": "2015-11-25",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "I:Cube",
+            "artist": {
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "country": "FR",
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "I:Cube",
+              "type": "Person"
+            }
+          }
+        ],
+        "status-id": null,
+        "status": null,
+        "packaging-id": null,
+        "country": "FR",
+        "packaging": null,
+        "title": "VER105 12\" EP",
+        "disambiguation": "",
+        "id": "4f9a8d51-eb56-4252-8265-370ea87cd935",
+        "release-events": [
+          {
+            "date": "2015-11-25",
+            "area": {
+              "sort-name": "France",
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "disambiguation": "",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "type-id": null,
+              "name": "France",
+              "type": null
+            }
+          }
+        ],
+        "quality": "normal",
+        "barcode": null
+      }
+    ],
+    "length": 258000,
+    "id": "3f1140d3-d01c-40d9-b09b-f13a470de4cc",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "name": "I:Cube",
+        "joinphrase": "",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+          "type": "Person",
+          "name": "I:Cube",
+          "sort-name": "I:Cube",
+          "country": "FR",
+          "disambiguation": "house music"
+        }
+      }
+    ],
+    "isrcs": [],
+    "title": "Sequence III",
+    "video": false
+  }
+}

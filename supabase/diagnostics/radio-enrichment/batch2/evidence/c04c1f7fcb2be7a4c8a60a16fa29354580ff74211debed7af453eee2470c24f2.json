@@ -1,0 +1,369 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/d73f7df8-8cf6-49c1-828c-f5d80835917c?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:19.967332+00:00",
+  "body": {
+    "ipis": [],
+    "tags": [
+      {
+        "count": 3,
+        "name": "dubstep"
+      },
+      {
+        "count": 1,
+        "name": "edm"
+      },
+      {
+        "name": "electronic",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "post-dubstep"
+      },
+      {
+        "name": "uk",
+        "count": 1
+      }
+    ],
+    "country": "GB",
+    "life-span": {
+      "ended": false,
+      "begin": null,
+      "end": null
+    },
+    "name": "Pangaea",
+    "disambiguation": "dubstep artist, Kevin McAuley",
+    "end-area": null,
+    "aliases": [
+      {
+        "sort-name": "McAuley, Kevin",
+        "primary": null,
+        "type": "Legal name",
+        "end": null,
+        "begin": null,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "ended": false,
+        "locale": null,
+        "name": "Kevin McAuley"
+      }
+    ],
+    "begin-area": null,
+    "type": "Person",
+    "relations": [
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://pangaeauk.bandcamp.com/",
+          "id": "6439aa51-880c-4417-8ade-aa1c785b55dc"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "source-credit": "",
+        "attributes": [],
+        "type": "bandcamp",
+        "direction": "forward"
+      },
+      {
+        "attributes": [],
+        "source-credit": "Kevin McAuley",
+        "direction": "forward",
+        "type": "discogs",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "target-credit": "",
+        "end": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "url": {
+          "resource": "https://www.discogs.com/artist/1739856",
+          "id": "2c6bba2d-dd45-4e92-8afd-01248a64633c"
+        }
+      },
+      {
+        "type": "discogs",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "id": "853a5fa1-6622-4cfa-85a7-0c8d2ec88bb2",
+          "resource": "https://www.discogs.com/artist/943302"
+        },
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "attribute-values": {}
+      },
+      {
+        "type": "free streaming",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "resource": "https://open.spotify.com/artist/08Z0yhWGksNk3wceqlCeGE",
+          "id": "727fdf1c-1c7e-4d9e-a858-0273398705d9"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "url",
+        "attribute-values": {}
+      },
+      {
+        "direction": "forward",
+        "type": "free streaming",
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "end": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "begin": null,
+        "url": {
+          "id": "e335b776-e23e-4f03-8345-95e033f445e9",
+          "resource": "https://www.deezer.com/artist/181016"
+        },
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "url",
+        "attribute-values": {},
+        "url": {
+          "id": "e8dbfe77-56cb-4627-9ed5-3aec9fd65dd5",
+          "resource": "https://www.last.fm/music/Pangaea"
+        },
+        "target-credit": "",
+        "end": null,
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "begin": null,
+        "source-credit": "",
+        "attributes": [],
+        "type": "last.fm",
+        "direction": "forward"
+      },
+      {
+        "type": "myspace",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "id": "607aab66-8b6c-447c-8b5a-65a081010981",
+          "resource": "https://myspace.com/journeytopangaea"
+        },
+        "target-credit": "",
+        "end": null,
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "begin": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "url",
+        "attribute-values": {}
+      },
+      {
+        "type": "purchase for download",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "id": "cd635d0b-7fee-4bf3-8fbe-97b2e9cd379b",
+          "resource": "https://itunes.apple.com/us/artist/id272536044"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {}
+      },
+      {
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "url": {
+          "id": "18a1b97a-ff38-4a39-b597-0ace88590e1d",
+          "resource": "https://www.facebook.com/journeytopangaea"
+        },
+        "attribute-values": {},
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "social network",
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "type": "soundcloud",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "resource": "https://soundcloud.com/pangaea",
+          "id": "0b310602-a597-44db-b71a-ad2dca93e752"
+        },
+        "target-credit": "",
+        "end": null,
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {}
+      },
+      {
+        "target-type": "url",
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/1542680817",
+          "id": "ed6cd6d5-40c9-4ae2-8112-e041717392e4"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "source-credit": "",
+        "attributes": [],
+        "type": "streaming",
+        "direction": "forward"
+      },
+      {
+        "type": "streaming",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "resource": "https://music.apple.com/us/artist/272536044",
+          "id": "10933590-4f6a-4306-8118-3d698144bf90"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "type": "streaming",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {},
+        "url": {
+          "id": "818e7132-8368-40bc-87e2-0e0a90782e53",
+          "resource": "https://tidal.com/artist/4113845"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      },
+      {
+        "url": {
+          "id": "d9786bbd-b487-40b5-8cfd-8c7cda1033bd",
+          "resource": "https://tidal.com/artist/41704468"
+        },
+        "target-credit": "",
+        "end": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {},
+        "type": "streaming",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": []
+      },
+      {
+        "url": {
+          "id": "9e9370ad-a8ba-488d-81ef-6513d409d599",
+          "resource": "https://www.wikidata.org/wiki/Q111068628"
+        },
+        "begin": null,
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type": "wikidata",
+        "direction": "forward",
+        "source-credit": "Kevin McAuley",
+        "attributes": []
+      }
+    ],
+    "isnis": [],
+    "id": "d73f7df8-8cf6-49c1-828c-f5d80835917c",
+    "area": {
+      "disambiguation": "",
+      "name": "United Kingdom",
+      "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+      "sort-name": "United Kingdom",
+      "type": null,
+      "iso-3166-1-codes": [
+        "GB"
+      ],
+      "type-id": null
+    },
+    "gender": "Male",
+    "sort-name": "Pangaea",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "genres": [
+      {
+        "count": 3,
+        "id": "1b50083b-1afa-4778-82c8-548b309af783",
+        "name": "dubstep",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "name": "edm",
+        "id": "3976e9ba-16d0-461d-b732-99408a0374ba",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4",
+        "name": "electronic"
+      },
+      {
+        "name": "post-dubstep",
+        "id": "be85b02a-9cb7-47c8-a6c6-a214dde4b2b7",
+        "disambiguation": "",
+        "count": 1
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+  }
+}

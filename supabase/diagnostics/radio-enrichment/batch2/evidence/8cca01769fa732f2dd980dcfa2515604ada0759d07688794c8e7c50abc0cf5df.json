@@ -1,0 +1,315 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Amazon%22+AND+artist%3A%22Monolake%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:49.676685+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:49.602Z",
+    "count": 2,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "9520285f-2719-4d1d-9e7b-2499252e46c9",
+        "score": 100,
+        "artist-credit-id": "86b0ff62-4761-39e7-9bf9-d7d812d42c65",
+        "title": "Amazon",
+        "length": 351786,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Monolake",
+            "artist": {
+              "id": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+              "name": "Monolake",
+              "sort-name": "Monolake"
+            }
+          }
+        ],
+        "first-release-date": "1999-02-25",
+        "releases": [
+          {
+            "id": "ffd62abd-ae0b-43a6-8bed-59c0853a45f0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Interstate",
+            "status": "Official",
+            "release-group": {
+              "id": "d08d33a0-a2e4-3863-aa99-a68cecc904b8",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Interstate",
+              "primary-type": "Album"
+            },
+            "date": "1999-02-25",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1999-02-25",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "f93ab56d-a5cc-3b38-a7dc-c3f24951cf03",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "7671815f-2876-3740-a48f-e2bd7bb409dd",
+                    "number": "8",
+                    "title": "Amazon",
+                    "length": 351786
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 7
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 3,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "downtempo"
+          },
+          {
+            "count": 3,
+            "name": "ambient"
+          },
+          {
+            "count": 2,
+            "name": "minimal"
+          },
+          {
+            "count": 1,
+            "name": "techno"
+          }
+        ]
+      },
+      {
+        "id": "cc8c3147-9027-4be3-9ce0-e0dc5b1649a7",
+        "score": 100,
+        "artist-credit-id": "86b0ff62-4761-39e7-9bf9-d7d812d42c65",
+        "title": "Amazon",
+        "length": 643229,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Monolake",
+            "artist": {
+              "id": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+              "name": "Monolake",
+              "sort-name": "Monolake"
+            }
+          }
+        ],
+        "first-release-date": "2005",
+        "releases": [
+          {
+            "id": "b853c13f-5e93-4824-aa0d-646439e9c6fc",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Interstate",
+            "status": "Official",
+            "release-group": {
+              "id": "d08d33a0-a2e4-3863-aa99-a68cecc904b8",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Interstate",
+              "primary-type": "Album"
+            },
+            "date": "2005",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2005",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "38aaf0c4-c445-4651-8e87-3bb2d8d3a3e6",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "51147217-4558-4cbf-b3c9-6f4f4a3b0400",
+                    "number": "6",
+                    "title": "Amazon",
+                    "length": 658773
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "700fe4a6-6524-40b5-8fd8-39d14302d4ed",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Interstate",
+            "status": "Official",
+            "disambiguation": "remastered",
+            "release-group": {
+              "id": "d08d33a0-a2e4-3863-aa99-a68cecc904b8",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Interstate",
+              "primary-type": "Album"
+            },
+            "date": "2026-06-19",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2026-06-19",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "5c0b32f0-8f42-4f93-9226-e1fed7bddd45",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "f20f3df1-e918-4c97-99e5-992a07de835e",
+                    "number": "6",
+                    "title": "Amazon",
+                    "length": 642962
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "5217ee70-973a-46eb-b53f-41694227158c",
+            "status-id": "6a3772de-4605-4132-993d-aa315cd19b4b",
+            "count": 1,
+            "title": "Interstate",
+            "status": "Withdrawn",
+            "release-group": {
+              "id": "d08d33a0-a2e4-3863-aa99-a68cecc904b8",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Interstate",
+              "primary-type": "Album"
+            },
+            "date": "2022-12-03",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2022-12-03",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "8125cf9d-ebfd-3d78-81ae-4d124cf792e0",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "8f5e49bf-694a-4588-945f-8c1a346ee9bd",
+                    "number": "6",
+                    "title": "Amazon",
+                    "length": 643229
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "c2f54775-f31f-490c-a0ec-4f7780eeafb4",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Interstate",
+            "status": "Official",
+            "release-group": {
+              "id": "d08d33a0-a2e4-3863-aa99-a68cecc904b8",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Interstate",
+              "primary-type": "Album"
+            },
+            "date": "2007-06-25",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2007-06-25",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "c36990a1-5646-369f-93e3-bae822f47e04",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1d7b4496-8a0e-3a36-a60b-e11a1aad8971",
+                    "number": "6",
+                    "title": "Amazon",
+                    "length": 658000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 5
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USI4R0401084"
+        ]
+      }
+    ]
+  }
+}

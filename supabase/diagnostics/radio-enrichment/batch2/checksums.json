@@ -1,0 +1,10 @@
+{
+  "manifest.json": "ab1b0f494945f271cde20c6abe9c61ae69d7a6566f5b73f9712e5d606fd03b77",
+  "apply.NOT-EXECUTED.sql": "0f3b0988af8e4c0693bd2f3fa244001f751afb15e97ed965e425d2ff7dd04294",
+  "rollback.NOT-EXECUTED.sql": "75041172109f4dacf9484100d860af6dd0f53479010f5573dcafa92f5d2562ea",
+  "preflight.json": "abfc9fed9dba5b3528a095a6fb0bc7c0f6c1effe6c249f0064c2f99d30e3efab",
+  "recordings-staging.json": "97f1c298fc0195fc6968eb437dd4cd44b591f603612c218ab3481b0733f74c8c",
+  "metadata-staging.json": "c94dacdaf60a4281414299fa0d76493329f3457283643c167517baa00bc885cd",
+  "ingestion-plan.md": "aaf47c33ca22be2aadd8ac2400972a690cf0c0b44e6ace932ca598d57ac8a15c",
+  "README.md": "3c2660d0a771d33e2a7523b2212fe56c3617c6ab84424daafe00577e17a0a0d6"
+}

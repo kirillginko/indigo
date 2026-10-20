@@ -1,0 +1,212 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/cc9f278d-d083-4370-b830-f2ee1f118489?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:16.680257+00:00",
+  "body": {
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "country": "CA",
+    "sort-name": "Priori",
+    "gender": "Male",
+    "disambiguation": "Canadian DJ & producer Francis Latreille",
+    "begin-area": null,
+    "end-area": null,
+    "aliases": [],
+    "tags": [],
+    "type": "Person",
+    "name": "Priori",
+    "isnis": [
+      "0000000475678406"
+    ],
+    "relations": [
+      {
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "direction": "backward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "country": "CA",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Latreille, Francis",
+          "id": "b6d42c25-df25-45dd-aebc-4fd738c5e5a5",
+          "disambiguation": "Canadian DJ, producer & audio engineer",
+          "type": "Person",
+          "name": "Francis Latreille"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {}
+      },
+      {
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "member of band",
+        "ended": false,
+        "artist": {
+          "sort-name": "Chestnut People",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "disambiguation": "",
+          "id": "340feef5-fc4c-4471-9b1b-f83e3a595279",
+          "name": "Chestnut People",
+          "type": "Group"
+        },
+        "end": null,
+        "begin": null,
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "url": {
+          "resource": "https://prioricamp.bandcamp.com/",
+          "id": "038b956e-2169-42d2-a06d-92d6cd71dde7"
+        },
+        "attribute-values": {},
+        "type": "bandcamp",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "id": "2b9da9a2-2ec4-469b-bd58-54914b50d8c2",
+          "resource": "https://www.discogs.com/artist/5975825"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "ended": false,
+        "attribute-values": {},
+        "type": "discogs",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "b7f42ec1-4fa5-4d6c-8b2c-f5c07cbe326d",
+          "resource": "https://open.spotify.com/artist/76UMzIcqhjgf2Xr8gPdKO1"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": ""
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "e28bf815-3dd4-46a7-9883-2f84d77d7a6e",
+          "resource": "https://www.deezer.com/artist/1687991"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "purchase for download",
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "82e594ba-678d-4a02-bbe2-76c6a3953dc6",
+          "resource": "https://www.beatport.com/artist/priori/655246"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "soundcloud",
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "url": {
+          "id": "31066b57-2a46-40dc-8be8-349e8607f0dc",
+          "resource": "https://soundcloud.com/priori-ties"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward"
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "2bd3a2ba-9249-4810-8d6e-3714b8cd33ad",
+          "resource": "https://music.apple.com/gb/artist/368832395"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "streaming"
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "id": "cc9f278d-d083-4370-b830-f2ee1f118489",
+    "genres": [],
+    "ipis": [],
+    "area": {
+      "disambiguation": "city",
+      "id": "c3cc624e-b963-49cf-ad0b-e318cb341963",
+      "type": null,
+      "name": "Montréal",
+      "type-id": null,
+      "sort-name": "Montréal"
+    },
+    "life-span": {
+      "ended": false,
+      "begin": null,
+      "end": null
+    }
+  }
+}

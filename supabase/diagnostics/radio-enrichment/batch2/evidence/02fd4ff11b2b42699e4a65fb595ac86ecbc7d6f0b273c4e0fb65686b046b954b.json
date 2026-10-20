@@ -1,0 +1,2325 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Even+When+You+Sleep%22+AND+artist%3A%22The+S.O.S.+Band%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:18.929357+00:00",
+  "body": {
+    "created": "2026-10-20T01:25:18.747Z",
+    "count": 12,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "046d5c8a-66f9-48b9-ac73-92180e46bcc6",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 249626,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1990",
+        "releases": [
+          {
+            "id": "b8b4eac9-45f3-427e-bb5a-0a0968e5f0a5",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "The Collection",
+            "disambiguation": "special edition",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b31d046c-b0fb-4f40-8c4b-79a875c19d6b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1990",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "814470a0-eacc-3d5f-a0d0-8ba1f27bfee7",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "83ab4e24-7ba4-488b-94cf-24736c4262b6",
+                    "number": "9",
+                    "title": "Even When You Sleep",
+                    "length": 249626
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "4e6091cd-6f39-4131-8529-c38a9617cb2a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "The Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b31d046c-b0fb-4f40-8c4b-79a875c19d6b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 14,
+            "media": [
+              {
+                "id": "c42552c8-0fef-384e-ae6f-e6068940af1e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "bec9edb7-2a87-384c-81aa-4d2a50012693",
+                    "number": "9",
+                    "title": "Even When You Sleep",
+                    "length": 250058
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60b72f00-818e-44fa-862a-50f4664de10b",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 249106,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1990",
+        "releases": [
+          {
+            "id": "06ec1364-9139-485c-a2c7-a3bc955c06ff",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ce04f2f5-29cb-436b-bcca-d56f196c49b1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Best Of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2019-07-26",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2019-07-26",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "2bd21085-003d-392b-84df-25d2d84fb139",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "86471b3f-96c5-44ac-86f2-7788b5aa79d9",
+                    "number": "10",
+                    "title": "Even When You Sleep",
+                    "length": 248000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 9
+              }
+            ]
+          },
+          {
+            "id": "fa3f70a4-b123-4488-a079-f448213a9dd2",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "The Very Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f32cdeab-a2a7-3683-9165-0497d7bd4ea1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Very Best Of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1990",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "fabc8f22-8937-3c94-9ea8-44f8515e08c8",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6dd55ef1-f97f-3aed-9ffb-877ac15cc002",
+                    "number": "6",
+                    "title": "Even When You Sleep",
+                    "length": 249640
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "f2d79565-dcaf-4651-b581-8a5da0c57452",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 10,
+            "title": "The Tabu Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 97,
+            "media": [
+              {
+                "id": "31530959-ec0e-3019-a236-471657652cf7",
+                "position": 6,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "54166be3-88c9-4d58-bafe-bee68d17a807",
+                    "number": "1",
+                    "title": "Even When You Sleep",
+                    "length": 248173
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "3ffe5c4f-7410-4401-8132-45c67ee757ac",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "The Best of The S.O.S. Band",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "25e02d86-a86d-3dfb-a832-3cf7302c1adf",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Best of The SOS Band",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1995",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1995",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "175abaca-f8e5-3998-b4f8-a248dff979a6",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "38517d3e-ca04-3c99-9c9d-259942db162a",
+                    "number": "3",
+                    "title": "Even When You Sleep",
+                    "length": 249106
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "4e699f16-fe42-4005-b58a-8e6e7837c69f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "The Best of The SOS Band",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "25e02d86-a86d-3dfb-a832-3cf7302c1adf",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Best of The SOS Band",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996-05-31",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996-05-31",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              },
+              {
+                "date": "1996-05-31",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "d9ee72d0-64ef-368b-b9f4-e895b06a2d53",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e2720c7d-116f-34fb-9eb2-4d156e1ec43c",
+                    "number": "3",
+                    "title": "Even When You Sleep",
+                    "length": 249240
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 2
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USMO18682729"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "soul"
+          },
+          {
+            "count": 1,
+            "name": "r&b"
+          }
+        ]
+      },
+      {
+        "id": "8109fd34-1137-4c44-8457-1f111ab880c6",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 251000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2013",
+        "releases": [
+          {
+            "id": "98e8e8e8-d4dd-4b40-a869-69a3956e6fc0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "The Very Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ade1ee82-a3e9-4e74-8ab2-538d759f31f1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Very Best Of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "62c34053-d787-3ee2-adba-235efb2ffd17",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c3aa9c3e-5a27-476d-b849-d405d50705ad",
+                    "number": "5",
+                    "title": "Even When You Sleep",
+                    "length": 251000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "b7ec3c1a-4ae9-4125-ba8c-f1e02f265bfb",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 248200,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986-04-17",
+        "releases": [
+          {
+            "id": "cbf88da5-68d2-488f-85d7-8b552498e8d0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "1986-04-17",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1986-04-17",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "aa6ca9cc-b617-3510-bd5a-f3ce7aab4eb2",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "fb25e1e1-0d0b-4776-8e76-57461de38604",
+                    "number": "A1",
+                    "title": "Even When You Sleep",
+                    "length": 248200
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "55c48a28-e84a-4434-9375-067c98629e4a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "3dd89573-f0b8-375f-92c9-83da7c5c9c46",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "0da0fc78-ad61-4ac5-9cfd-247a4c8a1d63",
+                    "number": "1",
+                    "title": "Even When You Sleep",
+                    "length": 248200
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "ae2d7eca-aab9-426d-911a-de2279744dfb",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "0d0df3a6-b442-38ac-bf32-b88cc5812c56",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e6482b61-0cfb-40c2-b7da-066f4942150e",
+                    "number": "1",
+                    "title": "Even When You Sleep",
+                    "length": 248200
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "c69191cf-473b-326a-baeb-8093c8a22a4a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "c75621ba-b6cf-3b1a-9874-852d608356f4",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "47952259-ad4e-3bc2-85fb-d3f9b9c8cff2",
+                    "number": "1",
+                    "title": "Even When You Sleep",
+                    "length": 248200
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ee909479-a3a0-4c43-8889-1832e2bdf3d2",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 195773,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1989",
+        "releases": [
+          {
+            "id": "dc2527b6-699d-40b8-a01b-ef643084f280",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "In One Go",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5572b77a-1ca7-4f0c-9c9c-c63b8231cf98",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In One Go",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1989",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1989",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "809404b8-90a5-3247-8509-2c5efdffa0b0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1906379e-b46d-3866-9f0f-9e62fab48b18",
+                    "number": "2",
+                    "title": "Even When You Sleep",
+                    "length": 195773
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9a98e390-e532-4db5-9ad8-afc80690530f",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 248000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2013-09-09",
+        "releases": [
+          {
+            "id": "d87c1ee6-2040-423e-9109-8a603ad8b4d1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "2013-09-09",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-09-09",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "20add559-6961-3408-bce3-be68c6ec6c36",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "dfdb91a9-3209-4407-8395-be1d349f3251",
+                    "number": "1",
+                    "title": "Even When You Sleep",
+                    "length": 248000
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "5927ea0f-173f-4009-9e55-10fab7b411b8",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep",
+        "length": 249720,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014",
+        "releases": [
+          {
+            "id": "f2d79565-dcaf-4651-b581-8a5da0c57452",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 10,
+            "title": "The Tabu Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 97,
+            "media": [
+              {
+                "id": "0cf7f2de-0d10-3eb8-ab3b-7637a6d6a930",
+                "position": 9,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "61dcdd9b-dc0a-4f7e-b9ae-9c8fc9add1e1",
+                    "number": "14",
+                    "title": "Even When You Sleep",
+                    "length": 249720
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 13
+              }
+            ]
+          },
+          {
+            "id": "abfdbd3d-acf1-4021-b848-c1653df3c31c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "The 7'' Singles",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "16c952cb-35d5-318c-a0d1-86ca631d4eb5",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5a9cd3bc-ed4a-4e52-a0ef-cc466e6c00c5",
+                    "number": "14",
+                    "title": "Even When You Sleep",
+                    "length": 249720
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 13
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d2ece777-9265-4a11-a376-870d520c4d44",
+        "score": 94,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep (remix)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986",
+        "releases": [
+          {
+            "id": "d87c1ee6-2040-423e-9109-8a603ad8b4d1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "2013-09-09",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-09-09",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "840b366a-5b45-3218-8e5c-5885df01132d",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "fb0dfd32-666d-45b5-a639-4ea938df6f23",
+                    "number": "7",
+                    "title": "Even When You Sleep (remix)"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "e6543615-f216-44d6-8daa-7054a4af8d4f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Even When You Sleep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "12eb83cc-196e-48f3-85d1-828b54be47af",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Even When You Sleep",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "c2fb4b05-6115-36f1-80da-7a1b9bdd7346",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "7ac138a7-8cbc-40cc-a723-ea2a1f294afa",
+                    "number": "2",
+                    "title": "Even When You Sleep (Remix)"
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "8cb6689e-d025-467f-96eb-a0e9cd68631a",
+        "score": 94,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep (instrumental)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986",
+        "releases": [
+          {
+            "id": "d87c1ee6-2040-423e-9109-8a603ad8b4d1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "2013-09-09",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-09-09",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "840b366a-5b45-3218-8e5c-5885df01132d",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f13ae13f-e66f-4d54-8d59-c9fa2b0f9209",
+                    "number": "8",
+                    "title": "Even When You Sleep (instrumental)"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "e6543615-f216-44d6-8daa-7054a4af8d4f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Even When You Sleep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "12eb83cc-196e-48f3-85d1-828b54be47af",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Even When You Sleep",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "c2fb4b05-6115-36f1-80da-7a1b9bdd7346",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "9c1e7d24-95f1-4f96-aed3-44afe28b4729",
+                    "number": "3",
+                    "title": "Even When You Sleep (Instrumental)"
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d13b69d8-36e8-4ffa-bad6-af9c27114140",
+        "score": 89,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep (a cappella)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986",
+        "releases": [
+          {
+            "id": "d87c1ee6-2040-423e-9109-8a603ad8b4d1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "2013-09-09",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-09-09",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "840b366a-5b45-3218-8e5c-5885df01132d",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "0e5cdad9-2759-4592-a792-890efddc828a",
+                    "number": "9",
+                    "title": "Even When You Sleep (a cappella)"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "e6543615-f216-44d6-8daa-7054a4af8d4f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Even When You Sleep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "12eb83cc-196e-48f3-85d1-828b54be47af",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Even When You Sleep",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "c2fb4b05-6115-36f1-80da-7a1b9bdd7346",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "d57107bd-4be8-48cd-a5e6-fceafc5ad70e",
+                    "number": "4",
+                    "title": "Even When You Sleep (Acapella)"
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e4c12d23-80a2-445c-926d-4971995bcbda",
+        "score": 89,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep (extended version)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2013-09-09",
+        "releases": [
+          {
+            "id": "d87c1ee6-2040-423e-9109-8a603ad8b4d1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "Sands of Time",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2a9efa6a-1368-39c4-85b2-57ce3915b215",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sands of Time",
+              "primary-type": "Album"
+            },
+            "date": "2013-09-09",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-09-09",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "840b366a-5b45-3218-8e5c-5885df01132d",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "339fb77f-6711-41f2-a8ce-a159e26ebef4",
+                    "number": "6",
+                    "title": "Even When You Sleep (extended version)"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "b2814bd6-f5d2-4222-9f79-f21925bbe4c3",
+        "score": 89,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Even When You Sleep (Extended Version)",
+        "length": 340133,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986",
+        "releases": [
+          {
+            "id": "e6543615-f216-44d6-8daa-7054a4af8d4f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Even When You Sleep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "12eb83cc-196e-48f3-85d1-828b54be47af",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Even When You Sleep",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "c2fb4b05-6115-36f1-80da-7a1b9bdd7346",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "7c5bd4c7-1a14-4700-b79d-c24193188cfc",
+                    "number": "1",
+                    "title": "Even When You Sleep (Extended Remix)"
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "f2d79565-dcaf-4651-b581-8a5da0c57452",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 10,
+            "title": "The Tabu Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 97,
+            "media": [
+              {
+                "id": "c0bef48e-6ce2-3fb7-b439-0daef2f6f88f",
+                "position": 10,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "41dc7cd2-a280-49cd-9d53-3b32e9b1f654",
+                    "number": "9",
+                    "title": "Even When You Sleep [Extended Version]",
+                    "length": 340133
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "0c714358-deea-4455-a624-7ebdf9e118c8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "The 12'' Mixes",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 10,
+            "media": [
+              {
+                "id": "9a767940-9b9c-3ed2-b1d2-bff30dcea449",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f992fd8a-200c-4606-a357-dc118a9e2c32",
+                    "number": "9",
+                    "title": "Even When You Sleep (Extended Version)",
+                    "length": 340133
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

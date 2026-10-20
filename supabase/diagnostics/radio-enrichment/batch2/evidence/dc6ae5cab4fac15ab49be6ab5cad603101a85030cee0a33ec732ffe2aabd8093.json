@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F29966&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:03.029737+00:00",
+  "body": {
+    "id": "7a5c7a1e-0705-425f-a95a-f55ff0e0eead",
+    "resource": "https://www.discogs.com/artist/29966",
+    "relations": [
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "discogs",
+        "attribute-values": {},
+        "artist": {
+          "sort-name": "Harris, Gene",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "",
+          "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+          "type": "Person",
+          "name": "Gene Harris"
+        },
+        "ended": false,
+        "end": null,
+        "begin": null,
+        "target-type": "artist",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "direction": "backward"
+      }
+    ]
+  }
+}

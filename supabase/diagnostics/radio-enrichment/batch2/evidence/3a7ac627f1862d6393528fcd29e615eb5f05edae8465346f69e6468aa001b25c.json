@@ -1,0 +1,456 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/88b9d123-ebda-477a-99bd-022378a6ffa1?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:13.505030+00:00",
+  "body": {
+    "tags": [
+      {
+        "count": 3,
+        "name": "drum and bass"
+      },
+      {
+        "count": 1,
+        "name": "dubstep"
+      },
+      {
+        "count": 2,
+        "name": "jungle"
+      }
+    ],
+    "type": "Person",
+    "name": "Sully",
+    "isnis": [
+      "0000000372511793"
+    ],
+    "end-area": null,
+    "aliases": [
+      {
+        "locale": null,
+        "begin": null,
+        "end": null,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "sort-name": "Stevens, Jack",
+        "name": "Jack Stevens",
+        "type": "Legal name",
+        "primary": null,
+        "ended": false
+      },
+      {
+        "name": "sully-e64",
+        "type": "Search hint",
+        "ended": false,
+        "primary": null,
+        "end": null,
+        "begin": null,
+        "locale": null,
+        "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+        "sort-name": "sully-e64"
+      },
+      {
+        "type": "Search hint",
+        "name": "sullyE64",
+        "ended": false,
+        "primary": null,
+        "begin": null,
+        "end": null,
+        "locale": null,
+        "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+        "sort-name": "sullyE64"
+      }
+    ],
+    "disambiguation": "UK jungle and dubstep producer",
+    "gender": "Male",
+    "begin-area": null,
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "country": "GB",
+    "sort-name": "Sully",
+    "life-span": {
+      "end": null,
+      "begin": null,
+      "ended": false
+    },
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "462f9321-6103-49c9-b6db-96219bce6f62",
+        "name": "drum and bass",
+        "count": 3
+      },
+      {
+        "count": 1,
+        "name": "dubstep",
+        "disambiguation": "",
+        "id": "1b50083b-1afa-4778-82c8-548b309af783"
+      },
+      {
+        "count": 2,
+        "id": "ea9b6ec3-fc8f-4c55-b2f9-19bd4511a986",
+        "disambiguation": "",
+        "name": "jungle"
+      }
+    ],
+    "ipis": [],
+    "area": {
+      "disambiguation": "",
+      "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+      "iso-3166-1-codes": [
+        "GB"
+      ],
+      "type-id": null,
+      "sort-name": "United Kingdom",
+      "name": "United Kingdom",
+      "type": null
+    },
+    "id": "88b9d123-ebda-477a-99bd-022378a6ffa1",
+    "relations": [
+      {
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "artist": {
+          "id": "c6adba29-8479-4d63-89d0-ad0952b3c7e7",
+          "disambiguation": "",
+          "sort-name": "Innasekt",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "name": "Innasekt",
+          "type": "Group"
+        },
+        "attribute-values": {},
+        "type": "member of band",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "allmusic",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "664eb661-9335-474f-a9bc-02076cd64db8",
+          "resource": "https://www.allmusic.com/artist/mn0002634548"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null
+      },
+      {
+        "target-credit": "",
+        "source-credit": "Jack Stevens",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "discogs",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://www.discogs.com/artist/334840",
+          "id": "4f939e23-24f5-465b-9aca-be5e609555ec"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.discogs.com/artist/955986",
+          "id": "b925ad82-8a60-4dff-bcda-b855e9241ddd"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "type": "discogs",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": ""
+      },
+      {
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "0d7aee4f-eadd-445a-a421-2521c75acad0",
+          "resource": "https://open.spotify.com/artist/6qN110S0oYY3UAPzLbH7FW"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "free streaming"
+      },
+      {
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "9eafdc6d-8838-4125-8eb8-b1b3ce578003",
+          "resource": "https://open.spotify.com/artist/6ryGFEDvM7703b889hPUFZ"
+        }
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.deezer.com/artist/198808907",
+          "id": "3f507c28-8f66-4a7b-9d51-3ed6a6f0fd59"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": ""
+      },
+      {
+        "url": {
+          "id": "4b6e087f-51e7-45a0-8e18-34dc4b028402",
+          "resource": "https://www.deezer.com/artist/198810337"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "free streaming"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://www.deezer.com/artist/311222",
+          "id": "f1f61e93-1000-4a73-a313-2a9aa28f94df"
+        },
+        "direction": "forward",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false
+      },
+      {
+        "type": "image",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "url": {
+          "id": "bb4275df-5512-47aa-955e-31a4db9764e1",
+          "resource": "https://web.archive.org/web/20250216215123if_/https://d3vhc53cl8e8km.cloudfront.net/hello-staging/wp-content/uploads/2021/04/18021754/2b33e3bc-9fec-11eb-954e-0ecc81f4ee58-972x597.jpg"
+        }
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "last.fm",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.last.fm/music/Sully",
+          "id": "6ca4bfb4-7572-4d4a-87e6-2f46484d814e"
+        },
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "direction": "forward"
+      },
+      {
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "1de04113-9372-4a0b-a8fc-4ab3dfee50e2",
+          "resource": "https://www.beatport.com/artist/sully-uk/1206669"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "Sully (UK)",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "purchase for download",
+        "ended": false
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.junodownload.com/artists/Sully/",
+          "id": "f45493d7-004d-47d4-b4ad-c4ff348cc467"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "ended": false,
+        "attribute-values": {},
+        "type": "purchase for download",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "social network",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "resource": "https://twitter.com/sullyE64",
+          "id": "38d34548-6047-42ac-ab9a-aba759359ad1"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://soundcloud.com/sully-e64",
+          "id": "abab6886-7ccc-4041-afd1-24bb2869e061"
+        },
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "type": "soundcloud",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/254051369",
+          "id": "ea97b73e-18a5-4b11-aab6-bfd6106fab15"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {}
+      },
+      {
+        "attribute-values": {},
+        "type": "streaming",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "Jack Stevens",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "8ec52e4a-d51f-4716-a828-6a32df5cfb29",
+          "resource": "https://tidal.com/artist/12710159"
+        }
+      },
+      {
+        "type": "streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://tidal.com/artist/3546529",
+          "id": "50ded07c-3ec3-4de5-9797-2bd136571840"
+        }
+      },
+      {
+        "type": "streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://tidal.com/artist/51023043",
+          "id": "03ff80f1-4e94-4947-8515-0bf2edbf74a6"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+  }
+}

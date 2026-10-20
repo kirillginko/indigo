@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F2835065&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:35.873791+00:00",
+  "body": {
+    "resource": "https://www.discogs.com/artist/2835065",
+    "relations": [
+      {
+        "artist": {
+          "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+          "sort-name": "Moin",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "name": "Moin",
+          "country": "GB",
+          "disambiguation": "noise rock alias of Raime"
+        },
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-credit": "",
+        "direction": "backward",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "artist",
+        "type": "discogs"
+      }
+    ],
+    "id": "34e1bbdd-7871-4ac9-8cce-48d20ed9795c"
+  }
+}

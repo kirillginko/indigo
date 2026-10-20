@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/33417705-b15c-425f-9e0d-9b22f38ebe64?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:27.622517+00:00",
+  "body": {
+    "video": false,
+    "isrcs": [],
+    "first-release-date": "1998-11",
+    "releases": [
+      {
+        "quality": "normal",
+        "packaging": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Hit It Up EP",
+        "country": "FR",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "disambiguation": "Chicago house music DJ/producer",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "sort-name": "Johnson, Paul",
+              "type": "Person",
+              "name": "Paul Johnson"
+            },
+            "name": "Paul Johnson",
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": null,
+        "date": "1998-11",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "France",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "disambiguation": "",
+              "type": null,
+              "name": "France"
+            },
+            "date": "1998-11"
+          }
+        ],
+        "barcode": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "08bc9473-b3ad-4e19-8c5d-d1adc3876032"
+      },
+      {
+        "id": "b7d2a23e-f52c-4ee2-a32e-0330c4daac30",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2011-04-29",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "type": null,
+              "name": "[Worldwide]"
+            },
+            "date": "2011-04-29"
+          }
+        ],
+        "barcode": "",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "name": "Paul Johnson",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Johnson, Paul",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "disambiguation": "Chicago house music DJ/producer"
+            },
+            "name": "Paul Johnson",
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": null,
+        "title": "Hit It Up EP",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "XW",
+        "packaging": null,
+        "quality": "normal"
+      }
+    ],
+    "title": "What Ever U Do",
+    "length": 373000,
+    "artist-credit": [
+      {
+        "name": "Paul Johnson",
+        "joinphrase": "",
+        "artist": {
+          "name": "Paul Johnson",
+          "type": "Person",
+          "sort-name": "Johnson, Paul",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+          "disambiguation": "Chicago house music DJ/producer"
+        }
+      }
+    ],
+    "id": "33417705-b15c-425f-9e0d-9b22f38ebe64",
+    "disambiguation": ""
+  }
+}

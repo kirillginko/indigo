@@ -1,0 +1,129 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/dca88466-d07b-4cce-b196-c966d25c6719?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:15.671169+00:00",
+  "body": {
+    "title": "Lolina",
+    "length": 260099,
+    "first-release-date": "2016-02-28",
+    "releases": [
+      {
+        "id": "f3d01210-9c51-4f40-b563-f7ad1cad7cc8",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "Inga Copeland / Alina Astrova",
+              "id": "54492185-df45-494f-b133-f52da3fba781",
+              "type": "Person",
+              "sort-name": "Lolina",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "name": "Lolina"
+            },
+            "name": "Lolina",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "title": "Live in Paris",
+        "date": "2016-02-28",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2016-02-28"
+          }
+        ],
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "country": "XW"
+      },
+      {
+        "disambiguation": "",
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "barcode": null,
+        "text-representation": {
+          "language": "eng",
+          "script": null
+        },
+        "status": "Official",
+        "quality": "normal",
+        "id": "9623052c-e425-454d-84df-e0f95ebb7063",
+        "artist-credit": [
+          {
+            "name": "Lolina",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Lolina",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "name": "Lolina",
+              "type": "Person",
+              "id": "54492185-df45-494f-b133-f52da3fba781",
+              "disambiguation": "Inga Copeland / Alina Astrova"
+            }
+          }
+        ],
+        "date": "2016-05-19",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "type": null,
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom"
+            },
+            "date": "2016-05-19"
+          }
+        ],
+        "title": "Live in Paris",
+        "packaging-id": null
+      }
+    ],
+    "video": false,
+    "isrcs": [
+      "NLM971500149"
+    ],
+    "artist-credit": [
+      {
+        "name": "Lolina",
+        "joinphrase": "",
+        "artist": {
+          "type": "Person",
+          "name": "Lolina",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Lolina",
+          "id": "54492185-df45-494f-b133-f52da3fba781",
+          "disambiguation": "Inga Copeland / Alina Astrova"
+        }
+      }
+    ],
+    "id": "dca88466-d07b-4cce-b196-c966d25c6719",
+    "disambiguation": ""
+  }
+}

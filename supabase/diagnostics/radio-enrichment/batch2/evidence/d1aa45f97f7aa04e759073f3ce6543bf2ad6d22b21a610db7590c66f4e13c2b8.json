@@ -1,0 +1,223 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/bad72ddc-9f06-4ee1-8625-0cec801c18b4?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:43.031939+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Person",
+          "name": "David Axelrod",
+          "disambiguation": "baroque pop composer",
+          "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Axelrod, David"
+        },
+        "joinphrase": "",
+        "name": "David Axelrod"
+      }
+    ],
+    "disambiguation": "",
+    "id": "c95304b6-859d-46de-abbc-128a511f3302",
+    "length": 197000,
+    "title": "Mucho Chupar",
+    "first-release-date": "1974",
+    "releases": [
+      {
+        "quality": "normal",
+        "packaging": null,
+        "country": "US",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Heavy Axe",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "David Axelrod",
+            "artist": {
+              "name": "David Axelrod",
+              "type": "Person",
+              "disambiguation": "baroque pop composer",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "sort-name": "Axelrod, David",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "1974",
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "type": null
+            }
+          }
+        ],
+        "date": "1974",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "e9cf8d16-f8f6-4e0f-8ace-9ae892191458"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "0142ac26-9b99-3ede-a1c7-55b2593e3c9c",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "1998"
+          }
+        ],
+        "barcode": null,
+        "date": "1998",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Heavy Axe",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "David Axelrod",
+              "type": "Person",
+              "disambiguation": "baroque pop composer",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Axelrod, David"
+            },
+            "name": "David Axelrod",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "packaging": null
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "18a40443-2fa9-424c-92b7-483e8ed614f6",
+        "status": "Official",
+        "date": "2005",
+        "barcode": "090204926053",
+        "release-events": [
+          {
+            "date": "2005",
+            "area": {
+              "name": "Germany",
+              "type": null,
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type-id": null,
+              "sort-name": "Germany"
+            }
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Hit the Rhodes, Jack",
+        "country": "DE",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "quality": "normal",
+        "packaging": "Digipak"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "80bcb5f8-8b68-450a-ba27-9e652f1d3e37",
+        "status": "Official",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2020-11",
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null,
+              "name": "United States"
+            }
+          }
+        ],
+        "date": "2020-11",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Heavy Axe",
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "name": "David Axelrod",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "disambiguation": "baroque pop composer",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "sort-name": "Axelrod, David"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "quality": "normal",
+        "packaging": null
+      }
+    ],
+    "video": false,
+    "isrcs": []
+  }
+}

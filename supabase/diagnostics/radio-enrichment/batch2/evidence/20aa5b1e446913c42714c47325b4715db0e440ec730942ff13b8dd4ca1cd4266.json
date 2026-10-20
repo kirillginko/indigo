@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/7216a2f8-7eae-4c65-8348-077ae9879bf1?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:00.710545+00:00",
+  "body": {
+    "isrcs": [],
+    "id": "7216a2f8-7eae-4c65-8348-077ae9879bf1",
+    "artist-credit": [
+      {
+        "artist": {
+          "disambiguation": "",
+          "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+          "type": "Person",
+          "name": "Barbara Mason",
+          "sort-name": "Mason, Barbara",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "joinphrase": "",
+        "name": "Barbara Mason"
+      }
+    ],
+    "disambiguation": "",
+    "first-release-date": "1996",
+    "releases": [
+      {
+        "barcode": "5030073110226",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "country": "GB",
+        "disambiguation": "",
+        "date": "1996",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "1996"
+          }
+        ],
+        "packaging-id": null,
+        "title": "Hits of the 80’s, Volume 3",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "id": "b778f35f-7b96-4098-8ae4-15f63bf8f238",
+        "quality": "normal",
+        "status": "Official"
+      }
+    ],
+    "video": false,
+    "title": "Another Man",
+    "length": 413000
+  }
+}

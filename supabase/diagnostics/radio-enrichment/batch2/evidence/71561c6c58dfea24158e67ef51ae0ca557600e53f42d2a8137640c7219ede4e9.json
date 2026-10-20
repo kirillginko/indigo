@@ -1,0 +1,959 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22For+Your+Love%22+AND+artist%3A%22The+S.O.S.+Band%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:20.036384+00:00",
+  "body": {
+    "created": "2026-10-20T01:25:19.856Z",
+    "count": 5,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "23aca383-129e-4ecb-b8dc-5d5b139569c1",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "For Your Love",
+        "length": 238040,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014",
+        "releases": [
+          {
+            "id": "f2d79565-dcaf-4651-b581-8a5da0c57452",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 10,
+            "title": "The Tabu Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 97,
+            "media": [
+              {
+                "id": "0cf7f2de-0d10-3eb8-ab3b-7637a6d6a930",
+                "position": 9,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "006315a6-e7b7-4519-a40a-214079c8cf6d",
+                    "number": "8",
+                    "title": "For Your Love",
+                    "length": 238040
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "abfdbd3d-acf1-4021-b848-c1653df3c31c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "The 7'' Singles",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "16c952cb-35d5-318c-a0d1-86ca631d4eb5",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "0c44c84b-8e94-49b9-a2c9-0ae94671527e",
+                    "number": "8",
+                    "title": "For Your Love",
+                    "length": 238040
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "4f557d50-6c4e-41c5-9d3c-e53a6033d6e2",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "For Your Love",
+        "length": 373000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1983-07-07",
+        "releases": [
+          {
+            "id": "bd38f7d4-4bdc-42a5-8f2c-25ac5b8d9008",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "On the Rise",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ad63d27d-d0db-3e72-976c-55a67af0c2dc",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "On the Rise",
+              "primary-type": "Album"
+            },
+            "track-count": 8,
+            "media": [
+              {
+                "id": "f1f2039e-f37a-3af3-a453-5e542ad37d80",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "0829a764-1f2a-4e0d-a1fa-41f64ae4f903",
+                    "number": "3",
+                    "title": "For Your Love",
+                    "length": 373000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "1b685ede-5a17-435f-a1fd-9b06cb4667f7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "On the Rise",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ad63d27d-d0db-3e72-976c-55a67af0c2dc",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "On the Rise",
+              "primary-type": "Album"
+            },
+            "date": "",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "5c40e9a3-63bc-378f-975e-041348a46a4d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a4192609-1c9f-4e89-87c2-b16e7a520e8e",
+                    "number": "3",
+                    "title": "For Your Love",
+                    "length": 374000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "f2d79565-dcaf-4651-b581-8a5da0c57452",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 10,
+            "title": "The Tabu Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "07b35c7d-a509-4eac-9f6b-d865efcf1e05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Tabu Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 97,
+            "media": [
+              {
+                "id": "2fb6c0cf-69fa-36df-a45f-b2afd54de530",
+                "position": 4,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a7c651ab-1905-46f5-ac70-cbc6f133ac02",
+                    "number": "3",
+                    "title": "For Your Love",
+                    "length": 370120
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "b7ab1371-8e42-4346-bcd4-a3b4979af5d5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "On the Rise",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ad63d27d-d0db-3e72-976c-55a67af0c2dc",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "On the Rise",
+              "primary-type": "Album"
+            },
+            "date": "2013-07-16",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-07-16",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "cf5616cd-a6dd-3cbb-80fc-b69a13f854fa",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4e0322e2-4b6a-48d2-bce8-c2ea63bc7d90",
+                    "number": "3",
+                    "title": "For Your Love",
+                    "length": 373000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "c7f74f5a-b71c-4049-b7b1-8443223ab5df",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "On the Rise",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ad63d27d-d0db-3e72-976c-55a67af0c2dc",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "On the Rise",
+              "primary-type": "Album"
+            },
+            "date": "1983-07-07",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1983-07-07",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "4c89d402-bf28-31c9-a31c-5a7bdb9b8275",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "3adbb683-7239-3b32-a9a7-2982b9d194e6",
+                    "number": "A3",
+                    "title": "For Your Love",
+                    "length": 369000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "71ce718d-7df1-4d7e-97ac-12f649d0c3ea",
+        "score": 100,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "For Your Love",
+        "length": 375170,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2013",
+        "releases": [
+          {
+            "id": "98e8e8e8-d4dd-4b40-a869-69a3956e6fc0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 2,
+            "title": "The Very Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ade1ee82-a3e9-4e74-8ab2-538d759f31f1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Very Best Of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "0d21da5a-f2c3-3617-9953-cdae59de21b2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "161fd34b-73cc-4592-9bc9-5e988fa212f5",
+                    "number": "12",
+                    "title": "For Your Love",
+                    "length": 375170
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 11
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "45a987ee-975f-49c9-bb3c-5ae6562b7bdb",
+        "score": 95,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "Yearning for Your Love",
+        "length": 115000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1997",
+        "releases": [
+          {
+            "id": "a69dd332-c6b0-42b0-9701-d6b06020ae68",
+            "artist-credit-id": "20346c64-474a-34cb-a47a-0e81c9160234",
+            "count": 2,
+            "title": "Chapter 114. Bow Down",
+            "artist-credit": [
+              {
+                "name": "DJ Screw",
+                "artist": {
+                  "id": "d0dd58c4-ab66-41c4-9883-4f493ef6653f",
+                  "name": "DJ Screw",
+                  "sort-name": "Screw, DJ",
+                  "disambiguation": "US “screw” rap DJ/producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "93b7004c-d8df-4b4b-8b38-8c86528d9f02",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Chapter 114. Bow Down",
+              "primary-type": "Album",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 16,
+            "media": [
+              {
+                "id": "6e545c9d-c913-3fd7-88b4-de5956ab45d7",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5c01ec67-dce5-4ad4-8185-f8a7f2faaf3a",
+                    "number": "8",
+                    "title": "Yearning for Your Love",
+                    "length": 115000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9ca20415-b2cd-4a3b-bcb1-23dfd2862c29",
+        "score": 91,
+        "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+        "title": "For Your Love (extended version)",
+        "length": 572000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "aliases": [
+                {
+                  "sort-name": "S.O.S. Band",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "S.O.S. Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The SOS Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "S.O.S Band, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The S.O.S Band",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "SOS Band",
+                  "name": "SOS Band",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1984",
+        "releases": [
+          {
+            "id": "b7ab1371-8e42-4346-bcd4-a3b4979af5d5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "On the Rise",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ad63d27d-d0db-3e72-976c-55a67af0c2dc",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "On the Rise",
+              "primary-type": "Album"
+            },
+            "date": "2013-07-16",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2013-07-16",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "cf5616cd-a6dd-3cbb-80fc-b69a13f854fa",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "db9f65f9-6860-4964-a9df-3ea6cc64abd4",
+                    "number": "9",
+                    "title": "For Your Love (extended version)",
+                    "length": 572000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "7004681c-8ba4-4256-b4d4-54f56942ed2e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "009a47c0-fcbe-316c-b1d9-607720f7385f",
+            "count": 1,
+            "title": "Weekend Girl",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The S.O.S. Band",
+                "artist": {
+                  "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                  "name": "The S.O.S. Band",
+                  "sort-name": "S.O.S. Band, The"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0b7d0535-8806-4129-bb8b-bda9f98c2769",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Weekend Girl",
+              "primary-type": "Single"
+            },
+            "date": "1984",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "9e8662c8-f1fc-3e36-a150-6211e4e148b9",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "41e68b57-8e76-4a15-98b9-00b8c453073d",
+                    "number": "B",
+                    "title": "For Your Love (Special extended version)",
+                    "length": 575000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

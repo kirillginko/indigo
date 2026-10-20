@@ -1,0 +1,612 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/39515237-2d70-436a-800c-fcbac974bec4?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:16.960778+00:00",
+  "body": {
+    "begin-area": {
+      "sort-name": "Atlanta",
+      "name": "Atlanta",
+      "type": null,
+      "type-id": null,
+      "disambiguation": "",
+      "id": "26e0e534-19ea-4645-bfb3-1aa4e83a4046"
+    },
+    "sort-name": "S.O.S. Band, The",
+    "ipis": [],
+    "id": "39515237-2d70-436a-800c-fcbac974bec4",
+    "type": "Group",
+    "country": "US",
+    "isnis": [
+      "0000000121916526"
+    ],
+    "genres": [
+      {
+        "count": 2,
+        "disambiguation": "",
+        "id": "fe4ba6a1-9873-4fd0-a12b-a70c81818514",
+        "name": "funk"
+      },
+      {
+        "disambiguation": "",
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "count": 1,
+        "name": "jazz"
+      },
+      {
+        "name": "jazz-funk",
+        "disambiguation": "",
+        "id": "f3c43ae8-839a-4523-b295-cfa4eba6c911",
+        "count": 1
+      },
+      {
+        "id": "31be54b2-4d0c-42df-aa44-c496c7b4c3c3",
+        "disambiguation": "",
+        "count": 1,
+        "name": "r&b"
+      },
+      {
+        "disambiguation": "",
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827",
+        "count": 1,
+        "name": "soul"
+      }
+    ],
+    "life-span": {
+      "end": "1992",
+      "begin": "1977",
+      "ended": true
+    },
+    "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+    "name": "The S.O.S. Band",
+    "relations": [
+      {
+        "target-type": "artist",
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "artist": {
+          "sort-name": "Bryant, Jason",
+          "name": "Jason Bryant",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "15cf0514-8fe1-401b-b9c6-ba06a88d5d94",
+          "type": "Person",
+          "disambiguation": "",
+          "country": null
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "backward",
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Mary Davis",
+          "sort-name": "Davis, Mary",
+          "id": "6b364aa6-a5db-453a-a8fb-a15f0589d159",
+          "type": "Person",
+          "country": "US",
+          "disambiguation": "soul singer"
+        },
+        "target-type": "artist",
+        "direction": "backward",
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "source-credit": "",
+        "type": "member of band",
+        "artist": {
+          "type": "Person",
+          "disambiguation": "",
+          "country": "US",
+          "sort-name": "Ellis, Billy",
+          "name": "Billy Ellis",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "3c1b1918-140a-4c89-850c-3a2d7943291c"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [],
+        "direction": "backward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "source-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "attribute-values": {},
+        "artist": {
+          "disambiguation": "",
+          "country": "US",
+          "type": "Person",
+          "id": "1fb1e695-ba15-4e9d-861b-44d96c2f61b6",
+          "sort-name": "Ford, Penny",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Penny Ford"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "direction": "backward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "direction": "backward",
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "artist": {
+          "id": "1bdc3cee-135e-4d73-92ca-a5dcce91dbc5",
+          "sort-name": "Jones, James Earl, III",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "James Earl Jones III",
+          "disambiguation": "",
+          "country": null,
+          "type": "Person"
+        },
+        "target-type": "artist"
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "direction": "backward",
+        "target-type": "artist",
+        "artist": {
+          "country": null,
+          "disambiguation": "",
+          "type": "Person",
+          "id": "a88bc57d-c195-4627-a483-6614165dadba",
+          "name": "Willie Killebrew",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Killebrew, Willie"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "type": "member of band",
+        "source-credit": ""
+      },
+      {
+        "artist": {
+          "id": "ab93c397-a963-4b64-84d8-866de477e7fa",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Madame Golong",
+          "sort-name": "Madame Golong",
+          "country": "US",
+          "disambiguation": "",
+          "type": "Person"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-credits": {
+          "drums (drum set)": "Crystal Martin"
+        },
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [
+          "drums (drum set)"
+        ],
+        "direction": "backward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {
+          "drums (drum set)": "12092505-6ee1-46af-a15a-b5b468b6b155"
+        },
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "attribute-values": {},
+        "artist": {
+          "id": "13642e09-7c4a-40bf-9aa3-931b05759bbe",
+          "sort-name": "Simpson, John Alexander",
+          "name": "John Alexander Simpson",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "The SOS Band",
+          "country": null,
+          "type": "Person"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "direction": "backward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "direction": "backward",
+        "target-type": "artist",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Bruno Speight",
+          "sort-name": "Speight, Bruno",
+          "id": "70181327-a82b-4941-8103-fea3a06fe614",
+          "type": "Person",
+          "country": null,
+          "disambiguation": ""
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "type": "member of band",
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "artist": {
+          "id": "9c14df2e-c463-417e-bb8f-1bb44336ad7c",
+          "sort-name": "Currelley‐Young, Chandra",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Chandra Currelley‐Young",
+          "disambiguation": "American actress and singer",
+          "country": "US",
+          "type": "Person"
+        },
+        "target-type": "artist",
+        "direction": "backward",
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": true
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "ed2a315e-8c2f-4a59-be9d-6acc0be8e827",
+          "resource": "https://www.allmusic.com/artist/mn0000495366"
+        },
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "allmusic",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "url": {
+          "resource": "http://www.soulwalking.co.uk/S.O.S%20Band.html",
+          "id": "c2366254-cec0-4a91-b254-eb806a65891d"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "78f75830-94e1-4138-8f8a-643e3bb21ce5",
+        "type": "biography",
+        "source-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "fcc1f422-ba16-4f83-b318-1ff70060cb66",
+          "resource": "https://www.discogs.com/artist/98545"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "source-credit": "",
+        "type": "discogs"
+      },
+      {
+        "source-credit": "",
+        "type": "free streaming",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.spotify.com/artist/6pXCjxMOBcWtvULYkFPVW6",
+          "id": "3ebff918-6818-4a17-80b6-88f42a304537"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "c6e7e460-23e8-4c0d-bbb2-1e73f6e90ec7",
+          "resource": "https://www.deezer.com/artist/1610567"
+        },
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "type": "free streaming",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "id": "6f3bc71d-d8c9-4072-a3cd-11cc219e56fd",
+          "resource": "https://www.last.fm/music/S.O.S.+Band"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "last.fm"
+      },
+      {
+        "source-credit": "",
+        "type": "official homepage",
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "target-type": "url",
+        "url": {
+          "id": "a8b36962-0d0c-4216-bae8-f64b76ba52c5",
+          "resource": "https://www.thesosband.com/"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/s_o_s__band",
+          "id": "f2f236fd-955e-4dd5-bfb9-e26cc6b49404"
+        },
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "purchase for download",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "d9c1ce46-e8ed-426f-8aec-aa29ee8fb569",
+          "resource": "https://itunes.apple.com/us/artist/id14868524"
+        },
+        "direction": "forward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "type": "social network",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.facebook.com/therealsosband",
+          "id": "4066c2fb-8547-4cc6-96f8-4625df44ab40"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "url": {
+          "id": "b1951100-6b89-4233-b453-628692fce1ea",
+          "resource": "https://tidal.com/artist/6009107"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url"
+      },
+      {
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "4ed4d06f-b1b0-4488-86cc-bd6cfa2504b4",
+          "resource": "https://www.wikidata.org/wiki/Q1478806"
+        },
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "wikidata"
+      }
+    ],
+    "gender-id": null,
+    "area": {
+      "disambiguation": "",
+      "type": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "sort-name": "United States",
+      "name": "United States",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "type-id": null
+    },
+    "tags": [
+      {
+        "name": "80s",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "classic pop and rock"
+      },
+      {
+        "name": "funk",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "jazz"
+      },
+      {
+        "name": "jazz-funk",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "r&b"
+      },
+      {
+        "count": 1,
+        "name": "rhythm & blues"
+      },
+      {
+        "count": 1,
+        "name": "soul"
+      }
+    ],
+    "end-area": null,
+    "gender": null,
+    "aliases": [
+      {
+        "sort-name": "S.O.S. Band",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "S.O.S. Band",
+        "locale": null,
+        "ended": false,
+        "begin": null,
+        "end": null,
+        "type": "Artist name",
+        "primary": null
+      },
+      {
+        "primary": null,
+        "end": null,
+        "type": null,
+        "ended": false,
+        "begin": null,
+        "locale": null,
+        "name": "SOS Band",
+        "type-id": null,
+        "sort-name": "SOS Band"
+      },
+      {
+        "type": "Artist name",
+        "end": null,
+        "primary": null,
+        "begin": null,
+        "ended": false,
+        "locale": null,
+        "sort-name": "S.O.S Band, The",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "The S.O.S Band"
+      },
+      {
+        "end": null,
+        "type": "Artist name",
+        "primary": null,
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "name": "The SOS Band",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "sort-name": "SOS Band, The"
+      }
+    ],
+    "disambiguation": ""
+  }
+}

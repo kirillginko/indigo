@@ -1,0 +1,686 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/826b488f-5164-45ca-abc4-ab11b3c321eb?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:07.993572+00:00",
+  "body": {
+    "life-span": {
+      "begin": "1933-12-12",
+      "end": "2020-03-24",
+      "ended": true
+    },
+    "area": {
+      "iso-3166-1-codes": [
+        "CM"
+      ],
+      "disambiguation": "",
+      "id": "bf132644-e3ee-3bfc-9323-7f82824e4945",
+      "sort-name": "Cameroon",
+      "type-id": null,
+      "type": null,
+      "name": "Cameroon"
+    },
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "6f33d775-b4e2-473c-a7db-e34c525cc52d",
+        "name": "afro-jazz",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "afrobeat",
+        "id": "fcc58a18-9326-4c92-8b29-c294d44379c3",
+        "disambiguation": "funk/soul + West African sounds"
+      },
+      {
+        "disambiguation": "",
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "name": "jazz",
+        "count": 3
+      },
+      {
+        "count": 3,
+        "name": "makossa",
+        "disambiguation": "",
+        "id": "fe3ac8f4-a9cb-4ad7-801e-6d1a69b1a380"
+      }
+    ],
+    "ipis": [],
+    "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+    "relations": [
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "direction": "forward",
+        "target-credit": "L’African Team de Paris",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "type": "Group",
+          "name": "L'African-Team",
+          "id": "c607c1ff-5130-4c06-a3e1-47a7996ecf73",
+          "disambiguation": "",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "sort-name": "L'African-Team"
+        },
+        "ended": false,
+        "type": "member of band",
+        "attribute-values": {}
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Dibango, Georgia",
+          "id": "7d3a1a57-a3ae-4cfc-a3d9-604657b9d581",
+          "disambiguation": "",
+          "type": "Person",
+          "name": "Georgia Dibango"
+        },
+        "ended": false,
+        "type": "parent",
+        "attribute-values": {},
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "type": "parent",
+        "ended": false,
+        "artist": {
+          "disambiguation": "",
+          "id": "64fc5518-cde7-4817-8473-f38e52914d1c",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "FR",
+          "sort-name": "BKS, James",
+          "name": "James BKS",
+          "type": "Person"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406"
+      },
+      {
+        "attribute-values": {},
+        "type": "allmusic",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "2b9ead6a-19a2-4f84-b0d0-722016ca3e66",
+          "resource": "https://www.allmusic.com/artist/mn0000674011"
+        }
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "BBC Music page",
+        "attribute-values": {},
+        "ended": true,
+        "target-type": "url",
+        "end": "2020-11-19",
+        "begin": null,
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "url": {
+          "id": "50afe822-d43d-498d-9a84-506c5fdff9d3",
+          "resource": "https://www.bbc.co.uk/music/artists/826b488f-5164-45ca-abc4-ab11b3c321eb"
+        },
+        "direction": "forward"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "78f75830-94e1-4138-8f8a-643e3bb21ce5",
+        "url": {
+          "id": "7ba5b8cb-b4cd-491f-87c5-a3a965ae61bc",
+          "resource": "https://www.britannica.com/biography/Manu-Dibango"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "biography",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "url": {
+          "resource": "https://www.discogs.com/artist/20560",
+          "id": "5e35492b-c1fa-46ab-a34a-75979b1095a3"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "discogs",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://open.spotify.com/artist/30UIjoCGuL3Fa5BOc3ayNW",
+          "id": "e6029de3-be9a-4fc0-983d-21c57b49851c"
+        },
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://www.deezer.com/artist/4929",
+          "id": "cf40db5a-e657-441d-92f1-14dbdbfcbbdc"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "free streaming",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "IMDb",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "url": {
+          "resource": "https://www.imdb.com/name/nm0225073/",
+          "id": "a6ca076d-2e22-41e3-9e99-bc799c7a2b6d"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "last.fm",
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "url": {
+          "id": "006fe20d-02a9-4930-b83d-bf96993802c3",
+          "resource": "https://www.last.fm/music/Manu+Dibango"
+        },
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "url": {
+          "resource": "https://genius.com/artists/Manu-dibango",
+          "id": "1e244e5a-27bc-409a-8222-01e133f38e2a"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "lyrics",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "url": {
+          "id": "941702ed-f160-45ca-88b6-5ba2998deb61",
+          "resource": "https://myspace.com/manudibango"
+        },
+        "attribute-values": {},
+        "type": "myspace",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "type": "official homepage",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "ddf027c0-441a-4432-9515-280b684d0e45",
+          "resource": "http://www.manudibango.net/"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15"
+      },
+      {
+        "ended": false,
+        "type": "other databases",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n91010968",
+          "id": "6294f48a-4bdd-44c4-b587-bac0337c9c8e"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null
+      },
+      {
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "9d90c258-4602-4d00-a7f2-3bd0d31295fe",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb12137495j"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://d-nb.info/gnd/13435852X",
+          "id": "fae9e4a8-fc70-46e8-92c8-d46667b4954d"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false,
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "c795da01-908e-4bbd-89ac-1e11524a80f6",
+          "resource": "https://rateyourmusic.com/artist/manu_dibango"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "other databases",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "9ba07a5a-3c1f-41e6-9700-8dde604d92ab",
+          "resource": "https://www.worldcat.org/identities/lccn-n91010968"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "end": null,
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "direction": "forward",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/27182",
+          "id": "2393a0e4-9ec6-4f88-9e3d-77a049e17aa9"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "purchase for download",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "type": "purchase for download",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "bd400655-ca66-4cc6-b64e-33bca46b7c35",
+          "resource": "https://www.beatport.com/artist/manu-dibango/291316"
+        }
+      },
+      {
+        "type": "social network",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.facebook.com/ManuDibangoOfficiel",
+          "id": "70ade0c9-df1b-4fae-9a4e-494935c16071"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "type": "songkick",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "url": {
+          "resource": "https://www.songkick.com/artists/437566",
+          "id": "d7bd8170-47b5-475c-8c2d-43deab65e19d"
+        }
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/5361622",
+          "id": "b7109eea-e93a-4948-a7fe-47d9f41b9050"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "streaming",
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "2393a0e4-9ec6-4f88-9e3d-77a049e17aa9",
+          "resource": "https://open.qobuz.com/artist/27182"
+        },
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://tidal.com/artist/11321",
+          "id": "699ad682-d53a-4545-a4e1-298fc23db8f5"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "resource": "http://viaf.org/viaf/32031953",
+          "id": "55e9a9e3-ccbb-4145-a957-66d03b8a232e"
+        },
+        "direction": "forward",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "VIAF",
+        "ended": false
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "wikidata",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q445829",
+          "id": "0bf79233-d543-411c-84df-e6e0baadc4f8"
+        },
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "begin": null,
+        "end": null,
+        "target-type": "url"
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.youtube.com/user/manudibangomusic",
+          "id": "f6e169b7-58ab-4abf-95ab-821137a89b9f"
+        },
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "youtube",
+        "attribute-values": {},
+        "ended": false
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "isnis": [
+      "0000000081109606"
+    ],
+    "type": "Person",
+    "name": "Manu Dibango",
+    "tags": [
+      {
+        "count": 1,
+        "name": "african rumba"
+      },
+      {
+        "name": "afro-jazz",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "afrobeat"
+      },
+      {
+        "name": "afrofunk",
+        "count": 1
+      },
+      {
+        "count": 4,
+        "name": "death by covid-19"
+      },
+      {
+        "count": 3,
+        "name": "jazz"
+      },
+      {
+        "name": "makossa",
+        "count": 3
+      },
+      {
+        "count": 1,
+        "name": "traditional"
+      }
+    ],
+    "aliases": [
+      {
+        "sort-name": "Dibango, Manu",
+        "type-id": null,
+        "locale": null,
+        "end": null,
+        "begin": null,
+        "primary": null,
+        "ended": false,
+        "type": null,
+        "name": "Dibango, Manu"
+      },
+      {
+        "locale": null,
+        "end": null,
+        "begin": null,
+        "sort-name": "Emmanuel N'Djoké Dibango",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "type": "Legal name",
+        "name": "Emmanuel N'Djoké Dibango",
+        "primary": null,
+        "ended": false
+      },
+      {
+        "ended": false,
+        "primary": null,
+        "type": null,
+        "name": "Manu Dibangu",
+        "type-id": null,
+        "sort-name": "Manu Dibangu",
+        "end": null,
+        "begin": null,
+        "locale": null
+      }
+    ],
+    "end-area": {
+      "type-id": null,
+      "sort-name": "Melun",
+      "type": null,
+      "name": "Melun",
+      "disambiguation": "",
+      "id": "7db7ab36-3812-414a-a479-6f7f5c45ecee"
+    },
+    "gender": "Male",
+    "disambiguation": "",
+    "begin-area": {
+      "name": "Douala",
+      "type": null,
+      "id": "28ac856c-2ef4-47ae-a8cf-61b3d2e91232",
+      "disambiguation": "",
+      "sort-name": "Douala",
+      "type-id": null
+    },
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "sort-name": "Dibango, Manu",
+    "country": "CM"
+  }
+}

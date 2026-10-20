@@ -1,0 +1,160 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Beyond+The+Sea++La+Mer%22+AND+artist%3A%22Martin+Denny%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:17.146966+00:00",
+  "body": {
+    "created": "2026-10-20T01:24:17.070Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "0053e65f-702a-4bc6-9922-d38f9d3d4744",
+        "score": 100,
+        "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+        "title": "Beyond The Sea (La Mer)",
+        "length": 164932,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "name": "Martin Denny",
+              "sort-name": "Denny, Martin",
+              "aliases": [
+                {
+                  "sort-name": "The Exotic Sounds of Martin Denny",
+                  "name": "The Exotic Sounds of Martin Denny",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2017",
+        "releases": [
+          {
+            "id": "c8c32e94-0d55-4d56-b0d1-55b0fa2bf166",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 2,
+            "title": "Essential Classics, Vol. 58: Martin Denny",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "428a039a-7222-4a6e-ad1a-b5b8dbbd8db7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Essential Classics, Vol. 58: Martin Denny",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 20,
+            "media": [
+              {
+                "id": "b4383ccd-2774-3351-8161-2c35645541be",
+                "position": 2,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b93007a9-dd36-4bbc-a11a-ee294bbef17a",
+                    "number": "5",
+                    "title": "Beyond the Sea - la Mer",
+                    "length": 164932
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "e98210c8-c8da-4e57-bbe8-51ab652d8d04",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Hypnotíque + The Enchanted Sea",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a5d38aa1-b5d4-48ac-baef-8fd665a2f868",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hypnotíque + The Enchanted Sea",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2017",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2017",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 30,
+            "media": [
+              {
+                "id": "d496bb2e-8e9f-3253-aa72-9a21aa398bc4",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "738c77cc-7ff6-46d6-973f-f0cb221796c3",
+                    "number": "17",
+                    "title": "Beyond The Sea (La Mer)",
+                    "length": 166933
+                  }
+                ],
+                "track-count": 30,
+                "track-offset": 16
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "ES31E2203758"
+        ]
+      }
+    ]
+  }
+}

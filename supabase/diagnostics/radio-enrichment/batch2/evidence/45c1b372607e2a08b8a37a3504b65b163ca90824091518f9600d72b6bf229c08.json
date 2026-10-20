@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/af946d92-02b8-4923-9d87-7796d10b0f3c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:21.964863+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Ramsey Lewis",
+          "type": "Person",
+          "sort-name": "Lewis, Ramsey",
+          "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+          "disambiguation": "",
+          "country": "US"
+        },
+        "joinphrase": "",
+        "name": "Ramsey Lewis"
+      }
+    ],
+    "video": false,
+    "disambiguation": "",
+    "title": "Essence of Love",
+    "first-release-date": "1983",
+    "length": 493000,
+    "isrcs": [],
+    "id": "af946d92-02b8-4923-9d87-7796d10b0f3c",
+    "releases": [
+      {
+        "disambiguation": "",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "US",
+        "title": "Les Fleurs",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "1983",
+            "area": {
+              "disambiguation": "",
+              "name": "United States",
+              "type": null,
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States"
+            }
+          }
+        ],
+        "id": "d00f795a-b1ab-4a2d-ba07-c06eb4c7ecdc",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "",
+              "country": "US",
+              "name": "Ramsey Lewis",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Lewis, Ramsey",
+              "id": "fe19b809-e86c-4736-882a-53b72e23171b"
+            },
+            "joinphrase": "",
+            "name": "Ramsey Lewis"
+          }
+        ],
+        "date": "1983",
+        "packaging": null,
+        "packaging-id": null
+      }
+    ]
+  }
+}

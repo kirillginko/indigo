@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F1164&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:56.033408+00:00",
+  "body": {
+    "relations": [
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "artist": {
+          "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc",
+          "sort-name": "Hand, Kelli",
+          "name": "Kelli Hand",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "",
+          "country": "US",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "target-type": "artist",
+        "attributes": [],
+        "end": null,
+        "direction": "backward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "discogs"
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/1164",
+    "id": "85925cbc-286c-4999-b97b-037a8313900a"
+  }
+}

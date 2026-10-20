@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/71ce718d-7df1-4d7e-97ac-12f649d0c3ea?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:14.411261+00:00",
+  "body": {
+    "id": "71ce718d-7df1-4d7e-97ac-12f649d0c3ea",
+    "video": false,
+    "length": 375170,
+    "isrcs": [],
+    "disambiguation": "",
+    "title": "For Your Love",
+    "releases": [
+      {
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XE",
+        "id": "98e8e8e8-d4dd-4b40-a869-69a3956e6fc0",
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "2013",
+        "status": "Official",
+        "barcode": "5014797671966",
+        "release-events": [
+          {
+            "date": "2013",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "name": "Europe",
+              "sort-name": "Europe",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "The Very Best Of",
+        "artist-credit": [
+          {
+            "name": "The S.O.S. Band",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "The S.O.S. Band",
+              "sort-name": "S.O.S. Band, The",
+              "id": "39515237-2d70-436a-800c-fcbac974bec4",
+              "type": "Group",
+              "country": "US",
+              "disambiguation": ""
+            },
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      }
+    ],
+    "first-release-date": "2013",
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Group",
+          "country": "US",
+          "disambiguation": "",
+          "name": "The S.O.S. Band",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "S.O.S. Band, The",
+          "id": "39515237-2d70-436a-800c-fcbac974bec4"
+        },
+        "name": "The S.O.S. Band",
+        "joinphrase": ""
+      }
+    ]
+  }
+}

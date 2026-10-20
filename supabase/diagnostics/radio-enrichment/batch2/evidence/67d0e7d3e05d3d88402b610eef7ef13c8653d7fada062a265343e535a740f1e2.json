@@ -1,0 +1,84 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22C%27mon+Dive%22+AND+artist%3A%22Moin%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:38.481076+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:38.408Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "14250626-4352-4dba-a071-da358046d3f3",
+        "score": 100,
+        "artist-credit-id": "8722be88-7362-378b-9e98-fd6deb442879",
+        "title": "C’mon Dive",
+        "length": 220000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Moin",
+            "artist": {
+              "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+              "name": "Moin",
+              "sort-name": "Moin",
+              "disambiguation": "noise rock alias of Raime"
+            }
+          }
+        ],
+        "first-release-date": "2024-10-25",
+        "releases": [
+          {
+            "id": "42e9b713-d780-4e54-a0a4-7f4c40093d66",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "You Never End",
+            "status": "Official",
+            "release-group": {
+              "id": "a9e4b564-2df4-4a5f-b041-95cf799f676b",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "You Never End",
+              "primary-type": "Album"
+            },
+            "date": "2024-10-25",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2024-10-25",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "3b90609f-c0cc-31d9-892b-bb718dda9c9d",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b1879202-04a3-4fef-a8b9-f3e7e472e94f",
+                    "number": "8",
+                    "title": "C’mon Dive",
+                    "length": 220000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 7
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "DEG932403660"
+        ]
+      }
+    ]
+  }
+}

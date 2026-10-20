@@ -1,0 +1,223 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/146e6a5e-3668-4d48-a416-a215166696c7?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:48.777038+00:00",
+  "body": {
+    "isrcs": [],
+    "disambiguation": "",
+    "id": "146e6a5e-3668-4d48-a416-a215166696c7",
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "US",
+          "sort-name": "Spirit",
+          "name": "Spirit",
+          "type": "Group",
+          "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+          "disambiguation": "psychedelic rock"
+        },
+        "joinphrase": "",
+        "name": "Spirit"
+      }
+    ],
+    "first-release-date": "1991",
+    "releases": [
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": null,
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "disambiguation": "",
+        "packaging-id": null,
+        "title": "Time Circle",
+        "date": "1991",
+        "release-events": [
+          {
+            "date": "1991",
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Spirit",
+            "artist": {
+              "name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "Spirit",
+              "type": "Group",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock"
+            }
+          }
+        ],
+        "id": "ddf5a3ef-1f83-4bec-a2eb-bba32a218cf0",
+        "quality": "normal",
+        "status": "Official"
+      },
+      {
+        "date": "1991",
+        "release-events": [
+          {
+            "date": "1991",
+            "area": {
+              "sort-name": "Europe",
+              "type-id": null,
+              "name": "Europe",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "Time Circle",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "sort-name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock"
+            },
+            "name": "Spirit",
+            "joinphrase": ""
+          }
+        ],
+        "id": "f908d2f9-763d-4a04-8c7b-96d21758be52",
+        "quality": "normal",
+        "status": "Official",
+        "barcode": "5099747126826",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "country": "XE",
+        "disambiguation": "Matrix / Runout (CD 1): 1-02-471268-10 12 A2 DADC AUSTRIA; Matrix / Runout (CD 2): 2-02-471268-10 13 A1 DADC AUSTRIA"
+      },
+      {
+        "release-events": [
+          {
+            "date": "2008",
+            "area": {
+              "type": null,
+              "name": "Germany",
+              "type-id": null,
+              "sort-name": "Germany",
+              "disambiguation": "",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "iso-3166-1-codes": [
+                "DE"
+              ]
+            }
+          }
+        ],
+        "date": "2008",
+        "packaging-id": null,
+        "title": "Time Circle (1968–1972)",
+        "quality": "normal",
+        "status": "Official",
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "name": "Spirit",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock"
+            }
+          }
+        ],
+        "id": "89b15299-824a-48bd-a9db-7ecee5fd589b",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "country": "DE",
+        "barcode": "693723424026",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": ""
+      },
+      {
+        "country": "AU",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "612657030622",
+        "disambiguation": "",
+        "title": "Fresh From the Time Coast: The Best of 1968–1977",
+        "packaging-id": null,
+        "date": "2009-10-27",
+        "release-events": [
+          {
+            "area": {
+              "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "AU"
+              ],
+              "name": "Australia",
+              "type-id": null,
+              "sort-name": "Australia",
+              "type": null
+            },
+            "date": "2009-10-27"
+          }
+        ],
+        "status": "Official",
+        "quality": "normal",
+        "id": "e8b9e9e6-c8b3-4df1-af48-026768ccc1af",
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "psychedelic rock",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "sort-name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "name": "Spirit",
+              "type": "Group"
+            }
+          }
+        ]
+      }
+    ],
+    "video": false,
+    "title": "Girl in Your Eye",
+    "length": 198493
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "url": "https://api.discogs.com/artists/8270419",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:28.066222+00:00",
+  "body": {
+    "name": "Nala Sinephro",
+    "id": 8270419,
+    "resource_url": "https://api.discogs.com/artists/8270419",
+    "uri": "https://www.discogs.com/artist/8270419-Nala-Sinephro",
+    "releases_url": "https://api.discogs.com/artists/8270419/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/WVeZMyixrwkxy7FVTYUHfycBXVohYs_xxi3hjxxv0vQ/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTcyMzc3NjEz/NC05NTA2LnBuZw.jpeg",
+        "resource_url": "https://i.discogs.com/WVeZMyixrwkxy7FVTYUHfycBXVohYs_xxi3hjxxv0vQ/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTcyMzc3NjEz/NC05NTA2LnBuZw.jpeg",
+        "uri150": "https://i.discogs.com/A22kFma0WeSZXu4n0nsfHxWMGuk0eyMSNI4f-4GgZyg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTcyMzc3NjEz/NC05NTA2LnBuZw.jpeg",
+        "width": 600,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/TjOjSz4umIXX1VTQVyVWNUA0NmrqtjUmvDVI57r7RNI/rs:fit/g:sm/q:90/h:432/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNzcwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/TjOjSz4umIXX1VTQVyVWNUA0NmrqtjUmvDVI57r7RNI/rs:fit/g:sm/q:90/h:432/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNzcwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Rq9A0T0CtH4r_uHbzFPRrFKg0HaqPsPeiua3ZuymjIE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNzcwLmpwZWc.jpeg",
+        "width": 600,
+        "height": 432
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/UX3jwVBxmc_Gq4g_ntEhTlbib8zBN6HJmzXQBZADPd0/rs:fit/g:sm/q:90/h:583/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNjM1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/UX3jwVBxmc_Gq4g_ntEhTlbib8zBN6HJmzXQBZADPd0/rs:fit/g:sm/q:90/h:583/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNjM1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/G42P7838rle_dio1obtW5XyndBwzrNk3cUQqDydKRG4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNjM1LmpwZWc.jpeg",
+        "width": 600,
+        "height": 583
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/gQRu_qvHNiAMXPJ1F9wNBKUxI01WOISgvjHvLZ-giJo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNTc0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/gQRu_qvHNiAMXPJ1F9wNBKUxI01WOISgvjHvLZ-giJo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNTc0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/aZH6LkHuFoX8oidYxzMK-nUwI9G7foqz0jY7O0WLpIA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTgyNzA0/MTktMTYzMDQyOTI0/OS0zNTc0LmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      }
+    ],
+    "realname": "Nala Sinephro",
+    "profile": "London based Caribbean-Belgian composer, producer, and musician",
+    "urls": [
+      "https://www.nalasinephro.com",
+      "https://nalasinephro.bandcamp.com",
+      "https://www.instagram.com/nalasinephro/",
+      "https://en.wikipedia.org/wiki/Nala_Sinephro"
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

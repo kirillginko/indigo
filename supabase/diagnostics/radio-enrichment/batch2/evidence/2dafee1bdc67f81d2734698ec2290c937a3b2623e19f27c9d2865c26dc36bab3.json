@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Atlas++Imbalance+Computer+Music%22+AND+artist%3A%22Monolake%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:50.794207+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:50.722Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

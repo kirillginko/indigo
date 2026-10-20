@@ -1,0 +1,129 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/6dc6a180-4ac4-45bc-a21b-d3dab0236a54?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:14.455053+00:00",
+  "body": {
+    "isrcs": [
+      "NLM971500104"
+    ],
+    "id": "6dc6a180-4ac4-45bc-a21b-d3dab0236a54",
+    "releases": [
+      {
+        "artist-credit": [
+          {
+            "name": "Lolina",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "Inga Copeland / Alina Astrova",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Lolina",
+              "type": "Person",
+              "sort-name": "Lolina",
+              "id": "54492185-df45-494f-b133-f52da3fba781"
+            }
+          }
+        ],
+        "date": "2015-03",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "title": "RELAXIN' With Lolina",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2015-03"
+          }
+        ],
+        "id": "c9d3d3db-35c6-4222-b398-fd77016793c5"
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "name": "Lolina",
+              "id": "54492185-df45-494f-b133-f52da3fba781",
+              "sort-name": "Lolina",
+              "disambiguation": "Inga Copeland / Alina Astrova",
+              "country": "GB"
+            },
+            "name": "Lolina"
+          }
+        ],
+        "date": "2015-10-12",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "RELAXIN' With Lolina",
+        "quality": "normal",
+        "status": "Official",
+        "barcode": "8717127019113",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            },
+            "date": "2015-10-12"
+          }
+        ],
+        "id": "080bc504-dc29-4740-aa52-587c0d1d1692"
+      }
+    ],
+    "artist-credit": [
+      {
+        "artist": {
+          "sort-name": "Lolina",
+          "id": "54492185-df45-494f-b133-f52da3fba781",
+          "type": "Person",
+          "name": "Lolina",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "disambiguation": "Inga Copeland / Alina Astrova"
+        },
+        "joinphrase": "",
+        "name": "Lolina"
+      }
+    ],
+    "video": false,
+    "disambiguation": "",
+    "title": "Miss Understood",
+    "first-release-date": "2015-03",
+    "length": 227000
+  }
+}

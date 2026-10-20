@@ -1,0 +1,103 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Baby%2C+Baby%22+AND+artist%3A%22Les+McCann%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:05.188906+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:05.117Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "f34b53a8-28a9-462e-b5b9-171cd254d5e0",
+        "score": 100,
+        "artist-credit-id": "1d21ac72-f1d8-332e-92e8-4ca88d12c7f8",
+        "title": "Baby, Baby",
+        "length": 181000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Les McCann",
+            "artist": {
+              "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+              "name": "Les McCann",
+              "sort-name": "McCann, Les",
+              "aliases": [
+                {
+                  "sort-name": "McCann, Leslie Coleman",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Leslie Coleman McCann",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1970",
+        "releases": [
+          {
+            "id": "bd585754-892a-48d9-a1c8-c3e5701b93b2",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "1d21ac72-f1d8-332e-92e8-4ca88d12c7f8",
+            "count": 1,
+            "title": "Comment",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Les McCann",
+                "artist": {
+                  "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+                  "name": "Les McCann",
+                  "sort-name": "McCann, Les"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ce934af8-8ad6-4358-9498-8767adf9ba94",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Comment",
+              "primary-type": "Album"
+            },
+            "date": "1970",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1970",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "0c0447c8-7839-3b3c-8290-e5573bc81be3",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "cc25760f-ab35-4f25-aec4-1f768399569f",
+                    "number": "B2",
+                    "title": "Baby, Baby",
+                    "length": 181000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

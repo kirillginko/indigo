@@ -1,0 +1,367 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/4aed68fe-a23a-478e-b50c-00bf2f294804?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:39.772283+00:00",
+  "body": {
+    "length": 333000,
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "US",
+          "disambiguation": "baroque pop composer",
+          "name": "David Axelrod",
+          "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+          "sort-name": "Axelrod, David",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "name": "David Axelrod",
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "1969",
+    "title": "The Human Abstract",
+    "id": "4aed68fe-a23a-478e-b50c-00bf2f294804",
+    "releases": [
+      {
+        "country": "US",
+        "disambiguation": "",
+        "packaging-id": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "2c2b2243-7098-42e4-b01e-6afed5a45557",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null
+            },
+            "date": "1969"
+          }
+        ],
+        "date": "1969",
+        "title": "Songs of Experience",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "name": "David Axelrod",
+              "type": "Person",
+              "sort-name": "Axelrod, David",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "barcode": null,
+        "packaging": null
+      },
+      {
+        "disambiguation": "",
+        "country": "AU",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "release-events": [
+          {
+            "area": {
+              "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+              "name": "Australia",
+              "disambiguation": "",
+              "type": null,
+              "iso-3166-1-codes": [
+                "AU"
+              ],
+              "sort-name": "Australia",
+              "type-id": null
+            },
+            "date": "2000"
+          }
+        ],
+        "date": "2000",
+        "id": "5559ee29-be41-3b3e-a7ee-3680ca1edd82",
+        "barcode": "724352158928",
+        "packaging": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "David Axelrod",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Axelrod, David",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "name": "David Axelrod",
+              "disambiguation": "baroque pop composer"
+            }
+          }
+        ],
+        "quality": "normal",
+        "title": "Songs of Experience"
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "David Axelrod",
+            "artist": {
+              "sort-name": "Axelrod, David",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "name": "David Axelrod",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "724352158928",
+        "quality": "normal",
+        "title": "Songs of Experience",
+        "date": "2000",
+        "release-events": [
+          {
+            "date": "2000",
+            "area": {
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "a29aa23f-f9c2-4eaa-9c2b-6d8f9a3db44c",
+        "status": "Official",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "GB"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "name": "David Axelrod",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "sort-name": "Axelrod, David",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "David Axelrod",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": null,
+        "barcode": null,
+        "quality": "normal",
+        "title": "1968 to 1970: An Axelrod Anthology",
+        "date": "2001-04-10",
+        "release-events": [
+          {
+            "date": "2001-04-10",
+            "area": {
+              "disambiguation": "",
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null
+            }
+          }
+        ],
+        "id": "16c757f6-5118-42a8-aba0-2b5895826997",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "US"
+      },
+      {
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "GB",
+        "disambiguation": "",
+        "title": "Sampled, Volume 4",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            }
+          }
+        ],
+        "barcode": "724358070323",
+        "packaging": null,
+        "id": "04f82235-ceba-4359-a023-c0c91ceb70f6",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom"
+            },
+            "date": "2003-01-27"
+          }
+        ],
+        "date": "2003-01-27"
+      },
+      {
+        "date": "2006-02-27",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type-id": null,
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            },
+            "date": "2006-02-27"
+          }
+        ],
+        "id": "133ade3e-ed55-4a9c-bcde-55401112157f",
+        "packaging": null,
+        "barcode": "0094633884526",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "name": "David Axelrod",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "sort-name": "Axelrod, David",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "David Axelrod",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "title": "The Edge of Music: An Exploration of 50 Years in Music",
+        "disambiguation": "",
+        "country": "GB",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null
+      },
+      {
+        "date": "2018-08-10",
+        "release-events": [
+          {
+            "date": "2018-08-10",
+            "area": {
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "disambiguation": "",
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "id": "938143f4-8ef2-4f89-8e9c-5c7ec285e459",
+        "title": "Songs of Experience",
+        "barcode": "659457516628",
+        "packaging": "Gatefold Cover",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "David Axelrod",
+            "artist": {
+              "sort-name": "Axelrod, David",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "name": "David Axelrod",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "disambiguation": "baroque pop composer"
+            }
+          }
+        ],
+        "quality": "normal",
+        "country": "US",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+        "status": "Official"
+      }
+    ],
+    "isrcs": [],
+    "video": false,
+    "disambiguation": ""
+  }
+}

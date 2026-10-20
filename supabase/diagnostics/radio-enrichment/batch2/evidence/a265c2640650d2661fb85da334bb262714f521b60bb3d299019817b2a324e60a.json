@@ -1,0 +1,143 @@
+{
+  "url": "https://api.discogs.com/artists/866",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:37.643274+00:00",
+  "body": {
+    "name": "Paul Johnson",
+    "id": 866,
+    "resource_url": "https://api.discogs.com/artists/866",
+    "uri": "https://www.discogs.com/artist/866-Paul-Johnson",
+    "releases_url": "https://api.discogs.com/artists/866/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/avOJDGTks4QwzQId-Pg3THUKrHwFQZilfKG_W74MeVA/rs:fit/g:sm/q:90/h:280/w:431/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MDYwLTg4/NDAuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/avOJDGTks4QwzQId-Pg3THUKrHwFQZilfKG_W74MeVA/rs:fit/g:sm/q:90/h:280/w:431/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MDYwLTg4/NDAuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/dpboeu7EIlOgUpg4wEn81BMYezUPYW9GRUlKjJiV3_U/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MDYwLTg4/NDAuanBlZw.jpeg",
+        "width": 431,
+        "height": 280
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Urde5zFEEjrXtTuwv3SDYNZdxOPjpqWJMFYCaz70w-M/rs:fit/g:sm/q:90/h:360/w:480/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MDc2LTg4/MzUuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/Urde5zFEEjrXtTuwv3SDYNZdxOPjpqWJMFYCaz70w-M/rs:fit/g:sm/q:90/h:360/w:480/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MDc2LTg4/MzUuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/_hq91eDQuwKl-VmrGXjY84cNDhvCWCdJ64SSgSUyerQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MDc2LTg4/MzUuanBlZw.jpeg",
+        "width": 480,
+        "height": 360
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/qVElYZj_OIQP-6Y2sI7SbaZmFtkEfveHuJnsMLEmfyE/rs:fit/g:sm/q:90/h:355/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTMzLTMw/NDkuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/qVElYZj_OIQP-6Y2sI7SbaZmFtkEfveHuJnsMLEmfyE/rs:fit/g:sm/q:90/h:355/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTMzLTMw/NDkuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/hos6incuopv7ygHnELCsNFfsJwkQyowPBt2_-nInlXc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTMzLTMw/NDkuanBlZw.jpeg",
+        "width": 500,
+        "height": 355
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Hn7Fo3GpIJjxvIH89QNbsEZFa2R9qjHxJZdXH_zdNZg/rs:fit/g:sm/q:90/h:300/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTYxLTY3/ODAuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/Hn7Fo3GpIJjxvIH89QNbsEZFa2R9qjHxJZdXH_zdNZg/rs:fit/g:sm/q:90/h:300/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTYxLTY3/ODAuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/unMIkNPs6pOMCqkJTy81X3unKs4NqyMr2l2n2Axx2uE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTYxLTY3/ODAuanBlZw.jpeg",
+        "width": 400,
+        "height": 300
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Zx2exGDcuZVkXuYmJtAsgPJ1pw8JRDEyD7MMgibfmoE/rs:fit/g:sm/q:90/h:325/w:585/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTkzLTE4/NTEuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/Zx2exGDcuZVkXuYmJtAsgPJ1pw8JRDEyD7MMgibfmoE/rs:fit/g:sm/q:90/h:325/w:585/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTkzLTE4/NTEuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/EHCXjhV9F_edKOzqfUflXOBTeRDRVMpplPOhaBXKoBs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0x/NDM0NDQ2MTkzLTE4/NTEuanBlZw.jpeg",
+        "width": 585,
+        "height": 325
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/0DAnJ-ggAwp_QoiLUoHThyCfbaUYpYEuXEy0tRsVcT0/rs:fit/g:sm/q:90/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0w/MDEuanBn.jpeg",
+        "resource_url": "https://i.discogs.com/0DAnJ-ggAwp_QoiLUoHThyCfbaUYpYEuXEy0tRsVcT0/rs:fit/g:sm/q:90/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0w/MDEuanBn.jpeg",
+        "uri150": "https://i.discogs.com/2ZoCXG3bVOj-ztVDfryrFJ_oXoQtFUPf5Nhn7GN1xI8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg2Ni0w/MDEuanBn.jpeg",
+        "width": 150,
+        "height": 150
+      }
+    ],
+    "realname": "Paul Leighton Johnson",
+    "profile": "American house DJ and producer\r\nBorn: 11th January 1971 Chicago, IL - died: 4th August 2021 Chicago, IL.\r\nHe released a vast amount of music for some of the most consistently underground dance labels before hooking up with [l=Peacefrog Records]. 12\" releases on the likes of [l=Cajual Records] / [l=Relief Records] and [l=Dance Mania] led to his debut album release \"Bump Talkin'\" in 1996. This and the follow up \"Feel The Music\" became two of the most talked about releases of their time.\r\nHe lost the use of his legs as a result of a shooting accident in 1987, and required a wheelchair for mobility.\r\nCo-founded [l=Dust Traxx, Inc.] in 1997 and ran his own label [l=Nocturnal Interludes].",
+    "urls": [
+      "http://www.facebook.com/DJPaulJohnson",
+      "http://soundcloud.com/djpauljohnson",
+      "http://en.wikipedia.org/wiki/Paul_Johnson_(producer)"
+    ],
+    "namevariations": [
+      "Johnson",
+      "P Johnson",
+      "P. Johnson",
+      "P.J.",
+      "P.Johnson",
+      "PJ",
+      "Paul",
+      "Paul J.",
+      "Paul J. Reedit",
+      "Paul John",
+      "Paul Jonson"
+    ],
+    "aliases": [
+      {
+        "id": 10187,
+        "name": "Yonkapin",
+        "resource_url": "https://api.discogs.com/artists/10187"
+      },
+      {
+        "id": 102721,
+        "name": "The P.J. Project",
+        "resource_url": "https://api.discogs.com/artists/102721"
+      },
+      {
+        "id": 251395,
+        "name": "Pilly P.",
+        "resource_url": "https://api.discogs.com/artists/251395"
+      },
+      {
+        "id": 1556504,
+        "name": "A Nite Life Production",
+        "resource_url": "https://api.discogs.com/artists/1556504"
+      }
+    ],
+    "groups": [
+      {
+        "id": 2125,
+        "name": "Traxmen",
+        "resource_url": "https://api.discogs.com/artists/2125",
+        "active": true
+      },
+      {
+        "id": 4599,
+        "name": "2 Men On Wax",
+        "resource_url": "https://api.discogs.com/artists/4599",
+        "active": true
+      },
+      {
+        "id": 10188,
+        "name": "Brother 2 Brother",
+        "resource_url": "https://api.discogs.com/artists/10188",
+        "active": true
+      },
+      {
+        "id": 27241,
+        "name": "Club Style",
+        "resource_url": "https://api.discogs.com/artists/27241",
+        "active": true
+      },
+      {
+        "id": 76226,
+        "name": "Disco Thieves",
+        "resource_url": "https://api.discogs.com/artists/76226",
+        "active": true
+      },
+      {
+        "id": 245600,
+        "name": "Pjay",
+        "resource_url": "https://api.discogs.com/artists/245600",
+        "active": true
+      }
+    ],
+    "data_quality": "Correct"
+  }
+}

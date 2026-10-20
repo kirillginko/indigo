@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/c28b38dc-d79b-46fe-823b-cbf00753f9ab?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:07.800567+00:00",
+  "body": {
+    "length": 258519,
+    "title": "Anstromm‐Feck 4",
+    "id": "c28b38dc-d79b-46fe-823b-cbf00753f9ab",
+    "artist-credit": [
+      {
+        "name": "Squarepusher",
+        "joinphrase": "",
+        "artist": {
+          "disambiguation": "",
+          "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+          "name": "Squarepusher",
+          "sort-name": "Squarepusher",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person"
+        }
+      }
+    ],
+    "disambiguation": "Alive in Japan 2001",
+    "isrcs": [],
+    "video": false,
+    "releases": [
+      {
+        "disambiguation": "",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "JP",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "barcode": "4523132123639",
+        "quality": "normal",
+        "status": "Official",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "disambiguation": ""
+            },
+            "name": "Squarepusher",
+            "joinphrase": ""
+          }
+        ],
+        "id": "301d957d-fd23-41fa-ad16-36ecefaf04c9",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "Do You Know Squarepusher",
+        "date": "2002-09-21",
+        "release-events": [
+          {
+            "area": {
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type": null,
+              "name": "Japan",
+              "type-id": null,
+              "sort-name": "Japan"
+            },
+            "date": "2002-09-21"
+          }
+        ]
+      },
+      {
+        "title": "Do You Know Squarepusher",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "2002-09-30"
+          }
+        ],
+        "date": "2002-09-30",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "type": "Person",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Squarepusher",
+              "name": "Squarepusher"
+            },
+            "joinphrase": "",
+            "name": "Squarepusher"
+          }
+        ],
+        "id": "8890ef49-5b9f-4d7a-b2c4-95d0f03b168d",
+        "status": "Official",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "801061009724",
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "disambiguation": ""
+      }
+    ],
+    "first-release-date": "2002-09-21"
+  }
+}

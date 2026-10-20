@@ -1,0 +1,426 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Dream%22+AND+artist%3A%22David+Axelrod%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:48.921770+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:48.845Z",
+    "count": 2,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "fafac3bf-2f4a-40e4-bb5f-a61bd14d344a",
+        "score": 100,
+        "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+        "title": "A Dream",
+        "length": 147000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "artist": {
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "name": "David Axelrod",
+              "sort-name": "Axelrod, David",
+              "disambiguation": "baroque pop composer",
+              "aliases": [
+                {
+                  "sort-name": "Axelrod, D.",
+                  "name": "D. Axelrod",
+                  "locale": "en",
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006-02-27",
+        "releases": [
+          {
+            "id": "133ade3e-ed55-4a9c-bcde-55401112157f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 2,
+            "title": "The Edge of Music: An Exploration of 50 Years in Music",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5c3ecf35-4098-3932-bd84-6fb76a17e137",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Edge of Music: An Exploration of 50 Years in Music",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-02-27",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2006-02-27",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "675e8761-a3a2-303c-bb67-d319d550c6c3",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b77dea9c-b48a-3d83-a917-eed355549e13",
+                    "number": "5",
+                    "title": "A Dream",
+                    "length": 147000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "430c460a-eeeb-4711-aae1-26346980f60a",
+        "score": 100,
+        "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+        "title": "A Dream",
+        "length": 153253,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "artist": {
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "name": "David Axelrod",
+              "sort-name": "Axelrod, David",
+              "disambiguation": "baroque pop composer",
+              "aliases": [
+                {
+                  "sort-name": "Axelrod, D.",
+                  "name": "D. Axelrod",
+                  "locale": "en",
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1968",
+        "releases": [
+          {
+            "id": "65178e02-dab2-46ec-a029-bea4bf73a3f1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Song of Innocence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "48a01037-41ca-3420-8ef5-c7a0779860f1",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Song of Innocence",
+              "primary-type": "Album"
+            },
+            "track-count": 7,
+            "media": [
+              {
+                "id": "8286b0da-7b93-459e-90e1-97de7d700509",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "66534460-b008-4d04-902c-74a9412bd8a7",
+                    "number": "4",
+                    "title": "A Dream",
+                    "length": 153253
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "2d32a8f2-3d40-4fe7-a473-a59599ec81fd",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Song of Innocence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "48a01037-41ca-3420-8ef5-c7a0779860f1",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Song of Innocence",
+              "primary-type": "Album"
+            },
+            "date": "2000",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "a26dec48-52c7-374f-9247-6a10b27fde7a",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "31f4c701-099e-34d1-b644-c3ecbd9d0c15",
+                    "number": "4",
+                    "title": "A Dream",
+                    "length": 153253
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "dbb9726c-4b84-4cc4-beee-5b2b61034a7f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Song of Innocence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "48a01037-41ca-3420-8ef5-c7a0779860f1",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Song of Innocence",
+              "primary-type": "Album"
+            },
+            "date": "2018-04-21",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2018-04-21",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "4d79e3ef-8514-37e1-a0d7-f6e1280e0504",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "22939318-3cdc-48da-b984-2426333f4f37",
+                    "number": "A4",
+                    "title": "A Dream",
+                    "length": 146000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "988c6dad-3a79-4065-baf3-c9b8b7774455",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Song of Innocence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "48a01037-41ca-3420-8ef5-c7a0779860f1",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Song of Innocence",
+              "primary-type": "Album"
+            },
+            "date": "2018-05-18",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2018-05-18",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "d058506c-dc89-31f8-8ede-c2d4b7e0be6f",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "12b3b1c0-b885-46c8-bb55-744ec2696222",
+                    "number": "4",
+                    "title": "A Dream",
+                    "length": 150000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "f7591e4d-e41c-3569-8c68-e1dcd138f52d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Song of Innocence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "48a01037-41ca-3420-8ef5-c7a0779860f1",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Song of Innocence",
+              "primary-type": "Album"
+            },
+            "date": "1968",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1968",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "edd3f357-eef9-3760-b57f-8c88c323a1fe",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "d89fa75d-c168-3d3a-95d9-9deaf90bccbb",
+                    "number": "A4",
+                    "title": "A Dream",
+                    "length": 153253
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USCA29901179"
+        ]
+      }
+    ]
+  }
+}

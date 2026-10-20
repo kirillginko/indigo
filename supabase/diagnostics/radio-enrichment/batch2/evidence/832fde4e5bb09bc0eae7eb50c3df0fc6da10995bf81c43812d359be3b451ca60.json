@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/a7b1d0aa-b85f-4b41-81fe-315f6c8567f0?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:57.217362+00:00",
+  "body": {
+    "first-release-date": "2005",
+    "releases": [
+      {
+        "date": "2005",
+        "barcode": null,
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "United States"
+            },
+            "date": "2005"
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "ac74eff0-bbb9-4849-8d3b-5d668e75a94a",
+        "quality": "normal",
+        "packaging": "Digipak",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Syndromes 2",
+        "country": "US",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "name": "J‐Rocc",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "sort-name": "J‐Rocc",
+              "disambiguation": "turntablist of the Beat Junkies",
+              "id": "75f94a97-f38e-4284-be50-960cd1a3c742"
+            },
+            "joinphrase": "",
+            "name": "J.Rocc"
+          }
+        ],
+        "disambiguation": ""
+      }
+    ],
+    "isrcs": [],
+    "video": false,
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Person",
+          "name": "Bill Withers",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Withers, Bill",
+          "disambiguation": "",
+          "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+        },
+        "name": "Bill Withers",
+        "joinphrase": ""
+      }
+    ],
+    "id": "a7b1d0aa-b85f-4b41-81fe-315f6c8567f0",
+    "disambiguation": "part of \"Syndromes 2\" DJ mix",
+    "length": 251000,
+    "title": "Can We Pretend"
+  }
+}

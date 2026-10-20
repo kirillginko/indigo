@@ -1,0 +1,1233 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/81c25acd-9542-4181-ad10-3894688c2c8c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:22.867977+00:00",
+  "body": {
+    "isrcs": [
+      "GBAHW0000216"
+    ],
+    "releases": [
+      {
+        "title": "Into Battle With the Art of Noise",
+        "quality": "normal",
+        "packaging": null,
+        "barcode": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "id": "9e2b7522-aafa-4165-9590-7375ebf49b52",
+        "date": "1983-09-26",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "disambiguation": ""
+            },
+            "date": "1983-09-26"
+          }
+        ],
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status": "Official",
+        "country": "GB",
+        "disambiguation": ""
+      },
+      {
+        "quality": "normal",
+        "barcode": "",
+        "packaging": "Cardboard/Paper Sleeve",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "disambiguation": "",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "country": "GB"
+            }
+          }
+        ],
+        "title": "Into Battle With the Art of Noise",
+        "id": "4311bce3-b072-4376-9df3-88082cd6e3d3",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "type-id": null
+            },
+            "date": "1983-12"
+          }
+        ],
+        "date": "1983-12",
+        "status": "Promotion",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "country": "US"
+      },
+      {
+        "country": "FR",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": null,
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "1983",
+            "area": {
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "name": "France",
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "sort-name": "France"
+            }
+          }
+        ],
+        "date": "1983",
+        "id": "a04c484d-708a-3c5d-b613-d939e5057e2d",
+        "title": "Into Battle With the Art of Noise",
+        "packaging": null,
+        "barcode": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "title": "Daft",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ],
+        "packaging": "Jewel Case",
+        "barcode": "601215319521",
+        "quality": "normal",
+        "date": "1984",
+        "release-events": [
+          {
+            "date": "1984",
+            "area": {
+              "sort-name": "Canada",
+              "iso-3166-1-codes": [
+                "CA"
+              ],
+              "type": null,
+              "type-id": null,
+              "disambiguation": "",
+              "name": "Canada",
+              "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b"
+            }
+          }
+        ],
+        "id": "26101881-634f-41ab-ba38-d0571544992b",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "country": "CA",
+        "disambiguation": ""
+      },
+      {
+        "status": "Official",
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "country": "GB",
+        "quality": "normal",
+        "packaging": null,
+        "barcode": "8731889474720",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "title": "Daft",
+        "id": "2c999811-bc3a-3033-8b6d-cf24c415e269",
+        "release-events": [
+          {
+            "date": "1986",
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            }
+          }
+        ],
+        "date": "1986"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            },
+            "date": "1986"
+          }
+        ],
+        "date": "1986",
+        "id": "b198310e-baed-4d3a-88c3-825f2ca14bb1",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group"
+            }
+          }
+        ],
+        "barcode": "4007192564927",
+        "packaging": null,
+        "quality": "normal",
+        "title": "Daft",
+        "disambiguation": "",
+        "country": "GB",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null
+      },
+      {
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "disambiguation": "",
+        "country": "GB",
+        "barcode": "",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "title": "Daft",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "disambiguation": ""
+            },
+            "date": "1986"
+          }
+        ],
+        "date": "1986",
+        "id": "c2e1a6b2-f49d-4cd5-8d56-1341c0ba62a4"
+      },
+      {
+        "country": "XE",
+        "disambiguation": "Back with \"be happy or die\"",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "date": "1986",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type": null,
+              "sort-name": "Europe",
+              "type-id": null
+            },
+            "date": "1986"
+          }
+        ],
+        "id": "22afa8f8-57fa-48e2-8767-c35b904e96f8",
+        "title": "Daft",
+        "packaging": "Jewel Case",
+        "barcode": "4007192564927",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "country": "GB",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "title": "Daft",
+        "quality": "normal",
+        "barcode": "745099474720",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "id": "b3190749-e523-42ca-a149-1c5e25e01735",
+        "date": "1994-05-09",
+        "release-events": [
+          {
+            "area": {
+              "name": "Europe",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "disambiguation": "",
+              "sort-name": "Europe",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type-id": null
+            },
+            "date": "1994-05-09"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status": "Official",
+        "country": "XE",
+        "disambiguation": ""
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "country": "JP",
+        "disambiguation": "",
+        "title": "Daft",
+        "barcode": "4943674001927",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ],
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "1994",
+            "area": {
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type": null,
+              "sort-name": "Japan",
+              "type-id": null,
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "name": "Japan",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "1994",
+        "id": "c4146a78-49b0-4c90-9017-ee762d9c8429"
+      },
+      {
+        "date": "1998-11-23",
+        "release-events": [
+          {
+            "date": "1998-11-23",
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom"
+            }
+          }
+        ],
+        "id": "cea6679d-e2f2-3ee7-83f1-7a5f2797fa7f",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise"
+            }
+          }
+        ],
+        "barcode": "5030094024229",
+        "packaging": null,
+        "quality": "normal",
+        "title": "Daft",
+        "disambiguation": "",
+        "country": "GB",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null
+            },
+            "date": "1998"
+          }
+        ],
+        "date": "1998",
+        "id": "766fd4e3-5049-4e3f-a96d-18873204c01d",
+        "title": "Daft",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB"
+            }
+          }
+        ],
+        "barcode": "601215319521",
+        "packaging": "Jewel Case",
+        "quality": "normal",
+        "country": "US",
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official"
+      },
+      {
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "FR",
+        "disambiguation": "",
+        "title": "Daft",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "disambiguation": "",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group"
+            }
+          }
+        ],
+        "packaging": "Jewel Case",
+        "barcode": "5030094024229",
+        "id": "6cd83fea-1812-46ab-aa92-5b3e953c01b6",
+        "release-events": [
+          {
+            "date": "1999",
+            "area": {
+              "sort-name": "France",
+              "type": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "type-id": null,
+              "disambiguation": "",
+              "name": "France",
+              "id": "08310658-51eb-3801-80de-5a0739207115"
+            }
+          }
+        ],
+        "date": "1999"
+      },
+      {
+        "status": "Official",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "GB",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ],
+        "packaging": "Digipak",
+        "barcode": "5018766992700",
+        "title": "Daft",
+        "id": "e566bedb-ef36-4f19-a266-3313a4e5d916",
+        "release-events": [
+          {
+            "date": "2000",
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            }
+          }
+        ],
+        "date": "2000"
+      },
+      {
+        "id": "c5ae00b9-5525-4e04-96de-5de6abc276f8",
+        "release-events": [
+          {
+            "area": {
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "name": "Germany",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type": null,
+              "sort-name": "Germany",
+              "type-id": null
+            },
+            "date": "2000"
+          }
+        ],
+        "date": "2000",
+        "quality": "normal",
+        "barcode": "4009910489420",
+        "packaging": "Digipak",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group"
+            }
+          }
+        ],
+        "title": "Daft",
+        "disambiguation": "",
+        "country": "DE",
+        "status": "Official",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "id": "ca102ece-50bf-408d-9920-ea9f779aabde",
+        "date": "2003-11-24",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "Germany",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "type-id": null,
+              "sort-name": "Germany",
+              "type": null,
+              "iso-3166-1-codes": [
+                "DE"
+              ]
+            },
+            "date": "2003-11-24"
+          }
+        ],
+        "title": "Into Battle With the Art of Noise",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "4009910500125",
+        "country": "DE",
+        "disambiguation": "",
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official"
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "status": "Official",
+        "country": "DE",
+        "disambiguation": "",
+        "title": "Into Battle With the Art of Noise",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "GB",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": null,
+        "barcode": "4009910500125",
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "sort-name": "Germany",
+              "type-id": null,
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "name": "Germany",
+              "disambiguation": ""
+            },
+            "date": "2003-11-25"
+          }
+        ],
+        "date": "2003-11-25",
+        "id": "5bd4d2d6-867e-3e2c-87a1-21163c971baf"
+      },
+      {
+        "quality": "normal",
+        "packaging": "Jewel Case",
+        "barcode": "5055041804907",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ],
+        "title": "Daft",
+        "id": "d8de1efd-17ae-4ec6-8564-459566607a90",
+        "date": "2003",
+        "release-events": [
+          {
+            "date": "2003",
+            "area": {
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type-id": null,
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            }
+          }
+        ],
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "country": "GB"
+      },
+      {
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "disambiguation": "",
+        "country": "US",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": "827912024173",
+        "packaging": "Jewel Case",
+        "quality": "normal",
+        "title": "Daft",
+        "date": "2005-10-04",
+        "release-events": [
+          {
+            "date": "2005-10-04",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null
+            }
+          }
+        ],
+        "id": "43a310b3-379f-35dd-8a02-fe0165669a7c"
+      },
+      {
+        "id": "a3041e8c-83ba-3f1a-91c9-76e0ceeb8e54",
+        "release-events": [
+          {
+            "date": "2006-08-21",
+            "area": {
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type-id": null,
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            }
+          }
+        ],
+        "date": "2006-08-21",
+        "title": "And What Have You Done With My Body, God?",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "packaging": null,
+        "barcode": "5055041821225",
+        "country": "GB",
+        "disambiguation": "",
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official"
+      },
+      {
+        "country": "US",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "status": "Official",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "type-id": null
+            },
+            "date": "2006-09-19"
+          }
+        ],
+        "date": "2006-09-19",
+        "id": "c3c2ed5c-75bd-43e2-a3b8-16c801018863",
+        "title": "And What Have You Done With My Body, God?",
+        "barcode": null,
+        "packaging": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "packaging": "Cardboard/Paper Sleeve",
+        "barcode": "4580132732384",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "disambiguation": "",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            }
+          }
+        ],
+        "quality": "normal",
+        "title": "Daft",
+        "date": "2008-10-29",
+        "release-events": [
+          {
+            "area": {
+              "name": "Japan",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "Japan",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type": null
+            },
+            "date": "2008-10-29"
+          }
+        ],
+        "id": "ea5fb75c-d183-44a1-a568-a3a2f888758e",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "disambiguation": "",
+        "country": "JP"
+      },
+      {
+        "title": "Into Battle With the Art of Noise",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "country": "GB"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": "Digipak",
+        "barcode": "698458814920",
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "2011-04-04",
+            "area": {
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom"
+            }
+          }
+        ],
+        "date": "2011-04-04",
+        "id": "0412de09-02a1-427d-8081-537b3f49208c",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "status": "Official",
+        "country": "GB",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "country": "GB",
+        "status": "Official",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "date": "2018-07-27",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "2018-07-27"
+          }
+        ],
+        "id": "b02147f6-b3e8-4cef-9ed9-e9874d1ff9d4",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "type": "Group"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "barcode": "4050538386394",
+        "packaging": null,
+        "quality": "normal",
+        "title": "Moments in Love"
+      },
+      {
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "barcode": "5030094024229",
+        "packaging": null,
+        "title": "Daft",
+        "id": "9e15b2c8-30ad-45cc-acca-9fb7c620553f",
+        "release-events": [
+          {
+            "date": "",
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            }
+          }
+        ],
+        "date": "",
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "GB"
+      }
+    ],
+    "id": "81c25acd-9542-4181-ad10-3894688c2c8c",
+    "disambiguation": "",
+    "video": false,
+    "length": 104693,
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "sort-name": "Art of Noise",
+          "id": "be899560-1570-402e-9f95-3182898a8b70",
+          "name": "Art of Noise",
+          "disambiguation": "",
+          "country": "GB"
+        },
+        "joinphrase": "",
+        "name": "Art of Noise"
+      }
+    ],
+    "first-release-date": "1983-09-26",
+    "title": "Donna"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/ae1bb010-e34c-4e32-b868-4cdcbde01222?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:30.514885+00:00",
+  "body": {
+    "isrcs": [
+      "USZ4V2000457"
+    ],
+    "video": false,
+    "first-release-date": "2020-10-30",
+    "releases": [
+      {
+        "quality": "normal",
+        "packaging": "None",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Fires in Heaven",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "name": "SALEM",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "disambiguation": "US‐based electronic group",
+              "sort-name": "SALEM",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US"
+            },
+            "name": "Salem",
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "barcode": "819478029389",
+        "release-events": [
+          {
+            "date": "2020-10-30",
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "type": null,
+              "name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2020-10-30",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "3d681a62-6ae4-4c05-9f1a-2d23a81560db",
+        "status": "Official"
+      }
+    ],
+    "title": "Capulets",
+    "length": 116420,
+    "artist-credit": [
+      {
+        "name": "Salem",
+        "joinphrase": "",
+        "artist": {
+          "type": "Group",
+          "name": "SALEM",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "US",
+          "sort-name": "SALEM",
+          "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+          "disambiguation": "US‐based electronic group"
+        }
+      }
+    ],
+    "id": "ae1bb010-e34c-4e32-b868-4cdcbde01222",
+    "disambiguation": ""
+  }
+}

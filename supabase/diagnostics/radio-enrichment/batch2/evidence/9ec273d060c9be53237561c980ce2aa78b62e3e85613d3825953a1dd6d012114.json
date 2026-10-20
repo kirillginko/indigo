@@ -1,0 +1,131 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%229%22+AND+artist%3A%22Priori%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:18.619621+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:18.540Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "d7deafd4-24fb-423f-a8b0-db4538b6a4ee",
+        "score": 100,
+        "artist-credit-id": "dfe751ef-a325-384f-92a0-048d024d4781",
+        "title": "9",
+        "length": 432757,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Priori",
+            "artist": {
+              "id": "cc9f278d-d083-4370-b830-f2ee1f118489",
+              "name": "Priori",
+              "sort-name": "Priori",
+              "disambiguation": "Canadian DJ & producer Francis Latreille"
+            }
+          }
+        ],
+        "first-release-date": "2026-03-13",
+        "releases": [
+          {
+            "id": "29fed6a5-8d0e-4f96-83c9-ea473562767b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "9",
+            "status": "Official",
+            "release-group": {
+              "id": "c1f5effc-b7e9-4a30-b661-393cf464ee37",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "9",
+              "primary-type": "EP"
+            },
+            "date": "2026-03-13",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2026-03-13",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "f0e0b964-5cd4-4021-9bf9-0470cf6ccb29",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "a0f51954-64fa-40eb-94a5-aecbc2a86330",
+                    "number": "3",
+                    "title": "9",
+                    "length": 432757
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "8c2979c1-43a6-4914-8f1c-abe14dd29fad",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "9",
+            "status": "Official",
+            "release-group": {
+              "id": "c1f5effc-b7e9-4a30-b661-393cf464ee37",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "9",
+              "primary-type": "EP"
+            },
+            "date": "2026-03-13",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2026-03-13",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "684b1d8b-f9d3-40be-bdad-a26e10206fe1",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "5f5032ec-ef8c-49f5-adb0-98f8bdd73e41",
+                    "number": "3",
+                    "title": "9",
+                    "length": 432757
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 2
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "BEN582600003"
+        ]
+      }
+    ]
+  }
+}

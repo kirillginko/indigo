@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/dc51d589-8804-45a7-b0f8-1b24f918226e?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:52.446710+00:00",
+  "body": {
+    "length": 249000,
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "Spirit",
+          "type": "Group",
+          "disambiguation": "psychedelic rock",
+          "name": "Spirit",
+          "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+          "country": "US"
+        },
+        "joinphrase": "",
+        "name": "Spirit"
+      }
+    ],
+    "first-release-date": "2005",
+    "title": "Model Shop II (Clear)",
+    "isrcs": [],
+    "releases": [
+      {
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "US",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "psychedelic rock",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "type": "Group",
+              "sort-name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            },
+            "joinphrase": "",
+            "name": "Spirit"
+          }
+        ],
+        "packaging": null,
+        "barcode": "090771619723",
+        "title": "Model Shop",
+        "id": "46c5f55b-b59e-4dff-9f09-39e9e97002cd",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States",
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States"
+            },
+            "date": "2005"
+          }
+        ],
+        "date": "2005"
+      },
+      {
+        "status": "Official",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "country": "XE",
+        "quality": "normal",
+        "barcode": "5013929471948",
+        "packaging": "Cardboard/Paper Sleeve",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Spirit",
+              "type": "Group",
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock",
+              "country": "US"
+            },
+            "joinphrase": "",
+            "name": "Spirit"
+          }
+        ],
+        "title": "It Shall Be: Ode & Epic Recordings 1968–1972",
+        "id": "51af57ec-497f-4780-b561-0b68fc66749c",
+        "date": "2018-03-16",
+        "release-events": [
+          {
+            "date": "2018-03-16",
+            "area": {
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type": null,
+              "sort-name": "Europe"
+            }
+          }
+        ]
+      }
+    ],
+    "id": "dc51d589-8804-45a7-b0f8-1b24f918226e",
+    "video": false,
+    "disambiguation": ""
+  }
+}

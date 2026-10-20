@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/5575cbe2-ad18-4adf-ba98-af7032b9612d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:33.167582+00:00",
+  "body": {
+    "title": "Essence of Matter",
+    "length": 339866,
+    "video": false,
+    "releases": [
+      {
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "barcode": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United States",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            },
+            "date": "1999"
+          }
+        ],
+        "date": "1999",
+        "title": "The Real Electrifying Eddie Harris",
+        "packaging-id": null,
+        "status": "Official",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Eddie Harris",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "saxophone, piano, vocals",
+              "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+              "type": "Person",
+              "name": "Eddie Harris",
+              "sort-name": "Harris, Eddie",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "id": "c3a08c14-7b89-412e-9cba-d32d10c43b5f"
+      }
+    ],
+    "first-release-date": "1999",
+    "disambiguation": "",
+    "id": "5575cbe2-ad18-4adf-ba98-af7032b9612d",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Eddie Harris",
+        "artist": {
+          "type": "Person",
+          "name": "Eddie Harris",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "sort-name": "Harris, Eddie",
+          "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+          "disambiguation": "saxophone, piano, vocals"
+        }
+      }
+    ],
+    "isrcs": []
+  }
+}

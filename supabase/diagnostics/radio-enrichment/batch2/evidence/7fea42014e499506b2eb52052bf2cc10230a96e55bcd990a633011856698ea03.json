@@ -1,0 +1,177 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/1d2fd789-abab-4dba-b370-632463cf6fb8?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:00.396000+00:00",
+  "body": {
+    "releases": [
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "country": "XW",
+        "disambiguation": "",
+        "title": "Layers",
+        "artist-credit": [
+          {
+            "name": "Les McCann",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+              "name": "Les McCann",
+              "disambiguation": "",
+              "type": "Person",
+              "sort-name": "McCann, Les",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "barcode": "00081227128067",
+        "packaging": "None",
+        "quality": "normal",
+        "date": "1973",
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "type-id": null
+            },
+            "date": "1973"
+          }
+        ],
+        "id": "7b7d744c-31ae-43b6-849e-3ae5cb5acd9e"
+      },
+      {
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "release-events": [
+          {
+            "date": "1974-02",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "disambiguation": "",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States"
+            }
+          }
+        ],
+        "date": "1974-02",
+        "id": "2c682461-53a6-463f-bbad-e5a5bea59915",
+        "packaging": null,
+        "barcode": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "name": "Les McCann",
+              "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+              "disambiguation": "",
+              "sort-name": "McCann, Les",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": "",
+            "name": "Les McCann"
+          }
+        ],
+        "quality": "normal",
+        "title": "Layers"
+      },
+      {
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "5a05a03b-faf8-4f9b-b445-d88212671db5",
+        "release-events": [
+          {
+            "date": "1993",
+            "area": {
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "sort-name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null
+            }
+          }
+        ],
+        "date": "1993",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Les McCann",
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "name": "Les McCann",
+              "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+              "sort-name": "McCann, Les",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": null,
+        "title": "Layers"
+      }
+    ],
+    "id": "1d2fd789-abab-4dba-b370-632463cf6fb8",
+    "isrcs": [
+      "USATL0200292"
+    ],
+    "video": false,
+    "disambiguation": "",
+    "first-release-date": "1973",
+    "title": "Sometimes I Cry",
+    "length": 322080,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Les McCann",
+        "artist": {
+          "country": "US",
+          "disambiguation": "",
+          "name": "Les McCann",
+          "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+          "sort-name": "McCann, Les",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        }
+      }
+    ]
+  }
+}

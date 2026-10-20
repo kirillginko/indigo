@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Day+In+The+Life+Of+A+Fool++Manha+De+Carnaval+++Jazz%22+AND+artist%3A%22Gene+Harris%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:05.285014+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:05.214Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

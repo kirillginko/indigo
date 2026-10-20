@@ -1,0 +1,335 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/374e5598-11ed-4352-bc73-e77501b73bdf?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:05.604186+00:00",
+  "body": {
+    "title": "Go! Spastic",
+    "first-release-date": "2001-06-16",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Squarepusher",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "Squarepusher",
+          "disambiguation": "",
+          "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+          "name": "Squarepusher",
+          "country": "GB"
+        }
+      }
+    ],
+    "length": 381493,
+    "disambiguation": "",
+    "video": false,
+    "isrcs": [
+      "GBBPW0100050"
+    ],
+    "id": "374e5598-11ed-4352-bc73-e77501b73bdf",
+    "releases": [
+      {
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "JP",
+        "barcode": "4523132112404",
+        "packaging": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "joinphrase": "",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "type": "Person",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "quality": "normal",
+        "title": "Go Plastic",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "name": "Japan",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type": null,
+              "sort-name": "Japan"
+            },
+            "date": "2001-06-16"
+          }
+        ],
+        "date": "2001-06-16",
+        "id": "a1776127-4aad-48d4-87e4-c0912adfbd03"
+      },
+      {
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status": "Official",
+        "country": "GB",
+        "disambiguation": "",
+        "title": "Go Plastic",
+        "quality": "normal",
+        "barcode": "5021603086111",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Squarepusher",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Squarepusher",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "country": "GB"
+            }
+          }
+        ],
+        "id": "506b1a66-338a-30e4-83e6-30fd5ab53401",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "type-id": null
+            },
+            "date": "2001-06-25"
+          },
+          {
+            "date": "2001-06-26",
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States"
+            }
+          }
+        ],
+        "date": "2001-06-25"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type": null,
+              "sort-name": "[Worldwide]",
+              "type-id": null
+            },
+            "date": "2001-06-25"
+          }
+        ],
+        "date": "2001-06-25",
+        "id": "6fe45753-635c-462f-a73e-1120ba71b762",
+        "title": "Go Plastic",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Squarepusher",
+            "artist": {
+              "sort-name": "Squarepusher",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "disambiguation": "",
+              "name": "Squarepusher",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "0801061008536",
+        "quality": "normal",
+        "country": "XW",
+        "disambiguation": "",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "status": "Official"
+      },
+      {
+        "country": "US",
+        "disambiguation": "",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "3d3a0f39-bab9-42e1-b966-2e99a7a82fe5",
+        "date": "2001-06",
+        "release-events": [
+          {
+            "date": "2001-06",
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States"
+            }
+          }
+        ],
+        "title": "Go Plastic",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Squarepusher",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "type": "Person",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "barcode": "801061008529",
+        "packaging": "Jewel Case"
+      },
+      {
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "FR",
+        "disambiguation": "",
+        "title": "Go Plastic",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Squarepusher",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Squarepusher",
+              "type": "Person",
+              "disambiguation": "",
+              "name": "Squarepusher",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "country": "GB"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "724381043424",
+        "id": "c69c3dda-e0fd-3023-82a6-bfec0138215a",
+        "release-events": [
+          {
+            "date": "2001",
+            "area": {
+              "type": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "sort-name": "France",
+              "type-id": null,
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "name": "France",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "2001"
+      },
+      {
+        "disambiguation": "",
+        "country": "DE",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "release-events": [
+          {
+            "date": "2001",
+            "area": {
+              "disambiguation": "",
+              "name": "Germany",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "sort-name": "Germany",
+              "type": null,
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type-id": null
+            }
+          }
+        ],
+        "date": "2001",
+        "id": "9b2bd5ab-c23f-44c9-913e-0452a08f0303",
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "joinphrase": "",
+            "artist": {
+              "country": "GB",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "disambiguation": "",
+              "type": "Person",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "barcode": "5021603085121",
+        "packaging": "Jewel Case",
+        "quality": "normal",
+        "title": "Go Plastic"
+      }
+    ]
+  }
+}

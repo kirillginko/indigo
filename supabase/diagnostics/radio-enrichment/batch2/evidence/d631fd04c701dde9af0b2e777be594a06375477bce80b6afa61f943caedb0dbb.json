@@ -1,0 +1,285 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/696c7fbe-1716-4107-b030-09679dd9ed86?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:25.449392+00:00",
+  "body": {
+    "length": 272893,
+    "title": "Trapdoor",
+    "disambiguation": "",
+    "id": "00d24ff8-465a-4bcb-803e-387a085b07b5",
+    "artist-credit": [
+      {
+        "name": "Salem",
+        "joinphrase": "",
+        "artist": {
+          "disambiguation": "US‐based electronic group",
+          "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+          "name": "SALEM",
+          "sort-name": "SALEM",
+          "country": "US",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group"
+        }
+      }
+    ],
+    "isrcs": [],
+    "video": false,
+    "releases": [
+      {
+        "country": "US",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "656605799322",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "date": "2010-09-28",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            },
+            "date": "2010-09-28"
+          }
+        ],
+        "title": "King Night",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "quality": "normal",
+        "id": "a0c26fb4-23a0-4a1b-a2ca-687c093639ad",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Salem",
+            "artist": {
+              "type": "Group",
+              "name": "SALEM",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "SALEM",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "disambiguation": "US‐based electronic group"
+            }
+          }
+        ]
+      },
+      {
+        "id": "c2852bc2-4919-41e7-aab4-c3ff47ba1c2c",
+        "artist-credit": [
+          {
+            "name": "Salem",
+            "joinphrase": "",
+            "artist": {
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "disambiguation": "US‐based electronic group",
+              "type": "Group",
+              "sort-name": "SALEM",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "name": "SALEM"
+            }
+          }
+        ],
+        "status": "Official",
+        "quality": "normal",
+        "date": "2010-09-28",
+        "release-events": [
+          {
+            "date": "2010-09-28",
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            }
+          }
+        ],
+        "title": "King Night",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "Amazon exclusive",
+        "barcode": "884977752229",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None"
+      },
+      {
+        "quality": "normal",
+        "status": "Official",
+        "id": "5472b422-4d66-4a7b-93e1-c56f0ff2f7f2",
+        "artist-credit": [
+          {
+            "name": "Salem",
+            "joinphrase": "",
+            "artist": {
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "disambiguation": "US‐based electronic group",
+              "sort-name": "SALEM",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "SALEM",
+              "type": "Group"
+            }
+          }
+        ],
+        "date": "2010-09-28",
+        "release-events": [
+          {
+            "area": {
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            },
+            "date": "2010-09-28"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "King Night",
+        "disambiguation": "limited edition",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "country": "US",
+        "barcode": "656605799322",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      },
+      {
+        "status": "Official",
+        "quality": "normal",
+        "id": "54312f2a-bb51-4b29-85d2-fcb0aca73549",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "US‐based electronic group",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "name": "SALEM",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "SALEM",
+              "type": "Group"
+            },
+            "joinphrase": "",
+            "name": "Salem"
+          }
+        ],
+        "title": "King Night",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2010-09-28",
+        "release-events": [
+          {
+            "date": "2010-09-28",
+            "area": {
+              "iso-3166-1-codes": [
+                "CA"
+              ],
+              "disambiguation": "",
+              "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+              "sort-name": "Canada",
+              "type-id": null,
+              "name": "Canada",
+              "type": null
+            }
+          },
+          {
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States"
+            },
+            "date": "2010-09-28"
+          }
+        ],
+        "disambiguation": "bonus track version",
+        "country": "CA",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "884977752182"
+      },
+      {
+        "barcode": "886977895623",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "country": "GB",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null
+            },
+            "date": "2010-10-04"
+          }
+        ],
+        "date": "2010-10-04",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "King Night",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Salem",
+            "artist": {
+              "name": "SALEM",
+              "sort-name": "SALEM",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "disambiguation": "US‐based electronic group",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+            }
+          }
+        ],
+        "id": "d70bf357-1549-3e90-8729-639bdb1eaa98",
+        "quality": "normal",
+        "status": "Official"
+      }
+    ],
+    "first-release-date": "2010-09-28"
+  }
+}

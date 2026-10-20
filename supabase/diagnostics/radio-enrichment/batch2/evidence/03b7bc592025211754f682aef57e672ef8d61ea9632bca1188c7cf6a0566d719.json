@@ -1,0 +1,3264 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22BREADFAN%22+AND+artist%3A%22Budgie%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:03.494736+00:00",
+  "body": {
+    "created": "2026-10-20T01:25:03.310Z",
+    "count": 18,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "2daa80ff-2a58-4c27-ba48-cb7e787bc400",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2012-05-21",
+        "releases": [
+          {
+            "id": "b129b9e6-ec8a-4166-b347-7447ddf74095",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "A to Z of Classic Rock, Vol. 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5544f80b-8c11-4bab-8cb4-828f9792747e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "A to Z of Classic Rock, Vol. 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2012-05-21",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2012-05-21",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "acc45037-21ea-3444-b8e2-297743eb8582",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "2de108e2-f2e2-41ea-b7d4-54267f2b2711",
+                    "number": "2",
+                    "title": "Breadfan"
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c0defd87-1425-417e-aae1-0d99cfeea618",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 373000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014",
+        "releases": [
+          {
+            "id": "d3c4e1d6-4ac2-4127-b6f7-fe592d7981be",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Live in London 1974",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "49ec159a-562b-40bd-9bb8-bf068226e8e2",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Live in London 1974",
+              "primary-type": "Album"
+            },
+            "date": "2014",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 6,
+            "media": [
+              {
+                "id": "84bdaa9e-9d92-3eba-be51-0bdebaad8b66",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "bde9b1e7-ae83-496f-b225-c8b101217fda",
+                    "number": "A1",
+                    "title": "Breadfan",
+                    "length": 373000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e783ae79-7d9f-46ba-b0e8-dafe7c163d30",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 456746,
+        "disambiguation": "live, 1978-04-30: A&M Recording Studios, Los Angeles, United States",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005",
+        "releases": [
+          {
+            "id": "7ebf317b-65b1-44e0-b52c-24be0c3f106d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "Radio Sessions 1974 & 1978",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "39e9b852-516b-4ede-bc32-fe5d35f70daa",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Radio Sessions 1974 & 1978",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2005",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "c78f038a-896c-3c8a-920a-3762f6da86b6",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9e42e97e-3a7b-40ed-9f5a-1119f26156e9",
+                    "number": "10",
+                    "title": "Breadfan",
+                    "length": 456746
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "b66a0bef-d7c9-4483-83c5-35792046e31e",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 459866,
+        "disambiguation": "live, 1978-07-03: Los Angeles, United States",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1998",
+        "releases": [
+          {
+            "id": "61cd3140-1726-4697-b0ea-41e95999159e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "Heavier Than Air: Rarest Eggs",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d6eccd93-ca0f-3789-a2fd-bcd76307369d",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Heavier Than Air: Rarest Eggs",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "1998",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "7bf125b6-8038-3034-a030-8728257a6afa",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "36caec8e-a13e-4700-8c2f-93a6131feeff",
+                    "number": "12",
+                    "title": "Breadfan",
+                    "length": 459866
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "628d0d1c-ca82-430e-b92c-e6bfd1d232f0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "Heavier Than Air: Rarest Eggs",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d6eccd93-ca0f-3789-a2fd-bcd76307369d",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Heavier Than Air: Rarest Eggs",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "1998",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "2a31a076-ff14-33a6-af3c-521d1fadf7a3",
+                "position": 2,
+                "track": [
+                  {
+                    "id": "e8cfa16b-96cf-3455-b59b-45e6af778e00",
+                    "number": "12",
+                    "title": "Breadfan",
+                    "length": 459866
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 11
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cc60f66f-f026-4d6e-b3f5-40184f7b7cbd",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 366360,
+        "disambiguation": "live, 1974-??-??: Global Village, London, United Kingdom",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005",
+        "releases": [
+          {
+            "id": "7ebf317b-65b1-44e0-b52c-24be0c3f106d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "Radio Sessions 1974 & 1978",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "39e9b852-516b-4ede-bc32-fe5d35f70daa",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Radio Sessions 1974 & 1978",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2005",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "988f60dc-0c9b-3d03-a3c7-cb2b6c5068a9",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "8f87b6fd-3ec8-4aca-8ad5-e85f83793f42",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 366360
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e9d1683e-18d3-45c2-9572-b8a7982376c0",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 363226,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2009",
+        "releases": [
+          {
+            "id": "30ea6bca-2200-4908-aa0e-a9f2ea01fb85",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 6,
+            "title": "100 Rock Essentials",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4175e19d-ae42-4e06-987f-3f4fa6816905",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "100 Rock Essentials",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2009",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2009",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 100,
+            "media": [
+              {
+                "id": "f15f78c0-9245-40bc-9d50-81a1b1940dcb",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e6339259-a71b-4e53-a8a7-62cf6a2c54db",
+                    "number": "11",
+                    "title": "Breadfan",
+                    "length": 363866
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "ce8f7f96-28e0-4cee-a9ac-51442f805514",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 5,
+            "title": "101 70s Rock Anthems",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "161e368f-66d0-4163-9974-9c6da4b11c3e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "101 70s Rock Anthems",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2017-05-26",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2017-05-26",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 101,
+            "media": [
+              {
+                "id": "064020db-ed9a-3597-8f52-51663c039d55",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4e32e592-88af-45c4-89b4-70c2694a7fff",
+                    "number": "6",
+                    "title": "Breadfan",
+                    "length": 363226
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "56b707db-1cb8-44f5-bd98-f325c495f8d6",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 370000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003",
+        "releases": [
+          {
+            "id": "60e128f7-2458-417b-9847-6efdd80ed302",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "12 Tons of Rock - Best of Budgie",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a11c1ab6-6a5f-40cd-b09d-b8286977d9b3",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "12 Tons of Rock - Best of Budgie",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2003",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2003",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "74481bde-10bf-30f5-8103-4da18a1e2266",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1f6cb7c7-d846-42fc-8165-04e3f72e41fe",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 370000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "73207761-f977-4cfd-bf56-8bc41b0f5fbf",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 418800,
+        "disambiguation": "live, 1980-08-24: Reading Festival, Richfield Avenue, Reading, England, UK",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1997",
+        "releases": [
+          {
+            "id": "1de41286-117e-4d7c-a375-7025f24e7a34",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "We Came, We Saw…",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e16425b8-7f7a-332a-989d-6696466ee61e",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "We Came, We Saw…",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "1997",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1997",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "f14a7897-17f2-36eb-ad11-6a9c28f88150",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "450bffba-4367-37a6-8e9b-21c73e27a1d9",
+                    "number": "7",
+                    "title": "Breadfan",
+                    "length": 418800
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2c5f88cd-08a6-4b52-a5e3-eab834e842a9",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 366360,
+        "disambiguation": "live, 1974-03-09: Global VIllage, London, United Kingdom",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1973",
+        "releases": [
+          {
+            "id": "9a1e7924-ad1d-428c-b157-1646e1953e40",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "2025-11-07",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2025-11-07",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "aec4c499-e05e-4870-bf18-a8a9bd781c8e",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "09209312-235c-4ab0-b493-fd20360b7076",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 370733
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "a1bf43ea-ba36-4246-a47a-aea2e546d0ec",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "The Ultimate Rock Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "964599bc-a1ba-32a9-a33d-2d54046fefd7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ultimate Rock Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2002",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2002",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "4e55db5b-53a0-393b-9d46-03367489bee5",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4e154647-a7d9-3fa0-99b6-213646c3b774",
+                    "number": "7",
+                    "title": "Breadfan",
+                    "length": 365520
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "821b40f7-ea80-4e8c-a5fe-b199d830319e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Metal Mania",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b1529fb6-3a9a-4ee1-967c-6b513c409142",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Metal Mania",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2018-02-02",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2018-02-02",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "8b83b732-87a3-3f1c-a7e6-2e0508da1e8b",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b7bea0d2-c4e5-481b-beef-861b0971ca7d",
+                    "number": "11",
+                    "title": "Breadfan",
+                    "length": 364000
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "b2a11749-8069-4833-b078-2358ea1b5b7b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back On A Friend",
+            "status": "Official",
+            "disambiguation": "Remastered on 180g vinyl",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "2017-02-03",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2017-02-03",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "ef0824f7-359e-385b-b974-23a30270ef6c",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "e476048f-5429-4171-a172-d27e543b3237",
+                    "number": "A1",
+                    "title": "Breadfan"
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "2d21f361-77d7-41e3-a44a-7a445f19c72d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "1996",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "ae9429f3-cd54-3e99-8072-33fb7b240daa",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b66c02a7-9fb4-4a12-b322-59bfb414b1b3",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 370733
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "61cd3140-1726-4697-b0ea-41e95999159e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "Heavier Than Air: Rarest Eggs",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d6eccd93-ca0f-3789-a2fd-bcd76307369d",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Heavier Than Air: Rarest Eggs",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "1998",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "7bf125b6-8038-3034-a030-8728257a6afa",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ed489e7e-e92c-4cd5-911a-73a4c8e033a7",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 366360
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "0dca847c-613e-40dd-8d59-f5b81ff7c63d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "1973",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1973",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "69deab84-2d97-3f10-8e6b-6b5b211ef32f",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "323a448d-1d2b-4194-b14e-d5df36378e60",
+                    "number": "A1",
+                    "title": "Breadfan",
+                    "length": 370733
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "23929b09-7ff7-4475-ac79-e473b93fd7f7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "The Only Classic Rock Album You’ll Ever Need",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7d5022ee-df66-41ba-b731-4feae2e28369",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Only Classic Rock Album You’ll Ever Need",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013-05-27",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2013-05-27",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 51,
+            "media": [
+              {
+                "id": "ab17f8f9-94a5-3cda-9534-c15db67f34cc",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d1fac95b-27a5-470b-8af1-577dfe8dca04",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 363899
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "db8faca4-381a-4c4c-b2af-be168d8f665d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "1989",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1989",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "587e30b9-dd28-39bc-a6c9-d7cf3521d0bf",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1e22df54-9812-3f6f-8425-50a272bf7b16",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 370733
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "9f051a9f-e959-4ff0-8445-41891d14f186",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "1973",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1973",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "9ab4c86d-935a-3c77-8078-32d391166e0b",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "c9fdec60-0d97-3f88-83e4-a1dceeccc4fc",
+                    "number": "A1",
+                    "title": "Breadfan",
+                    "length": 370733
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "a4fba293-171d-4c47-b029-03de36a81924",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Best of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "88f45486-1b27-3e4f-ae3a-3084a025ffc7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Best of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 13,
+            "media": [
+              {
+                "id": "90e322cc-4070-3b4c-b5e8-73b883a8c845",
+                "position": 1,
+                "track": [
+                  {
+                    "id": "db1938f5-f778-3b91-9a53-c9186b644588",
+                    "number": "9",
+                    "title": "Breadfan",
+                    "length": 362560
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "628d0d1c-ca82-430e-b92c-e6bfd1d232f0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "Heavier Than Air: Rarest Eggs",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d6eccd93-ca0f-3789-a2fd-bcd76307369d",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Heavier Than Air: Rarest Eggs",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "1998",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "2a31a076-ff14-33a6-af3c-521d1fadf7a3",
+                "position": 2,
+                "track": [
+                  {
+                    "id": "3a5f7cf8-d939-39dd-9dd9-fd759877dc80",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 366360
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "43f40c2b-8968-48b6-98cd-66e4dc09589d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "The Definitive Anthology: An Ecstasy of Fumbling",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7774ebad-e201-3f32-a3e8-ca0be6c19d99",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Definitive Anthology: An Ecstasy of Fumbling",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 29,
+            "media": [
+              {
+                "id": "f694d7c4-d9fe-301e-af9b-9ea038cf4dfd",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "289d34c3-4959-395e-aec8-51a02d42fa2b",
+                    "number": "6",
+                    "title": "Breadfan",
+                    "length": 366093
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "a12e9dc1-ab1d-4cc5-b731-dfb22f72739d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "The Best of Budgie",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d8956286-dc8a-396c-945c-9071f18da59a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Best of Budgie",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1998-06-30",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998-06-30",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "450430f9-a7d2-327f-8910-7d4ec9d9f275",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "de63407f-54d4-33f6-9f49-63636e0aff64",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 366426
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "e7ef9e82-c22f-41d8-a47f-5c42dc394aa7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "The Metallic-Era",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7e442803-7c09-333e-bd31-e45ba321d409",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Metallic-Era",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "34e79a7b-bd1c-3d7a-9681-b763d2418b2e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "021e92b9-d32b-317a-adae-b634f8eab9c6",
+                    "number": "11",
+                    "title": "Breadfan",
+                    "length": 367093
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "44cc4a3b-fa89-401c-81b7-0e543aeb8e54",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Full Metal Garage: The Songs That Drove Metallica",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2050d8ed-8a24-30e7-b897-d5bdb4591b7e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Full Metal Garage: The Songs That Drove Metallica",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-06-26",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2006-06-26",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 27,
+            "media": [
+              {
+                "id": "17fe4f55-2542-391b-bd15-9c2a4a58b027",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d6a40492-c24d-376c-943c-6ff9a94bb5a0",
+                    "number": "7",
+                    "title": "Breadfan",
+                    "length": 365440
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "248fc387-23d5-4e9b-ae29-4bc03fe95243",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "2005-01-17",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005-01-17",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "a4538cca-e5e9-3366-bb2f-f1945621b3fc",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e257349b-4bfd-338b-b3c8-dee3e9309953",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 365813
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "6506d240-25e4-446e-9f66-6077585cf5b3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Best of Budgie",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "75893948-0de8-4956-8354-f701b6386835",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Best of Budgie",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1989",
+            "country": "KR",
+            "release-events": [
+              {
+                "date": "1989",
+                "area": {
+                  "id": "b9f7d640-46e8-313e-b158-ded6d18593b3",
+                  "name": "South Korea",
+                  "sort-name": "South Korea",
+                  "iso-3166-1-codes": [
+                    "KR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "3930749c-a05f-3bdb-b6c3-89b1a2c10775",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "69826938-48a3-4053-a189-baa2eccc756d",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 369360
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "201b97aa-7d85-42e5-9a61-362fd62ca5fe",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "Classic Rock",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "71a11c32-175a-32ad-b0b0-3e71a049fe68",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Classic Rock",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2008-12-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2008-12-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 57,
+            "media": [
+              {
+                "id": "8ddcdec1-e69b-3ca3-b1c8-46ae9528a471",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6649f20b-330d-389b-9099-14ce5fcf1933",
+                    "number": "3",
+                    "title": "Breadfan",
+                    "length": 364160
+                  }
+                ],
+                "track-count": 19,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "3b809cec-5df9-4839-8b9f-a17385cecec8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 3,
+            "title": "The MCA Albums 1973-1975",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3ce60e26-3a36-4451-8bb0-e5691455f994",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The MCA Albums 1973-1975",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2016-06-03",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2016-06-03",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "20bfd713-a525-3fd9-bdcb-fa3e78b70ac9",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d4ef367f-015a-4bee-b939-23afd1be0461",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 366360
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "e84cba2f-699f-4dd8-a144-06ab6f221447",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Best of Budgie",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "75893948-0de8-4956-8354-f701b6386835",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Best of Budgie",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1975",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1975",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "41c266bf-83d5-3124-b78e-349ba1549ac8",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "da4c2acd-6490-4ef8-89e5-b1d7e1783990",
+                    "number": "A1",
+                    "title": "Breadfan",
+                    "length": 369360
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USUM70807087"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "heavy metal"
+          }
+        ]
+      },
+      {
+        "id": "134e8257-7b7c-4060-bc8b-3f4447ea38bc",
+        "score": 100,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan",
+        "length": 457866,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020",
+        "releases": [
+          {
+            "id": "111d3f52-4772-4821-8005-328f884f5a36",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Live in Los Angeles",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b2c101d3-3aad-43fe-a826-3dcecfa43297",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Live in Los Angeles",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "track-count": 10,
+            "media": [
+              {
+                "id": "08cd8ddf-7b60-30be-93bf-6b45d5a3d975",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "59fd1dff-954f-4e30-b25d-cdf9cca2f2dd",
+                    "number": "10",
+                    "title": "Breadfan",
+                    "length": 457866
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "6c3ec3f7-f03b-4c7a-8218-0837188be065",
+        "score": 92,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan (Live)",
+        "length": 555747,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2022-04-08",
+        "releases": [
+          {
+            "id": "b4a4bfad-d454-4013-b72d-405be86ab36f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Live Flight",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6c0cf670-f9b7-41d9-9807-5c60382d694a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Live Flight",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2022-04-08",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2022-04-08",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "9f5280ea-fb9b-3b2d-8f6a-32d8d8dbf06a",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "96c5cb9d-27fa-4f48-8040-054338e1b49f",
+                    "number": "9",
+                    "title": "Breadfan",
+                    "length": 555747
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a5119def-8707-4f00-93e9-212ddbb9fd36",
+        "score": 86,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan (live 1973)",
+        "length": 365160,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005-01-17",
+        "releases": [
+          {
+            "id": "248fc387-23d5-4e9b-ae29-4bc03fe95243",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "2005-01-17",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005-01-17",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "a4538cca-e5e9-3366-bb2f-f1945621b3fc",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f614197e-0e55-37be-9c89-8d1c0008b76c",
+                    "number": "10",
+                    "title": "Breadfan (live 1973)",
+                    "length": 365160
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a12fce99-9556-4ff2-8fcd-9e960e9c8e03",
+        "score": 86,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan (2003 version)",
+        "length": 327320,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005-01-17",
+        "releases": [
+          {
+            "id": "248fc387-23d5-4e9b-ae29-4bc03fe95243",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "2005-01-17",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005-01-17",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "a4538cca-e5e9-3366-bb2f-f1945621b3fc",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "8b68c5f6-7eac-3f42-95f4-bb91d626aa0b",
+                    "number": "8",
+                    "title": "Breadfan (2003 version)",
+                    "length": 327320
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "99d9a415-68ed-41a2-86a1-34f6f381509e",
+        "score": 86,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan (live 1973)",
+        "length": 370000,
+        "video": true,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005-01-17",
+        "releases": [
+          {
+            "id": "248fc387-23d5-4e9b-ae29-4bc03fe95243",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Never Turn Your Back on a Friend",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58ea61fb-af46-3af2-88fd-e1743afc8064",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Turn Your Back on a Friend",
+              "primary-type": "Album"
+            },
+            "date": "2005-01-17",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005-01-17",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "a4538cca-e5e9-3366-bb2f-f1945621b3fc",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6931dc24-2286-478e-9baa-08ded2978acf",
+                    "number": "11",
+                    "title": "Breadfan (live 1973)",
+                    "length": 370000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dbe69cf8-16ca-4f68-b5c5-282b4ba91efb",
+        "score": 86,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan - live",
+        "length": 457866,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020-07-02",
+        "releases": [
+          {
+            "id": "48d95f2f-c072-469a-b76a-dbe54fd03342",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Live in Los Angeles (live)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b2c101d3-3aad-43fe-a826-3dcecfa43297",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Live in Los Angeles",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "track-count": 10,
+            "media": [
+              {
+                "id": "2a807a89-b6ec-3bb9-85c7-a82ec2173110",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "6e48f0ec-9969-4390-8e84-106e83e975dc",
+                    "number": "10",
+                    "title": "Breadfan - live",
+                    "length": 457866
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 9
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "NLV7F1703776"
+        ]
+      },
+      {
+        "id": "42b460cc-0600-42dd-b6b6-6a71afe0beab",
+        "score": 86,
+        "artist-credit-id": "d88eca29-72e6-3b1a-b8d7-b121a44e1342",
+        "title": "Breadfan",
+        "length": 370000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Six Ton Budgie",
+            "artist": {
+              "id": "dc07204a-22da-4f45-af7c-50690746c023",
+              "name": "Six Ton Budgie",
+              "sort-name": "Ray Phillip's Budgie"
+            }
+          }
+        ],
+        "first-release-date": "1995",
+        "releases": [
+          {
+            "id": "51979179-dcb0-416c-9d6e-96f108dc6fc6",
+            "count": 1,
+            "title": "Unplucked!",
+            "release-group": {
+              "id": "aed058f6-2c70-4164-abea-5ef97c08514d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Unplucked!",
+              "primary-type": "Album"
+            },
+            "date": "1995",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1995",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "08f1544e-453d-459d-9e38-684ca7475076",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b42facc5-b669-472d-9f3d-980f183df8fe",
+                    "number": "1",
+                    "title": "Breadfan",
+                    "length": 370000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "18ddb792-f102-4f8d-9120-03e9c9ec9c4d",
+        "score": 78,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan (lost edit not transmitted)",
+        "length": 419000,
+        "disambiguation": "live, 1980-08-24: Reading Festival, Richfield Avenue, Reading, England, UK",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006-02-21",
+        "releases": [
+          {
+            "id": "ae754065-2100-40e1-ac71-e346fffcee5d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 2,
+            "title": "The BBC Recordings",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "83105212-e817-35dd-a815-61882c440a7c",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The BBC Recordings",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2006-02-21",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2006-02-21",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 23,
+            "media": [
+              {
+                "id": "db4612c9-1ab9-3b00-8019-ade9f2a90ed2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "84322000-dbdf-3642-9f4a-d1d4d2b70b83",
+                    "number": "11",
+                    "title": "Breadfan (lost edit not transmitted)",
+                    "length": 419000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "82b85ebe-c927-4da7-a0bc-3f16e8ab7117",
+        "score": 75,
+        "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+        "title": "Breadfan / Nude Disintegrating Parachutist Woman",
+        "length": 472907,
+        "disambiguation": "live, 2002-08-02: Sunken Gardens Amphitheater, San Antonio, TX, USA",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Budgie",
+            "artist": {
+              "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+              "name": "Budgie",
+              "sort-name": "Budgie",
+              "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales",
+              "aliases": [
+                {
+                  "sort-name": "Six Ton Budgie",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Six Ton Budgie",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1968",
+                  "end-date": "1970"
+                },
+                {
+                  "sort-name": "Hills Contemporary Grass",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Hills Contemporary Grass",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": "1967",
+                  "end-date": "1968"
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002",
+        "releases": [
+          {
+            "id": "75279da4-a8bb-49ab-b453-ffa9455b36ad",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c6e73789-0b3a-3678-8081-9c8922243b86",
+            "count": 1,
+            "title": "Life in San Antonio",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Budgie",
+                "artist": {
+                  "id": "517566c5-3d43-4a81-8f78-9a78f3209e09",
+                  "name": "Budgie",
+                  "sort-name": "Budgie",
+                  "disambiguation": "hard rock band from Cardiff, South Glamorgan, Wales"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "62569aa6-b26b-3634-bfd2-5cfc5b5822e1",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Life in San Antonio",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2002",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2002",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "ed4b08ee-e2c3-3931-86b8-5b570c491797",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "392d4e4d-4149-3b1e-aafd-23e6db5233e9",
+                    "number": "12",
+                    "title": "Breadfan / Nude Disintegrating Parachutist Woman",
+                    "length": 472907
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 11
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

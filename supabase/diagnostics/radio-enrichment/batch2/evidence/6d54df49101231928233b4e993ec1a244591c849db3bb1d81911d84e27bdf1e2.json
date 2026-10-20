@@ -1,0 +1,273 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/363e12b1-7e51-4140-91b2-688dec8bee47?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:35.205974+00:00",
+  "body": {
+    "disambiguation": "noise rock alias of Raime",
+    "life-span": {
+      "end": null,
+      "ended": false,
+      "begin": null
+    },
+    "ipis": [],
+    "isnis": [],
+    "area": {
+      "name": "United Kingdom",
+      "type-id": null,
+      "sort-name": "United Kingdom",
+      "type": null,
+      "disambiguation": "",
+      "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+      "iso-3166-1-codes": [
+        "GB"
+      ]
+    },
+    "gender": null,
+    "end-area": null,
+    "country": "GB",
+    "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+    "sort-name": "Moin",
+    "gender-id": null,
+    "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+    "begin-area": {
+      "type-id": null,
+      "sort-name": "London",
+      "name": "London",
+      "type": null,
+      "disambiguation": "Greater London",
+      "id": "f03d09b3-39dc-4083-afd6-159e3f0d462f"
+    },
+    "relations": [
+      {
+        "end": null,
+        "attribute-values": {},
+        "attribute-ids": {},
+        "ended": false,
+        "attributes": [],
+        "begin": null,
+        "direction": "backward",
+        "source-credit": "",
+        "artist": {
+          "type": "Person",
+          "sort-name": "Andrews, Joe",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Joe Andrews",
+          "disambiguation": "British electronic producer; Raime",
+          "id": "02b68bff-5b54-4c5e-9522-02ff5139d550"
+        },
+        "target-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821"
+      },
+      {
+        "artist": {
+          "disambiguation": "British electronic producer; Raime",
+          "id": "144d6b49-9b27-44f6-b424-3b2487d86c4b",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Halstead, Tom",
+          "name": "Tom Halstead",
+          "type": "Person"
+        },
+        "direction": "backward",
+        "source-credit": "",
+        "ended": false,
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "attribute-ids": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "target-credit": "",
+        "type": "member of band"
+      },
+      {
+        "type": "member of band",
+        "target-credit": "",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "ended": false,
+        "begin": null,
+        "source-credit": "",
+        "direction": "backward",
+        "artist": {
+          "id": "a1290ce3-d716-4ab5-890f-50eb335b726e",
+          "disambiguation": "Italian drummer",
+          "name": "Valentina Magaletti",
+          "sort-name": "Magaletti, Valentina",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "type": "Person"
+        }
+      },
+      {
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "source-credit": "",
+        "url": {
+          "resource": "https://m-o-i-n.bandcamp.com/",
+          "id": "96d5bd1d-4342-44be-9c7b-71152839f56e"
+        },
+        "type": "bandcamp",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward"
+      },
+      {
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "resource": "https://www.discogs.com/artist/2835065",
+          "id": "34e1bbdd-7871-4ac9-8cce-48d20ed9795c"
+        },
+        "type": "discogs"
+      },
+      {
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "free streaming",
+        "url": {
+          "id": "4d04d655-e07b-47a9-9915-5c79bd7c95eb",
+          "resource": "https://open.spotify.com/artist/3HKbW1X4Aj2RZU6ruh3a0e"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "42f90815-4ee8-49b9-be37-5eee5628f65a",
+          "resource": "https://www.deezer.com/artist/288890641"
+        },
+        "type": "free streaming",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-type": "url",
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type": "free streaming",
+        "url": {
+          "resource": "https://www.deezer.com/artist/4028980",
+          "id": "6ce1f2b6-994b-4772-a4ad-6e0d7a9b09f2"
+        }
+      },
+      {
+        "type": "other databases",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/moin_f1",
+          "id": "4312f5ad-3dde-4607-928f-f49dd2bc7855"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type": "streaming",
+        "url": {
+          "id": "cf1d2136-e939-4a38-872d-730163b0851d",
+          "resource": "https://music.apple.com/gb/artist/1526872705"
+        }
+      },
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "streaming",
+        "url": {
+          "resource": "https://tidal.com/artist/4731207",
+          "id": "322e2c14-1a62-4a7f-a725-8baa548cf83c"
+        },
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      }
+    ],
+    "tags": [
+      {
+        "count": 1,
+        "name": "experimental rock"
+      }
+    ],
+    "genres": [
+      {
+        "name": "experimental rock",
+        "disambiguation": "",
+        "id": "65c97e89-b42b-45c2-a70e-0eca1b8f0ff7",
+        "count": 1
+      }
+    ],
+    "type": "Group",
+    "aliases": [],
+    "name": "Moin"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F97988&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:21.566805+00:00",
+  "body": {
+    "id": "96a64627-5b80-440b-a89a-8040d892eceb",
+    "resource": "https://www.discogs.com/artist/97988",
+    "relations": [
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-type": "artist",
+        "type": "discogs",
+        "target-credit": "",
+        "artist": {
+          "disambiguation": "South African musician",
+          "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+          "name": "Letta Mbulu",
+          "country": "ZA",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Mbulu, Letta",
+          "type": "Person"
+        },
+        "source-credit": "",
+        "direction": "backward",
+        "attributes": [],
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "end": null
+      }
+    ]
+  }
+}

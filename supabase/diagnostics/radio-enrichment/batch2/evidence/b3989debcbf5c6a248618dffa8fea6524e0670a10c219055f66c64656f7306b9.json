@@ -1,0 +1,167 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/eaf19621-8f3f-42c5-9879-b8235641bbb6?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:33.814265+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "name": "Moin",
+        "joinphrase": "",
+        "artist": {
+          "country": "GB",
+          "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+          "name": "Moin",
+          "disambiguation": "noise rock alias of Raime",
+          "type": "Group",
+          "sort-name": "Moin",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        }
+      }
+    ],
+    "length": 289739,
+    "title": "Foot Wrong",
+    "first-release-date": "2022-10-28",
+    "video": false,
+    "disambiguation": "",
+    "id": "eaf19621-8f3f-42c5-9879-b8235641bbb6",
+    "releases": [
+      {
+        "release-events": [
+          {
+            "date": "2022-10-28",
+            "area": {
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2022-10-28",
+        "id": "430ec900-7f9e-4302-9d18-99ca395bac04",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Moin",
+            "artist": {
+              "country": "GB",
+              "name": "Moin",
+              "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+              "disambiguation": "noise rock alias of Raime",
+              "sort-name": "Moin",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ],
+        "barcode": "",
+        "packaging": "None",
+        "quality": "normal",
+        "title": "Paste",
+        "disambiguation": "",
+        "country": "XW",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b"
+      },
+      {
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "country": "XW",
+        "packaging": "None",
+        "barcode": "4062548051278",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Moin",
+              "type": "Group",
+              "disambiguation": "noise rock alias of Raime",
+              "name": "Moin",
+              "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+              "country": "GB"
+            },
+            "joinphrase": "",
+            "name": "Moin"
+          }
+        ],
+        "quality": "normal",
+        "title": "Paste",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": ""
+            },
+            "date": "2022-10-28"
+          }
+        ],
+        "date": "2022-10-28",
+        "id": "1258ac37-2232-4f96-a202-f8caa8235028"
+      },
+      {
+        "title": "Paste",
+        "packaging": "Cardboard/Paper Sleeve",
+        "barcode": "",
+        "artist-credit": [
+          {
+            "name": "Moin",
+            "joinphrase": "",
+            "artist": {
+              "name": "Moin",
+              "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+              "disambiguation": "noise rock alias of Raime",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Moin",
+              "type": "Group"
+            }
+          }
+        ],
+        "quality": "normal",
+        "date": "2022-10-28",
+        "release-events": [
+          {
+            "date": "2022-10-28",
+            "area": null
+          }
+        ],
+        "id": "1851240c-f781-449e-8ab2-91af1ea2b506",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": null,
+          "language": "eng"
+        },
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status": "Official",
+        "country": null,
+        "disambiguation": ""
+      }
+    ],
+    "isrcs": [
+      "DEG932202814"
+    ]
+  }
+}

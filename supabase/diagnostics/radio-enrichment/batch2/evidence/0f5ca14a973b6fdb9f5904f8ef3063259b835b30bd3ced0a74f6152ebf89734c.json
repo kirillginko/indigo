@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/daef2103-26ab-4d34-a40f-1f700f0057a7?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:46.460560+00:00",
+  "body": {
+    "id": "daef2103-26ab-4d34-a40f-1f700f0057a7",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "name": "Monolake",
+        "joinphrase": "",
+        "artist": {
+          "name": "Monolake",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "DE",
+          "sort-name": "Monolake",
+          "id": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+          "disambiguation": ""
+        }
+      }
+    ],
+    "length": 558000,
+    "title": "Occam",
+    "releases": [
+      {
+        "id": "c801bca5-ad99-4523-bc69-c292f3efdb4d",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "date": "1997-09-08",
+            "area": {
+              "disambiguation": "",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "sort-name": "Germany",
+              "type-id": null,
+              "name": "Germany",
+              "type": null
+            }
+          }
+        ],
+        "barcode": "718752050463",
+        "date": "1997-09-08",
+        "disambiguation": "",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "artist-credit": [
+          {
+            "name": "Monolake",
+            "joinphrase": "",
+            "artist": {
+              "name": "Monolake",
+              "type": "Group",
+              "id": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+              "disambiguation": "",
+              "sort-name": "Monolake",
+              "country": "DE",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ],
+        "country": "DE",
+        "title": "Occam / Arte",
+        "text-representation": {
+          "language": "deu",
+          "script": "Latn"
+        },
+        "packaging": "Cardboard/Paper Sleeve",
+        "quality": "high"
+      },
+      {
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "disambiguation": "",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Techno Nations 7",
+        "packaging": null,
+        "quality": "normal",
+        "status": "Official",
+        "id": "1019964b-6de0-4291-a01a-4d334bd56851",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "642620106825",
+        "release-events": [
+          {
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "1998-03-16"
+          }
+        ],
+        "date": "1998-03-16"
+      }
+    ],
+    "first-release-date": "1997-09-08",
+    "isrcs": [],
+    "video": false
+  }
+}

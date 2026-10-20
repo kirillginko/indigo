@@ -1,0 +1,1299 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/81f877e8-910a-479d-ae17-43d9cbf7d693?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:28.172674+00:00",
+  "body": {
+    "isrcs": [
+      "GBAHS0300554",
+      "GBAHT1700123"
+    ],
+    "id": "f131f09c-6e8f-4baf-bbf8-2870c1686500",
+    "releases": [
+      {
+        "disambiguation": "",
+        "quality": "normal",
+        "title": "Now That’s What I Call Music 7",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "5099926111032",
+        "id": "a35db6f3-6657-4961-9c06-d1bac62f10b2",
+        "release-events": [
+          {
+            "date": "1986-08-11",
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom",
+              "type": null,
+              "type-id": null
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            },
+            "name": "Various Artists"
+          }
+        ],
+        "date": "1986-08-11",
+        "packaging-id": null,
+        "packaging": null
+      },
+      {
+        "title": "Now That’s What I Call Music 7",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "id": "2c41ac07-9c20-374b-a530-c75105264a56",
+        "release-events": [
+          {
+            "date": "1986-08-11",
+            "area": {
+              "type-id": null,
+              "type": null,
+              "name": "United Kingdom",
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": "5099926111056",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "name": "Various Artists",
+              "type": "Other",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "sort-name": "Various Artists"
+            },
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": "c70b737a-0114-39a9-88f7-82843e54f906",
+        "packaging": "Cassette Case",
+        "date": "1986-08-11"
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "artist": {
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "date": "1986",
+        "packaging-id": null,
+        "packaging": null,
+        "disambiguation": "",
+        "title": "Now That’s What I Call Music 7",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status": "Official",
+        "barcode": "5099926111032",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "85d1f4af-fb43-41d4-8434-44ff420c018e",
+        "release-events": [
+          {
+            "date": "1986",
+            "area": {
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "80008f8a-fbf8-4883-b657-a32483afff0e",
+        "release-events": [
+          {
+            "date": "1986",
+            "area": {
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": null,
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "title": "Paranoimia",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "packaging-id": null,
+        "packaging": null,
+        "date": "1986",
+        "artist-credit": [
+          {
+            "joinphrase": " with ",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "disambiguation": ""
+            },
+            "name": "The Art of Noise"
+          },
+          {
+            "joinphrase": "",
+            "artist": {
+              "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+              "sort-name": "Headroom, Max",
+              "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+              "name": "Max Headroom",
+              "type": "Character",
+              "country": null,
+              "disambiguation": "titular character from \"Max Headroom\""
+            },
+            "name": "Max Headroom"
+          }
+        ]
+      },
+      {
+        "quality": "normal",
+        "title": "Paranoimia",
+        "country": "GB",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "id": "e2b67579-f8ef-4bbd-affa-c2b5c510d4cf",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "1986"
+          }
+        ],
+        "status": "Official",
+        "barcode": "5013136300277",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "name": "The Art of Noise",
+            "joinphrase": " with ",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "Art of Noise"
+            }
+          },
+          {
+            "name": "Max Headroom",
+            "joinphrase": "",
+            "artist": {
+              "type": "Character",
+              "name": "Max Headroom",
+              "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+              "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+              "sort-name": "Headroom, Max",
+              "disambiguation": "titular character from \"Max Headroom\"",
+              "country": null
+            }
+          }
+        ],
+        "packaging-id": null,
+        "packaging": null,
+        "date": "1986"
+      },
+      {
+        "packaging": "Cardboard/Paper Sleeve",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "date": "1986",
+        "artist-credit": [
+          {
+            "name": "The Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "disambiguation": ""
+            },
+            "joinphrase": " with "
+          },
+          {
+            "artist": {
+              "disambiguation": "titular character from \"Max Headroom\"",
+              "country": null,
+              "name": "Max Headroom",
+              "type": "Character",
+              "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+              "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+              "sort-name": "Headroom, Max"
+            },
+            "joinphrase": "",
+            "name": "Max Headroom"
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "type": null,
+              "name": "United States",
+              "type-id": null
+            },
+            "date": "1986"
+          }
+        ],
+        "id": "2be9de5c-af76-4cf3-8d9d-c566a2a1c0f8",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "044114301714",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "US",
+        "title": "Paranoimia",
+        "quality": "normal",
+        "disambiguation": ""
+      },
+      {
+        "date": "1986",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "packaging": "Cardboard/Paper Sleeve",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "joinphrase": " with ",
+            "name": "The Art of Noise"
+          },
+          {
+            "name": "Max Headroom",
+            "joinphrase": "",
+            "artist": {
+              "name": "Max Headroom",
+              "type": "Character",
+              "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+              "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+              "sort-name": "Headroom, Max",
+              "disambiguation": "titular character from \"Max Headroom\"",
+              "country": null
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "id": "d678a917-ee45-4f60-9b81-677a022204c2",
+        "release-events": [
+          {
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "1986"
+          }
+        ],
+        "disambiguation": "",
+        "quality": "normal",
+        "title": "Paranoimia (The Paranoid Mix)",
+        "text-representation": {
+          "language": "eng",
+          "script": null
+        },
+        "country": "GB"
+      },
+      {
+        "disambiguation": "",
+        "quality": "normal",
+        "title": "Re-works of Art of Noise",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "CA",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "044114156727",
+        "id": "e5d2e739-c9ca-4a43-a341-5ab50f9d0034",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "CA"
+              ],
+              "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+              "sort-name": "Canada",
+              "type": null,
+              "name": "Canada",
+              "type-id": null
+            },
+            "date": "1986"
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Art of Noise",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            },
+            "name": "Art of Noise"
+          }
+        ],
+        "date": "1986",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case"
+      },
+      {
+        "packaging-id": null,
+        "packaging": null,
+        "date": "1986",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "id": "607772c8-80d2-399b-aa7b-cffe63278036",
+        "release-events": [
+          {
+            "date": "1986",
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "status": "Official",
+        "barcode": "5013136156713",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "title": "Re-works of Art of Noise",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": ""
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "JP",
+        "quality": "normal",
+        "title": "Re-Works of Art of Noise",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "1987-02-25",
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "sort-name": "Japan",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "name": "Japan",
+              "type": null,
+              "type-id": null
+            }
+          }
+        ],
+        "id": "416758bc-f3fa-4ccc-9132-961e834f52f4",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1987-02-25"
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case",
+        "date": "1987",
+        "title": "Re-works of Art of Noise",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "US",
+        "disambiguation": "",
+        "id": "711a2cfe-6224-42c7-ad79-e1f53c067fc4",
+        "release-events": [
+          {
+            "date": "1987",
+            "area": {
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "044114156727"
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ],
+        "date": "1988",
+        "packaging": "Cardboard/Paper Sleeve",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "disambiguation": "",
+        "country": "XE",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "quality": "normal",
+        "title": "The Best of the Art of Noise",
+        "status": "Official",
+        "barcode": "042283736719",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "date": "1988",
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "name": "Europe",
+              "type": null,
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "sort-name": "Europe",
+              "iso-3166-1-codes": [
+                "XE"
+              ]
+            }
+          }
+        ],
+        "id": "ef2538e4-18ce-4ddf-a974-624417cf9bc0"
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "name": "Art of Noise"
+          }
+        ],
+        "packaging-id": null,
+        "packaging": null,
+        "date": "1988",
+        "quality": "normal",
+        "title": "The Best of the Art of Noise: Art Works 7\"",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "id": "399c0262-c6d0-4f0f-bcf7-3a13bb465bc5",
+        "release-events": [
+          {
+            "date": "1988",
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type": null,
+              "name": "United Kingdom",
+              "type-id": null
+            }
+          }
+        ],
+        "status": "Official",
+        "barcode": "042283736719",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Art of Noise",
+              "type": "Group",
+              "country": "GB",
+              "disambiguation": ""
+            },
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": "36327bc2-f691-3d66-80e5-bd03cec6060a",
+        "packaging": "Slim Jewel Case",
+        "date": "1992",
+        "title": "Shades of Paranoimia",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "CD2",
+        "id": "0915055e-a5c5-49e2-9cfb-f71b7ebe08fe",
+        "release-events": [
+          {
+            "date": "1992",
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "type": null,
+              "type-id": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": "5021732201485",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "Australia",
+              "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+              "iso-3166-1-codes": [
+                "AU"
+              ],
+              "type-id": null,
+              "name": "Australia",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "1992"
+          }
+        ],
+        "id": "a1369f44-87d2-36d6-8479-d2582339d3ca",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "AU",
+        "quality": "normal",
+        "title": "The Best of the Art of Noise",
+        "disambiguation": "",
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1992",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Art of Noise",
+              "type": "Group"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ]
+      },
+      {
+        "date": "1992",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Art of Noise",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "barcode": "010467410823",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "31d63339-a9b6-4986-845a-53688cf64d5d",
+        "release-events": [
+          {
+            "date": "1992",
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "The Best of the Art of Noise",
+        "quality": "normal",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Art of Noise",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "date": "1992",
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "disambiguation": "",
+        "country": "FR",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "title": "The Best of the Art of Noise",
+        "barcode": "3072666003838",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "France",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "type-id": null,
+              "name": "France",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "1992"
+          }
+        ],
+        "id": "ed233537-d793-48d9-9860-13efaefbd23e"
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "name": "Art of Noise"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case",
+        "date": "1992",
+        "title": "The Best of the Art of Noise",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "id": "6c562d9a-6d88-45f6-ad2d-34efd064cd83",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "type": null,
+              "type-id": null
+            },
+            "date": "1992"
+          }
+        ],
+        "status": "Official",
+        "barcode": "5021732102706",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "id": "9dbc23e7-aeeb-4e1f-bfa0-19b07f74a489",
+        "release-events": [
+          {
+            "date": "1992",
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "barcode": "752792102720",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "title": "The Best of the Art of Noise",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "pink cover",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case",
+        "date": "1992",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise"
+            }
+          }
+        ]
+      },
+      {
+        "disambiguation": "",
+        "title": "The Best of the Art of Noise",
+        "quality": "normal",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "CA",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "057362137127",
+        "status": "Official",
+        "id": "da9a4d8f-0273-37d4-8e64-9fe660a42fdf",
+        "release-events": [
+          {
+            "date": "1992",
+            "area": {
+              "type-id": null,
+              "type": null,
+              "name": "Canada",
+              "sort-name": "Canada",
+              "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+              "iso-3166-1-codes": [
+                "CA"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Art of Noise",
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            }
+          }
+        ],
+        "date": "1992",
+        "packaging-id": null,
+        "packaging": null
+      },
+      {
+        "disambiguation": "",
+        "title": "The Best of the Art of Noise",
+        "quality": "normal",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "5021732102720",
+        "status": "Official",
+        "id": "1fcc6e70-828d-3c58-9308-15a3baa905e0",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type-id": null,
+              "type": null,
+              "name": "United Kingdom"
+            },
+            "date": "1992"
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "Art of Noise"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "date": "1992",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case"
+      },
+      {
+        "quality": "normal",
+        "title": "The Best of the Art of Noise",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "JP",
+        "disambiguation": "",
+        "id": "696e1df1-47ac-44a8-bf63-a2ab29dbc704",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "name": "Japan",
+              "sort-name": "Japan",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "iso-3166-1-codes": [
+                "JP"
+              ]
+            },
+            "date": "1992"
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "",
+              "sort-name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "Art of Noise"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "packaging": null,
+        "date": "1992"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "sort-name": "Germany",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type-id": null,
+              "name": "Germany",
+              "type": null
+            },
+            "date": "1994-06-03"
+          }
+        ],
+        "id": "4f75b886-dc78-4fa7-9275-15507030d23c",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "745099610227",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "DE",
+        "title": "The Best of the Art of Noise",
+        "quality": "normal",
+        "disambiguation": "",
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "1994-06-03",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "name": "Art of Noise",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "sort-name": "Art of Noise",
+              "disambiguation": "",
+              "country": "GB"
+            }
+          }
+        ]
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "disambiguation": "add compilations to this artist"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1994-11-21",
+        "country": "DE",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "title": "Visions of Sound",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "1994-11-21",
+            "area": {
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "sort-name": "Germany",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type-id": null,
+              "name": "Germany",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "e719cd31-0b39-4f19-b070-984d7158f170",
+        "barcode": "782124281120",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "1994",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "Germany",
+              "type": null,
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "sort-name": "Germany"
+            },
+            "date": "1994"
+          }
+        ],
+        "id": "5f945b07-13e2-48ce-a97f-6edbee78bc51",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "5099747576492",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "DE",
+        "quality": "normal",
+        "title": "Galaxy Dance Party präsentiert von Raumschiff Enterprise: 34 Intergalaktische Party‐Hits",
+        "disambiguation": ""
+      }
+    ],
+    "artist-credit": [
+      {
+        "name": "The Art of Noise",
+        "artist": {
+          "id": "be899560-1570-402e-9f95-3182898a8b70",
+          "sort-name": "Art of Noise",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Art of Noise",
+          "type": "Group",
+          "country": "GB",
+          "disambiguation": ""
+        },
+        "joinphrase": " with "
+      },
+      {
+        "name": "Max Headroom",
+        "joinphrase": "",
+        "artist": {
+          "sort-name": "Headroom, Max",
+          "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+          "name": "Max Headroom",
+          "type": "Character",
+          "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+          "country": null,
+          "disambiguation": "titular character from \"Max Headroom\""
+        }
+      }
+    ],
+    "video": false,
+    "disambiguation": "7″ mix",
+    "first-release-date": "1986-08-11",
+    "title": "Paranoimia",
+    "length": 198000
+  }
+}

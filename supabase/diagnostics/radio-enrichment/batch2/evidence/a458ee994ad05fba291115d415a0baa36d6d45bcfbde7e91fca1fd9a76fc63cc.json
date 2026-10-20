@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/e2ce91d3-0726-4435-9e47-f12ea544d3d6?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:43.653720+00:00",
+  "body": {
+    "isrcs": [],
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "US",
+          "disambiguation": "baroque pop composer",
+          "sort-name": "Axelrod, David",
+          "type": "Person",
+          "name": "David Axelrod",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "d5c756c1-4872-457b-8f00-d620547cbb85"
+        },
+        "joinphrase": "",
+        "name": "David Axelrod"
+      }
+    ],
+    "title": "Songs of Innocence",
+    "video": false,
+    "first-release-date": "2005-09-13",
+    "id": "e2ce91d3-0726-4435-9e47-f12ea544d3d6",
+    "length": 270946,
+    "releases": [
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "date": "2005-09-13",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "packaging-id": null,
+        "status": "Official",
+        "country": "US",
+        "title": "The Edge: David Axelrod at Capitol Records 1966-1970",
+        "disambiguation": "",
+        "id": "ac04e639-ff08-43b2-9391-f03161c61d5a",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "name": "United States",
+              "type": null
+            },
+            "date": "2005-09-13"
+          }
+        ],
+        "quality": "normal",
+        "barcode": null
+      }
+    ]
+  }
+}

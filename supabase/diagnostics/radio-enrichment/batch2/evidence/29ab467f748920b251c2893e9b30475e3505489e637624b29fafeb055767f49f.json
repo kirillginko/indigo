@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F44126&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:02.880046+00:00",
+  "body": {
+    "relations": [
+      {
+        "target-type": "artist",
+        "attributes": [],
+        "direction": "backward",
+        "attribute-values": {},
+        "begin": null,
+        "attribute-ids": {},
+        "type": "discogs",
+        "source-credit": "",
+        "ended": false,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "target-credit": "",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+          "type": "Person",
+          "name": "Les McCann",
+          "sort-name": "McCann, Les",
+          "disambiguation": "",
+          "country": "US"
+        }
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/44126",
+    "id": "2877f763-cf9a-4768-acc1-48d38e0e4657"
+  }
+}

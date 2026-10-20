@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/2fa255e6-8a98-451a-b4c2-bd2493fdd1fc?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:11.153319+00:00",
+  "body": {
+    "isrcs": [],
+    "id": "2fa255e6-8a98-451a-b4c2-bd2493fdd1fc",
+    "releases": [
+      {
+        "id": "5641fb29-be95-407d-9709-f951db46ba79",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "type": null,
+              "name": "United Kingdom",
+              "type-id": null,
+              "disambiguation": ""
+            },
+            "date": "2011-09-09"
+          }
+        ],
+        "status": "Official",
+        "barcode": "5055300329752",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "title": "Carrier",
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "packaging": "Digipak",
+        "date": "2011-09-09",
+        "artist-credit": [
+          {
+            "name": "Sully",
+            "artist": {
+              "type": "Person",
+              "name": "Sully",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "88b9d123-ebda-477a-99bd-022378a6ffa1",
+              "sort-name": "Sully",
+              "disambiguation": "UK jungle and dubstep producer",
+              "country": "GB"
+            },
+            "joinphrase": ""
+          }
+        ]
+      },
+      {
+        "country": "XW",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "quality": "normal",
+        "title": "Carrier",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "[Worldwide]",
+              "type": null,
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]"
+            },
+            "date": "2011-09-12"
+          }
+        ],
+        "id": "d6def599-6435-48f9-bb99-6fa4ede5cc5c",
+        "barcode": null,
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "UK jungle and dubstep producer",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Sully",
+              "type": "Person",
+              "sort-name": "Sully",
+              "id": "88b9d123-ebda-477a-99bd-022378a6ffa1"
+            },
+            "joinphrase": "",
+            "name": "Sully"
+          }
+        ],
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2011-09-12"
+      }
+    ],
+    "video": false,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "artist": {
+          "sort-name": "Sully",
+          "id": "88b9d123-ebda-477a-99bd-022378a6ffa1",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Sully",
+          "country": "GB",
+          "disambiguation": "UK jungle and dubstep producer"
+        },
+        "name": "Sully"
+      }
+    ],
+    "disambiguation": "",
+    "title": "Bonafide",
+    "first-release-date": "2011-09-09",
+    "length": 200000
+  }
+}

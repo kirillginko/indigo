@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/79a2f1b3-f045-42b6-9b7a-be882e2fb297?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:15.527460+00:00",
+  "body": {
+    "length": 269000,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "The S.O.S. Band",
+        "artist": {
+          "country": "US",
+          "disambiguation": "",
+          "id": "39515237-2d70-436a-800c-fcbac974bec4",
+          "name": "The S.O.S. Band",
+          "type": "Group",
+          "sort-name": "S.O.S. Band, The",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        }
+      }
+    ],
+    "first-release-date": "1992",
+    "title": "Tell Me If You Still Care",
+    "releases": [
+      {
+        "id": "f3f7d179-4b22-470f-8c91-5302eec1156b",
+        "date": "1992",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "Netherlands",
+              "type": null,
+              "iso-3166-1-codes": [
+                "NL"
+              ],
+              "disambiguation": "",
+              "name": "Netherlands",
+              "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7"
+            },
+            "date": "1992"
+          }
+        ],
+        "title": "Dance Classics Gold, The Ballads",
+        "quality": "normal",
+        "packaging": "Jewel Case",
+        "barcode": "3351477490625",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86"
+            }
+          }
+        ],
+        "country": "NL",
+        "disambiguation": "",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status": "Official"
+      }
+    ],
+    "id": "79a2f1b3-f045-42b6-9b7a-be882e2fb297",
+    "isrcs": [],
+    "video": false,
+    "disambiguation": ""
+  }
+}

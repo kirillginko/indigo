@@ -1,0 +1,1052 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Kilimanjaro%22+AND+artist%3A%22Letta+Mbulu%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:23.883146+00:00",
+  "body": {
+    "created": "2026-10-20T01:24:23.701Z",
+    "count": 10,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "6f16ca74-38c1-4a80-91b1-fcd0307a669d",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005",
+        "releases": [
+          {
+            "id": "c08e15a8-9feb-4656-b7b2-2f31aa2cf203",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "cd48230e-a720-47a7-ade8-fd05f22d2d8c",
+            "count": 1,
+            "title": "The Soul Of Disco",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "joinphrase": " And ",
+                "name": "Joey Negro",
+                "artist": {
+                  "id": "cea6cb45-d685-4917-90bf-482b656f4cf8",
+                  "name": "Joey Negro",
+                  "sort-name": "Negro, Joey",
+                  "disambiguation": "English DJ/producer"
+                }
+              },
+              {
+                "name": "Sean P",
+                "artist": {
+                  "id": "49f4e174-2c13-4b49-a306-1df7fde73bb9",
+                  "name": "Sean P.",
+                  "sort-name": "P., Sean",
+                  "disambiguation": "funk/soul/disco compiler/producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "29334407-2ca4-4d48-be58-72dfe0b27f38",
+              "title": "The Soul Of Disco",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2005",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "2501b77d-09c8-40d1-8563-26569b10d77c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d58b3bea-af19-4821-9e15-e8c11edcd6eb",
+                    "number": "6",
+                    "title": "Kilimanjaro"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "033d92ef-b222-4c88-a1cc-8a9e8b297500",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005",
+        "releases": [
+          {
+            "id": "98125d6a-dcf3-49a5-8e58-6f38df36ca95",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "The Soul of Disco",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "9a9b256f-db9f-4468-a77f-3f53d99440b6",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Soul of Disco",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2005",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2005",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 23,
+            "media": [
+              {
+                "id": "59de39df-1e4c-3381-8929-92d9e027d1e7",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e82f57b1-960f-4557-9644-056dba459db3",
+                    "number": "4",
+                    "title": "Kilimanjaro"
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0d4f7951-4e59-42cc-a810-0d956b899980",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro",
+        "length": 351370,
+        "disambiguation": "part of “Meat Me Down the Disco” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2017-11-03",
+        "releases": [
+          {
+            "id": "ba143cea-fa4f-4548-a0f8-238955dadfb3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c7f41f69-cf70-3552-9af0-055750840a39",
+            "count": 1,
+            "title": "Meat Me Down the Disco",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Horse Meat Disco",
+                "artist": {
+                  "id": "b3bfd3b4-2215-4e45-af59-b6f353bb2476",
+                  "name": "Horse Meat Disco",
+                  "sort-name": "Horse Meat Disco"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ab07229c-cdc0-4a12-bdc1-36e09e64eea0",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Meat Me Down the Disco",
+              "primary-type": "Album",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2017-11-03",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2017-11-03",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 31,
+            "media": [
+              {
+                "id": "56e7be3b-5780-39fb-affb-28f6eb05379c",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "ccbdd00e-ad93-4f3a-aff2-d918307dcee4",
+                    "number": "7",
+                    "title": "Kilimanjaro",
+                    "length": 351370
+                  }
+                ],
+                "track-count": 31,
+                "track-offset": 6
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBPKF1100030"
+        ]
+      },
+      {
+        "id": "504ef089-6f33-4150-877f-2bf99007c28b",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro",
+        "length": 356000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2010",
+        "releases": [
+          {
+            "id": "95d97ea5-868b-40b7-8db4-2de4a91032da",
+            "artist-credit-id": "cd48230e-a720-47a7-ade8-fd05f22d2d8c",
+            "count": 2,
+            "title": "The Soul Of Disco",
+            "artist-credit": [
+              {
+                "joinphrase": " And ",
+                "name": "Joey Negro",
+                "artist": {
+                  "id": "cea6cb45-d685-4917-90bf-482b656f4cf8",
+                  "name": "Joey Negro",
+                  "sort-name": "Negro, Joey",
+                  "disambiguation": "English DJ/producer"
+                }
+              },
+              {
+                "name": "Sean P",
+                "artist": {
+                  "id": "49f4e174-2c13-4b49-a306-1df7fde73bb9",
+                  "name": "Sean P.",
+                  "sort-name": "P., Sean",
+                  "disambiguation": "funk/soul/disco compiler/producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "242b22b6-d927-475b-8ccc-6db9878b694e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Soul Of Disco",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2010",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2010",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 23,
+            "media": [
+              {
+                "id": "bd94864a-b3d4-4e0c-a8d1-4a6c1d643015",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6d93d939-bea7-4e17-bb3b-51db39c44151",
+                    "number": "4",
+                    "title": "Kilimanjaro",
+                    "length": 356000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9782ce00-2427-40b7-a7c3-8b330c927972",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro",
+        "length": 355905,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2009-07-20",
+        "releases": [
+          {
+            "id": "72acdbb6-f800-4ba6-ba8e-39d92660265c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "65ac587d-5ea2-3960-81d3-6e55b9d53d1e",
+            "count": 1,
+            "title": "Joey Negro Presents It's a Summer Groove",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Joey Negro",
+                "artist": {
+                  "id": "cea6cb45-d685-4917-90bf-482b656f4cf8",
+                  "name": "Joey Negro",
+                  "sort-name": "Negro, Joey",
+                  "disambiguation": "English DJ/producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4cdbe997-5379-418f-8e86-85ac04cfde7b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Joey Negro Presents It's a Summer Groove",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2009-07-20",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2009-07-20",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "b5801546-f644-3d4d-93c8-d1bb420b70cc",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "171d3a5d-0515-46c3-a5c4-75f9eeea38a2",
+                    "number": "8",
+                    "title": "Kilimanjaro",
+                    "length": 355905
+                  }
+                ],
+                "track-count": 21,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "68ea49af-82ab-41af-9b6d-765f8f7aebdb",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro",
+        "length": 352000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1981",
+        "releases": [
+          {
+            "id": "91cae7b7-1ff3-4ae0-b517-21a640f8ff72",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "Kilimanjaro",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "eaaf6b63-0c23-4372-bdee-d9fc9015da02",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Kilimanjaro",
+              "primary-type": "Single"
+            },
+            "date": "1981",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1981",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "ad721207-7842-3a0d-91b6-55d8e768648d",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "e606cba1-51ec-4a0d-97ce-a22a1d0a8ad5",
+                    "number": "A",
+                    "title": "Kilimanjaro",
+                    "length": 352000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e92947d2-21de-441d-90e2-fc8e5f84c4a1",
+        "score": 94,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro (Instrumental)",
+        "length": 360000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1981",
+        "releases": [
+          {
+            "id": "91cae7b7-1ff3-4ae0-b517-21a640f8ff72",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "Kilimanjaro",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "eaaf6b63-0c23-4372-bdee-d9fc9015da02",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Kilimanjaro",
+              "primary-type": "Single"
+            },
+            "date": "1981",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1981",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "ad721207-7842-3a0d-91b6-55d8e768648d",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "b1a5eac9-7f9c-493b-899e-04ffbeda3373",
+                    "number": "B",
+                    "title": "Kilimanjaro (Instrumental)",
+                    "length": 360000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a94776f0-55e0-495d-bdcf-14d3adfb49df",
+        "score": 87,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro (The Revenge edit)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2011",
+        "releases": [
+          {
+            "id": "e1a4a01f-d3fd-478a-981e-97320e7874a3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "876cda63-ef1f-3014-b362-4b4d28985861",
+            "count": 1,
+            "title": "Reekin'Structions",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Revenge",
+                "artist": {
+                  "id": "9438c8ed-2d8e-4176-baa3-3a8eefcd1596",
+                  "name": "The Revenge",
+                  "sort-name": "Revenge, The",
+                  "disambiguation": "Scottish DJ & producer based in Copenhagen, Denmark"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "bc708132-84f2-4bc6-9912-24081d1a6135",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Reekin'Structions",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2011",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2011",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "defd283c-6fc2-306e-8fee-97b8eaed22e0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "532e2c1f-729f-445e-b24a-7ebd99f418a0",
+                    "number": "8",
+                    "title": "Kilimanjaro (The Revenge edit)"
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d0acba0e-af38-4158-8a85-b1985fe83260",
+        "score": 87,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro (The Revenge edit)",
+        "length": 351000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2017-03-11",
+        "releases": [
+          {
+            "id": "9034711d-20ce-4536-a07f-b5b3a4499ca1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c7f41f69-cf70-3552-9af0-055750840a39",
+            "count": 1,
+            "title": "Meat Me Down the Disco",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Horse Meat Disco",
+                "artist": {
+                  "id": "b3bfd3b4-2215-4e45-af59-b6f353bb2476",
+                  "name": "Horse Meat Disco",
+                  "sort-name": "Horse Meat Disco"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ab07229c-cdc0-4a12-bdc1-36e09e64eea0",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Meat Me Down the Disco",
+              "primary-type": "Album",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2017-03-11",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2017-03-11",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "07565443-4717-394d-a40c-ab21d3891230",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "6771e7c5-85e9-4cfb-a738-f25c16011e3b",
+                    "number": "8",
+                    "title": "Kilimanjaro (The Revenge edit)",
+                    "length": 351370
+                  }
+                ],
+                "track-count": 32,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "6669e640-130c-4ed9-b6f3-478d81c365ac",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c7f41f69-cf70-3552-9af0-055750840a39",
+            "count": 1,
+            "title": "Meat Me Down the Disco",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Horse Meat Disco",
+                "artist": {
+                  "id": "b3bfd3b4-2215-4e45-af59-b6f353bb2476",
+                  "name": "Horse Meat Disco",
+                  "sort-name": "Horse Meat Disco"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ab07229c-cdc0-4a12-bdc1-36e09e64eea0",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Meat Me Down the Disco",
+              "primary-type": "Album",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2017-11-07",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2017-11-07",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 33,
+            "media": [
+              {
+                "id": "46359e85-693c-31f8-88c2-c986e077806b",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "0c61082c-199c-4ae2-9ce4-a572e2efec06",
+                    "number": "8",
+                    "title": "Kilimanjaro (The Revenge edit)",
+                    "length": 351000
+                  }
+                ],
+                "track-count": 33,
+                "track-offset": 7
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBPKF1100030"
+        ]
+      },
+      {
+        "id": "425da76d-3f05-497c-a414-55aa5f35c1c1",
+        "score": 87,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Kilimanjaro Take Us Higher",
+        "length": 290000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1980",
+        "releases": [
+          {
+            "id": "824ae55d-57e8-43a8-b366-c5b7809a9ec0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "Sound of a Rainbow",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "48315789-647d-47c6-ab54-e4af798b68ce",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sound of a Rainbow",
+              "primary-type": "Album"
+            },
+            "date": "1980",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1980",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "37bfaf18-922d-3ce5-9f5e-73bd71125ebd",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "af4eeea4-1f83-4f79-8778-a27ca4d00986",
+                    "number": "A1",
+                    "title": "Kilimanjaro Take Us Higher",
+                    "length": 290000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

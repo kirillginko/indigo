@@ -1,0 +1,1204 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Darlin%27+If%22+AND+artist%3A%22Spirit%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:58.665901+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:58.483Z",
+    "count": 8,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "6e4e5291-d1bb-4f7f-9206-923702e53be2",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin’ If",
+        "length": 218333,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1996-09-30",
+        "releases": [
+          {
+            "id": "8f89e1a6-89c2-462f-b681-aba520b8649a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "2014-11-07",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-11-07",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "e37cd287-b771-4601-857c-fbb7baa87980",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "5f664dd6-cbc3-41a5-9ca6-fc53bc1b1f11",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 218000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "c1e30a56-a630-42a5-a33e-5da83fef6708",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 5,
+            "title": "Original Album Classics",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4ec8b6d9-6ee1-406b-867e-92820964751a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Original Album Classics",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2016",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2016",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 73,
+            "media": [
+              {
+                "id": "ff731316-9577-3cea-96f8-57390ec8469b",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "2fa5d5c5-5764-445e-a7fb-90875fa5c974",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 221706
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "e7396540-5abe-4a18-b5db-53725fee6ba5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "1996",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "95584513-b9e0-3b31-9b83-6b09f73e0d78",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "35cb6e28-f704-4eb4-81be-13d2e8da387e",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 218000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "2631da2f-92a2-49b4-b285-1e500f8c0738",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 2,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "disambiguation": "limited edition",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "2017-07-07",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2017-07-07",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "adc3c27a-00ce-3772-96e7-b1f0e63d2c77",
+                "position": 2,
+                "format": "Hybrid SACD (SACD layer, 2 channels)",
+                "track": [
+                  {
+                    "id": "fb35d38c-1ad6-4bff-bdfc-2039d433a45e",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 219000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "82bfb079-7b7a-4dad-b171-70c991f8e12b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 5,
+            "title": "Original Album Classics",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4ec8b6d9-6ee1-406b-867e-92820964751a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Original Album Classics",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2011",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2011",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 73,
+            "media": [
+              {
+                "id": "74641f8c-f98a-3916-b1e8-4e45e8186597",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "41b689c1-e175-420a-9c16-ffc36a7633b5",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 218333
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "2631da2f-92a2-49b4-b285-1e500f8c0738",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 2,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "disambiguation": "limited edition",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "2017-07-07",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2017-07-07",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "d2af195b-241a-3efa-9d01-61ff4a863a65",
+                "position": 1,
+                "format": "Hybrid SACD (CD layer)",
+                "track": [
+                  {
+                    "id": "3a5eeb0f-336b-41ef-9beb-beed7d84e1c1",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 219000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "3678cb16-ba12-4880-a407-384362434f25",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "1996",
+            "country": "CA",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+                  "name": "Canada",
+                  "sort-name": "Canada",
+                  "iso-3166-1-codes": [
+                    "CA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "49f113a0-ee27-33f8-aa61-b4924ca9bdb5",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9b910a6a-4ab4-34d3-8e3b-7e4f12f42409",
+                    "number": "6",
+                    "title": "Darlin' If",
+                    "length": 218333
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "c3a84f39-b043-451c-bfb0-a1c68c06515f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "1996-09-30",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1996-09-30",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "9d14aca5-2a4f-3c2e-8d82-814a4916b616",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d3106311-2afa-4534-864a-934c64bb1c8c",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 218000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 5
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USSM16800076"
+        ]
+      },
+      {
+        "id": "ea8d1b25-d046-4a41-a823-3624bd3794cc",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin' If",
+        "length": 202093,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "releases": [
+          {
+            "id": "24f53dd4-0dcb-4eb5-bca1-b37b609edb6b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "Chronicles 1967–1992",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6d943e07-c581-34b7-a801-e92761fcf5e6",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Chronicles 1967–1992",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 22,
+            "media": [
+              {
+                "id": "a4b9a0fe-6df0-33d7-9405-e1d62ca37360",
+                "position": 1,
+                "track": [
+                  {
+                    "id": "20a402cb-8b85-3cc0-9b0d-278d63bf25b6",
+                    "number": "19",
+                    "title": "Darlin' If",
+                    "length": 202093
+                  }
+                ],
+                "track-count": 22,
+                "track-offset": 18
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "rock"
+          },
+          {
+            "count": 1,
+            "name": "psychedelic rock"
+          }
+        ]
+      },
+      {
+        "id": "85efe13a-9448-40e9-a14d-e9a13e39bbfa",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin' If",
+        "length": 220266,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1969",
+        "releases": [
+          {
+            "id": "9e7bf695-b209-4cc2-8aec-a9ecdc1b0f65",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "1969",
+            "country": "CA",
+            "release-events": [
+              {
+                "date": "1969",
+                "area": {
+                  "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+                  "name": "Canada",
+                  "sort-name": "Canada",
+                  "iso-3166-1-codes": [
+                    "CA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "f00b7170-7ef2-30cb-bf9e-d5d7363720de",
+                "position": 1,
+                "track": [
+                  {
+                    "id": "f9d631c9-62d4-34d6-9d8d-427ff6b23579",
+                    "number": "6",
+                    "title": "Darlin' If",
+                    "length": 220266
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cdfc6396-6519-487a-a335-64a067086224",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin’ If",
+        "length": 188080,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2004",
+        "releases": [
+          {
+            "id": "e356ca60-1494-434c-ad86-ed4c2f78674a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 2,
+            "title": "Live From the Time Coast",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "aeac2bd4-3439-48cc-9038-93d158f47557",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Live From the Time Coast",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2004",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2004",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 29,
+            "media": [
+              {
+                "id": "09de3534-7815-3ce1-8b04-7d48e418b7a4",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b45e2741-9bbb-45da-bcdd-e138fb335cdb",
+                    "number": "8",
+                    "title": "Darlin’ If",
+                    "length": 188080
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ecfe9d11-bfdd-4ec4-8f20-895fb2f9cda7",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin’ If",
+        "length": 198907,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2010",
+        "releases": [
+          {
+            "id": "235f8078-8e0a-4d69-9066-6f66274526a3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 2,
+            "title": "The Last Euro Tour",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e029e401-7d63-4655-9d43-a474328a4f31",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Last Euro Tour",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Live"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"
+              ]
+            },
+            "date": "2010",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2010",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "9f7f20a9-ee24-3523-8156-5a551ff6c78a",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a3a8d613-519a-4929-ac27-bc2bfb12f892",
+                    "number": "9",
+                    "title": "Darlin’ If",
+                    "length": 198907
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "aac755e3-d74b-4b5d-a736-699bdb697d93",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin’ If",
+        "length": 207000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2008",
+        "releases": [
+          {
+            "id": "faee808a-ff28-49be-ac9b-e730a3b2065f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 3,
+            "title": "Rock and Roll Planet … 1977–1979",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a8bdea21-b359-4a44-b0fa-c7d9ef4b9fe1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Rock and Roll Planet … 1977–1979",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2008",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2008",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 54,
+            "media": [
+              {
+                "id": "717f67e2-fee0-402f-86d0-f993cfad7b22",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "eade4e2a-7007-408e-9500-c3562ccf9314",
+                    "number": "6",
+                    "title": "Darlin’ If",
+                    "length": 207000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e077ea3c-a3b9-4ed7-8c30-2321b3511f84",
+        "score": 100,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin’ If",
+        "length": 147000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1968",
+        "releases": [
+          {
+            "id": "7378c805-0afa-4b62-b855-791a9e93a7ed",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 1,
+            "title": "The Family That Plays Together",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2d13c365-47dc-37f7-9491-663f62f65a17",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Family That Plays Together",
+              "primary-type": "Album"
+            },
+            "date": "1968",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1968",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "c2bc4d8d-7b7c-39fd-860f-5aeb6e91f683",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "9e160799-2288-4d27-8c8f-befb19b810d7",
+                    "number": "A6",
+                    "title": "Darlin’ If",
+                    "length": 147000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "61fe939a-2872-49fe-adb1-1bae660ff0c1",
+        "score": 77,
+        "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+        "title": "Darlin’ If (original 1968 stereo mix)",
+        "length": 219000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "aliases": [
+                {
+                  "sort-name": "Randy California and Spirit",
+                  "name": "Randy California and Spirit",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2018-03-16",
+        "releases": [
+          {
+            "id": "51af57ec-497f-4780-b561-0b68fc66749c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "248edee0-5cf5-39ef-a1ee-c5c1eeda4872",
+            "count": 5,
+            "title": "It Shall Be: Ode & Epic Recordings 1968–1972",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Spirit",
+                "artist": {
+                  "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                  "name": "Spirit",
+                  "sort-name": "Spirit",
+                  "disambiguation": "psychedelic rock"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "dfe60292-a359-4467-91b2-b06cef7c5ee2",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "It Shall Be: Ode & Epic Recordings 1968–1972",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2018-03-16",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2018-03-16",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 108,
+            "media": [
+              {
+                "id": "5852e3b3-5b3d-3d45-96a7-796c85bc7bcb",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e72af25d-ff0a-40b4-bd54-05ad630c9e62",
+                    "number": "17",
+                    "title": "Darlin’ If (original 1968 stereo mix)",
+                    "length": 219000
+                  }
+                ],
+                "track-count": 22,
+                "track-offset": 16
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

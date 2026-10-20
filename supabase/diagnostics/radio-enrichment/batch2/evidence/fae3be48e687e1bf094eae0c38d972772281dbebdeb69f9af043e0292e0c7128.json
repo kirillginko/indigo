@@ -1,0 +1,151 @@
+{
+  "url": "https://api.discogs.com/artists/1164",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:56.224517+00:00",
+  "body": {
+    "name": "Kelli Hand",
+    "id": 1164,
+    "resource_url": "https://api.discogs.com/artists/1164",
+    "uri": "https://www.discogs.com/artist/1164-Kelli-Hand",
+    "releases_url": "https://api.discogs.com/artists/1164/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/MYlQCWY4GQpfHtEyNwSvZoO2ecu4VhSS9GEyum5NUJM/rs:fit/g:sm/q:90/h:497/w:497/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODA4ODgyMC05/MTg2LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/MYlQCWY4GQpfHtEyNwSvZoO2ecu4VhSS9GEyum5NUJM/rs:fit/g:sm/q:90/h:497/w:497/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODA4ODgyMC05/MTg2LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/c7yfH9oC59JlkzSU18tElivRu-T4Iwo5ItvLIFv4zb4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODA4ODgyMC05/MTg2LmpwZWc.jpeg",
+        "width": 497,
+        "height": 497
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/n7397q3ioyJpCVwFQ7TBSw9tot3Nh2cIGSKImqPtqlc/rs:fit/g:sm/q:90/h:600/w:422/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTY5MzE1OTIyNC0z/NTQ1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/n7397q3ioyJpCVwFQ7TBSw9tot3Nh2cIGSKImqPtqlc/rs:fit/g:sm/q:90/h:600/w:422/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTY5MzE1OTIyNC0z/NTQ1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Iu7ekO1GKkgS5tBrSqFcEfr61ox6tPPkd37unSBIEz8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTY5MzE1OTIyNC0z/NTQ1LmpwZWc.jpeg",
+        "width": 422,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/k00IVIT-lToHmkAaaULGh--hc60wPAD5UsvkAtiLM28/rs:fit/g:sm/q:90/h:322/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTQ4MzU0Nzk2MC01/ODgzLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/k00IVIT-lToHmkAaaULGh--hc60wPAD5UsvkAtiLM28/rs:fit/g:sm/q:90/h:322/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTQ4MzU0Nzk2MC01/ODgzLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/egi_5jfjOYjEhuuxRl1OQxwkSCtua2GONLiwzBCUheU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTQ4MzU0Nzk2MC01/ODgzLmpwZWc.jpeg",
+        "width": 400,
+        "height": 322
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/FSKv9iMyAGTw5ZWi_-zrYiqu_gb1IqB7B3Uirz9mXmM/rs:fit/g:sm/q:90/h:405/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTcwNDU5NzM1Ni02/NjgwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/FSKv9iMyAGTw5ZWi_-zrYiqu_gb1IqB7B3Uirz9mXmM/rs:fit/g:sm/q:90/h:405/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTcwNDU5NzM1Ni02/NjgwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/J7GoBq5L3Mf4Lgqd1mnyoBnmuFGLGuCqBYkinHV8g0I/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTcwNDU5NzM1Ni02/NjgwLmpwZWc.jpeg",
+        "width": 600,
+        "height": 405
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Hx3bKUNJLCS1YVpZIYs7Kb8P00IRsAaWelpZMFUtNvE/rs:fit/g:sm/q:90/h:354/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTcwNDU5NzM1Ni04/OTI3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/Hx3bKUNJLCS1YVpZIYs7Kb8P00IRsAaWelpZMFUtNvE/rs:fit/g:sm/q:90/h:354/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTcwNDU5NzM1Ni04/OTI3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/BnJ-aBJH49Rq6kl9tFkfpl_MdePvc36j4Q6puIRfXrA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTcwNDU5NzM1Ni04/OTI3LmpwZWc.jpeg",
+        "width": 600,
+        "height": 354
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/0dIaF_ZiBQfJme-l4ecmrztbxw1QmR9Pc6pZW6P8LGQ/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTQ3MDk0NjQ2OS0y/OTYyLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/0dIaF_ZiBQfJme-l4ecmrztbxw1QmR9Pc6pZW6P8LGQ/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTQ3MDk0NjQ2OS0y/OTYyLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/RFFrAfQCCXIqzkV_5h3nJLnxnqdK-FfZTZ7spmoz7Ag/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTQ3MDk0NjQ2OS0y/OTYyLmpwZWc.jpeg",
+        "width": 598,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/cddpMiguJvavcLioG3ImZUFT7z7Zf3Rq6yLvuq91_CU/rs:fit/g:sm/q:90/h:424/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODYwNzY0MS02/OTQzLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/cddpMiguJvavcLioG3ImZUFT7z7Zf3Rq6yLvuq91_CU/rs:fit/g:sm/q:90/h:424/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODYwNzY0MS02/OTQzLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Et4TvvJUuwEr1pH725-p9EpUrDuZ31YFNNLIvauWTJM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODYwNzY0MS02/OTQzLmpwZWc.jpeg",
+        "width": 600,
+        "height": 424
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ro9uOQ54pE79UhqkxM6cc9EWe0Yl_XDeqn5ZhyS-w5A/rs:fit/g:sm/q:90/h:600/w:442/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODYwNzY3Mi00/ODA3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/ro9uOQ54pE79UhqkxM6cc9EWe0Yl_XDeqn5ZhyS-w5A/rs:fit/g:sm/q:90/h:600/w:442/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODYwNzY3Mi00/ODA3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/mBph4yc2wrEYooCJgpn_IqV5e_8fEfSyEhX0BmdNq5A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTExNjQt/MTYyODYwNzY3Mi00/ODA3LmpwZWc.jpeg",
+        "width": 442,
+        "height": 600
+      }
+    ],
+    "realname": "Kelli Maria Hand",
+    "profile": "US techno and house DJ/producer, born 1965, Detroit, MI – died: August 3, 2021.\r\nShe launched her own label originally called [l=UK House Records], later changed to [l=Acacia Records], after the street name where she lived in Detroit.",
+    "urls": [
+      "http://www.k-handmusic.com",
+      "http://acaciaus.bandcamp.com",
+      "http://repertoire.bmi.com/Search/Search?Main_Search_Text=kelli%20hand&Main_Search=Writer%2FComposer&Search_Type=all&View_Count=0&Page_Number=0",
+      "http://www.facebook.com/officialkhandmusic",
+      "http://soundcloud.com/khand",
+      "http://www.instagram.com/khand.music",
+      "https://twitter.com/khandmusic",
+      "http://web.archive.org/web/20160818033230/http://www.gridface.com/features/k-hand.html",
+      "http://en.wikipedia.org/wiki/Kelli_Hand",
+      "http://www.youtube.com/channel/UC5AJBchjaSVj7YSS5Z0hN8A"
+    ],
+    "namevariations": [
+      "K : Hand",
+      "K Hand",
+      "K-HAND",
+      "K-Hand",
+      "K. Hand",
+      "K.Hand",
+      "Kelli Maria Hand",
+      "Kelly Hand",
+      "Kelly Hunt",
+      "Kely",
+      "Ms. K. Hand"
+    ],
+    "aliases": [
+      {
+        "id": 38921,
+        "name": "Etat Solide",
+        "resource_url": "https://api.discogs.com/artists/38921"
+      },
+      {
+        "id": 69105,
+        "name": "KMH",
+        "resource_url": "https://api.discogs.com/artists/69105"
+      },
+      {
+        "id": 249423,
+        "name": "Broad Mix Music",
+        "resource_url": "https://api.discogs.com/artists/249423"
+      },
+      {
+        "id": 398640,
+        "name": "By Kely",
+        "resource_url": "https://api.discogs.com/artists/398640"
+      },
+      {
+        "id": 629022,
+        "name": "The Hand (2)",
+        "resource_url": "https://api.discogs.com/artists/629022"
+      },
+      {
+        "id": 814758,
+        "name": "Messenger (4)",
+        "resource_url": "https://api.discogs.com/artists/814758"
+      },
+      {
+        "id": 958929,
+        "name": "Gorsch",
+        "resource_url": "https://api.discogs.com/artists/958929"
+      }
+    ],
+    "groups": [
+      {
+        "id": 32655,
+        "name": "Rhythm Formation",
+        "resource_url": "https://api.discogs.com/artists/32655",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

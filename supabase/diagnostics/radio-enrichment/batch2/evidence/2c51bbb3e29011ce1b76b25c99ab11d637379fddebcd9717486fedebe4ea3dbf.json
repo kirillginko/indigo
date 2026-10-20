@@ -1,0 +1,696 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/d5c756c1-4872-457b-8f00-d620547cbb85?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:44.708751+00:00",
+  "body": {
+    "disambiguation": "baroque pop composer",
+    "sort-name": "Axelrod, David",
+    "name": "David Axelrod",
+    "genres": [
+      {
+        "name": "art pop",
+        "count": 2,
+        "id": "930ef127-3653-4677-9b95-ecc90c7c1a14",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "id": "150eb95a-7739-4fde-a5fe-b62ca576a928",
+        "count": 3,
+        "name": "baroque pop"
+      },
+      {
+        "disambiguation": "",
+        "id": "fe4ba6a1-9873-4fd0-a12b-a70c81818514",
+        "count": 2,
+        "name": "funk"
+      },
+      {
+        "disambiguation": "",
+        "name": "hard rock",
+        "count": 1,
+        "id": "51cb9f91-e6a2-41bf-891f-e78e3f1e52ab"
+      },
+      {
+        "disambiguation": "",
+        "name": "jazz",
+        "count": 2,
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b"
+      },
+      {
+        "disambiguation": "",
+        "name": "jazz fusion",
+        "id": "2377ff19-83e7-4873-b425-dce6d1ad4ef4",
+        "count": 1
+      },
+      {
+        "disambiguation": "",
+        "name": "jazz-funk",
+        "id": "f3c43ae8-839a-4523-b295-cfa4eba6c911",
+        "count": 3
+      },
+      {
+        "disambiguation": "",
+        "name": "pop",
+        "id": "911c7bbb-172d-4df8-9478-dbff4296e791",
+        "count": 1
+      },
+      {
+        "disambiguation": "",
+        "count": 1,
+        "id": "d698ece0-6fed-4262-b446-42c98b73b65a",
+        "name": "psychedelic"
+      },
+      {
+        "id": "2aeb5340-c474-4677-b9a6-35ddac9b6a58",
+        "count": 3,
+        "name": "psychedelic pop",
+        "disambiguation": ""
+      },
+      {
+        "id": "146ef761-5ad9-48b4-b0b3-483104f7da48",
+        "count": 2,
+        "name": "psychedelic rock",
+        "disambiguation": ""
+      },
+      {
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827",
+        "count": 1,
+        "name": "soul",
+        "disambiguation": ""
+      }
+    ],
+    "relations": [
+      {
+        "attributes": [],
+        "target-type": "artist",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "attribute-ids": {},
+        "type": "parent",
+        "source-credit": "",
+        "ended": false,
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "end": null,
+        "target-credit": "",
+        "artist": {
+          "sort-name": "Axelrod, Michael T.",
+          "country": "US",
+          "disambiguation": "",
+          "id": "bbca7c76-1621-4443-86ab-955171ca2baa",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Michael T. Axelrod",
+          "type": "Person"
+        }
+      },
+      {
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "ddf451e1-caab-494e-b376-d21909925434",
+          "resource": "https://www.allmusic.com/artist/mn0000634377"
+        },
+        "type": "allmusic"
+      },
+      {
+        "attributes": [],
+        "end": "2020-11-19",
+        "ended": true,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "id": "5435814e-03bb-451a-bd99-cfde7e39f2d2",
+          "resource": "https://www.bbc.co.uk/music/artists/d5c756c1-4872-457b-8f00-d620547cbb85"
+        },
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "type": "BBC Music page"
+      },
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "url": {
+          "id": "e33bd90e-978d-432e-ba35-34dfed71d5b5",
+          "resource": "https://www.discogs.com/artist/5451"
+        },
+        "type": "discogs",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": []
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "free streaming",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://open.spotify.com/artist/4hCKF3RZSkFSMntkfCxO74",
+          "id": "c54fcece-6e28-4ae0-9fc6-2823cd7467b2"
+        },
+        "attributes": [],
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null
+      },
+      {
+        "url": {
+          "resource": "https://www.deezer.com/artist/4930",
+          "id": "76d44cf3-e9b6-4cdc-9504-b462da42db6b"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "image",
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "url": {
+          "resource": "http://images37.concordmusicgroup.com/artists/fullsize/DavidAxelrod.jpg",
+          "id": "3e5fc897-5645-4401-8f29-c87cbc78d79f"
+        }
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "attributes": [],
+        "type": "image",
+        "url": {
+          "resource": "https://commons.wikimedia.org/wiki/File:David_Axelrod_Billboard.png",
+          "id": "1b62f937-9e34-4102-9b62-9f4886a05ec2"
+        },
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null
+      },
+      {
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "image",
+        "url": {
+          "id": "d273455f-cb3e-41e8-9247-869266955cde",
+          "resource": "https://static.stereogum.com/uploads/2017/02/5454-1486353534-compressed.jpg"
+        },
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c"
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "IMDb",
+        "url": {
+          "id": "945426f1-3597-4d55-b9cc-0d1537449faa",
+          "resource": "https://www.imdb.com/name/nm0043477/"
+        },
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": [],
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "url": {
+          "id": "da05fe01-628f-4593-bb4b-3d56cd64a1a9",
+          "resource": "https://www.last.fm/music/David+Axelrod"
+        },
+        "type": "last.fm",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "url": {
+          "resource": "https://myspace.com/davidaxelrod",
+          "id": "9c624794-34e0-4c4f-a5fd-60e69a142f05"
+        },
+        "type": "myspace"
+      },
+      {
+        "url": {
+          "resource": "http://www.davidaxelrodmusic.com/",
+          "id": "94cb63c4-dfe8-435e-8b72-e06fce2d3a1f"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "type": "official homepage",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "attributes": [],
+        "type": "other databases",
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n94009352",
+          "id": "83e4571f-d0b8-422c-be5d-a60d6c38aa30"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "210ed71b-ad30-48e0-8f17-2ed4b5571eff",
+          "resource": "https://adp.library.ucsb.edu/names/302376"
+        },
+        "attributes": [],
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "1de6e59a-555a-44b0-b38d-8dae050e6024",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb14045222m"
+        },
+        "type": "other databases",
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://d-nb.info/gnd/134674669",
+          "id": "db20618c-c59a-472e-bc52-a8ae676113b4"
+        }
+      },
+      {
+        "type": "other databases",
+        "url": {
+          "id": "b5f589e7-7771-4155-a2b2-a4aa78e27dab",
+          "resource": "https://rateyourmusic.com/artist/david_axelrod"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attributes": []
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "id": "28ac8bc8-0feb-46de-8262-f8b06d5146e7",
+          "resource": "https://www.worldcat.org/identities/lccn-n94009352"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "attributes": [],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {}
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": [],
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "cd9e3e0d-c039-4035-acce-c7720ce4a814",
+          "resource": "https://itunes.apple.com/us/artist/id1211603"
+        },
+        "type": "purchase for download",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "type": "purchase for download",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/35192",
+          "id": "83e038b6-56a8-4f7e-9e4c-aaf55f539702"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "url": {
+          "id": "ff4fe9f2-33c6-427b-a5e4-169be30b80f0",
+          "resource": "https://secondhandsongs.com/artist/2373"
+        },
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "type": "secondhandsongs",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/1211603",
+          "id": "c0c6db61-c307-43a4-af66-6b4764d4795e"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "type": "streaming",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "streaming",
+        "url": {
+          "id": "83e038b6-56a8-4f7e-9e4c-aaf55f539702",
+          "resource": "https://open.qobuz.com/artist/35192"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "streaming",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "e4120f5c-4759-4164-ac82-cf05f4abe2cb",
+          "resource": "https://tidal.com/artist/64547"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": ""
+      },
+      {
+        "type": "VIAF",
+        "url": {
+          "id": "b4fd5fa4-4175-442a-9024-61b392032362",
+          "resource": "http://viaf.org/viaf/66667321"
+        },
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "attributes": [],
+        "type": "wikidata",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "url": {
+          "id": "ce887490-c161-4416-b75f-86d3f25b5030",
+          "resource": "https://www.wikidata.org/wiki/Q1251914"
+        },
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null
+      }
+    ],
+    "area": {
+      "name": "United States",
+      "type": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "type-id": null,
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "disambiguation": "",
+      "sort-name": "United States"
+    },
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "gender": "Male",
+    "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+    "begin-area": {
+      "type-id": null,
+      "id": "1f40c6e1-47ba-4e35-996f-fe6ee5840e62",
+      "type": null,
+      "name": "Los Angeles",
+      "sort-name": "Los Angeles",
+      "disambiguation": ""
+    },
+    "type": "Person",
+    "ipis": [
+      "00001674711"
+    ],
+    "aliases": [
+      {
+        "sort-name": "Axelrod, D.",
+        "type-id": null,
+        "ended": false,
+        "end": null,
+        "primary": false,
+        "type": null,
+        "name": "D. Axelrod",
+        "begin": null,
+        "locale": "en"
+      }
+    ],
+    "end-area": {
+      "type": null,
+      "name": "Burbank",
+      "type-id": null,
+      "id": "6c6a147d-4c26-409c-9d26-543836ed57f8",
+      "disambiguation": "",
+      "sort-name": "Burbank"
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "tags": [
+      {
+        "count": 2,
+        "name": "art pop"
+      },
+      {
+        "name": "baroque pop",
+        "count": 3
+      },
+      {
+        "count": 2,
+        "name": "funk"
+      },
+      {
+        "name": "fusion",
+        "count": 1
+      },
+      {
+        "name": "hard rock",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "instrumental soul"
+      },
+      {
+        "name": "jazz",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "jazz funk"
+      },
+      {
+        "name": "jazz fusion",
+        "count": 1
+      },
+      {
+        "count": 3,
+        "name": "jazz-funk"
+      },
+      {
+        "count": 1,
+        "name": "pop"
+      },
+      {
+        "name": "psychedelic",
+        "count": 1
+      },
+      {
+        "count": 3,
+        "name": "psychedelic pop"
+      },
+      {
+        "name": "psychedelic rock",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "soul"
+      }
+    ],
+    "country": "US",
+    "isnis": [
+      "0000000116623884"
+    ],
+    "life-span": {
+      "end": "2017-02-05",
+      "ended": true,
+      "begin": "1931-04-17"
+    }
+  }
+}

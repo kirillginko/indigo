@@ -1,0 +1,81 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/dde0b79d-28ef-4d6c-910f-c8331d36d78a?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:16.763145+00:00",
+  "body": {
+    "isrcs": [
+      "NLM971800066"
+    ],
+    "releases": [
+      {
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "XW",
+        "disambiguation": "",
+        "title": "The Smoke",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Lolina",
+            "joinphrase": "",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "Inga Copeland / Alina Astrova",
+              "name": "Lolina",
+              "id": "54492185-df45-494f-b133-f52da3fba781",
+              "sort-name": "Lolina",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "barcode": null,
+        "packaging": "None",
+        "id": "2130e7e5-581e-4907-ba40-11e6f71d6e46",
+        "date": "2018-03-14",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type": null,
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": ""
+            },
+            "date": "2018-03-14"
+          }
+        ]
+      }
+    ],
+    "id": "dde0b79d-28ef-4d6c-910f-c8331d36d78a",
+    "disambiguation": "",
+    "video": false,
+    "length": 321392,
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "GB",
+          "id": "54492185-df45-494f-b133-f52da3fba781",
+          "name": "Lolina",
+          "disambiguation": "Inga Copeland / Alina Astrova",
+          "type": "Person",
+          "sort-name": "Lolina",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "name": "Lolina",
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "2018-03-14",
+    "title": "Betrayal"
+  }
+}

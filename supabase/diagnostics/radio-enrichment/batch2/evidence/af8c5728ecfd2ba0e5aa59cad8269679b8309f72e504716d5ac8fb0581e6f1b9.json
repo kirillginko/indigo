@@ -1,0 +1,3478 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Another+Man%22+AND+artist%3A%22Barbara+Mason%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:06.953623+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:06.769Z",
+    "count": 22,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "63e1b171-e128-4f73-b8bb-a2b46bce4c7a",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 225000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1989",
+        "releases": [
+          {
+            "id": "cf17cf6c-0007-411f-a0fb-4b21bea58aa4",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Groove Zone, Sector Two",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "1367a515-9552-45d5-bc28-76b7dd5e306b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Groove Zone, Sector Two",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1989",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1989",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 19,
+            "media": [
+              {
+                "id": "656080f2-26d9-3ff9-8cea-9bc5bd69c4d1",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b56abb7c-34fc-3fad-b2b0-a802882dafa9",
+                    "number": "7",
+                    "title": "Another Man",
+                    "length": 225000
+                  }
+                ],
+                "track-count": 19,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "7def73a1-0652-4611-a13c-a4332bcc0788",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 191000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1995",
+        "releases": [
+          {
+            "id": "748230be-c2a5-40c6-b3c0-aea6cae08c6f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "Mega Disco",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "402318b9-f135-36bb-844c-44b419e4e0f6",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Mega Disco",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 100,
+            "media": [
+              {
+                "id": "8f236296-5a19-3cc5-aacd-8b5d9478eafc",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b392c9e6-b4f7-3f68-b83c-2e3cff2411af",
+                    "number": "11",
+                    "title": "Another Man",
+                    "length": 191000
+                  }
+                ],
+                "track-count": 25,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "5ec741de-e546-4963-a597-49252c90da4d",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 416000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1997",
+        "releases": [
+          {
+            "id": "5c648d1b-4e09-45a0-a595-3c03fdc4e432",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Gay Dancing",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c1362a25-d06d-4b06-bbc1-3e35c2054f54",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Gay Dancing",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1997",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "6048cad7-1a59-30d1-8744-2f1c72cc0f31",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "52f2bc8e-d03c-4135-9a83-d20dcdd32f3d",
+                    "number": "7",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fe4843d3-a120-474b-b20f-7dc8ef267076",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 297000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003-11-04",
+        "releases": [
+          {
+            "id": "2b7187be-50da-40f2-b41c-99b893ac15a5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "The Greatest Hits",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "02cd68d9-0bf4-3eef-8f27-3f1e4a07d869",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Greatest Hits",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2003-11-04",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2003-11-04",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "a4ed075e-de6e-3c9b-9c15-8a7b1ab24e49",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e22b907f-ff3a-33fd-8f85-3fedf4adde5d",
+                    "number": "19",
+                    "title": "Another Man",
+                    "length": 297000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 18
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "61a724ad-dbfb-4811-9cdf-07f35feb841f",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 301000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1997",
+        "releases": [
+          {
+            "id": "0b56bfed-ff3e-4e77-b217-ec13efcbb34b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "The Mastas: The Classics, Volume 1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f05b817a-5c7f-418f-bf56-b6a96f0e7b86",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Mastas - The Classics Vol.1",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "1997",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "271e4957-1243-3dd8-9ea3-2faf213adae7",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "fa4c75c5-cf15-3409-ac17-fa9ef468acde",
+                    "number": "3",
+                    "title": "Another Man",
+                    "length": 301000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "27afba3b-2823-4df9-b837-2b0e313cdc65",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 183484,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1996",
+        "releases": [
+          {
+            "id": "b92d84bd-afe1-4bb8-9868-c2c3dc24f3e4",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Soul Classics 100 Greatest Hits, Vol. 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3b5e17ac-93bd-40a7-93ce-371bf5f41afb",
+              "title": "Soul Classics 100 Greatest Hits, Vol. 2",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "a7f1bc3c-6461-4e5d-ad15-808287b1b861",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b0fc2197-2f3b-47d3-ba03-d6223c517e34",
+                    "number": "7",
+                    "title": "Another Man",
+                    "length": 183484
+                  }
+                ],
+                "track-count": 25,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "5e0c71cc-b4c3-4ac0-aa0a-c799b3d0f035",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 225226,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2021-06-25",
+        "releases": [
+          {
+            "id": "c4afa826-2876-44ff-82e8-1bed56b75b20",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "Greatest Ever Decade: 80s",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2f21d64b-128e-4743-9f74-a7b1cb1c2eb4",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Greatest Ever Decade: 80s",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2021-06-25",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2021-06-25",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 80,
+            "media": [
+              {
+                "id": "b41a8286-9e7e-3af1-86fc-258e9703e67f",
+                "position": 4,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3ce7fa5c-d026-4f3b-8ad4-a61419c7fd53",
+                    "number": "13",
+                    "title": "Another Man",
+                    "length": 225226
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 12
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "db5977be-ac6b-445c-a555-631bd8af9a77",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 416000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1993",
+        "releases": [
+          {
+            "id": "41a0c891-aaba-4f27-9f97-8dbc932a05e0",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "The West End Story Volume 2",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "baa9c244-f69a-4fa3-ba7e-f66c6f7d2237",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The West End Story Volume 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1993",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1993",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "ed06e173-90f0-3865-b63d-ea7f1f6f1d6b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ae827dc3-8fd6-4358-95d6-6baeb66d3849",
+                    "number": "3",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "935cacc8-8b89-455e-b5bd-26d80e05fabe",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 417000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2017-02-01",
+        "releases": [
+          {
+            "id": "5399e730-501e-4025-a8da-8e997eadb10b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "Funk: The Very Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "139fccfe-2bea-45a7-83b8-86335b8ac670",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Funk: The Very Best Of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2017-02-01",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2017-02-01",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 60,
+            "media": [
+              {
+                "id": "8c4094eb-450f-38aa-ad78-af1b14ae85ad",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "72919202-0670-4cc5-bc3a-d8f536ee0820",
+                    "number": "5",
+                    "title": "Another Man",
+                    "length": 417000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c1aa99cf-573a-4ae7-98b9-fc3a104049d7",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 416000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1984",
+        "releases": [
+          {
+            "id": "db66b3a4-d7a9-4a47-888d-229aa38aa9de",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Street Sounds Edition 8",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7666c65a-75dc-4d43-82a0-be4797b06a5e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Street Sounds Edition 8",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1984",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "41c3d0d0-5ac3-34f2-9f7e-2c1bb265886c",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "7a684bcc-da83-49d1-861d-e76712faea51",
+                    "number": "B1",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d9439ae9-794d-4791-aaab-d5db6442ba35",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 416000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1995",
+        "releases": [
+          {
+            "id": "c382b137-efb3-4d50-a1f0-5f4014765cf7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "You Are the Star (Soulful Sounds of West End)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5642e856-e684-47b6-a59c-e1fffb0eab05",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "You Are the Star (Soulful Sounds of West End)",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2015-03-25",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2015-03-25",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "3b75aca3-4825-30e0-b264-9d531bfefa28",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "766d5a8a-c84d-4540-ab41-bbc83d1e876b",
+                    "number": "3",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "79e646d0-422e-49dd-869f-40937227cb95",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Gay Classics Vol. V - Heading Out",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "9e412792-b026-443f-aeb1-bac2b3f775be",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Gay Classics Vol. V - Heading Out",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1995",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1995",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "3d2a320a-a1f2-3e2f-96f9-ec10d088803c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e646bd79-d0ef-40a3-bdf0-9cd1801ddc70",
+                    "number": "8",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "8299a1a3-54fc-4b88-bf39-4e5eb9e2c7e1",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 411000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2001",
+        "releases": [
+          {
+            "id": "efadcad2-6f9d-4d2b-8aaf-d5f5a70157a1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Funky Collector, Volume 14",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3586c5aa-cee2-47d4-a906-4dee0acd4392",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Funky Collector, Volume №14",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2001",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2001",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "5f000a6c-3bf2-3294-8c66-dd9c0b2996cb",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b52a1e86-90af-3775-9c8b-42c9c66ab918",
+                    "number": "11",
+                    "title": "Another Man",
+                    "length": 411000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "6c5ba9d6-dc3d-40bd-a93d-4c2c450ecc89",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 411360,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1994",
+        "releases": [
+          {
+            "id": "731f2d4f-3827-4581-8849-0efa6f1d2219",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Super Dance Plus 6",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5263a087-ebca-472a-8ba7-04e55fa24eab",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Super Dance Plus 6",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1994",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1994",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "1d01a465-8b28-35cc-b46d-7d7787255673",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1cd59caa-395f-45c6-be24-bfda5d62f444",
+                    "number": "14",
+                    "title": "Another Man",
+                    "length": 411360
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 13
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2095a99e-4858-490d-8569-2826cd6824eb",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 353693,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1996-04-23",
+        "releases": [
+          {
+            "id": "be41ef50-6679-4853-b3bb-ee523a9f4d80",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Can't Get This No More, Volume 1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "dbd2190e-eea9-4f62-8f20-48fc6ecca6d0",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Can't Get This No More, Volume 1",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996-04-23",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1996-04-23",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "73c68b27-9b20-3b3b-8635-18bce4c9d3a1",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e137cb2d-9ef4-3bd1-b913-20df07b877c0",
+                    "number": "2",
+                    "title": "Another Man",
+                    "length": 353693
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 1
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USZUR0601012"
+        ]
+      },
+      {
+        "id": "7216a2f8-7eae-4c65-8348-077ae9879bf1",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 413000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1996",
+        "releases": [
+          {
+            "id": "b778f35f-7b96-4098-8ae4-15f63bf8f238",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Hits of the 80’s, Volume 3",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "2eba17a7-a17b-3ce1-903e-3b64e47b5828",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hits of the 80’s, Volume 3",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "0f76556c-c600-3a0a-8510-f5ca346b87db",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d800a2c8-99ed-3624-9dbc-868513ef92e0",
+                    "number": "2",
+                    "title": "Another Man",
+                    "length": 413000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c5bd1ec9-3ac7-4b2b-8f99-a3acfd48d10e",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 346000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2021-03-04",
+        "releases": [
+          {
+            "id": "3e6a6c26-0f5b-4517-a6f3-fc34fcacfb28",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Funky Disco 70 - 80 - 90",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "9748cd38-1db4-4731-9076-5b36616a866b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Funky Disco 70 - 80 - 90",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2021-03-04",
+            "country": "BE",
+            "release-events": [
+              {
+                "date": "2021-03-04",
+                "area": {
+                  "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+                  "name": "Belgium",
+                  "sort-name": "Belgium",
+                  "iso-3166-1-codes": [
+                    "BE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "38dd9644-9887-32ea-96fd-7ae18a29cee2",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "483d63ef-6f29-47f4-b7c3-244f082e6018",
+                    "number": "25",
+                    "title": "Another Man",
+                    "length": 346000
+                  }
+                ],
+                "track-count": 25,
+                "track-offset": 24
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "74fbd987-26b5-4421-9f9a-273a5675fe90",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man",
+        "length": 415360,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1983",
+        "releases": [
+          {
+            "id": "492ff574-4631-499e-85f3-d68ee84c5b64",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Maximum Dance 2 12\"",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "98879195-7f14-42e1-84c6-20f2126f6dfb",
+              "title": "Maximum Dance 2 12\"",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "f00b2b62-88ab-38cb-a849-53e836aa7893",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6e70a143-2986-3915-8a47-d7ebec63acde",
+                    "number": "7",
+                    "title": "Another Man (12\" version)",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "cbca1da0-4a2b-4b3b-9c2f-16edb2dd4b2f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "'80s Love Anthems",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0af81d2d-f372-48ef-9f80-31b6b1b49777",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "'80s Love Anthems",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 24,
+            "media": [
+              {
+                "id": "87b13277-070c-323a-81c7-857bab5a3f41",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "7d0380b2-31da-3009-88f1-b0a8324f703d",
+                    "number": "9",
+                    "title": "Another Man",
+                    "length": 414000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "9935fb53-82d2-4bea-8143-c38a48a2ca80",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1983",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1983",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "653add8d-083b-3ab1-96cf-1d38b65c5748",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "45103433-5747-3f5c-abf4-1b0f393e11ba",
+                    "number": "A1",
+                    "title": "Another Man (vocal)",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "215ecc6e-6073-47cd-8c36-3500718052f7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "disambiguation": "published by Sugar Biscuit",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1984-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "832e069b-8330-35c6-8fed-b5b2d077e1a7",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "e698596e-cc9e-4c48-ab65-abd58044bcb1",
+                    "number": "A1",
+                    "title": "Another Man (vocal)",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "23ed2ad7-3dcb-47a4-8e34-8701b7fb1ea5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Pure Groove 80’s, Volume 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4d186e07-dd33-41cd-a756-291c0c3ef3cb",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Pure Groove 80’s, Vol. 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "fe8c0faf-8bb3-35d3-954f-1cb3799d96f3",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ab5d1dbd-14ad-3159-99bd-1030dc4ba755",
+                    "number": "13",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 12
+              }
+            ]
+          },
+          {
+            "id": "e12fa605-e999-4828-b97e-5c82bfd1b15f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Old School Jams",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "98cfee81-0662-4a11-be8a-530ae3409f91",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Old School Jams",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1994-12-26",
+            "country": "CA",
+            "release-events": [
+              {
+                "date": "1994-12-26",
+                "area": {
+                  "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+                  "name": "Canada",
+                  "sort-name": "Canada",
+                  "iso-3166-1-codes": [
+                    "CA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "00a068a7-202b-3775-b161-ae9b2b5c3094",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4fbb40b0-1afc-31a8-b703-46fd8b268bbb",
+                    "number": "8",
+                    "title": "Another Man",
+                    "length": 415360
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "ef7b43c7-81dd-4e4e-b4ed-dd57ad3e418d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Old School Jams: The History Lesson",
+            "status": "Official",
+            "disambiguation": "2 CD",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e9859235-d1ad-4d55-8bbe-7818f9a06448",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Old School Jams: The History Lesson",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997-12-11",
+            "country": "CA",
+            "release-events": [
+              {
+                "date": "1997-12-11",
+                "area": {
+                  "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+                  "name": "Canada",
+                  "sort-name": "Canada",
+                  "iso-3166-1-codes": [
+                    "CA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "11d0e949-63b2-373e-b8f3-6fbce6a903b2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "7da53f5e-ee2f-4b4e-be10-d34d5f766bf1",
+                    "number": "8",
+                    "title": "Another Man",
+                    "length": 415360
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "d49020a3-2696-42b5-bae9-3e112c51c83c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "G.I. Disco (The History Of The Cold War's Hottest 80's Club Music In West Germany)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a331b587-e95c-4dbb-b8ec-48efd607b3cb",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "G.I. Disco (The History Of The Cold War's Hottest 80's Club Music In West Germany)",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2010",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2010",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "87e39ebb-ddba-3e6b-9fce-90e6863dd8d9",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5c7077ec-a34b-4eed-a249-5df69f98491d",
+                    "number": "9",
+                    "title": "Another Man",
+                    "length": 415000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "33f27cbe-26a5-4e72-b43d-d0022e76f662",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6e8df6d3-0bdb-31a2-a7ba-2c09a3aa0327",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Another Man",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1984",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "308655f3-9c44-3d07-af0b-5151c53ad5b3",
+                "position": 1,
+                "track": [
+                  {
+                    "id": "8e257dc1-2c7c-36b8-9564-d43ead523a81",
+                    "number": "5",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "cbd41348-229f-438b-86cc-6cc4ddbb7d30",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Jumpin’: Original Full Length Classics From the Disco Underground",
+            "status": "Official",
+            "disambiguation": "15th anniversary edition",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0bc6c336-ff00-4051-a193-da1e308c10aa",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Jumpin’: Original Full Length Classics From the Disco Underground",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2010",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2010",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 24,
+            "media": [
+              {
+                "id": "d5fb8039-3425-39e3-8707-271f42bf06f6",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9281eaed-3a6f-4b49-ac60-3e6e53e296d2",
+                    "number": "1",
+                    "title": "Another Man",
+                    "length": 415000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "2549a4b1-0afc-4989-9b3c-30b5189d478c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6e8df6d3-0bdb-31a2-a7ba-2c09a3aa0327",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Another Man",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1995-05-16",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1995-05-16",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "77e734e3-e29d-3f67-ab4c-12f8aed9bf53",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "434498ce-12b6-4e4f-b4aa-7fde0f2c8f2c",
+                    "number": "5",
+                    "title": "Another Man",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "045e8bd6-10b0-4358-a3c4-fba07dba956a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Disco Giants 6",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "58675be4-131d-41d6-a10b-3f727846e34f",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Disco Giants 6",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2009",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2009",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "424a22f4-212a-37db-b520-67482a26ceb9",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "0d137795-080e-3aa1-b492-bef1e99f800d",
+                    "number": "1",
+                    "title": "Another Man",
+                    "length": 412000
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "36286012-e0ec-43f9-8864-4ce83dde930e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Nighttime Lovers, Volume 5",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6433a463-8a72-4320-b785-9b4faeae45bb",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Nighttime Lovers, Volume 5",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2007-02-09",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2007-02-09",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              },
+              {
+                "date": "2007",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "102d3ce6-0a42-3690-9b8d-8b56567bbabb",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "32a15d36-b40e-44e9-9f2b-a881c82f9190",
+                    "number": "1",
+                    "title": "Another Man",
+                    "length": 412000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "576f1191-52fd-436b-8698-4a817c4ba859",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Funky Dance Grooves, Volume 1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "06787d6c-6f7f-37b3-8768-7649610a1d02",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Funky Dance Grooves, Volume 1",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1995",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1995",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 29,
+            "media": [
+              {
+                "id": "cdb34dbd-67c4-39af-a421-d68fac63314d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c27005d0-6adf-37f7-94ae-67ee93db0c25",
+                    "number": "14",
+                    "title": "Another Man",
+                    "length": 412666
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 13
+              }
+            ]
+          },
+          {
+            "id": "bfebd99a-1fb0-44e1-a94d-b37c90195fad",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Anthems, Volume 3",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b5e87b38-22d1-4db6-b2ce-2c78dbc92170",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Anthems, Volume 3",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1989",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1989",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "3e9d6f0b-410e-30e3-9151-303cfd66624d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "19ef5b8c-62dd-46df-88a2-6d1d7de6a45e",
+                    "number": "5",
+                    "title": "Another Man",
+                    "length": 412000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 4
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "soul"
+          },
+          {
+            "count": 1,
+            "name": "disco"
+          },
+          {
+            "count": 2,
+            "name": "r&b"
+          }
+        ]
+      },
+      {
+        "id": "5fde4a18-1b38-4b8b-a065-2ebd1c7717c5",
+        "score": 94,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man (instrumental)",
+        "length": 349000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1983",
+        "releases": [
+          {
+            "id": "215ecc6e-6073-47cd-8c36-3500718052f7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "disambiguation": "published by Sugar Biscuit",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1984-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "832e069b-8330-35c6-8fed-b5b2d077e1a7",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "a8c76a6b-f3a6-40af-b35d-f1974cfe0e1a",
+                    "number": "B1",
+                    "title": "Another Man (instrumental)",
+                    "length": 349000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "9935fb53-82d2-4bea-8143-c38a48a2ca80",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1983",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1983",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "653add8d-083b-3ab1-96cf-1d38b65c5748",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "fa4ae5fd-2784-39f9-bbbc-3629ff681315",
+                    "number": "B1",
+                    "title": "Another Man (instrumental)",
+                    "length": 349000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 2
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "disco"
+          }
+        ]
+      },
+      {
+        "id": "7e816fe3-04d5-4fc3-8994-fdfc72224ebb",
+        "score": 94,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man (rap)",
+        "length": 286000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1983",
+        "releases": [
+          {
+            "id": "215ecc6e-6073-47cd-8c36-3500718052f7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "disambiguation": "published by Sugar Biscuit",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1984-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "832e069b-8330-35c6-8fed-b5b2d077e1a7",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "49977b4a-4b49-4f4c-afba-597c188505dd",
+                    "number": "B2",
+                    "title": "Another Man (rap)",
+                    "length": 286000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "9349b78e-44a8-4b38-8b30-4fb787bd4003",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "track-count": 2,
+            "media": [
+              {
+                "id": "e6c8db5a-11da-3d5d-9460-d728bedd3272",
+                "position": 1,
+                "format": "7\" Vinyl",
+                "track": [
+                  {
+                    "id": "044b156f-f203-46b6-b82c-83d0f425d183",
+                    "number": "B1",
+                    "title": "Another Man (Rap)",
+                    "length": 286000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 1
+              }
+            ]
+          },
+          {
+            "id": "9935fb53-82d2-4bea-8143-c38a48a2ca80",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1983",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1983",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "653add8d-083b-3ab1-96cf-1d38b65c5748",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "d8e2423c-43f4-3481-ab39-b7179c162894",
+                    "number": "B2",
+                    "title": "Another Man (rap)",
+                    "length": 286000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9aacf881-9227-4f77-9a58-8c52b2450812",
+        "score": 94,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man (vocal)",
+        "length": 416000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2011-06-10",
+        "releases": [
+          {
+            "id": "4f6569fb-af65-4549-a05e-cf704ce50509",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "382912ca-c80f-3fde-b290-f8d00faa821b",
+            "count": 4,
+            "title": "Grand 12‐Inches 8",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Ben Liebrand",
+                "artist": {
+                  "id": "a9abe28b-5774-41ea-8393-8b26903fee72",
+                  "name": "Ben Liebrand",
+                  "sort-name": "Liebrand, Ben"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b5a34282-d99e-40db-8a73-c2725efe81a5",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Grand 12‐Inches 8",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2011-06-10",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "2011-06-10",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 41,
+            "media": [
+              {
+                "id": "2d95c52a-45c0-3995-8e67-01c0e0b664e9",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d5e2faf1-b4fd-4719-b15d-cbe6336a661a",
+                    "number": "9",
+                    "title": "Another Man (vocal)",
+                    "length": 416000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "NLD141100056"
+        ]
+      },
+      {
+        "id": "15ff6e0b-e79b-4ccc-8d49-9a838582f612",
+        "score": 90,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man (short version)",
+        "length": 227000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1983",
+        "releases": [
+          {
+            "id": "4edf1649-1ba6-42db-94d4-71edb2ec9611",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 5,
+            "title": "Breezin': 100 Smooth Pop Songs (The Ultimate Collection)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "eeb4e121-46d9-4055-a3cb-f17a2c9b79b4",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Breezin': 100 Smooth Pop Songs (The Ultimate Collection)",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2019-09-27",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2019-09-27",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 100,
+            "media": [
+              {
+                "id": "249a18ba-b84b-38dd-8640-b8ee6d37a418",
+                "position": 4,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "230d9be1-b7cd-4160-ab5a-7b15e45a2dce",
+                    "number": "16",
+                    "title": "Another Man",
+                    "length": 223866
+                  }
+                ],
+                "track-count": 19,
+                "track-offset": 15
+              }
+            ]
+          },
+          {
+            "id": "215ecc6e-6073-47cd-8c36-3500718052f7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "disambiguation": "published by Sugar Biscuit",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1984-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1984-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "832e069b-8330-35c6-8fed-b5b2d077e1a7",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "3797c807-5bf3-4d12-b456-eea7869adcca",
+                    "number": "A2",
+                    "title": "Another Man (short version)",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 1
+              }
+            ]
+          },
+          {
+            "id": "9349b78e-44a8-4b38-8b30-4fb787bd4003",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "track-count": 2,
+            "media": [
+              {
+                "id": "e6c8db5a-11da-3d5d-9460-d728bedd3272",
+                "position": 1,
+                "format": "7\" Vinyl",
+                "track": [
+                  {
+                    "id": "f3359c1b-561a-4545-b2e8-b15ba1874b39",
+                    "number": "A1",
+                    "title": "Another Man (Short Version)",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "0677ebde-b24c-4d49-8c8d-fdd7f00855a0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Romantic Hits for Lovers, Volume 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6944e4de-07c2-444c-91d9-87cf58cdf823",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Romantic Hits for Lovers, Volume 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1984",
+            "country": "NL",
+            "release-events": [
+              {
+                "date": "1984",
+                "area": {
+                  "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+                  "name": "Netherlands",
+                  "sort-name": "Netherlands",
+                  "iso-3166-1-codes": [
+                    "NL"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "3ee9dbbd-6d77-3f81-88ea-7078165d1ae2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "7589bdc8-8548-4340-a20d-5c49e7bd3588",
+                    "number": "11",
+                    "title": "Another Man",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "9935fb53-82d2-4bea-8143-c38a48a2ca80",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Another Man",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae739d7f-be46-4fdc-85cd-4ac2b8c2d10e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Another Man",
+              "primary-type": "Single"
+            },
+            "date": "1983",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1983",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "653add8d-083b-3ab1-96cf-1d38b65c5748",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "eaa8fc3e-94e2-3b2b-b8b9-486cdbbfa0a9",
+                    "number": "A2",
+                    "title": "Another Man (short version)",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "33262b7d-ed51-4ce3-a15f-16b925141c1d",
+        "score": 86,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "Another Man (Dr Packer edit)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020-12-08",
+        "releases": [
+          {
+            "id": "98d9d63c-ae74-4f24-b12c-2c8a6bb6b584",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Salsoul Meets West End Reworks",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "867b0827-a7f6-4ca3-932f-0c3c19c3015d",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Salsoul Meets West End Reworks",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 30,
+            "media": [
+              {
+                "id": "184eb09f-6335-43d4-9e1b-43b276a43376",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "5a5d0891-f506-4e6a-852c-dd6c9331fbc4",
+                    "number": "3",
+                    "title": "Another Man (Dr Packer edit)"
+                  }
+                ],
+                "track-count": 30,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

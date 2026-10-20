@@ -1,0 +1,207 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/0a940418-cc92-40d2-84f5-78a28c502875?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:03.821125+00:00",
+  "body": {
+    "id": "0a940418-cc92-40d2-84f5-78a28c502875",
+    "video": false,
+    "length": 232000,
+    "isrcs": [
+      "USUYG1507024"
+    ],
+    "disambiguation": "",
+    "title": "Mayors a Cop",
+    "releases": [
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": ", ",
+            "artist": {
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "New York rapper, founder of 10k",
+              "name": "MIKE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "MIKE",
+              "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+            },
+            "name": "MIKE"
+          },
+          {
+            "artist": {
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "rapper",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Wiki",
+              "sort-name": "Wiki",
+              "id": "383b0514-362e-4aeb-9950-04a75fc0210c"
+            },
+            "name": "Wiki",
+            "joinphrase": " & "
+          },
+          {
+            "joinphrase": "",
+            "name": "The Alchemist",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "The Alchemist",
+              "sort-name": "Alchemist, The",
+              "id": "03f3deb7-0419-4bf9-a1e7-511946385717",
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "hip hop DJ & producer"
+            }
+          }
+        ],
+        "barcode": "197342337281",
+        "release-events": [
+          {
+            "area": {
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "2023-09-22"
+          }
+        ],
+        "disambiguation": "",
+        "title": "Faith Is a Rock",
+        "date": "2023-09-22",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "id": "fa05073d-daa7-4c50-97a7-14767168183d",
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "XW"
+      },
+      {
+        "text-representation": {
+          "script": null,
+          "language": null
+        },
+        "artist-credit": [
+          {
+            "joinphrase": ", ",
+            "artist": {
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "New York rapper, founder of 10k",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "MIKE",
+              "sort-name": "MIKE",
+              "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+            },
+            "name": "MIKE"
+          },
+          {
+            "name": "Wiki",
+            "artist": {
+              "country": "US",
+              "disambiguation": "rapper",
+              "type": "Person",
+              "id": "383b0514-362e-4aeb-9950-04a75fc0210c",
+              "name": "Wiki",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Wiki"
+            },
+            "joinphrase": " & "
+          },
+          {
+            "name": "The Alchemist",
+            "artist": {
+              "disambiguation": "hip hop DJ & producer",
+              "country": "US",
+              "type": "Person",
+              "id": "03f3deb7-0419-4bf9-a1e7-511946385717",
+              "sort-name": "Alchemist, The",
+              "name": "The Alchemist",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null
+            },
+            "date": "2023-10-03"
+          }
+        ],
+        "barcode": null,
+        "title": "Faith Is a Rock",
+        "disambiguation": "",
+        "date": "2023-10-03",
+        "packaging-id": null,
+        "status": "Official",
+        "packaging": null,
+        "id": "05a0f70c-744e-4dcf-9f96-05e04bacaa12",
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal"
+      }
+    ],
+    "artist-credit": [
+      {
+        "joinphrase": ", ",
+        "artist": {
+          "type": "Person",
+          "country": "US",
+          "disambiguation": "New York rapper, founder of 10k",
+          "name": "MIKE",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "MIKE",
+          "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+        },
+        "name": "MIKE"
+      },
+      {
+        "joinphrase": " & ",
+        "artist": {
+          "sort-name": "Wiki",
+          "name": "Wiki",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "383b0514-362e-4aeb-9950-04a75fc0210c",
+          "type": "Person",
+          "disambiguation": "rapper",
+          "country": "US"
+        },
+        "name": "Wiki"
+      },
+      {
+        "joinphrase": "",
+        "name": "The Alchemist",
+        "artist": {
+          "id": "03f3deb7-0419-4bf9-a1e7-511946385717",
+          "name": "The Alchemist",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Alchemist, The",
+          "country": "US",
+          "disambiguation": "hip hop DJ & producer",
+          "type": "Person"
+        }
+      }
+    ],
+    "first-release-date": "2023-09-22"
+  }
+}

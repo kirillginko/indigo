@@ -1,0 +1,571 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/07065c90-1519-4bd9-8259-9872f3c9a776?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:36.528126+00:00",
+  "body": {
+    "aliases": [
+      {
+        "primary": null,
+        "ended": false,
+        "name": "Paul Leighton Johnson",
+        "type": "Legal name",
+        "sort-name": "Johnson, Paul Leighton",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "locale": null,
+        "begin": null,
+        "end": null
+      }
+    ],
+    "end-area": {
+      "disambiguation": "",
+      "id": "46b3a6a8-d5a8-4203-bf5c-adc0bf97fcc1",
+      "type": null,
+      "name": "Evergreen Park",
+      "sort-name": "Evergreen Park",
+      "type-id": null
+    },
+    "type": "Person",
+    "name": "Paul Johnson",
+    "isnis": [
+      "0000000075908188"
+    ],
+    "tags": [
+      {
+        "count": 4,
+        "name": "death by covid-19"
+      }
+    ],
+    "sort-name": "Johnson, Paul",
+    "country": "US",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "begin-area": {
+      "name": "Chicago",
+      "type": null,
+      "disambiguation": "",
+      "id": "29a709d8-0320-493e-8d0c-f2c386662b7f",
+      "type-id": null,
+      "sort-name": "Chicago"
+    },
+    "gender": "Male",
+    "disambiguation": "Chicago house music DJ/producer",
+    "area": {
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "disambiguation": "",
+      "type-id": null,
+      "sort-name": "United States",
+      "name": "United States",
+      "type": null
+    },
+    "genres": [],
+    "ipis": [
+      "00455844037"
+    ],
+    "life-span": {
+      "ended": true,
+      "end": "2021-08-04",
+      "begin": "1971-01-11"
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "relations": [
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "artist",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "type": "is person",
+        "attribute-values": {},
+        "artist": {
+          "id": "3b901075-06d8-4088-bf6e-6afef888bd54",
+          "disambiguation": "",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Yonkapin",
+          "type": "Person",
+          "name": "Yonkapin"
+        },
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "type": "is person",
+        "ended": false,
+        "artist": {
+          "name": "Darien's",
+          "type": "Person",
+          "disambiguation": "",
+          "id": "1e30f2fc-880f-4113-b2db-35c63274c85e",
+          "sort-name": "Darien's",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": null
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666"
+      },
+      {
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "artist": {
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "P.J. Project, The",
+          "id": "e097e0ab-cac6-4bfe-a91f-54656a8c0321",
+          "disambiguation": "",
+          "name": "The P.J. Project",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "type": "is person",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "ended": false,
+        "artist": {
+          "id": "1515416a-902a-4f5e-a21f-bb87e6b471ed",
+          "disambiguation": "",
+          "sort-name": "Pilly P.",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Pilly P.",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "type": "is person",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "ended": false,
+        "artist": {
+          "name": "Brother 2 Brother",
+          "type": "Group",
+          "disambiguation": "Garrard/Johnson",
+          "id": "ce0a0709-2600-493c-b84a-fe0642da7a6c",
+          "country": null,
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "Brother 2 Brother"
+        },
+        "attribute-values": {},
+        "type": "member of band",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "end": null,
+        "begin": null,
+        "target-type": "artist"
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "artist": {
+          "sort-name": "2 Men on Wax",
+          "country": "US",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "disambiguation": "",
+          "id": "363b6264-0e19-4287-b473-f11884133d8b",
+          "type": "Group",
+          "name": "2 Men on Wax"
+        },
+        "attribute-values": {},
+        "type": "member of band"
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "member of band",
+        "attribute-values": {},
+        "artist": {
+          "disambiguation": "",
+          "id": "879cc432-033a-4b38-b326-cd26b6d9c57c",
+          "sort-name": "Traxmen",
+          "country": "US",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "name": "Traxmen"
+        },
+        "ended": false,
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "artist": {
+          "type": "Group",
+          "name": "Club Style",
+          "sort-name": "Club Style",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "id": "d4704b59-edf4-4c8a-bce3-ee01b4c71278",
+          "disambiguation": ""
+        },
+        "attribute-values": {},
+        "type": "member of band",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "member of band",
+        "attribute-values": {},
+        "artist": {
+          "id": "3899f5dd-634f-43a1-9b58-c6e6eca6adce",
+          "disambiguation": "Paul Johnson and Mike",
+          "sort-name": "Pjay",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "type": "Group",
+          "name": "Pjay"
+        },
+        "ended": false,
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "type": "allmusic",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0000986446",
+          "id": "5f8865ad-96a0-445f-a5ec-ee470d5cb8ba"
+        },
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "end": null,
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "url": {
+          "id": "9e211f68-d26d-4a8c-84d0-9138f3d781ef",
+          "resource": "https://www.discogs.com/artist/866"
+        },
+        "attribute-values": {},
+        "type": "discogs",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "free streaming",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "52e59f31-eb84-422b-9f69-24953b27df34",
+          "resource": "https://open.spotify.com/artist/4BqZuFqHJ8CLn3ig0f1m0G"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.deezer.com/artist/2596",
+          "id": "f410c72a-0af1-4d06-98bf-36d3f2f8a805"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "url": {
+          "resource": "https://genius.com/artists/Paul-johnson",
+          "id": "e6cc28d9-83c3-4aa0-862f-bd43e71d5219"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "lyrics",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "d4aaa559-fad7-40f1-8dea-f802c3472631",
+          "resource": "https://myspace.com/djpauljohnson"
+        },
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "direction": "forward",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "myspace",
+        "ended": false
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "610245dc-dcb4-48b5-b057-17eddf528ce0",
+          "resource": "https://rateyourmusic.com/artist/paul_johnson"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": "2019-05-19",
+        "target-type": "url",
+        "url": {
+          "resource": "https://itunes.apple.com/gb/artist/id3642357",
+          "id": "57b64695-4e35-48b3-92bd-6bd7acfe3daf"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "type": "purchase for download",
+        "ended": true,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "46b4132e-f381-4082-b2d5-661e25f5b9f3",
+          "resource": "https://music.apple.com/us/artist/3642357"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "type": "purchase for download",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "purchase for download",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "77bdbf48-144a-4bd1-8d30-c13cee4e3ebb",
+          "resource": "https://www.beatport.com/artist/paul-johnson/231"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "end": null,
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.traxsource.com/artist/311",
+          "id": "1474a463-3165-4d7b-b980-9fe63c29f2ea"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "purchase for download",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "1d72a667-a81b-4884-82ad-ced0b6460c68",
+          "resource": "https://music.apple.com/gb/artist/3642357"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://music.apple.com/us/artist/3642357",
+          "id": "46b4132e-f381-4082-b2d5-661e25f5b9f3"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "type": "streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://tidal.com/artist/3519291",
+          "id": "b682a66c-e114-46fc-b33e-4282081f5c4b"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      },
+      {
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "id": "391a9172-9819-4de7-979a-32c77f9d8e2d",
+          "resource": "http://viaf.org/viaf/106380895"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "VIAF",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "wikidata",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "2cf38572-8e73-4bfc-bf26-58f2302550fa",
+          "resource": "https://www.wikidata.org/wiki/Q3032232"
+        },
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward"
+      }
+    ],
+    "id": "07065c90-1519-4bd9-8259-9872f3c9a776"
+  }
+}

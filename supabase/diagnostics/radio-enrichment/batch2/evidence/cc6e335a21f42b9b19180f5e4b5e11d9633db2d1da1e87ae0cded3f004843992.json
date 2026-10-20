@@ -1,0 +1,410 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:03.501778+00:00",
+  "body": {
+    "area": {
+      "type": null,
+      "name": "United States",
+      "sort-name": "United States",
+      "type-id": null,
+      "disambiguation": "",
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "iso-3166-1-codes": [
+        "US"
+      ]
+    },
+    "gender": "Female",
+    "end-area": null,
+    "country": "US",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "sort-name": "Mason, Barbara",
+    "disambiguation": "",
+    "life-span": {
+      "end": null,
+      "begin": "1947-08-09",
+      "ended": false
+    },
+    "ipis": [],
+    "isnis": [
+      "000000008221749X"
+    ],
+    "type": "Person",
+    "aliases": [
+      {
+        "type": null,
+        "locale": null,
+        "name": "Barbera Mason",
+        "type-id": null,
+        "sort-name": "Barbera Mason",
+        "primary": null,
+        "end": null,
+        "ended": false,
+        "begin": null
+      }
+    ],
+    "name": "Barbara Mason",
+    "begin-area": {
+      "disambiguation": "",
+      "type": null,
+      "id": "0eeb01c2-6e31-46ad-96b8-319749f731d2",
+      "name": "Philadelphia",
+      "sort-name": "Philadelphia",
+      "type-id": null
+    },
+    "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "tags": [
+      {
+        "name": "philly soul",
+        "count": 1
+      },
+      {
+        "name": "r&b",
+        "count": 1
+      },
+      {
+        "name": "smooth soul",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "soul"
+      }
+    ],
+    "genres": [
+      {
+        "count": 1,
+        "id": "779b2d38-deb0-4838-a0e2-18170323ca13",
+        "disambiguation": "",
+        "name": "philly soul"
+      },
+      {
+        "name": "r&b",
+        "count": 1,
+        "id": "31be54b2-4d0c-42df-aa44-c496c7b4c3c3",
+        "disambiguation": ""
+      },
+      {
+        "id": "d4eafdc7-1a86-422b-b598-79e6bb81745c",
+        "disambiguation": "",
+        "count": 1,
+        "name": "smooth soul"
+      },
+      {
+        "name": "soul",
+        "disambiguation": "",
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827",
+        "count": 2
+      }
+    ],
+    "relations": [
+      {
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type": "allmusic",
+        "url": {
+          "id": "0231a397-3bd6-4c45-8301-160b8ad337d6",
+          "resource": "https://www.allmusic.com/artist/mn0000125749"
+        }
+      },
+      {
+        "url": {
+          "id": "1d5bf57f-786f-478b-bb76-c830a7dd25e9",
+          "resource": "https://www.discogs.com/artist/48720"
+        },
+        "type": "discogs",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null
+      },
+      {
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type": "free streaming",
+        "url": {
+          "id": "4d92547c-bfe4-4f08-973c-1e94e4fff85c",
+          "resource": "https://open.spotify.com/artist/5PmZd7YOaUgQwhOja44fmZ"
+        }
+      },
+      {
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "free streaming",
+        "url": {
+          "id": "c698f7da-e411-433b-8747-ae464e5c4bef",
+          "resource": "https://www.deezer.com/artist/61663"
+        }
+      },
+      {
+        "type": "last.fm",
+        "url": {
+          "id": "47a93b56-ef9e-454e-a5c8-2a8c3fab38f6",
+          "resource": "https://www.last.fm/music/Barbara%20Mason"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": []
+      },
+      {
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://myspace.com/barbaramason",
+          "id": "f262a82c-2b37-4e41-a32d-891f6a4afe3a"
+        },
+        "type": "myspace",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://barbaramasonmusic.com/",
+          "id": "cb88b965-2dcb-4a53-8ee8-10af6eda5ee4"
+        },
+        "type": "official homepage",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n93065966",
+          "id": "fa2d0477-8a91-4eae-922c-7e38ef9504ab"
+        },
+        "type": "other databases"
+      },
+      {
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "resource": "https://d-nb.info/gnd/134457439",
+          "id": "4d3854b1-d966-49ef-8d7d-29a9a09f8f0e"
+        },
+        "type": "other databases"
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "type": "other databases",
+        "url": {
+          "id": "d82bdabf-befe-49ba-9e53-2c315822f9a7",
+          "resource": "http://snaccooperative.org/ark:/99166/w6gf24gb"
+        },
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "c6d5e664-3622-4e94-a509-80750079fe2c",
+          "resource": "https://rateyourmusic.com/artist/barbara_mason"
+        },
+        "type": "other databases",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "target-credit": ""
+      },
+      {
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-n93065966",
+          "id": "3e6a9d0f-4822-4831-b48f-ae80d4245d81"
+        },
+        "type": "other databases",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null
+      },
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "secondhandsongs",
+        "url": {
+          "resource": "https://secondhandsongs.com/artist/11351",
+          "id": "3859a219-beac-4638-81d9-fe5a4e364fe4"
+        },
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3"
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "target-type": "url",
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type": "songkick",
+        "url": {
+          "id": "31dd6ba4-d9d3-402f-a1c9-e60ae48fffc6",
+          "resource": "https://www.songkick.com/artists/554388"
+        }
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "type": "streaming",
+        "url": {
+          "resource": "https://tidal.com/artist/35549",
+          "id": "69fa0e1b-49b7-4256-9c6e-3778d2992306"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "VIAF",
+        "url": {
+          "resource": "http://viaf.org/viaf/38588035",
+          "id": "976296e6-9790-45c5-b9fb-24521b4c082a"
+        }
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q528298",
+          "id": "afbc4e1f-6917-4250-a933-9b2fd6d5ef6c"
+        },
+        "type": "wikidata",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698"
+      }
+    ]
+  }
+}

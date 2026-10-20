@@ -1,0 +1,119 @@
+{
+  "url": "https://api.discogs.com/artists/1029",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:27.834411+00:00",
+  "body": {
+    "name": "I:Cube",
+    "id": 1029,
+    "resource_url": "https://api.discogs.com/artists/1029",
+    "uri": "https://www.discogs.com/artist/1029-ICube",
+    "releases_url": "https://api.discogs.com/artists/1029/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/4uhvxxoeVkvJkvXNelKjDBl8E8PTst3en0kvDPZHgV4/rs:fit/g:sm/q:90/h:435/w:370/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTUxNzY3MTg2MC01/NTE4LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/4uhvxxoeVkvJkvXNelKjDBl8E8PTst3en0kvDPZHgV4/rs:fit/g:sm/q:90/h:435/w:370/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTUxNzY3MTg2MC01/NTE4LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/SJiYqfLWCFiDj-QiOfrgDzi_rrqkICsnipHDx8QXiZA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTUxNzY3MTg2MC01/NTE4LmpwZWc.jpeg",
+        "width": 370,
+        "height": 435
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/NfQf_ea0VAHBLDLfDYRmCY0NtC8R2sRT1POljsiGThc/rs:fit/g:sm/q:90/h:280/w:456/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTMyNjY4NjIxMy5q/cGVn.jpeg",
+        "resource_url": "https://i.discogs.com/NfQf_ea0VAHBLDLfDYRmCY0NtC8R2sRT1POljsiGThc/rs:fit/g:sm/q:90/h:280/w:456/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTMyNjY4NjIxMy5q/cGVn.jpeg",
+        "uri150": "https://i.discogs.com/nTT4Z1wojkdJFvEQM4HgAiwL75-Jo0qf7e2xbZE7qwY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTMyNjY4NjIxMy5q/cGVn.jpeg",
+        "width": 456,
+        "height": 280
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/yqdDKKsnli85Og1BNS3PRpo0sEifzqCBD6m1E-Y5yoY/rs:fit/g:sm/q:90/h:400/w:251/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTA3NjM1NjcxNi5q/cGc.jpeg",
+        "resource_url": "https://i.discogs.com/yqdDKKsnli85Og1BNS3PRpo0sEifzqCBD6m1E-Y5yoY/rs:fit/g:sm/q:90/h:400/w:251/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTA3NjM1NjcxNi5q/cGc.jpeg",
+        "uri150": "https://i.discogs.com/l9Kmbb9aNxqTpGYtkLGVrCL47Zp0I0UguAvRKw752yI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTA3NjM1NjcxNi5q/cGc.jpeg",
+        "width": 251,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/tBHIry8qGhkPTppUbug4V8eTuwrDGjKDkUr8uZRIWCM/rs:fit/g:sm/q:90/h:340/w:380/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTE0MjE3NDk4Ni5q/cGVn.jpeg",
+        "resource_url": "https://i.discogs.com/tBHIry8qGhkPTppUbug4V8eTuwrDGjKDkUr8uZRIWCM/rs:fit/g:sm/q:90/h:340/w:380/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTE0MjE3NDk4Ni5q/cGVn.jpeg",
+        "uri150": "https://i.discogs.com/HinXLFzPx8TkK7GNnpvohieaE8Y7f6whAR_hGd_ARHk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTE0MjE3NDk4Ni5q/cGVn.jpeg",
+        "width": 380,
+        "height": 340
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/51XH1suknJbVg8bG2gQ1GTQfs0vSVg0gE1t82cCFDGY/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTYxNTg4NzgxNC0y/MjExLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/51XH1suknJbVg8bG2gQ1GTQfs0vSVg0gE1t82cCFDGY/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTYxNTg4NzgxNC0y/MjExLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/zVF8hpSSWvSXJuaE513UxhPyw-DVpvN9v8oiGwyHiI8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEwMjkt/MTYxNTg4NzgxNC0y/MjExLmpwZWc.jpeg",
+        "width": 600,
+        "height": 337
+      }
+    ],
+    "realname": "Nicolas Chaix",
+    "profile": "DJ, musician and producer from Paris, France.",
+    "urls": [
+      "http://soundcloud.com/i-cube",
+      "https://icube.bandcamp.com",
+      "https://en.wikipedia.org/wiki/I:Cube"
+    ],
+    "namevariations": [
+      "Cubo",
+      "I : Cube",
+      "I Cube",
+      "I- Cube",
+      "I-Cube",
+      "I-cube",
+      "I. Cube",
+      "I.Cube",
+      "I: Cube",
+      "ICube",
+      "J- Cube",
+      "Oeil Cube",
+      "Œil Cube"
+    ],
+    "aliases": [
+      {
+        "id": 13021,
+        "name": "Faceball 2000",
+        "resource_url": "https://api.discogs.com/artists/13021"
+      },
+      {
+        "id": 40019,
+        "name": "Paztek",
+        "resource_url": "https://api.discogs.com/artists/40019"
+      },
+      {
+        "id": 462693,
+        "name": "Nicolas Chaix",
+        "resource_url": "https://api.discogs.com/artists/462693"
+      },
+      {
+        "id": 472569,
+        "name": "Cubo",
+        "resource_url": "https://api.discogs.com/artists/472569"
+      },
+      {
+        "id": 1272504,
+        "name": "DJ Ringardos",
+        "resource_url": "https://api.discogs.com/artists/1272504"
+      },
+      {
+        "id": 3184043,
+        "name": "The Eye Cube",
+        "resource_url": "https://api.discogs.com/artists/3184043"
+      },
+      {
+        "id": 3878938,
+        "name": "Petra Korde",
+        "resource_url": "https://api.discogs.com/artists/3878938"
+      },
+      {
+        "id": 5612570,
+        "name": "Icola",
+        "resource_url": "https://api.discogs.com/artists/5612570"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F1029&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:27.638825+00:00",
+  "body": {
+    "id": "a0079ddf-b03e-4147-bacd-b3df066d1634",
+    "relations": [
+      {
+        "direction": "backward",
+        "type": "discogs",
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "end": null,
+        "artist": {
+          "disambiguation": "house music",
+          "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+          "name": "I:Cube",
+          "country": "FR",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "I:Cube"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "artist"
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/1029"
+  }
+}

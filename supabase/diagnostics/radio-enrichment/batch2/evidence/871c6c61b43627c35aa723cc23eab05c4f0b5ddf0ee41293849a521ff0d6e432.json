@@ -1,0 +1,882 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/806b793c-fb2c-401e-be44-f753c0ea2f15?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:40.581634+00:00",
+  "body": {
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "relations": [
+      {
+        "artist": {
+          "disambiguation": "",
+          "id": "270fa9f0-1623-4e51-b0f8-a5c85bbd4f90",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Moggi",
+          "name": "Moggi",
+          "type": "Person"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist"
+      },
+      {
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "artist": {
+          "disambiguation": "aka Piero Umiliani",
+          "id": "fd943977-8ee0-459e-9fd7-dd5298c98c49",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "IT",
+          "sort-name": "Rovi",
+          "name": "Rovi",
+          "type": "Person"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "direction": "forward",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "artist": {
+          "sort-name": "Zalla",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": null,
+          "id": "124faf52-18bc-461f-85af-e7183839dbed",
+          "disambiguation": "",
+          "name": "Zalla",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "type": "is person"
+      },
+      {
+        "ended": false,
+        "artist": {
+          "disambiguation": "",
+          "id": "a6fdc7d3-4baf-4da2-a1eb-5146c613822e",
+          "sort-name": "Sitimo",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Sitimo"
+        },
+        "attribute-values": {},
+        "type": "is person",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "end": null,
+        "begin": null,
+        "target-type": "artist"
+      },
+      {
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "direction": "forward",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "is person",
+        "ended": false,
+        "artist": {
+          "type": "Person",
+          "name": "Jonefle",
+          "disambiguation": "",
+          "id": "73de54c1-1611-44b2-b862-ff6833d2483d",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Jonefle"
+        }
+      },
+      {
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "type": "Person",
+          "name": "Herbana",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Herbana",
+          "id": "3f83431a-c2d3-454e-a303-d5729a9b05fe",
+          "disambiguation": ""
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {}
+      },
+      {
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "end": null,
+        "begin": null,
+        "target-type": "artist",
+        "artist": {
+          "name": "L’ingegner Giovanni e Famiglia",
+          "type": "Person",
+          "id": "68a1060a-246a-4153-9aee-d5c3513d1c86",
+          "disambiguation": "",
+          "sort-name": "L’ingegner Giovanni e Famiglia",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "IT"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "id": "bccf0f7d-500d-46b1-b8bd-f01a65c90613",
+          "disambiguation": "",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "O’Milian, Peter",
+          "name": "Peter O’Milian",
+          "type": "Person"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {}
+      },
+      {
+        "artist": {
+          "sort-name": "Catamo",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "c781eacf-1270-45cb-9db6-3273d18d15ad",
+          "disambiguation": "",
+          "name": "Catamo",
+          "type": "Person"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "end": null,
+        "begin": null,
+        "target-type": "artist"
+      },
+      {
+        "artist": {
+          "name": "Raiword",
+          "type": "Person",
+          "disambiguation": "",
+          "id": "cce1b642-0421-4d14-a143-5a1551438cef",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": null,
+          "sort-name": "Raiword"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist"
+      },
+      {
+        "direction": "forward",
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "attribute-values": {},
+        "type": "is person",
+        "ended": false,
+        "artist": {
+          "name": "Peter Pietra",
+          "type": "Person",
+          "id": "f1366f30-f712-43fe-b07d-a508f1b155e7",
+          "disambiguation": "",
+          "country": null,
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Pietra, Peter"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "ended": false,
+        "artist": {
+          "name": "Ruscigan",
+          "type": "Person",
+          "disambiguation": "",
+          "id": "4b55899f-a388-4f2c-b3da-006d10fd9bfc",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": null,
+          "sort-name": "Ruscigan"
+        },
+        "attribute-values": {},
+        "type": "is person",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist"
+      },
+      {
+        "attribute-values": {},
+        "type": "is person",
+        "ended": false,
+        "artist": {
+          "name": "M. Zalla",
+          "type": "Person",
+          "country": "IT",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "M. Zalla",
+          "id": "74ab6660-8998-4bff-81c7-044a9b727890",
+          "disambiguation": "Piero Umiliani"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "artist",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666"
+      },
+      {
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "artist": {
+          "name": "Tusco",
+          "type": "Person",
+          "sort-name": "Tusco",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "IT",
+          "disambiguation": "alias of Piero Umiliani",
+          "id": "c1825353-477d-4611-8632-0b903d1c45a8"
+        },
+        "attribute-values": {},
+        "type": "is person",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "end": null,
+        "begin": null,
+        "target-type": "artist",
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null,
+        "artist": {
+          "name": "Piero Umiliani e i suoi solisti",
+          "type": "Group",
+          "id": "b8472ce8-d71c-431d-8387-b50c6ea14f71",
+          "disambiguation": "",
+          "sort-name": "Umiliani, Piero e i suoi solisti",
+          "country": "IT",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "ended": false,
+        "type": "member of band",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [
+          "eponymous",
+          "original"
+        ],
+        "attribute-ids": {
+          "eponymous": "15eea3b8-5655-43c8-b2c2-dd03c901a79b",
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        }
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "disambiguation": "Session group, which recorded for Piero Umilianin",
+          "id": "065d770b-237a-4bd9-8fa1-dd71e2a8cab8",
+          "sort-name": "Soundwork-Shoppers, The",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "IT",
+          "type": "Group",
+          "name": "The Soundwork-Shoppers"
+        },
+        "ended": false,
+        "type": "member of band",
+        "attribute-values": {}
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "member of band",
+        "ended": false,
+        "artist": {
+          "disambiguation": "",
+          "id": "5d9fdfc0-d054-4a2b-bd40-4a0a73d0e08a",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "IT",
+          "sort-name": "Umiliani, Piero e la sua Orchestra",
+          "type": "Group",
+          "name": "Piero Umiliani e la sua Orchestra"
+        },
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "artist": {
+          "disambiguation": "",
+          "id": "62c03e93-bc69-4163-8eaa-8cf2ebf7ee4f",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "sort-name": "Moggi, Johnny Quintet",
+          "type": "Group",
+          "name": "Johnny Moggi Quintet"
+        },
+        "attribute-values": {},
+        "type": "member of band",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "allmusic",
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "25e10adf-ffb2-4912-8e62-8db6f2ff03cd",
+          "resource": "https://www.allmusic.com/artist/mn0000240758"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "url": {
+          "resource": "https://www.discogs.com/artist/8722",
+          "id": "45548a8e-f46f-4b35-a929-eba9e4bb323a"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "discogs"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://open.spotify.com/artist/5sD7Cf3SaTVcrg81GQi1Xk",
+          "id": "e5470db0-99fa-426a-b9b5-4b2db48e301e"
+        },
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "free streaming",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://www.deezer.com/artist/4916",
+          "id": "fd02d8c2-4f22-44a6-9166-84ad9c598fe5"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "IMDb",
+        "ended": false,
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "url": {
+          "id": "6c993c62-75c3-4d83-baff-9da67e52a135",
+          "resource": "https://www.imdb.com/name/nm0006327/"
+        },
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "official homepage",
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "url": {
+          "resource": "http://www.umiliani.com/",
+          "id": "c1385ae5-c390-469b-bb6d-02eb787fcefa"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "63cfa2b8-c193-47bd-ae3c-e6eb5ba7423a",
+          "resource": "http://soundtrackcollector.com/composer/1103/"
+        }
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "21805104-de89-4687-b7a2-e21671e383c3",
+          "resource": "https://rateyourmusic.com/artist/piero_umiliani"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.45cat.com/artist/piero-umiliani",
+          "id": "7b7bedb2-0d79-4e68-b29f-4ec054379434"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "ended": false,
+        "type": "other databases",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.jazzmusicarchives.com/artist/piero-umiliani",
+          "id": "75ffcc16-c521-41a9-b721-f234ab38d3eb"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false
+      },
+      {
+        "attribute-values": {},
+        "type": "social network",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://twitter.com/PUmiliani",
+          "id": "a8eba8ec-6587-4e05-987c-d615a14414b1"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "social network",
+        "url": {
+          "resource": "https://www.facebook.com/Piero-Umiliani-1392499961020309",
+          "id": "15b6976f-aeb3-4a5c-bc17-396acc7dc9c5"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "streaming",
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/32486918",
+          "id": "fd3e3761-049a-4391-b5cf-9c80d9b5ffc7"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "streaming",
+        "ended": false,
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://tidal.com/artist/3583278",
+          "id": "6681de29-ac18-41b7-a997-fc624b9edc09"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "resource": "http://viaf.org/viaf/40607101",
+          "id": "f3ee5ee0-f5da-4d65-88d2-f48420d52541"
+        },
+        "type": "VIAF",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "ended": false,
+        "type": "wikidata",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "url": {
+          "id": "9a0b1f38-78b5-439f-829b-ba5cefe6b497",
+          "resource": "https://www.wikidata.org/wiki/Q326321"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      }
+    ],
+    "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+    "area": {
+      "sort-name": "Italy",
+      "type-id": null,
+      "disambiguation": "",
+      "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+      "iso-3166-1-codes": [
+        "IT"
+      ],
+      "type": null,
+      "name": "Italy"
+    },
+    "genres": [
+      {
+        "count": 1,
+        "id": "573a284f-2ae3-4636-af36-10fc1078d295",
+        "disambiguation": "",
+        "name": "bossa nova"
+      },
+      {
+        "name": "easy listening",
+        "id": "ca06817d-8622-4120-b49d-96921c8bb767",
+        "disambiguation": "",
+        "count": 3
+      },
+      {
+        "count": 1,
+        "name": "electronic",
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4",
+        "disambiguation": ""
+      },
+      {
+        "name": "instrumental",
+        "disambiguation": "",
+        "id": "4ae63770-68af-4fae-b0f1-5e53f372c743",
+        "count": 1
+      },
+      {
+        "count": 3,
+        "disambiguation": "",
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "name": "jazz"
+      },
+      {
+        "disambiguation": "",
+        "id": "f3c43ae8-839a-4523-b295-cfa4eba6c911",
+        "name": "jazz-funk",
+        "count": 1
+      },
+      {
+        "name": "lounge",
+        "disambiguation": "",
+        "id": "de2785b2-f282-4718-a422-37dc93964bdd",
+        "count": 2
+      }
+    ],
+    "ipis": [
+      "00031295601"
+    ],
+    "life-span": {
+      "end": "2001-02-14",
+      "begin": "1926-07-17",
+      "ended": true
+    },
+    "sort-name": "Umiliani, Piero",
+    "country": "IT",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "begin-area": {
+      "disambiguation": "",
+      "id": "2b397313-0d04-4167-b9a8-914f16935d4a",
+      "name": "Firenze",
+      "type": null,
+      "sort-name": "Firenze",
+      "type-id": null
+    },
+    "gender": "Male",
+    "disambiguation": "",
+    "aliases": [
+      {
+        "end": null,
+        "begin": null,
+        "locale": null,
+        "sort-name": "Piero Umilani",
+        "type-id": null,
+        "name": "Piero Umilani",
+        "type": null,
+        "ended": false,
+        "primary": null
+      },
+      {
+        "primary": null,
+        "ended": false,
+        "type": null,
+        "name": "Piero Umliani",
+        "sort-name": "Piero Umliani",
+        "type-id": null,
+        "locale": null,
+        "begin": null,
+        "end": null
+      }
+    ],
+    "end-area": {
+      "disambiguation": "",
+      "id": "dccd77b2-bd3d-49eb-a98f-fd58e87f481e",
+      "name": "Roma",
+      "type": null,
+      "type-id": null,
+      "sort-name": "Roma"
+    },
+    "isnis": [
+      "000000005936845X"
+    ],
+    "type": "Person",
+    "name": "Piero Umiliani",
+    "tags": [
+      {
+        "name": "bossa nova",
+        "count": 1
+      },
+      {
+        "count": 3,
+        "name": "easy listening"
+      },
+      {
+        "count": 1,
+        "name": "electronic"
+      },
+      {
+        "count": 1,
+        "name": "european"
+      },
+      {
+        "count": 1,
+        "name": "film composer"
+      },
+      {
+        "count": 1,
+        "name": "film score"
+      },
+      {
+        "name": "instrumental",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "italian"
+      },
+      {
+        "count": 3,
+        "name": "jazz"
+      },
+      {
+        "count": 1,
+        "name": "jazz-funk"
+      },
+      {
+        "count": 1,
+        "name": "library music"
+      },
+      {
+        "name": "lounge",
+        "count": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Blika%22+AND+artist%3A%22Blawan%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:53.089733+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:53.016Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "bacdb928-2382-4868-95eb-2927f8f30f44",
+        "score": 100,
+        "artist-credit-id": "414aa9f5-04d8-3ef8-ae24-3df9c6126f21",
+        "title": "Blika",
+        "length": 244000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Blawan",
+            "artist": {
+              "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+              "name": "Blawan",
+              "sort-name": "Blawan",
+              "disambiguation": "British techno producer & DJ"
+            }
+          }
+        ],
+        "first-release-date": "2021-11-12",
+        "releases": [
+          {
+            "id": "44deb1b4-8341-48ac-b81a-403ab9bc65de",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Woke Up Right Handed EP",
+            "status": "Official",
+            "release-group": {
+              "id": "b701da13-b305-43ec-a26d-b24a7d79040b",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Woke Up Right Handed EP",
+              "primary-type": "EP"
+            },
+            "date": "2021-11-12",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2021-11-12",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 5,
+            "media": [
+              {
+                "id": "0c436da4-0f05-3903-a014-98ee213c4f88",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "de501dbd-43be-4b41-988a-c48b6f58aef7",
+                    "number": "1",
+                    "title": "Blika",
+                    "length": 244000
+                  }
+                ],
+                "track-count": 5,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBBKS2100211"
+        ]
+      }
+    ]
+  }
+}

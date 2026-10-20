@@ -1,0 +1,703 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Anstromm+Feck+4%22+AND+artist%3A%22Squarepusher%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:12.198738+00:00",
+  "body": {
+    "created": "2026-10-20T01:25:12.122Z",
+    "count": 4,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "dcf2ebc0-a187-4772-b432-7323b15bc9a1",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Anstromm‐Feck 4",
+        "length": 209893,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002-09-21",
+        "releases": [
+          {
+            "id": "33c88024-d17c-3c4d-b025-4d1d23ca56a6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-30",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2002-09-30",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "53e22eb2-8975-3358-9c54-44eacc9b3835",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "cfe10575-ae1b-3301-9675-753f989fcef9",
+                    "number": "A4",
+                    "title": "Anstromm‐Feck 4",
+                    "length": 209893
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "8890ef49-5b9f-4d7a-b2c4-95d0f03b168d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 2,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-30",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2002-09-30",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "38214fd2-7f19-3413-840a-a7e932b9266a",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e362d7ce-fadc-3684-b0e9-fc4aa9c31c4f",
+                    "number": "4",
+                    "title": "Anstromm‐Feck 4",
+                    "length": 209893
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "301d957d-fd23-41fa-ad16-36ecefaf04c9",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 2,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-21",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2002-09-21",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "3bc42da7-3c67-3cd7-94ef-a8c509624349",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "70ac2705-3384-4b89-87b7-1a366dbe696e",
+                    "number": "4",
+                    "title": "Anstromm‐Feck 4",
+                    "length": 209893
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 3,
+            "name": "electronic"
+          },
+          {
+            "count": 0,
+            "name": "industrial"
+          },
+          {
+            "count": 1,
+            "name": "drum and bass"
+          },
+          {
+            "count": 0,
+            "name": "jazz"
+          },
+          {
+            "count": 0,
+            "name": "experimental"
+          },
+          {
+            "count": 0,
+            "name": "idm"
+          },
+          {
+            "count": 0,
+            "name": "glitch"
+          },
+          {
+            "count": 0,
+            "name": "acid jazz"
+          },
+          {
+            "count": 0,
+            "name": "drum n bass"
+          },
+          {
+            "count": 1,
+            "name": "drill and bass"
+          }
+        ]
+      },
+      {
+        "id": "2085216a-5654-4a24-a964-0503e2822d8d",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Anstromm-Feck 4",
+        "length": 209000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002-09-30",
+        "releases": [
+          {
+            "id": "21e2e9c4-702b-4e58-8efc-6ad23f075b54",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 2,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-30",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2002-09-30",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "1b7638f8-d45e-40fd-9d61-2a02818741f1",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b32c4e9b-c866-4aff-b731-8ee91d8607f5",
+                    "number": "4",
+                    "title": "Anstromm-Feck 4",
+                    "length": 209000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9e0221ba-8b4d-4c6a-a8f2-6e9e30c97fcc",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Anstromm-Feck 4",
+        "length": 258000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002-09-30",
+        "releases": [
+          {
+            "id": "21e2e9c4-702b-4e58-8efc-6ad23f075b54",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 2,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-30",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2002-09-30",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "8d32b47d-6183-4473-908b-004198a9b94d",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "69b0356d-cbfc-4847-9d46-89afec2e425f",
+                    "number": "10",
+                    "title": "Anstromm-Feck 4",
+                    "length": 258000
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c28b38dc-d79b-46fe-823b-cbf00753f9ab",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Anstromm‐Feck 4",
+        "length": 258519,
+        "disambiguation": "Alive in Japan 2001",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002-09-21",
+        "releases": [
+          {
+            "id": "301d957d-fd23-41fa-ad16-36ecefaf04c9",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 2,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-21",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2002-09-21",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "76b979f8-723a-3d66-a9c1-db8ab0989cea",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "593c7aef-4d79-439a-bec8-00a03a233e7b",
+                    "number": "10",
+                    "title": "Anstromm‐Feck 4",
+                    "length": 258519
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 9
+              }
+            ]
+          },
+          {
+            "id": "8890ef49-5b9f-4d7a-b2c4-95d0f03b168d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 2,
+            "title": "Do You Know Squarepusher",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c3037944-2e4a-3a85-9f4b-0a1b120cbfbe",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Do You Know Squarepusher",
+              "primary-type": "Album"
+            },
+            "date": "2002-09-30",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2002-09-30",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "d8334896-6575-3eb8-8e24-2362c3959f1b",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3174cb87-d4cf-3121-ad5c-94cc49fbacf8",
+                    "number": "10",
+                    "title": "Anstromm‐Feck 4",
+                    "length": 258519
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 9
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 2,
+            "name": "electronic"
+          },
+          {
+            "count": 0,
+            "name": "industrial"
+          },
+          {
+            "count": 1,
+            "name": "drum and bass"
+          },
+          {
+            "count": 0,
+            "name": "ambient"
+          },
+          {
+            "count": 0,
+            "name": "jazz"
+          },
+          {
+            "count": 0,
+            "name": "experimental"
+          },
+          {
+            "count": 0,
+            "name": "idm"
+          },
+          {
+            "count": 0,
+            "name": "acid jazz"
+          },
+          {
+            "count": 0,
+            "name": "drum n bass"
+          }
+        ]
+      }
+    ]
+  }
+}

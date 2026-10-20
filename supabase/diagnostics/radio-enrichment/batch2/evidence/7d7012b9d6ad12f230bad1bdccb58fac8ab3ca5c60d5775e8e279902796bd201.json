@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F3563778&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:51.572801+00:00",
+  "body": {
+    "id": "b7ea6abd-62ed-4cc6-b443-65748196fedf",
+    "relations": [
+      {
+        "target-credit": "",
+        "end": null,
+        "artist": {
+          "name": "Sepehr",
+          "id": "a3e77268-597b-4ce8-8837-78b673e20114",
+          "disambiguation": "electronic musician Sepehr Alimagham",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Sepehr",
+          "type": "Person"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "artist",
+        "attribute-values": {},
+        "type": "discogs",
+        "direction": "backward",
+        "source-credit": "",
+        "attributes": []
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/3563778"
+  }
+}

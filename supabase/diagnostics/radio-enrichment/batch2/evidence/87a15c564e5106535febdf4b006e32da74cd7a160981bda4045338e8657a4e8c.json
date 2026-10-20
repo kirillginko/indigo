@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/78c10d26-8969-4389-a9e8-b473fd1eaa15?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:16.628555+00:00",
+  "body": {
+    "length": 288156,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Earth, Wind & Fire",
+        "artist": {
+          "type": "Group",
+          "sort-name": "Earth, Wind & Fire",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "US",
+          "disambiguation": "",
+          "id": "535afeda-2538-435d-9dd1-5e10be586774",
+          "name": "Earth, Wind & Fire"
+        }
+      }
+    ],
+    "first-release-date": "2004",
+    "title": "Earth, Wind & Fire",
+    "isrcs": [],
+    "releases": [
+      {
+        "title": "Funky Jazz 6 - Cool & Soul",
+        "quality": "normal",
+        "barcode": null,
+        "packaging": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86"
+            }
+          }
+        ],
+        "id": "fe977e5b-16d8-4544-b3df-825bb0740817",
+        "date": "2004",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "name": "Italy",
+              "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+              "sort-name": "Italy",
+              "iso-3166-1-codes": [
+                "IT"
+              ],
+              "type": null,
+              "type-id": null
+            },
+            "date": "2004"
+          }
+        ],
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status": "Official",
+        "country": "IT",
+        "disambiguation": ""
+      }
+    ],
+    "id": "78c10d26-8969-4389-a9e8-b473fd1eaa15",
+    "disambiguation": "",
+    "video": false
+  }
+}

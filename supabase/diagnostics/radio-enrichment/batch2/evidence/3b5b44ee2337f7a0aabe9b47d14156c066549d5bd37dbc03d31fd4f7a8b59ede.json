@@ -1,0 +1,551 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/1a373a43-f0d2-4c7f-a3f1-5a098d30d994?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:21.620081+00:00",
+  "body": {
+    "length": 42293,
+    "title": "Opus 4",
+    "id": "1a373a43-f0d2-4c7f-a3f1-5a098d30d994",
+    "artist-credit": [
+      {
+        "artist": {
+          "disambiguation": "",
+          "id": "be899560-1570-402e-9f95-3182898a8b70",
+          "type": "Group",
+          "name": "Art of Noise",
+          "sort-name": "Art of Noise",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "GB"
+        },
+        "name": "Art of Noise",
+        "joinphrase": ""
+      }
+    ],
+    "disambiguation": "The Ambient Collection version",
+    "isrcs": [
+      "GBAHT1500167"
+    ],
+    "video": false,
+    "releases": [
+      {
+        "date": "1990-10-05",
+        "release-events": [
+          {
+            "date": "1990-10-05",
+            "area": {
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "packaging-id": null,
+        "title": "The Ambient Collection",
+        "id": "f21056a2-8552-3421-8dac-fe92e49d2291",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "sort-name": "Art of Noise",
+              "name": "Art of Noise",
+              "type": "Group",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "barcode": "752790101220",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "country": "US",
+        "disambiguation": ""
+      },
+      {
+        "id": "09cd994f-5aee-4105-8fbc-f5da3a932435",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "status": "Official",
+        "quality": "normal",
+        "date": "1990-10-05",
+        "release-events": [
+          {
+            "area": {
+              "name": "Europe",
+              "type-id": null,
+              "sort-name": "Europe",
+              "type": null,
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "iso-3166-1-codes": [
+                "XE"
+              ]
+            },
+            "date": "1990-10-05"
+          }
+        ],
+        "title": "The Ambient Collection",
+        "packaging-id": null,
+        "disambiguation": "",
+        "barcode": "042284340328",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "XE",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null
+      },
+      {
+        "status": "Official",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "sort-name": "Art of Noise",
+              "name": "Art of Noise",
+              "type": "Group",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            }
+          }
+        ],
+        "id": "4c4a682f-b457-46be-a243-b2ef7d754e8b",
+        "title": "The Ambient Collection",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "1990",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States"
+            },
+            "date": "1990"
+          }
+        ],
+        "disambiguation": "",
+        "country": "US",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "042284340328"
+      },
+      {
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "The Ambient Collection",
+        "release-events": [
+          {
+            "date": "1990",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "sort-name": "United States",
+              "type-id": null,
+              "type": null
+            }
+          }
+        ],
+        "date": "1990",
+        "id": "30df7989-f6ec-489f-8feb-84f886287c52",
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": "",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "sort-name": "Art of Noise",
+              "name": "Art of Noise",
+              "type": "Group"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "010467410625",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "country": "US",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "barcode": "042284340342",
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "packaging": "Cassette Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": null,
+        "id": "022f8f66-cf1a-4c81-b43b-9da4d2757951",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            },
+            "name": "Art of Noise",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "1990",
+            "area": null
+          }
+        ],
+        "date": "1990",
+        "packaging-id": "c70b737a-0114-39a9-88f7-82843e54f906",
+        "title": "The Ambient Collection"
+      },
+      {
+        "id": "261e9a3b-28d3-3d31-b494-8f31c39c3665",
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            }
+          }
+        ],
+        "status": "Official",
+        "quality": "normal",
+        "title": "The Ambient Collection",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "Germany",
+              "type-id": null,
+              "sort-name": "Germany",
+              "disambiguation": "",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "iso-3166-1-codes": [
+                "DE"
+              ]
+            },
+            "date": "1990"
+          }
+        ],
+        "date": "1990",
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "4009880901229",
+        "country": "DE",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case"
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "barcode": "3072666003432",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XE",
+        "disambiguation": "",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "The Ambient Collection",
+        "date": "1990",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "Europe",
+              "sort-name": "Europe",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "iso-3166-1-codes": [
+                "XE"
+              ]
+            },
+            "date": "1990"
+          }
+        ],
+        "id": "fb315a87-1df7-43ce-8309-770ab6a6b649",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "type": "Group",
+              "name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Art of Noise"
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ],
+        "quality": "normal",
+        "status": "Official"
+      },
+      {
+        "disambiguation": "",
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "barcode": "010467410625",
+        "country": "US",
+        "status-id": null,
+        "packaging": null,
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "joinphrase": "",
+            "artist": {
+              "name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "sort-name": "Art of Noise",
+              "type": "Group",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "90fe3896-08d9-4c23-96ea-21e11db498bd",
+        "status": null,
+        "quality": "normal",
+        "title": "The Ambient Collection",
+        "packaging-id": null,
+        "release-events": [
+          {
+            "date": "1990",
+            "area": {
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "date": "1990"
+      },
+      {
+        "id": "37b36d95-f93c-4b9c-9ae0-88e8bd486de6",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Art of Noise",
+            "artist": {
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "type": "Group",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB"
+            }
+          }
+        ],
+        "status": "Official",
+        "quality": "normal",
+        "title": "The Ambient Collection",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "1991-04-01",
+        "release-events": [
+          {
+            "area": {
+              "name": "United Kingdom",
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "1991-04-01"
+          }
+        ],
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "5021732101228",
+        "country": "GB",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Box",
+        "barcode": "5021732107527",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "date": "1997-08-04",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "name": "United Kingdom",
+              "sort-name": "United Kingdom",
+              "type-id": null
+            },
+            "date": "1997-08-04"
+          }
+        ],
+        "title": "State of the Art",
+        "packaging-id": "c1668fc7-8944-4a00-bc3e-46e8d861d211",
+        "status": "Official",
+        "quality": "normal",
+        "id": "f1dde109-7471-4aa6-b243-c67aec653ace",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "sort-name": "Art of Noise",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "GB",
+              "name": "Art of Noise",
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "disambiguation": ""
+            },
+            "joinphrase": "",
+            "name": "Art of Noise"
+          }
+        ]
+      },
+      {
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "title": "The Ambient Collection",
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "type": null
+            },
+            "date": ""
+          }
+        ],
+        "date": "",
+        "id": "2b5694d2-3dcf-4b12-a8bf-4fd591f2b581",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "The Art Of Noise",
+            "artist": {
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "country": "GB",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "disambiguation": "",
+              "id": "be899560-1570-402e-9f95-3182898a8b70"
+            }
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "barcode": "825646111442",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "country": "XW",
+        "disambiguation": ""
+      }
+    ],
+    "first-release-date": "1990-10-05"
+  }
+}

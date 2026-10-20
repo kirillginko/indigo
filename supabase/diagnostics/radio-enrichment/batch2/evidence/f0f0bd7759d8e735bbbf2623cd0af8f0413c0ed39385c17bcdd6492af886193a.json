@@ -1,0 +1,93 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Border+Beach%22+AND+artist%3A%22Lolina%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:24.636078+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:24.566Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "38b48a13-7571-49ab-851e-4238ac1ec8eb",
+        "score": 100,
+        "artist-credit-id": "1253a9dd-6d2d-3d02-bdb7-3ff4ca7b31da",
+        "title": "Border Beach",
+        "length": 135000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Lolina",
+            "artist": {
+              "id": "54492185-df45-494f-b133-f52da3fba781",
+              "name": "Lolina",
+              "sort-name": "Lolina",
+              "disambiguation": "Inga Copeland / Alina Astrova",
+              "aliases": [
+                {
+                  "sort-name": "Balmainjeans",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Balmainjeans",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2026-05-01",
+        "releases": [
+          {
+            "id": "66d203b3-fcc0-41d1-8025-960b5f658e86",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "1253a9dd-6d2d-3d02-bdb7-3ff4ca7b31da",
+            "count": 1,
+            "title": "Monopoly of Mistakes",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Lolina",
+                "artist": {
+                  "id": "54492185-df45-494f-b133-f52da3fba781",
+                  "name": "Lolina",
+                  "sort-name": "Lolina",
+                  "disambiguation": "Inga Copeland / Alina Astrova"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "249fa93d-9cec-4008-847e-f3d0e04e0c23",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Monopoly of Mistakes",
+              "primary-type": "Album"
+            },
+            "track-count": 11,
+            "media": [
+              {
+                "id": "b7c8ae83-0fc0-4b76-8855-7034077eda2d",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "71646933-431f-4efd-9d35-af6f90cf42d0",
+                    "number": "1",
+                    "title": "Border Beach",
+                    "length": 135000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "UKKTQ2600011"
+        ]
+      }
+    ]
+  }
+}

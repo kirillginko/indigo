@@ -1,0 +1,254 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/760e95ff-c503-4567-8109-759b9594c182?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:19:59.171946+00:00",
+  "body": {
+    "life-span": {
+      "ended": false,
+      "begin": null,
+      "end": null
+    },
+    "ipis": [],
+    "genres": [],
+    "area": {
+      "type-id": null,
+      "sort-name": "London",
+      "disambiguation": "Greater London",
+      "id": "f03d09b3-39dc-4083-afd6-159e3f0d462f",
+      "type": null,
+      "name": "London"
+    },
+    "id": "760e95ff-c503-4567-8109-759b9594c182",
+    "relations": [
+      {
+        "direction": "forward",
+        "url": {
+          "id": "95faff15-494c-44f5-87c0-9cd2e912cd3b",
+          "resource": "https://klein1997.bandcamp.com/"
+        },
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "ended": false,
+        "type": "bandcamp",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "id": "5979a003-c09e-4770-ac82-2f2bc2f9bb24",
+          "resource": "https://www.discogs.com/artist/4981772"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "ended": false,
+        "attribute-values": {},
+        "type": "discogs",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "url": {
+          "id": "86657d12-909f-43ac-8e87-bf68ed512015",
+          "resource": "https://open.spotify.com/artist/6chuFWw4BmHxOc3X0cC8Ct"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "free streaming",
+        "attribute-values": {}
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://www.deezer.com/artist/286170",
+          "id": "21894270-65f2-4133-9d9d-0f07556c05c4"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "75372e8b-d52a-460f-b81a-edd261fa06c5",
+          "resource": "https://therealjist.club/"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "official homepage",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "purchase for download",
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/128737",
+          "id": "f10e55c6-970c-4a6f-96b1-e4964cede220"
+        },
+        "direction": "forward"
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "social network",
+        "attribute-values": {},
+        "ended": false,
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "resource": "https://www.instagram.com/kleinrus/",
+          "id": "63ee8591-a296-49e0-9202-9ee9dcffce52"
+        },
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "f3fa2e13-2d42-41db-a9d4-13a075863618",
+          "resource": "https://music.apple.com/gb/artist/1271293810"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "streaming",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "f10e55c6-970c-4a6f-96b1-e4964cede220",
+          "resource": "https://open.qobuz.com/artist/128737"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "end": null,
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "streaming",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "2e1573cb-e8a8-4db2-8996-35d1ba7e48bf",
+          "resource": "https://tidal.com/artist/3640696"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://tidal.com/artist/46017543",
+          "id": "1d924c87-fbd1-4701-b668-66a4b4c29d3a"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "wikidata",
+        "attribute-values": {},
+        "ended": false,
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "b1fe26f1-53b9-458a-97cd-8551b3666faa",
+          "resource": "https://www.wikidata.org/wiki/Q42888223"
+        },
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward"
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "tags": [],
+    "isnis": [],
+    "type": "Person",
+    "name": "Klein",
+    "end-area": null,
+    "aliases": [],
+    "gender": "Female",
+    "disambiguation": "UK singer-songwriter and producer",
+    "begin-area": null,
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "country": "GB",
+    "sort-name": "Klein"
+  }
+}

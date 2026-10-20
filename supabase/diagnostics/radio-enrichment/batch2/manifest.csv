@@ -1,0 +1,41 @@
+status,artist,artist_id,musicbrainz_artist,discogs_ids,recording_witnesses,radio_appearances,reason
+ready,Lolina,fcc75b03-80c1-49cc-b675-eb6ac916d3b0,54492185-df45-494f-b133-f52da3fba781,4304488,3,38,
+ready,Nala Sinephro,cc49be7c-cd9b-4eaa-88a2-06f3f202c6c4,46a4b150-be30-44b3-a337-e06a72657d33,8270419,1,37,
+ready,Piero Umiliani,9dbaa8ab-bef4-4690-9d1e-0f2e64f5a483,806b793c-fb2c-401e-be44-f753c0ea2f15,8722,1,91,
+ready,Blawan,d1ba9a33-dee7-41f0-85a6-f8e87bf7c8c7,c27d4389-390e-497c-9a41-dd446ace742c,1622339,4,39,
+ready,Gene Harris,d3739140-435f-43da-8bd1-24e92aff6c70,1dbdc230-fe9c-4d71-b72e-88ba98800167,29966,2,52,
+ready,Manu Dibango,8941dae6-4879-46d8-bf42-721166f7880a,826b488f-5164-45ca-abc4-ab11b3c321eb,20560,1,40,
+ready,Ramsey Lewis,2c8e9ead-44b9-4482-b1a6-814480c33074,fe19b809-e86c-4736-882a-53b72e23171b,55738,2,103,
+ready,Paul Johnson,46812b32-b9b5-48a9-9905-f79cd8b4cf44,07065c90-1519-4bd9-8259-9872f3c9a776,866,5,34,
+ready,Monolake,3bc0ad49-5d5a-495f-8189-04425126743a,cedf92fe-eba1-45e2-ba16-b1b6af5169b8,534,1,32,
+ready,Les McCann,fd2407d9-32b9-4184-9476-c6f5f66a48ea,bc16d640-a069-42ec-a8c1-c24fd5c3d206,44126,2,93,
+ready,Spirit,464eeab3-e2ff-4dff-a7ec-6b499b6b88fe,ca5db97b-ba17-4e85-a876-46065e2052b3,270578,5,29,
+ready,Barbara Mason,a2d05287-c666-46ef-8a60-57c750e1596d,91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5,48720,3,38,
+ready,I:Cube,515ee18c-571b-403f-a371-d359c2c4c4a8,979d10bc-d1b9-41b1-8a87-7a7c68cbd885,1029,5,26,
+ready,Eddie Harris,16806488-f939-4cac-bc1f-56987318badf,f9ba6d40-60f3-4c85-ac23-0bf67c3247e4,41249,3,42,
+ready,Sepehr,d362f060-be2a-4e38-9f6e-0202df4b90b3,a3e77268-597b-4ce8-8837-78b673e20114,3563778,1,29,
+ready,Bill Withers,1d2e7ab4-f4e1-4cc2-81ba-5ab92941d37c,fd1a2d9d-9bb6-44de-83a3-41560658aba9,59249,4,26,
+ready,Martin Denny,a750aa2f-956a-4dd4-ac68-0746c7f2e09f,186edc09-db32-4d4f-ba71-eed418630c83,36860,3,30,
+ready,Letta Mbulu,c5582c58-475c-4778-9af7-5c061fe4a87e,9f7483cf-d8aa-45ce-b90c-da2e359a7815,97988,1,29,
+ready,Salem,f9250721-b691-4571-8ef5-4cdf3165bcd1,987fc4c9-2c99-4f6c-949b-8da8019769a8,1300441,4,28,
+ready,Squarepusher,3d117c1a-850d-4577-b432-abae11642042,4d86ad4e-28d8-4e9f-8cf4-735c57060fdc,269,5,25,
+ready,The S.O.S. Band,6ab1be02-3723-4082-89f3-fd82e9ec2a69,39515237-2d70-436a-800c-fcbac974bec4,98545,2,25,
+review,Klein,345cd5ec-5106-44b8-a5dc-eb2a34805909,760e95ff-c503-4567-8109-759b9594c182,4981772,1,92,production_destination_or_merge_conflict
+review,Mike,91f7756c-10c2-47f9-ad29-87b4790ae413,da943be1-5611-4bf9-ac4c-0eef1bc0c16b,5852757,3,47,production_destination_or_merge_conflict
+review,Sully,931dcba1-f5f3-4422-ade3-773dba26ae4f,88b9d123-ebda-477a-99bd-022378a6ffa1,"334840,955986",2,43,multiple_discogs_pages
+review,Moin,03f3634e-9ab3-438a-b5ef-e3253a88db13,363e12b1-7e51-4140-91b2-688dec8bee47,2835065,2,36,production_destination_or_merge_conflict
+review,Djrum,b9697fcc-7377-489f-b09a-7d9b2ac3f388,ed19b934-f1a8-4b04-aa74-6f9033caed26,1762528,1,36,discogs_billing_change
+review,Priori,df6a03e2-4348-4211-bef0-5ecbe86fc8c6,cc9f278d-d083-4370-b830-f2ee1f118489,5975825,1,34,production_destination_or_merge_conflict
+review,Gemini,040a175b-33bf-4b6b-b8b1-3affa96f32e6,385d09fa-1866-408c-8d15-9c7324494463,"1745,2145",1,33,multiple_discogs_pages
+review,K. Hand,13b47cf2-0f79-4b75-a10d-627ad13e96ae,0773e58b-1a46-4fe9-bcc1-c6f384daf4bc,1164,2,31,discogs_billing_change;substantive_billing_change
+review,Stone,554d0e11-e235-410d-83ee-d5f7ded9d2d9,ccf5389c-1cbe-4f86-8c92-cae8b87aaff8,630311,1,32,contradictory_title
+review,Tinashe,03af9ee7-dc11-49f4-8423-a32dfbacaa8e,396a9525-0994-4542-b480-c4587feeb476,3519986,1,31,production_destination_or_merge_conflict
+review,Art Of Noise,458c69c4-0904-4844-bd7a-5553c2ab9a0e,be899560-1570-402e-9f95-3182898a8b70,7142,5,31,discogs_billing_change
+review,Rosalía,57f69e78-3ecf-494c-ba68-bf5a2fdf4200,25f3abd9-63b5-471a-bd25-feb9672dfa11,5648334,3,41,production_destination_or_merge_conflict
+review,Sophie,49965312-72d0-4998-b59c-02e965bc8e58,774b02d7-5056-4b0f-9d69-a82b6ae27cde,3150192,2,30,production_destination_or_merge_conflict
+review,Earth,ff1fc8fe-068d-4719-9d8d-759e25ff44ec,,,4,30,contradictory_or_missing_artist_credit;credit_mismatch_or_alias_requires_review
+review,Pangaea,2633809e-444a-4904-922c-5b3070f9b3b6,d73f7df8-8cf6-49c1-828c-f5d80835917c,"943302,1739856",1,26,multiple_discogs_pages
+review,David Axelrod,f70b986e-d577-40f8-9bfb-7a0dec0cbf57,d5c756c1-4872-457b-8f00-d620547cbb85,5451,5,42,credit_mismatch_or_alias_requires_review
+review,Solange,bdf63011-bfc1-4802-862b-83d007c9495b,410e7fd3-b865-4fa0-bb18-1b7fd53382ca,"160408,587458",3,25,multiple_discogs_pages
+review,War,fd864fe7-14c2-41ed-962e-b89befdf0405,3e6bbdb8-66c8-439c-a3d9-87391ce88740,"9707,1287974",5,27,multiple_discogs_pages
+review,Budgie,5d85dcc0-1177-47bc-98a2-cba93859b773,19583b63-ae19-49fe-9868-a4bd9569ad9c,317252,2,26,contradictory_title

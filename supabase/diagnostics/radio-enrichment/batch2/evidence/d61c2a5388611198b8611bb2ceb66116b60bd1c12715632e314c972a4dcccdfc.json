@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Are+you+dreaming%22+AND+artist%3A%22K.+Hand%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:57.987602+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:57.915Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

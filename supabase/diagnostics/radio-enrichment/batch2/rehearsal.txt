@@ -1,0 +1,8 @@
+PASS: exact apply count, actual 0083 portrait trigger, duplicate apply refused atomically
+PASS: exact rollback removes this batch; repeated rollback is harmless
+PASS: existing conflicting identity rejects whole batch without partial writes
+PASS: destination held elsewhere rejects whole batch without partial writes
+PASS: publisher witness changed rejects whole batch without partial writes
+PASS: artist disappeared rejects whole batch without partial writes
+PASS: artist billing changed rejects whole batch without partial writes
+PASS: rollback preserves an independently inserted identical identity with another primary key

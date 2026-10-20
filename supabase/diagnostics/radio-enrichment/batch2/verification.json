@@ -1,0 +1,3857 @@
+{
+  "writes_production": false,
+  "results": [
+    {
+      "episodes": 67,
+      "id": "345cd5ec-5106-44b8-a5dc-eb2a34805909",
+      "lines": 92,
+      "name": "Klein",
+      "normalized_name": "klein",
+      "recordings": [
+        "5082b971-b828-433a-b298-d6e4a504bde0"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "5082b971-b828-433a-b298-d6e4a504bde0",
+          "status": 200,
+          "exact_credit_ids": [
+            "760e95ff-c503-4567-8109-759b9594c182"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "name": "Klein",
+                "type": "Person",
+                "disambiguation": "UK singer-songwriter and producer",
+                "id": "760e95ff-c503-4567-8109-759b9594c182",
+                "country": "GB",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Klein"
+              },
+              "name": "Klein",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "760e95ff-c503-4567-8109-759b9594c182",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Klein",
+      "discogs_ids": [
+        4981772
+      ],
+      "discogs_claimants": [
+        "760e95ff-c503-4567-8109-759b9594c182"
+      ],
+      "discogs_name": "Klein (11)",
+      "title_checks": [
+        {
+          "title": "200 Bill Feat. Khush & Matana Roberts",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "4 All We Know Ft Jessie Woo (Dj_xfactor Rehearsal Edit)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 42,
+      "id": "91f7756c-10c2-47f9-ad29-87b4790ae413",
+      "lines": 47,
+      "name": "Mike",
+      "normalized_name": "mike",
+      "recordings": [
+        "0a940418-cc92-40d2-84f5-78a28c502875",
+        "25fd585e-3fe1-4f3d-a5b2-931d8828e008",
+        "4321e4f7-72c3-42b2-8a0e-ae364cd27ef4"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "0a940418-cc92-40d2-84f5-78a28c502875",
+          "status": 200,
+          "exact_credit_ids": [
+            "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+          ],
+          "credit": [
+            {
+              "joinphrase": ", ",
+              "artist": {
+                "type": "Person",
+                "country": "US",
+                "disambiguation": "New York rapper, founder of 10k",
+                "name": "MIKE",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "MIKE",
+                "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+              },
+              "name": "MIKE"
+            },
+            {
+              "joinphrase": " & ",
+              "artist": {
+                "sort-name": "Wiki",
+                "name": "Wiki",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "383b0514-362e-4aeb-9950-04a75fc0210c",
+                "type": "Person",
+                "disambiguation": "rapper",
+                "country": "US"
+              },
+              "name": "Wiki"
+            },
+            {
+              "joinphrase": "",
+              "name": "The Alchemist",
+              "artist": {
+                "id": "03f3deb7-0419-4bf9-a1e7-511946385717",
+                "name": "The Alchemist",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Alchemist, The",
+                "country": "US",
+                "disambiguation": "hip hop DJ & producer",
+                "type": "Person"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "25fd585e-3fe1-4f3d-a5b2-931d8828e008",
+          "status": 200,
+          "exact_credit_ids": [
+            "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "sort-name": "MIKE",
+                "disambiguation": "New York rapper, founder of 10k",
+                "country": "US",
+                "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "MIKE",
+                "type": "Person"
+              },
+              "joinphrase": "",
+              "name": "MIKE"
+            }
+          ]
+        },
+        {
+          "recording": "4321e4f7-72c3-42b2-8a0e-ae364cd27ef4",
+          "status": 200,
+          "exact_credit_ids": [
+            "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+          ],
+          "credit": [
+            {
+              "name": "MIKE",
+              "joinphrase": "",
+              "artist": {
+                "name": "MIKE",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b",
+                "sort-name": "MIKE",
+                "disambiguation": "New York rapper, founder of 10k",
+                "country": "US"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "MIKE",
+      "discogs_ids": [
+        5852757
+      ],
+      "discogs_claimants": [
+        "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+      ],
+      "discogs_name": "Mike (408)",
+      "title_checks": [
+        {
+          "title": "AOK",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "At Thirst Sight By Assia",
+          "status": 200,
+          "artist_ids": [
+            "da943be1-5611-4bf9-ac4c-0eef1bc0c16b"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 36,
+      "id": "931dcba1-f5f3-4422-ade3-773dba26ae4f",
+      "lines": 43,
+      "name": "Sully",
+      "normalized_name": "sully",
+      "recordings": [
+        "2fa255e6-8a98-451a-b4c2-bd2493fdd1fc",
+        "84ef5052-2872-425b-8082-b843be6a5ed6"
+      ],
+      "status": "review",
+      "reasons": [
+        "multiple_discogs_pages"
+      ],
+      "witnesses": [
+        {
+          "recording": "2fa255e6-8a98-451a-b4c2-bd2493fdd1fc",
+          "status": 200,
+          "exact_credit_ids": [
+            "88b9d123-ebda-477a-99bd-022378a6ffa1"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "Sully",
+                "id": "88b9d123-ebda-477a-99bd-022378a6ffa1",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "name": "Sully",
+                "country": "GB",
+                "disambiguation": "UK jungle and dubstep producer"
+              },
+              "name": "Sully"
+            }
+          ]
+        },
+        {
+          "recording": "84ef5052-2872-425b-8082-b843be6a5ed6",
+          "status": 200,
+          "exact_credit_ids": [
+            "88b9d123-ebda-477a-99bd-022378a6ffa1"
+          ],
+          "credit": [
+            {
+              "name": "Sully",
+              "joinphrase": "",
+              "artist": {
+                "type": "Person",
+                "name": "Sully",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "GB",
+                "sort-name": "Sully",
+                "disambiguation": "UK jungle and dubstep producer",
+                "id": "88b9d123-ebda-477a-99bd-022378a6ffa1"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "88b9d123-ebda-477a-99bd-022378a6ffa1",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Sully",
+      "discogs_ids": [
+        334840,
+        955986
+      ]
+    },
+    {
+      "episodes": 36,
+      "id": "fcc75b03-80c1-49cc-b675-eb6ac916d3b0",
+      "lines": 38,
+      "name": "Lolina",
+      "normalized_name": "lolina",
+      "recordings": [
+        "6dc6a180-4ac4-45bc-a21b-d3dab0236a54",
+        "dca88466-d07b-4cce-b196-c966d25c6719",
+        "dde0b79d-28ef-4d6c-910f-c8331d36d78a"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "6dc6a180-4ac4-45bc-a21b-d3dab0236a54",
+          "status": 200,
+          "exact_credit_ids": [
+            "54492185-df45-494f-b133-f52da3fba781"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "sort-name": "Lolina",
+                "id": "54492185-df45-494f-b133-f52da3fba781",
+                "type": "Person",
+                "name": "Lolina",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "GB",
+                "disambiguation": "Inga Copeland / Alina Astrova"
+              },
+              "joinphrase": "",
+              "name": "Lolina"
+            }
+          ]
+        },
+        {
+          "recording": "dca88466-d07b-4cce-b196-c966d25c6719",
+          "status": 200,
+          "exact_credit_ids": [
+            "54492185-df45-494f-b133-f52da3fba781"
+          ],
+          "credit": [
+            {
+              "name": "Lolina",
+              "joinphrase": "",
+              "artist": {
+                "type": "Person",
+                "name": "Lolina",
+                "country": "GB",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Lolina",
+                "id": "54492185-df45-494f-b133-f52da3fba781",
+                "disambiguation": "Inga Copeland / Alina Astrova"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "dde0b79d-28ef-4d6c-910f-c8331d36d78a",
+          "status": 200,
+          "exact_credit_ids": [
+            "54492185-df45-494f-b133-f52da3fba781"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "GB",
+                "id": "54492185-df45-494f-b133-f52da3fba781",
+                "name": "Lolina",
+                "disambiguation": "Inga Copeland / Alina Astrova",
+                "type": "Person",
+                "sort-name": "Lolina",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              },
+              "name": "Lolina",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "54492185-df45-494f-b133-f52da3fba781",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Lolina",
+      "discogs_ids": [
+        4304488
+      ],
+      "discogs_claimants": [
+        "54492185-df45-494f-b133-f52da3fba781"
+      ],
+      "discogs_name": "Lolina (2)",
+      "title_checks": [
+        {
+          "title": "Betrayal",
+          "status": 200,
+          "artist_ids": [
+            "54492185-df45-494f-b133-f52da3fba781"
+          ]
+        },
+        {
+          "title": "Border Beach",
+          "status": 200,
+          "artist_ids": [
+            "54492185-df45-494f-b133-f52da3fba781"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 35,
+      "id": "cc49be7c-cd9b-4eaa-88a2-06f3f202c6c4",
+      "lines": 37,
+      "name": "Nala Sinephro",
+      "normalized_name": "nala sinephro",
+      "recordings": [
+        "8184610f-f5bc-4817-b080-e9e8a65db41d"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "8184610f-f5bc-4817-b080-e9e8a65db41d",
+          "status": 200,
+          "exact_credit_ids": [
+            "46a4b150-be30-44b3-a337-e06a72657d33"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "name": "Nala Sinephro",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "BE",
+                "sort-name": "Sinephro, Nala",
+                "type": "Person",
+                "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+                "disambiguation": "Caribbean-Belgian jazz artist"
+              },
+              "name": "Nala Sinephro",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "46a4b150-be30-44b3-a337-e06a72657d33",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Nala Sinephro",
+      "discogs_ids": [
+        8270419
+      ],
+      "discogs_claimants": [
+        "46a4b150-be30-44b3-a337-e06a72657d33"
+      ],
+      "discogs_name": "Nala Sinephro",
+      "title_checks": [
+        {
+          "title": "Continuum 1",
+          "status": 200,
+          "artist_ids": [
+            "46a4b150-be30-44b3-a337-e06a72657d33"
+          ]
+        },
+        {
+          "title": "Continuum 10",
+          "status": 200,
+          "artist_ids": [
+            "46a4b150-be30-44b3-a337-e06a72657d33"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 35,
+      "id": "03f3634e-9ab3-438a-b5ef-e3253a88db13",
+      "lines": 36,
+      "name": "Moin",
+      "normalized_name": "moin",
+      "recordings": [
+        "492ce2ac-b6dc-413f-b8f7-133708255195",
+        "eaf19621-8f3f-42c5-9879-b8235641bbb6"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "492ce2ac-b6dc-413f-b8f7-133708255195",
+          "status": 200,
+          "exact_credit_ids": [
+            "363e12b1-7e51-4140-91b2-688dec8bee47"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "GB",
+                "name": "Moin",
+                "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+                "disambiguation": "noise rock alias of Raime",
+                "sort-name": "Moin",
+                "type": "Group",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              },
+              "joinphrase": "",
+              "name": "Moin"
+            }
+          ]
+        },
+        {
+          "recording": "eaf19621-8f3f-42c5-9879-b8235641bbb6",
+          "status": 200,
+          "exact_credit_ids": [
+            "363e12b1-7e51-4140-91b2-688dec8bee47"
+          ],
+          "credit": [
+            {
+              "name": "Moin",
+              "joinphrase": "",
+              "artist": {
+                "country": "GB",
+                "id": "363e12b1-7e51-4140-91b2-688dec8bee47",
+                "name": "Moin",
+                "disambiguation": "noise rock alias of Raime",
+                "type": "Group",
+                "sort-name": "Moin",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "363e12b1-7e51-4140-91b2-688dec8bee47",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Moin",
+      "discogs_ids": [
+        2835065
+      ],
+      "discogs_claimants": [
+        "363e12b1-7e51-4140-91b2-688dec8bee47"
+      ],
+      "discogs_name": "Moin (2)",
+      "title_checks": [
+        {
+          "title": "BELLY UP",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "C'mon Dive",
+          "status": 200,
+          "artist_ids": [
+            "363e12b1-7e51-4140-91b2-688dec8bee47"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 34,
+      "id": "9dbaa8ab-bef4-4690-9d1e-0f2e64f5a483",
+      "lines": 91,
+      "name": "Piero Umiliani",
+      "normalized_name": "piero umiliani",
+      "recordings": [
+        "995e3fd3-4907-4894-a367-5632a4438654"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "995e3fd3-4907-4894-a367-5632a4438654",
+          "status": 200,
+          "exact_credit_ids": [
+            "806b793c-fb2c-401e-be44-f753c0ea2f15"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Piero Umiliani",
+              "artist": {
+                "sort-name": "Umiliani, Piero",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Piero Umiliani",
+                "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                "type": "Person",
+                "disambiguation": "",
+                "country": "IT"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Piero Umiliani",
+      "discogs_ids": [
+        8722
+      ],
+      "discogs_claimants": [
+        "806b793c-fb2c-401e-be44-f753c0ea2f15"
+      ],
+      "discogs_name": "Piero Umiliani",
+      "title_checks": [
+        {
+          "title": "Cantata Per Maryam",
+          "status": 200,
+          "artist_ids": [
+            "806b793c-fb2c-401e-be44-f753c0ea2f15"
+          ]
+        },
+        {
+          "title": "Centrali Termiche 1",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 34,
+      "id": "d1ba9a33-dee7-41f0-85a6-f8e87bf7c8c7",
+      "lines": 39,
+      "name": "Blawan",
+      "normalized_name": "blawan",
+      "recordings": [
+        "294c1c6f-f27c-42ee-aa88-ed19f282e267",
+        "32d538f2-1778-49ed-930c-9db235905b17",
+        "94652b68-0467-45b1-8df5-315fee0ffb76",
+        "f66c2b7f-ea08-44a4-8a95-54e6c7298d27"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "294c1c6f-f27c-42ee-aa88-ed19f282e267",
+          "status": 200,
+          "exact_credit_ids": [
+            "c27d4389-390e-497c-9a41-dd446ace742c"
+          ],
+          "credit": [
+            {
+              "name": "Blawan",
+              "artist": {
+                "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+                "sort-name": "Blawan",
+                "name": "Blawan",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "disambiguation": "British techno producer & DJ",
+                "country": "GB",
+                "type": "Person"
+              },
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "32d538f2-1778-49ed-930c-9db235905b17",
+          "status": 200,
+          "exact_credit_ids": [
+            "c27d4389-390e-497c-9a41-dd446ace742c"
+          ],
+          "credit": [
+            {
+              "name": "Blawan",
+              "joinphrase": "",
+              "artist": {
+                "disambiguation": "British techno producer & DJ",
+                "name": "Blawan",
+                "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+                "country": "GB",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Blawan",
+                "type": "Person"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "94652b68-0467-45b1-8df5-315fee0ffb76",
+          "status": 200,
+          "exact_credit_ids": [
+            "c27d4389-390e-497c-9a41-dd446ace742c"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "GB",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Blawan",
+                "disambiguation": "British techno producer & DJ",
+                "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+                "type": "Person",
+                "name": "Blawan"
+              },
+              "name": "Blawan",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "f66c2b7f-ea08-44a4-8a95-54e6c7298d27",
+          "status": 200,
+          "exact_credit_ids": [
+            "c27d4389-390e-497c-9a41-dd446ace742c"
+          ],
+          "credit": [
+            {
+              "name": "Blawan",
+              "artist": {
+                "country": "GB",
+                "disambiguation": "British techno producer & DJ",
+                "sort-name": "Blawan",
+                "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+                "name": "Blawan",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              },
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "c27d4389-390e-497c-9a41-dd446ace742c",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Blawan",
+      "discogs_ids": [
+        1622339
+      ],
+      "discogs_claimants": [
+        "c27d4389-390e-497c-9a41-dd446ace742c"
+      ],
+      "discogs_name": "Blawan",
+      "title_checks": [
+        {
+          "title": "And Both His Sons",
+          "status": 200,
+          "artist_ids": [
+            "c27d4389-390e-497c-9a41-dd446ace742c"
+          ]
+        },
+        {
+          "title": "Blika",
+          "status": 200,
+          "artist_ids": [
+            "c27d4389-390e-497c-9a41-dd446ace742c"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 34,
+      "id": "b9697fcc-7377-489f-b09a-7d9b2ac3f388",
+      "lines": 36,
+      "name": "Djrum",
+      "normalized_name": "djrum",
+      "recordings": [
+        "f7ef58bc-15c2-4f64-8c47-0215ab728672"
+      ],
+      "status": "review",
+      "reasons": [
+        "discogs_billing_change"
+      ],
+      "witnesses": [
+        {
+          "recording": "f7ef58bc-15c2-4f64-8c47-0215ab728672",
+          "status": 200,
+          "exact_credit_ids": [
+            "ed19b934-f1a8-4b04-aa74-6f9033caed26"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Djrum",
+                "type": "Person",
+                "sort-name": "Djrum",
+                "country": "GB",
+                "disambiguation": ""
+              },
+              "name": "Djrum",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Djrum",
+      "discogs_ids": [
+        1762528
+      ],
+      "discogs_claimants": [
+        "ed19b934-f1a8-4b04-aa74-6f9033caed26"
+      ],
+      "discogs_name": "DJ Rum",
+      "title_checks": [
+        {
+          "title": "A Tune For Us",
+          "status": 200,
+          "artist_ids": [
+            "ed19b934-f1a8-4b04-aa74-6f9033caed26"
+          ]
+        },
+        {
+          "title": "Blood in My Mouth",
+          "status": 200,
+          "artist_ids": [
+            "ed19b934-f1a8-4b04-aa74-6f9033caed26"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 33,
+      "id": "d3739140-435f-43da-8bd1-24e92aff6c70",
+      "lines": 52,
+      "name": "Gene Harris",
+      "normalized_name": "gene harris",
+      "recordings": [
+        "62649d95-8883-422c-b64d-5341a7f84714",
+        "66ae17e6-659f-44c1-ac31-80df97c8663d"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "62649d95-8883-422c-b64d-5341a7f84714",
+          "status": 200,
+          "exact_credit_ids": [
+            "1dbdc230-fe9c-4d71-b72e-88ba98800167"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "sort-name": "Harris, Gene",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US",
+                "name": "Gene Harris",
+                "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+                "disambiguation": ""
+              },
+              "joinphrase": "",
+              "name": "Gene Harris"
+            }
+          ]
+        },
+        {
+          "recording": "66ae17e6-659f-44c1-ac31-80df97c8663d",
+          "status": 200,
+          "exact_credit_ids": [
+            "1dbdc230-fe9c-4d71-b72e-88ba98800167"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Gene Harris",
+              "artist": {
+                "type": "Person",
+                "name": "Gene Harris",
+                "sort-name": "Harris, Gene",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+                "disambiguation": ""
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Gene Harris",
+      "discogs_ids": [
+        29966
+      ],
+      "discogs_claimants": [
+        "1dbdc230-fe9c-4d71-b72e-88ba98800167"
+      ],
+      "discogs_name": "Gene Harris",
+      "title_checks": [
+        {
+          "title": "A Day In The Life Of A Fool",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "A Day In The Life Of A Fool (Manha De Carnaval) (Jazz)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 32,
+      "id": "8941dae6-4879-46d8-bf42-721166f7880a",
+      "lines": 40,
+      "name": "Manu Dibango",
+      "normalized_name": "manu dibango",
+      "recordings": [
+        "f2a60753-deed-473b-9083-fe67149c29cc"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "f2a60753-deed-473b-9083-fe67149c29cc",
+          "status": 200,
+          "exact_credit_ids": [
+            "826b488f-5164-45ca-abc4-ab11b3c321eb"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                "name": "Manu Dibango",
+                "disambiguation": "",
+                "country": "CM",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "sort-name": "Dibango, Manu"
+              },
+              "name": "Manu Dibango",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Manu Dibango",
+      "discogs_ids": [
+        20560
+      ],
+      "discogs_claimants": [
+        "826b488f-5164-45ca-abc4-ab11b3c321eb"
+      ],
+      "discogs_name": "Manu Dibango",
+      "title_checks": [
+        {
+          "title": "Abele Dance",
+          "status": 200,
+          "artist_ids": [
+            "826b488f-5164-45ca-abc4-ab11b3c321eb"
+          ]
+        },
+        {
+          "title": "African Battle",
+          "status": 200,
+          "artist_ids": [
+            "826b488f-5164-45ca-abc4-ab11b3c321eb"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 32,
+      "id": "df6a03e2-4348-4211-bef0-5ecbe86fc8c6",
+      "lines": 34,
+      "name": "Priori",
+      "normalized_name": "priori",
+      "recordings": [
+        "392cefbd-40cf-4fd7-b5c3-a1e1273c780e"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "392cefbd-40cf-4fd7-b5c3-a1e1273c780e",
+          "status": 200,
+          "exact_credit_ids": [
+            "cc9f278d-d083-4370-b830-f2ee1f118489"
+          ],
+          "credit": [
+            {
+              "name": "Priori",
+              "joinphrase": "",
+              "artist": {
+                "type": "Person",
+                "name": "Priori",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "CA",
+                "sort-name": "Priori",
+                "disambiguation": "Canadian DJ & producer Francis Latreille",
+                "id": "cc9f278d-d083-4370-b830-f2ee1f118489"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "cc9f278d-d083-4370-b830-f2ee1f118489",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Priori",
+      "discogs_ids": [
+        5975825
+      ],
+      "discogs_claimants": [
+        "cc9f278d-d083-4370-b830-f2ee1f118489"
+      ],
+      "discogs_name": "Priori (2)",
+      "title_checks": [
+        {
+          "title": "9",
+          "status": 200,
+          "artist_ids": [
+            "cc9f278d-d083-4370-b830-f2ee1f118489"
+          ]
+        },
+        {
+          "title": "9 (Original Mix)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 31,
+      "id": "2c8e9ead-44b9-4482-b1a6-814480c33074",
+      "lines": 103,
+      "name": "Ramsey Lewis",
+      "normalized_name": "ramsey lewis",
+      "recordings": [
+        "3fc14411-26a3-479d-807d-060b6b448739",
+        "af946d92-02b8-4923-9d87-7796d10b0f3c"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "3fc14411-26a3-479d-807d-060b6b448739",
+          "status": 200,
+          "exact_credit_ids": [
+            "fe19b809-e86c-4736-882a-53b72e23171b"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "US",
+                "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+                "name": "Ramsey Lewis",
+                "disambiguation": "",
+                "type": "Person",
+                "sort-name": "Lewis, Ramsey",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              },
+              "joinphrase": "",
+              "name": "Ramsey Lewis"
+            }
+          ]
+        },
+        {
+          "recording": "af946d92-02b8-4923-9d87-7796d10b0f3c",
+          "status": 200,
+          "exact_credit_ids": [
+            "fe19b809-e86c-4736-882a-53b72e23171b"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Ramsey Lewis",
+                "type": "Person",
+                "sort-name": "Lewis, Ramsey",
+                "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+                "disambiguation": "",
+                "country": "US"
+              },
+              "joinphrase": "",
+              "name": "Ramsey Lewis"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "fe19b809-e86c-4736-882a-53b72e23171b",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Ramsey Lewis",
+      "discogs_ids": [
+        55738
+      ],
+      "discogs_claimants": [
+        "fe19b809-e86c-4736-882a-53b72e23171b"
+      ],
+      "discogs_name": "Ramsey Lewis",
+      "title_checks": [
+        {
+          "title": "\"Live\" In Tokyo",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "A Felicidade (Happiness)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 31,
+      "id": "46812b32-b9b5-48a9-9905-f79cd8b4cf44",
+      "lines": 34,
+      "name": "Paul Johnson",
+      "normalized_name": "paul johnson",
+      "recordings": [
+        "33417705-b15c-425f-9e0d-9b22f38ebe64",
+        "514a7a99-aca2-4a86-8ee1-f094e5ef3e08",
+        "9ce9bbf9-5586-4eb4-89d3-14bd0e167c5c",
+        "ae001107-c8b5-4cbe-832b-8467ec65c7af",
+        "d1c5ca62-b8f9-4db1-ae6f-1b3597bccd6f"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "33417705-b15c-425f-9e0d-9b22f38ebe64",
+          "status": 200,
+          "exact_credit_ids": [
+            "07065c90-1519-4bd9-8259-9872f3c9a776"
+          ],
+          "credit": [
+            {
+              "name": "Paul Johnson",
+              "joinphrase": "",
+              "artist": {
+                "name": "Paul Johnson",
+                "type": "Person",
+                "sort-name": "Johnson, Paul",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+                "disambiguation": "Chicago house music DJ/producer"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "514a7a99-aca2-4a86-8ee1-f094e5ef3e08",
+          "status": 200,
+          "exact_credit_ids": [
+            "07065c90-1519-4bd9-8259-9872f3c9a776"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "disambiguation": "Chicago house music DJ/producer",
+                "country": "US",
+                "type": "Person",
+                "name": "Paul Johnson",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+                "sort-name": "Johnson, Paul"
+              },
+              "name": "Paul Johnson"
+            }
+          ]
+        },
+        {
+          "recording": "9ce9bbf9-5586-4eb4-89d3-14bd0e167c5c",
+          "status": 200,
+          "exact_credit_ids": [
+            "07065c90-1519-4bd9-8259-9872f3c9a776"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+                "disambiguation": "Chicago house music DJ/producer",
+                "type": "Person",
+                "name": "Paul Johnson",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US",
+                "sort-name": "Johnson, Paul"
+              },
+              "name": "Paul Johnson",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "ae001107-c8b5-4cbe-832b-8467ec65c7af",
+          "status": 200,
+          "exact_credit_ids": [
+            "07065c90-1519-4bd9-8259-9872f3c9a776"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Paul Johnson",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Johnson, Paul",
+                "type": "Person",
+                "name": "Paul Johnson",
+                "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+                "disambiguation": "Chicago house music DJ/producer",
+                "country": "US"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "d1c5ca62-b8f9-4db1-ae6f-1b3597bccd6f",
+          "status": 200,
+          "exact_credit_ids": [
+            "07065c90-1519-4bd9-8259-9872f3c9a776"
+          ],
+          "credit": [
+            {
+              "name": "Paul Johnson",
+              "joinphrase": "",
+              "artist": {
+                "disambiguation": "Chicago house music DJ/producer",
+                "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Johnson, Paul",
+                "type": "Person",
+                "name": "Paul Johnson"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "07065c90-1519-4bd9-8259-9872f3c9a776",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Paul Johnson",
+      "discogs_ids": [
+        866
+      ],
+      "discogs_claimants": [
+        "07065c90-1519-4bd9-8259-9872f3c9a776"
+      ],
+      "discogs_name": "Paul Johnson",
+      "title_checks": [
+        {
+          "title": "3rd Dimension (Armandi Remix)",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "A Little Suntin Suntin (Mogier Edit)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 30,
+      "id": "040a175b-33bf-4b6b-b8b1-3affa96f32e6",
+      "lines": 33,
+      "name": "Gemini",
+      "normalized_name": "gemini",
+      "recordings": [
+        "005a6a39-749e-4254-abd7-e50e4f106c9c"
+      ],
+      "status": "review",
+      "reasons": [
+        "multiple_discogs_pages"
+      ],
+      "witnesses": [
+        {
+          "recording": "005a6a39-749e-4254-abd7-e50e4f106c9c",
+          "status": 200,
+          "exact_credit_ids": [
+            "385d09fa-1866-408c-8d15-9c7324494463"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Gemini",
+                "type": "Person",
+                "name": "Gemini",
+                "id": "385d09fa-1866-408c-8d15-9c7324494463",
+                "disambiguation": "Spencer Kincy, Chicago house producer",
+                "country": "US"
+              },
+              "joinphrase": "",
+              "name": "Gemini"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "385d09fa-1866-408c-8d15-9c7324494463",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Gemini",
+      "discogs_ids": [
+        1745,
+        2145
+      ]
+    },
+    {
+      "episodes": 30,
+      "id": "3bc0ad49-5d5a-495f-8189-04425126743a",
+      "lines": 32,
+      "name": "Monolake",
+      "normalized_name": "monolake",
+      "recordings": [
+        "daef2103-26ab-4d34-a40f-1f700f0057a7"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "daef2103-26ab-4d34-a40f-1f700f0057a7",
+          "status": 200,
+          "exact_credit_ids": [
+            "cedf92fe-eba1-45e2-ba16-b1b6af5169b8"
+          ],
+          "credit": [
+            {
+              "name": "Monolake",
+              "joinphrase": "",
+              "artist": {
+                "name": "Monolake",
+                "type": "Group",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "DE",
+                "sort-name": "Monolake",
+                "id": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+                "disambiguation": ""
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Monolake",
+      "discogs_ids": [
+        534
+      ],
+      "discogs_claimants": [
+        "cedf92fe-eba1-45e2-ba16-b1b6af5169b8"
+      ],
+      "discogs_name": "Monolake",
+      "title_checks": [
+        {
+          "title": "Amazon",
+          "status": 200,
+          "artist_ids": [
+            "cedf92fe-eba1-45e2-ba16-b1b6af5169b8"
+          ]
+        },
+        {
+          "title": "Atlas (Imbalance Computer Music)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 30,
+      "id": "13b47cf2-0f79-4b75-a10d-627ad13e96ae",
+      "lines": 31,
+      "name": "K. Hand",
+      "normalized_name": "k hand",
+      "recordings": [
+        "045cf620-0fd2-4da3-aa11-96abc33f785e",
+        "3da239a6-3ac7-40a0-8fdd-122d6cd25376"
+      ],
+      "status": "review",
+      "reasons": [
+        "discogs_billing_change",
+        "substantive_billing_change"
+      ],
+      "witnesses": [
+        {
+          "recording": "045cf620-0fd2-4da3-aa11-96abc33f785e",
+          "status": 200,
+          "exact_credit_ids": [
+            "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc"
+          ],
+          "credit": [
+            {
+              "name": "K. Hand",
+              "joinphrase": "",
+              "artist": {
+                "type": "Person",
+                "sort-name": "Hand, Kelli",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Kelli Hand",
+                "disambiguation": "",
+                "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "3da239a6-3ac7-40a0-8fdd-122d6cd25376",
+          "status": 200,
+          "exact_credit_ids": [
+            "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "K. Hand",
+              "artist": {
+                "type": "Person",
+                "country": "US",
+                "disambiguation": "",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Kelli Hand",
+                "sort-name": "Hand, Kelli",
+                "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Kelli Hand",
+      "discogs_ids": [
+        1164
+      ],
+      "discogs_claimants": [
+        "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc"
+      ],
+      "discogs_name": "Kelli Hand",
+      "title_checks": [
+        {
+          "title": "Are You Dreaming?",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Are you dreaming",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 29,
+      "id": "fd2407d9-32b9-4184-9476-c6f5f66a48ea",
+      "lines": 93,
+      "name": "Les McCann",
+      "normalized_name": "les mccann",
+      "recordings": [
+        "034eb957-fe7b-4f2a-a1c5-aa1a68e0fc57",
+        "1d2fd789-abab-4dba-b370-632463cf6fb8"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "034eb957-fe7b-4f2a-a1c5-aa1a68e0fc57",
+          "status": 200,
+          "exact_credit_ids": [
+            "bc16d640-a069-42ec-a8c1-c24fd5c3d206"
+          ],
+          "credit": [
+            {
+              "name": "Les McCann",
+              "joinphrase": "",
+              "artist": {
+                "country": "US",
+                "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+                "name": "Les McCann",
+                "disambiguation": "",
+                "type": "Person",
+                "sort-name": "McCann, Les",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "1d2fd789-abab-4dba-b370-632463cf6fb8",
+          "status": 200,
+          "exact_credit_ids": [
+            "bc16d640-a069-42ec-a8c1-c24fd5c3d206"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Les McCann",
+              "artist": {
+                "country": "US",
+                "disambiguation": "",
+                "name": "Les McCann",
+                "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+                "sort-name": "McCann, Les",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Les McCann",
+      "discogs_ids": [
+        44126
+      ],
+      "discogs_claimants": [
+        "bc16d640-a069-42ec-a8c1-c24fd5c3d206"
+      ],
+      "discogs_name": "Les McCann",
+      "title_checks": [
+        {
+          "title": "A Bag Of Gold",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Baby, Baby",
+          "status": 200,
+          "artist_ids": [
+            "bc16d640-a069-42ec-a8c1-c24fd5c3d206"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 29,
+      "id": "554d0e11-e235-410d-83ee-d5f7ded9d2d9",
+      "lines": 32,
+      "name": "Stone",
+      "normalized_name": "stone",
+      "recordings": [
+        "0c8e9b5e-b73b-4f5b-8268-24a0c4601331"
+      ],
+      "status": "review",
+      "reasons": [
+        "contradictory_title"
+      ],
+      "witnesses": [
+        {
+          "recording": "0c8e9b5e-b73b-4f5b-8268-24a0c4601331",
+          "status": 200,
+          "exact_credit_ids": [
+            "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Stone",
+              "artist": {
+                "name": "Stone",
+                "type": "Person",
+                "id": "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8",
+                "disambiguation": "1960s~2010s French variété singer Annie Gautrat / Stone & Charden",
+                "sort-name": "Stone",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "FR"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Stone",
+      "discogs_ids": [
+        630311
+      ],
+      "discogs_claimants": [
+        "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8"
+      ],
+      "discogs_name": "Stone (14)",
+      "title_checks": [
+        {
+          "title": "Achey",
+          "status": 200,
+          "artist_ids": [
+            "e74c9522-9499-4a9c-8c5b-4aa2f67a2fdf"
+          ]
+        },
+        {
+          "title": "Blurry Apple",
+          "status": 200,
+          "artist_ids": [
+            "e74c9522-9499-4a9c-8c5b-4aa2f67a2fdf"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 27,
+      "id": "03af9ee7-dc11-49f4-8423-a32dfbacaa8e",
+      "lines": 31,
+      "name": "Tinashe",
+      "normalized_name": "tinashe",
+      "recordings": [
+        "ba14279b-8e9a-4981-bf9a-6a0f1296d502"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "ba14279b-8e9a-4981-bf9a-6a0f1296d502",
+          "status": 200,
+          "exact_credit_ids": [
+            "396a9525-0994-4542-b480-c4587feeb476"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "American R&B singer",
+                "id": "396a9525-0994-4542-b480-c4587feeb476",
+                "name": "Tinashe",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "sort-name": "Tinashe"
+              },
+              "joinphrase": "",
+              "name": "Tinashe"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "396a9525-0994-4542-b480-c4587feeb476",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Tinashe",
+      "discogs_ids": [
+        3519986
+      ],
+      "discogs_claimants": [
+        "396a9525-0994-4542-b480-c4587feeb476"
+      ],
+      "discogs_name": "Tinashe (2)",
+      "title_checks": [
+        {
+          "title": "2 On",
+          "status": 200,
+          "artist_ids": [
+            "396a9525-0994-4542-b480-c4587feeb476"
+          ]
+        },
+        {
+          "title": "2 on Miami Bass (KIRA x SSP EDIT)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 27,
+      "id": "458c69c4-0904-4844-bd7a-5553c2ab9a0e",
+      "lines": 31,
+      "name": "Art Of Noise",
+      "normalized_name": "art of noise",
+      "recordings": [
+        "0cd2543f-ea28-47c0-bf47-176152a0c24b",
+        "1a373a43-f0d2-4c7f-a3f1-5a098d30d994",
+        "81c25acd-9542-4181-ad10-3894688c2c8c",
+        "81f877e8-910a-479d-ae17-43d9cbf7d693",
+        "f131f09c-6e8f-4baf-bbf8-2870c1686500"
+      ],
+      "status": "review",
+      "reasons": [
+        "discogs_billing_change"
+      ],
+      "witnesses": [
+        {
+          "recording": "0cd2543f-ea28-47c0-bf47-176152a0c24b",
+          "status": 200,
+          "exact_credit_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Art of Noise",
+              "artist": {
+                "type": "Group",
+                "name": "Art of Noise",
+                "id": "be899560-1570-402e-9f95-3182898a8b70",
+                "disambiguation": "",
+                "sort-name": "Art of Noise",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "GB"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "1a373a43-f0d2-4c7f-a3f1-5a098d30d994",
+          "status": 200,
+          "exact_credit_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "",
+                "id": "be899560-1570-402e-9f95-3182898a8b70",
+                "type": "Group",
+                "name": "Art of Noise",
+                "sort-name": "Art of Noise",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "GB"
+              },
+              "name": "Art of Noise",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "81c25acd-9542-4181-ad10-3894688c2c8c",
+          "status": 200,
+          "exact_credit_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "type": "Group",
+                "sort-name": "Art of Noise",
+                "id": "be899560-1570-402e-9f95-3182898a8b70",
+                "name": "Art of Noise",
+                "disambiguation": "",
+                "country": "GB"
+              },
+              "joinphrase": "",
+              "name": "Art of Noise"
+            }
+          ]
+        },
+        {
+          "recording": "81f877e8-910a-479d-ae17-43d9cbf7d693",
+          "status": 200,
+          "exact_credit_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ],
+          "credit": [
+            {
+              "name": "The Art of Noise",
+              "artist": {
+                "id": "be899560-1570-402e-9f95-3182898a8b70",
+                "sort-name": "Art of Noise",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "Art of Noise",
+                "type": "Group",
+                "country": "GB",
+                "disambiguation": ""
+              },
+              "joinphrase": " with "
+            },
+            {
+              "name": "Max Headroom",
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "Headroom, Max",
+                "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+                "name": "Max Headroom",
+                "type": "Character",
+                "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+                "country": null,
+                "disambiguation": "titular character from \"Max Headroom\""
+              }
+            }
+          ]
+        },
+        {
+          "recording": "f131f09c-6e8f-4baf-bbf8-2870c1686500",
+          "status": 200,
+          "exact_credit_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ],
+          "credit": [
+            {
+              "name": "The Art of Noise",
+              "joinphrase": " with ",
+              "artist": {
+                "country": "GB",
+                "disambiguation": "",
+                "sort-name": "Art of Noise",
+                "type": "Group",
+                "name": "Art of Noise",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "id": "be899560-1570-402e-9f95-3182898a8b70"
+              }
+            },
+            {
+              "joinphrase": "",
+              "name": "Max Headroom",
+              "artist": {
+                "type": "Character",
+                "name": "Max Headroom",
+                "type-id": "5c1375b0-f18d-3db7-a164-a49d7a63773f",
+                "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+                "disambiguation": "titular character from \"Max Headroom\"",
+                "country": null,
+                "sort-name": "Headroom, Max"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "be899560-1570-402e-9f95-3182898a8b70",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Art of Noise",
+      "discogs_ids": [
+        7142
+      ],
+      "discogs_claimants": [
+        "be899560-1570-402e-9f95-3182898a8b70"
+      ],
+      "discogs_name": "The Art Of Noise",
+      "title_checks": [
+        {
+          "title": "A Nation Rejects",
+          "status": 200,
+          "artist_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ]
+        },
+        {
+          "title": "Camilla",
+          "status": 200,
+          "artist_ids": [
+            "be899560-1570-402e-9f95-3182898a8b70"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 26,
+      "id": "57f69e78-3ecf-494c-ba68-bf5a2fdf4200",
+      "lines": 41,
+      "name": "Rosalía",
+      "normalized_name": "rosalia",
+      "recordings": [
+        "0e186565-b892-43a6-9d30-563ed4a0f814",
+        "11ea8e82-ad0d-4fc3-a597-5d912f607a3c",
+        "4cb75f78-548a-4405-b8b1-a50a3657e59b"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "0e186565-b892-43a6-9d30-563ed4a0f814",
+          "status": 200,
+          "exact_credit_ids": [
+            "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "ES",
+                "disambiguation": "Spanish singer",
+                "sort-name": "ROSALÍA",
+                "type": "Person",
+                "name": "ROSALÍA",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+              },
+              "joinphrase": "",
+              "name": "ROSALÍA"
+            }
+          ]
+        },
+        {
+          "recording": "11ea8e82-ad0d-4fc3-a597-5d912f607a3c",
+          "status": 200,
+          "exact_credit_ids": [
+            "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+          ],
+          "credit": [
+            {
+              "name": "ROSALÍA",
+              "joinphrase": "",
+              "artist": {
+                "name": "ROSALÍA",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "ROSALÍA",
+                "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+                "disambiguation": "Spanish singer",
+                "country": "ES"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "4cb75f78-548a-4405-b8b1-a50a3657e59b",
+          "status": 200,
+          "exact_credit_ids": [
+            "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "Spanish singer",
+                "country": "ES",
+                "sort-name": "ROSALÍA",
+                "type": "Person",
+                "name": "ROSALÍA",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+              },
+              "name": "ROSALÍA",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "ROSALÍA",
+      "discogs_ids": [
+        5648334
+      ],
+      "discogs_claimants": [
+        "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+      ],
+      "discogs_name": "Rosalía (3)",
+      "title_checks": [
+        {
+          "title": "A PALE (OVERMONO EDIT)",
+          "status": 200,
+          "artist_ids": [
+            "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+          ]
+        },
+        {
+          "title": "A Palé",
+          "status": 200,
+          "artist_ids": [
+            "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 26,
+      "id": "464eeab3-e2ff-4dff-a7ec-6b499b6b88fe",
+      "lines": 29,
+      "name": "Spirit",
+      "normalized_name": "spirit",
+      "recordings": [
+        "146e6a5e-3668-4d48-a416-a215166696c7",
+        "6aaa8e21-68b9-4de5-9372-772cd3e7d0f1",
+        "9e8bbbd7-fd46-4c80-bd75-1a5df2ccedd6",
+        "dc51d589-8804-45a7-b0f8-1b24f918226e",
+        "eec7e4d1-bf66-4238-b16d-c6491b51d2ab"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "146e6a5e-3668-4d48-a416-a215166696c7",
+          "status": 200,
+          "exact_credit_ids": [
+            "ca5db97b-ba17-4e85-a876-46065e2052b3"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "sort-name": "Spirit",
+                "name": "Spirit",
+                "type": "Group",
+                "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                "disambiguation": "psychedelic rock"
+              },
+              "joinphrase": "",
+              "name": "Spirit"
+            }
+          ]
+        },
+        {
+          "recording": "6aaa8e21-68b9-4de5-9372-772cd3e7d0f1",
+          "status": 200,
+          "exact_credit_ids": [
+            "ca5db97b-ba17-4e85-a876-46065e2052b3"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Group",
+                "sort-name": "Spirit",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                "name": "Spirit",
+                "disambiguation": "psychedelic rock"
+              },
+              "joinphrase": "",
+              "name": "Spirit"
+            }
+          ]
+        },
+        {
+          "recording": "9e8bbbd7-fd46-4c80-bd75-1a5df2ccedd6",
+          "status": 200,
+          "exact_credit_ids": [
+            "ca5db97b-ba17-4e85-a876-46065e2052b3"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                "name": "Spirit",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Spirit",
+                "country": "US",
+                "disambiguation": "psychedelic rock",
+                "type": "Group"
+              },
+              "name": "Spirit",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "dc51d589-8804-45a7-b0f8-1b24f918226e",
+          "status": 200,
+          "exact_credit_ids": [
+            "ca5db97b-ba17-4e85-a876-46065e2052b3"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Spirit",
+                "type": "Group",
+                "disambiguation": "psychedelic rock",
+                "name": "Spirit",
+                "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                "country": "US"
+              },
+              "joinphrase": "",
+              "name": "Spirit"
+            }
+          ]
+        },
+        {
+          "recording": "eec7e4d1-bf66-4238-b16d-c6491b51d2ab",
+          "status": 200,
+          "exact_credit_ids": [
+            "ca5db97b-ba17-4e85-a876-46065e2052b3"
+          ],
+          "credit": [
+            {
+              "name": "Spirit",
+              "joinphrase": "",
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+                "type": "Group",
+                "name": "Spirit",
+                "sort-name": "Spirit",
+                "country": "US",
+                "disambiguation": "psychedelic rock"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Spirit",
+      "discogs_ids": [
+        270578
+      ],
+      "discogs_claimants": [
+        "ca5db97b-ba17-4e85-a876-46065e2052b3"
+      ],
+      "discogs_name": "Spirit (8)",
+      "title_checks": [
+        {
+          "title": "Caught [JAZZ]",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Darlin' If",
+          "status": 200,
+          "artist_ids": [
+            "ca5db97b-ba17-4e85-a876-46065e2052b3"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 25,
+      "id": "a2d05287-c666-46ef-8a60-57c750e1596d",
+      "lines": 38,
+      "name": "Barbara Mason",
+      "normalized_name": "barbara mason",
+      "recordings": [
+        "7216a2f8-7eae-4c65-8348-077ae9879bf1",
+        "bba66649-7153-4b52-b4d1-aabf86ab71b0",
+        "e2b1dde4-d85d-43b0-b3ae-1f115e56d70d"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "7216a2f8-7eae-4c65-8348-077ae9879bf1",
+          "status": 200,
+          "exact_credit_ids": [
+            "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "",
+                "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                "type": "Person",
+                "name": "Barbara Mason",
+                "sort-name": "Mason, Barbara",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              },
+              "joinphrase": "",
+              "name": "Barbara Mason"
+            }
+          ]
+        },
+        {
+          "recording": "bba66649-7153-4b52-b4d1-aabf86ab71b0",
+          "status": 200,
+          "exact_credit_ids": [
+            "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Barbara Mason",
+              "artist": {
+                "disambiguation": "",
+                "country": "US",
+                "sort-name": "Mason, Barbara",
+                "type": "Person",
+                "name": "Barbara Mason",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "e2b1dde4-d85d-43b0-b3ae-1f115e56d70d",
+          "status": 200,
+          "exact_credit_ids": [
+            "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+          ],
+          "credit": [
+            {
+              "name": "Barbara Mason",
+              "joinphrase": "",
+              "artist": {
+                "name": "Barbara Mason",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Mason, Barbara",
+                "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                "disambiguation": "",
+                "country": "US"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Barbara Mason",
+      "discogs_ids": [
+        48720
+      ],
+      "discogs_claimants": [
+        "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+      ],
+      "discogs_name": "Barbara Mason",
+      "title_checks": [
+        {
+          "title": "All In Love Is Fair",
+          "status": 200,
+          "artist_ids": [
+            "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+          ]
+        },
+        {
+          "title": "Another Man",
+          "status": 200,
+          "artist_ids": [
+            "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 25,
+      "id": "49965312-72d0-4998-b59c-02e965bc8e58",
+      "lines": 30,
+      "name": "Sophie",
+      "normalized_name": "sophie",
+      "recordings": [
+        "86e9080c-564e-46ab-9414-e5f8c828b33c",
+        "d39fe3eb-59d7-407e-8bf7-c74c689d4784"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "86e9080c-564e-46ab-9414-e5f8c828b33c",
+          "status": 200,
+          "exact_credit_ids": [
+            "774b02d7-5056-4b0f-9d69-a82b6ae27cde"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "name": "SOPHIE",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "SOPHIE",
+                "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+                "type": "Person",
+                "country": "GB",
+                "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon"
+              },
+              "name": "SOPHIE",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "d39fe3eb-59d7-407e-8bf7-c74c689d4784",
+          "status": 200,
+          "exact_credit_ids": [
+            "774b02d7-5056-4b0f-9d69-a82b6ae27cde"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+                "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+                "name": "SOPHIE",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "GB",
+                "sort-name": "SOPHIE",
+                "type": "Person"
+              },
+              "name": "SOPHIE",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "SOPHIE",
+      "discogs_ids": [
+        3150192
+      ],
+      "discogs_claimants": [
+        "774b02d7-5056-4b0f-9d69-a82b6ae27cde"
+      ],
+      "discogs_name": "Sophie (42)",
+      "title_checks": [
+        {
+          "title": "BIPP (LAO Bootleg)",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "BIPP (Official Stream)",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 25,
+      "id": "ff1fc8fe-068d-4719-9d8d-759e25ff44ec",
+      "lines": 30,
+      "name": "Earth",
+      "normalized_name": "earth",
+      "recordings": [
+        "6461ad9b-b0eb-47b8-9b0b-06e643a11d15",
+        "6ec721a0-c7d2-431e-8108-ac4c1b08a489",
+        "78c10d26-8969-4389-a9e8-b473fd1eaa15",
+        "f00363cc-efe2-4cdf-a407-02ebc0c9867c"
+      ],
+      "status": "review",
+      "reasons": [
+        "contradictory_or_missing_artist_credit",
+        "credit_mismatch_or_alias_requires_review"
+      ],
+      "witnesses": [
+        {
+          "recording": "6461ad9b-b0eb-47b8-9b0b-06e643a11d15",
+          "status": 200,
+          "exact_credit_ids": [],
+          "credit": [
+            {
+              "artist": {
+                "id": "535afeda-2538-435d-9dd1-5e10be586774",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "Earth, Wind & Fire",
+                "type": "Group",
+                "sort-name": "Earth, Wind & Fire",
+                "country": "US",
+                "disambiguation": ""
+              },
+              "name": "Earth, Wind & Fire",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "6ec721a0-c7d2-431e-8108-ac4c1b08a489",
+          "status": 200,
+          "exact_credit_ids": [],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Earth, Wind & Fire",
+              "artist": {
+                "type": "Group",
+                "disambiguation": "",
+                "country": "US",
+                "sort-name": "Earth, Wind & Fire",
+                "name": "Earth, Wind & Fire",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "id": "535afeda-2538-435d-9dd1-5e10be586774"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "78c10d26-8969-4389-a9e8-b473fd1eaa15",
+          "status": 200,
+          "exact_credit_ids": [],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Earth, Wind & Fire",
+              "artist": {
+                "type": "Group",
+                "sort-name": "Earth, Wind & Fire",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "disambiguation": "",
+                "id": "535afeda-2538-435d-9dd1-5e10be586774",
+                "name": "Earth, Wind & Fire"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "f00363cc-efe2-4cdf-a407-02ebc0c9867c",
+          "status": 200,
+          "exact_credit_ids": [],
+          "credit": [
+            {
+              "artist": {
+                "sort-name": "Earth and Fire",
+                "disambiguation": "",
+                "country": "NL",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "id": "251e5d69-b1b5-44b4-bd5b-280440cb4b44",
+                "type": "Group",
+                "name": "Earth and Fire"
+              },
+              "joinphrase": "",
+              "name": "Earth & Fire"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 25,
+      "id": "2633809e-444a-4904-922c-5b3070f9b3b6",
+      "lines": 26,
+      "name": "Pangaea",
+      "normalized_name": "pangaea",
+      "recordings": [
+        "8885b413-16f0-4e98-92ae-7cbc391c60cc"
+      ],
+      "status": "review",
+      "reasons": [
+        "multiple_discogs_pages"
+      ],
+      "witnesses": [
+        {
+          "recording": "8885b413-16f0-4e98-92ae-7cbc391c60cc",
+          "status": 200,
+          "exact_credit_ids": [
+            "d73f7df8-8cf6-49c1-828c-f5d80835917c"
+          ],
+          "credit": [
+            {
+              "name": "Pangaea",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "name": "Pangaea",
+                "id": "d73f7df8-8cf6-49c1-828c-f5d80835917c",
+                "sort-name": "Pangaea",
+                "disambiguation": "dubstep artist, Kevin McAuley",
+                "country": "GB"
+              },
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "d73f7df8-8cf6-49c1-828c-f5d80835917c",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Pangaea",
+      "discogs_ids": [
+        943302,
+        1739856
+      ]
+    },
+    {
+      "episodes": 25,
+      "id": "515ee18c-571b-403f-a371-d359c2c4c4a8",
+      "lines": 26,
+      "name": "I:Cube",
+      "normalized_name": "i cube",
+      "recordings": [
+        "2080e06a-2ade-454a-8de4-6c39bf99807d",
+        "3f1140d3-d01c-40d9-b09b-f13a470de4cc",
+        "59f24e5b-468f-4560-aea5-5175d98aa994",
+        "bca6597a-3781-4ce2-844c-332fc6fa9184",
+        "e81c5032-10d2-4c14-bd5e-7b8826cc121f"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "2080e06a-2ade-454a-8de4-6c39bf99807d",
+          "status": 200,
+          "exact_credit_ids": [
+            "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+          ],
+          "credit": [
+            {
+              "name": "I:Cube",
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "I:Cube",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "FR",
+                "name": "I:Cube",
+                "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                "disambiguation": "house music"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "3f1140d3-d01c-40d9-b09b-f13a470de4cc",
+          "status": 200,
+          "exact_credit_ids": [
+            "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+          ],
+          "credit": [
+            {
+              "name": "I:Cube",
+              "joinphrase": "",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                "type": "Person",
+                "name": "I:Cube",
+                "sort-name": "I:Cube",
+                "country": "FR",
+                "disambiguation": "house music"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "59f24e5b-468f-4560-aea5-5175d98aa994",
+          "status": 200,
+          "exact_credit_ids": [
+            "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+          ],
+          "credit": [
+            {
+              "name": "I:Cube",
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "I:Cube",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "FR",
+                "name": "I:Cube",
+                "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                "disambiguation": "house music"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "bca6597a-3781-4ce2-844c-332fc6fa9184",
+          "status": 200,
+          "exact_credit_ids": [
+            "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+          ],
+          "credit": [
+            {
+              "name": "I:Cube",
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "I:Cube",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "FR",
+                "name": "I:Cube",
+                "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                "disambiguation": "house music"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "e81c5032-10d2-4c14-bd5e-7b8826cc121f",
+          "status": 200,
+          "exact_credit_ids": [
+            "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "I:Cube",
+              "artist": {
+                "name": "I:Cube",
+                "type": "Person",
+                "disambiguation": "house music",
+                "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                "sort-name": "I:Cube",
+                "country": "FR",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "I:Cube",
+      "discogs_ids": [
+        1029
+      ],
+      "discogs_claimants": [
+        "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+      ],
+      "discogs_name": "I:Cube",
+      "title_checks": [
+        {
+          "title": "118 BPM",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Adore",
+          "status": 200,
+          "artist_ids": [
+            "979d10bc-d1b9-41b1-8a87-7a7c68cbd885"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 24,
+      "id": "16806488-f939-4cac-bc1f-56987318badf",
+      "lines": 42,
+      "name": "Eddie Harris",
+      "normalized_name": "eddie harris",
+      "recordings": [
+        "0ad36b62-58fa-438c-9980-939f2661cf2c",
+        "370a48f5-330f-4f44-8a04-dfa03c234475",
+        "5575cbe2-ad18-4adf-ba98-af7032b9612d"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "0ad36b62-58fa-438c-9980-939f2661cf2c",
+          "status": 200,
+          "exact_credit_ids": [
+            "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "saxophone, piano, vocals",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Eddie Harris",
+                "type": "Person",
+                "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+                "sort-name": "Harris, Eddie"
+              },
+              "joinphrase": "",
+              "name": "Eddie Harris"
+            }
+          ]
+        },
+        {
+          "recording": "370a48f5-330f-4f44-8a04-dfa03c234475",
+          "status": 200,
+          "exact_credit_ids": [
+            "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4"
+          ],
+          "credit": [
+            {
+              "name": "Eddie Harris",
+              "artist": {
+                "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+                "sort-name": "Harris, Eddie",
+                "name": "Eddie Harris",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "disambiguation": "saxophone, piano, vocals",
+                "country": "US",
+                "type": "Person"
+              },
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "5575cbe2-ad18-4adf-ba98-af7032b9612d",
+          "status": 200,
+          "exact_credit_ids": [
+            "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Eddie Harris",
+              "artist": {
+                "type": "Person",
+                "name": "Eddie Harris",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US",
+                "sort-name": "Harris, Eddie",
+                "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+                "disambiguation": "saxophone, piano, vocals"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Eddie Harris",
+      "discogs_ids": [
+        41249
+      ],
+      "discogs_claimants": [
+        "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4"
+      ],
+      "discogs_name": "Eddie Harris",
+      "title_checks": [
+        {
+          "title": "Ballad [JAZZ]",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Brother Ed",
+          "status": 200,
+          "artist_ids": [
+            "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 24,
+      "id": "f70b986e-d577-40f8-9bfb-7a0dec0cbf57",
+      "lines": 42,
+      "name": "David Axelrod",
+      "normalized_name": "david axelrod",
+      "recordings": [
+        "15ac9c5d-00a3-49d1-a0cf-a2ecb6e21903",
+        "4aed68fe-a23a-478e-b50c-00bf2f294804",
+        "75fc69ea-6cec-45ba-a9fb-12a21c24e262",
+        "bad72ddc-9f06-4ee1-8625-0cec801c18b4",
+        "e2ce91d3-0726-4435-9e47-f12ea544d3d6"
+      ],
+      "status": "review",
+      "reasons": [
+        "credit_mismatch_or_alias_requires_review"
+      ],
+      "witnesses": [
+        {
+          "recording": "15ac9c5d-00a3-49d1-a0cf-a2ecb6e21903",
+          "status": 200,
+          "exact_credit_ids": [],
+          "credit": [
+            {
+              "artist": {
+                "type": "Group",
+                "name": "The Electric Prunes",
+                "sort-name": "Electric Prunes, The",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "id": "8cb8b329-e152-4394-80d0-6aab033ec16c",
+                "disambiguation": ""
+              },
+              "joinphrase": "",
+              "name": "The Electric Prunes"
+            }
+          ]
+        },
+        {
+          "recording": "4aed68fe-a23a-478e-b50c-00bf2f294804",
+          "status": 200,
+          "exact_credit_ids": [
+            "d5c756c1-4872-457b-8f00-d620547cbb85"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "US",
+                "disambiguation": "baroque pop composer",
+                "name": "David Axelrod",
+                "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                "sort-name": "Axelrod, David",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              },
+              "name": "David Axelrod",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "75fc69ea-6cec-45ba-a9fb-12a21c24e262",
+          "status": 200,
+          "exact_credit_ids": [
+            "d5c756c1-4872-457b-8f00-d620547cbb85"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "name": "David Axelrod",
+                "type": "Person",
+                "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "disambiguation": "baroque pop composer",
+                "country": "US",
+                "sort-name": "Axelrod, David"
+              },
+              "joinphrase": "",
+              "name": "David Axelrod"
+            }
+          ]
+        },
+        {
+          "recording": "bad72ddc-9f06-4ee1-8625-0cec801c18b4",
+          "status": 200,
+          "exact_credit_ids": [
+            "d5c756c1-4872-457b-8f00-d620547cbb85"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Person",
+                "name": "David Axelrod",
+                "disambiguation": "baroque pop composer",
+                "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Axelrod, David"
+              },
+              "joinphrase": "",
+              "name": "David Axelrod"
+            }
+          ]
+        },
+        {
+          "recording": "e2ce91d3-0726-4435-9e47-f12ea544d3d6",
+          "status": 200,
+          "exact_credit_ids": [
+            "d5c756c1-4872-457b-8f00-d620547cbb85"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "US",
+                "disambiguation": "baroque pop composer",
+                "sort-name": "Axelrod, David",
+                "type": "Person",
+                "name": "David Axelrod",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "d5c756c1-4872-457b-8f00-d620547cbb85"
+              },
+              "joinphrase": "",
+              "name": "David Axelrod"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "d5c756c1-4872-457b-8f00-d620547cbb85",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "David Axelrod",
+      "discogs_ids": [
+        5451
+      ],
+      "discogs_claimants": [
+        "d5c756c1-4872-457b-8f00-d620547cbb85"
+      ],
+      "discogs_name": "David Axelrod",
+      "title_checks": [
+        {
+          "title": "1000 Rads",
+          "status": 200,
+          "artist_ids": [
+            "d5c756c1-4872-457b-8f00-d620547cbb85"
+          ]
+        },
+        {
+          "title": "A Dream",
+          "status": 200,
+          "artist_ids": [
+            "d5c756c1-4872-457b-8f00-d620547cbb85"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 24,
+      "id": "d362f060-be2a-4e38-9f6e-0202df4b90b3",
+      "lines": 29,
+      "name": "Sepehr",
+      "normalized_name": "sepehr",
+      "recordings": [
+        "2af7fd47-50fa-42db-a00f-8be6ed761ee5"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "2af7fd47-50fa-42db-a00f-8be6ed761ee5",
+          "status": 200,
+          "exact_credit_ids": [
+            "a3e77268-597b-4ce8-8837-78b673e20114"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "name": "Sepehr",
+                "type": "Person",
+                "id": "a3e77268-597b-4ce8-8837-78b673e20114",
+                "disambiguation": "electronic musician Sepehr Alimagham",
+                "sort-name": "Sepehr",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US"
+              },
+              "joinphrase": "",
+              "name": "Sepehr"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "a3e77268-597b-4ce8-8837-78b673e20114",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Sepehr",
+      "discogs_ids": [
+        3563778
+      ],
+      "discogs_claimants": [
+        "a3e77268-597b-4ce8-8837-78b673e20114"
+      ],
+      "discogs_name": "Sepehr",
+      "title_checks": [
+        {
+          "title": "Abandoned Ecstacy (XTC Mix)",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Bipayan",
+          "status": 200,
+          "artist_ids": [
+            "a3e77268-597b-4ce8-8837-78b673e20114"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 24,
+      "id": "1d2e7ab4-f4e1-4cc2-81ba-5ab92941d37c",
+      "lines": 26,
+      "name": "Bill Withers",
+      "normalized_name": "bill withers",
+      "recordings": [
+        "4d761a73-cce1-4940-89f9-520000a50e11",
+        "82fc357b-dd29-4e4e-881b-0a6c3fd2512e",
+        "a7b1d0aa-b85f-4b41-81fe-315f6c8567f0",
+        "fcbb5068-2666-4938-8bb1-903929b285b2"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "4d761a73-cce1-4940-89f9-520000a50e11",
+          "status": 200,
+          "exact_credit_ids": [
+            "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+          ],
+          "credit": [
+            {
+              "joinphrase": " with ",
+              "artist": {
+                "type": "Person",
+                "country": "US",
+                "disambiguation": "",
+                "name": "Bill Withers",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Withers, Bill",
+                "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+              },
+              "name": "Bill Withers"
+            },
+            {
+              "name": "Studio Rio",
+              "artist": {
+                "id": "8d35e82f-3bb0-45cd-8b83-72bc710bac5f",
+                "sort-name": "Studio Rio",
+                "name": "Studio Rio",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "disambiguation": "",
+                "country": null,
+                "type": "Group"
+              },
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "82fc357b-dd29-4e4e-881b-0a6c3fd2512e",
+          "status": 200,
+          "exact_credit_ids": [
+            "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "US",
+                "name": "Bill Withers",
+                "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+                "disambiguation": "",
+                "sort-name": "Withers, Bill",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+              },
+              "joinphrase": "",
+              "name": "Bill Withers"
+            }
+          ]
+        },
+        {
+          "recording": "a7b1d0aa-b85f-4b41-81fe-315f6c8567f0",
+          "status": 200,
+          "exact_credit_ids": [
+            "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Person",
+                "name": "Bill Withers",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Withers, Bill",
+                "disambiguation": "",
+                "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+              },
+              "name": "Bill Withers",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "fcbb5068-2666-4938-8bb1-903929b285b2",
+          "status": 200,
+          "exact_credit_ids": [
+            "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "sort-name": "Withers, Bill",
+                "type": "Person",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US",
+                "name": "Bill Withers",
+                "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+                "disambiguation": ""
+              },
+              "name": "Bill Withers",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Bill Withers",
+      "discogs_ids": [
+        59249
+      ],
+      "discogs_claimants": [
+        "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+      ],
+      "discogs_name": "Bill Withers",
+      "title_checks": [
+        {
+          "title": "1973 BBC Concert Complete",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "Ain't No Sunshine",
+          "status": 200,
+          "artist_ids": [
+            "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 24,
+      "id": "bdf63011-bfc1-4802-862b-83d007c9495b",
+      "lines": 25,
+      "name": "Solange",
+      "normalized_name": "solange",
+      "recordings": [
+        "1c442496-a7c4-430b-bf78-b53549e0666c",
+        "bca9118e-eaac-46a0-a737-96379696915d",
+        "e5a6a011-73e8-4c66-9dd2-de95161c6caa"
+      ],
+      "status": "review",
+      "reasons": [
+        "multiple_discogs_pages"
+      ],
+      "witnesses": [
+        {
+          "recording": "1c442496-a7c4-430b-bf78-b53549e0666c",
+          "status": 200,
+          "exact_credit_ids": [
+            "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "country": "US",
+                "disambiguation": "US RnB vocalist Solange Knowles",
+                "type": "Person",
+                "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+                "name": "Solange",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Solange"
+              },
+              "name": "Solange",
+              "joinphrase": " feat. "
+            },
+            {
+              "joinphrase": "",
+              "name": "Lil Wayne",
+              "artist": {
+                "sort-name": "Lil Wayne",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "name": "Lil Wayne",
+                "id": "ac9a487a-d9d2-4f27-bb23-0f4686488345",
+                "type": "Person",
+                "disambiguation": "",
+                "country": "US"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "bca9118e-eaac-46a0-a737-96379696915d",
+          "status": 200,
+          "exact_credit_ids": [
+            "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+                "disambiguation": "US RnB vocalist Solange Knowles",
+                "country": "US",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Solange",
+                "type": "Person",
+                "name": "Solange"
+              },
+              "name": "Solange",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "e5a6a011-73e8-4c66-9dd2-de95161c6caa",
+          "status": 200,
+          "exact_credit_ids": [
+            "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Solange",
+              "artist": {
+                "name": "Solange",
+                "type": "Person",
+                "disambiguation": "US RnB vocalist Solange Knowles",
+                "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US",
+                "sort-name": "Solange"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Solange",
+      "discogs_ids": [
+        160408,
+        587458
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "a750aa2f-956a-4dd4-ac68-0746c7f2e09f",
+      "lines": 30,
+      "name": "Martin Denny",
+      "normalized_name": "martin denny",
+      "recordings": [
+        "19992bab-ade9-46d1-843f-5232c3e5bf9f",
+        "5158fe52-5765-49ee-8fcd-46bbdb08d4c8",
+        "bee0af84-b672-428b-935c-956269876b3d"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "19992bab-ade9-46d1-843f-5232c3e5bf9f",
+          "status": 200,
+          "exact_credit_ids": [
+            "186edc09-db32-4d4f-ba71-eed418630c83"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "name": "Martin Denny",
+                "sort-name": "Denny, Martin",
+                "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                "disambiguation": "",
+                "country": "US"
+              },
+              "joinphrase": "",
+              "name": "Martin Denny"
+            }
+          ]
+        },
+        {
+          "recording": "5158fe52-5765-49ee-8fcd-46bbdb08d4c8",
+          "status": 200,
+          "exact_credit_ids": [
+            "186edc09-db32-4d4f-ba71-eed418630c83"
+          ],
+          "credit": [
+            {
+              "name": "Martin Denny",
+              "joinphrase": "",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "sort-name": "Denny, Martin",
+                "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                "name": "Martin Denny",
+                "disambiguation": "",
+                "country": "US"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "bee0af84-b672-428b-935c-956269876b3d",
+          "status": 200,
+          "exact_credit_ids": [
+            "186edc09-db32-4d4f-ba71-eed418630c83"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Martin Denny",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Denny, Martin",
+                "type": "Person",
+                "disambiguation": "",
+                "name": "Martin Denny",
+                "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                "country": "US"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "186edc09-db32-4d4f-ba71-eed418630c83",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Martin Denny",
+      "discogs_ids": [
+        36860
+      ],
+      "discogs_claimants": [
+        "186edc09-db32-4d4f-ba71-eed418630c83"
+      ],
+      "discogs_name": "Martin Denny",
+      "title_checks": [
+        {
+          "title": "Beyond The Sea (La Mer)",
+          "status": 200,
+          "artist_ids": [
+            "186edc09-db32-4d4f-ba71-eed418630c83"
+          ]
+        },
+        {
+          "title": "Firecracker",
+          "status": 200,
+          "artist_ids": [
+            "186edc09-db32-4d4f-ba71-eed418630c83"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "c5582c58-475c-4778-9af7-5c061fe4a87e",
+      "lines": 29,
+      "name": "Letta Mbulu",
+      "normalized_name": "letta mbulu",
+      "recordings": [
+        "eff6626f-68c2-4650-ba17-06a9a99329a6"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "eff6626f-68c2-4650-ba17-06a9a99329a6",
+          "status": 200,
+          "exact_credit_ids": [
+            "9f7483cf-d8aa-45ce-b90c-da2e359a7815"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "South African musician",
+                "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                "type": "Person",
+                "country": "ZA",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "sort-name": "Mbulu, Letta",
+                "name": "Letta Mbulu"
+              },
+              "joinphrase": "",
+              "name": "Letta Mbulu"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Letta Mbulu",
+      "discogs_ids": [
+        97988
+      ],
+      "discogs_claimants": [
+        "9f7483cf-d8aa-45ce-b90c-da2e359a7815"
+      ],
+      "discogs_name": "Letta Mbulu",
+      "title_checks": [
+        {
+          "title": "Down By The River",
+          "status": 200,
+          "artist_ids": [
+            "9f7483cf-d8aa-45ce-b90c-da2e359a7815"
+          ]
+        },
+        {
+          "title": "Kilimanjaro",
+          "status": 200,
+          "artist_ids": [
+            "9f7483cf-d8aa-45ce-b90c-da2e359a7815"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "f9250721-b691-4571-8ef5-4cdf3165bcd1",
+      "lines": 28,
+      "name": "Salem",
+      "normalized_name": "salem",
+      "recordings": [
+        "696c7fbe-1716-4107-b030-09679dd9ed86",
+        "879bc03f-84e6-4d7b-9727-352e27e327cb",
+        "ae1bb010-e34c-4e32-b868-4cdcbde01222",
+        "f3df97bc-02ba-4737-8254-c8490839db3f"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "696c7fbe-1716-4107-b030-09679dd9ed86",
+          "status": 200,
+          "exact_credit_ids": [
+            "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+          ],
+          "credit": [
+            {
+              "name": "Salem",
+              "joinphrase": "",
+              "artist": {
+                "disambiguation": "US‐based electronic group",
+                "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+                "name": "SALEM",
+                "sort-name": "SALEM",
+                "country": "US",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "type": "Group"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "879bc03f-84e6-4d7b-9727-352e27e327cb",
+          "status": 200,
+          "exact_credit_ids": [
+            "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Group",
+                "name": "SALEM",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+                "country": "US",
+                "disambiguation": "US‐based electronic group",
+                "sort-name": "SALEM"
+              },
+              "joinphrase": "",
+              "name": "SALEM"
+            }
+          ]
+        },
+        {
+          "recording": "ae1bb010-e34c-4e32-b868-4cdcbde01222",
+          "status": 200,
+          "exact_credit_ids": [
+            "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+          ],
+          "credit": [
+            {
+              "name": "Salem",
+              "joinphrase": "",
+              "artist": {
+                "type": "Group",
+                "name": "SALEM",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "sort-name": "SALEM",
+                "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+                "disambiguation": "US‐based electronic group"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "f3df97bc-02ba-4737-8254-c8490839db3f",
+          "status": 200,
+          "exact_credit_ids": [
+            "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+                "disambiguation": "US‐based electronic group",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "sort-name": "SALEM",
+                "name": "SALEM",
+                "type": "Group"
+              },
+              "name": "Salem",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "SALEM",
+      "discogs_ids": [
+        1300441
+      ],
+      "discogs_claimants": [
+        "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+      ],
+      "discogs_name": "SALEM (6)",
+      "title_checks": [
+        {
+          "title": "BETTER OFF ALONE (Atari Teenage Riot Remix)",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "BITCHESBURNIN UP",
+          "status": 200,
+          "artist_ids": []
+        }
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "fd864fe7-14c2-41ed-962e-b89befdf0405",
+      "lines": 27,
+      "name": "War",
+      "normalized_name": "war",
+      "recordings": [
+        "4c1ba36a-a74a-45b4-8c5d-b119d162eb68",
+        "4c9da3fc-868b-4d3d-9872-328a15db00ca",
+        "b39bcc7b-f7ff-4040-b80d-639068c8dbdf",
+        "b7e28cd6-43f2-470e-814e-8c0d70e43cde",
+        "fb564c4d-27f4-44be-9611-3362aeb13331"
+      ],
+      "status": "review",
+      "reasons": [
+        "multiple_discogs_pages"
+      ],
+      "witnesses": [
+        {
+          "recording": "4c1ba36a-a74a-45b4-8c5d-b119d162eb68",
+          "status": 200,
+          "exact_credit_ids": [
+            "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+          ],
+          "credit": [
+            {
+              "name": "War",
+              "joinphrase": "",
+              "artist": {
+                "country": "US",
+                "disambiguation": "US funk/rock band",
+                "sort-name": "War",
+                "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "War",
+                "type": "Group"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "4c9da3fc-868b-4d3d-9872-328a15db00ca",
+          "status": 200,
+          "exact_credit_ids": [
+            "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "War",
+                "sort-name": "War",
+                "country": "US",
+                "disambiguation": "US funk/rock band",
+                "type": "Group"
+              },
+              "name": "War"
+            }
+          ]
+        },
+        {
+          "recording": "b39bcc7b-f7ff-4040-b80d-639068c8dbdf",
+          "status": 200,
+          "exact_credit_ids": [
+            "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+          ],
+          "credit": [
+            {
+              "name": "War",
+              "artist": {
+                "country": "US",
+                "disambiguation": "US funk/rock band",
+                "sort-name": "War",
+                "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+                "name": "War",
+                "type": "Group",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              },
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "b7e28cd6-43f2-470e-814e-8c0d70e43cde",
+          "status": 200,
+          "exact_credit_ids": [
+            "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+          ],
+          "credit": [
+            {
+              "name": "War",
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "War",
+                "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+                "name": "War",
+                "type": "Group",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "disambiguation": "US funk/rock band"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "fb564c4d-27f4-44be-9611-3362aeb13331",
+          "status": 200,
+          "exact_credit_ids": [
+            "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "disambiguation": "US funk/rock band",
+                "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+                "name": "War",
+                "country": "US",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "War",
+                "type": "Group"
+              },
+              "name": "War",
+              "joinphrase": ""
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "War",
+      "discogs_ids": [
+        9707,
+        1287974
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "5d85dcc0-1177-47bc-98a2-cba93859b773",
+      "lines": 26,
+      "name": "Budgie",
+      "normalized_name": "budgie",
+      "recordings": [
+        "0605acbc-dc4c-481c-8cdb-9ca281847a02",
+        "77c7d5af-6fb0-4ed6-9bdd-8b90d367ee5d"
+      ],
+      "status": "review",
+      "reasons": [
+        "contradictory_title"
+      ],
+      "witnesses": [
+        {
+          "recording": "0605acbc-dc4c-481c-8cdb-9ca281847a02",
+          "status": 200,
+          "exact_credit_ids": [
+            "19583b63-ae19-49fe-9868-a4bd9569ad9c"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+                "disambiguation": "Los Angeles-based hip-hop producer from London, England",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "US",
+                "sort-name": "Budgie",
+                "type": "Person",
+                "name": "Budgie"
+              },
+              "joinphrase": "",
+              "name": "Budgie"
+            }
+          ]
+        },
+        {
+          "recording": "77c7d5af-6fb0-4ed6-9bdd-8b90d367ee5d",
+          "status": 200,
+          "exact_credit_ids": [
+            "19583b63-ae19-49fe-9868-a4bd9569ad9c"
+          ],
+          "credit": [
+            {
+              "name": "Budgie",
+              "joinphrase": "",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+                "type": "Person",
+                "name": "Budgie",
+                "sort-name": "Budgie",
+                "disambiguation": "Los Angeles-based hip-hop producer from London, England",
+                "country": "US"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Budgie",
+      "discogs_ids": [
+        317252
+      ],
+      "discogs_claimants": [
+        "19583b63-ae19-49fe-9868-a4bd9569ad9c"
+      ],
+      "discogs_name": "Budgie (3)",
+      "title_checks": [
+        {
+          "title": "A Friend Feat Natanya",
+          "status": 200,
+          "artist_ids": []
+        },
+        {
+          "title": "BREADFAN",
+          "status": 200,
+          "artist_ids": [
+            "517566c5-3d43-4a81-8f78-9a78f3209e09"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "3d117c1a-850d-4577-b432-abae11642042",
+      "lines": 25,
+      "name": "Squarepusher",
+      "normalized_name": "squarepusher",
+      "recordings": [
+        "0764a4f5-7665-46c9-967c-f75e9b2dff1e",
+        "374e5598-11ed-4352-bc73-e77501b73bdf",
+        "3ad4bec5-b791-4f3a-a1ee-8462b9d5deec",
+        "c28b38dc-d79b-46fe-823b-cbf00753f9ab",
+        "f7212871-a315-4e77-990f-5a63db978982"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "0764a4f5-7665-46c9-967c-f75e9b2dff1e",
+          "status": 200,
+          "exact_credit_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                "type": "Person",
+                "name": "Squarepusher",
+                "sort-name": "Squarepusher",
+                "country": "GB",
+                "disambiguation": ""
+              },
+              "joinphrase": "",
+              "name": "Squarepusher"
+            }
+          ]
+        },
+        {
+          "recording": "374e5598-11ed-4352-bc73-e77501b73bdf",
+          "status": 200,
+          "exact_credit_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "Squarepusher",
+              "artist": {
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person",
+                "sort-name": "Squarepusher",
+                "disambiguation": "",
+                "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                "name": "Squarepusher",
+                "country": "GB"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "3ad4bec5-b791-4f3a-a1ee-8462b9d5deec",
+          "status": 200,
+          "exact_credit_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Person",
+                "name": "Squarepusher",
+                "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                "disambiguation": "",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "GB",
+                "sort-name": "Squarepusher"
+              },
+              "joinphrase": "",
+              "name": "Squarepusher"
+            }
+          ]
+        },
+        {
+          "recording": "c28b38dc-d79b-46fe-823b-cbf00753f9ab",
+          "status": 200,
+          "exact_credit_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ],
+          "credit": [
+            {
+              "name": "Squarepusher",
+              "joinphrase": "",
+              "artist": {
+                "disambiguation": "",
+                "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                "name": "Squarepusher",
+                "sort-name": "Squarepusher",
+                "country": "GB",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "type": "Person"
+              }
+            }
+          ]
+        },
+        {
+          "recording": "f7212871-a315-4e77-990f-5a63db978982",
+          "status": 200,
+          "exact_credit_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Person",
+                "name": "Squarepusher",
+                "sort-name": "Squarepusher",
+                "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                "country": "GB",
+                "disambiguation": "",
+                "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+              },
+              "joinphrase": "",
+              "name": "Squarepusher"
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "Squarepusher",
+      "discogs_ids": [
+        269
+      ],
+      "discogs_claimants": [
+        "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+      ],
+      "discogs_name": "Squarepusher",
+      "title_checks": [
+        {
+          "title": "Anstromm-Feck 4",
+          "status": 200,
+          "artist_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ]
+        },
+        {
+          "title": "Come On My Selector",
+          "status": 200,
+          "artist_ids": [
+            "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+          ]
+        }
+      ]
+    },
+    {
+      "episodes": 23,
+      "id": "6ab1be02-3723-4082-89f3-fd82e9ec2a69",
+      "lines": 25,
+      "name": "The S.O.S. Band",
+      "normalized_name": "the s o s band",
+      "recordings": [
+        "71ce718d-7df1-4d7e-97ac-12f649d0c3ea",
+        "79a2f1b3-f045-42b6-9b7a-be882e2fb297"
+      ],
+      "status": "evidence_ready",
+      "reasons": [],
+      "witnesses": [
+        {
+          "recording": "71ce718d-7df1-4d7e-97ac-12f649d0c3ea",
+          "status": 200,
+          "exact_credit_ids": [
+            "39515237-2d70-436a-800c-fcbac974bec4"
+          ],
+          "credit": [
+            {
+              "artist": {
+                "type": "Group",
+                "country": "US",
+                "disambiguation": "",
+                "name": "The S.O.S. Band",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "S.O.S. Band, The",
+                "id": "39515237-2d70-436a-800c-fcbac974bec4"
+              },
+              "name": "The S.O.S. Band",
+              "joinphrase": ""
+            }
+          ]
+        },
+        {
+          "recording": "79a2f1b3-f045-42b6-9b7a-be882e2fb297",
+          "status": 200,
+          "exact_credit_ids": [
+            "39515237-2d70-436a-800c-fcbac974bec4"
+          ],
+          "credit": [
+            {
+              "joinphrase": "",
+              "name": "The S.O.S. Band",
+              "artist": {
+                "country": "US",
+                "disambiguation": "",
+                "id": "39515237-2d70-436a-800c-fcbac974bec4",
+                "name": "The S.O.S. Band",
+                "type": "Group",
+                "sort-name": "S.O.S. Band, The",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              }
+            }
+          ]
+        }
+      ],
+      "musicbrainz_artist": "39515237-2d70-436a-800c-fcbac974bec4",
+      "musicbrainz_status": 200,
+      "musicbrainz_name": "The S.O.S. Band",
+      "discogs_ids": [
+        98545
+      ],
+      "discogs_claimants": [
+        "39515237-2d70-436a-800c-fcbac974bec4"
+      ],
+      "discogs_name": "The S.O.S. Band",
+      "title_checks": [
+        {
+          "title": "Even When You Sleep",
+          "status": 200,
+          "artist_ids": [
+            "39515237-2d70-436a-800c-fcbac974bec4"
+          ]
+        },
+        {
+          "title": "For Your Love",
+          "status": 200,
+          "artist_ids": [
+            "39515237-2d70-436a-800c-fcbac974bec4"
+          ]
+        }
+      ]
+    }
+  ],
+  "requests_this_invocation": {
+    "musicbrainz.org": 257,
+    "api.discogs.com": 34
+  }
+}

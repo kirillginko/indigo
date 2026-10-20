@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/ae001107-c8b5-4cbe-832b-8467ec65c7af?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:30.871155+00:00",
+  "body": {
+    "first-release-date": "1995",
+    "title": "U Remind Me of Some Sex",
+    "length": 300000,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Paul Johnson",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Johnson, Paul",
+          "type": "Person",
+          "name": "Paul Johnson",
+          "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+          "disambiguation": "Chicago house music DJ/producer",
+          "country": "US"
+        }
+      }
+    ],
+    "isrcs": [],
+    "releases": [
+      {
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "sort-name": "Johnson, Paul",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "name": "Paul Johnson",
+              "disambiguation": "Chicago house music DJ/producer"
+            },
+            "joinphrase": "",
+            "name": "Paul Johnson"
+          }
+        ],
+        "packaging": "Cardboard/Paper Sleeve",
+        "barcode": null,
+        "title": "Sex Crazed / Track Happy",
+        "id": "264be3fc-d1a6-418d-9472-06dd2c76f891",
+        "date": "1995",
+        "release-events": [
+          {
+            "date": "1995",
+            "area": {
+              "disambiguation": "",
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "type-id": null
+            }
+          }
+        ],
+        "status": "Official",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "US"
+      }
+    ],
+    "id": "ae001107-c8b5-4cbe-832b-8467ec65c7af",
+    "disambiguation": "",
+    "video": false
+  }
+}

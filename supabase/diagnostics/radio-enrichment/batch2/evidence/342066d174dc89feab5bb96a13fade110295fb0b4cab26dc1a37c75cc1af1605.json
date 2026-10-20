@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/bba66649-7153-4b52-b4d1-aabf86ab71b0?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:01.290130+00:00",
+  "body": {
+    "id": "bba66649-7153-4b52-b4d1-aabf86ab71b0",
+    "length": 186000,
+    "releases": [
+      {
+        "packaging": null,
+        "packaging-id": null,
+        "status": "Official",
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Barbara Mason",
+            "artist": {
+              "name": "Barbara Mason",
+              "type": "Person",
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "",
+              "sort-name": "Mason, Barbara"
+            }
+          }
+        ],
+        "date": "1968",
+        "quality": "normal",
+        "id": "378afc60-3081-436f-8137-a45f836d789b",
+        "release-events": [
+          {
+            "date": "1968",
+            "area": {
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States"
+            }
+          }
+        ],
+        "barcode": "",
+        "disambiguation": "",
+        "title": "Oh How It Hurts"
+      }
+    ],
+    "first-release-date": "1968",
+    "video": false,
+    "isrcs": [],
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Barbara Mason",
+        "artist": {
+          "disambiguation": "",
+          "country": "US",
+          "sort-name": "Mason, Barbara",
+          "type": "Person",
+          "name": "Barbara Mason",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5"
+        }
+      }
+    ],
+    "title": "Yes, I’m Ready"
+  }
+}

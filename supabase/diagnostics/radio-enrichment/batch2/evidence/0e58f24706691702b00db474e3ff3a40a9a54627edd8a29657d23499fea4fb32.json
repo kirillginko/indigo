@@ -1,0 +1,118 @@
+{
+  "url": "https://api.discogs.com/artists/5451",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:45.933880+00:00",
+  "body": {
+    "name": "David Axelrod",
+    "id": 5451,
+    "resource_url": "https://api.discogs.com/artists/5451",
+    "uri": "https://www.discogs.com/artist/5451-David-Axelrod",
+    "releases_url": "https://api.discogs.com/artists/5451/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/yrBK3WhejcFE1mKyn3Tm1tOEvDOiwmXBuF45m-Nb-ts/rs:fit/g:sm/q:90/h:600/w:519/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTczNjc5ODg5OC04/OTY5LnBuZw.jpeg",
+        "resource_url": "https://i.discogs.com/yrBK3WhejcFE1mKyn3Tm1tOEvDOiwmXBuF45m-Nb-ts/rs:fit/g:sm/q:90/h:600/w:519/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTczNjc5ODg5OC04/OTY5LnBuZw.jpeg",
+        "uri150": "https://i.discogs.com/-m4uOM0M29LxPdm80YjRNG0WqTp-mpFOC0e89XaeChE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTczNjc5ODg5OC04/OTY5LnBuZw.jpeg",
+        "width": 519,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ekPl__FMeuxzuSFKXM5g1Y6xLShxedecfS8gvfFghDg/rs:fit/g:sm/q:90/h:500/w:502/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTUwNTA2NTA5My02/ODE4LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/ekPl__FMeuxzuSFKXM5g1Y6xLShxedecfS8gvfFghDg/rs:fit/g:sm/q:90/h:500/w:502/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTUwNTA2NTA5My02/ODE4LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/I_l-w-U19exE8Z_3hmWBbWMgUFZur8CU4futW1tkWG4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTUwNTA2NTA5My02/ODE4LmpwZWc.jpeg",
+        "width": 502,
+        "height": 500
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Aw_Ejo8DsFZAJu-JlJN5dX6n_Z-6kIViQByXspXyBJU/rs:fit/g:sm/q:90/h:351/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTQwMjc4NjM2MS0z/ODgwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/Aw_Ejo8DsFZAJu-JlJN5dX6n_Z-6kIViQByXspXyBJU/rs:fit/g:sm/q:90/h:351/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTQwMjc4NjM2MS0z/ODgwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/s_IR5W_RdfPSnuLShd4GyOgSPIMfl-s8N2icgZtKkxo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTQwMjc4NjM2MS0z/ODgwLmpwZWc.jpeg",
+        "width": 500,
+        "height": 351
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/i2Y5weO64JlvxFHhqk6FUU3RjCF9EN2qOcMNQNywh2o/rs:fit/g:sm/q:90/h:595/w:387/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTQxNTI1OTI1Ny0x/MzExLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/i2Y5weO64JlvxFHhqk6FUU3RjCF9EN2qOcMNQNywh2o/rs:fit/g:sm/q:90/h:595/w:387/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTQxNTI1OTI1Ny0x/MzExLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/ITFUd61fJmdT70Z1-Zl5EFPt7pX-sC_citMSZ8IWQyk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTQxNTI1OTI1Ny0x/MzExLmpwZWc.jpeg",
+        "width": 387,
+        "height": 595
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/1-EdOTaTnto35mhKjKeyJghxvxv-mmP5s4ziB2h93rs/rs:fit/g:sm/q:90/h:288/w:188/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTA4NTAzNjU4OC5q/cGc.jpeg",
+        "resource_url": "https://i.discogs.com/1-EdOTaTnto35mhKjKeyJghxvxv-mmP5s4ziB2h93rs/rs:fit/g:sm/q:90/h:288/w:188/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTA4NTAzNjU4OC5q/cGc.jpeg",
+        "uri150": "https://i.discogs.com/4bdR5Q5BYrJHn8QHdOA7kOsIgTjrDf_JTukuTBGyI2s/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTA4NTAzNjU4OC5q/cGc.jpeg",
+        "width": 188,
+        "height": 288
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/wBSKOimA6eXB-4HKNqeUwKXCgbY04hsZHYgstYydm3Y/rs:fit/g:sm/q:90/h:202/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTA4NTAzNzcxMi5q/cGc.jpeg",
+        "resource_url": "https://i.discogs.com/wBSKOimA6eXB-4HKNqeUwKXCgbY04hsZHYgstYydm3Y/rs:fit/g:sm/q:90/h:202/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTA4NTAzNzcxMi5q/cGc.jpeg",
+        "uri150": "https://i.discogs.com/GsmXmEY_UlV6Kj-oqULWCNpXG83leWOZoOM0vvs-MNQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTA4NTAzNzcxMi5q/cGc.jpeg",
+        "width": 200,
+        "height": 202
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/IHBDs8kszd3PBKR91cFF40gYm1M6jc62Ki1Qx2XNH8E/rs:fit/g:sm/q:90/h:400/w:390/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTE0OTA5OTcxNy5q/cGVn.jpeg",
+        "resource_url": "https://i.discogs.com/IHBDs8kszd3PBKR91cFF40gYm1M6jc62Ki1Qx2XNH8E/rs:fit/g:sm/q:90/h:400/w:390/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTE0OTA5OTcxNy5q/cGVn.jpeg",
+        "uri150": "https://i.discogs.com/bdIIA8pmSn8BIG85_Sjm12W1cUdUTcQeuWx_LHM_cTk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTE0OTA5OTcxNy5q/cGVn.jpeg",
+        "width": 390,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/EHyP2nGCucRAGZl3LG7ZXltg5UXvVQGcxRiMJYgtopg/rs:fit/g:sm/q:90/h:335/w:247/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTY2MDQ5NDE4MS05/MTE0LnBuZw.jpeg",
+        "resource_url": "https://i.discogs.com/EHyP2nGCucRAGZl3LG7ZXltg5UXvVQGcxRiMJYgtopg/rs:fit/g:sm/q:90/h:335/w:247/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTY2MDQ5NDE4MS05/MTE0LnBuZw.jpeg",
+        "uri150": "https://i.discogs.com/IKxrJz9XPU05EXa8KibA0azpTWwourEtIs60rZRdjpk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU0NTEt/MTY2MDQ5NDE4MS05/MTE0LnBuZw.jpeg",
+        "width": 247,
+        "height": 335
+      }
+    ],
+    "realname": "David Axelrod",
+    "profile": "American composer, arranger and producer (born April 17, 1931, Los Angeles, California, USA - died February 5, 2017, Los Angeles, California, USA). His music has been sampled by [a=A Tribe Called Quest], [a=The Beatnuts], [a=Organized Konfusion], [a=Diamond D], and many, many others.",
+    "urls": [
+      "http://web.archive.org/web/20170217112503/http://www.davidaxelrodmusic.com/",
+      "https://myspace.com/davidaxelrod",
+      "https://en.wikipedia.org/wiki/David_Axelrod_(musician)",
+      "https://www.whosampled.com/David-Axelrod/",
+      "https://adp.library.ucsb.edu/names/302376"
+    ],
+    "namevariations": [
+      "Axelrod",
+      "Axlerod",
+      "D Axelrod",
+      "D. A. Axelrod",
+      "D. Alexrod",
+      "D. Axeirod",
+      "D. Axelroad",
+      "D. Axelrod",
+      "D. Axelrood",
+      "D. Axlerod",
+      "D.A. Axelrod",
+      "D.A.Axelrod",
+      "D.Axelrod",
+      "Dave Axelrod",
+      "Dave Azelrod",
+      "David A. Axelrod",
+      "David Alexrod",
+      "David Axcelrod",
+      "David Axelord",
+      "David Axlerod"
+    ],
+    "groups": [
+      {
+        "id": 1018613,
+        "name": "Pride (7)",
+        "resource_url": "https://api.discogs.com/artists/1018613",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

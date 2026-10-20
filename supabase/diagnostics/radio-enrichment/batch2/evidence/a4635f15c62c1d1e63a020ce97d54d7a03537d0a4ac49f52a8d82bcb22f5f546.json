@@ -1,0 +1,81 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/f66c2b7f-ea08-44a4-8a95-54e6c7298d27?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:48.223597+00:00",
+  "body": {
+    "first-release-date": "2021-11-12",
+    "title": "Gosk",
+    "length": 196000,
+    "video": false,
+    "artist-credit": [
+      {
+        "name": "Blawan",
+        "artist": {
+          "country": "GB",
+          "disambiguation": "British techno producer & DJ",
+          "sort-name": "Blawan",
+          "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+          "name": "Blawan",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "joinphrase": ""
+      }
+    ],
+    "disambiguation": "",
+    "id": "f66c2b7f-ea08-44a4-8a95-54e6c7298d27",
+    "releases": [
+      {
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "title": "Woke Up Right Handed EP",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "2021-11-12",
+            "area": {
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "44deb1b4-8341-48ac-b81a-403ab9bc65de",
+        "barcode": "191404119754",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "British techno producer & DJ",
+              "country": "GB",
+              "type": "Person",
+              "name": "Blawan",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+              "sort-name": "Blawan"
+            },
+            "joinphrase": "",
+            "name": "Blawan"
+          }
+        ],
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2021-11-12"
+      }
+    ],
+    "isrcs": [
+      "GBBKS2100214"
+    ]
+  }
+}

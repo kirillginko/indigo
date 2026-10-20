@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/0ad36b62-58fa-438c-9980-939f2661cf2c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:30.965234+00:00",
+  "body": {
+    "isrcs": [],
+    "id": "0ad36b62-58fa-438c-9980-939f2661cf2c",
+    "releases": [
+      {
+        "title": "That Is Why You're Overweight",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "US",
+        "disambiguation": "",
+        "id": "68d676c8-67fa-4faf-ab83-41ec99ba8a03",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "type": null,
+              "name": "United States"
+            },
+            "date": "1976"
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "name": "Eddie Harris",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+              "sort-name": "Harris, Eddie",
+              "disambiguation": "saxophone, piano, vocals",
+              "country": "US"
+            },
+            "joinphrase": "",
+            "name": "Eddie Harris"
+          }
+        ],
+        "packaging-id": null,
+        "packaging": null,
+        "date": "1976"
+      },
+      {
+        "release-events": [
+          {
+            "date": "2001",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "name": "United States",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "e7e50402-f352-4d12-bccb-318ef0841c3c",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "090431681923",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "US",
+        "quality": "normal",
+        "title": "Free Speech / That Is Why You're Overweight",
+        "disambiguation": "",
+        "packaging": null,
+        "packaging-id": null,
+        "date": "2001",
+        "artist-credit": [
+          {
+            "name": "Eddie Harris",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "name": "Eddie Harris",
+              "sort-name": "Harris, Eddie",
+              "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+              "disambiguation": "saxophone, piano, vocals",
+              "country": "US"
+            },
+            "joinphrase": ""
+          }
+        ]
+      }
+    ],
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "disambiguation": "saxophone, piano, vocals",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Eddie Harris",
+          "type": "Person",
+          "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+          "sort-name": "Harris, Eddie"
+        },
+        "joinphrase": "",
+        "name": "Eddie Harris"
+      }
+    ],
+    "video": false,
+    "length": 298000,
+    "first-release-date": "1976",
+    "title": "Flowers"
+  }
+}

@@ -1,0 +1,478 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/cedf92fe-eba1-45e2-ba16-b1b6af5169b8?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:47.705821+00:00",
+  "body": {
+    "gender-id": null,
+    "relations": [
+      {
+        "attribute-ids": {},
+        "begin": "2004-10",
+        "target-credit": "",
+        "ended": true,
+        "direction": "backward",
+        "end": "2004-12",
+        "attributes": [],
+        "target-type": "artist",
+        "attribute-values": {},
+        "artist": {
+          "country": "DE",
+          "disambiguation": "German techno producer Torsten Pröfrock",
+          "type": "Person",
+          "id": "976b0d63-f80c-4c9f-811a-090dc1eb6c7d",
+          "name": "T++",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "T++"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "type": "member of band",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "artist": {
+          "type": "Person",
+          "disambiguation": "",
+          "country": "DE",
+          "sort-name": "Behles, Gerhard",
+          "name": "Gerhard Behles",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "ecbd62e8-479f-4269-bf7e-6b39f47d7da3"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": true,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "end": "1999",
+        "attributes": [
+          "original"
+        ],
+        "direction": "backward"
+      },
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "end": null,
+        "attributes": [
+          "original"
+        ],
+        "direction": "backward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "artist": {
+          "type": "Person",
+          "disambiguation": "German electronic musician and mastering engineer",
+          "country": "DE",
+          "sort-name": "Henke, Robert",
+          "name": "Robert Henke",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "e34bb7bf-53ec-4fbb-b23b-dd839d9d662d"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist"
+      },
+      {
+        "source-credit": "",
+        "type": "allmusic",
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-type": "url",
+        "url": {
+          "id": "ac33ae9d-e3ce-4989-ac98-428712cf660c",
+          "resource": "https://www.allmusic.com/artist/mn0000926892"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false
+      },
+      {
+        "attribute-values": {},
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "target-type": "url",
+        "url": {
+          "resource": "https://roberthenke.bandcamp.com/",
+          "id": "b9fa3b42-9072-45c9-b3e3-23642eba261d"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "bandcamp"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.discogs.com/artist/534",
+          "id": "daad3829-d37d-41db-b0fa-893df8c89df6"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "discogs"
+      },
+      {
+        "source-credit": "",
+        "type": "free streaming",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "f82bfb78-f868-4370-97ed-40f6301964e8",
+          "resource": "https://open.spotify.com/artist/4XvKzACpcdk5iiZbWNvfbq"
+        },
+        "direction": "forward"
+      },
+      {
+        "source-credit": "",
+        "type": "free streaming",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.deezer.com/artist/13116",
+          "id": "9e3b822b-b248-40d3-9dc1-22bb2136cb50"
+        },
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "url": {
+          "id": "98b10c85-8501-4f1d-a716-2fb02eb4b81c",
+          "resource": "https://myspace.com/monolakemusic"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "myspace"
+      },
+      {
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://www.monolake.de/",
+          "id": "aeb561fa-56f3-4743-86ed-f0cbf7aadce8"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "official homepage"
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "0dcbbb93-71ab-4b76-9057-5e2eeb7830c3",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb14573658q"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url"
+      },
+      {
+        "url": {
+          "resource": "https://d-nb.info/gnd/10322244-3",
+          "id": "682f5a3c-8be8-4ef0-abd4-9bff0fc495b6"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "url": {
+          "id": "0680c3d8-2851-40a1-9db9-b8f234cf9668",
+          "resource": "https://ra.co/dj/monolake"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "2b624483-dd7b-4866-8eeb-8fd9391f6db8",
+          "resource": "https://rateyourmusic.com/artist/monolake"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.worldcat.org/identities/nc-monolake%20duo%20musical/",
+          "id": "5390c143-eeac-499e-85ea-f9718062a0d5"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://www.musik-sammler.de/artist/32973",
+          "id": "b0f54ca0-3e33-46ba-9f36-d761da0e635a"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://tidal.com/artist/3906787",
+          "id": "329ac30a-1942-4107-9acd-22e8a83b94d4"
+        },
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "wikidata",
+        "target-type": "url",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "eab52e03-e2b3-45d0-9dd5-bd7b3cff8920",
+          "resource": "https://www.wikidata.org/wiki/Q2752431"
+        },
+        "direction": "forward"
+      },
+      {
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.youtube.com/channel/UC_QBkYcd1Z_G-P3n8OqTCmQ",
+          "id": "19dd960f-8248-4e35-8a5f-c075ab2d7075"
+        },
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "youtube"
+      },
+      {
+        "source-credit": "",
+        "type": "youtube music",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "631712a0-7525-42ba-b7a3-605aa7a238c4",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "0cdb506a-570a-495a-a280-110d30f9f15b",
+          "resource": "https://music.youtube.com/channel/UC_QBkYcd1Z_G-P3n8OqTCmQ"
+        },
+        "attributes": [],
+        "end": null
+      }
+    ],
+    "name": "Monolake",
+    "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+    "area": {
+      "type": null,
+      "disambiguation": "",
+      "sort-name": "Germany",
+      "type-id": null,
+      "name": "Germany",
+      "iso-3166-1-codes": [
+        "DE"
+      ],
+      "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad"
+    },
+    "end-area": null,
+    "tags": [
+      {
+        "name": "ambient",
+        "count": 2
+      },
+      {
+        "count": 2,
+        "name": "ambient techno"
+      },
+      {
+        "name": "dub techno",
+        "count": 2
+      },
+      {
+        "name": "idm",
+        "count": 3
+      },
+      {
+        "count": 2,
+        "name": "minimal techno"
+      }
+    ],
+    "disambiguation": "",
+    "aliases": [],
+    "gender": null,
+    "sort-name": "Monolake",
+    "begin-area": null,
+    "id": "cedf92fe-eba1-45e2-ba16-b1b6af5169b8",
+    "ipis": [],
+    "type": "Group",
+    "life-span": {
+      "ended": false,
+      "begin": "1995",
+      "end": null
+    },
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "608b0471-7531-4854-a348-e698c69cb699",
+        "count": 2,
+        "name": "ambient"
+      },
+      {
+        "disambiguation": "",
+        "id": "1c6e4eae-915d-4662-a7ff-038920b67d9e",
+        "count": 2,
+        "name": "ambient techno"
+      },
+      {
+        "name": "dub techno",
+        "count": 2,
+        "id": "16aab171-3dce-454e-bb96-2636f15813fc",
+        "disambiguation": ""
+      },
+      {
+        "name": "idm",
+        "id": "8eb583f1-4fd7-460c-8246-dcdccc0e3ef9",
+        "disambiguation": "",
+        "count": 3
+      },
+      {
+        "name": "minimal techno",
+        "id": "c1313278-b276-4a79-9fc1-770dd62a8b83",
+        "disambiguation": "",
+        "count": 2
+      }
+    ],
+    "isnis": [
+      "000000010661006X"
+    ],
+    "country": "DE"
+  }
+}

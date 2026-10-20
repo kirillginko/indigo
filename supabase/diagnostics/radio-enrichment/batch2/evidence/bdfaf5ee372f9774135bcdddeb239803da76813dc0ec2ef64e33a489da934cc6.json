@@ -1,0 +1,241 @@
+{
+  "url": "https://api.discogs.com/artists/8722",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:41.653913+00:00",
+  "body": {
+    "name": "Piero Umiliani",
+    "id": 8722,
+    "resource_url": "https://api.discogs.com/artists/8722",
+    "uri": "https://www.discogs.com/artist/8722-Piero-Umiliani",
+    "releases_url": "https://api.discogs.com/artists/8722/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/VxB9S6b4tS7ypTv7bxjA7ooFD48qZ_Fm8TBrIqpig40/rs:fit/g:sm/q:90/h:364/w:469/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3Nzk1NS02/OTE1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/VxB9S6b4tS7ypTv7bxjA7ooFD48qZ_Fm8TBrIqpig40/rs:fit/g:sm/q:90/h:364/w:469/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3Nzk1NS02/OTE1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/wQAs3cOt4zmxvJWujnzhYDTPo9jSzDYFXrd-CN6ajvM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3Nzk1NS02/OTE1LmpwZWc.jpeg",
+        "width": 469,
+        "height": 364
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/RGNrXWKdFwOxNmPesTk8j0_YpncZ5Iz0UhOXXgx3XKU/rs:fit/g:sm/q:90/h:364/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM5ODgwNTU5NS04/OTk4LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/RGNrXWKdFwOxNmPesTk8j0_YpncZ5Iz0UhOXXgx3XKU/rs:fit/g:sm/q:90/h:364/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM5ODgwNTU5NS04/OTk4LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Bvow8QoXeLizW5wee_zpiIWhWR8CTcCNe21HxxOK6rY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM5ODgwNTU5NS04/OTk4LmpwZWc.jpeg",
+        "width": 600,
+        "height": 364
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/wWocZdAUE65b-Jpno6SPAVKUKmzdp7QgA4ZcV8EBZJ0/rs:fit/g:sm/q:90/h:492/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTQ5NTY5OTE1My03/MjQ1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/wWocZdAUE65b-Jpno6SPAVKUKmzdp7QgA4ZcV8EBZJ0/rs:fit/g:sm/q:90/h:492/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTQ5NTY5OTE1My03/MjQ1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/m4REFyHT1hk7o4OIvwrpargV7Ahjp7vjg_3xfQvhEB4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTQ5NTY5OTE1My03/MjQ1LmpwZWc.jpeg",
+        "width": 600,
+        "height": 492
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/DodsYm5zMWq9YxDEIwADeK-cjvRiKZlybxVwRaFtGUI/rs:fit/g:sm/q:90/h:160/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3NzkxNC01/NTQxLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/DodsYm5zMWq9YxDEIwADeK-cjvRiKZlybxVwRaFtGUI/rs:fit/g:sm/q:90/h:160/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3NzkxNC01/NTQxLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/d3F9e2ZDGnttKiokoulEeZ19oAdPkPYQqcc-IEwtAK4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3NzkxNC01/NTQxLmpwZWc.jpeg",
+        "width": 500,
+        "height": 160
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/7JW5LeJw1nxFwJqk7FNMWDLZbwuQIsxMrX5Ubi36M5M/rs:fit/g:sm/q:90/h:310/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3Nzk5Ni02/ODU0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/7JW5LeJw1nxFwJqk7FNMWDLZbwuQIsxMrX5Ubi36M5M/rs:fit/g:sm/q:90/h:310/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3Nzk5Ni02/ODU0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/l-TKHwnLUEuDkyRc7cvnfcI3r32Uo8gjVE4iaNLQsUw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3Nzk5Ni02/ODU0LmpwZWc.jpeg",
+        "width": 225,
+        "height": 310
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/J2i1FkpkkAPsPpIwll9sX6rAHFsIqamG0-j7eknIisY/rs:fit/g:sm/q:90/h:310/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODAyNi00/NTg5LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/J2i1FkpkkAPsPpIwll9sX6rAHFsIqamG0-j7eknIisY/rs:fit/g:sm/q:90/h:310/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODAyNi00/NTg5LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/URCRE_f7JX2yOnWbw-_fam0B2TKizGOhtnzoHz5nClg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODAyNi00/NTg5LmpwZWc.jpeg",
+        "width": 225,
+        "height": 310
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/6s0_b804r8HGUXdJeAIREjXVNx9GppOebh4ypZfJZO8/rs:fit/g:sm/q:90/h:311/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODA1NS02/Mzc1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/6s0_b804r8HGUXdJeAIREjXVNx9GppOebh4ypZfJZO8/rs:fit/g:sm/q:90/h:311/w:225/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODA1NS02/Mzc1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/rr59EabrAAXEnC5alDYw4_FnQBUJtayE8pAxZb1j2Yw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODA1NS02/Mzc1LmpwZWc.jpeg",
+        "width": 225,
+        "height": 311
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/A51TzkZj3jjiqswocAWBVFr5PIZGDRnoWAgvd5qvemo/rs:fit/g:sm/q:90/h:580/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODA5My03/NDI1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/A51TzkZj3jjiqswocAWBVFr5PIZGDRnoWAgvd5qvemo/rs:fit/g:sm/q:90/h:580/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODA5My03/NDI1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/cjgSO7dii7xxYOTnaLE1628aPQVe3LI9iDjuEGNdnS8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTM1Njg3ODA5My03/NDI1LmpwZWc.jpeg",
+        "width": 400,
+        "height": 580
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/WjDwxet19EdEEF-3p9wtNusSj7xfk9dHNCv1wPlPbqo/rs:fit/g:sm/q:90/h:430/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTcxNDAwMTI4OC01/NTIxLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/WjDwxet19EdEEF-3p9wtNusSj7xfk9dHNCv1wPlPbqo/rs:fit/g:sm/q:90/h:430/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTcxNDAwMTI4OC01/NTIxLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/j_Iua8S6pzbigWbhL7TSJel6ZsFg9f3KMpeGBjRCpcg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTg3MjIt/MTcxNDAwMTI4OC01/NTIxLmpwZWc.jpeg",
+        "width": 600,
+        "height": 430
+      }
+    ],
+    "profile": "Italian composer of film scores and library music (born on July 17, 1926 in Firenze; died on February 14, 2001 in Roma). Founder of  [l79332],  [l97782], [l938491] and cofounder of [l432706]. \n\nBest known for composing [m66474], which was originally used for a Mondo documentary about Sweden (Svezia, Inferno e Paradiso) and became world-famous in 1977 when performed for The Muppet Show. The song was also the theme to the [a506143] show. \n\nHe helped form the style of the European '60s/'70s jazz-influenced film soundtracks which later experienced a revival in films like Kill Bill and Ocean's Twelve.",
+    "urls": [
+      "http://www.umiliani.com/",
+      "http://www.umiliani.eu/",
+      "https://pieroumiliani.bandcamp.com/",
+      "https://www.facebook.com/profile.php?id=100032893647124",
+      "https://x.com/PUmiliani",
+      "https://myspace.com/pieroumilianiofficialspac",
+      "https://it.wikipedia.org/wiki/Piero_Umiliani",
+      "https://en.wikipedia.org/wiki/Piero_Umiliani",
+      "https://www.imdb.com/name/nm0006327/",
+      "https://www.whosampled.com/Piero-Umiliani/"
+    ],
+    "namevariations": [
+      "(Piero Umiliani) Liuto",
+      "Foster",
+      "Imiliani",
+      "M.o Piero Umiliani",
+      "M.o Umiliani",
+      "P Umiliani",
+      "P-Umiliani",
+      "P. Ulimiani",
+      "P. Umbrani",
+      "P. Umilani",
+      "P. Umiliani",
+      "P. Umilizni",
+      "P. Umilliani",
+      "P. ウミリアーニ",
+      "P.Umiliani",
+      "Piero",
+      "Piero Alimani",
+      "Piero Umilani",
+      "Piero Umiliani & His Orchestra",
+      "Piero Umiliani & I Suoi Oscillatori",
+      "Piero Umiliani E I Suoi Oscillatori",
+      "Piero Umiliani Ed I Suoi Oscillatori",
+      "Piero Umillani",
+      "Piero Uniliano",
+      "Pierre Umiliani",
+      "Pierro Umilliani",
+      "Pietro Umiliani",
+      "Piro Umilliani",
+      "Uliliani",
+      "Umilani",
+      "Umiliani",
+      "Umiliani, Piero {K T)",
+      "Umiliano",
+      "Umilion",
+      "Umilioni",
+      "Umiljani",
+      "Umilliani",
+      "Uniliani",
+      "{Piero Umiliani} Liuto",
+      "פיירו אומיליאני",
+      "ピエロ・ウミリアーニ"
+    ],
+    "aliases": [
+      {
+        "id": 710019,
+        "name": "Moggi",
+        "resource_url": "https://api.discogs.com/artists/710019"
+      },
+      {
+        "id": 942729,
+        "name": "Rovi",
+        "resource_url": "https://api.discogs.com/artists/942729"
+      },
+      {
+        "id": 1344082,
+        "name": "M. Zalla",
+        "resource_url": "https://api.discogs.com/artists/1344082"
+      },
+      {
+        "id": 2133548,
+        "name": "L'Ingegner Giovanni & Famiglia",
+        "resource_url": "https://api.discogs.com/artists/2133548"
+      },
+      {
+        "id": 2261507,
+        "name": "Tusco",
+        "resource_url": "https://api.discogs.com/artists/2261507"
+      },
+      {
+        "id": 3553887,
+        "name": "Catamo",
+        "resource_url": "https://api.discogs.com/artists/3553887"
+      },
+      {
+        "id": 7517301,
+        "name": "Old Big Chief And His Magic Twenty Fingers",
+        "resource_url": "https://api.discogs.com/artists/7517301"
+      },
+      {
+        "id": 7517308,
+        "name": "Maestro (50)",
+        "resource_url": "https://api.discogs.com/artists/7517308"
+      }
+    ],
+    "groups": [
+      {
+        "id": 844738,
+        "name": "Piero Umiliani E La Sua Orchestra",
+        "resource_url": "https://api.discogs.com/artists/844738",
+        "active": true
+      },
+      {
+        "id": 942730,
+        "name": "The Soundwork-Shoppers",
+        "resource_url": "https://api.discogs.com/artists/942730",
+        "active": true
+      },
+      {
+        "id": 1325659,
+        "name": "Piero Umiliani E Il Suo Complesso",
+        "resource_url": "https://api.discogs.com/artists/1325659",
+        "active": true
+      },
+      {
+        "id": 1687408,
+        "name": "Piero Umiliani E I Suoi Solisti",
+        "resource_url": "https://api.discogs.com/artists/1687408",
+        "active": true
+      },
+      {
+        "id": 2299238,
+        "name": "Gianni Basso Quintet",
+        "resource_url": "https://api.discogs.com/artists/2299238",
+        "active": true
+      },
+      {
+        "id": 2348435,
+        "name": "Johnny Moggi Quintet",
+        "resource_url": "https://api.discogs.com/artists/2348435",
+        "active": true
+      },
+      {
+        "id": 3442595,
+        "name": "Piero Umiliani Quartet",
+        "resource_url": "https://api.discogs.com/artists/3442595",
+        "active": true
+      },
+      {
+        "id": 4917448,
+        "name": "Piero Umiliani E Il Suo Sestetto",
+        "resource_url": "https://api.discogs.com/artists/4917448",
+        "active": true
+      },
+      {
+        "id": 7464080,
+        "name": "Piero Umiliani & His Octet",
+        "resource_url": "https://api.discogs.com/artists/7464080",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

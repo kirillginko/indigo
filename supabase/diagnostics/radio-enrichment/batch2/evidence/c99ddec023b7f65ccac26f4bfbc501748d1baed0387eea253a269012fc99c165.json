@@ -1,0 +1,180 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/385d09fa-1866-408c-8d15-9c7324494463?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:45.356252+00:00",
+  "body": {
+    "disambiguation": "Spencer Kincy, Chicago house producer",
+    "name": "Gemini",
+    "life-span": {
+      "begin": null,
+      "end": null,
+      "ended": false
+    },
+    "country": "US",
+    "ipis": [],
+    "tags": [
+      {
+        "count": 1,
+        "name": "dubstep"
+      }
+    ],
+    "type": "Person",
+    "aliases": [
+      {
+        "ended": false,
+        "locale": null,
+        "name": "Gemini Sounds",
+        "primary": null,
+        "type": null,
+        "sort-name": "Gemini Sounds",
+        "end": null,
+        "type-id": null,
+        "begin": null
+      }
+    ],
+    "end-area": null,
+    "begin-area": null,
+    "area": {
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "type": null,
+      "sort-name": "United States",
+      "type-id": null,
+      "disambiguation": "",
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "name": "United States"
+    },
+    "isnis": [
+      "0000000003080932"
+    ],
+    "id": "385d09fa-1866-408c-8d15-9c7324494463",
+    "relations": [
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "artist",
+        "attribute-values": {},
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "artist": {
+          "country": "US",
+          "disambiguation": "",
+          "name": "Spencer Kincy",
+          "id": "34cdd688-4fc3-4272-b2c9-80b3dc8c539b",
+          "sort-name": "Kincy, Spencer",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "source-credit": "",
+        "attributes": [],
+        "type": "is person",
+        "direction": "backward"
+      },
+      {
+        "attribute-values": {},
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "url",
+        "target-credit": "",
+        "end": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "begin": null,
+        "url": {
+          "id": "281ccec7-3a2d-4a5a-abd7-89c26e4d57d3",
+          "resource": "https://www.allmusic.com/artist/mn0000159104"
+        },
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type": "allmusic"
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "type": "allmusic",
+        "direction": "forward",
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "url": {
+          "id": "72888779-92e5-4cd7-8315-6b494b41010e",
+          "resource": "https://www.allmusic.com/artist/mn0000192281"
+        },
+        "begin": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "end": null,
+        "target-credit": ""
+      },
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://www.discogs.com/artist/1745",
+          "id": "58bf4914-2523-4649-ab5f-0f3df355c5a1"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "source-credit": "",
+        "attributes": [],
+        "type": "discogs",
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "end": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "url": {
+          "id": "cace6ed3-6f2e-45cc-b79a-ccca6e4062ee",
+          "resource": "https://www.discogs.com/artist/2145"
+        },
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "direction": "forward",
+        "type": "discogs",
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type": "other databases",
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/gemini_f1",
+          "id": "9557e547-7756-4b20-a43a-a9669d1295d7"
+        },
+        "attribute-values": {},
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "url"
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "1b50083b-1afa-4778-82c8-548b309af783",
+        "name": "dubstep",
+        "count": 1
+      }
+    ],
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "sort-name": "Gemini",
+    "gender": "Male"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/0605acbc-dc4c-481c-8cdb-9ca281847a02?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:57.414004+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+          "disambiguation": "Los Angeles-based hip-hop producer from London, England",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "sort-name": "Budgie",
+          "type": "Person",
+          "name": "Budgie"
+        },
+        "joinphrase": "",
+        "name": "Budgie"
+      }
+    ],
+    "disambiguation": "",
+    "id": "0605acbc-dc4c-481c-8cdb-9ca281847a02",
+    "title": "Want 2 Love U",
+    "length": 154338,
+    "isrcs": [],
+    "video": false,
+    "first-release-date": "2018-12-07",
+    "releases": [
+      {
+        "quality": "normal",
+        "packaging": null,
+        "country": "XW",
+        "text-representation": {
+          "language": "eng",
+          "script": null
+        },
+        "title": "Holy Ghost Zone",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Budgie",
+              "type": "Person",
+              "sort-name": "Budgie",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+              "disambiguation": "Los Angeles-based hip-hop producer from London, England"
+            },
+            "name": "Budgie",
+            "joinphrase": ""
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2018-12-07"
+          }
+        ],
+        "barcode": null,
+        "date": "2018-12-07",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "acec1964-720a-42d3-b987-fd27afd89164"
+      }
+    ]
+  }
+}

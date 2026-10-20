@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/3da239a6-3ac7-40a0-8fdd-122d6cd25376?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:54.230161+00:00",
+  "body": {
+    "releases": [
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "title": "Project 5 EP",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "1997",
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "K. Hand",
+            "artist": {
+              "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Kelli Hand",
+              "sort-name": "Hand, Kelli",
+              "country": "US",
+              "disambiguation": "",
+              "type": "Person"
+            }
+          }
+        ],
+        "id": "4f23cc26-754d-43e0-ba9f-41cb850ee3db",
+        "packaging": null,
+        "status": "Official",
+        "packaging-id": null,
+        "date": "1997",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "US"
+      },
+      {
+        "disambiguation": "",
+        "title": "Project 5 EP",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2018-01-15",
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "K. Hand",
+            "artist": {
+              "disambiguation": "",
+              "country": "US",
+              "type": "Person",
+              "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc",
+              "sort-name": "Hand, Kelli",
+              "name": "Kelli Hand",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XW",
+        "id": "af2f8c45-c02b-4675-b56b-3d9ec8165c30",
+        "packaging": "None",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2018-01-15"
+      }
+    ],
+    "first-release-date": "1997",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "K. Hand",
+        "artist": {
+          "type": "Person",
+          "country": "US",
+          "disambiguation": "",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Kelli Hand",
+          "sort-name": "Hand, Kelli",
+          "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc"
+        }
+      }
+    ],
+    "disambiguation": "",
+    "title": "[untitled]",
+    "isrcs": [],
+    "id": "0859c948-06ab-491e-96ce-36eaac449028",
+    "video": false,
+    "length": 453724
+  }
+}

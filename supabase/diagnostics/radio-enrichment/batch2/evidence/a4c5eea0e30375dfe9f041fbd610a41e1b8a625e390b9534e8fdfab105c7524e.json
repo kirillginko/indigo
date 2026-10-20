@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/370a48f5-330f-4f44-8a04-dfa03c234475?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:32.084212+00:00",
+  "body": {
+    "disambiguation": "",
+    "title": "Wait Please",
+    "releases": [
+      {
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "packaging": "Cardboard/Paper Sleeve",
+        "id": "7e1b631e-bc66-4bf6-8369-f506ce9680b6",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "date": "1970",
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "1970",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "barcode": "",
+        "title": "Free Speech",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+              "sort-name": "Harris, Eddie",
+              "name": "Eddie Harris",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "saxophone, piano, vocals",
+              "country": "US",
+              "type": "Person"
+            },
+            "name": "Eddie Harris"
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "status": "Official",
+        "date": "2001",
+        "packaging-id": null,
+        "packaging": null,
+        "id": "e7e50402-f352-4d12-bccb-318ef0841c3c",
+        "country": "US",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "saxophone, piano, vocals",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Eddie Harris",
+              "sort-name": "Harris, Eddie",
+              "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4"
+            },
+            "name": "Eddie Harris"
+          }
+        ],
+        "title": "Free Speech / That Is Why You're Overweight",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "sort-name": "United States"
+            },
+            "date": "2001"
+          }
+        ],
+        "barcode": "090431681923"
+      }
+    ],
+    "artist-credit": [
+      {
+        "name": "Eddie Harris",
+        "artist": {
+          "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+          "sort-name": "Harris, Eddie",
+          "name": "Eddie Harris",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "saxophone, piano, vocals",
+          "country": "US",
+          "type": "Person"
+        },
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "1970",
+    "id": "370a48f5-330f-4f44-8a04-dfa03c234475",
+    "video": false,
+    "length": 527000,
+    "isrcs": []
+  }
+}

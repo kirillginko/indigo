@@ -1,0 +1,177 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/ba14279b-8e9a-4981-bf9a-6a0f1296d502?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:14.741907+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "artist": {
+          "disambiguation": "American R&B singer",
+          "id": "396a9525-0994-4542-b480-c4587feeb476",
+          "name": "Tinashe",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "Tinashe"
+        },
+        "joinphrase": "",
+        "name": "Tinashe"
+      }
+    ],
+    "length": 66000,
+    "title": "SHY GUY",
+    "first-release-date": "2021-08-06",
+    "video": false,
+    "disambiguation": "",
+    "releases": [
+      {
+        "quality": "normal",
+        "barcode": "192641784224",
+        "packaging": "None",
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Tinashe",
+              "type": "Person",
+              "disambiguation": "American R&B singer",
+              "name": "Tinashe",
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "country": "US"
+            }
+          }
+        ],
+        "title": "333",
+        "id": "292f3a7d-5b4a-4367-97fc-fd939b329b93",
+        "release-events": [
+          {
+            "date": "2021-08-06",
+            "area": {
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type": null,
+              "sort-name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2021-08-06",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "country": "XW"
+      },
+      {
+        "id": "99720763-2031-4d74-aa85-0b99f905eb7b",
+        "release-events": [
+          {
+            "date": "2021-11-02",
+            "area": {
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2021-11-02",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Tinashe",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Tinashe",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "American R&B singer",
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe"
+            }
+          }
+        ],
+        "packaging": "Jewel Case",
+        "barcode": "192641784224",
+        "title": "333",
+        "disambiguation": "",
+        "country": "XW",
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "deluxe",
+        "country": "XW",
+        "quality": "normal",
+        "barcode": "192641932960",
+        "packaging": "None",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Tinashe",
+              "type": "Person",
+              "name": "Tinashe",
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "disambiguation": "American R&B singer",
+              "country": "US"
+            },
+            "name": "Tinashe",
+            "joinphrase": ""
+          }
+        ],
+        "title": "333",
+        "id": "6bd5c256-3b3d-4a92-a799-b598b5c42f05",
+        "date": "2022-03-03",
+        "release-events": [
+          {
+            "date": "2022-03-03",
+            "area": {
+              "name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type": null
+            }
+          }
+        ]
+      }
+    ],
+    "id": "ba14279b-8e9a-4981-bf9a-6a0f1296d502",
+    "isrcs": [
+      "USA2P2128490"
+    ]
+  }
+}

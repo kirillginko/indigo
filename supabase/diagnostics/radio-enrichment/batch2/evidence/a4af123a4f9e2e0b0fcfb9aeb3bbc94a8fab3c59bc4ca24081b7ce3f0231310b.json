@@ -1,0 +1,319 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/6ec721a0-c7d2-431e-8108-ac4c1b08a489?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:15.523053+00:00",
+  "body": {
+    "title": "Happy Seasons",
+    "disambiguation": "",
+    "releases": [
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "XW",
+        "id": "71e8af55-8e29-4082-b6a9-48716a62c163",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2014-10-17",
+        "status": "Official",
+        "barcode": "0886444825160",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "2014-10-17"
+          }
+        ],
+        "disambiguation": "24-Bit 44.1 kHz",
+        "title": "Holiday",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Earth, Wind & Fire",
+              "sort-name": "Earth, Wind & Fire",
+              "id": "535afeda-2538-435d-9dd1-5e10be586774",
+              "type": "Group",
+              "country": "US",
+              "disambiguation": ""
+            },
+            "name": "Earth, Wind & Fire",
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      },
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "release-events": [
+          {
+            "area": {
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "2014-10-21"
+          }
+        ],
+        "barcode": null,
+        "title": "Holiday",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "name": "Earth, Wind & Fire",
+            "artist": {
+              "disambiguation": "",
+              "country": "US",
+              "type": "Group",
+              "id": "535afeda-2538-435d-9dd1-5e10be586774",
+              "sort-name": "Earth, Wind & Fire",
+              "name": "Earth, Wind & Fire",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "packaging": null,
+        "id": "70b210a5-e96f-4265-b047-5e7831aed003",
+        "date": "2014-10-21",
+        "packaging-id": null,
+        "status": "Official",
+        "country": "US",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "country": "US",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "id": "28dd4470-062f-4125-bfee-bd64ab0618fe",
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "2014-10-21",
+        "title": "Holiday",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "2014-10-21",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "barcode": "888750159823",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "country": "US",
+              "disambiguation": "",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Earth, Wind & Fire",
+              "sort-name": "Earth, Wind & Fire",
+              "id": "535afeda-2538-435d-9dd1-5e10be586774"
+            },
+            "name": "Earth, Wind & Fire"
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "type": "Group",
+              "id": "535afeda-2538-435d-9dd1-5e10be586774",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Earth, Wind & Fire",
+              "sort-name": "Earth, Wind & Fire"
+            },
+            "name": "Earth, Wind & Fire",
+            "joinphrase": ""
+          }
+        ],
+        "title": "The Classic Christmas Album",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]"
+            },
+            "date": "2015-10-02"
+          }
+        ],
+        "barcode": "886445473803",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "XW",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2015-10-02",
+        "packaging": "None",
+        "id": "64748430-ad53-40b3-9de3-ce3e55a0a157"
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Earth, Wind & Fire",
+            "artist": {
+              "id": "535afeda-2538-435d-9dd1-5e10be586774",
+              "sort-name": "Earth, Wind & Fire",
+              "name": "Earth, Wind & Fire",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "disambiguation": "",
+              "country": "US",
+              "type": "Group"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "The Classic Christmas Album",
+        "barcode": null,
+        "release-events": [
+          {
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "disambiguation": "",
+              "type": null
+            },
+            "date": "2015-10-15"
+          }
+        ],
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "quality": "normal",
+        "status-id": null,
+        "country": "US",
+        "status": null,
+        "date": "2015-10-15",
+        "packaging-id": null,
+        "id": "9c5710a9-d8ac-4215-8c4e-f864de3c3bec",
+        "packaging": null
+      },
+      {
+        "packaging": null,
+        "id": "a78b2ea0-404f-4c35-b1dd-63843eca1f81",
+        "status": "Official",
+        "date": "2015",
+        "packaging-id": null,
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "The Classic Christmas Album",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "2015",
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "sort-name": "United States"
+            }
+          }
+        ],
+        "barcode": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "disambiguation": "",
+              "country": "US",
+              "sort-name": "Earth, Wind & Fire",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Earth, Wind & Fire",
+              "id": "535afeda-2538-435d-9dd1-5e10be586774"
+            },
+            "name": "Earth, Wind & Fire",
+            "joinphrase": ""
+          }
+        ]
+      }
+    ],
+    "first-release-date": "2014-10-17",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Earth, Wind & Fire",
+        "artist": {
+          "type": "Group",
+          "disambiguation": "",
+          "country": "US",
+          "sort-name": "Earth, Wind & Fire",
+          "name": "Earth, Wind & Fire",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "535afeda-2538-435d-9dd1-5e10be586774"
+        }
+      }
+    ],
+    "video": false,
+    "id": "6ec721a0-c7d2-431e-8108-ac4c1b08a489",
+    "length": 238000,
+    "isrcs": []
+  }
+}

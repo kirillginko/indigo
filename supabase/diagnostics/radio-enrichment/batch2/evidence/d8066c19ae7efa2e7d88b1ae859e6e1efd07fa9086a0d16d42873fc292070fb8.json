@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/d1c5ca62-b8f9-4db1-ae6f-1b3597bccd6f?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:35.371204+00:00",
+  "body": {
+    "id": "d1c5ca62-b8f9-4db1-ae6f-1b3597bccd6f",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "name": "Paul Johnson",
+        "joinphrase": "",
+        "artist": {
+          "disambiguation": "Chicago house music DJ/producer",
+          "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Johnson, Paul",
+          "type": "Person",
+          "name": "Paul Johnson"
+        }
+      }
+    ],
+    "title": "Hear the Music",
+    "length": 321000,
+    "isrcs": [],
+    "video": false,
+    "releases": [
+      {
+        "quality": "normal",
+        "packaging": null,
+        "title": "Feel the Music",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "GB",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "name": "Paul Johnson",
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "name": "Paul Johnson",
+              "sort-name": "Johnson, Paul",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "Chicago house music DJ/producer",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776"
+            }
+          }
+        ],
+        "date": "1996-11-25",
+        "release-events": [
+          {
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "1996-11-25"
+          }
+        ],
+        "barcode": "5025128905629",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "b63954a9-244c-40dd-b6ee-d5a96f5a11fd"
+      }
+    ],
+    "first-release-date": "1996-11-25"
+  }
+}

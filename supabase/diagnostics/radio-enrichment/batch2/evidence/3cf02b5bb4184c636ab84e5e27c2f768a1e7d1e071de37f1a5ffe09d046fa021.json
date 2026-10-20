@@ -1,0 +1,1194 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/75fc69ea-6cec-45ba-a9fb-12a21c24e262?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:41.895475+00:00",
+  "body": {
+    "first-release-date": "1968",
+    "id": "5a6169af-5f45-4f27-8a7f-7fe541cb68d7",
+    "releases": [
+      {
+        "quality": "normal",
+        "id": "f7591e4d-e41c-3569-8c68-e1dcd138f52d",
+        "release-events": [
+          {
+            "date": "1968",
+            "area": {
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "barcode": "",
+        "disambiguation": "",
+        "title": "Song of Innocence",
+        "packaging": "Cardboard/Paper Sleeve",
+        "country": "US",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Axelrod, David",
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "David Axelrod",
+              "type": "Person"
+            }
+          }
+        ],
+        "date": "1968"
+      },
+      {
+        "date": "1998",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            }
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": null,
+        "status": "Official",
+        "title": "Blue Break Beats Vol. 4",
+        "disambiguation": "",
+        "barcode": "0060256716549",
+        "id": "1a5420ab-3227-4858-bece-95998f13b278",
+        "release-events": [
+          {
+            "date": "1998",
+            "area": null
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "date": "1998",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists"
+            }
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "country": "XE",
+        "packaging": "Jewel Case",
+        "title": "Blue Break Beats, Volume 4",
+        "disambiguation": "",
+        "barcode": "724349402706",
+        "id": "8d1e0e73-1340-4241-9cb2-275b350678ee",
+        "release-events": [
+          {
+            "date": "1998",
+            "area": {
+              "name": "Europe",
+              "type": null,
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "disambiguation": "",
+              "sort-name": "Europe"
+            }
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists",
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist"
+            }
+          }
+        ],
+        "date": "1999-02-09",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "country": "US",
+        "status": "Official",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "Blue Break Beats, Volume 4",
+        "barcode": "724349402720",
+        "quality": "normal",
+        "id": "39148bb7-7693-4ac1-bd6d-37269ae26ac0",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "name": "United States",
+              "type": null
+            },
+            "date": "1999-02-09"
+          }
+        ]
+      },
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "artist": {
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists",
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "date": "1999-08-31",
+        "packaging": "Jewel Case",
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "All Back to Mine",
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null
+            },
+            "date": "1999-08-31"
+          }
+        ],
+        "id": "6419aabb-0232-4ce4-992d-78ce058f22af",
+        "barcode": "724352235223"
+      },
+      {
+        "date": "1999-09-28",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+        "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+        "country": "GB",
+        "status": "Promotion",
+        "packaging": "Gatefold Cover",
+        "title": "Bollox to Ibiza: The Autumn Collection",
+        "disambiguation": "",
+        "barcode": "",
+        "id": "d4d45265-eb29-4113-ad6c-18d0e08b3df8",
+        "release-events": [
+          {
+            "area": {
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": ""
+            },
+            "date": "1999-09-28"
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "David Axelrod",
+              "type": "Person",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "baroque pop composer",
+              "country": "US",
+              "sort-name": "Axelrod, David"
+            },
+            "joinphrase": "",
+            "name": "David Axelrod"
+          }
+        ],
+        "date": "2000",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": "Jewel Case",
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "Song of Innocence",
+        "barcode": "724352158829",
+        "quality": "normal",
+        "id": "2d32a8f2-3d40-4fe7-a473-a59599ec81fd",
+        "release-events": [
+          {
+            "date": "2000",
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "sort-name": "United Kingdom"
+            }
+          }
+        ]
+      },
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "sort-name": "Various Artists"
+            }
+          }
+        ],
+        "date": "2001-03-12",
+        "status": "Official",
+        "packaging-id": null,
+        "country": "XE",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "Best of Blue Break Beats",
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "Europe",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "type-id": null,
+              "name": "Europe",
+              "type": null
+            },
+            "date": "2001-03-12"
+          }
+        ],
+        "id": "73defaf1-8eee-45ee-b40c-d026fece47e3",
+        "barcode": null
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Axelrod, David",
+              "disambiguation": "baroque pop composer",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "type": "Person",
+              "name": "David Axelrod"
+            },
+            "name": "David Axelrod",
+            "joinphrase": ""
+          }
+        ],
+        "date": "2001-04-10",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": null,
+        "packaging-id": null,
+        "country": "US",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "1968 to 1970: An Axelrod Anthology",
+        "barcode": null,
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "name": "United States",
+              "type": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "sort-name": "United States"
+            },
+            "date": "2001-04-10"
+          }
+        ],
+        "id": "16c757f6-5118-42a8-aba0-2b5895826997"
+      },
+      {
+        "title": "Sampled, Volume 4",
+        "disambiguation": "",
+        "id": "04f82235-ceba-4359-a023-c0c91ceb70f6",
+        "release-events": [
+          {
+            "area": {
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": ""
+            },
+            "date": "2003-01-27"
+          }
+        ],
+        "quality": "normal",
+        "barcode": "724358070323",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "date": "2003-01-27",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other"
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "status": "Official",
+        "country": "GB",
+        "packaging": null
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "country": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "date": "2003-03-03",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "David Axelrod",
+            "artist": {
+              "name": "David Axelrod",
+              "type": "Person",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "sort-name": "Axelrod, David"
+            }
+          }
+        ],
+        "release-events": [
+          {
+            "area": null,
+            "date": "2003-03-03"
+          }
+        ],
+        "id": "65178e02-dab2-46ec-a029-bea4bf73a3f1",
+        "quality": "normal",
+        "barcode": "00724352158850",
+        "title": "Song of Innocence",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "title": "The Edge of Music: An Exploration of 50 Years in Music",
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type": null,
+              "name": "United Kingdom",
+              "sort-name": "United Kingdom",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "2006-02-27"
+          }
+        ],
+        "id": "133ade3e-ed55-4a9c-bcde-55401112157f",
+        "barcode": "0094633884526",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "name": "David Axelrod",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "disambiguation": "baroque pop composer",
+              "country": "US",
+              "sort-name": "Axelrod, David"
+            }
+          }
+        ],
+        "date": "2006-02-27",
+        "packaging": null,
+        "packaging-id": null,
+        "country": "GB",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "date": "2007",
+        "packaging-id": null,
+        "status": "Official",
+        "country": "BE",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "Trip Tease, Volume 1: Fine Moments from the Blue Note Catalogue",
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+              "type": null,
+              "name": "Belgium",
+              "sort-name": "Belgium",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "BE"
+              ]
+            },
+            "date": "2007"
+          }
+        ],
+        "id": "b759de9d-0d15-4ffd-a0d1-4ad3a7c65dff",
+        "barcode": "5099950322527"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "date": "2008-03-21",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": "Digipak",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "country": "DE",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "Trip Tease, Volume 1: Fine Moments from the Blue Note Catalogue",
+        "barcode": "0094639081721",
+        "quality": "normal",
+        "id": "ac0a5e43-29f6-444d-a0a4-d7c0038e4bbe",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "sort-name": "Germany",
+              "type": null,
+              "name": "Germany",
+              "type-id": null,
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad"
+            },
+            "date": "2008-03-21"
+          }
+        ]
+      },
+      {
+        "barcode": "",
+        "release-events": [
+          {
+            "date": "2008-04-29",
+            "area": {
+              "sort-name": "Canada",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "CA"
+              ],
+              "type-id": null,
+              "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+              "type": null,
+              "name": "Canada"
+            }
+          },
+          {
+            "date": "2008-04-29",
+            "area": {
+              "sort-name": "United States",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "name": "United States"
+            }
+          }
+        ],
+        "id": "c9dd2c67-c161-4379-94c6-1075a667a16f",
+        "quality": "normal",
+        "title": "Grand Theft Auto IV: Fusion FM",
+        "disambiguation": "content ripped from game CD",
+        "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+        "status": "Bootleg",
+        "packaging-id": null,
+        "country": "CA",
+        "packaging": null,
+        "date": "2008-04-29",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists",
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "country": null
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "date": "2008-04-29",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "country": "US",
+        "status": "Official",
+        "packaging": "Cardboard/Paper Sleeve",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "The Music of Grand Theft Auto IV",
+        "barcode": "",
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "2008-04-29",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "name": "United States",
+              "type": null,
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "b1d4b76a-7f08-3c58-a960-715cc6eb5673"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "date": "2008-04-29",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging": "None",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": "XW",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "The Music of Grand Theft Auto IV",
+        "barcode": "859700676738",
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "2008-04-29",
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "name": "[Worldwide]",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null
+            }
+          },
+          {
+            "date": "2008-04-29",
+            "area": {
+              "type-id": null,
+              "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+              "type": null,
+              "name": "Australia",
+              "sort-name": "Australia",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "AU"
+              ]
+            }
+          }
+        ],
+        "id": "28bd70fd-da89-4bce-b176-4583e9618337"
+      },
+      {
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "Europe",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type-id": null,
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "type": null,
+              "name": "Europe"
+            },
+            "date": "2008-04-29"
+          }
+        ],
+        "id": "4ebc0f4f-96bd-44d8-9134-763526743017",
+        "barcode": "",
+        "disambiguation": "made in the EU",
+        "title": "The Music of Grand Theft Auto IV",
+        "packaging": "Cardboard/Paper Sleeve",
+        "status": "Official",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "country": "XE",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists",
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86"
+            }
+          }
+        ],
+        "date": "2008-04-29"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "country": "BE",
+        "packaging-id": null,
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "date": "2008-11-17",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "id": "6821297e-7bba-4271-8755-82c99f7f4f06",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "BE"
+              ],
+              "disambiguation": "",
+              "sort-name": "Belgium",
+              "name": "Belgium",
+              "type": null,
+              "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+              "type-id": null
+            },
+            "date": "2008-11-17"
+          }
+        ],
+        "quality": "normal",
+        "barcode": "5099924256124",
+        "title": "100% Smooth Jazz",
+        "disambiguation": ""
+      },
+      {
+        "title": "Mojo Presents: Heavy Mod",
+        "disambiguation": "",
+        "barcode": "",
+        "id": "c83b3ac2-bf21-4c16-987e-bc20599c9444",
+        "release-events": [
+          {
+            "date": "2008-12",
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "sort-name": "United Kingdom"
+            }
+          }
+        ],
+        "quality": "normal",
+        "date": "2008-12",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists",
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "country": null
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "country": "GB",
+        "status": "Promotion"
+      },
+      {
+        "country": "XW",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other",
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist"
+            }
+          }
+        ],
+        "date": "2010-12-13",
+        "quality": "normal",
+        "id": "8bb87645-b718-479c-a861-d5d8044a407d",
+        "release-events": [
+          {
+            "date": "2010-12-13",
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "name": "[Worldwide]",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null
+            }
+          }
+        ],
+        "barcode": "",
+        "disambiguation": "",
+        "title": "100 Best of Blue Note"
+      },
+      {
+        "title": "100 Best of Blue Note",
+        "disambiguation": "",
+        "barcode": "5099990530326",
+        "id": "b8cb31b0-f0b9-487e-b1b1-2836c41d0103",
+        "release-events": [
+          {
+            "date": "2011-03-04",
+            "area": {
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "type-id": null,
+              "name": "Europe",
+              "type": null,
+              "sort-name": "Europe",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "quality": "normal",
+        "date": "2011-03-04",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Other",
+        "packaging-id": "815b7785-8284-3926-8f04-e48bc6c4d102",
+        "status": "Official",
+        "country": "XE"
+      },
+      {
+        "disambiguation": "",
+        "title": "Song of Innocence",
+        "barcode": "659457516512",
+        "quality": "normal",
+        "id": "dbb9726c-4b84-4cc4-beee-5b2b61034a7f",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "sort-name": "United States",
+              "name": "United States",
+              "type": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null
+            },
+            "date": "2018-04-21"
+          }
+        ],
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "David Axelrod",
+              "type": "Person",
+              "sort-name": "Axelrod, David",
+              "country": "US",
+              "disambiguation": "baroque pop composer"
+            },
+            "joinphrase": "",
+            "name": "David Axelrod"
+          }
+        ],
+        "date": "2018-04-21",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": null,
+        "packaging-id": null,
+        "status": "Official",
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XW",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status": "Official",
+        "packaging": "Cardboard/Paper Sleeve",
+        "date": "2018-05-18",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "baroque pop composer",
+              "sort-name": "Axelrod, David",
+              "name": "David Axelrod",
+              "type": "Person",
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": "",
+            "name": "David Axelrod"
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "659457516529",
+        "id": "988c6dad-3a79-4065-baf3-c9b8b7774455",
+        "release-events": [
+          {
+            "date": "2018-05-18",
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "type-id": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]"
+            }
+          }
+        ],
+        "quality": "normal",
+        "title": "Song of Innocence",
+        "disambiguation": ""
+      }
+    ],
+    "length": 328760,
+    "isrcs": [
+      "USCA29700350",
+      "USTC50808975"
+    ],
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "name": "David Axelrod",
+          "type": "Person",
+          "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "baroque pop composer",
+          "country": "US",
+          "sort-name": "Axelrod, David"
+        },
+        "joinphrase": "",
+        "name": "David Axelrod"
+      }
+    ],
+    "title": "Holy Thursday",
+    "video": false
+  }
+}

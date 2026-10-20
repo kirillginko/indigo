@@ -1,0 +1,87 @@
+{
+  "url": "https://api.discogs.com/artists/3150192",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:11.265842+00:00",
+  "body": {
+    "name": "Sophie (42)",
+    "id": 3150192,
+    "resource_url": "https://api.discogs.com/artists/3150192",
+    "uri": "https://www.discogs.com/artist/3150192-Sophie-42",
+    "releases_url": "https://api.discogs.com/artists/3150192/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/TN4Eqw1AYPuiFhesFJMEtQRlJTbejffCqzXZWFIQAtQ/rs:fit/g:sm/q:90/h:423/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTcyNzIxNzY2/Ni05MDM2LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/TN4Eqw1AYPuiFhesFJMEtQRlJTbejffCqzXZWFIQAtQ/rs:fit/g:sm/q:90/h:423/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTcyNzIxNzY2/Ni05MDM2LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/KiFa2FvgyU7FXW7ZMEzY3glWo6BGwBII2E4nBmH-3YA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTcyNzIxNzY2/Ni05MDM2LmpwZWc.jpeg",
+        "width": 600,
+        "height": 423
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/om4SeksztKmcNdpt7x8hq_NDSuMs2adzy1nYN_9NIBE/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyMzA4MDAz/NC00MDExLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/om4SeksztKmcNdpt7x8hq_NDSuMs2adzy1nYN_9NIBE/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyMzA4MDAz/NC00MDExLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/wMWbObB5m1OlWOL7VEcND7Chxr4IeW3KWO04U_a1dao/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyMzA4MDAz/NC00MDExLmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/4CimJsjSxYMWvL08r-dpGwifJ-qy-0LuZnSvBGnJw-8/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyOTY0MDY4/MS0zNDc1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/4CimJsjSxYMWvL08r-dpGwifJ-qy-0LuZnSvBGnJw-8/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyOTY0MDY4/MS0zNDc1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/V2lSeO3oCGMBThcS18X4fr1udKC4XY5RiaDw7961-Cg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyOTY0MDY4/MS0zNDc1LmpwZWc.jpeg",
+        "width": 600,
+        "height": 337
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/AGcTOgUnAAERoEwxJ9Mq6NUcVF276x_m71uON5BvKgo/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyOTY0MDQ0/MC0zMzQ0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/AGcTOgUnAAERoEwxJ9Mq6NUcVF276x_m71uON5BvKgo/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyOTY0MDQ0/MC0zMzQ0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/vF7h3eq398lhLJKmwPMOHM5uSyUXCLDURb7MHETkVE4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTUyOTY0MDQ0/MC0zMzQ0LmpwZWc.jpeg",
+        "width": 600,
+        "height": 337
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/joNN3Y-f1oa3yW-EQD5rNFJnYd4vc_fI0z5PVct4Q5Y/rs:fit/g:sm/q:90/h:600/w:399/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTQwODgyNzY3/NS00ODQ0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/joNN3Y-f1oa3yW-EQD5rNFJnYd4vc_fI0z5PVct4Q5Y/rs:fit/g:sm/q:90/h:600/w:399/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTQwODgyNzY3/NS00ODQ0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/OuUm3iF-GYY0FCD0bbgJPmSPxrXzp7_SdCMc9kZwjXw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNTAx/OTItMTQwODgyNzY3/NS00ODQ0LmpwZWc.jpeg",
+        "width": 399,
+        "height": 600
+      }
+    ],
+    "realname": "Sophie Xeon",
+    "profile": "Sophie Xeon (17 September 1986 in Northampton, England– 30 January 2021 in Athens, Greece) better known mononymously as SOPHIE (stylised in all caps), was a British musician, record producer, singer, songwriter, and DJ. Sophie was known for her synthesised and \"hyperkinetic\" take on pop music, and came to prominence with singles such as \"Bipp\" (2013) and \"Lemonade\" (2014).\n\nSophie died aged 34 at 4am local time on 30 January 2021 at her home in Athens, Greece following an accident. According to her UK label, Transgressive, the artist slipped and fell to her death while climbing to watch the full moon.",
+    "urls": [
+      "http://msmsmsm.com",
+      "http://www.facebook.com/msmsmsmsophie",
+      "http://www.imdb.com/name/nm3146383",
+      "http://www.instagram.com/sophie_msmsmsm",
+      "http://soundcloud.com/msmsmsm",
+      "http://twitter.com/SOPHIEMSMSMSM",
+      "http://en.wikipedia.org/wiki/Sophie_(musician)",
+      "http://www.youtube.com/@SOPHIEMSMSMSM"
+    ],
+    "namevariations": [
+      "ソフィー"
+    ],
+    "aliases": [
+      {
+        "id": 4469865,
+        "name": "Samuel Long",
+        "resource_url": "https://api.discogs.com/artists/4469865"
+      },
+      {
+        "id": 6256067,
+        "name": "Sophie Long (2)",
+        "resource_url": "https://api.discogs.com/artists/6256067"
+      },
+      {
+        "id": 7540443,
+        "name": "Sophie Xeon",
+        "resource_url": "https://api.discogs.com/artists/7540443"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

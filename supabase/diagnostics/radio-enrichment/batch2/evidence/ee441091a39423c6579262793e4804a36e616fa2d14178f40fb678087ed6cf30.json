@@ -1,0 +1,92 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/32d538f2-1778-49ed-930c-9db235905b17?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:45.865674+00:00",
+  "body": {
+    "disambiguation": "part of \"Dubstep Allstars, Volume 07: Mixed by Chef & Ramadanman\" DJ-mix",
+    "video": false,
+    "releases": [
+      {
+        "country": "GB",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "status": "Official",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom"
+            },
+            "date": "2009-11-09"
+          }
+        ],
+        "date": "2009-11-09",
+        "id": "9f8d8ed5-67e6-4e04-814d-f40c9c7e2c6e",
+        "title": "Dubstep Allstars, Volume 07: Mixed by Chef & Ramadanman",
+        "barcode": "800071000448",
+        "packaging": null,
+        "artist-credit": [
+          {
+            "joinphrase": " & ",
+            "name": "Chef",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Chefal",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "id": "51db3e1b-c6e7-4eeb-815a-ba315eeb3273",
+              "name": "Chefal",
+              "disambiguation": "aka Chef, dubstep DJ, dubstep label owner"
+            }
+          },
+          {
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Ramadanman",
+              "id": "6857206a-c96e-4fc9-93b5-3b3c5c567e45",
+              "name": "Ramadanman",
+              "disambiguation": "",
+              "country": "GB"
+            },
+            "name": "Ramadanman",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal"
+      }
+    ],
+    "id": "32d538f2-1778-49ed-930c-9db235905b17",
+    "isrcs": [],
+    "title": "Fram",
+    "first-release-date": "2009-11-09",
+    "artist-credit": [
+      {
+        "name": "Blawan",
+        "joinphrase": "",
+        "artist": {
+          "disambiguation": "British techno producer & DJ",
+          "name": "Blawan",
+          "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Blawan",
+          "type": "Person"
+        }
+      }
+    ],
+    "length": 164000
+  }
+}

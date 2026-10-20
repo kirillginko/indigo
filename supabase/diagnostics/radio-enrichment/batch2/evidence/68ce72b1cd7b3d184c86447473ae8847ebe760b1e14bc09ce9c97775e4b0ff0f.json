@@ -1,0 +1,93 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/4c1ba36a-a74a-45b4-8c5d-b119d162eb68?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:47.052624+00:00",
+  "body": {
+    "isrcs": [],
+    "releases": [
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "type": "Other",
+              "name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": null,
+        "packaging": null,
+        "date": "2008-04-29",
+        "title": "Grand Theft Auto IV: International Funk 99",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "CA",
+        "disambiguation": "content ripped from game CD",
+        "id": "6ce019ea-012f-44fd-a666-c94f526e2559",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "sort-name": "Canada",
+              "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+              "iso-3166-1-codes": [
+                "CA"
+              ],
+              "type-id": null,
+              "name": "Canada",
+              "type": null
+            },
+            "date": "2008-04-29"
+          },
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "name": "United States",
+              "type": null
+            },
+            "date": "2008-04-29"
+          }
+        ],
+        "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+        "barcode": "",
+        "status": "Bootleg"
+      }
+    ],
+    "id": "4c1ba36a-a74a-45b4-8c5d-b119d162eb68",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "name": "War",
+        "joinphrase": "",
+        "artist": {
+          "country": "US",
+          "disambiguation": "US funk/rock band",
+          "sort-name": "War",
+          "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "War",
+          "type": "Group"
+        }
+      }
+    ],
+    "video": false,
+    "length": 494000,
+    "title": "Galaxy",
+    "first-release-date": "2008-04-29"
+  }
+}

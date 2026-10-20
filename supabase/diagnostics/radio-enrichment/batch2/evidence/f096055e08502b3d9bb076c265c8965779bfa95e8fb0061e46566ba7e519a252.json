@@ -1,0 +1,971 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/be899560-1570-402e-9f95-3182898a8b70?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:30.123235+00:00",
+  "body": {
+    "gender": null,
+    "type": "Group",
+    "name": "Art of Noise",
+    "gender-id": null,
+    "id": "be899560-1570-402e-9f95-3182898a8b70",
+    "sort-name": "Art of Noise",
+    "end-area": null,
+    "disambiguation": "",
+    "begin-area": {
+      "sort-name": "London",
+      "id": "f03d09b3-39dc-4083-afd6-159e3f0d462f",
+      "type-id": null,
+      "disambiguation": "Greater London",
+      "type": null,
+      "name": "London"
+    },
+    "country": "GB",
+    "genres": [
+      {
+        "id": "930ef127-3653-4677-9b95-ecc90c7c1a14",
+        "count": 2,
+        "disambiguation": "",
+        "name": "art pop"
+      },
+      {
+        "id": "0e7a3c6a-4fbc-4b66-8201-9196032768ac",
+        "count": 2,
+        "name": "avant-garde pop",
+        "disambiguation": ""
+      },
+      {
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4",
+        "count": 2,
+        "disambiguation": "",
+        "name": "electronic"
+      },
+      {
+        "count": 1,
+        "id": "8302fd70-150f-4f74-b11c-10a7ff7586b9",
+        "disambiguation": "",
+        "name": "plunderphonics"
+      },
+      {
+        "name": "sampledelia",
+        "disambiguation": "",
+        "count": 2,
+        "id": "1384a044-7eff-4fb3-b948-a74703cf4010"
+      },
+      {
+        "name": "synth-pop",
+        "disambiguation": "",
+        "id": "988e91a3-3341-416d-b7f8-7dbef6848dac",
+        "count": 4
+      }
+    ],
+    "area": {
+      "disambiguation": "",
+      "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+      "sort-name": "United Kingdom",
+      "iso-3166-1-codes": [
+        "GB"
+      ],
+      "type-id": null,
+      "name": "United Kingdom",
+      "type": null
+    },
+    "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+    "isnis": [
+      "0000000121589561"
+    ],
+    "relations": [
+      {
+        "direction": "backward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": true,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-ids": {},
+        "attributes": [],
+        "end": "1985",
+        "artist": {
+          "sort-name": "Horn, Trevor",
+          "id": "b81c06a5-341f-4d04-a72e-7738030f792b",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Trevor Horn",
+          "country": "GB",
+          "disambiguation": ""
+        },
+        "type": "member of band",
+        "target-type": "artist",
+        "source-credit": "",
+        "begin": "1983"
+      },
+      {
+        "source-credit": "",
+        "begin": "1983",
+        "target-type": "artist",
+        "type": "member of band",
+        "artist": {
+          "disambiguation": "",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Paul Morley",
+          "id": "a8449e6e-834b-4e2a-8497-0182a6e2aade",
+          "sort-name": "Morley, Paul"
+        },
+        "end": "1985",
+        "attributes": [],
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": true,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "backward",
+        "target-credit": ""
+      },
+      {
+        "type": "member of band",
+        "target-type": "artist",
+        "source-credit": "",
+        "begin": "1983",
+        "ended": true,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "backward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "disambiguation": "",
+          "country": "GB",
+          "type": "Person",
+          "name": "Gary Langan",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "9f6c4f5a-278a-4c46-aaed-bf5410f013c5",
+          "sort-name": "Langan, Gary"
+        },
+        "end": "1987"
+      },
+      {
+        "type": "member of band",
+        "target-type": "artist",
+        "source-credit": "",
+        "begin": "1983",
+        "direction": "backward",
+        "target-credit": "",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": true,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": "1990",
+        "artist": {
+          "country": "GB",
+          "disambiguation": "English score composer",
+          "sort-name": "Dudley, Anne",
+          "id": "0b0bd0c0-3723-4715-87d7-9d57f0eb240f",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Anne Dudley",
+          "type": "Person"
+        }
+      },
+      {
+        "source-credit": "",
+        "begin": "1983",
+        "target-type": "artist",
+        "type": "member of band",
+        "end": "1990",
+        "artist": {
+          "id": "46a16e88-4537-4b29-a06b-4a5dfe90a6cd",
+          "sort-name": "Jeczalik, J.J.",
+          "name": "J.J. Jeczalik",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "disambiguation": ""
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "backward",
+        "ended": true,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821"
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "backward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": true,
+        "end": "2000",
+        "artist": {
+          "country": "GB",
+          "disambiguation": "",
+          "id": "49b4ba82-fb3d-4a03-ad4c-b802b2498d8f",
+          "sort-name": "Creme, Lol",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Lol Creme",
+          "type": "Person"
+        },
+        "attributes": [],
+        "type": "member of band",
+        "source-credit": "",
+        "begin": "1998",
+        "target-type": "artist"
+      },
+      {
+        "attribute-ids": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": true,
+        "direction": "backward",
+        "target-credit": "",
+        "artist": {
+          "country": "GB",
+          "disambiguation": "English score composer",
+          "id": "0b0bd0c0-3723-4715-87d7-9d57f0eb240f",
+          "sort-name": "Dudley, Anne",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Anne Dudley"
+        },
+        "end": "2000",
+        "attributes": [],
+        "type": "member of band",
+        "source-credit": "",
+        "begin": "1998",
+        "target-type": "artist"
+      },
+      {
+        "begin": "1998",
+        "source-credit": "",
+        "target-type": "artist",
+        "type": "member of band",
+        "artist": {
+          "sort-name": "Horn, Trevor",
+          "id": "b81c06a5-341f-4d04-a72e-7738030f792b",
+          "name": "Trevor Horn",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "disambiguation": ""
+        },
+        "end": "2000",
+        "attributes": [],
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "ended": true,
+        "direction": "backward",
+        "target-credit": ""
+      },
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "begin": "1998",
+        "target-type": "artist",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": true,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "direction": "backward",
+        "artist": {
+          "country": "GB",
+          "disambiguation": "",
+          "id": "a8449e6e-834b-4e2a-8497-0182a6e2aade",
+          "sort-name": "Morley, Paul",
+          "name": "Paul Morley",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "end": "2000",
+        "attributes": []
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "allmusic",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "003b91a4-726c-4937-8a8d-8a455c7fb40a",
+          "resource": "https://www.allmusic.com/artist/mn0000930204"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846"
+      },
+      {
+        "end": "2020-11-19",
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.bbc.co.uk/music/artists/be899560-1570-402e-9f95-3182898a8b70",
+          "id": "288f928a-477d-4f3e-bf56-55015f92deb0"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": true,
+        "attribute-values": {},
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "BBC Music page"
+      },
+      {
+        "type": "biography",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "attribute-ids": {},
+        "url": {
+          "resource": "http://www.ztt.com/artists/art_of_noise.html",
+          "id": "c7d638b1-7e43-451a-8684-04c608582bf5"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "78f75830-94e1-4138-8f8a-643e3bb21ce5",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "51218a4f-7863-4dcc-90cf-22a4362150f2",
+          "resource": "https://www.discogs.com/artist/7142"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "attributes": [],
+        "type": "discogs",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "type-id": "f484f897-81cc-406e-96f9-cd799a04ee24",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "http://mattangert.tzo.com/newsite/index.html",
+          "id": "71f826e8-39a3-4132-bdc9-956ff1ea1d92"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "fanpage"
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "fe658e87-46e1-4e6e-beb2-16845c2fcf9f",
+          "resource": "https://open.spotify.com/artist/77zrvBORXcnTyysjjKRfBU"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "end": null,
+        "attributes": [],
+        "type": "free streaming",
+        "begin": null,
+        "source-credit": "The Art of Noise",
+        "target-type": "url"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "free streaming",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "3de88372-67ce-4390-96f3-f7a92d4d707c",
+          "resource": "https://www.deezer.com/artist/204"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "image",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://commons.wikimedia.org/wiki/File:Christopher_Austin_Paul_Morley.jpg",
+          "id": "1fe42f0f-5c20-43eb-b1fd-5702cc6d56fb"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "target-credit": "",
+        "direction": "forward"
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "image",
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "392b3f95-02c4-45d3-a5df-af961b482628",
+          "resource": "https://upload.wikimedia.org/wikipedia/en/8/8e/Art_Of_Noise.jpeg"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.imdb.com/name/nm1691259/",
+          "id": "ae6c4ff3-bca5-422c-a3e5-54bf38882389"
+        },
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "IMDb"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "1f171391-1f98-4f45-b191-038ec3b12395",
+        "attribute-ids": {},
+        "url": {
+          "id": "31f2a811-e980-498a-b3ba-6f876c0ae467",
+          "resource": "http://www.muzines.co.uk/articles/art-empire-industry/1267"
+        },
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "interview"
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "bda15b5d-1331-46fa-878c-afee11510547",
+          "resource": "http://muzikum.eu/en/122-10010/art-of-noise/lyrics.html"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "lyrics",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null
+      },
+      {
+        "type": "myspace",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "b43a3ebb-4c72-4d21-9e28-753e072e59f5",
+          "resource": "https://myspace.com/artofnoiseoffical"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "other databases",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "9f4726bf-556e-42d3-a8ef-f65f0183fd6d",
+          "resource": "http://id.loc.gov/authorities/names/n93000984"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "929231c8-466e-4c00-ab5c-581d641f5337",
+          "resource": "http://musicmoz.org/Bands_and_Artists/A/Art_of_Noise,_The/"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "other databases",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb13901706c",
+          "id": "ff41edec-de84-4cc2-a75c-7a236dd1c0f7"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "url": {
+          "resource": "https://d-nb.info/gnd/5049392-9",
+          "id": "be379323-6b3a-4f36-aee3-df2a94803ef2"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "other databases",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "url": {
+          "id": "a0e2d9d6-3d5b-4014-837e-ee7f9b92aad5",
+          "resource": "https://rateyourmusic.com/artist/art_of_noise"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": [],
+        "type": "other databases",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "e88c4b89-dbf0-4a09-aa98-30f1656355e1",
+          "resource": "https://www.musik-sammler.de/artist/the-art-of-noise/"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "other databases"
+      },
+      {
+        "type": "other databases",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "id": "8a9b75f9-c544-4f3f-8366-83d13b0981fc",
+          "resource": "https://www.worldcat.org/identities/lccn-n93000984"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "52fac586-3410-4156-ba03-4028d17655a2",
+          "resource": "https://itunes.apple.com/us/artist/id78916824"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "purchase for download",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "7b35adcd-f327-4c08-b331-986b36d7cd36",
+          "resource": "http://www.ztt.com/shop/"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "ended": false
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "cd4858f5-6e68-461e-8299-f80fce4773f8",
+          "resource": "https://twitter.com/artofnoiseoffic"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "end": null,
+        "attributes": [],
+        "type": "social network",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "type": "social network",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "e11b8f8a-001c-413c-b299-5d4ba19ec11e",
+          "resource": "https://www.facebook.com/artofnoiseofficial"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "social network",
+        "attributes": [],
+        "end": null,
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.instagram.com/artofnoiseofficial/",
+          "id": "edec23b1-c3e0-4ad4-b613-985ff0e99073"
+        }
+      },
+      {
+        "type": "songkick",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.songkick.com/artists/384258",
+          "id": "0fb23318-6163-417d-960a-d681065d9130"
+        },
+        "attribute-ids": {},
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "soundcloud",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "id": "ef61181a-b2c8-4623-af25-27d5b9504bb8",
+          "resource": "https://soundcloud.com/art-of-noise-official"
+        },
+        "attribute-ids": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/78916824",
+          "id": "3513cc9b-d75d-408a-8c72-9bbb949561a9"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://tidal.com/artist/3545250",
+          "id": "18b8d16a-7282-4f8c-807b-2040a5a0fdb6"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "b5ac432b-7860-4f40-8be4-1b1a7b6ace51",
+          "resource": "http://viaf.org/viaf/131476632"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "end": null,
+        "attributes": [],
+        "type": "VIAF",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q502967",
+          "id": "7eb7f1d5-6d40-4296-8ae1-679f0e323199"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "wikidata",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "type": "wikipedia",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "ended": true,
+        "attribute-values": {},
+        "type-id": "29651736-fa6d-48e4-aadc-a557c6add1cb",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "b5b6ee1d-c0ab-4b45-8b40-e43edc930069",
+          "resource": "https://en.wikipedia.org/wiki/File:Art_Of_Noise.jpeg"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "type": "youtube",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "274bfc4e-0da2-48a1-a873-e03d7af8a97b",
+          "resource": "https://www.youtube.com/channel/UCeuZSIikkhiagrFxPJcZ8Bw"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "url": {
+          "resource": "https://music.youtube.com/channel/UClyaVdvS3c1V5SHTJgkXzVg",
+          "id": "a66f5c0d-1014-47d3-9343-17e878ace730"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "631712a0-7525-42ba-b7a3-605aa7a238c4",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "youtube music",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      }
+    ],
+    "tags": [
+      {
+        "name": "_private tag 1",
+        "count": 1
+      },
+      {
+        "name": "art pop",
+        "count": 2
+      },
+      {
+        "name": "avant-garde pop",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "british"
+      },
+      {
+        "name": "classic pop and rock",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "electronic"
+      },
+      {
+        "count": 1,
+        "name": "english"
+      },
+      {
+        "count": 2,
+        "name": "fairlight cmi"
+      },
+      {
+        "count": 1,
+        "name": "new pop"
+      },
+      {
+        "name": "plunderphonics",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "sampledelia"
+      },
+      {
+        "name": "synth-pop",
+        "count": 4
+      },
+      {
+        "name": "uk",
+        "count": 1
+      }
+    ],
+    "life-span": {
+      "end": "2000",
+      "begin": "1983",
+      "ended": true
+    },
+    "ipis": [],
+    "aliases": [
+      {
+        "end": null,
+        "locale": null,
+        "begin": null,
+        "sort-name": "The Art Of Noise",
+        "primary": null,
+        "type": null,
+        "name": "The Art Of Noise",
+        "type-id": null,
+        "ended": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,493 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Firecracker%22+AND+artist%3A%22Martin+Denny%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:18.270159+00:00",
+  "body": {
+    "created": "2026-10-20T01:24:18.193Z",
+    "count": 4,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "ec576f76-b1f2-4dc9-a2ab-cd5035d942cc",
+        "score": 100,
+        "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+        "title": "Firecracker",
+        "length": 149000,
+        "disambiguation": "mono",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "name": "Martin Denny",
+              "sort-name": "Denny, Martin",
+              "aliases": [
+                {
+                  "sort-name": "The Exotic Sounds of Martin Denny",
+                  "name": "The Exotic Sounds of Martin Denny",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1959-08",
+        "releases": [
+          {
+            "id": "fb73832e-db78-45b6-8bae-8e214e23ac8d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Quiet Village / The Enchanted Sea",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "9935fec7-5378-3a94-8001-11005737d7e7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Quiet Village / The Enchanted Sea",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997-07-29",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1997-07-29",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 25,
+            "media": [
+              {
+                "id": "eaa1a84b-9c2a-3ecd-8c3d-7bae481f82a5",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9727bd93-aed3-3848-8386-055220383ab9",
+                    "number": "6",
+                    "title": "Firecracker",
+                    "length": 149586
+                  }
+                ],
+                "track-count": 25,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "83cef198-7379-4534-b087-630b07c19aaa",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Quiet Village: The Exotic Sounds of Martin Denny",
+            "status": "Official",
+            "disambiguation": "mono",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "fb69936b-2689-4fd3-bb4b-9a8697f76404",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Quiet Village – The Exotic Sounds of Martin Denny",
+              "primary-type": "Album"
+            },
+            "date": "1959-08",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1959-08",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "22a7b121-df05-36dd-8f31-e42c1faba82e",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "875ce569-8986-485f-950d-cdc20bc068d3",
+                    "number": "A6",
+                    "title": "Firecracker",
+                    "length": 149000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "8f663704-9666-40a1-aa8d-6696e6c342b8",
+        "score": 100,
+        "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+        "title": "Firecracker",
+        "length": 148773,
+        "disambiguation": "stereo",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "name": "Martin Denny",
+              "sort-name": "Denny, Martin",
+              "aliases": [
+                {
+                  "sort-name": "The Exotic Sounds of Martin Denny",
+                  "name": "The Exotic Sounds of Martin Denny",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2017",
+        "releases": [
+          {
+            "id": "de8f8f44-80ad-4cdd-a7f1-1a9d8d0fd31e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Afro-Desia + Quiet Village",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "84a06335-38c3-4636-8699-afa0090ce4ee",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Afro-Desia + Quiet Village",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2017",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2017",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 29,
+            "media": [
+              {
+                "id": "06c75c91-b009-3b40-a453-f9248ab59f00",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c38c4bb0-c21c-46f2-aa98-d4d22b11d42d",
+                    "number": "18",
+                    "title": "Firecracker",
+                    "length": 148773
+                  }
+                ],
+                "track-count": 29,
+                "track-offset": 17
+              }
+            ]
+          },
+          {
+            "id": "31b04661-5208-4550-810d-76af52d740cc",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Quiet Village: The Exotic Sounds of Martin Denny",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "fb69936b-2689-4fd3-bb4b-9a8697f76404",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Quiet Village – The Exotic Sounds of Martin Denny",
+              "primary-type": "Album"
+            },
+            "track-count": 13,
+            "media": [
+              {
+                "id": "7a50b98a-00cc-39b7-aa4e-d73e1c8e0e1a",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "bf503591-ae8c-4c7d-af44-cb06b66cfe16",
+                    "number": "6",
+                    "title": "Firecracker",
+                    "length": 149000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USEM34900428"
+        ]
+      },
+      {
+        "id": "da088f9e-57bf-4b74-b8bb-ba6c248c472e",
+        "score": 84,
+        "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+        "title": "Firecracker (Mono Version Remastered)",
+        "length": 146000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "name": "Martin Denny",
+              "sort-name": "Denny, Martin",
+              "aliases": [
+                {
+                  "sort-name": "The Exotic Sounds of Martin Denny",
+                  "name": "The Exotic Sounds of Martin Denny",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006",
+        "releases": [
+          {
+            "id": "da3a06b8-867f-4661-a42f-9394cd69aa50",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Quiet Village - The Exotic Sounds of Martin Denny",
+            "status": "Official",
+            "disambiguation": "remastered",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "fb69936b-2689-4fd3-bb4b-9a8697f76404",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Quiet Village – The Exotic Sounds of Martin Denny",
+              "primary-type": "Album"
+            },
+            "date": "2006",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2006",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "0597b706-82dc-38af-b610-ec6996ca44d0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6d3e03bd-2695-4f7a-b2a3-add5bf7b0e0e",
+                    "number": "6",
+                    "title": "Firecracker (Mono Version Remastered)",
+                    "length": 146000
+                  }
+                ],
+                "track-count": 26,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "47b018df-9537-406f-99be-e4273c2cb831",
+        "score": 84,
+        "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+        "title": "Firecracker (Stereo Version Remastered)",
+        "length": 149000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "name": "Martin Denny",
+              "sort-name": "Denny, Martin",
+              "aliases": [
+                {
+                  "sort-name": "The Exotic Sounds of Martin Denny",
+                  "name": "The Exotic Sounds of Martin Denny",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006",
+        "releases": [
+          {
+            "id": "da3a06b8-867f-4661-a42f-9394cd69aa50",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "06adb7cf-a784-3f5d-9e87-7ba54b0363fb",
+            "count": 1,
+            "title": "Quiet Village - The Exotic Sounds of Martin Denny",
+            "status": "Official",
+            "disambiguation": "remastered",
+            "artist-credit": [
+              {
+                "name": "Martin Denny",
+                "artist": {
+                  "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+                  "name": "Martin Denny",
+                  "sort-name": "Denny, Martin"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "fb69936b-2689-4fd3-bb4b-9a8697f76404",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Quiet Village – The Exotic Sounds of Martin Denny",
+              "primary-type": "Album"
+            },
+            "date": "2006",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2006",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "0597b706-82dc-38af-b610-ec6996ca44d0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "713dcfcd-68ff-41de-a099-818d39e47e11",
+                    "number": "19",
+                    "title": "Firecracker (Stereo Version Remastered)",
+                    "length": 149000
+                  }
+                ],
+                "track-count": 26,
+                "track-offset": 18
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

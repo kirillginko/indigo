@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F4981772&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:00.126409+00:00",
+  "body": {
+    "resource": "https://www.discogs.com/artist/4981772",
+    "id": "5979a003-c09e-4770-ac82-2f2bc2f9bb24",
+    "relations": [
+      {
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "target-type": "artist",
+        "direction": "backward",
+        "target-credit": "",
+        "artist": {
+          "sort-name": "Klein",
+          "disambiguation": "UK singer-songwriter and producer",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "760e95ff-c503-4567-8109-759b9594c182",
+          "type": "Person",
+          "name": "Klein"
+        },
+        "attribute-ids": {},
+        "type": "discogs",
+        "source-credit": "",
+        "ended": false,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null
+      }
+    ]
+  }
+}

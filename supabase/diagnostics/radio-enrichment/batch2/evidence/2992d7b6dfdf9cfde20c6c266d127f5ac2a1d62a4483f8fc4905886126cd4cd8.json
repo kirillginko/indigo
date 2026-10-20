@@ -1,0 +1,81 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/84ef5052-2872-425b-8082-b843be6a5ed6?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:12.314594+00:00",
+  "body": {
+    "title": "Rotten",
+    "length": 310580,
+    "artist-credit": [
+      {
+        "name": "Sully",
+        "joinphrase": "",
+        "artist": {
+          "type": "Person",
+          "name": "Sully",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "sort-name": "Sully",
+          "disambiguation": "UK jungle and dubstep producer",
+          "id": "88b9d123-ebda-477a-99bd-022378a6ffa1"
+        }
+      }
+    ],
+    "id": "84ef5052-2872-425b-8082-b843be6a5ed6",
+    "disambiguation": "",
+    "video": false,
+    "isrcs": [
+      "IELXJ1500002"
+    ],
+    "first-release-date": "2016-01-22",
+    "releases": [
+      {
+        "quality": "normal",
+        "packaging": "None",
+        "country": "XW",
+        "title": "Lifted / Rotten",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Sully",
+              "type": "Person",
+              "disambiguation": "UK jungle and dubstep producer",
+              "id": "88b9d123-ebda-477a-99bd-022378a6ffa1",
+              "sort-name": "Sully",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB"
+            },
+            "name": "Sully",
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "barcode": "5050580644359",
+        "release-events": [
+          {
+            "date": "2016-01-22",
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "type": null,
+              "name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2016-01-22",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "6e9e0dc0-fe47-4e8e-b809-ba0a5b9e0fec"
+      }
+    ]
+  }
+}

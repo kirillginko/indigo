@@ -1,0 +1,624 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/fe19b809-e86c-4736-882a-53b72e23171b?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:23.359166+00:00",
+  "body": {
+    "area": {
+      "sort-name": "United States",
+      "name": "United States",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "type-id": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "type": null,
+      "disambiguation": ""
+    },
+    "relations": [
+      {
+        "attribute-values": {},
+        "type-id": "75c09861-6857-4ec0-9729-84eefde7fc86",
+        "artist": {
+          "disambiguation": "",
+          "country": "US",
+          "type": "Group",
+          "id": "e08c5358-7cf6-40ce-9d1f-e0a79e320f2c",
+          "sort-name": "Urban Knights",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Urban Knights"
+        },
+        "target-type": "artist",
+        "direction": "forward",
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "source-credit": "",
+        "type": "collaboration"
+      },
+      {
+        "source-credit": "",
+        "type": "member of band",
+        "artist": {
+          "id": "98789b37-4903-42b4-9f5a-2e602684bff5",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "The Ramsey Lewis Trio",
+          "sort-name": "Lewis, Ramsey, Trio, The",
+          "country": "US",
+          "disambiguation": "",
+          "type": "Group"
+        },
+        "attribute-credits": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": "2022",
+        "attributes": [
+          "eponymous",
+          "original",
+          "piano"
+        ],
+        "direction": "forward",
+        "begin": "1956",
+        "target-credit": "",
+        "ended": true,
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348",
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c",
+          "eponymous": "15eea3b8-5655-43c8-b2c2-dd03c901a79b"
+        }
+      },
+      {
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "artist": {
+          "name": "Frayne Lewis",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Lewis, Frayne",
+          "id": "92112eec-0381-4c8c-bf70-15f165480654",
+          "type": "Person",
+          "country": "US",
+          "disambiguation": ""
+        },
+        "attribute-values": {},
+        "target-type": "artist",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "parent"
+      },
+      {
+        "type": "allmusic",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0000334770",
+          "id": "8874d3a6-5a94-4fd0-bb16-4145fd3883ab"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-type": "url"
+      },
+      {
+        "type": "discogs",
+        "source-credit": "",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.discogs.com/artist/55738",
+          "id": "107023c4-866c-4fda-a06a-25991f456fc4"
+        },
+        "direction": "forward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-values": {},
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "free streaming",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "a74d3bfd-63de-4c7a-9644-2894d7d65ac3",
+          "resource": "https://open.spotify.com/artist/7Kfrmups2Z3ncDQmNS5jRc"
+        },
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "00a18f07-1e0d-4da3-a1ef-59df433796ff",
+          "resource": "https://www.deezer.com/artist/13032"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "type": "free streaming",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "IMDb",
+        "attribute-values": {},
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.imdb.com/name/nm0507640/",
+          "id": "af201b92-12a9-404d-b847-b1c1435eb651"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null
+      },
+      {
+        "url": {
+          "resource": "http://www.ramseylewis.com/",
+          "id": "d51f4ac5-aa69-4c2f-a3c1-846f987b6d9d"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "target-type": "url",
+        "type": "official homepage",
+        "source-credit": ""
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n83127087",
+          "id": "52a7e152-876a-4ef8-bc74-238cb6ff6e5b"
+        },
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url"
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb13931165v",
+          "id": "b27584bc-7bce-4b32-b6ce-12d61fdcdf29"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "83023d09-887c-40b5-b7ac-20354cdb88d0",
+          "resource": "https://d-nb.info/gnd/134444450"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null
+      },
+      {
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://snaccooperative.org/ark:/99166/w61d47vw",
+          "id": "4dba28f8-f4f9-4b7c-9027-9764621c160e"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/ramsey_lewis",
+          "id": "c5609b14-9d6d-486f-8c78-d46726c27a18"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-n83127087",
+          "id": "eef587c2-25be-49b9-872e-90573dd2faf6"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/37591",
+          "id": "c5adb80f-9bb8-4700-8aea-aabff8de1877"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "purchase for download"
+      },
+      {
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://twitter.com/ramseylewis",
+          "id": "18c74fd4-979d-4210-8db2-0b4b1fc189cb"
+        },
+        "target-type": "url",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.facebook.com/RamseyLewisJazz",
+          "id": "51aac6ac-af7d-413e-b9ec-b3a68abbae7f"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "type": "songkick",
+        "source-credit": "",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "resource": "https://www.songkick.com/artists/170313",
+          "id": "fdcc56c3-0cc6-43a9-be48-a0a64bb7ff3a"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58"
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://music.apple.com/us/artist/541011",
+          "id": "bfe80c50-8a69-49c1-a58f-5efa59909abe"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "c5adb80f-9bb8-4700-8aea-aabff8de1877",
+          "resource": "https://open.qobuz.com/artist/37591"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://tidal.com/artist/1233",
+          "id": "24c0d573-544e-49e0-be11-8b49563018cf"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      },
+      {
+        "type": "VIAF",
+        "source-credit": "",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://viaf.org/viaf/84975143",
+          "id": "ceeced0d-4b48-44ec-9f54-9d1a106c0890"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "attribute-values": {}
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "b3db9089-8484-4350-becf-3136a8f19dbe",
+          "resource": "https://www.wikidata.org/wiki/Q1936300"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "type": "wikidata",
+        "source-credit": ""
+      },
+      {
+        "type": "youtube",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.youtube.com/user/TheRamseyLewis",
+          "id": "9e693030-689e-4bd2-b430-4cc213747cd8"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "attribute-values": {}
+      }
+    ],
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "name": "Ramsey Lewis",
+    "aliases": [
+      {
+        "end": null,
+        "type": null,
+        "primary": null,
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "sort-name": "Ramsay Lewis",
+        "type-id": null,
+        "name": "Ramsay Lewis"
+      },
+      {
+        "sort-name": "Lewis Jr, Ramsey E",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "Ramsey E Lewis Jr",
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "type": "Artist name",
+        "end": null,
+        "primary": null
+      },
+      {
+        "sort-name": "Lewis Jr., Ramsey Emmanuel",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "name": "Ramsey Emmanuel Lewis Jr.",
+        "primary": null,
+        "end": null,
+        "type": "Legal name",
+        "ended": false,
+        "locale": null,
+        "begin": null
+      },
+      {
+        "name": "Ramsey Leweis",
+        "type-id": null,
+        "sort-name": "Ramsey Leweis",
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "end": null,
+        "type": null,
+        "primary": null
+      }
+    ],
+    "disambiguation": "",
+    "gender": "Male",
+    "tags": [
+      {
+        "name": "2008 universal fire victim",
+        "count": 1
+      },
+      {
+        "name": "jazz",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "jazz-funk"
+      },
+      {
+        "count": 1,
+        "name": "pop"
+      },
+      {
+        "count": 1,
+        "name": "soul jazz"
+      }
+    ],
+    "end-area": {
+      "disambiguation": "",
+      "id": "29a709d8-0320-493e-8d0c-f2c386662b7f",
+      "type-id": null,
+      "name": "Chicago",
+      "type": null,
+      "sort-name": "Chicago"
+    },
+    "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+    "ipis": [
+      "00018006322"
+    ],
+    "sort-name": "Lewis, Ramsey",
+    "begin-area": {
+      "disambiguation": "",
+      "id": "29a709d8-0320-493e-8d0c-f2c386662b7f",
+      "type-id": null,
+      "type": null,
+      "name": "Chicago",
+      "sort-name": "Chicago"
+    },
+    "life-span": {
+      "ended": true,
+      "begin": "1935-05-27",
+      "end": "2022-09-12"
+    },
+    "country": "US",
+    "genres": [
+      {
+        "name": "jazz",
+        "count": 2,
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "disambiguation": ""
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "f3c43ae8-839a-4523-b295-cfa4eba6c911",
+        "name": "jazz-funk"
+      },
+      {
+        "name": "pop",
+        "id": "911c7bbb-172d-4df8-9478-dbff4296e791",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "e70f0aa3-9531-448c-8182-7ff34e3d74f8",
+        "name": "soul jazz"
+      }
+    ],
+    "isnis": [
+      "0000000114944924"
+    ],
+    "type": "Person"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "url": "https://api.discogs.com/artists/44126",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:03.058015+00:00",
+  "body": {
+    "name": "Les McCann",
+    "id": 44126,
+    "resource_url": "https://api.discogs.com/artists/44126",
+    "uri": "https://www.discogs.com/artist/44126-Les-McCann",
+    "releases_url": "https://api.discogs.com/artists/44126/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/92t6dqj9iCiJzA0lZ-yUSsA1BTxRvNkiAHsw6aJO6vw/rs:fit/g:sm/q:90/h:589/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ0MTI2/LTE3MzQ3NDQwNTQt/MzI0MS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/92t6dqj9iCiJzA0lZ-yUSsA1BTxRvNkiAHsw6aJO6vw/rs:fit/g:sm/q:90/h:589/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ0MTI2/LTE3MzQ3NDQwNTQt/MzI0MS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/YsuUkrEQaWeunIN-R5yeSgiHpjqmzrsZpXnYTlpOENc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ0MTI2/LTE3MzQ3NDQwNTQt/MzI0MS5qcGVn.jpeg",
+        "width": 600,
+        "height": 589
+      }
+    ],
+    "realname": "Leslie Coleman McCann",
+    "profile": "Les McCann (born September 23, 1935, Lexington, Kentucky - died December 29, 2023) was a jazz piano player and vocalist whose biggest successes came as a crossover artist into Soul Jazz and Boogaloo.",
+    "urls": [
+      "https://www.lesmccannunlimited.com",
+      "http://en.wikipedia.org/wiki/Les_McCann",
+      "https://www.imdb.com/name/nm0564895/",
+      "http://users.rcn.com/bobfreed/www/lesdisco/index.html",
+      "https://www.allmusic.com/artist/les-mccann-mn0000245760"
+    ],
+    "namevariations": [
+      "L. Cann",
+      "L. Mac Cann",
+      "L. McCann",
+      "L.McCann",
+      "Lea McCann",
+      "Les",
+      "Les Mac Cann",
+      "Les Macann",
+      "Les Mc Can",
+      "Les Mc Cann",
+      "Les Mc Gann",
+      "Les Mc.Cann",
+      "Les McAnn",
+      "Les McCan",
+      "Less McCann",
+      "McCann",
+      "Лес Маккен"
+    ],
+    "groups": [
+      {
+        "id": 890163,
+        "name": "Les McCann Ltd.",
+        "resource_url": "https://api.discogs.com/artists/890163",
+        "active": true
+      },
+      {
+        "id": 2355185,
+        "name": "The Gerald Wilson Big Band",
+        "resource_url": "https://api.discogs.com/artists/2355185",
+        "active": true
+      },
+      {
+        "id": 2519944,
+        "name": "Les McCann And His Magic Band",
+        "resource_url": "https://api.discogs.com/artists/2519944",
+        "active": true
+      },
+      {
+        "id": 4006008,
+        "name": "Les Mccann Trio",
+        "resource_url": "https://api.discogs.com/artists/4006008",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

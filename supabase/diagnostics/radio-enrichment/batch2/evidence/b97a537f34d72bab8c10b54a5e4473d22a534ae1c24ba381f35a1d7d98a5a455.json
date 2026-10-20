@@ -1,0 +1,406 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/186edc09-db32-4d4f-ba71-eed418630c83?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:15.058195+00:00",
+  "body": {
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "relations": [
+      {
+        "ended": false,
+        "artist": {
+          "sort-name": "Denny, Martin & His Orchestra",
+          "type-id": "a0b36c92-3eb1-3839-a4f9-4799823f54a5",
+          "country": null,
+          "disambiguation": "",
+          "id": "19178bff-090b-462e-b5f0-69c15ec01c90",
+          "type": "Orchestra",
+          "name": "Martin Denny & His Orchestra"
+        },
+        "attribute-values": {},
+        "type": "member of band",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "begin": null,
+        "end": null
+      },
+      {
+        "direction": "forward",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0000311074",
+          "id": "f827e72e-d0c3-485e-be88-e972e1e7556b"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "type": "allmusic",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "ended": false,
+        "type": "discogs",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "id": "c86966ad-c50e-4daf-859f-29d22fd9ebb8",
+          "resource": "https://www.discogs.com/artist/36860"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "end": null,
+        "target-type": "url"
+      },
+      {
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "fa4eb48d-1021-443b-a0bb-a921a2d5abe4",
+          "resource": "https://open.spotify.com/artist/3D9J9nPNW1cBktx5apJq4V"
+        }
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.deezer.com/artist/241877",
+          "id": "35f98ac3-8323-4b33-a730-64533c20aa05"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "ended": false,
+        "type": "free streaming",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {}
+      },
+      {
+        "attribute-values": {},
+        "type": "IMDb",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "url": {
+          "resource": "https://www.imdb.com/name/nm0219661/",
+          "id": "bbec8aae-0313-43c9-9beb-5023aca52cf6"
+        }
+      },
+      {
+        "direction": "forward",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n94018689",
+          "id": "2d3350c7-da91-4841-8419-00430f7f3c0e"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "other databases",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false,
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "5b85ed8b-3cdb-494c-bf38-01b29d89cd98",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb141709882"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward"
+      },
+      {
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://d-nb.info/gnd/135005205",
+          "id": "8d736cab-16cd-4168-affe-220a3d5864c6"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "7aef5e5b-509b-4d9d-b505-dd9528f1e4cb",
+          "resource": "http://snaccooperative.org/ark:/99166/w6zc92b1"
+        },
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "42fa28c2-e8ac-423c-99e5-dc14c77443d8",
+          "resource": "https://www.worldcat.org/identities/lccn-n94018689"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "type": "other databases",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "url": {
+          "id": "511abdc8-8057-411e-b827-7ddcc31e1bed",
+          "resource": "https://secondhandsongs.com/artist/11677"
+        },
+        "attribute-values": {},
+        "type": "secondhandsongs",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/33325120",
+          "id": "94bd29b5-a3ec-435b-9f9b-ab264b3a7ed5"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://tidal.com/artist/56748",
+          "id": "a2c0501d-cb3a-49d9-b430-2951db15206a"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {}
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "VIAF",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "resource": "http://viaf.org/viaf/59293628",
+          "id": "a82aeafe-af54-4d20-a017-fa6008cbe681"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "wikidata",
+        "attribute-values": {},
+        "ended": false,
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "ccce06c1-79ed-42d6-a5a2-736783729b97",
+          "resource": "https://www.wikidata.org/wiki/Q557535"
+        },
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward"
+      }
+    ],
+    "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+    "ipis": [
+      "00007955178"
+    ],
+    "genres": [
+      {
+        "name": "easy listening",
+        "id": "ca06817d-8622-4120-b49d-96921c8bb767",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "count": 3,
+        "disambiguation": "",
+        "id": "1b757a82-3b28-4522-81d9-82d3d10b00c0",
+        "name": "exotica"
+      },
+      {
+        "count": 1,
+        "name": "jazz",
+        "disambiguation": "",
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b"
+      },
+      {
+        "id": "de2785b2-f282-4718-a422-37dc93964bdd",
+        "disambiguation": "",
+        "name": "lounge",
+        "count": 2
+      }
+    ],
+    "area": {
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "disambiguation": "",
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "type-id": null,
+      "sort-name": "United States",
+      "name": "United States",
+      "type": null
+    },
+    "life-span": {
+      "ended": true,
+      "begin": "1911-04-10",
+      "end": "2005-03-02"
+    },
+    "country": "US",
+    "sort-name": "Denny, Martin",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "begin-area": {
+      "disambiguation": "",
+      "id": "74e50e58-5deb-4b99-93a2-decbb365c07f",
+      "name": "New York",
+      "type": null,
+      "type-id": null,
+      "sort-name": "New York"
+    },
+    "gender": "Male",
+    "disambiguation": "",
+    "end-area": {
+      "type": null,
+      "name": "Honolulu",
+      "id": "a1411661-be21-4290-8dc1-50f3d8e3ea67",
+      "disambiguation": "",
+      "sort-name": "Honolulu",
+      "type-id": null
+    },
+    "aliases": [
+      {
+        "end": null,
+        "begin": null,
+        "locale": null,
+        "type-id": null,
+        "sort-name": "The Exotic Sounds of Martin Denny",
+        "name": "The Exotic Sounds of Martin Denny",
+        "type": null,
+        "ended": false,
+        "primary": null
+      }
+    ],
+    "tags": [
+      {
+        "name": "easy listening",
+        "count": 1
+      },
+      {
+        "name": "exotica",
+        "count": 3
+      },
+      {
+        "name": "jazz",
+        "count": 1
+      },
+      {
+        "name": "lounge",
+        "count": 2
+      }
+    ],
+    "isnis": [
+      "0000000055187459"
+    ],
+    "type": "Person",
+    "name": "Martin Denny"
+  }
+}

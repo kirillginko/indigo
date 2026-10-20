@@ -1,0 +1,175 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/62649d95-8883-422c-b64d-5341a7f84714?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:59.775508+00:00",
+  "body": {
+    "title": "Love Talkin'",
+    "first-release-date": "1974",
+    "artist-credit": [
+      {
+        "artist": {
+          "sort-name": "Harris, Gene",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "name": "Gene Harris",
+          "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+          "disambiguation": ""
+        },
+        "joinphrase": "",
+        "name": "Gene Harris"
+      }
+    ],
+    "length": 287893,
+    "video": false,
+    "disambiguation": "",
+    "isrcs": [],
+    "releases": [
+      {
+        "id": "26d4881c-94f5-4e1d-a571-e4148ac53d22",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "type-id": null
+            },
+            "date": "1974"
+          }
+        ],
+        "date": "1974",
+        "quality": "normal",
+        "packaging": null,
+        "barcode": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "name": "Gene Harris",
+              "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+              "sort-name": "Harris, Gene",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": "",
+            "name": "Gene Harris"
+          }
+        ],
+        "title": "Astral Signal",
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "title": "Astral Signal",
+        "quality": "normal",
+        "packaging": null,
+        "barcode": null,
+        "artist-credit": [
+          {
+            "name": "Gene Harris",
+            "joinphrase": "",
+            "artist": {
+              "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+              "name": "Gene Harris",
+              "disambiguation": "",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Harris, Gene"
+            }
+          }
+        ],
+        "id": "8d11fadd-b5d5-4324-88f4-f7f7768e3b9e",
+        "date": "1998-10-28",
+        "release-events": [
+          {
+            "date": "1998-10-28",
+            "area": {
+              "name": "Japan",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "Japan",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type": null
+            }
+          }
+        ],
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": null,
+          "script": "Latn"
+        },
+        "status": "Official",
+        "country": "JP",
+        "disambiguation": ""
+      },
+      {
+        "packaging-id": null,
+        "text-representation": {
+          "language": "jpn",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "JP",
+        "disambiguation": "",
+        "title": "Astral Signal",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Gene Harris",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Harris, Gene",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+              "name": "Gene Harris",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": "4988006870048",
+        "packaging": null,
+        "id": "83a962c7-1191-4d1d-b2be-dbedbe63f5be",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "sort-name": "Japan",
+              "type-id": null,
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "name": "Japan",
+              "disambiguation": ""
+            },
+            "date": "2009-04-22"
+          }
+        ],
+        "date": "2009-04-22"
+      }
+    ],
+    "id": "62649d95-8883-422c-b64d-5341a7f84714"
+  }
+}

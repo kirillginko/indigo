@@ -1,0 +1,57 @@
+{
+  "url": "https://api.discogs.com/artists/1762528",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:56.997972+00:00",
+  "body": {
+    "name": "DJ Rum",
+    "id": 1762528,
+    "resource_url": "https://api.discogs.com/artists/1762528",
+    "uri": "https://www.discogs.com/artist/1762528-DJ-Rum",
+    "releases_url": "https://api.discogs.com/artists/1762528/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/PmwjAPILuh2P24n6cJSTkVGNxt1XHlbsk68FOHFbFOQ/rs:fit/g:sm/q:90/h:600/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE3NjI1/MjgtMTMzNzA5NzEz/MC00NzI3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/PmwjAPILuh2P24n6cJSTkVGNxt1XHlbsk68FOHFbFOQ/rs:fit/g:sm/q:90/h:600/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE3NjI1/MjgtMTMzNzA5NzEz/MC00NzI3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/bGFoEHIiiSRp8jVoPG-RR6XdUXLH86MbEvrkUeCuSSE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE3NjI1/MjgtMTMzNzA5NzEz/MC00NzI3LmpwZWc.jpeg",
+        "width": 400,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Ettlp7VRSXqkwHT2Z7YBUNz-0Eac5TO6nzXFatIxBT0/rs:fit/g:sm/q:90/h:267/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE3NjI1/MjgtMTI5MjgwNTU1/Mi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/Ettlp7VRSXqkwHT2Z7YBUNz-0Eac5TO6nzXFatIxBT0/rs:fit/g:sm/q:90/h:267/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE3NjI1/MjgtMTI5MjgwNTU1/Mi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/NUsqUxmCwY2CBG-fC3Sz7nx_7OT9X-9uFfBZeh0lF6A/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTE3NjI1/MjgtMTI5MjgwNTU1/Mi5qcGVn.jpeg",
+        "width": 400,
+        "height": 267
+      }
+    ],
+    "realname": "Felix Manuel",
+    "profile": "",
+    "urls": [
+      "http://soundcloud.com/djrum",
+      "https://www.facebook.com/DjrumMusic/",
+      "https://djrum.bandcamp.com"
+    ],
+    "namevariations": [
+      "DJRum",
+      "DjRUM",
+      "DjRum",
+      "Djrum",
+      "djrum"
+    ],
+    "aliases": [
+      {
+        "id": 3722068,
+        "name": "Felix Manuel",
+        "resource_url": "https://api.discogs.com/artists/3722068"
+      },
+      {
+        "id": 4948510,
+        "name": "Struction (2)",
+        "resource_url": "https://api.discogs.com/artists/4948510"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

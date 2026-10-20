@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F5975825&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:17.515630+00:00",
+  "body": {
+    "relations": [
+      {
+        "end": null,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "attributes": [],
+        "begin": null,
+        "direction": "backward",
+        "source-credit": "",
+        "artist": {
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "CA",
+          "sort-name": "Priori",
+          "name": "Priori",
+          "disambiguation": "Canadian DJ & producer Francis Latreille",
+          "id": "cc9f278d-d083-4370-b830-f2ee1f118489"
+        },
+        "target-credit": "",
+        "type": "discogs",
+        "target-type": "artist",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4"
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/5975825",
+    "id": "2b9da9a2-2ec4-469b-bd58-54914b50d8c2"
+  }
+}

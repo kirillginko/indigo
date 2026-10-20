@@ -1,0 +1,129 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/bca9118e-eaac-46a0-a737-96379696915d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:04.961949+00:00",
+  "body": {
+    "first-release-date": "2019-03-01",
+    "releases": [
+      {
+        "disambiguation": "",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "name": "Solange",
+            "joinphrase": "",
+            "artist": {
+              "name": "Solange",
+              "type": "Person",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Solange",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+            }
+          }
+        ],
+        "country": "XW",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "When I Get Home",
+        "packaging": "None",
+        "quality": "normal",
+        "id": "d8a54dea-12d4-48db-b2a4-12ed29a1c4f6",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2019-03-01"
+          }
+        ],
+        "barcode": "886447578018",
+        "date": "2019-03-01"
+      },
+      {
+        "date": "2019-06-28",
+        "barcode": "190759440414",
+        "release-events": [
+          {
+            "date": "2019-06-28",
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null,
+              "name": "United States"
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "4f3a0a39-88b0-485f-86ef-00639c8f0550",
+        "quality": "normal",
+        "packaging": null,
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "title": "When I Get Home",
+        "country": "US",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "name": "Solange",
+            "joinphrase": "",
+            "artist": {
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Solange",
+              "type": "Person",
+              "name": "Solange"
+            }
+          }
+        ],
+        "disambiguation": ""
+      }
+    ],
+    "isrcs": [
+      "USSM11901221"
+    ],
+    "video": false,
+    "length": 222000,
+    "title": "Down With the Clique",
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+          "disambiguation": "US RnB vocalist Solange Knowles",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Solange",
+          "type": "Person",
+          "name": "Solange"
+        },
+        "name": "Solange",
+        "joinphrase": ""
+      }
+    ],
+    "disambiguation": "",
+    "id": "bca9118e-eaac-46a0-a737-96379696915d"
+  }
+}
