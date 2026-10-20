@@ -108,7 +108,7 @@ struct PhoneForYouView: View {
                                         Task { await open(suggestion.node, from: ListeningSurface.Origin(screen: "foryou.slides", via: suggestion.via, route: suggestion.kind.rawValue)) }
                                     }
                                 case .onNow(let entry):
-                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets, usesForYouArtworkSizing: true) {
+                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets) {
                                         appState.select(entry.route)
                                     }
                                 }

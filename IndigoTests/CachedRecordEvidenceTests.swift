@@ -61,7 +61,7 @@ final class CachedRecordEvidenceTests: XCTestCase {
         record.releaseDiscogsIDs = [10, 11]
         record.releaseImageURLStrings = ["", ""]
         record.releaseLabels = ["Warp Records", "Warp Records"]
-        record.cacheVersion = 13
+        record.cacheVersion = 14
         record.fetchedAt = Date()
         context.insert(record)
         try? context.save()

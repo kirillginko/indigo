@@ -1255,15 +1255,19 @@ final class DigStore {
             }
 
             guard let next = await nextPortraitNeeded() else {
-                if quiet > 0 { artworkRevision &+= 1 }
-                return
+                if quiet > 0 { artworkRevision &+= 1; quiet = 0 }
+                // A lazy grid can request portraits after the backlog has drained.
+                try? await Task.sleep(for: .seconds(2))
+                continue
             }
             // Consumed above, so the flag is set there instead.
             let wasOnScreen = lastWasOnScreen
             // The request and the row it becomes both happen on the worker.
             // What comes back is a value, and what is done about it is this
             // loop's business — see `DigWorker.PortraitOutcome`.
-            let outcome = await worker.fillPortrait(named: next)
+            let outcome = await worker.fillPortrait(
+                named: next, verifiedDiscogsID: cataloguePortraitIDs[RecordingKey.normalizeArtist(next)]
+            )
             guard !Task.isCancelled else { return }
 
             let address: URL
@@ -1297,7 +1301,8 @@ final class DigStore {
             // Stays here: these are rows the main context may already hold
             // and be drawing from, and rewriting one column on them is the
             // whole point — see `paint`.
-            paint(next, with: address.absoluteString)
+            let verifiedID = cataloguePortraitIDs[RecordingKey.normalizeArtist(next)]
+            paint(next, with: address.absoluteString, owner: verifiedID)
             saveContext()
 
             // Telling the page costs it a full rebuild of its graph, so this
@@ -1309,6 +1314,7 @@ final class DigStore {
             // new address out of `portraits`; nothing is rebuilt.
             let key = RecordingKey.normalizeArtist(next)
             portraits[key] = address
+            if let verifiedID { portraits[ArtistPortrait.identityKey(verifiedID)] = address }
             portraitsSettled.insert(key)
             quiet += 1
             if wasOnScreen || quiet >= 5 {
@@ -1385,7 +1391,7 @@ final class DigStore {
         lastWasOnScreen = false
         let outOfDate = portraitQueueBuiltAt != revision
             && portraitQueueBuiltWhen.map { ContinuousClock.now - $0 >= Self.portraitQueueLifetime } ?? true
-        if portraitQueue.isEmpty || outOfDate {
+        if portraitQueueBuiltWhen == nil || outOfDate {
             portraitQueue = await worker.pendingPortraits()
             portraitQueueBuiltAt = revision
             portraitQueueBuiltWhen = .now
@@ -1481,6 +1487,8 @@ final class DigStore {
         for (name, portrait) in adopted {
             let key = RecordingKey.normalizeArtist(name)
             if let stale = withheld[name] {
+                cataloguePortraitIDs.removeValue(forKey: key)
+                catalogueVouched.remove(key)
                 let inMemory = portraits.removeValue(forKey: key)?.absoluteString
                 for address in Set([stale, inMemory].compactMap { $0 }) {
                     StoredEdge.unpaint(artistKey: key, address: address, in: context)
@@ -1488,9 +1496,16 @@ final class DigStore {
                 portraitsSettled.insert(key)
                 continue
             }
+            if portrait.state != "verified" {
+                cataloguePortraitIDs.removeValue(forKey: key)
+                catalogueVouched.remove(key)
+            }
             guard let address = portrait.url, let url = URL(string: address) else { continue }
             portraits[key] = url
-            if portrait.state == "verified" { catalogueVouched.insert(key) }
+            if portrait.state == "verified" {
+                catalogueVouched.insert(key)
+                cataloguePortraitIDs[key] = portrait.discogsID
+            }
             if portrait.state == "verified", let id = portrait.discogsID {
                 portraits[ArtistPortrait.identityKey(id)] = url
             }
@@ -1610,6 +1625,8 @@ final class DigStore {
     /// the catalogue answers old-rule faces that way too, and those are the
     /// ones most in need of the full image.
     @ObservationIgnored private var catalogueVouched: Set<String> = []
+    /// Verified identities let a small portrait be upgraded without searching by name.
+    @ObservationIgnored private var cataloguePortraitIDs: [String: Int] = [:]
 
     /// Whether a name on screen holds only Discogs' 150-pixel thumb, kept
     /// from when these were 38-point rows: asked for again, once a session
@@ -1633,10 +1650,9 @@ final class DigStore {
 
     private func wantsSharperPortrait(_ name: String) -> Bool {
         let key = RecordingKey.normalizeArtist(name)
-        // Not a face the catalogue verified: asking again by name could
-        // only lose it to a namesake, and the catalogue upgrades its own to the
-        // full image, which reaches this device through the change feed.
-        guard !key.isEmpty, !sharpened.contains(key), !catalogueVouched.contains(key) else { return false }
+        // Verified faces are upgraded by identity; never search their name again.
+        guard !key.isEmpty, !sharpened.contains(key) else { return false }
+        if catalogueVouched.contains(key), cataloguePortraitIDs[key] == nil { return false }
         return DiscogsClient.isSmallCut(portraits[key]?.absoluteString)
     }
 

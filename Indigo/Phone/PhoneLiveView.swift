@@ -2,7 +2,7 @@
 //  PhoneLiveView.swift
 //  Indigo
 //
-//  The phone's Live tab: one station to a screen, its picture full-bleed,
+//  The phone's Live tab: one station to a screen, its picture sized to stay sharp,
 //  swiped up to the next. What is on air, who is playing it, and one big
 //  button to listen. Swiping only moves between stations -- a stream starts
 //  on Play, never on a swipe -- and whatever is playing keeps playing while
@@ -48,7 +48,6 @@ struct PhoneLiveSlide: View {
     let entry: StationEntry
     let item: MediaItem?
     let insets: EdgeInsets
-    var usesForYouArtworkSizing = false
     let openStation: () -> Void
 
     @Environment(PlaybackCoordinator.self) private var player
@@ -61,17 +60,13 @@ struct PhoneLiveSlide: View {
     var body: some View {
         LiveShowReader(providerID: entry.station.providerID, stationID: entry.station.id) { show, next in
             ZStack {
-                // Square artwork, made as large as the screen's longer side
-                // and cropped at the other: full-bleed, as the station's
-                // picture should be, not a square with bands above and below.
+                // Fill the screen only when the image has enough native pixels.
+                // Small show pictures and station marks stay sharp on the field.
                 GeometryReader { proxy in
-                    Group {
-                        if usesForYouArtworkSizing, let artwork = show?.artworkURL {
-                            PhoneSlideArtwork(picture: artwork, preview: nil, viewport: proxy.size)
-                        } else {
-                            picture(show, side: max(proxy.size.width, proxy.size.height))
-                        }
-                    }
+                    PhoneSlideArtwork(
+                        picture: show?.artworkURL, preview: nil, viewport: proxy.size,
+                        stationMark: StationMark.logoURL(for: entry.station.providerID)
+                    )
                     .frame(width: proxy.size.width, height: proxy.size.height)
                 }
                 .clipped()
@@ -96,27 +91,6 @@ struct PhoneLiveSlide: View {
                 }
             }
             .foregroundStyle(.white)
-        }
-    }
-
-    @ViewBuilder
-    private func picture(_ show: RadioShow?, side: CGFloat) -> some View {
-        if let artwork = show?.artworkURL {
-            ArtworkView(remoteURL: artwork, side: side, glyphScale: 0.3,
-                        markURL: StationMark.logoURL(for: entry.station.providerID))
-        } else {
-            // Nothing published for what is on: the player's moving field,
-            // with the station's mark on it.
-            ZStack {
-                PlayerShaderBackdrop()
-                // In the upper part of the screen, clear of the words below.
-                ArtworkView(
-                    side: 120, glyphScale: 0.3,
-                    markURL: StationMark.logoURL(for: entry.station.providerID),
-                    showsGround: false
-                )
-                .offset(y: -side * 0.2)
-            }
         }
     }
 

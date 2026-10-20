@@ -67,11 +67,16 @@ nonisolated struct DiscogsSearchResult: Decodable, Sendable {
     let style: [String]?
     let label: [String]?
     let year: String?
+    /// The master a release search hit is a pressing of. How a hit is
+    /// matched to an artist's own shelf, which lists masters rather than
+    /// every pressing.
+    var masterID: Int? = nil
 
     private enum CodingKeys: String, CodingKey {
         case id, title, genre, style, label, year
         case thumbnail = "thumb"
         case coverImage = "cover_image"
+        case masterID = "master_id"
     }
 }
 

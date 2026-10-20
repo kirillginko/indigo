@@ -249,6 +249,7 @@ final class StreamAudioEngine {
 
     func pause() {
         connectDeadline?.cancel()
+        pauseCheck?.cancel()
         isUserPaused = true
         reconnectTask?.cancel()
         isWaitingForNetwork = false
@@ -261,6 +262,7 @@ final class StreamAudioEngine {
         levelMonitor.reset()
         reconnectTask?.cancel()
         connectDeadline?.cancel()
+        pauseCheck?.cancel()
         reconnect.reset()
         isWaitingForNetwork = false
         isRetryPending = false
@@ -334,6 +336,7 @@ final class StreamAudioEngine {
 
     private func start(url: URL) {
         removeObservers()
+        pauseCheck?.cancel()
         // Whatever failed last is behind us; the next failure is a new one.
         reconnect.opening()
         reconnectTask?.cancel()
@@ -476,6 +479,39 @@ final class StreamAudioEngine {
         }
     }
 
+    /// How long a pause nobody asked for is given to explain itself.
+    @ObservationIgnored private static let pauseGrace = Duration.milliseconds(1500)
+    @ObservationIgnored private var pauseCheck: Task<Void, Never>?
+
+    /// A player the system paused without saying why, reopened.
+    ///
+    /// On an iPhone the session can be taken out from under a station with
+    /// no interruption to hear — most likely by the web player, whose video
+    /// is torn down just as a station opens when a YouTube upload is
+    /// switched away from — and AVPlayer simply stops. No stall, no failure,
+    /// no end. Unconfirmed on a device; what is certain is that the
+    /// engine went on saying "playing", and the bar and the lock screen with
+    /// it, over silence. A call or a lost route arrives inside the grace as
+    /// a pause from the coordinator, and a drop as one of the notifications;
+    /// whatever is still paused after that is a station that went quiet.
+    private func watchForUnexplainedPause(_ paused: AVPlayer) {
+        guard state == .playing || state == .buffering else { return }
+        pauseCheck?.cancel()
+        pauseCheck = Task { [weak self] in
+            try? await Task.sleep(for: Self.pauseGrace)
+            guard !Task.isCancelled, let self, self.player === paused, !self.isUserPaused,
+                  paused.timeControlStatus == .paused,
+                  !self.isRetryPending, !self.isWaitingForNetwork,
+                  self.state == .playing || self.state == .buffering
+            else { return }
+            self.handleInterruption("Playback stopped.")
+        }
+    }
+
+    /// Pauses the player without the engine knowing, as iOS can. Used by
+    /// tests.
+    func pausePlayerBehindTheEngine() { player.pause() }
+
     /// Whether a notification is about the item on the air. Notifications
     /// are delivered through the main queue, so one posted just before its
     /// item was discarded can still arrive after the next has opened.
@@ -516,9 +552,10 @@ final class StreamAudioEngine {
                     // pauses as it goes, and the notifications below say
                     // which; on an iPhone the system also pauses it for a
                     // call or a lost route, which the coordinator hears
-                    // from the audio session. Answering this as well would
-                    // race the reconnect those have already begun.
-                    break
+                    // from the audio session. Answering this at once would
+                    // race the reconnect those have already begun — so it
+                    // is answered only if, after a moment, nothing has.
+                    self.watchForUnexplainedPause(player)
                 @unknown default:
                     break
                 }

@@ -192,4 +192,34 @@ final class StreamDropTests: XCTestCase {
         engine.networkChanged(isOnline: true)
         XCTAssertEqual(engine.connections, 2, "Back on with the network")
     }
+
+    /// A player the system pauses without a call, a lost route or a drop to
+    /// explain it is reopened, rather than left reading "playing".
+    func testAPauseNobodyAskedForIsReconnected() async throws {
+        let engine = StreamAudioEngine(monitorsNetwork: false)
+        engine.setVolume(0)
+        defer { engine.stop() }
+        engine.play(url: try Self.shortStream(seconds: 30))
+        await waitUntil(5) { engine.state == .playing }
+        XCTAssertEqual(engine.state, .playing)
+
+        engine.pausePlayerBehindTheEngine()
+        await waitUntil(5) { engine.connections >= 2 }
+        XCTAssertEqual(engine.connections, 2, "The silent station was reopened")
+        await waitUntil(5) { engine.state == .playing }
+        XCTAssertEqual(engine.state, .playing)
+    }
+
+    /// The listener's pause is not one of those.
+    func testTheListenersPauseIsNotReconnected() async throws {
+        let engine = StreamAudioEngine(monitorsNetwork: false)
+        engine.setVolume(0)
+        defer { engine.stop() }
+        engine.play(url: try Self.shortStream(seconds: 30))
+        await waitUntil(5) { engine.state == .playing }
+        engine.pause()
+        try await Task.sleep(for: .seconds(2.5))
+        XCTAssertEqual(engine.connections, 1)
+        XCTAssertEqual(engine.state, .paused)
+    }
 }

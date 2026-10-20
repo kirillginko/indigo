@@ -24,6 +24,32 @@ final class PhoneSlideArtworkSizingTests: XCTestCase {
         XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(viewport: .zero), 0)
     }
 
+    func testLowResolutionImagesStayWithinTheirNativeRetinaPixels() {
+        // The bundled Radio Panik and n.10.as marks are 225 and 447 pixels square.
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: CGSize(width: 225, height: 225), scale: 3), 75)
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: CGSize(width: 447, height: 447), scale: 3), 149)
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: CGSize(width: 150, height: 150), scale: 3), 50)
+    }
+
+    func testSmallLandscapeArtworkUsesItsShorterEdgeAndTheActualDisplayScale() {
+        let pixels = CGSize(width: 800, height: 240)
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: pixels, scale: 3), 80)
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: pixels, scale: 2), 120)
+    }
+
+    func testSharpArtworkAndStationMarksRespectTheirLayoutLimits() {
+        let pixels = CGSize(width: 1200, height: 1200)
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: pixels, scale: 3), 200)
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: viewport, imagePixels: pixels, scale: 3, maximumSide: 120), 120)
+    }
+
     func testBothDimensionsMustCoverTheViewport() {
         XCTAssertFalse(PhoneSlideArtworkSizing.fillsViewport(imagePixels: CGSize(width: 3000, height: 1000), viewport: viewport, scale: 3))
         XCTAssertTrue(PhoneSlideArtworkSizing.fillsViewport(imagePixels: CGSize(width: 2048, height: 3072), viewport: viewport, scale: 3))

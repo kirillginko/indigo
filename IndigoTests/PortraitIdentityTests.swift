@@ -41,6 +41,20 @@ final class SearchTransport: DiscogsTransport, @unchecked Sendable {
     }
 }
 
+/// Answers the artist-detail request and records whether a name search was used.
+private final class PortraitDetailTransport: DiscogsTransport, @unchecked Sendable {
+    let body: [String: Any]
+    private(set) var paths: [String] = []
+
+    init(_ body: [String: Any]) { self.body = body }
+
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        paths.append(request.url!.path)
+        return (try JSONSerialization.data(withJSONObject: body),
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!)
+    }
+}
+
 private final class PortraitAsks: @unchecked Sendable {
     private let lock = NSLock()
     private var asks: [[String]] = []
@@ -300,6 +314,38 @@ final class PortraitIdentityTests: XCTestCase {
         let worker = DigWorker(modelContainer: container, discogs: DiscogsClient(transport: SearchTransport([]), token: "test"))
         guard case .found(let url) = await worker.fillPortrait(named: "Hype Williams") else { return XCTFail() }
         XCTAssertFalse(DiscogsClient.isSmallCut(url.absoluteString), url.absoluteString)
+    }
+
+    func testAVerifiedThumbnailIsUpgradedByIdentityWithoutSearchingItsName() async throws {
+        cache("Hype Williams", Faces.director)
+        let full = "https://img.test/director-full.jpg"
+        let transport = PortraitDetailTransport([
+            "id": 398459, "name": "Hype Williams",
+            "images": [["type": "primary", "uri": full, "uri150": Faces.director]]
+        ])
+        let worker = DigWorker(modelContainer: container, discogs: DiscogsClient(transport: transport, token: "test"))
+        guard case .found(let url) = await worker.fillPortrait(named: "Hype Williams", verifiedDiscogsID: 398459) else {
+            return XCTFail("Expected the full portrait of the verified artist")
+        }
+        XCTAssertEqual(url.absoluteString, full)
+        XCTAssertEqual(transport.paths, ["/artists/398459"])
+        let dig = store()
+        await dig.loadPortraitIndex()
+        XCTAssertEqual(dig.portraitURL(for: "Hype Williams", discogsID: 398459)?.absoluteString, full)
+        XCTAssertFalse(dig.wantsPortraitRequest(for: "Hype Williams"))
+    }
+
+    func testAnUnavailableFullPortraitKeepsTheVerifiedThumbnail() async throws {
+        cache("Hype Williams", Faces.director)
+        let transport = PortraitDetailTransport(["id": 398459, "name": "Hype Williams", "images": []])
+        let worker = DigWorker(modelContainer: container, discogs: DiscogsClient(transport: transport, token: "test"))
+        guard case .unreachable = await worker.fillPortrait(named: "Hype Williams", verifiedDiscogsID: 398459) else {
+            return XCTFail("A missing full image must not erase the verified thumbnail")
+        }
+        XCTAssertEqual(transport.paths, ["/artists/398459"])
+        let dig = store()
+        await dig.loadPortraitIndex()
+        XCTAssertEqual(dig.portraitURL(for: "Hype Williams")?.absoluteString, Faces.director)
     }
 
     func testAnUpgradedFaceIsNotAskedForAgainOnTheNextLaunch() async throws {
