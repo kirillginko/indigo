@@ -16,8 +16,8 @@
 
 import Foundation
 
-nonisolated struct RadioArtistProfile: Sendable, Equatable {
-    enum Source: String, Sendable { case genres = "musicbrainz genres", tags = "musicbrainz tags", none, ambiguous, unlinked, failed }
+nonisolated struct RadioArtistProfile: Sendable, Equatable, Codable {
+    enum Source: String, Sendable, Codable { case genres = "musicbrainz genres", tags = "musicbrainz tags", none, ambiguous, unlinked, failed }
 
     let discogsID: Int
     var musicBrainzID: String?

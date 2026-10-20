@@ -37,8 +37,17 @@ final class LiveRadioArtistProfiles: XCTestCase {
         }
     }
 
+    /// Kept on disk as they arrive, so a host that goes away mid-census
+    /// resumes where it was. A failed lookup is asked again next time.
     private actor Profiles {
+        let file: URL
         var memo: [Int: RadioArtistProfile] = [:]
+        init(file: URL) {
+            self.file = file
+            if let data = try? Data(contentsOf: file), let held = try? JSONDecoder().decode([Int: RadioArtistProfile].self, from: data) {
+                memo = held.filter { $0.value.source != .failed }
+            }
+        }
         func get(_ ids: [Int]) async -> [Int: RadioArtistProfile] {
             var out: [Int: RadioArtistProfile] = [:]
             for id in Set(ids).sorted() {
@@ -46,7 +55,9 @@ final class LiveRadioArtistProfiles: XCTestCase {
                 let found = await RadioArtistProfiles.live.profile(discogsID: id)
                 memo[id] = found
                 out[id] = found
+                if memo.count % 10 == 0, let data = try? JSONEncoder().encode(memo) { try? data.write(to: file, options: .atomic) }
             }
+            if let data = try? JSONEncoder().encode(memo) { try? data.write(to: file, options: .atomic) }
             return out
         }
     }
@@ -83,7 +94,7 @@ final class LiveRadioArtistProfiles: XCTestCase {
         let context = ModelContext(container)
         let inputs = try XCTUnwrap(ClusterSeedPicks.inputs(context: context, vectors: [:]))
         let vectors = inputs.vectors
-        let plays = Plays(), profiles = Profiles()
+        let plays = Plays(), profiles = Profiles(file: dir.appendingPathComponent("radio-artist-profiles-memo.json"))
         var lines = ["Radio artist profiles (MusicBrainz by Discogs id); style space: \(vectors.count) styles"]
 
         // The listener's fill, without and with profiles.
@@ -141,6 +152,8 @@ final class LiveRadioArtistProfiles: XCTestCase {
         }
         lines.append(String(format: "Profiles for the listener's %d radio candidates (%d without device styles): %.0f s", radioIDs.count, unstyled.count, profileSeconds))
         census("Listener's radio candidates", radioProfiles)
+        let reportFile = dir.appendingPathComponent("radio-artist-profiles.txt")
+        try lines.joined(separator: "\n").write(to: reportFile, atomically: true, encoding: .utf8)
         let linkedStarted = ContinuousClock.now
         let linkedProfiles = await profiles.get(linkedIDs.sorted())
         census("MusicBrainz-linked artists", linkedProfiles)
@@ -149,6 +162,6 @@ final class LiveRadioArtistProfiles: XCTestCase {
         for p in examples { lines.append("  " + describe(p, vectors: vectors)) }
         let report = lines.joined(separator: "\n")
         print(report)
-        try report.write(to: dir.appendingPathComponent("radio-artist-profiles.txt"), atomically: true, encoding: .utf8)
+        try report.write(to: reportFile, atomically: true, encoding: .utf8)
     }
 }
