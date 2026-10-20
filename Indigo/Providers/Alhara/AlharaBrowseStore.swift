@@ -42,7 +42,10 @@ final class AlharaBrowseStore {
     func loadLiveArtworkIfNeeded(title: String) async {
         guard liveArtwork[title] == nil else { return }
         let parsed = AlharaLiveTitle.parse(title)
-        liveArtwork[title] = .some(await api.searchArtwork(host: parsed.host, show: parsed.show))
+        let found = await api.searchArtwork(host: parsed.host, show: parsed.show)
+        // Cancelled is not "none found": the restarted lookup asks again.
+        guard !Task.isCancelled else { return }
+        liveArtwork[title] = .some(found)
     }
     @ObservationIgnored private var next: URL?
     /// Every show a grid has rendered, so opening one is instant.

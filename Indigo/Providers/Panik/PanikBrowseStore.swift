@@ -95,6 +95,8 @@ final class PanikBrowseStore {
         }
     }
 
+    @ObservationIgnored private var showPageFetches: [String: Task<Void, Never>] = [:]
+
     func show(slug: String) -> PanikShow? {
         showDetails[slug] ?? shows.first { $0.slug == slug }
     }
@@ -102,6 +104,29 @@ final class PanikBrowseStore {
     func episodes(ofShow slug: String) -> [PanikEpisode] { showEpisodes[slug] ?? [] }
     func isLoadingShow(_ slug: String) -> Bool { loadingShows.contains(slug) }
     func showError(_ slug: String) -> String? { showErrors[slug] }
+
+    /// The show's own page and nothing else: its big picture and blurb,
+    /// without waiting on the podcast feed `loadShowIfNeeded` fetches
+    /// beside it, which can take many seconds. What Live needs to put the
+    /// show's picture up.
+    ///
+    /// The request belongs to the store, not the caller: a Live slide
+    /// restarts its lookup when the show directory arrives, and that used to
+    /// cancel this fetch half-way and leave it marked as running, so it was
+    /// never asked again.
+    func loadShowDetailIfNeeded(slug: String) async {
+        guard showDetails[slug] == nil else { return }
+        if let running = showPageFetches[slug] { return await running.value }
+        let listing = shows.first { $0.slug == slug }
+        let fetch = Task { [api] in
+            if let show = try? await api.fetchShow(slug: slug, listing: listing) {
+                showDetails[slug] = show
+            }
+            showPageFetches[slug] = nil
+        }
+        showPageFetches[slug] = fetch
+        await fetch.value
+    }
 
     func loadShowIfNeeded(slug: String) async {
         guard showEpisodes[slug] == nil, !loadingShows.contains(slug) else { return }

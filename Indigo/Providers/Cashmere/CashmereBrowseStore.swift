@@ -62,6 +62,8 @@ final class CashmereBrowseStore {
         guard replayArtwork[trackTitle] == nil else { return }
         let wanted = RecordingKey.normalize(trackTitle)
         let found = (try? await api.fetchEpisodes(first: 10, search: trackTitle))?.episodes ?? []
+        // Cancelled is not "none found": the restarted lookup asks again.
+        guard !Task.isCancelled else { return }
         let exact = found.first { RecordingKey.normalize($0.title) == wanted && $0.artworkURL != nil }
         let sameProgramme = programme.flatMap { name in
             found.first { episode in

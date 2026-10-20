@@ -51,7 +51,24 @@ struct PhoneSlideArtwork: View {
     }
     private var sharper: URL? { ArtworkSizing.sharper(picture, pixels: targetPixels) }
     private var request: String { "\(sharper?.absoluteString ?? "")|\(picture?.absoluteString ?? "")|\(preview?.absoluteString ?? "")|\(stationMark?.absoluteString ?? "")|\(RemoteArtworkStore.step(for: targetPixels))" }
-    private var current: Loaded? { loaded?.request == request ? loaded : nil }
+    /// What to draw. The station's mark carries over when the show's picture
+    /// moves to a better address — Radio Panik's goes from a directory
+    /// thumbnail to the show page's — so the slide is not blanked to wait.
+    private var current: Loaded? {
+        guard let loaded else { return nil }
+        return loaded.request == request || loaded.address == stationMark ? loaded : nil
+    }
+
+    /// How long a picture takes to come up out of the blur.
+    private static let reveal = Animation.easeOut(duration: 0.5)
+
+    private static func pixels(of image: PlatformImage) -> CGSize {
+        #if os(macOS)
+        image.size
+        #else
+        CGSize(width: image.size.width * image.scale, height: image.size.height * image.scale)
+        #endif
+    }
 
     private func fills(_ pixels: CGSize) -> Bool {
         if let fillFloor { return PhoneSlideArtworkSizing.fillsSlide(imagePixels: pixels, minimumSide: fillFloor) }
@@ -61,22 +78,10 @@ struct PhoneSlideArtwork: View {
     var body: some View {
         Group {
             if let current {
-                let isStationMark = current.address == stationMark
-                if !isStationMark, fills(current.pixels) {
-                    ArtworkView(remoteURL: current.address, side: viewport.height,
-                                aspect: viewport.width / max(1, viewport.height), glyphScale: 0.3)
-                } else {
-                    ZStack {
-                        PlayerShaderBackdrop()
-                        ArtworkView(remoteURL: current.address,
-                                    side: PhoneSlideArtworkSizing.containedSide(
-                                        viewport: viewport, imagePixels: current.pixels,
-                                        scale: scale, maximumSide: isStationMark ? 120 : 200),
-                                    glyphScale: 0.3)
-                            .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
-                            .position(x: viewport.width / 2, y: viewport.height * 0.26)
-                    }
-                }
+                picture(current)
+                    .id(current.address)
+                    .transition(.modifier(active: BlurReveal(radius: 28, opacity: 0),
+                                          identity: BlurReveal(radius: 0, opacity: 1)))
             } else if (picture == nil && stationMark == nil) || settled {
                 MineralSheenSurface()
             } else {
@@ -85,30 +90,77 @@ struct PhoneSlideArtwork: View {
         }
         .task(id: request) {
             settled = false
+            // The mark alongside, not after: it is a bundled file or a small
+            // one, and it is what the slide shows while the show's picture is
+            // still on its way.
+            async let mark: Void = showMarkWhileLoading()
             var seen = Set<URL>()
             var bestCoverage: CGFloat = 0
-            for address in [sharper, picture, preview, stationMark].compactMap({ $0 }) where seen.insert(address).inserted {
+            for address in [sharper, picture, preview].compactMap({ $0 }) where seen.insert(address).inserted {
                 guard !Task.isCancelled else { return }
-                // A mark is a fallback, never a replacement for a loaded show picture.
-                if address == stationMark, bestCoverage > 0 { continue }
-                if let image = await RemoteArtworkStore.shared.image(for: address, pixels: targetPixels) {
-                    guard !Task.isCancelled else { return }
-                    #if os(macOS)
-                    let pixels = image.size
-                    #else
-                    let pixels = CGSize(width: image.size.width * image.scale, height: image.size.height * image.scale)
-                    #endif
-                    let coverage = min(pixels.width / max(1, viewport.width), pixels.height / max(1, viewport.height))
-                    if coverage > bestCoverage {
-                        bestCoverage = coverage
+                guard let image = await RemoteArtworkStore.shared.image(for: address, pixels: targetPixels),
+                      !Task.isCancelled else { continue }
+                let pixels = Self.pixels(of: image)
+                // On Live a picture too small to fill the slide does not
+                // displace the station's mark: a 60-pixel thumbnail drawn at
+                // twenty points is worse than the logo.
+                if fillFloor != nil, stationMark != nil, !fills(pixels) { continue }
+                let coverage = min(pixels.width / max(1, viewport.width), pixels.height / max(1, viewport.height))
+                if coverage > bestCoverage {
+                    bestCoverage = coverage
+                    withAnimation(Self.reveal) {
                         loaded = Loaded(request: request, address: address, pixels: pixels)
                     }
-                    if PhoneSlideArtworkSizing.fillsViewport(imagePixels: pixels, viewport: viewport, scale: scale) {
-                        return
-                    }
+                }
+                if PhoneSlideArtworkSizing.fillsViewport(imagePixels: pixels, viewport: viewport, scale: scale) {
+                    break
                 }
             }
+            await mark
             if !Task.isCancelled { settled = true }
         }
+    }
+
+    /// Puts the station's mark up, unless the show's own picture got there
+    /// first.
+    private func showMarkWhileLoading() async {
+        guard let stationMark,
+              let image = await RemoteArtworkStore.shared.image(for: stationMark, pixels: targetPixels),
+              !Task.isCancelled
+        else { return }
+        if let loaded, loaded.request == request, loaded.address != stationMark { return }
+        withAnimation(Self.reveal) {
+            loaded = Loaded(request: request, address: stationMark, pixels: Self.pixels(of: image))
+        }
+    }
+
+    @ViewBuilder
+    private func picture(_ current: Loaded) -> some View {
+        let isStationMark = current.address == stationMark
+        if !isStationMark, fills(current.pixels) {
+            ArtworkView(remoteURL: current.address, side: viewport.height,
+                        aspect: viewport.width / max(1, viewport.height), glyphScale: 0.3)
+        } else {
+            ZStack {
+                PlayerShaderBackdrop()
+                ArtworkView(remoteURL: current.address,
+                            side: PhoneSlideArtworkSizing.containedSide(
+                                viewport: viewport, imagePixels: current.pixels,
+                                scale: scale, maximumSide: isStationMark ? 120 : 200),
+                            glyphScale: 0.3)
+                    .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
+                    .position(x: viewport.width / 2, y: viewport.height * 0.26)
+            }
+        }
+    }
+}
+
+/// A picture arriving: from a blur and transparent to sharp and opaque.
+private struct BlurReveal: ViewModifier {
+    let radius: CGFloat
+    let opacity: Double
+
+    func body(content: Content) -> some View {
+        content.blur(radius: radius).opacity(opacity)
     }
 }

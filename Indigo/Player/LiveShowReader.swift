@@ -164,7 +164,7 @@ struct LiveShowReader<Content: View>: View {
             // big one (999×762 for Les Promesses de l'Aube).
             let slug = show.detailID
                 ?? panikBrowse.shows.first { RadioShowArtwork.matches($0.title, show.title) }?.slug
-            if let slug { await panikBrowse.loadShowIfNeeded(slug: slug) }
+            if let slug { await panikBrowse.loadShowDetailIfNeeded(slug: slug) }
         default:
             break
         }

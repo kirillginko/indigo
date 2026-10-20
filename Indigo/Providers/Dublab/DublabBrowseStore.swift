@@ -77,6 +77,9 @@ final class DublabBrowseStore {
         do {
             page = try await api.search(title, page: 1)
         } catch {
+            // A slide that restarts its lookup cancels this one; that is not
+            // an answer, and recording it would stop the next one asking.
+            guard !Task.isCancelled else { return }
             Trace.note("dublab.live artwork \(title): \(error)")
             liveArtwork[title] = .some(nil)
             return

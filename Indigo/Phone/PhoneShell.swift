@@ -118,7 +118,11 @@ struct PhoneMiniPlayer: View {
 
     var body: some View {
         if let item = player.current {
-            LiveShowReader(providerID: item.sourceID, stationID: item.id) { show in
+            LiveShowReader(providerID: item.sourceID, stationID: item.id) { onAir in
+                // What the station is broadcasting belongs to the station,
+                // not to an archived show of theirs that is playing instead:
+                // an LYL archive episode wore the live show's picture.
+                let show = item.isLive ? onAir : nil
                 HStack(spacing: 10) {
                     ArtworkView(
                         localKey: item.artworkKey,
@@ -227,7 +231,9 @@ struct PhoneNowPlayingView: View {
     var body: some View {
         ZStack {
             if let item = player.current {
-                LiveShowReader(providerID: item.sourceID, stationID: item.id) { show in
+                LiveShowReader(providerID: item.sourceID, stationID: item.id) { onAir in
+                    // Only a station has a show on air; see PhoneMiniPlayer.
+                    let show = item.isLive ? onAir : nil
                     VStack(spacing: 22) {
                         Spacer(minLength: 0)
                         picture(item, show)
