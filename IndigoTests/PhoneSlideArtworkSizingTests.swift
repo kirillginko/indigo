@@ -58,4 +58,16 @@ final class PhoneSlideArtworkSizingTests: XCTestCase {
     func testHighResolutionSquareCanFillTheSlide() {
         XCTAssertTrue(PhoneSlideArtworkSizing.fillsViewport(imagePixels: CGSize(width: 3000, height: 3000), viewport: viewport, scale: 3))
     }
+
+    // MARK: - Live fills unless the picture is very small
+
+    func testTheLotsCameraFrameFillsTheSlide() {
+        XCTAssertTrue(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 426, height: 240), minimumSide: 200))
+    }
+
+    func testAThumbnailDoesNotFillTheSlide() {
+        XCTAssertFalse(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 150, height: 150), minimumSide: 200))
+        XCTAssertFalse(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 800, height: 120), minimumSide: 200))
+        XCTAssertFalse(PhoneSlideArtworkSizing.fillsSlide(imagePixels: nil, minimumSide: 200))
+    }
 }

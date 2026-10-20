@@ -16,6 +16,15 @@ nonisolated enum PhoneSlideArtworkSizing {
         guard scale > 0 else { return 0 }
         return max(0, min(available, min(imagePixels.width, imagePixels.height) / scale))
     }
+
+    /// Whether a picture is enough to fill a slide when some softness is
+    /// acceptable: its shorter side has at least `minimumSide` pixels. The
+    /// Lot's booth camera frame is 426×240 and fills; a 150-pixel thumbnail
+    /// does not.
+    static func fillsSlide(imagePixels: CGSize?, minimumSide: CGFloat) -> Bool {
+        guard let imagePixels else { return false }
+        return min(imagePixels.width, imagePixels.height) >= minimumSide
+    }
 }
 
 struct PhoneSlideArtwork: View {
@@ -23,6 +32,10 @@ struct PhoneSlideArtwork: View {
     let preview: URL?
     let viewport: CGSize
     var stationMark: URL? = nil
+    /// Live's slides: fill the slide with any picture whose shorter side has
+    /// this many pixels, accepting some softness, rather than only one sharp
+    /// at full Retina. Nil keeps the strict rule.
+    var fillFloor: CGFloat? = nil
     @Environment(\.displayScale) private var scale
     @State private var loaded: Loaded?
     @State private var settled = false
@@ -40,11 +53,16 @@ struct PhoneSlideArtwork: View {
     private var request: String { "\(sharper?.absoluteString ?? "")|\(picture?.absoluteString ?? "")|\(preview?.absoluteString ?? "")|\(stationMark?.absoluteString ?? "")|\(RemoteArtworkStore.step(for: targetPixels))" }
     private var current: Loaded? { loaded?.request == request ? loaded : nil }
 
+    private func fills(_ pixels: CGSize) -> Bool {
+        if let fillFloor { return PhoneSlideArtworkSizing.fillsSlide(imagePixels: pixels, minimumSide: fillFloor) }
+        return PhoneSlideArtworkSizing.fillsViewport(imagePixels: pixels, viewport: viewport, scale: scale)
+    }
+
     var body: some View {
         Group {
             if let current {
                 let isStationMark = current.address == stationMark
-                if !isStationMark, PhoneSlideArtworkSizing.fillsViewport(imagePixels: current.pixels, viewport: viewport, scale: scale) {
+                if !isStationMark, fills(current.pixels) {
                     ArtworkView(remoteURL: current.address, side: viewport.height,
                                 aspect: viewport.width / max(1, viewport.height), glyphScale: 0.3)
                 } else {

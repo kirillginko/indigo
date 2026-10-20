@@ -60,12 +60,14 @@ struct PhoneLiveSlide: View {
     var body: some View {
         LiveShowReader(providerID: entry.station.providerID, stationID: entry.station.id) { show, next in
             ZStack {
-                // Fill the screen only when the image has enough native pixels.
-                // Small show pictures and station marks stay sharp on the field.
+                // Full-bleed, as a station's picture should be, unless it is
+                // too small to stand it: a little soft is fine, a thumbnail
+                // blown up to the screen is not. Station marks stay small.
                 GeometryReader { proxy in
                     PhoneSlideArtwork(
                         picture: show?.artworkURL, preview: nil, viewport: proxy.size,
-                        stationMark: StationMark.logoURL(for: entry.station.providerID)
+                        stationMark: StationMark.logoURL(for: entry.station.providerID),
+                        fillFloor: 200
                     )
                     .frame(width: proxy.size.width, height: proxy.size.height)
                 }

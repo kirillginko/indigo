@@ -102,6 +102,12 @@ struct LiveShowReader<Content: View>: View {
             if archiveArtwork(for: show) == nil { await lylBrowse.loadShowsIfNeeded() }
         case PanikProvider.providerID:
             await panikBrowse.loadShowsIfNeeded()
+            // The directory's pictures are 60-pixel thumbnails, and a live
+            // slide draws the picture full-bleed. The show's own page has the
+            // big one (999×762 for Les Promesses de l'Aube).
+            let slug = show.detailID
+                ?? panikBrowse.shows.first { RadioShowArtwork.matches($0.title, show.title) }?.slug
+            if let slug { await panikBrowse.loadShowIfNeeded(slug: slug) }
         default:
             break
         }
