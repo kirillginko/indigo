@@ -101,4 +101,40 @@ final class RadioDiscoverTests: XCTestCase {
         let different = await cache.load(key: "another history")
         XCTAssertNil(different)
     }
+
+    /// Curator affinity: programmes that return to the listener's artists are
+    /// compatible, a one-off overlap is not; what two independent curators
+    /// both select comes first, an artist every programme plays is damped,
+    /// and a candidate's styles are never the programme's.
+    func testCuratorsWhoseSelectionsOverlapEndorseWhatTheyBothPlay() {
+        let seedA = UUID(), seedB = UUID(), shared = UUID(), popular = UUID(), oneOff = UUID(), lonely = UUID()
+        let inputs = RadioDiscover.Inputs(seeds: [.init(id: 1, name: "Seed A", cluster: 0, weight: 2, recordings: []),
+                                                  .init(id: 2, name: "Seed B", cluster: 0, weight: 2, recordings: [])],
+                                         labels: [0: "Ambient"], styles: [0: ["ambient"]], artistStyles: [:], known: ["seed a", "seed b"], key: "k")
+        let rows: [Int: [UUID]] = [1: [seedA], 2: [seedB]]
+        func episode(_ show: UUID, _ n: Int, host: String) -> RadioDiscover.Episode {
+            .init(id: UUID(), radio_show_id: show, provider: "nts", external_id: "s/\(n)", archive_url: nil, title: "Ep \(n)", aired_at: Date(),
+                  image_url: nil, duration_seconds: nil, radio_shows: .init(title: "Show \(host)", host_name: host))
+        }
+        func slot(_ row: UUID, _ i: Int, _ e: RadioDiscover.Episode) -> RadioDiscover.Slot {
+            .init(artist_id: row, raw_artist_name: nil, raw_track_title: "Track \(i)", track_index: i, offset_seconds: 60 * i, media_url: nil, radio_episodes: e)
+        }
+        let one = UUID(), two = UUID(), three = UUID()
+        let e1 = episode(one, 1, host: "DJ One"), e2 = episode(two, 2, host: "DJ Two"), e3 = episode(three, 3, host: "DJ Three")
+        // Shows one and two each play both seeds: compatible. Show three plays one seed once: not.
+        var seedSlots = [slot(seedA, 1, e1), slot(seedB, 2, e1), slot(seedA, 1, e2), slot(seedB, 2, e2), slot(seedA, 1, e3)]
+        let affinities = RadioDiscover.affinities(inputs: inputs, rows: rows, seedSlots: seedSlots)
+        XCTAssertEqual(Set(affinities.map(\.title)), ["Show DJ One", "Show DJ Two"])
+        seedSlots += [slot(shared, 5, e1), slot(shared, 6, e2), slot(popular, 7, e1), slot(popular, 8, e2),
+                      slot(lonely, 9, e1), slot(oneOff, 10, e3)]
+        let identities: [UUID: RadioDiscover.Identity] = [shared: .init(id: 50, name: "Shared"), popular: .init(id: 51, name: "Popular"),
+                                                          lonely: .init(id: 52, name: "Lonely"), oneOff: .init(id: 53, name: "One Off")]
+        let curated = RadioDiscover.curate(inputs: inputs, rows: rows, affinities: affinities, slots: seedSlots, identities: identities,
+                                           showsPlaying: [popular: 200, shared: 3])
+        XCTAssertEqual(curated.map(\.identity.name), ["Shared", "Popular"],
+                       "two curators agree; one curator once is not an endorsement; an incompatible programme endorses no one")
+        XCTAssertEqual(curated.first?.programmes.count, 2)
+        XCTAssertEqual(curated.first?.bridges, ["Seed A", "Seed B"])
+        XCTAssertTrue(curated.allSatisfy { $0.sharedStyles.isEmpty }, "no style from a programme or a seed")
+    }
 }

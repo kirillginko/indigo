@@ -9,6 +9,11 @@ nonisolated struct RadioDiscoverSource: Sendable {
     var recording: @Sendable (Int, String, String) async -> TrackDiscovery.Appearance?
     var plays: @Sendable (DiscoveredTrack.Source) async -> Bool?
     var catalogueReads: @Sendable () async -> Int = { 0 }
+    /// A programme's most recent episodes, by show: what the curator selects
+    /// beyond the episodes the listener's artists are in.
+    var programmeEpisodes: @Sendable ([UUID], Int) async throws -> [UUID] = { _, _ in [] }
+    /// How many programmes play each row, catalogue-wide (popularity damping).
+    var showsPlaying: @Sendable ([UUID]) async throws -> [UUID: Int] = { _ in [:] }
 
     actor Reads {
         var count = 0
@@ -94,7 +99,31 @@ nonisolated struct RadioDiscoverSource: Sendable {
             }
         },
         plays: TrackDiscoverySource.live.plays,
-        catalogueReads: { await reads.count }
+        catalogueReads: { await reads.count },
+        programmeEpisodes: { shows, perShow in
+            let client = try SupabaseService.requireClient()
+            struct Row: Decodable { let id: UUID }
+            var out: [UUID] = []
+            // One request per show, so a prolific programme cannot take another's share.
+            for show in shows {
+                try Task.checkCancellation()
+                await reads.add()
+                let rows: [Row] = try await client.from("radio_episodes").select("id").eq("radio_show_id", value: show.uuidString)
+                    .order("aired_at", ascending: false).limit(perShow).execute().value
+                out += rows.map(\.id)
+            }
+            return out
+        },
+        showsPlaying: { rows in
+            var out: [UUID: Int] = [:]
+            // Ten rows a request: the count is an aggregate under anon's short statement timeout.
+            for offset in stride(from: 0, to: rows.count, by: 10) {
+                await reads.add()
+                guard let found = try? await ListenerRetrieval.liveRadio.showsPlaying(Array(rows[offset..<min(offset + 10, rows.count)])) else { continue }
+                for (row, shows) in found { out[row] = shows }
+            }
+            return out
+        }
     )
 }
 
