@@ -64,7 +64,10 @@ nonisolated struct DiscogsEnricher {
         // are stamped complete, and stay fresh for a day. Nothing about them
         // says which artist they describe, so the only way not to serve them
         // is to stop trusting the whole generation that could contain one.
-        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 13,
+        //
+        // 14 for the same reason: until then an artist's styles came from
+        // every namesake's records, and nothing on the row says whose.
+        if !force, let cached = cachedArtist(named: name), cached.cacheVersion >= 14,
            cached.isFresh { return cached }
         guard let bundle = try await client.artist(named: name) else { return nil }
         return write(bundle, name: name)
@@ -85,7 +88,7 @@ nonisolated struct DiscogsEnricher {
     /// and a picture, or a whole profile with no shelf behind it — is asked
     /// about again rather than served as though it were the artist.
     func freshArtist(named name: String) -> DiscogsArtist? {
-        guard let cached = cachedArtist(named: name), cached.cacheVersion >= 13, cached.isFresh
+        guard let cached = cachedArtist(named: name), cached.cacheVersion >= 14, cached.isFresh
         else { return nil }
         return cached
     }
@@ -240,8 +243,15 @@ nonisolated struct DiscogsEnricher {
         // mastering house, the distributor, the magazine that ran the mix. As
         // an artist's imprints that reads as nonsense: Space Afrika listed on
         // GZ Media and Bonati Mastering alongside Dais and sferic.
-        record.genres = Self.unique(bundle.catalogue.flatMap { $0.genre ?? [] })
-        record.styles = Self.unique(bundle.catalogue.flatMap { $0.style ?? [] })
+        // And only the styles of records that are on their shelf, for the
+        // reason the discography above is: the search is a match on the text
+        // of a credit. AnD — two techno producers — were filed as Indie
+        // Rock, Folk Rock and Hardcore Hip-Hop, because "AnD" also matches
+        // And And And and A.n.D., and For You told the listener their
+        // records led "Toward Folk".
+        let own = Self.ownRecords(in: bundle.catalogue, shelf: releases)
+        record.genres = Self.unique(own.flatMap { $0.genre ?? [] })
+        record.styles = Self.unique(own.flatMap { $0.style ?? [] })
         record.collaboratorNames = Self.unique(
             (bundle.releases.releases ?? []).compactMap { release in
                 guard release.role != nil, release.role != "Main" else { return nil }
@@ -250,7 +260,7 @@ nonisolated struct DiscogsEnricher {
         )
         Self.repaintPortrait(of: record, in: context)
         record.fetchedAt = Date()
-        record.cacheVersion = 13
+        record.cacheVersion = 14
         return record
     }
 
@@ -577,6 +587,20 @@ nonisolated struct DiscogsEnricher {
         of release: DiscogsArtistRelease, catalogued: (Int) -> [String]
     ) -> String? {
         labels(of: release, catalogued: catalogued).first
+    }
+
+    /// The hits of a name search that are this artist's own records: a
+    /// pressing the shelf lists, or a pressing of a master it lists.
+    /// Nothing, when none of them are — no styles rather than a namesake's.
+    static func ownRecords(in catalogue: [DiscogsSearchResult], shelf: [DiscogsArtistRelease]) -> [DiscogsSearchResult] {
+        let releases = Set(shelf.filter { $0.type != "master" }.compactMap(\.id))
+        let masters = Set(shelf.filter { $0.type == "master" }.compactMap(\.id))
+        let mainReleases = Set(shelf.compactMap(\.mainRelease))
+        return catalogue.filter { hit in
+            if let id = hit.id, releases.contains(id) || mainReleases.contains(id) { return true }
+            if let master = hit.masterID, masters.contains(master) { return true }
+            return false
+        }
     }
 
     private static func unique(_ values: [String]) -> [String] {

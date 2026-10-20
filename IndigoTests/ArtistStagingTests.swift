@@ -148,7 +148,7 @@ final class ArtistStagingTests: XCTestCase {
         XCTAssertEqual(early.aliasNames, ["SCNTST"])
         XCTAssertEqual(early.imageURL?.absoluteString, "https://img.test/artist.jpg")
         XCTAssertTrue(early.releaseTitles.isEmpty, "The shelf has not arrived")
-        XCTAssertLessThan(early.cacheVersion, 13)
+        XCTAssertLessThan(early.cacheVersion, 14)
         XCTAssertNil(enricher.freshArtist(named: "Skee Mask"),
                      "A profile with no shelf behind it must not satisfy the cache")
 
@@ -160,7 +160,7 @@ final class ArtistStagingTests: XCTestCase {
             catalogue: found.catalogue
         )))
         XCTAssertFalse(complete.releaseTitles.isEmpty)
-        XCTAssertEqual(complete.cacheVersion, 13)
+        XCTAssertEqual(complete.cacheVersion, 14)
         XCTAssertEqual(complete.realName, "Bryan Müller", "The complete write agrees with the early one")
         XCTAssertNotNil(enricher.freshArtist(named: "Skee Mask"))
     }
@@ -207,13 +207,13 @@ final class ArtistStagingTests: XCTestCase {
         let partial = try XCTUnwrap(storedArtist(), "The entry should not wait for the shelf")
         XCTAssertEqual(partial.realName, "Bryan Müller")
         XCTAssertTrue(partial.releaseTitles.isEmpty)
-        XCTAssertLessThan(partial.cacheVersion, 13)
+        XCTAssertLessThan(partial.cacheVersion, 14)
 
         gate.open()
         await enrichment.value
 
         let complete = try XCTUnwrap(storedArtist())
-        XCTAssertEqual(complete.cacheVersion, 13)
+        XCTAssertEqual(complete.cacheVersion, 14)
         XCTAssertFalse(complete.releaseTitles.isEmpty)
     }
 
@@ -373,7 +373,7 @@ final class ArtistStagingTests: XCTestCase {
             // stays true for 750ms after the last real request on purpose, so
             // what is asserted is that it goes false *before* the dig returns,
             // not that it was never true.
-            if storedArtist()?.cacheVersion == 13, !store.isDiggingInForeground {
+            if storedArtist()?.cacheVersion == 14, !store.isDiggingInForeground {
                 theGateOpenedWhileWaiting = true
                 break
             }
@@ -406,7 +406,7 @@ final class ArtistStagingTests: XCTestCase {
         store.budgetPatience = .milliseconds(150)
 
         await store.enrichArtist(name: "Skee Mask", mbid: nil)
-        XCTAssertEqual(storedArtist()?.cacheVersion, 13, "The artist on screen is still looked up in full")
+        XCTAssertEqual(storedArtist()?.cacheVersion, 14, "The artist on screen is still looked up in full")
 
         await store.fillMissingReleaseArtwork(forArtist: "Skee Mask", mbid: nil, limit: 12, whenThereIsRoom: true)
 
