@@ -345,10 +345,10 @@ struct ExploreView: View {
                     Button { pick.play(using: player) } label: {
                         MapLabel(pick.track.artist, pick.track.title, MosaicColor.lavender,
                                  pick.track.sharpArtwork.full, pick.track.artistDiscogsID, cardWidth(in: size),
-                                 connection: pick.track.reason)
+                                 connection: pick.connection)
                     }
                     .buttonStyle(ExploreCardButtonStyle())
-                    .help("\(pick.episode)\n\(pick.track.reason)\n\(pick.timing.label)")
+                    .help("\(pick.track.reason)\n\(pick.strength) · your \(pick.clusterLabel) listening\n\(pick.episode)\n\(pick.timing.label)")
                     .accessibilityLabel("\(pick.track.playLabel): \(pick.track.artist) — \(pick.track.title). \(pick.track.reason)")
                     .contextMenu { RadioDiscoverMenu(pick: pick) }
                     .graphNode("radioDiscover.\(pick.id)", section: "radioDiscover", legend: true)

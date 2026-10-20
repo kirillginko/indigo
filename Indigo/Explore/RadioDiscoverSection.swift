@@ -60,9 +60,9 @@ struct PhoneRadioDiscoverSlide: View {
     var body: some View {
         let art = pick.track.sharpArtwork
         PhoneForYouSlide(card: .init(
-            picture: art.full, kind: pick.track.isRecording ? "Track" : "In a radio show",
+            picture: art.full, kind: kind,
             title: pick.track.artist, subtitle: pick.track.title,
-            reason: pick.track.reason, via: nil, heading: position,
+            reason: pick.track.reason, via: pick.evidence.map { $0.programmes.prefix(3).joined(separator: " · ") }, heading: pick.strength,
             button: pick.track.isRecording ? "PLAY TRACK" : "HEAR IN RADIO SHOW",
             icon: pick.track.isRecording ? "play.fill" : "dot.radiowaves.left.and.right",
             preview: art.preview
@@ -72,11 +72,11 @@ struct PhoneRadioDiscoverSlide: View {
         .contextMenu { RadioDiscoverMenu(pick: pick) }
     }
 
-    private var position: String {
+    private var kind: String {
         if case .episode(_, let at) = pick.track.source {
-            return "Approx. start \(at / 60):\(String(format: "%02d", at % 60))"
+            return "In a radio show · approx. \(at / 60):\(String(format: "%02d", at % 60))"
         }
-        return "Radio Discover"
+        return "Track"
     }
 }
 
