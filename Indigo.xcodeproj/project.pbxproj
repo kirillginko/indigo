@@ -130,6 +130,7 @@
 				581130273040B143002E7036 /* Sources */,
 				581130283040B143002E7036 /* Frameworks */,
 				581130293040B143002E7036 /* Resources */,
+				A19110013040B143002E7036 /* Remove Quarantine Attributes */,
 			);
 			buildRules = (
 			);
@@ -262,6 +263,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A19110013040B143002E7036 /* Remove Quarantine Attributes */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Remove Quarantine Attributes";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\n# Downloaded resources can carry quarantine metadata into the app (ITMS-91109).\n# Run after copying resources and before Xcode signs the assembled bundle.\n/usr/bin/xattr -dr com.apple.quarantine \"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		581130273040B143002E7036 /* Sources */ = {
@@ -431,6 +450,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				/* Allow the quarantine cleanup phase to update the assembled app bundle. */
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Config/Info.plist";
@@ -479,6 +500,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				/* Allow the quarantine cleanup phase to update the assembled app bundle. */
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Config/Info.plist";

@@ -8,9 +8,13 @@ nonisolated enum PhoneSlideArtworkSizing {
         return imagePixels.width >= viewport.width * scale && imagePixels.height >= viewport.height * scale
     }
 
-    /// A single compact layout, independent of the source image's dimensions.
-    static func containedSide(viewport: CGSize) -> CGFloat {
-        max(0, min(200, viewport.width - 96, viewport.height * 0.28))
+    /// Keep small images within their native pixels at the screen's backing scale.
+    static func containedSide(viewport: CGSize, imagePixels: CGSize? = nil,
+                              scale: CGFloat = 1, maximumSide: CGFloat = 200) -> CGFloat {
+        let available = max(0, min(maximumSide, viewport.width - 96, viewport.height * 0.28))
+        guard let imagePixels else { return available }
+        guard scale > 0 else { return 0 }
+        return max(0, min(available, min(imagePixels.width, imagePixels.height) / scale))
     }
 }
 
@@ -18,6 +22,7 @@ struct PhoneSlideArtwork: View {
     let picture: URL?
     let preview: URL?
     let viewport: CGSize
+    var stationMark: URL? = nil
     @Environment(\.displayScale) private var scale
     @State private var loaded: Loaded?
     @State private var settled = false
@@ -32,26 +37,29 @@ struct PhoneSlideArtwork: View {
         max(viewport.width, viewport.height) * scale
     }
     private var sharper: URL? { ArtworkSizing.sharper(picture, pixels: targetPixels) }
-    private var request: String { "\(sharper?.absoluteString ?? "")|\(picture?.absoluteString ?? "")|\(preview?.absoluteString ?? "")|\(RemoteArtworkStore.step(for: targetPixels))" }
+    private var request: String { "\(sharper?.absoluteString ?? "")|\(picture?.absoluteString ?? "")|\(preview?.absoluteString ?? "")|\(stationMark?.absoluteString ?? "")|\(RemoteArtworkStore.step(for: targetPixels))" }
     private var current: Loaded? { loaded?.request == request ? loaded : nil }
 
     var body: some View {
         Group {
             if let current {
-                if PhoneSlideArtworkSizing.fillsViewport(imagePixels: current.pixels, viewport: viewport, scale: scale) {
+                let isStationMark = current.address == stationMark
+                if !isStationMark, PhoneSlideArtworkSizing.fillsViewport(imagePixels: current.pixels, viewport: viewport, scale: scale) {
                     ArtworkView(remoteURL: current.address, side: viewport.height,
                                 aspect: viewport.width / max(1, viewport.height), glyphScale: 0.3)
                 } else {
                     ZStack {
                         PlayerShaderBackdrop()
                         ArtworkView(remoteURL: current.address,
-                                    side: PhoneSlideArtworkSizing.containedSide(viewport: viewport),
+                                    side: PhoneSlideArtworkSizing.containedSide(
+                                        viewport: viewport, imagePixels: current.pixels,
+                                        scale: scale, maximumSide: isStationMark ? 120 : 200),
                                     glyphScale: 0.3)
                             .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
                             .position(x: viewport.width / 2, y: viewport.height * 0.26)
                     }
                 }
-            } else if picture == nil || settled {
+            } else if (picture == nil && stationMark == nil) || settled {
                 MineralSheenSurface()
             } else {
                 PlayerShaderBackdrop()
@@ -61,8 +69,10 @@ struct PhoneSlideArtwork: View {
             settled = false
             var seen = Set<URL>()
             var bestCoverage: CGFloat = 0
-            for address in [sharper, picture, preview].compactMap({ $0 }) where seen.insert(address).inserted {
+            for address in [sharper, picture, preview, stationMark].compactMap({ $0 }) where seen.insert(address).inserted {
                 guard !Task.isCancelled else { return }
+                // A mark is a fallback, never a replacement for a loaded show picture.
+                if address == stationMark, bestCoverage > 0 { continue }
                 if let image = await RemoteArtworkStore.shared.image(for: address, pixels: targetPixels) {
                     guard !Task.isCancelled else { return }
                     #if os(macOS)

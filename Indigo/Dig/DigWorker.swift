@@ -642,21 +642,36 @@ actor DigWorker {
     ///
     /// Returns the address for the store to put in its own picture map. That
     /// map is what the rows read, and it stays where the rows are.
-    func fillPortrait(named name: String) async -> PortraitOutcome {
-        // Whoever the full lookup already decided this artist is.
-        //
-        // Where a page has already been opened the answer is sitting in the
-        // store — the right Discogs id, and their picture — so asking a
-        // search engine to guess again is both a wasted request and the way
-        // the video director's photograph got filed under the duo's name.
-        // That picture is verified by identity, so it is kept under the
-        // Discogs id as well as the name (`ArtistPortrait.identityKey`).
-        // Unless all it holds is the 150-pixel thumb, which is why this
-        // name was asked for again: then the search, for the cover.
-        if let resolved = Self.resolvedPortrait(named: name, in: modelContext),
+    func fillPortrait(named name: String, verifiedDiscogsID: Int? = nil) async -> PortraitOutcome {
+        let resolved = Self.resolvedPortrait(named: name, in: modelContext)
+        if let resolved, verifiedDiscogsID == nil || verifiedDiscogsID == resolved.discogsID,
            !DiscogsClient.isSmallCut(resolved.address) {
             writeIdentity(resolved.address, discogsID: resolved.discogsID, named: name)
             return write(resolved.address, named: name)
+        }
+
+        // The catalogue can verify an artist while still supplying only its
+        // 150-pixel cut. Read that exact artist's entry for the full portrait;
+        // a name search could replace it with a namesake's face.
+        if let id = verifiedDiscogsID ?? resolved?.discogsID, id > 0 {
+            do {
+                let detail = try await discogs.artistDetail(id: id)
+                guard !Task.isCancelled else { return .cancelled }
+                let image = detail.images?.first(where: { $0.type == "primary" })
+                    ?? detail.images?.first
+                guard detail.id == id,
+                      let address = DiscogsClient.usableImage(image?.uri),
+                      !DiscogsClient.isSmallCut(address) else { return .unreachable }
+                writeIdentity(address, discogsID: id, named: name)
+                return write(address, named: name)
+            } catch is CancellationError {
+                return .cancelled
+            } catch DiscogsError.rateLimited {
+                return .refused
+            } catch {
+                // Keep the verified thumbnail if its full image is unavailable.
+                return .unreachable
+            }
         }
 
         // By name only: a picture only when exactly one Discogs artist has
