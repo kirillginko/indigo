@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F59249&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:00.403662+00:00",
+  "body": {
+    "relations": [
+      {
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "Withers, Bill",
+          "disambiguation": "",
+          "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+          "name": "Bill Withers",
+          "country": "US"
+        },
+        "end": null,
+        "target-credit": "",
+        "attribute-values": {},
+        "target-type": "artist",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "backward",
+        "type": "discogs",
+        "attributes": [],
+        "source-credit": ""
+      }
+    ],
+    "id": "55ca4f27-62b5-4341-a0ba-296681e5a80e",
+    "resource": "https://www.discogs.com/artist/59249"
+  }
+}

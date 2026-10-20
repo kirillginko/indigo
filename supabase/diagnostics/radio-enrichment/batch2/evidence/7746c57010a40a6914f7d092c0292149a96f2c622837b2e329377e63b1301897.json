@@ -1,0 +1,989 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Pal%C3%A9%22+AND+artist%3A%22Rosal%C3%ADa%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:47.728835+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:47.552Z",
+    "count": 8,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "c7739fda-5f70-4f20-bdaf-770fb84a010f",
+        "score": 100,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A palé",
+        "length": 143000,
+        "video": true,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2019-11-07",
+        "releases": [
+          {
+            "id": "9468f4d4-6645-49ba-86a6-bdc44f0cf0aa",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+            "count": 1,
+            "title": "A palé",
+            "status": "Official",
+            "disambiguation": "video",
+            "artist-credit": [
+              {
+                "name": "ROSALÍA",
+                "artist": {
+                  "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+                  "name": "ROSALÍA",
+                  "sort-name": "ROSALÍA",
+                  "disambiguation": "Spanish singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "16d219da-70b8-4333-93d3-739e9684126d",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "A palé",
+              "primary-type": "Single"
+            },
+            "date": "2019-11-07",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2019-11-07",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "63dc2f0a-c6b6-308c-8a53-79bdcc01f0d1",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "2e69aaa2-dcbe-47d9-a5d4-6040e958dba9",
+                    "number": "1",
+                    "title": "A palé",
+                    "length": 143000
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "13564f7e-d793-415a-ba30-9beadd20ffb0",
+        "score": 100,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A palé",
+        "length": 143000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2019-11-07",
+        "releases": [
+          {
+            "id": "1f93b280-2dd1-4443-bab9-c2656feebd74",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+            "count": 1,
+            "title": "A palé",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "ROSALÍA",
+                "artist": {
+                  "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+                  "name": "ROSALÍA",
+                  "sort-name": "ROSALÍA",
+                  "disambiguation": "Spanish singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "16d219da-70b8-4333-93d3-739e9684126d",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "A palé",
+              "primary-type": "Single"
+            },
+            "date": "2019-11-07",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2019-11-07",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "f10f3963-fcec-3c69-99ed-35c9fe7b967c",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "06be6bc3-f889-497d-96dd-4a92b5493610",
+                    "number": "1",
+                    "title": "A palé",
+                    "length": 143000
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USSM11912728"
+        ]
+      },
+      {
+        "id": "8efeb13c-78f8-42b3-8c30-5c6f3af57ba8",
+        "score": 94,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A palé (Afraamix)",
+        "length": 240563,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2019-12-20",
+        "releases": [
+          {
+            "id": "50112e8d-9da1-4f5c-a209-ac7ec01d777f",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+            "count": 1,
+            "title": "A palé (Afraamix)",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "ROSALÍA",
+                "artist": {
+                  "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+                  "name": "ROSALÍA",
+                  "sort-name": "ROSALÍA",
+                  "disambiguation": "Spanish singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a757aed3-dff0-43de-9b37-9d77770d70d2",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "A palé (Afraamix)",
+              "primary-type": "Single",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2019-12-20",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2019-12-20",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "67563472-c7ea-3ebb-ba84-14451945ad8c",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "4c6c344d-1a48-4d7b-b1ee-aa9679e9adf7",
+                    "number": "1",
+                    "title": "A palé (Afraamix)",
+                    "length": 240563
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "b3ed0c99-fe57-4a0d-b5ba-1a6c8df74b1d",
+        "score": 94,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A Palé (remix)",
+        "length": 216776,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2022-12-16",
+        "releases": [
+          {
+            "id": "578039ac-7323-4b75-a318-62f0743c8d27",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "1af3b41b-f5a0-3a39-adb3-475f67a79d18",
+            "count": 1,
+            "title": "Two Feet at Holy Ship! Wrecked 2022 (DJ Mix)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Two Feet",
+                "artist": {
+                  "id": "07d0e0b3-dea4-4892-bee7-eaad19d093ec",
+                  "name": "Two Feet",
+                  "sort-name": "Two Feet",
+                  "disambiguation": "American singer-songwriter Zachary William \"Bill\" Dess"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d3fd87b4-bde8-48fa-85f7-eca0b8889c29",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Two Feet at Holy Ship! Wrecked 2022 (DJ Mix)",
+              "primary-type": "Album",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2022-12-16",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2022-12-16",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "165e5930-8f80-4080-baed-7d0c5a566844",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b1556e8c-1747-4ad9-bf94-d04c288d5e41",
+                    "number": "4",
+                    "title": "A Palé (remix)",
+                    "length": 216776
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "6451d0ae-2274-48d4-be3c-663334d65768",
+        "score": 89,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A Palé (Overmono edit)",
+        "length": 269000,
+        "disambiguation": "part of “FeelMyBicep Radio, Vol. 3” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020",
+        "releases": [
+          {
+            "id": "6df3f0c6-125d-42f7-a9f8-0744fe5df8bf",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d5b65c82-6539-39e6-94b4-6cad47a4a7cc",
+            "count": 1,
+            "title": "FeelMyBicep Radio, Vol. 3",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Bicep",
+                "artist": {
+                  "id": "10e8f0df-90f9-4957-aedd-c4e0d187e3a8",
+                  "name": "Bicep",
+                  "sort-name": "Bicep"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b09e365f-38d8-469a-8963-1eb6a250a565",
+              "type-id": "3b2e49e1-2875-37b8-9fa9-1f7cf3f49900",
+              "primary-type-id": "3b2e49e1-2875-37b8-9fa9-1f7cf3f49900",
+              "title": "FeelMyBicep Radio, Vol. 3",
+              "primary-type": "Broadcast",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2020",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2020",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "0e534b80-715c-45b7-a426-34e645e5482b",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "228b48b4-7459-4df3-8e02-ad3416738c97",
+                    "number": "12",
+                    "title": "A Palé (Overmono edit)",
+                    "length": 269000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 11
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "US23A1520191"
+        ]
+      },
+      {
+        "id": "6d496e84-6d4e-4a1a-a084-054797d39774",
+        "score": 89,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A palé (Gesaffelstein remix)",
+        "length": 204000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020-01-03",
+        "releases": [
+          {
+            "id": "1bc0e8c1-3c31-4590-8637-27842370f854",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+            "count": 1,
+            "title": "A palé (Gesaffelstein remix)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "ROSALÍA",
+                "artist": {
+                  "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+                  "name": "ROSALÍA",
+                  "sort-name": "ROSALÍA",
+                  "disambiguation": "Spanish singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "05a475b0-def2-416e-88c4-434b7a7d3ebb",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "A palé (Gesaffelstein remix)",
+              "primary-type": "Single",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2020-01-03",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2020-01-03",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "4a673ee8-b353-3011-afcf-a08a8c5efd45",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "8292d04f-b141-42c4-a514-34152adc7f0f",
+                    "number": "1",
+                    "title": "A palé (Gesaffelstein remix)",
+                    "length": 204000
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USQX91903940"
+        ]
+      },
+      {
+        "id": "c8bcbe45-a3a2-4bed-923e-5c14b8ca9e5b",
+        "score": 74,
+        "artist-credit-id": "1520464f-4097-4275-9782-54728f243569",
+        "title": "A Palé (Gesaffelstein remix)",
+        "length": 61000,
+        "disambiguation": "part of “Secret Sky 2020” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " & ",
+            "name": "Gesaffelstein",
+            "artist": {
+              "id": "cc3e537d-ff34-423f-8cd6-635a80f4dba7",
+              "name": "Gesaffelstein",
+              "sort-name": "Gesaffelstein",
+              "aliases": [
+                {
+                  "sort-name": "Lévy, Mike",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Mike Lévy",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Levy, Mike",
+                  "name": "Mike Levy",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Gessafelstein",
+                  "name": "Gessafelstein",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020-05-09",
+        "releases": [
+          {
+            "id": "9a4e15e4-a17a-4809-9eca-80b5676366fb",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "346cd7c0-fdb4-36f4-918e-57d41da24ace",
+            "count": 1,
+            "title": "Secret Sky 2020",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Jai Wolf",
+                "artist": {
+                  "id": "4e65e361-e974-4c9f-a368-970d69b1c93b",
+                  "name": "Jai Wolf",
+                  "sort-name": "Jai Wolf",
+                  "disambiguation": "Bangladeshi-American DJ"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "79a60ad0-df7a-44bd-8674-a661a4350950",
+              "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Secret Sky 2020",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Live",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 25,
+            "media": [
+              {
+                "id": "c67d4881-3389-391a-af81-df1a924000c8",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "110900d6-1625-4941-9474-17cc29a2d0d3",
+                    "number": "11",
+                    "title": "A Palé (Gesaffelstein remix)",
+                    "length": 61000
+                  }
+                ],
+                "track-count": 25,
+                "track-offset": 10
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "US23A1525688"
+        ]
+      },
+      {
+        "id": "4440b8e7-1a11-4fdd-877a-775fc6da4ac8",
+        "score": 60,
+        "artist-credit-id": "96c07f84-7f4c-41a0-b19c-ef4c36b68884",
+        "title": "A Pale Satisfaction (Jensen Interceptor's Pushin mashup)",
+        "length": 256908,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " X ",
+            "name": "Benny Benassi",
+            "artist": {
+              "id": "674bf89f-8e70-4472-929d-6b4ed6f98c88",
+              "name": "Benny Benassi",
+              "sort-name": "Benassi, Benny",
+              "disambiguation": "Italian DJ, producer & remixer",
+              "aliases": [
+                {
+                  "sort-name": "B., Benny, D.J.",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "D.J. Benny B.",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Benassi Geneser, Marco",
+                  "name": "Marco Benassi Geneser",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Benny Banassi",
+                  "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                  "name": "Benny Banassi",
+                  "locale": null,
+                  "type": "Search hint",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Benni Benassi",
+                  "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                  "name": "Benni Benassi",
+                  "locale": null,
+                  "type": "Search hint",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Bee, Benny",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Benny Bee",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Benassi, Marco",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Marco Benassi",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Benny Bennasi",
+                  "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                  "name": "Benny Bennasi",
+                  "locale": null,
+                  "type": "Search hint",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Rosalía",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2023-05-04",
+        "releases": [
+          {
+            "id": "77afa144-79ad-447f-9010-daa0b5e1df97",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "3b3ef60c-9f59-36f3-b1dd-43b8986487c2",
+            "count": 1,
+            "title": "Powerhouse Productions, Pt.1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Jensen Interceptor",
+                "artist": {
+                  "id": "11eb34eb-6def-4a75-8b21-6f1a3f6c6477",
+                  "name": "Jensen Interceptor",
+                  "sort-name": "Jensen Interceptor",
+                  "disambiguation": "Australian electro/techno producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f0168639-f9e5-4c00-8684-c8fcb80f8eff",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Powerhouse Productions, Pt.1",
+              "primary-type": "Album"
+            },
+            "date": "2023-05-04",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2023-05-04",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "401236d2-e572-34e3-b421-0d29bcb9a671",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "3ca6cdc7-48f6-4204-8531-f8decf9eaceb",
+                    "number": "7",
+                    "title": "A Pale Satisfaction (Jensen Interceptor's Pushin mashup)",
+                    "length": 256908
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

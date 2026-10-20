@@ -1,0 +1,66 @@
+{
+  "url": "https://api.discogs.com/artists/3563778",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:51.757312+00:00",
+  "body": {
+    "name": "Sepehr",
+    "id": 3563778,
+    "resource_url": "https://api.discogs.com/artists/3563778",
+    "uri": "https://www.discogs.com/artist/3563778-Sepehr",
+    "releases_url": "https://api.discogs.com/artists/3563778/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/GBQznTDz07_azQVcnY7IVfqX8Z2G1PvLTCDCc-HviF4/rs:fit/g:sm/q:90/h:600/w:480/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTY4NzM2NzYx/Ni0xMTYxLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/GBQznTDz07_azQVcnY7IVfqX8Z2G1PvLTCDCc-HviF4/rs:fit/g:sm/q:90/h:600/w:480/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTY4NzM2NzYx/Ni0xMTYxLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Q3xZ3XJyaC14ooRRQ8uPQQ4CzLUp2O5GNYs3ld_65EU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTY4NzM2NzYx/Ni0xMTYxLmpwZWc.jpeg",
+        "width": 480,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/3YMxBuuoJEX8eshiiggRcKRdfYmTPfzt-s6sBSG4IaE/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTYwNzYxNjkx/Mi00NzI0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/3YMxBuuoJEX8eshiiggRcKRdfYmTPfzt-s6sBSG4IaE/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTYwNzYxNjkx/Mi00NzI0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/nnqYBPduukdIt2iIrCcM_cr0fnhqixNx_m1DdSmRiEM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTYwNzYxNjkx/Mi00NzI0LmpwZWc.jpeg",
+        "width": 450,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/2Qp2_nKmvPQINgA0sBGf5TzVPVxkOb4v9N_n1V2eUDY/rs:fit/g:sm/q:90/h:399/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTU1NTM3MDA0/NC0zMTU2LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/2Qp2_nKmvPQINgA0sBGf5TzVPVxkOb4v9N_n1V2eUDY/rs:fit/g:sm/q:90/h:399/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTU1NTM3MDA0/NC0zMTU2LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/XQv2YFAtPTJHbeHgrCBTCDMJhsoTeDQsFRhyEY9MSIY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM1NjM3/NzgtMTU1NTM3MDA0/NC0zMTU2LmpwZWc.jpeg",
+        "width": 600,
+        "height": 399
+      }
+    ],
+    "realname": "Sepehr Alimagham",
+    "profile": "Sepehr is a live act, DJ, producer, and sonic maverick. Label owner of Shaytoon, a record label focused on highlighting the sounds of the psychedelic electronic underground from the Middle East diaspora. ",
+    "urls": [
+      "http://sepehr.bandcamp.com",
+      "http://www.soundcloud.com/sepehr-a",
+      "https://www.facebook.com/SepehrMusicPage",
+      "https://twitter.com/sepehr_sf"
+    ],
+    "namevariations": [
+      "Sepehr Alimagham",
+      "Sepehr Alimagham Tabari"
+    ],
+    "aliases": [
+      {
+        "id": 15898958,
+        "name": "Saffron Bloom",
+        "resource_url": "https://api.discogs.com/artists/15898958"
+      }
+    ],
+    "groups": [
+      {
+        "id": 13066815,
+        "name": "Flower Storm",
+        "resource_url": "https://api.discogs.com/artists/13066815",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

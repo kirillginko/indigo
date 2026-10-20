@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/8885b413-16f0-4e98-92ae-7cbc391c60cc?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:18.937579+00:00",
+  "body": {
+    "isrcs": [],
+    "id": "8885b413-16f0-4e98-92ae-7cbc391c60cc",
+    "releases": [
+      {
+        "artist-credit": [
+          {
+            "name": "Pangaea",
+            "artist": {
+              "country": "GB",
+              "disambiguation": "dubstep artist, Kevin McAuley",
+              "sort-name": "Pangaea",
+              "id": "d73f7df8-8cf6-49c1-828c-f5d80835917c",
+              "name": "Pangaea",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "date": "2012-10-29",
+        "packaging-id": null,
+        "packaging": null,
+        "disambiguation": "",
+        "title": "Release",
+        "quality": "normal",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "GB",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": null,
+        "id": "b3d729d2-0404-42dc-ae29-5044940f7c13",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "2012-10-29"
+          }
+        ]
+      },
+      {
+        "disambiguation": "",
+        "quality": "normal",
+        "title": "Release",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "XW",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "id": "2e279ffc-eacf-4df9-a6a9-9fdb1c112ff8",
+        "release-events": [
+          {
+            "date": "2012-10-29",
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "name": "[Worldwide]",
+              "type": null,
+              "type-id": null
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "Pangaea",
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "name": "Pangaea",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Pangaea",
+              "id": "d73f7df8-8cf6-49c1-828c-f5d80835917c",
+              "disambiguation": "dubstep artist, Kevin McAuley",
+              "country": "GB"
+            }
+          }
+        ],
+        "date": "2012-10-29",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "packaging": "None"
+      }
+    ],
+    "artist-credit": [
+      {
+        "name": "Pangaea",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Pangaea",
+          "id": "d73f7df8-8cf6-49c1-828c-f5d80835917c",
+          "sort-name": "Pangaea",
+          "disambiguation": "dubstep artist, Kevin McAuley",
+          "country": "GB"
+        },
+        "joinphrase": ""
+      }
+    ],
+    "video": false,
+    "disambiguation": "",
+    "title": "Majestic 12",
+    "first-release-date": "2012-10-29",
+    "length": 303000
+  }
+}

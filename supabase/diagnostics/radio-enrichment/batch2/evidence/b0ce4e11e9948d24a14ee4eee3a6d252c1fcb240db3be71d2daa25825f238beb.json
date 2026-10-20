@@ -1,0 +1,2650 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Camilla%22+AND+artist%3A%22Art+Of+Noise%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:36.627900+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:36.435Z",
+    "count": 4,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "1921faf1-8fc4-4a65-a3ca-aac747f2bb1c",
+        "score": 100,
+        "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+        "title": "Camilla",
+        "length": 421733,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "aliases": [
+                {
+                  "sort-name": "The Art Of Noise",
+                  "name": "The Art Of Noise",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1999-08",
+        "releases": [
+          {
+            "id": "c06ca348-d985-4a96-a2f4-464b52864b79",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Ballade nocturne",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ae6c6310-c8e8-3892-94d8-d9ba996e5e45",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Ballade nocturne",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1999-08",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999-08",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "57bb928c-cbed-3b49-bdcd-6d0a97c459ac",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "63fa9fb7-0d26-3428-869a-527d6670394a",
+                    "number": "9",
+                    "title": "Camilla",
+                    "length": 421733
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c49b0afa-f7a8-4dbe-8d42-f6dab02af59e",
+        "score": 100,
+        "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+        "title": "Camilla",
+        "length": 476306,
+        "disambiguation": "'Ambient Collection' version",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "aliases": [
+                {
+                  "sort-name": "The Art Of Noise",
+                  "name": "The Art Of Noise",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1990-10-05",
+        "releases": [
+          {
+            "id": "f1dde109-7471-4aa6-b243-c67aec653ace",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 3,
+            "title": "State of the Art",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7d525279-a406-4b9e-a591-d4317a55f090",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "State of the Art",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997-08-04",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1997-08-04",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 38,
+            "media": [
+              {
+                "id": "75343d0b-33d2-462c-acde-0a40d67c83b2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1649ac4f-f8ea-4900-9c26-2124af14ecd2",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "6b85ea76-7954-4978-8003-c9161c589643",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Best of the Art of Noise: The Art of Love",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "924516c1-46c6-3372-89c2-58f7ac25fb88",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Best of the Art of Noise: The Art of Love",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1992",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1992",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "811aaa53-0357-3125-9dd9-de5f9df9dc50",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "2c4e899d-5555-3f44-9e0a-72af84ffaea3",
+                    "number": "5",
+                    "title": "Camilla",
+                    "length": 477000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "37b36d95-f93c-4b9c-9ae0-88e8bd486de6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1991-04-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1991-04-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "cec0eeec-2d34-35bf-b54b-94ede6cec04d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "52183d79-37c7-4430-aaba-8bf7ab5a6493",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "022f8f66-cf1a-4c81-b43b-9da4d2757951",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 13,
+            "media": [
+              {
+                "id": "87cbd77f-d1d1-33c7-8c27-8ca0bad77a36",
+                "position": 1,
+                "format": "Cassette",
+                "track": [
+                  {
+                    "id": "9122182c-50a2-414e-8178-4e9f16acf532",
+                    "number": "A6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "fb315a87-1df7-43ce-8309-770ab6a6b649",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "ea164120-11f8-3896-8964-2aac891c332c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c6357c64-d7d7-46cf-aa0d-26899e4a14f7",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "4c4a682f-b457-46be-a243-b2ef7d754e8b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "3488d8b0-141c-382b-979d-b50484e6edd9",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9cb36525-4631-425b-b280-6e5a70ab8032",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "30df7989-f6ec-489f-8feb-84f886287c52",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "5aa64dd3-2fa8-3d83-9bdc-f9e6cadc9551",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "386936e3-b47a-4f7a-9e8f-58621659d2e1",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "f21056a2-8552-3421-8dac-fe92e49d2291",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990-10-05",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990-10-05",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "26c9e196-bfeb-320c-b74d-9396c05b337b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b6bf0b97-0eb3-355f-86c6-24b0ed925ab5",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "09cd994f-5aee-4105-8fbc-f5da3a932435",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990-10-05",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1990-10-05",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "8fa24f20-e688-37d3-9e0b-f882cb59672e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "68b25dac-97e3-339e-a94e-a4bd4b32eafb",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "2b5694d2-3dcf-4b12-a8bf-4fd591f2b581",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "28bec82b-3842-30a4-909f-50b427a725ca",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art Of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "38f37089-77da-4370-bae6-06d7a740fdb6",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "d1f77b61-b98a-4952-9428-8d4da431171f",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "90fe3896-08d9-4c23-96ea-21e11db498bd",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "85e9786d-bdba-474e-b162-3238b2aba859",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e48ac7b5-3440-40ee-af37-342df306299a",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "261e9a3b-28d3-3d31-b494-8f31c39c3665",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "1fa97ffc-69fe-33fa-84c6-3e442106b700",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "efcd5dbf-12f3-34cd-a869-d5c5e5b71813",
+                    "number": "6",
+                    "title": "Camilla",
+                    "length": 476306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBAHT1500172"
+        ],
+        "tags": [
+          {
+            "count": 3,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "downtempo"
+          },
+          {
+            "count": 1,
+            "name": "chillout"
+          },
+          {
+            "count": 2,
+            "name": "ambient"
+          },
+          {
+            "count": 1,
+            "name": "electronica"
+          }
+        ]
+      },
+      {
+        "id": "1d2fe94c-1898-49cc-94ae-28198819b489",
+        "score": 73,
+        "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+        "title": "Camilla The Old Old Story (remixed by J. Majik)",
+        "length": 354493,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "aliases": [
+                {
+                  "sort-name": "The Art Of Noise",
+                  "name": "The Art Of Noise",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1996-10-14",
+        "releases": [
+          {
+            "id": "f1dde109-7471-4aa6-b243-c67aec653ace",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 3,
+            "title": "State of the Art",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7d525279-a406-4b9e-a591-d4317a55f090",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "State of the Art",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997-08-04",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1997-08-04",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 38,
+            "media": [
+              {
+                "id": "81cd239f-ffb4-4079-a303-04e865b06be8",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "446c93d9-43fa-4dd8-b843-697b03f0d99d",
+                    "number": "7",
+                    "title": "Camilla The Old Old Story (remixed by J. Majik)",
+                    "length": 354493
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "09b8b2eb-f63b-49b3-8a25-b87867763903",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "Something Always Happens",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6adc2636-e221-4b92-812e-266d26250038",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Something Always Happens",
+              "primary-type": "Single"
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "57b74107-b973-39b3-abab-31980098fd98",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "e7403128-8cf7-3ebd-a776-ef6ef200a607",
+                    "number": "B",
+                    "title": "Camilla the Old Old Story (J. Majik remix)",
+                    "length": 353000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 1
+              }
+            ]
+          },
+          {
+            "id": "36bcd09b-9497-45e0-8e90-ee36ccab36dd",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 2,
+            "title": "The Drum and Bass Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "24375c1e-49d0-33f1-b2c9-0119488486f9",
+              "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Drum and Bass Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "001d604e-3cae-30e1-a362-0b9e6c43bba8",
+                "position": 2,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "4bbbadd9-79a5-4146-8bdb-7e1962245a0f",
+                    "number": "D1",
+                    "title": "Camilla the Old Old Story (remixed by J. Majik)",
+                    "length": 353000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "37b613fe-b8a0-447c-9aa9-6c7123b7fc8c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Drum and Bass Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "24375c1e-49d0-33f1-b2c9-0119488486f9",
+              "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Drum and Bass Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "1996-10-14",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1996-10-14",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "88244a66-4a6a-3c25-bd15-06e380a12868",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "05642d0c-a9fc-37c3-90d3-bbbcae61ff83",
+                    "number": "7",
+                    "title": "Camilla The Old Old Story (remixed by J. Majik)",
+                    "length": 354493
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "3873916c-9f23-3a26-b262-50f361aadba6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Drum and Bass Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "24375c1e-49d0-33f1-b2c9-0119488486f9",
+              "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Drum and Bass Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "1996",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "dc097126-68b6-3767-a5eb-063c235f5644",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4adede30-f54a-3bbe-a296-89ece4d39dae",
+                    "number": "7",
+                    "title": "Camilla The Old Old Story (remixed by J. Majik)",
+                    "length": 354493
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "b23d2986-7059-3b09-a111-5da396120883",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Drum and Bass Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "24375c1e-49d0-33f1-b2c9-0119488486f9",
+              "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Drum and Bass Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "1997-01-14",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1997-01-14",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "a937009d-4e0a-3674-a684-78e7f626c018",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "488bf595-3d54-387a-ad92-ff16fc8f5d0d",
+                    "number": "7",
+                    "title": "Camilla The Old Old Story (remixed by J. Majik)",
+                    "length": 354493
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 6
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBAHS0004239"
+        ],
+        "tags": [
+          {
+            "count": 2,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "downtempo"
+          },
+          {
+            "count": 2,
+            "name": "drum and bass"
+          },
+          {
+            "count": 1,
+            "name": "jungle"
+          },
+          {
+            "count": 1,
+            "name": "ambient"
+          }
+        ]
+      },
+      {
+        "id": "0959b449-aa4c-4beb-a56e-e256a00e0c89",
+        "score": 72,
+        "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+        "title": "Camilla – The Old, Old Story",
+        "length": 443933,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "aliases": [
+                {
+                  "sort-name": "The Art Of Noise",
+                  "name": "The Art Of Noise",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986-05-01",
+        "releases": [
+          {
+            "id": "208860a3-b14c-4153-9c73-04ee4dc2be7c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "28bec82b-3842-30a4-909f-50b427a725ca",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "disambiguation": "reissue",
+            "artist-credit": [
+              {
+                "name": "The Art Of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1994-06-03",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1994-06-03",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "0757e4c2-f9d4-4465-9c41-c7f27f240261",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "56b9f8ee-fbd2-4360-b83d-245b73787fe6",
+                    "number": "9",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 444000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "7e307bf6-16ca-4f00-853f-ec5a4a84fe8a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1991",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1991",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "ccc008f0-23fd-3bd2-a74a-29761eb8df4e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "dd9fec38-e738-4736-a30a-e605010ad95f",
+                    "number": "9",
+                    "title": "Camilla",
+                    "length": 443893
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "89cfbff8-a01f-4ae3-90b9-ee8071a54fd3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "960c28c9-af90-4d6c-9cad-c96c84d407cb",
+            "count": 1,
+            "title": "In Visible Silence = イン・ヴィジブル・サイレンス",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "joinphrase": " = ",
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              },
+              {
+                "name": "ジ・アート・オブ・ノイズ",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986-05-01",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "1986-05-01",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "237cdb3d-0eac-35ec-8014-40ca5d11c420",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "237555fb-cf63-4453-a30c-c1ab1b2c06c6",
+                    "number": "9",
+                    "title": "Camilla = カミラ",
+                    "length": 444000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "e52f30dd-9374-470e-a2de-ab7fc9ea2c7d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "disambiguation": "deluxe edition",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "2017-05-19",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2017-05-19",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 35,
+            "media": [
+              {
+                "id": "47961b60-b55a-3a48-b82d-b5ad4d3f25f1",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "6bbf683d-25e3-496d-982a-ddfb109778d4",
+                    "number": "9",
+                    "title": "Camilla (2017 remastered version)",
+                    "length": 444082
+                  }
+                ],
+                "track-count": 35,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "586679c8-c3b9-43e6-be0b-50e04095f861",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 2,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "disambiguation": "deluxe edition",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "2017-05-19",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2017-05-19",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 35,
+            "media": [
+              {
+                "id": "c736ccf2-40af-39ed-9df6-e965189138a2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "14745316-83d4-46a6-9749-7cfbbda14e3b",
+                    "number": "9",
+                    "title": "Camilla – The Old, Old Story",
+                    "length": 443880
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "36194b16-7e3d-336c-815c-97415472f1a0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1988",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1988",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "77120fff-cb35-3f36-b879-0922ed4e6dc6",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a344378e-ed8a-33d1-a135-9bcc456cebff",
+                    "number": "9",
+                    "title": "Camilla – The Old, Old Story",
+                    "length": 443880
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "1b0bf7ba-e335-42ed-b529-df39520587fc",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 2,
+            "title": "In Visible Silence / Re-Works of Art of Noise",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "73a581df-6603-4508-9885-901af1b12463",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence / Re-Works of Art of Noise",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "d428f06c-eb0e-37a6-958c-d736afe29c09",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "db69e4fc-e376-4552-934e-d26d1c2c1891",
+                    "number": "B3",
+                    "title": "Camilla — The Old, Old Story",
+                    "length": 443000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "15381cfd-5608-4474-9cc1-945be1a1d75d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "bed55caf-b836-3151-821f-d8e28246ae1b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9fbc1ef2-e891-4a31-a116-f2af63562e1a",
+                    "number": "9",
+                    "title": "Camilla",
+                    "length": 443893
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "75c952e1-902b-4642-bc35-6d3bb954a01d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "dd977356-efa2-363a-833d-c8dc61079734",
+                "position": 1,
+                "format": "Cassette",
+                "track": [
+                  {
+                    "id": "05c614dc-77dd-4005-a833-e3e4bf855efe",
+                    "number": "B3",
+                    "title": "Camilla",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "b9f535ac-9399-405f-a240-fc2b96113872",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "c31bf379-ce3a-3fa0-8bc0-ab69b44c2791",
+                "position": 1,
+                "format": "Cassette",
+                "track": [
+                  {
+                    "id": "4994aedd-7b39-4138-bd0f-89ce34ff879b",
+                    "number": "B3",
+                    "title": "Camilla",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "4d4bb4bf-3a87-435e-9466-918960e07a42",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "a02ea4c7-4b19-3262-b712-0b62ed79caff",
+            "count": 1,
+            "title": "Moments In Love",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Art Of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f8213d13-61c0-4639-b337-207937ac297e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Moments In Love",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2002",
+            "country": "RU",
+            "release-events": [
+              {
+                "date": "2002",
+                "area": {
+                  "id": "1f1fc3a4-9500-39b8-9f10-f0a465557eef",
+                  "name": "Russia",
+                  "sort-name": "Russia",
+                  "iso-3166-1-codes": [
+                    "RU"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "fed65ee0-c7fa-393e-b8fb-da66660570b3",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ed1a8638-b15c-4caa-804a-d7ce2b06c410",
+                    "number": "5",
+                    "title": "Camilla the Old Old Story",
+                    "length": 443000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "3f362319-aa1e-4958-9a5d-3afd8f9f3389",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "05335cc8-6aa7-36fb-8c0c-d90911956a71",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "cb4749c6-36f0-46a1-b902-197fdcfb8d42",
+                    "number": "9",
+                    "title": "Camilla",
+                    "length": 443933
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "94523cec-7faf-41fc-94e2-57956c1b99ec",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1993-05-28",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1993-05-28",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "98f61ce2-8fc6-377d-a6cc-cb35afd42548",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "7bc8717b-9aa1-3f3b-a830-2d17411cac6f",
+                    "number": "9",
+                    "title": "Camilla — The Old, Old Story",
+                    "length": 443000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "adf5f7f3-6b59-4fe7-939d-47ba51b7f5fe",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1988",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1988",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "8d9bbfdf-9197-383c-b24d-a97c9d38434e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3fa22bfb-a96e-35cc-a358-910f930ba91f",
+                    "number": "9",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 443000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "9c7696f7-e47f-4f2f-bc9d-7da77652882f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1988",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1988",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "372441fd-4c47-3897-8bdc-aef71f4793a0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3a506639-8d53-4c1a-8fcb-e55e02dd0690",
+                    "number": "9",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "45586c75-d363-4ec5-9aff-62f904beaa5c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "fff3a081-3a6f-35b7-a190-de5faed53ac7",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "25f6447f-ed77-3908-bbb2-be1262904cbe",
+                    "number": "9",
+                    "title": "Camilla",
+                    "length": 443880
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "36db0c45-161d-33df-968c-dd535fa0af17",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "b2087f0d-ff75-3858-96c4-56d45df38cd6",
+                "position": 1,
+                "format": "Vinyl",
+                "track": [
+                  {
+                    "id": "fe03a8e4-14b8-3712-99bc-a93e42f81771",
+                    "number": "9",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "553b6261-cb36-3d24-a4ed-2fd7128b02da",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "01abe8ed-81c1-3d30-be23-35692a350bc0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b60e7623-6089-30e5-9b7a-532bdcc96dc4",
+                    "number": "9",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "834a680f-21a8-4523-81ab-3031b5fbf0bd",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "17314d66-1b62-3980-8bd7-5c07f5ac9c31",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ad4322a6-fc2d-3d84-9b89-632dd20f07f0",
+                    "number": "9",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          },
+          {
+            "id": "77c56e4d-e183-3afd-92c9-eb529323461a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "1986",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "1f891c83-a466-3fd3-95e2-7262cdce17b8",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "ec85ba4d-7974-3072-9fa6-022bc1333dce",
+                    "number": "B3",
+                    "title": "Camilla - The Old, Old Story",
+                    "length": 444533
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 8
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBAHT1700119"
+        ],
+        "tags": [
+          {
+            "count": 2,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "experimental"
+          },
+          {
+            "count": 0,
+            "name": "hard rock"
+          },
+          {
+            "count": 0,
+            "name": "classic rock"
+          },
+          {
+            "count": 1,
+            "name": "leftfield"
+          },
+          {
+            "count": 0,
+            "name": "experimental rock"
+          },
+          {
+            "count": 0,
+            "name": "pop/rock"
+          },
+          {
+            "count": 0,
+            "name": "alternative/indie rock"
+          },
+          {
+            "count": 0,
+            "name": "dance-rock"
+          }
+        ]
+      }
+    ]
+  }
+}

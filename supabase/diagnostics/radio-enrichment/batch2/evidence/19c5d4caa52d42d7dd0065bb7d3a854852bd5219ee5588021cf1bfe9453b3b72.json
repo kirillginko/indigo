@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F1762528&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:56.811734+00:00",
+  "body": {
+    "relations": [
+      {
+        "type": "discogs",
+        "source-credit": "",
+        "attributes": [],
+        "end": null,
+        "direction": "backward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "artist": {
+          "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+          "sort-name": "Djrum",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Djrum",
+          "disambiguation": "",
+          "country": "GB",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "target-type": "artist"
+      }
+    ],
+    "id": "c23f972c-c1b0-4207-96df-045d23c99f81",
+    "resource": "https://www.discogs.com/artist/1762528"
+  }
+}

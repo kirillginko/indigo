@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/15ac9c5d-00a3-49d1-a0cf-a2ecb6e21903?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:38.698544+00:00",
+  "body": {
+    "video": false,
+    "first-release-date": "1968",
+    "releases": [
+      {
+        "disambiguation": "",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "barcode": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Cardboard/Paper Sleeve",
+        "country": "US",
+        "id": "1cfd98e9-79c2-4f2d-9a0f-381a3bf2dfad",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "name": "The Electric Prunes",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Electric Prunes, The",
+              "disambiguation": "",
+              "id": "8cb8b329-e152-4394-80d0-6aab033ec16c"
+            },
+            "joinphrase": "",
+            "name": "The Electric Prunes"
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "title": "Release of an Oath",
+        "date": "1968",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            },
+            "date": "1968"
+          }
+        ]
+      },
+      {
+        "disambiguation": "",
+        "barcode": "617742073027",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "id": "7be99afa-bf8e-4d7f-b29c-2c1a9ae0f4a8",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "The Electric Prunes",
+            "artist": {
+              "type": "Group",
+              "name": "The Electric Prunes",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "Electric Prunes, The",
+              "id": "8cb8b329-e152-4394-80d0-6aab033ec16c",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States"
+            },
+            "date": "2006"
+          }
+        ],
+        "date": "2006",
+        "packaging-id": null,
+        "title": "Release of an Oath"
+      }
+    ],
+    "id": "15ac9c5d-00a3-49d1-a0cf-a2ecb6e21903",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Group",
+          "name": "The Electric Prunes",
+          "sort-name": "Electric Prunes, The",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "US",
+          "id": "8cb8b329-e152-4394-80d0-6aab033ec16c",
+          "disambiguation": ""
+        },
+        "joinphrase": "",
+        "name": "The Electric Prunes"
+      }
+    ],
+    "isrcs": [],
+    "title": "Closing Hymn",
+    "length": 173000
+  }
+}

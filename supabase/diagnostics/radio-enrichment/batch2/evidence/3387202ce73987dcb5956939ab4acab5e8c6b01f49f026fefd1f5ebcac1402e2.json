@@ -1,0 +1,1427 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/774b02d7-5056-4b0f-9d69-a82b6ae27cde?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:10.385896+00:00",
+  "body": {
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "name": "SOPHIE",
+    "relations": [
+      {
+        "source-credit": "",
+        "type": "member of band",
+        "artist": {
+          "type": "Group",
+          "disambiguation": "",
+          "country": null,
+          "sort-name": "Sfire",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Sfire",
+          "id": "120f7796-d3a8-4bca-9fe6-e9c065f48fd0"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [],
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "artist": {
+          "country": null,
+          "disambiguation": "",
+          "type": "Group",
+          "id": "adf84cc0-02d0-4a9b-941a-6e5439847efd",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Analemma",
+          "sort-name": "Analemma"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [],
+        "direction": "forward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "artist": {
+          "disambiguation": "",
+          "country": null,
+          "type": "Group",
+          "id": "4197204a-dcd4-410f-89f7-0495b8313490",
+          "sort-name": "Clockwork Venus",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Clockwork Venus"
+        },
+        "attribute-values": {},
+        "type": "member of band",
+        "source-credit": ""
+      },
+      {
+        "artist": {
+          "disambiguation": "Electronic art pop project active in the late 2000's, based out in Berlin",
+          "country": "DE",
+          "type": "Group",
+          "id": "d867087f-a2ef-4e55-9b6a-ed4f61297da0",
+          "sort-name": "Motherland",
+          "name": "Motherland",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [],
+        "direction": "forward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "direction": "backward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "artist": {
+          "id": "4d0b2ba7-542c-416a-a10b-ea75f227f9b2",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Benny Long",
+          "sort-name": "Long, Benny",
+          "country": "GB",
+          "disambiguation": "",
+          "type": "Person"
+        },
+        "type-id": "b42b7966-b904-449e-b8f9-8c7297b863d0",
+        "attribute-values": {},
+        "target-type": "artist",
+        "type": "sibling",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "url": {
+          "id": "f48319c5-61b7-4325-9077-1dc10fab11ca",
+          "resource": "https://www.allmusic.com/artist/mn0003301582"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "allmusic"
+      },
+      {
+        "source-credit": "",
+        "type": "bandcamp",
+        "target-type": "url",
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "attribute-values": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "dc4a184c-8b71-41a8-b55c-66ee398c9ce4",
+          "resource": "https://sophiemsmsmsm.bandcamp.com/"
+        }
+      },
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.discogs.com/artist/3150192",
+          "id": "0c8c7e7f-a96d-4718-87a2-6e6a0b1134e7"
+        },
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "discogs"
+      },
+      {
+        "target-type": "url",
+        "type-id": "f484f897-81cc-406e-96f9-cd799a04ee24",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://wholenew.world/",
+          "id": "7eaee805-bdb1-49f9-86a7-fb8062458034"
+        },
+        "source-credit": "",
+        "type": "fanpage"
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "39733114-647c-4d43-a73a-ebf7e273a999",
+          "resource": "https://open.spotify.com/artist/5a2w2tgpLwv26BYJf2qYwu"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.deezer.com/artist/122748712",
+          "id": "ec6b93eb-3ce3-4c09-8f85-5a77446acf70"
+        },
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "source-credit": "",
+        "type": "free streaming",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "0507412b-3520-4050-8c98-d2cb755dce69",
+          "resource": "https://www.deezer.com/artist/6478881"
+        }
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "id": "0113032d-c6f8-4e92-b5f5-d1fc47063c6d",
+          "resource": "https://www.deezer.com/artist/8152"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://commons.wikimedia.org/wiki/File:Sophie_msmsmsm.png",
+          "id": "2b45f992-80eb-4650-90ce-a869ef9cfb9d"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "type": "image",
+        "source-credit": ""
+      },
+      {
+        "type": "IMDb",
+        "source-credit": "",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "99fb1764-4c56-49d1-b461-a864abc11ab2",
+          "resource": "https://www.imdb.com/name/nm3146383/"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attribute-values": {}
+      },
+      {
+        "type": "last.fm",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "url": {
+          "id": "bd2edf42-386b-4ef5-aa67-c24f49f0763c",
+          "resource": "https://www.last.fm/music/Sophie"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f"
+      },
+      {
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://genius.com/artists/Sophie",
+          "id": "406a6eba-45cb-4981-a0b9-0b8c994f842f"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "attribute-values": {},
+        "type": "lyrics",
+        "source-credit": ""
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.musixmatch.com/artist/Sophie-3",
+          "id": "925e8d5c-4c2a-4a02-92c6-78cbbb539641"
+        },
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "lyrics",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "resource": "http://msmsmsm.com/",
+          "id": "dfd52c9c-5be2-422b-a9cf-e2cdd757005e"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "official homepage"
+      },
+      {
+        "source-credit": "",
+        "type": "online community",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "35b3a50f-bf0e-4309-a3b4-58eeed8cee6a",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "b57da737-df36-4ae3-afb9-84aa9753647f",
+          "resource": "https://www.reddit.com/r/Sophie/"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/no2016017466",
+          "id": "e205a36d-62f1-48ad-8d9f-584d089f2c2e"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "303a4af0-5092-4e0f-baa8-79c00c80eba5",
+          "resource": "https://imvdb.com/n/sophie"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {}
+      },
+      {
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://ra.co/dj/sophie",
+          "id": "c803c4d6-52eb-44da-841f-b27f39113a5d"
+        },
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/sophie-1",
+          "id": "5b2e784a-bd4b-4ec3-950b-8ff54d0918c8"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "2f84dcb3-bc90-4503-95e4-bef941e45597",
+          "resource": "https://www.worldcat.org/identities/lccn-no2016017466/"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": true,
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://bleep.com/artist/30164",
+          "id": "5a5d772d-9458-497d-9d17-f873723cf107"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "type": "purchase for download",
+        "source-credit": ""
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://boomkat.com/artists/sophie",
+          "id": "e27da981-1617-46ab-a00d-d0accfee996c"
+        },
+        "target-type": "url",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "type": "purchase for download",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "id": "6552758c-b60b-45a7-8f52-47846cf58017",
+          "resource": "https://itunes.apple.com/gb/artist/id904687727"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "type": "purchase for download",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "purchase for download",
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url",
+        "url": {
+          "id": "52c92373-3ab5-4a5f-ba79-a6cfd5d78c9e",
+          "resource": "https://open.qobuz.com/artist/80333"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "url": {
+          "resource": "https://www.beatport.com/artist/-/46544",
+          "id": "bece06dc-7c80-4ece-a702-d4b3fb1e7c6f"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url"
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.qobuz.com/us-en/interpreter/sophie-6/23740224",
+          "id": "5a7e353f-a150-4c37-bf80-5cba1e4d06ab"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203"
+      },
+      {
+        "target-type": "url",
+        "type-id": "611b1862-67af-4253-a64f-34adba305d1d",
+        "attribute-values": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "5a5d772d-9458-497d-9d17-f873723cf107",
+          "resource": "https://bleep.com/artist/30164"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "type": "purchase for mail-order"
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "resource": "https://boomkat.com/artists/sophie",
+          "id": "e27da981-1617-46ab-a00d-d0accfee996c"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "611b1862-67af-4253-a64f-34adba305d1d",
+        "type": "purchase for mail-order",
+        "source-credit": ""
+      },
+      {
+        "type": "purchase for mail-order",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "566b87e0-a399-4920-b83c-ed81b402a7bf",
+          "resource": "https://sophie.ochre.store/"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "611b1862-67af-4253-a64f-34adba305d1d"
+      },
+      {
+        "source-credit": "",
+        "type": "secondhandsongs",
+        "attribute-values": {},
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://secondhandsongs.com/artist/115897",
+          "id": "2f2bcce0-5c28-43ec-8496-93d595aa9f16"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://twitter.com/msmsmsm_forever",
+          "id": "ff16a6c2-b340-4585-afe3-d08272851e88"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-type": "url",
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://twitter.com/SOPHIEMSMSMSM",
+          "id": "b6280c93-fe02-4802-bc4f-43a37d4b94ba"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-type": "url",
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "11716641-2514-48bb-9169-6ca2d228654a",
+          "resource": "https://www.facebook.com/msmsmsmforever"
+        },
+        "target-type": "url",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "id": "cd915d4e-42f1-4f65-adaf-ac55ac9028b9",
+          "resource": "https://www.facebook.com/msmsmsmsophie"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "social network",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.instagram.com/msmsmsm_forever/",
+          "id": "471d5d20-a9f9-41cd-b603-bc2b3bb5d666"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "a3e848af-1c50-474a-ad2a-259234237caa",
+          "resource": "https://www.instagram.com/sophie_msmsmsm/"
+        },
+        "direction": "forward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "social network",
+        "source-credit": ""
+      },
+      {
+        "type": "social network",
+        "source-credit": "",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "afa01632-8799-4748-9cf2-ed5f150fad6a",
+          "resource": "https://www.tiktok.com/@msmsmsm_forever"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "source-credit": "",
+        "type": "soundcloud",
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://soundcloud.com/msmsmsm",
+          "id": "afd368d7-547b-4432-bee9-10200a870880"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "52c92373-3ab5-4a5f-ba79-a6cfd5d78c9e",
+          "resource": "https://open.qobuz.com/artist/80333"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "streaming",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://tidal.com/artist/66744",
+          "id": "d7ad2e25-765f-44e4-8bd3-f230ed4721b9"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://tidal.com/artist/9212130",
+          "id": "d6c596c5-802c-48f7-9509-14031638746f"
+        },
+        "direction": "forward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.qobuz.com/us-en/interpreter/sophie-6/23740224",
+          "id": "5a7e353f-a150-4c37-bf80-5cba1e4d06ab"
+        },
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "type": "VIAF",
+        "source-credit": "",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "416e628c-4b14-4ba6-897d-df4cba24ec26",
+          "resource": "http://viaf.org/viaf/749145857107622921549"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "type": "wikidata",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "f6e2ed4d-01b7-41be-a867-4df13d98694c",
+          "resource": "https://www.wikidata.org/wiki/Q18161827"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "source-credit": "",
+        "type": "youtube",
+        "attribute-values": {},
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.youtube.com/channel/UCu_9_zRVfKee4v7xXXcv2ag",
+          "id": "1bff9979-9daa-4a5e-95aa-71c771f54182"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false
+      },
+      {
+        "source-credit": "",
+        "type": "youtube music",
+        "target-type": "url",
+        "type-id": "631712a0-7525-42ba-b7a3-605aa7a238c4",
+        "attribute-values": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://music.youtube.com/channel/UCCdS019SDLmqebaiu2OpwGA",
+          "id": "595a1f2b-a0cf-4fdf-99de-59f0bed608ed"
+        }
+      }
+    ],
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "area": {
+      "id": "6fa1c7da-6689-4cec-85f9-680f853e8a08",
+      "name": "Scotland",
+      "type-id": null,
+      "iso-3166-2-codes": [
+        "GB-SCT"
+      ],
+      "sort-name": "Scotland",
+      "disambiguation": "",
+      "type": null
+    },
+    "tags": [
+      {
+        "name": "alternative dance",
+        "count": 2
+      },
+      {
+        "name": "art pop",
+        "count": 1
+      },
+      {
+        "name": "avant-garde pop",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "bass"
+      },
+      {
+        "name": "bassline",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "breakbeat"
+      },
+      {
+        "count": 1,
+        "name": "breaks"
+      },
+      {
+        "name": "bubblegum bass",
+        "count": 4
+      },
+      {
+        "name": "club",
+        "count": 1
+      },
+      {
+        "name": "dance",
+        "count": 1
+      },
+      {
+        "name": "dance-pop",
+        "count": 6
+      },
+      {
+        "count": 12,
+        "name": "deconstructed club"
+      },
+      {
+        "name": "deep dubstep",
+        "count": 1
+      },
+      {
+        "name": "drum and bass",
+        "count": 1
+      },
+      {
+        "name": "edm",
+        "count": 1
+      },
+      {
+        "count": 17,
+        "name": "electronic"
+      },
+      {
+        "count": 1,
+        "name": "electronica"
+      },
+      {
+        "count": 3,
+        "name": "experimental"
+      },
+      {
+        "count": 1,
+        "name": "future bass"
+      },
+      {
+        "name": "grime",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "hardcore"
+      },
+      {
+        "count": 1,
+        "name": "hip hop"
+      },
+      {
+        "count": 1,
+        "name": "house"
+      },
+      {
+        "name": "hyperpop",
+        "count": 13
+      },
+      {
+        "name": "left-field pop",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "leftfield"
+      },
+      {
+        "count": 4,
+        "name": "lgbtq+"
+      },
+      {
+        "name": "melodic house",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "melodic techno"
+      },
+      {
+        "name": "pc music",
+        "count": 4
+      },
+      {
+        "count": 11,
+        "name": "pop"
+      },
+      {
+        "name": "producer",
+        "count": 2
+      },
+      {
+        "count": 5,
+        "name": "queer"
+      },
+      {
+        "count": 1,
+        "name": "r&b"
+      },
+      {
+        "name": "tech house",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "trance"
+      },
+      {
+        "name": "trans",
+        "count": 2
+      },
+      {
+        "name": "trap",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "uk bass"
+      },
+      {
+        "count": 1,
+        "name": "uk garage"
+      },
+      {
+        "name": "yassification",
+        "count": 3
+      }
+    ],
+    "end-area": {
+      "id": "1876749b-4a07-495b-8b57-9dde0ac39c24",
+      "disambiguation": "",
+      "name": "Athens",
+      "type": null,
+      "type-id": null,
+      "sort-name": "Athens"
+    },
+    "gender": "Female",
+    "aliases": [
+      {
+        "type": "Artist name",
+        "end": null,
+        "primary": true,
+        "ended": false,
+        "locale": "en",
+        "begin": null,
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "SOPHIE",
+        "sort-name": "SOPHIE"
+      },
+      {
+        "ended": true,
+        "locale": null,
+        "begin": null,
+        "end": null,
+        "type": "Artist name",
+        "primary": null,
+        "name": "Sam Long",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "sort-name": "Long, Sam"
+      },
+      {
+        "ended": true,
+        "locale": null,
+        "begin": null,
+        "end": null,
+        "primary": null,
+        "type": "Legal name",
+        "sort-name": "Long, Samuel",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "name": "Samuel Long"
+      },
+      {
+        "end": null,
+        "type": null,
+        "primary": null,
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "name": "Sophie",
+        "type-id": null,
+        "sort-name": "Sophie"
+      },
+      {
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "name": "Sophie Long",
+        "sort-name": "Long, Sophie",
+        "end": null,
+        "primary": null,
+        "type": "Legal name",
+        "ended": true,
+        "locale": null,
+        "begin": null
+      },
+      {
+        "name": "Sophie Xeon",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "sort-name": "Xeon, Sophie",
+        "end": null,
+        "primary": null,
+        "type": "Legal name",
+        "ended": false,
+        "begin": null,
+        "locale": null
+      },
+      {
+        "ended": false,
+        "locale": "ja",
+        "begin": null,
+        "primary": true,
+        "end": null,
+        "type": "Artist name",
+        "sort-name": "ソフィー",
+        "name": "ソフィー",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc"
+      }
+    ],
+    "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+    "begin-area": {
+      "id": "e1897103-22e5-4d08-9969-92794635bb81",
+      "disambiguation": "",
+      "type-id": null,
+      "name": "Northampton",
+      "type": null,
+      "sort-name": "Northampton"
+    },
+    "sort-name": "SOPHIE",
+    "ipis": [
+      "00642569920",
+      "00642570061"
+    ],
+    "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+    "type": "Person",
+    "country": "GB",
+    "genres": [
+      {
+        "name": "alternative dance",
+        "id": "8301f73c-9166-4108-bfeb-4fd22dc19083",
+        "disambiguation": "",
+        "count": 2
+      },
+      {
+        "name": "art pop",
+        "count": 1,
+        "disambiguation": "",
+        "id": "930ef127-3653-4677-9b95-ecc90c7c1a14"
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "0e7a3c6a-4fbc-4b66-8201-9196032768ac",
+        "name": "avant-garde pop"
+      },
+      {
+        "id": "8ae6fbbe-2dd0-432e-a176-6678f48dffb4",
+        "disambiguation": "",
+        "count": 1,
+        "name": "bassline"
+      },
+      {
+        "name": "breakbeat",
+        "count": 1,
+        "id": "3b8f3f65-6caa-47c8-b076-fa59dfb69c43",
+        "disambiguation": ""
+      },
+      {
+        "name": "breaks",
+        "disambiguation": "",
+        "id": "63eddc75-dbad-4a05-a365-e30d1e87bca8",
+        "count": 1
+      },
+      {
+        "count": 4,
+        "id": "a969d92f-cd87-4a30-820a-e3c6405595de",
+        "disambiguation": "",
+        "name": "bubblegum bass"
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "bab69b07-8bb9-4415-b666-c37609cef80b",
+        "name": "club"
+      },
+      {
+        "id": "e5bba957-8c91-496a-a675-c6d0c6b51c33",
+        "disambiguation": "",
+        "count": 1,
+        "name": "dance"
+      },
+      {
+        "name": "dance-pop",
+        "count": 6,
+        "id": "b739a895-85ed-4ad3-8717-4e9ef5387dd8",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "id": "5a291744-e683-49bb-883e-bf978f235b6b",
+        "count": 12,
+        "name": "deconstructed club"
+      },
+      {
+        "name": "drum and bass",
+        "count": 1,
+        "id": "462f9321-6103-49c9-b6db-96219bce6f62",
+        "disambiguation": ""
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "3976e9ba-16d0-461d-b732-99408a0374ba",
+        "name": "edm"
+      },
+      {
+        "name": "electronic",
+        "disambiguation": "",
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4",
+        "count": 17
+      },
+      {
+        "name": "electronica",
+        "id": "53a3cea3-17af-4421-a07a-5824b540aeb5",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "name": "experimental",
+        "count": 3,
+        "id": "68c81274-5770-4e7b-a4bf-ab0d7d425d99",
+        "disambiguation": ""
+      },
+      {
+        "name": "future bass",
+        "count": 1,
+        "disambiguation": "",
+        "id": "e254f865-58ea-4483-9b2f-1bc65febcd71"
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "51cfaac4-6696-480b-8f1b-27cfc789109c",
+        "name": "grime"
+      },
+      {
+        "count": 1,
+        "id": "52faa157-6bad-4d86-a0ab-d4dec7d2513c",
+        "disambiguation": "",
+        "name": "hip hop"
+      },
+      {
+        "name": "house",
+        "disambiguation": "",
+        "id": "a2782cb6-1cd0-477c-a61d-b3f8b42dd1b3",
+        "count": 1
+      },
+      {
+        "name": "hyperpop",
+        "id": "a8a72860-0bf8-44fd-90a1-b947a8ac2c56",
+        "disambiguation": "",
+        "count": 13
+      },
+      {
+        "name": "leftfield",
+        "count": 2,
+        "disambiguation": "",
+        "id": "32bea60c-e201-4241-8ed4-228636d34a97"
+      },
+      {
+        "count": 1,
+        "id": "bd7072d4-359f-4441-9e04-2a8e39f6a279",
+        "disambiguation": "",
+        "name": "melodic house"
+      },
+      {
+        "count": 1,
+        "id": "7fc914c1-a44e-43fd-ace8-63a2c6550057",
+        "disambiguation": "",
+        "name": "melodic techno"
+      },
+      {
+        "name": "pop",
+        "count": 11,
+        "id": "911c7bbb-172d-4df8-9478-dbff4296e791",
+        "disambiguation": ""
+      },
+      {
+        "name": "r&b",
+        "count": 1,
+        "disambiguation": "",
+        "id": "31be54b2-4d0c-42df-aa44-c496c7b4c3c3"
+      },
+      {
+        "name": "tech house",
+        "count": 1,
+        "disambiguation": "",
+        "id": "1f9c4b4a-c43d-40bd-b806-357153641fd0"
+      },
+      {
+        "name": "trance",
+        "count": 1,
+        "disambiguation": "",
+        "id": "2afc2320-384f-43a4-a71e-1b763c485045"
+      },
+      {
+        "disambiguation": "",
+        "id": "9a339aa8-a0e5-450c-95a7-b11517bb508f",
+        "count": 1,
+        "name": "trap"
+      },
+      {
+        "id": "95c57cd7-7fb8-4405-ade1-775c2d27e54e",
+        "disambiguation": "",
+        "count": 1,
+        "name": "uk garage"
+      }
+    ],
+    "isnis": [
+      "0000000466086273"
+    ],
+    "life-span": {
+      "end": "2021-01-30",
+      "ended": true,
+      "begin": "1985-09-17"
+    }
+  }
+}

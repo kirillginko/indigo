@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F866&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:37.437322+00:00",
+  "body": {
+    "id": "9e211f68-d26d-4a8c-84d0-9138f3d781ef",
+    "relations": [
+      {
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "artist": {
+          "disambiguation": "Chicago house music DJ/producer",
+          "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+          "name": "Paul Johnson",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "Johnson, Paul"
+        },
+        "attribute-values": {},
+        "attribute-ids": {},
+        "ended": false,
+        "target-type": "artist",
+        "direction": "backward",
+        "type": "discogs",
+        "attributes": [],
+        "source-credit": ""
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/866"
+  }
+}

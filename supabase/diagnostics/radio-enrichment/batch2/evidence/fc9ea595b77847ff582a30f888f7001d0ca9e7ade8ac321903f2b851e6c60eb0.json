@@ -1,0 +1,81 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/392cefbd-40cf-4fd7-b5c3-a1e1273c780e?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:15.493258+00:00",
+  "body": {
+    "video": false,
+    "isrcs": [
+      "GBJX31844047"
+    ],
+    "first-release-date": "2019-09-02",
+    "releases": [
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "On a Nimbus",
+        "country": "XW",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Priori",
+            "artist": {
+              "type": "Person",
+              "name": "Priori",
+              "sort-name": "Priori",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "CA",
+              "disambiguation": "Canadian DJ & producer Francis Latreille",
+              "id": "cc9f278d-d083-4370-b830-f2ee1f118489"
+            }
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "quality": "normal",
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "c6ac5f68-ff0a-49b4-9361-c2272fad52f7",
+        "date": "2019-09-02",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            },
+            "date": "2019-09-02"
+          }
+        ],
+        "barcode": "5060731224972"
+      }
+    ],
+    "artist-credit": [
+      {
+        "name": "Priori",
+        "joinphrase": "",
+        "artist": {
+          "type": "Person",
+          "name": "Priori",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "CA",
+          "sort-name": "Priori",
+          "disambiguation": "Canadian DJ & producer Francis Latreille",
+          "id": "cc9f278d-d083-4370-b830-f2ee1f118489"
+        }
+      }
+    ],
+    "id": "392cefbd-40cf-4fd7-b5c3-a1e1273c780e",
+    "disambiguation": "",
+    "title": "Critter",
+    "length": 267907
+  }
+}

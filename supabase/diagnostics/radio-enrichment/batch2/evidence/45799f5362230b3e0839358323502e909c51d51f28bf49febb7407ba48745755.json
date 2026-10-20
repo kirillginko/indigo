@@ -1,0 +1,75 @@
+{
+  "url": "https://api.discogs.com/artists/97988",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:21.756083+00:00",
+  "body": {
+    "name": "Letta Mbulu",
+    "id": 97988,
+    "resource_url": "https://api.discogs.com/artists/97988",
+    "uri": "https://www.discogs.com/artist/97988-Letta-Mbulu",
+    "releases_url": "https://api.discogs.com/artists/97988/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/efYf1jW_fhbbf26W8BcWwFjox5EbLbnK4EC1B-R45GI/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3OTg4/LTE1NDc5OTAyNzUt/NjEzNS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/efYf1jW_fhbbf26W8BcWwFjox5EbLbnK4EC1B-R45GI/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3OTg4/LTE1NDc5OTAyNzUt/NjEzNS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/B_AhIzJcNP0gbx9CtuZlVwl7I97PDWXpdQKKzd3BgtI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3OTg4/LTE1NDc5OTAyNzUt/NjEzNS5qcGVn.jpeg",
+        "width": 599,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/VRr0IkiQjr3ecE2vzQGLsX1Xc2HvbfmQRlvMh1xnyUs/rs:fit/g:sm/q:90/h:520/w:520/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3OTg4/LTEyNjYyMDExOTYu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/VRr0IkiQjr3ecE2vzQGLsX1Xc2HvbfmQRlvMh1xnyUs/rs:fit/g:sm/q:90/h:520/w:520/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3OTg4/LTEyNjYyMDExOTYu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/E3zwg-oF3jhLFO1VV84TGkTqXn0I4SCyNjHZGHI-jOU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk3OTg4/LTEyNjYyMDExOTYu/anBlZw.jpeg",
+        "width": 520,
+        "height": 520
+      }
+    ],
+    "profile": "South African singer, born 23. August 1942 and raised in Soweto.\r\n\r\nAlready as a teenager she toured as part of the [b]King Kong musical[/b] ensemble but left for the USA in the sixties due to the political environment back home, teaming up with [a=Harry Belafonte] and [a=Cannonball Adderley]. Her voice can also be heard on the soundtrack of the successful TV series \"Roots\". \r\n\r\nMarried to [a=Caiphus Semenya], she returned to South Africa after 26 years of self-imposed exile.",
+    "urls": [
+      "https://www.imdb.com/name/nm1040856/",
+      "https://en.wikipedia.org/wiki/Letta_Mbulu",
+      "https://dougpayne.com/lmhome.htm"
+    ],
+    "namevariations": [
+      "L . Mubulu",
+      "L Mbulu",
+      "L. Mabutu",
+      "L. Mblulu",
+      "L. Mbula",
+      "L. Mbulu",
+      "L. Mubulu",
+      "Leita Mbulu",
+      "Lella Mbulu",
+      "Letta",
+      "Letta M Bulu",
+      "Letta M'Bulu",
+      "Letta M'bulu",
+      "Letta Mbola",
+      "Letta Mbula",
+      "Letta Mbulo",
+      "Lette Mbulu",
+      "Letty Mbuli",
+      "Mbula",
+      "Mbulu",
+      "Moulu",
+      "レッタ・ムブール"
+    ],
+    "groups": [
+      {
+        "id": 1855666,
+        "name": "The Skylarks (3)",
+        "resource_url": "https://api.discogs.com/artists/1855666",
+        "active": true
+      },
+      {
+        "id": 5262853,
+        "name": "Letta And The Safaris",
+        "resource_url": "https://api.discogs.com/artists/5262853",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

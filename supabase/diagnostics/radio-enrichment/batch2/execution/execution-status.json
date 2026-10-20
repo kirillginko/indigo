@@ -1,0 +1,27 @@
+{
+  "status": "CONDITIONALLY_APPROVED_HELD",
+  "reason": "Condition 5: no completed scheduled merge after Batch 1 insertion on 2026-10-19 17:12 UTC",
+  "checked_at": "2026-10-20T01:32:39.668301+00:00",
+  "approved_count": 21,
+  "approved_manifest_sha256": "ab1b0f494945f271cde20c6abe9c61ae69d7a6566f5b73f9712e5d606fd03b77",
+  "apply_sql_sha256": "0f3b0988af8e4c0693bd2f3fa244001f751afb15e97ed965e425d2ff7dd04294",
+  "rollback_sql_sha256": "75041172109f4dacf9484100d860af6dd0f53479010f5573dcafa92f5d2562ea",
+  "production_catalogue_writes": 0,
+  "current_production_links": 463,
+  "approved_subset_current_guard_count": 21,
+  "orphan_links": 0,
+  "witness_sets_unchanged": true,
+  "charles_sullivan_overlaps_approved_subset": false,
+  "latest_merge": {
+    "end_time": "2026-10-19 04:23:09.325162+00",
+    "jobname": "indigo-merge-split-artists",
+    "return_message": "1 row",
+    "start_time": "2026-10-19 04:23:00.031416+00",
+    "status": "succeeded"
+  },
+  "next_scheduled_merge_utc": "2026-10-20T04:23:00Z",
+  "next_scheduled_merge_local": "October 20, 2026, 12:23 am EDT",
+  "fresh_remote_reverification": "Deferred until required post-merge integrity check passes; must occur immediately before execution",
+  "automatic_retry_scheduled": false,
+  "review_cases_remain_excluded": 19
+}

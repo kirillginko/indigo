@@ -1,0 +1,280 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Down+By+The+River%22+AND+artist%3A%22Letta+Mbulu%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:22.685889+00:00",
+  "body": {
+    "created": "2026-10-20T01:24:22.610Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "4347221d-7799-4202-8c0d-1523657c8f8e",
+        "score": 100,
+        "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+        "title": "Down By The River",
+        "length": 309000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Letta Mbulu",
+            "artist": {
+              "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+              "name": "Letta Mbulu",
+              "sort-name": "Mbulu, Letta",
+              "disambiguation": "South African musician",
+              "aliases": [
+                {
+                  "sort-name": "Letta",
+                  "name": "Letta",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1983",
+        "releases": [
+          {
+            "id": "0c744432-f1cb-4c8a-9f49-1a6ae97ebbb6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "Sweet Juju",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3d33eccd-db45-459e-80d7-eb7c2e1f3c4e",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In the Music the Village Never Ends",
+              "primary-type": "Album"
+            },
+            "date": "1985",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "1985",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "95217ed7-3e44-3148-8cd5-74970eb77c4f",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "63db75df-ecde-4df3-9ddb-0695420f88ae",
+                    "number": "B2",
+                    "title": "Down By The River"
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "15c42d2c-ff44-43d3-bda2-ea07b121c244",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "In the Music the Village Never Ends",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3d33eccd-db45-459e-80d7-eb7c2e1f3c4e",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In the Music the Village Never Ends",
+              "primary-type": "Album"
+            },
+            "date": "1983",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "1983",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "adb171a8-38f8-3c98-a603-c027a6a8caf3",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "ffc48265-355e-4ce6-a550-4a53c5c0bbc3",
+                    "number": "B2",
+                    "title": "Down By The River",
+                    "length": 309000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "91b153fc-7b44-48e4-bbf8-aefae86f76d7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "In The Music The Village Never Ends",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3d33eccd-db45-459e-80d7-eb7c2e1f3c4e",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In the Music the Village Never Ends",
+              "primary-type": "Album"
+            },
+            "date": "1996",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "1996",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "e954ebd2-4b99-301a-9e68-0ddb12a7c767",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "33449d51-f438-4e97-a969-fab5cd0e477a",
+                    "number": "6",
+                    "title": "Down By The River",
+                    "length": 309000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "cfc4e9ec-2810-422c-8d07-37af1c909b73",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "0bc37dfa-5eb1-347f-95f2-abb90faec0a2",
+            "count": 1,
+            "title": "In The Music The Village Never Ends",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Letta Mbulu",
+                "artist": {
+                  "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815",
+                  "name": "Letta Mbulu",
+                  "sort-name": "Mbulu, Letta",
+                  "disambiguation": "South African musician"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3d33eccd-db45-459e-80d7-eb7c2e1f3c4e",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In the Music the Village Never Ends",
+              "primary-type": "Album"
+            },
+            "date": "2015-06-05",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2015-06-05",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "65751d95-cc88-3381-8717-e398efedd27c",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "22312e03-968e-42e5-bc5c-99d460f79632",
+                    "number": "B2",
+                    "title": "Down By The River",
+                    "length": 309000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

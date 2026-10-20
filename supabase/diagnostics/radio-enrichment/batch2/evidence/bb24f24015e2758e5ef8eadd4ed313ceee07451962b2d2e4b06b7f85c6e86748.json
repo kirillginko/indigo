@@ -1,0 +1,600 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/bc16d640-a069-42ec-a8c1-c24fd5c3d206?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:01.723843+00:00",
+  "body": {
+    "aliases": [
+      {
+        "locale": null,
+        "end": null,
+        "begin": null,
+        "type": "Legal name",
+        "name": "Leslie Coleman McCann",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "ended": false,
+        "sort-name": "McCann, Leslie Coleman",
+        "primary": null
+      }
+    ],
+    "life-span": {
+      "begin": "1935-09-23",
+      "end": "2023-12-29",
+      "ended": true
+    },
+    "ipis": [
+      "00042918579",
+      "00086263361"
+    ],
+    "isnis": [
+      "0000000114803443"
+    ],
+    "relations": [
+      {
+        "type": "member of band",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "artist",
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "ended": false,
+        "end": null,
+        "artist": {
+          "country": null,
+          "disambiguation": "",
+          "id": "d7d2310a-2ff7-4b42-aa49-53cc3822b39b",
+          "sort-name": "McCann, Les, Ltd.",
+          "name": "Les McCann Ltd.",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "attributes": [
+          "original"
+        ]
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "direction": "forward",
+        "artist": {
+          "disambiguation": "R&B/Jazz group with Dupree and McCann",
+          "country": "US",
+          "type": "Group",
+          "name": "The Soul Survivors",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "0fa160cd-9546-4f2a-b32c-766c78772d27",
+          "sort-name": "Soul Survivors, The"
+        },
+        "end": null,
+        "attributes": [],
+        "type": "member of band",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "artist"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0000245760",
+          "id": "4e282b4b-6baf-41e0-94e6-be08f41a5621"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "allmusic"
+      },
+      {
+        "url": {
+          "resource": "https://www.discogs.com/artist/44126",
+          "id": "2877f763-cf9a-4768-acc1-48d38e0e4657"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "discogs",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "free streaming",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "6beb8d24-e6b2-44cf-a4ec-a574b45cc57f",
+          "resource": "https://audiomack.com/les-mccann-1"
+        },
+        "attribute-ids": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://open.spotify.com/artist/07tYu4BGrfeogBobCefkHI",
+          "id": "2772acbd-fc84-45e4-b728-8f0605db2582"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "free streaming",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "free streaming",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.deezer.com/artist/66011",
+          "id": "4531c294-0985-4b6e-8ad3-1a4a8b4b53f9"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "2435237b-11be-4d3e-9d8b-5949a9e7d84b",
+          "resource": "https://www.imdb.com/name/nm0564895/"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attribute-values": {},
+        "ended": false,
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "IMDb"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "attribute-values": {},
+        "ended": true,
+        "attribute-ids": {},
+        "url": {
+          "id": "d560050d-763c-4bed-9bb6-5471d75861b8",
+          "resource": "http://www.lesmccann-officialwebsite.com/"
+        },
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "official homepage"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n82013478",
+          "id": "9c0a54ba-aa44-4b31-ad60-5c223a5de875"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "other databases",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null
+      },
+      {
+        "type": "other databases",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb139219933",
+          "id": "1d566a3f-e62b-4afd-9f94-58631ff1a673"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "url": {
+          "resource": "https://d-nb.info/gnd/134567730",
+          "id": "c51d82c7-0bf6-4121-a380-bde3beb412c4"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": [],
+        "type": "other databases",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "other databases",
+        "attributes": [],
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "f7ce6fd6-ea84-434f-9c07-85bc22cbd3f7",
+          "resource": "https://rateyourmusic.com/artist/les_mccann"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "other databases",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "2065109f-d065-4117-b7ed-ef0c089e12b7",
+          "resource": "https://www.musik-sammler.de/artist/97791/"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://www.muziekweb.nl/Link/M00000029898/POPULAR/",
+          "id": "ffd67757-a523-4dd2-a311-da0643cee091"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "other databases",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-ids": {},
+        "url": {
+          "id": "3c95669e-3691-47cf-87a4-f955bc7b39f9",
+          "resource": "https://www.worldcat.org/identities/lccn-n82013478"
+        },
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://music.apple.com/us/artist/56601",
+          "id": "ca5a9c35-16ae-420d-8281-e67a6daccd02"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "purchase for download"
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.qobuz.com/us-en/interpreter/les-mccann/35390",
+          "id": "1a9d1aac-bace-47b1-912a-c1f5223b27f7"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "purchase for download",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "secondhandsongs",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "48acc933-6b9e-4db0-801a-a4a7b7132805",
+          "resource": "https://secondhandsongs.com/artist/2382"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "ended": false
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "84228a38-147c-4a54-be09-d086bd8f546d",
+          "resource": "https://www.songkick.com/artists/283118"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "songkick"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "soundcloud",
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "2740c0a8-a1c0-46d6-9802-bde3bf615ab7",
+          "resource": "https://soundcloud.com/lesmccann"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://music.apple.com/us/artist/56601",
+          "id": "ca5a9c35-16ae-420d-8281-e67a6daccd02"
+        },
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "streaming"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "9b658a51-d1a4-4f53-b372-98cdfcf0b46c",
+          "resource": "https://tidal.com/artist/13359"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "VIAF",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "dd659204-c9ea-477f-a0b4-cd7e3c7dddc9",
+          "resource": "http://viaf.org/viaf/115382716"
+        }
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "wikidata",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q562912",
+          "id": "dfeff37e-2546-4f8f-b767-e54c1019515b"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "youtube music",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "6d18d70f-65c2-4cc1-ba8f-18006cce3775",
+          "resource": "https://music.youtube.com/channel/UCitVt4bBlK-iWV9PzPsI_hg"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "631712a0-7525-42ba-b7a3-605aa7a238c4",
+        "direction": "forward",
+        "target-credit": ""
+      }
+    ],
+    "tags": [
+      {
+        "count": 1,
+        "name": "2008 universal fire victim"
+      },
+      {
+        "name": "hard bop",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "jazz"
+      },
+      {
+        "count": 1,
+        "name": "post-bop"
+      },
+      {
+        "name": "soul jazz",
+        "count": 2
+      }
+    ],
+    "genres": [
+      {
+        "count": 1,
+        "id": "8c083468-2dce-4a31-ae77-433af3deafd3",
+        "name": "hard bop",
+        "disambiguation": ""
+      },
+      {
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "count": 2,
+        "name": "jazz",
+        "disambiguation": ""
+      },
+      {
+        "name": "post-bop",
+        "disambiguation": "",
+        "id": "94ce0ba0-9043-4b5b-87d6-3c1a8458f75d",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "id": "e70f0aa3-9531-448c-8182-7ff34e3d74f8",
+        "disambiguation": "",
+        "name": "soul jazz"
+      }
+    ],
+    "area": {
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "sort-name": "United States",
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "name": "United States",
+      "type": null,
+      "type-id": null,
+      "disambiguation": ""
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "country": "US",
+    "begin-area": {
+      "id": "4551ede8-589a-4776-8120-bf43e53c927b",
+      "sort-name": "Lexington",
+      "disambiguation": "",
+      "type": null,
+      "name": "Lexington",
+      "type-id": null
+    },
+    "disambiguation": "",
+    "sort-name": "McCann, Les",
+    "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+    "end-area": {
+      "type-id": null,
+      "type": null,
+      "name": "Los Angeles",
+      "disambiguation": "",
+      "sort-name": "Los Angeles",
+      "id": "1f40c6e1-47ba-4e35-996f-fe6ee5840e62"
+    },
+    "gender": "Male",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "type": "Person",
+    "name": "Les McCann"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F36860&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:16.119029+00:00",
+  "body": {
+    "id": "c86966ad-c50e-4daf-859f-29d22fd9ebb8",
+    "relations": [
+      {
+        "target-type": "artist",
+        "begin": null,
+        "source-credit": "",
+        "type": "discogs",
+        "attributes": [],
+        "end": null,
+        "artist": {
+          "sort-name": "Denny, Martin",
+          "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Martin Denny",
+          "country": "US",
+          "disambiguation": ""
+        },
+        "direction": "backward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "ended": false,
+        "attribute-ids": {}
+      }
+    ],
+    "resource": "https://www.discogs.com/artist/36860"
+  }
+}

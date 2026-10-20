@@ -1,0 +1,102 @@
+{
+  "url": "https://api.discogs.com/artists/36860",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:16.327136+00:00",
+  "body": {
+    "name": "Martin Denny",
+    "id": 36860,
+    "resource_url": "https://api.discogs.com/artists/36860",
+    "uri": "https://www.discogs.com/artist/36860-Martin-Denny",
+    "releases_url": "https://api.discogs.com/artists/36860/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/J_XWk4mNIBEqjVAPLZuOEYBKQViqrJH8gzi08-rXxTw/rs:fit/g:sm/q:90/h:360/w:291/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxMjAt/MTYyNS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/J_XWk4mNIBEqjVAPLZuOEYBKQViqrJH8gzi08-rXxTw/rs:fit/g:sm/q:90/h:360/w:291/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxMjAt/MTYyNS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/0NsS5loiUYmeEpnmIAYnXhGf1p641C7DBtUwR6HmHqY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxMjAt/MTYyNS5qcGVn.jpeg",
+        "width": 291,
+        "height": 360
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/P7u5pHL6EQuwt_cFSdmWZqkJQyJPl1XkVKcfzWZstlk/rs:fit/g:sm/q:90/h:299/w:252/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxMTAt/NDU3MS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/P7u5pHL6EQuwt_cFSdmWZqkJQyJPl1XkVKcfzWZstlk/rs:fit/g:sm/q:90/h:299/w:252/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxMTAt/NDU3MS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/nnfZ04__Jmpos4DPKlL4VrP1YTZSq4-Mj8hg2A6pnis/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxMTAt/NDU3MS5qcGVn.jpeg",
+        "width": 252,
+        "height": 299
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/bHaGSS6yrnaWogTZ2eDzKWrQLCO4ppnq4JK2_TpiOGk/rs:fit/g:sm/q:90/h:450/w:316/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTExOTg5NTQ0NTQu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/bHaGSS6yrnaWogTZ2eDzKWrQLCO4ppnq4JK2_TpiOGk/rs:fit/g:sm/q:90/h:450/w:316/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTExOTg5NTQ0NTQu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/mBWL5ZSvXUY3IRwVUtRQeF2XGVz6MdrHYg_50ZhZKxg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTExOTg5NTQ0NTQu/anBlZw.jpeg",
+        "width": 316,
+        "height": 450
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/aqipTqTibzje_HCMRiLZjA5DNfoNQIvz8T-Hm0AfdHM/rs:fit/g:sm/q:90/h:360/w:289/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxNDct/MTk5Mi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/aqipTqTibzje_HCMRiLZjA5DNfoNQIvz8T-Hm0AfdHM/rs:fit/g:sm/q:90/h:360/w:289/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxNDct/MTk5Mi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/2Kn6ApFPXxXifNbLgyEEvpHJcoQ_hSHCSi3NeHzmrzk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxNDct/MTk5Mi5qcGVn.jpeg",
+        "width": 289,
+        "height": 360
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/uvIZX67XaaHqD3TmWy4nf7IO7OyDnGkUZAEfgOOWa68/rs:fit/g:sm/q:90/h:338/w:406/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxOTkt/OTc2My5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/uvIZX67XaaHqD3TmWy4nf7IO7OyDnGkUZAEfgOOWa68/rs:fit/g:sm/q:90/h:338/w:406/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxOTkt/OTc2My5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/BYGMYOAmdV1Li2vjsGbIHU7B16KK9vPkzUJW0lcDucU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTEzNTc4MTYxOTkt/OTc2My5qcGVn.jpeg",
+        "width": 406,
+        "height": 338
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/w3H341YUONwtK3stNIAMlbqTS-GIKoBWRhBGcEYmNqs/rs:fit/g:sm/q:90/h:280/w:348/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTExMDUzOTQ1MzEu/anBn.jpeg",
+        "resource_url": "https://i.discogs.com/w3H341YUONwtK3stNIAMlbqTS-GIKoBWRhBGcEYmNqs/rs:fit/g:sm/q:90/h:280/w:348/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTExMDUzOTQ1MzEu/anBn.jpeg",
+        "uri150": "https://i.discogs.com/xO_5gU_zwjB9JjUrP-YFMZkTDgFEAmjsxbUCsj3PYIo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTM2ODYw/LTExMDUzOTQ1MzEu/anBn.jpeg",
+        "width": 348,
+        "height": 280
+      }
+    ],
+    "profile": "American pianist, composer, bandleader & arranger, known as the \"father of exotica\".\nBorn April 10, 1911, in New York, Mr. Denny toured widely with big bands in the 1930s, served in the Army Air Corps during World War II, and in the mid-1950s found himself in Hawaii with an engagement at the Hawaiian Village Hotel at Waikiki. His group, a quartet that also featured [a=Arthur Lyman] on the vibraphone, played around a pool at the hotel in a natural setting, performing soft arrangements of popular songs with an odd instrument or two from Hawaii or places in Asia and the South Pacific such as conch shells, Indonesian and Burmese gongs, Japanese kotos, boobams and even the local forest animals and so in serendipity blended ingredients of Easy Listening, Jungle Noise, Smooth Jazz, Polynesian \"Tiki\" instrumentation, that would become Mr. Denny's musical signature sound: Exotica.\nMr. Denny's recording of [a=Les Baxter]'s \"Quiet Village\" was released as a single in 1958 and reached the Top 5 of the Billboard pop charts. \nHis first album, \"Exotica,\" with its image of a sultry model of indeterminate ethnicity peeking through a bamboo screen, stayed at No. 1 for five weeks in 1959.\n\"Exotica\" and successive albums with titles like \"Forbidden Island,\" \"Afro-Desia\" and \"Primitiva\" provided the soundtrack to the trend for stylized Polynesiana - tiki cups, Hawaiian shirts and the bikini - in the early cold-war era.\nHe died on Wednesday March 5 2005, at his home in Hawaii Kai, near Honolulu. He was 93.\n1990: Winner of a Nā Hōkū Hanohano Lifetime Achievement Award under the auspices of the Hawaiʻi Academy of Recording Arts.\n\n",
+    "urls": [
+      "http://en.wikipedia.org/wiki/Martin_Denny",
+      "https://www.musicianguide.com/biographies/1608003786/Martin-Denny.html",
+      "https://www.danacountryman.com/denny/denny1.html",
+      "https://archives.starbulletin.com/2005/03/13/news/story3.html",
+      "https://fromthevaults-boppinbob.blogspot.com/2019/04/martin-denny-born-10-april-1911.html"
+    ],
+    "namevariations": [
+      "(The Exotic Sound Of) Martin Denny",
+      "Denny",
+      "Denny Martin",
+      "Los Exóticos Sonidos De Martin Denny",
+      "M Denny",
+      "M. Denny",
+      "M.Denny",
+      "Martin Dennis",
+      "Martin Denny & His Group",
+      "Martin Denny And His Music",
+      "Mr. Martin Denny",
+      "The Exotic Sounds Of Martin Denny",
+      "The Exotic Sounds of Martin Denny",
+      "The Martin Denny Combo",
+      "The Sounds Of Martin Denny"
+    ],
+    "groups": [
+      {
+        "id": 1484312,
+        "name": "Martin Denny And His Orchestra",
+        "resource_url": "https://api.discogs.com/artists/1484312",
+        "active": true
+      },
+      {
+        "id": 6607114,
+        "name": "The Martin Denny Group",
+        "resource_url": "https://api.discogs.com/artists/6607114",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

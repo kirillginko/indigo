@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/f2a60753-deed-473b-9083-fe67149c29cc?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:06.478349+00:00",
+  "body": {
+    "isrcs": [],
+    "id": "f2a60753-deed-473b-9083-fe67149c29cc",
+    "releases": [
+      {
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status": "Official",
+        "country": "GB",
+        "disambiguation": "",
+        "title": "Africafunk: The Original Sound of 1970s Funky Africa",
+        "quality": "normal",
+        "barcode": "5014797020160",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "country": null
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "id": "d067a1e4-0f73-4e19-85e9-06d980aef29f",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "type-id": null
+            },
+            "date": "1998"
+          }
+        ],
+        "date": "1998"
+      },
+      {
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "GB",
+        "packaging": null,
+        "barcode": "5014797030169",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "type": "Other",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "country": null
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "quality": "normal",
+        "title": "Africafunk: The Original Sound of 1970s Funky Africa",
+        "date": "1998",
+        "release-events": [
+          {
+            "date": "1998",
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "3611c16c-a71e-47d7-9d37-69a7cb03d9b0"
+      }
+    ],
+    "video": false,
+    "disambiguation": "",
+    "length": 355000,
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+          "name": "Manu Dibango",
+          "disambiguation": "",
+          "country": "CM",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "Dibango, Manu"
+        },
+        "name": "Manu Dibango",
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "1998",
+    "title": "Weya"
+  }
+}

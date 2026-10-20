@@ -1,0 +1,129 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/f3df97bc-02ba-4737-8254-c8490839db3f?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:31.616215+00:00",
+  "body": {
+    "length": 168230,
+    "title": "Starfall",
+    "id": "f3df97bc-02ba-4737-8254-c8490839db3f",
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+          "disambiguation": "US‐based electronic group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "US",
+          "sort-name": "SALEM",
+          "name": "SALEM",
+          "type": "Group"
+        },
+        "name": "Salem",
+        "joinphrase": ""
+      }
+    ],
+    "disambiguation": "",
+    "isrcs": [
+      "USZ4V2000366"
+    ],
+    "video": false,
+    "first-release-date": "2020-10-30",
+    "releases": [
+      {
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "title": "Fires in Heaven",
+        "release-events": [
+          {
+            "date": "2020-10-30",
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null
+            }
+          }
+        ],
+        "date": "2020-10-30",
+        "id": "3d681a62-6ae4-4c05-9f1a-2d23a81560db",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Salem",
+            "artist": {
+              "type": "Group",
+              "sort-name": "SALEM",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "SALEM",
+              "disambiguation": "US‐based electronic group",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8"
+            }
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "819478029389",
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XW",
+        "disambiguation": ""
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "US‐based electronic group",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "type": "Group",
+              "sort-name": "SALEM",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "SALEM"
+            },
+            "name": "Salem",
+            "joinphrase": ""
+          }
+        ],
+        "id": "3e33ca06-dde6-47eb-a0c1-e27833e2c15d",
+        "status": "Official",
+        "quality": "normal",
+        "title": "Fires in Heaven",
+        "packaging-id": null,
+        "date": "2021-01",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United States",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            },
+            "date": "2021-01"
+          }
+        ],
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "819478028979",
+        "country": "US",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ]
+  }
+}

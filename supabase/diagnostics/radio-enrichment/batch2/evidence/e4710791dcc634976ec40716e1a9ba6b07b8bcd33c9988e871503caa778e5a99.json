@@ -1,0 +1,309 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/ccf5389c-1cbe-4f86-8c92-cae8b87aaff8?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:06.987118+00:00",
+  "body": {
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "b7864789-29e6-4965-84e4-463baaa869df",
+        "count": 1,
+        "name": "chanson française"
+      }
+    ],
+    "isnis": [
+      "0000000080234640"
+    ],
+    "country": "FR",
+    "life-span": {
+      "begin": "1947-07-31",
+      "ended": false,
+      "end": null
+    },
+    "type": "Person",
+    "ipis": [],
+    "id": "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8",
+    "begin-area": {
+      "disambiguation": "",
+      "type": null,
+      "id": "dc10c22b-e510-4006-8b7f-fecb4f36436e",
+      "iso-3166-2-codes": [
+        "FR-75"
+      ],
+      "sort-name": "Paris",
+      "type-id": null,
+      "name": "Paris"
+    },
+    "sort-name": "Stone",
+    "gender": "Female",
+    "disambiguation": "1960s~2010s French variété singer Annie Gautrat / Stone & Charden",
+    "aliases": [
+      {
+        "primary": null,
+        "end": null,
+        "type": "Legal name",
+        "ended": false,
+        "locale": null,
+        "begin": null,
+        "sort-name": "Gautrat, Annie",
+        "name": "Annie Gautrat",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf"
+      }
+    ],
+    "end-area": null,
+    "tags": [
+      {
+        "count": 1,
+        "name": "chanson française"
+      }
+    ],
+    "area": {
+      "type": null,
+      "disambiguation": "",
+      "name": "France",
+      "iso-3166-1-codes": [
+        "FR"
+      ],
+      "type-id": null,
+      "sort-name": "France",
+      "id": "08310658-51eb-3801-80de-5a0739207115"
+    },
+    "name": "Stone",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "relations": [
+      {
+        "source-credit": "",
+        "type": "married",
+        "attribute-values": {},
+        "artist": {
+          "country": "FR",
+          "disambiguation": "",
+          "type": "Person",
+          "id": "fbc10916-50c1-428a-b4db-cb757015c6b0",
+          "name": "Éric Charden",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Charden, Éric"
+        },
+        "type-id": "b2bf7a5d-2da6-4742-baf4-e38d8a7ad029",
+        "target-type": "artist",
+        "direction": "backward",
+        "end": "1975",
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": "1966",
+        "target-credit": "",
+        "ended": true
+      },
+      {
+        "artist": {
+          "type": "Group",
+          "country": "FR",
+          "disambiguation": "",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Stone & Charden",
+          "sort-name": "Stone & Charden",
+          "id": "7d3f096f-c5f8-4925-88ef-7de172d24742"
+        },
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": "2012",
+        "attributes": [
+          "eponymous",
+          "original"
+        ],
+        "direction": "forward",
+        "ended": true,
+        "target-credit": "",
+        "begin": "1972",
+        "attribute-ids": {
+          "eponymous": "15eea3b8-5655-43c8-b2c2-dd03c901a79b",
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "id": "5997d89f-ea48-4f7d-8fc2-3648a29e2429",
+          "resource": "https://www.discogs.com/artist/630311"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-type": "url",
+        "type": "discogs",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "resource": "https://open.spotify.com/artist/4Go2edA0Xg8dGxqEv0Znp6",
+          "id": "76c81c91-cc8c-44e7-ab8f-62f9c9a52ebb"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "type": "free streaming",
+        "source-credit": "",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "f1f4e759-6b4b-4a30-a729-680b2ef00d0f",
+          "resource": "https://www.deezer.com/artist/171463777"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.imdb.com/name/nm0993436/",
+          "id": "94a0d119-2afa-47b9-b93c-059f48a5a146"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "target-type": "url",
+        "type": "IMDb",
+        "source-credit": ""
+      },
+      {
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "a66ab0e2-870e-4123-a708-94533ade1a42",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb13753990t"
+        },
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://d-nb.info/gnd/124641822",
+          "id": "23a41109-a267-43d5-8cf2-88e23de83d61"
+        },
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "http://www.encyclopedisque.fr/artiste/4454.html",
+          "id": "bf92b39b-ce61-4e67-814a-750779886904"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "url": {
+          "id": "f6d31731-52df-48ac-9dca-e2795cbd5a87",
+          "resource": "https://music.apple.com/fr/artist/1627057313"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "type": "VIAF",
+        "source-credit": "",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "8c2127c9-52fe-45f2-be47-1054d2a32966",
+          "resource": "http://viaf.org/viaf/64187138"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460"
+      },
+      {
+        "target-type": "url",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "attribute-values": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q3499706",
+          "id": "fa6b194f-f575-40be-901c-d57ebb4caabb"
+        },
+        "source-credit": "",
+        "type": "wikidata"
+      }
+    ]
+  }
+}

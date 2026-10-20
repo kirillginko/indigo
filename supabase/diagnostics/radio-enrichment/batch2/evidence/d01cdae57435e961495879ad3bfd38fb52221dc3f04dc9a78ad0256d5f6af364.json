@@ -1,0 +1,624 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/f9ba6d40-60f3-4c85-ac23-0bf67c3247e4?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:34.437134+00:00",
+  "body": {
+    "isnis": [
+      "000000009615627X"
+    ],
+    "life-span": {
+      "end": "1996-11-05",
+      "begin": "1934-10-20",
+      "ended": true
+    },
+    "disambiguation": "saxophone, piano, vocals",
+    "ipis": [
+      "00013464412",
+      "00013464706",
+      "00013477794",
+      "00075491358",
+      "00142053612"
+    ],
+    "country": "US",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "sort-name": "Harris, Eddie",
+    "area": {
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "disambiguation": "",
+      "type-id": null,
+      "sort-name": "United States",
+      "name": "United States",
+      "type": null
+    },
+    "end-area": {
+      "type": null,
+      "disambiguation": "",
+      "id": "1f40c6e1-47ba-4e35-996f-fe6ee5840e62",
+      "name": "Los Angeles",
+      "type-id": null,
+      "sort-name": "Los Angeles"
+    },
+    "gender": "Male",
+    "tags": [
+      {
+        "name": "hard bop",
+        "count": 2
+      },
+      {
+        "count": 3,
+        "name": "jazz"
+      },
+      {
+        "count": 1,
+        "name": "jazz fusion"
+      },
+      {
+        "count": 1,
+        "name": "soul jazz"
+      }
+    ],
+    "genres": [
+      {
+        "name": "hard bop",
+        "count": 2,
+        "id": "8c083468-2dce-4a31-ae77-433af3deafd3",
+        "disambiguation": ""
+      },
+      {
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "count": 3,
+        "disambiguation": "",
+        "name": "jazz"
+      },
+      {
+        "name": "jazz fusion",
+        "count": 1,
+        "id": "2377ff19-83e7-4873-b425-dce6d1ad4ef4",
+        "disambiguation": ""
+      },
+      {
+        "id": "e70f0aa3-9531-448c-8182-7ff34e3d74f8",
+        "disambiguation": "",
+        "count": 1,
+        "name": "soul jazz"
+      }
+    ],
+    "relations": [
+      {
+        "source-credit": "",
+        "direction": "forward",
+        "artist": {
+          "disambiguation": "",
+          "id": "d945d7c8-1947-4aba-8013-1dfd3bce4ced",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "sort-name": "Cedar Walton Quartet",
+          "name": "Cedar Walton Quartet"
+        },
+        "attribute-ids": {
+          "tenor saxophone": "ef7382cf-d5b4-4923-8b9e-3c482ed84b5e"
+        },
+        "attribute-values": {},
+        "attribute-credits": {},
+        "end": null,
+        "ended": false,
+        "attributes": [
+          "tenor saxophone"
+        ],
+        "begin": null,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "type": "member of band",
+        "target-credit": "",
+        "target-type": "artist"
+      },
+      {
+        "end": null,
+        "attribute-values": {},
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "begin": null,
+        "direction": "forward",
+        "source-credit": "",
+        "artist": {
+          "sort-name": "Snelwar-Smith",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "name": "Snelwar-Smith",
+          "type": "Group",
+          "id": "dbc2d135-8ac1-4d56-9c41-514898a06ab9",
+          "disambiguation": "Glenn Snelwar & Kimmer Smith"
+        },
+        "target-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821"
+      },
+      {
+        "target-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-credits": {},
+        "end": null,
+        "attribute-values": {},
+        "attribute-ids": {
+          "eponymous": "15eea3b8-5655-43c8-b2c2-dd03c901a79b",
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c",
+          "tenor saxophone": "ef7382cf-d5b4-4923-8b9e-3c482ed84b5e"
+        },
+        "attributes": [
+          "eponymous",
+          "original",
+          "tenor saxophone"
+        ],
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "source-credit": "",
+        "artist": {
+          "disambiguation": "",
+          "id": "de57d5fc-d454-4df0-bd20-951843bee615",
+          "name": "Eddie Harris Quartet",
+          "country": "US",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "Harris, Eddie, Quartet",
+          "type": "Group"
+        }
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "direction": "forward",
+        "source-credit": "",
+        "artist": {
+          "id": "92d920c4-97dd-45c2-86bf-ec2f1e948222",
+          "disambiguation": "",
+          "type": "Group",
+          "sort-name": "Bazillus",
+          "country": "CD",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Bazillus"
+        },
+        "attribute-credits": {},
+        "end": null,
+        "attribute-values": {},
+        "attribute-ids": {
+          "saxophone": "a9ed16cd-b8cb-4256-9c41-93f5f0458c49"
+        },
+        "attributes": [
+          "saxophone"
+        ],
+        "begin": null,
+        "ended": false
+      },
+      {
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "47a6f864-8109-4b72-af89-5d02bd368349",
+          "resource": "https://www.allmusic.com/artist/mn0000169124"
+        },
+        "type": "allmusic"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "url": {
+          "id": "6c521bf7-a533-4d31-b120-54cbfaca3b56",
+          "resource": "https://eddieharrismusic.bandcamp.com/"
+        },
+        "type": "bandcamp",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type": "discogs",
+        "url": {
+          "resource": "https://www.discogs.com/artist/41249",
+          "id": "0de95820-08e7-4dd1-84a2-1e4a8433a840"
+        }
+      },
+      {
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.spotify.com/artist/0bcDOCWIbvWApEIB7l1uZ4",
+          "id": "a16b947e-6cad-4d43-b2dd-05fb5bc52a55"
+        },
+        "type": "free streaming"
+      },
+      {
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "type": "free streaming",
+        "url": {
+          "id": "04d16639-beb3-4de5-848d-49659a70ae78",
+          "resource": "https://www.deezer.com/artist/64440"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "url": {
+          "id": "37bd47e4-48ff-4e27-a88a-91fae2499d7c",
+          "resource": "https://www.imdb.com/name/nm1226513/"
+        },
+        "type": "IMDb",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null
+      },
+      {
+        "url": {
+          "resource": "http://www.eddieharris.com/",
+          "id": "bc02a616-f518-496e-8252-61519d7115d0"
+        },
+        "type": "official homepage",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {}
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "type": "other databases",
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n88665508",
+          "id": "72c176c7-6746-43cd-9c6d-b3cf6e7b97c8"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "type": "other databases",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb13894985g",
+          "id": "56b912f9-3017-4712-847a-6a6b88e3798f"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type": "other databases",
+        "url": {
+          "id": "25196f14-643d-460c-95cc-517f95922caa",
+          "resource": "https://d-nb.info/gnd/134579569"
+        }
+      },
+      {
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/eddie_harris",
+          "id": "44a34e6a-2af8-4bb2-af67-dedb921ee0ea"
+        },
+        "type": "other databases"
+      },
+      {
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type": "other databases",
+        "url": {
+          "id": "9dbfb144-4380-4bd3-b0d8-2355189f592d",
+          "resource": "https://www.worldcat.org/identities/lccn-n88665508"
+        },
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type": "purchase for download",
+        "url": {
+          "id": "5f29745c-5136-4423-9fd1-ab019e4f8025",
+          "resource": "https://music.apple.com/us/artist/463784"
+        },
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-credit": "",
+        "target-type": "url"
+      },
+      {
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "56dc7ae1-d674-4eda-8b55-4dd041485f0a",
+          "resource": "https://open.qobuz.com/artist/50707"
+        },
+        "type": "purchase for download"
+      },
+      {
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.qobuz.com/us-en/interpreter/eddie-harris/50707",
+          "id": "f7ea3731-4c8c-48ef-b90c-4a7d26df9caf"
+        },
+        "type": "purchase for download"
+      },
+      {
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://secondhandsongs.com/artist/2381",
+          "id": "d626ac7e-5a3d-4779-9cdc-e0ff103752f8"
+        },
+        "type": "secondhandsongs"
+      },
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://soundcloud.com/eddieharris-scmusic",
+          "id": "14d7c1da-4fc9-467b-8dd0-7279fb5cb147"
+        },
+        "type": "soundcloud",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710"
+      },
+      {
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "5f29745c-5136-4423-9fd1-ab019e4f8025",
+          "resource": "https://music.apple.com/us/artist/463784"
+        },
+        "type": "streaming",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "target-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "d48f597b-26cd-43e7-bb7d-acee7368f7ef",
+          "resource": "https://tidal.com/artist/13482"
+        },
+        "type": "streaming"
+      },
+      {
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "id": "a03628ee-8aec-4cc9-8a4e-a86209cd1d6a",
+          "resource": "http://viaf.org/viaf/19865533"
+        },
+        "type": "VIAF",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "target-credit": "",
+        "target-type": "url"
+      },
+      {
+        "type": "wikidata",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q1264273",
+          "id": "8a341fdf-59c0-4bfb-8d2a-9261a8d59298"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": ""
+      },
+      {
+        "url": {
+          "resource": "https://music.youtube.com/channel/UC9yL1S9XFg2YiucmRGZUj3w",
+          "id": "881abccd-8704-4bcd-9911-97592a19fd31"
+        },
+        "type": "youtube music",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "631712a0-7525-42ba-b7a3-605aa7a238c4",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": ""
+      }
+    ],
+    "begin-area": {
+      "type-id": null,
+      "sort-name": "Chicago",
+      "name": "Chicago",
+      "disambiguation": "",
+      "type": null,
+      "id": "29a709d8-0320-493e-8d0c-f2c386662b7f"
+    },
+    "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "name": "Eddie Harris",
+    "type": "Person",
+    "aliases": [
+      {
+        "type-id": null,
+        "sort-name": "Eddie Harri",
+        "primary": null,
+        "locale": null,
+        "name": "Eddie Harri",
+        "type": null,
+        "ended": false,
+        "begin": null,
+        "end": null
+      }
+    ]
+  }
+}

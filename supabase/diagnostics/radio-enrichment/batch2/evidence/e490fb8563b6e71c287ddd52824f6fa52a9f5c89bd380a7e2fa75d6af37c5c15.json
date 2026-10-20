@@ -1,0 +1,81 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/4321e4f7-72c3-42b2-8a0e-ae364cd27ef4?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:05.612044+00:00",
+  "body": {
+    "isrcs": [
+      "QZHNB1948091"
+    ],
+    "id": "4321e4f7-72c3-42b2-8a0e-ae364cd27ef4",
+    "releases": [
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "New York rapper, founder of 10k",
+              "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b",
+              "sort-name": "MIKE",
+              "type": "Person",
+              "name": "MIKE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "MIKE"
+          }
+        ],
+        "packaging-id": null,
+        "packaging": null,
+        "date": "2017-06-21",
+        "title": "MAY GOD BLESS YOUR HUSTLE",
+        "quality": "normal",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "id": "8351e55c-6ca3-493a-a051-1204e3d379e6",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2017-06-21"
+          }
+        ],
+        "barcode": "194937840478",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ],
+    "disambiguation": "",
+    "video": false,
+    "artist-credit": [
+      {
+        "name": "MIKE",
+        "joinphrase": "",
+        "artist": {
+          "name": "MIKE",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b",
+          "sort-name": "MIKE",
+          "disambiguation": "New York rapper, founder of 10k",
+          "country": "US"
+        }
+      }
+    ],
+    "length": 69000,
+    "first-release-date": "2017-06-21",
+    "title": "Hunger"
+  }
+}

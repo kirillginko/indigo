@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%224+All+We+Know+Ft+Jessie+Woo++Dj_xfactor+Rehearsal+Edit%22+AND+artist%3A%22Klein%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:02.320763+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:02.250Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

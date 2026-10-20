@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F8270419&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:27.894852+00:00",
+  "body": {
+    "id": "80e9cf66-2dd6-4de2-855c-fe7450655e0f",
+    "resource": "https://www.discogs.com/artist/8270419",
+    "relations": [
+      {
+        "artist": {
+          "disambiguation": "Caribbean-Belgian jazz artist",
+          "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+          "type": "Person",
+          "name": "Nala Sinephro",
+          "sort-name": "Sinephro, Nala",
+          "country": "BE",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "source-credit": "",
+        "direction": "backward",
+        "ended": false,
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "attribute-ids": {},
+        "end": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-type": "artist",
+        "type": "discogs",
+        "target-credit": ""
+      }
+    ]
+  }
+}

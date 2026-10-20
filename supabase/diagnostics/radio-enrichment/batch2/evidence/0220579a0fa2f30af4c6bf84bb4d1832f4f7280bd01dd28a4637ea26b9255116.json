@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/2080e06a-2ade-454a-8de4-6c39bf99807d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:21.020964+00:00",
+  "body": {
+    "title": "Le Dub",
+    "first-release-date": "1999",
+    "artist-credit": [
+      {
+        "name": "I:Cube",
+        "joinphrase": "",
+        "artist": {
+          "sort-name": "I:Cube",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "FR",
+          "name": "I:Cube",
+          "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+          "disambiguation": "house music"
+        }
+      }
+    ],
+    "length": null,
+    "disambiguation": "",
+    "video": false,
+    "isrcs": [],
+    "releases": [
+      {
+        "country": "FR",
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "status": "Official",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "France",
+              "type": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "name": "France",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "disambiguation": ""
+            },
+            "date": "1999"
+          }
+        ],
+        "date": "1999",
+        "id": "8cd55b2b-0c51-4a2f-90de-eac6a8d102e7",
+        "title": "Tropiq",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "I:Cube",
+            "artist": {
+              "type": "Person",
+              "sort-name": "I:Cube",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "FR",
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "disambiguation": "house music"
+            }
+          }
+        ],
+        "barcode": null,
+        "packaging": null,
+        "quality": "normal"
+      }
+    ],
+    "id": "2080e06a-2ade-454a-8de4-6c39bf99807d"
+  }
+}

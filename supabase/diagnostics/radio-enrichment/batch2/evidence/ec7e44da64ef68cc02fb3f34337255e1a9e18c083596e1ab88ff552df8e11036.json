@@ -1,0 +1,247 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Day+In+The+Life+Of+A+Fool%22+AND+artist%3A%22Gene+Harris%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:04.124900+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:04.043Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "cae58994-a7ae-467c-b5c1-7d36501a4294",
+        "score": 100,
+        "artist-credit-id": "3d6b7bf0-091c-308e-bba7-a927e02982b1",
+        "title": "A Day in the Life of a Fool (Manha de Carnaval)",
+        "length": 326000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Gene Harris",
+            "artist": {
+              "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+              "name": "Gene Harris",
+              "sort-name": "Harris, Gene",
+              "aliases": [
+                {
+                  "sort-name": "Eugene Haire",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Eugene Haire",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Gene Haris",
+                  "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                  "name": "Gene Haris",
+                  "locale": null,
+                  "type": "Search hint",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Gene Harris",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Gene Harris",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1972",
+        "releases": [
+          {
+            "id": "40103d6b-9f42-4e1f-ad25-8e9d1447dfe8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "3d6b7bf0-091c-308e-bba7-a927e02982b1",
+            "count": 1,
+            "title": "The Three Sounds / Gene Harris of the Three Sounds",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Gene Harris",
+                "artist": {
+                  "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+                  "name": "Gene Harris",
+                  "sort-name": "Harris, Gene"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b33b5484-4895-4cec-8623-a5cb9e31fd7c",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Three Sounds / Gene Harris of the Three Sounds",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2012-12-04",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2012-12-04",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "31b868c8-3d2e-30ad-9d2f-988b0d3f8467",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "014af651-b2e5-4b39-b41f-e00215fc3e6a",
+                    "number": "11",
+                    "title": "A Day in the Life of a Fool (Manha de Carnaval)",
+                    "length": 329000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "8791086d-4996-48a0-8c2e-af4ab0d31a01",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "3d6b7bf0-091c-308e-bba7-a927e02982b1",
+            "count": 1,
+            "title": "Gene Harris of the Three Sounds",
+            "status": "Official",
+            "disambiguation": "black tracklist on labels",
+            "artist-credit": [
+              {
+                "name": "Gene Harris",
+                "artist": {
+                  "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+                  "name": "Gene Harris",
+                  "sort-name": "Harris, Gene"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e1b45a19-a485-4d20-9496-8ceb55daacc6",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Gene Harris of the Three Sounds",
+              "primary-type": "Album"
+            },
+            "date": "1972",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1972",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "c4c8bb6e-bf0c-3fd2-9f14-2e62a665ae1f",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "a55a835e-1c91-4403-8b57-55d10f7eccd7",
+                    "number": "A3",
+                    "title": "A Day in the Life of a Fool (Manha de Carnaval)",
+                    "length": 326000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "c58a0d83-fa42-4ccd-b092-9ef059bb9fba",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "3d6b7bf0-091c-308e-bba7-a927e02982b1",
+            "count": 1,
+            "title": "Gene Harris of the Three Sounds",
+            "status": "Official",
+            "disambiguation": "blue tracklist on labels",
+            "artist-credit": [
+              {
+                "name": "Gene Harris",
+                "artist": {
+                  "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+                  "name": "Gene Harris",
+                  "sort-name": "Harris, Gene"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e1b45a19-a485-4d20-9496-8ceb55daacc6",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Gene Harris of the Three Sounds",
+              "primary-type": "Album"
+            },
+            "date": "1972",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1972",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "a9bef3f4-813a-36fd-9185-ce31acbf6bdf",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "eb2937e2-a536-3eaa-895c-dd571bd254e2",
+                    "number": "A3",
+                    "title": "A Day in the Life of a Fool (Manha de Carnaval)",
+                    "length": 326000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

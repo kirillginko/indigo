@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/6461ad9b-b0eb-47b8-9b0b-06e643a11d15?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:14.548013+00:00",
+  "body": {
+    "video": false,
+    "title": "Fantasy",
+    "disambiguation": "part of “Throwback Grooves” DJ‐mix",
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "535afeda-2538-435d-9dd1-5e10be586774",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "Earth, Wind & Fire",
+          "type": "Group",
+          "sort-name": "Earth, Wind & Fire",
+          "country": "US",
+          "disambiguation": ""
+        },
+        "name": "Earth, Wind & Fire",
+        "joinphrase": ""
+      }
+    ],
+    "isrcs": [],
+    "releases": [
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "date": "2017-03-24",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "status": "Official",
+        "country": "GB",
+        "packaging": "Digipak",
+        "title": "Throwback: Grooves",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "name": "United Kingdom",
+              "type": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": ""
+            },
+            "date": "2017-03-24"
+          }
+        ],
+        "id": "b3979e56-b51f-43e5-92e6-d30fc2d36b68",
+        "quality": "normal",
+        "barcode": "0889854236229"
+      }
+    ],
+    "length": 218506,
+    "id": "6461ad9b-b0eb-47b8-9b0b-06e643a11d15",
+    "first-release-date": "2017-03-24"
+  }
+}

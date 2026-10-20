@@ -1,0 +1,553 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/987fc4c9-2c99-4f6c-949b-8da8019769a8?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:32.884183+00:00",
+  "body": {
+    "end-area": null,
+    "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+    "sort-name": "SALEM",
+    "name": "SALEM",
+    "type": "Group",
+    "gender-id": null,
+    "gender": null,
+    "country": "US",
+    "begin-area": {
+      "id": "7970c198-c8f3-4455-aa4d-e286a340af9a",
+      "sort-name": "Traverse City",
+      "type-id": null,
+      "type": null,
+      "name": "Traverse City",
+      "disambiguation": ""
+    },
+    "disambiguation": "US‐based electronic group",
+    "tags": [
+      {
+        "name": "chopped and screwed",
+        "count": 1
+      },
+      {
+        "name": "trap",
+        "count": 1
+      },
+      {
+        "name": "witch house",
+        "count": 2
+      }
+    ],
+    "isnis": [
+      "0000000469519249"
+    ],
+    "relations": [
+      {
+        "artist": {
+          "sort-name": "Marlatt, Heather",
+          "id": "65e24e6a-200d-424b-a62d-c165ae4eca49",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Heather Marlatt",
+          "country": "US",
+          "disambiguation": ""
+        },
+        "end": "2020",
+        "attributes": [
+          "original"
+        ],
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "ended": true,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "backward",
+        "target-credit": "",
+        "begin": "2006",
+        "source-credit": "",
+        "target-type": "artist",
+        "type": "member of band"
+      },
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "begin": "2006",
+        "target-type": "artist",
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "ended": false,
+        "target-credit": "",
+        "direction": "backward",
+        "artist": {
+          "type": "Person",
+          "name": "Jack Donoghue",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "811be483-2e29-4ce5-ba8d-4db1e5ef240f",
+          "sort-name": "Donoghue, Jack",
+          "disambiguation": "",
+          "country": "US"
+        },
+        "end": null,
+        "attributes": [
+          "original"
+        ]
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": false,
+        "direction": "backward",
+        "target-credit": "",
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "attributes": [
+          "original"
+        ],
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "John Holland",
+          "type": "Person",
+          "id": "026e512d-6e44-4cb6-9710-36d1a586212e",
+          "sort-name": "Holland, John",
+          "disambiguation": "US electronic producer (Salem)",
+          "country": "US"
+        },
+        "end": null,
+        "type": "member of band",
+        "target-type": "artist",
+        "source-credit": "",
+        "begin": "2006"
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "allmusic",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0002540652",
+          "id": "0e8a1a4c-974a-4814-bdbb-be0ea510a5c5"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846"
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "39e8a01e-9f57-4a2e-b948-51ed7bee5156",
+          "resource": "https://s4lem.bandcamp.com/"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "attributes": [],
+        "type": "bandcamp",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "discogs",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "540f2122-a367-4ad4-9bfd-3e4ad0782c8e",
+          "resource": "https://www.discogs.com/artist/1300441"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "ended": false
+      },
+      {
+        "type": "free streaming",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://open.spotify.com/artist/09CJcG6ndtL82D8x9VxaeT",
+          "id": "d67098da-3a6a-491c-a15f-38fe74d98fef"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "81973e45-eb38-4a39-be11-a21618c78751",
+          "resource": "https://www.deezer.com/artist/8669076"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "end": null,
+        "attributes": [],
+        "type": "free streaming",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "type": "interview",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "1f171391-1f98-4f45-b191-038ec3b12395",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.factmag.com/2009/01/01/new-talent-salem/",
+          "id": "793ed758-05a4-4990-8485-5dfe15ea6860"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "type": "myspace",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://myspace.com/s4lem",
+          "id": "d6b37249-8df3-47ff-adb8-00b336e5793c"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "url": {
+          "id": "2dab09ea-fe84-4bf1-9cb8-dbeedb1cd5c1",
+          "resource": "https://www.s4lem.com/"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": [],
+        "type": "official homepage",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "b74c58f5-cee8-4b57-ba6e-23d8c974f767",
+          "resource": "https://rateyourmusic.com/artist/salem-1"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "attributes": [],
+        "type": "other databases",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-ids": {},
+        "url": {
+          "id": "e622e32b-0e0b-49d1-8a70-d51dcc7f57b6",
+          "resource": "https://music.apple.com/us/artist/1772912183"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "purchase for download",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-ids": {},
+        "url": {
+          "id": "4ec72d45-ad31-44b8-a140-4b862cbb5432",
+          "resource": "https://open.qobuz.com/artist/412255"
+        },
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "purchase for download"
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "2cad7432-bafb-4c6a-af12-60f544b33273",
+          "resource": "https://www.facebook.com/SALEMGROUP"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "social network"
+      },
+      {
+        "type": "social network",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.instagram.com/s4lem/",
+          "id": "134b29df-58df-48d7-8e2f-c436c51e99a8"
+        },
+        "attribute-ids": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://soundcloud.com/salem-official",
+          "id": "c4faf840-dc4a-4c55-8193-1ceb197572b0"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "soundcloud"
+      },
+      {
+        "type": "streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "resource": "https://music.apple.com/us/artist/1772912183",
+          "id": "e622e32b-0e0b-49d1-8a70-d51dcc7f57b6"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://open.qobuz.com/artist/412255",
+          "id": "4ec72d45-ad31-44b8-a140-4b862cbb5432"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "9e5dfab4-da5d-4714-b95a-8bdf9f098185",
+          "resource": "https://tidal.com/artist/3557944"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "streaming",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "fd272273-fa25-4801-b25f-fdb2fe0ecb74",
+          "resource": "https://tidal.com/artist/8836338"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "streaming"
+      },
+      {
+        "type": "video channel",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "456bdef5-0389-4cf7-903b-951cb187b8ba",
+          "resource": "https://vimeo.com/salem"
+        },
+        "attribute-ids": {},
+        "type-id": "d86c9450-b6d0-4760-a275-e7547495b48b",
+        "attribute-values": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "wikidata",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q3469687",
+          "id": "99e4cee4-29fb-4cb3-97f5-960a9db859e9"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "youtube",
+        "attributes": [],
+        "end": null,
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.youtube.com/channel/UCpcDBJDu1q_H8pNGBZgbImw",
+          "id": "48ea4040-36fe-404b-89ef-a247d547ef2f"
+        }
+      }
+    ],
+    "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+    "area": {
+      "disambiguation": "",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "sort-name": "United States",
+      "name": "United States",
+      "type": null,
+      "type-id": null
+    },
+    "genres": [
+      {
+        "disambiguation": "",
+        "name": "chopped and screwed",
+        "id": "8a2e8d9c-3402-4e83-b35d-a23e8016461a",
+        "count": 1
+      },
+      {
+        "name": "trap",
+        "disambiguation": "",
+        "id": "9a339aa8-a0e5-450c-95a7-b11517bb508f",
+        "count": 1
+      },
+      {
+        "disambiguation": "",
+        "name": "witch house",
+        "count": 2,
+        "id": "34ec5538-a91a-454f-b500-18253bb45c20"
+      }
+    ],
+    "aliases": [
+      {
+        "begin": null,
+        "locale": null,
+        "end": null,
+        "type-id": null,
+        "ended": false,
+        "type": null,
+        "name": "S4LEM",
+        "primary": null,
+        "sort-name": "S4LEM"
+      }
+    ],
+    "ipis": [],
+    "life-span": {
+      "ended": false,
+      "end": null,
+      "begin": "2006"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/0764a4f5-7665-46c9-967c-f75e9b2dff1e?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:04.601571+00:00",
+  "body": {
+    "video": false,
+    "title": "Rustic Raver",
+    "isrcs": [],
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+          "type": "Person",
+          "name": "Squarepusher",
+          "sort-name": "Squarepusher",
+          "country": "GB",
+          "disambiguation": ""
+        },
+        "joinphrase": "",
+        "name": "Squarepusher"
+      }
+    ],
+    "disambiguation": "",
+    "id": "0764a4f5-7665-46c9-967c-f75e9b2dff1e",
+    "releases": [
+      {
+        "disambiguation": "",
+        "title": "State of the Art, Volume 5",
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "1997",
+            "area": {
+              "sort-name": "Netherlands",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "NL"
+              ],
+              "type-id": null,
+              "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+              "type": null,
+              "name": "Netherlands"
+            }
+          }
+        ],
+        "id": "fcc2b9d2-2fdd-4b33-9d82-6dd7697f434b",
+        "barcode": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other"
+            }
+          }
+        ],
+        "date": "1997",
+        "packaging": null,
+        "country": "NL",
+        "packaging-id": null,
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ],
+    "length": 386000,
+    "first-release-date": "1997"
+  }
+}

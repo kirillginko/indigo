@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F20560&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:08.806288+00:00",
+  "body": {
+    "resource": "https://www.discogs.com/artist/20560",
+    "id": "5e35492b-c1fa-46ab-a34a-75979b1095a3",
+    "relations": [
+      {
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "direction": "backward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "artist": {
+          "sort-name": "Dibango, Manu",
+          "country": "CM",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "",
+          "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+          "type": "Person",
+          "name": "Manu Dibango"
+        },
+        "ended": false,
+        "type": "discogs",
+        "attribute-values": {}
+      }
+    ]
+  }
+}

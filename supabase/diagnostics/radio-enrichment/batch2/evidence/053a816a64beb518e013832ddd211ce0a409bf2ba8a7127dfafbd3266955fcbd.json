@@ -1,0 +1,127 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/005a6a39-749e-4254-abd7-e50e4f106c9c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:40.818879+00:00",
+  "body": {
+    "length": 245480,
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Gemini",
+          "type": "Person",
+          "name": "Gemini",
+          "id": "385d09fa-1866-408c-8d15-9c7324494463",
+          "disambiguation": "Spencer Kincy, Chicago house producer",
+          "country": "US"
+        },
+        "joinphrase": "",
+        "name": "Gemini"
+      }
+    ],
+    "first-release-date": "1994",
+    "title": "Your Place or Mine",
+    "isrcs": [],
+    "releases": [
+      {
+        "quality": "normal",
+        "barcode": "765257071011",
+        "packaging": null,
+        "artist-credit": [
+          {
+            "name": "Gemini",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Gemini",
+              "type": "Person",
+              "disambiguation": "Spencer Kincy, Chicago house producer",
+              "name": "Gemini",
+              "id": "385d09fa-1866-408c-8d15-9c7324494463",
+              "country": "US"
+            }
+          }
+        ],
+        "title": "U Know How I Feel",
+        "id": "214c1765-8123-49a4-8d79-4df96684f08f",
+        "date": "1994",
+        "release-events": [
+          {
+            "date": "1994",
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States"
+            }
+          }
+        ],
+        "status": "Official",
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "country": "US"
+      },
+      {
+        "id": "2d6235bc-1e88-4796-9b49-45e0c63c14fb",
+        "date": "2018-03-30",
+        "release-events": [
+          {
+            "date": "2018-03-30",
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type": null,
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "quality": "normal",
+        "barcode": null,
+        "packaging": "None",
+        "artist-credit": [
+          {
+            "name": "Gemini",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "sort-name": "Gemini",
+              "id": "385d09fa-1866-408c-8d15-9c7324494463",
+              "name": "Gemini",
+              "disambiguation": "Spencer Kincy, Chicago house producer",
+              "country": "US"
+            }
+          }
+        ],
+        "title": "The Beginning",
+        "disambiguation": "anthology/remastered",
+        "country": "XW",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      }
+    ],
+    "id": "005a6a39-749e-4254-abd7-e50e4f106c9c",
+    "video": false,
+    "disambiguation": ""
+  }
+}

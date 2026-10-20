@@ -1,0 +1,4534 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Adore%22+AND+artist%3A%22I+Cube%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:29.981592+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:29.796Z",
+    "count": 26,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "0bd6950b-71e2-40a0-8dd0-e44897bdbc45",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 309146,
+        "disambiguation": "part of “Hôtel Costes: Best of…” DJ-mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2004-12-06",
+        "releases": [
+          {
+            "id": "7d7a417d-dbc0-498c-808e-6c5b2c49ccc1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes: Best of...",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "16b9cdb4-1219-3bde-b538-b33fbf5d0626",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes: Best of…",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2004",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2004",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "05740bfc-37a5-3d21-be1f-2863500b4fae",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "40b888e3-5879-40af-ab0d-41691adbf806",
+                    "number": "4",
+                    "title": "Adore",
+                    "length": 309146
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "4d9944f8-b19b-43c8-86d8-c7ad8beb4fd7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes: Best of…",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "16b9cdb4-1219-3bde-b538-b33fbf5d0626",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes: Best of…",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2004-12-06",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2004-12-06",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "24da1506-6ec5-3a8e-bc3e-4154d33d53f7",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1f9496f9-18fd-36ab-8690-b83976ad9c64",
+                    "number": "4",
+                    "title": "Adore",
+                    "length": 309146
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "ef542962-92a0-468b-96f8-7f63057ef3f2",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes: Best of…",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "16b9cdb4-1219-3bde-b538-b33fbf5d0626",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes: Best of…",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2004-12-11",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2004-12-11",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "c0543524-776e-314d-a745-9c433b0c3843",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a65f0622-77a4-409e-9c4b-06c5b7bec999",
+                    "number": "4",
+                    "title": "Adore",
+                    "length": 309146
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR08Q9900056"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "downtempo"
+          },
+          {
+            "count": 1,
+            "name": "chillout"
+          },
+          {
+            "count": 1,
+            "name": "ambient"
+          },
+          {
+            "count": 1,
+            "name": "dance"
+          },
+          {
+            "count": 1,
+            "name": "house"
+          },
+          {
+            "count": 1,
+            "name": "edm"
+          },
+          {
+            "count": 2,
+            "name": "electronica dance"
+          }
+        ]
+      },
+      {
+        "id": "3968aefd-3769-43f5-b5c6-c561b30050ea",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1999",
+        "releases": [
+          {
+            "id": "8cd55b2b-0c51-4a2f-90de-eac6a8d102e7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+            "count": 1,
+            "title": "Tropiq",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "I:Cube",
+                "artist": {
+                  "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                  "name": "I:Cube",
+                  "sort-name": "I:Cube",
+                  "disambiguation": "house music"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "adafff4b-0894-3a95-b146-73ce7d83e760",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Tropiq",
+              "primary-type": "EP"
+            },
+            "date": "1999",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "602da02e-f474-3b2e-a253-7d21cf97ce9b",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "125642da-d72d-3701-af9f-66f7e59b84ce",
+                    "number": "A2",
+                    "title": "Adore"
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "40e9dc6a-26dc-416e-a236-3cf0040dd5b4",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 269000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2010-05-31",
+        "releases": [
+          {
+            "id": "91ca5418-cd08-4e18-b66d-cec1ccd0e497",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 6,
+            "title": "Best of Lounge Music",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a0fdf57b-395d-4e50-8ea4-97ea8d271785",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Best of Lounge Music",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2010-05-31",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2010-05-31",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 120,
+            "media": [
+              {
+                "id": "526aa475-17df-35d1-bcc5-11500c4cfd66",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "66b357c6-bfa0-305b-a19f-1be40591130a",
+                    "number": "1",
+                    "title": "Adore",
+                    "length": 269000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "caf36e11-0c5f-49c2-b8e4-d39684b3b613",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 320960,
+        "disambiguation": "part of a “Hôtel Costes, Volume 2: La Suite” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1999",
+        "releases": [
+          {
+            "id": "00bf7801-080e-4dba-8679-32ce2bb026a1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes, Volume 2: La Suite",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1999",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "a0600457-f859-4fe8-a529-969543ae9e9f",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e8bf215c-4f61-42dc-b10a-7ba5d929131f",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320960
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "7d4a6759-22e9-4019-a060-eeb882cf7b34",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 10,
+            "title": "Hôtel Costes: 1999–2007, The Anniversary Boxset",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cddfbf34-37a6-41b3-b60e-c8c3bd6a3495",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes: 1999–2007, The Anniversary Boxset",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2007",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2007",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 151,
+            "media": [
+              {
+                "id": "e67c8c6b-adf1-3e8c-bad3-21aa5cf2b6f0",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "20fcb9ee-cc55-314a-8fdc-342ecdcacea7",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320973
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "e0b0623e-a9ca-42b0-be88-f2c65a58284d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes, Volume 2: La Suite",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 16,
+            "media": [
+              {
+                "id": "7ecd6510-ccaa-3a03-bfc4-d733e83b1589",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "769de60a-d2a7-4b04-a610-3ada00d6e779",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320960
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "cde3ae2d-0770-4475-a677-9c80f3cfaf34",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes, Volume 2: La Suite",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1999",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "89981bdf-daa1-3606-ab02-c0d48db6736c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5de3a132-5636-4fa1-a2b4-2600e3d81adf",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320973
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "083c8051-8b56-4213-8a5a-58ef9224a0c7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes, Volume 2: La Suite",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1999",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "c86122f4-f6d7-3737-a408-529952ea965f",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4f481e89-4bcb-3d24-bdf3-666bce8e69cc",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320960
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "9639d8d3-dce5-367c-9c6e-93d6af847ed6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes, Volume 2: La Suite",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1999",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "c7505bcb-02dd-35d6-9e9b-3d4cf7e414dd",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1d14e1f6-5e9f-37ba-8b18-01bcc5ce0beb",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320973
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "003fe17f-4493-47ba-83a5-766548f53179",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes, Volume 2: La Suite",
+            "status": "Official",
+            "disambiguation": "made in France by Universal M & L",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1999",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "0efcd9bf-b2d6-4da1-afeb-f36620c03c46",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "fc2b6cd1-5cf5-423e-86ad-46d153ea12d0",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320960
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 6
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR08Q9900056"
+        ],
+        "tags": [
+          {
+            "count": 4,
+            "name": "electronic"
+          },
+          {
+            "count": 3,
+            "name": "downtempo"
+          },
+          {
+            "count": 1,
+            "name": "chillout"
+          },
+          {
+            "count": 2,
+            "name": "ambient"
+          },
+          {
+            "count": 1,
+            "name": "dance"
+          },
+          {
+            "count": 2,
+            "name": "house"
+          },
+          {
+            "count": 3,
+            "name": "deep house"
+          },
+          {
+            "count": 1,
+            "name": "disco"
+          },
+          {
+            "count": 1,
+            "name": "trip hop"
+          },
+          {
+            "count": 1,
+            "name": "club"
+          },
+          {
+            "count": 1,
+            "name": "future jazz"
+          },
+          {
+            "count": 1,
+            "name": "jazzdance"
+          }
+        ]
+      },
+      {
+        "id": "6f5f05eb-9b92-4291-b1d4-0b72df505f39",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 393733,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003-07-11",
+        "releases": [
+          {
+            "id": "39f00bcb-8317-4856-8687-d21dd8f14255",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Sex Lounge 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "107306e1-69e2-39c6-a27b-af3e32e791d1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sex Lounge 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2003-07-11",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2003-07-11",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "ebb99eda-d0a9-34cb-9da2-fd226ac9eb2b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "05881422-e00e-3bf0-a7ad-72db838acd7d",
+                    "number": "13",
+                    "title": "Adore",
+                    "length": 393733
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 12
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "relaxed"
+          },
+          {
+            "count": 1,
+            "name": "dancehall"
+          }
+        ]
+      },
+      {
+        "id": "0bd655b2-22c6-433b-8b06-113be8ac4744",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 332480,
+        "disambiguation": "part of “Hôtel Costes: A Decade 1999–2009” DJ-mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2009-11-16",
+        "releases": [
+          {
+            "id": "01a3e083-2096-4f4a-9c3c-c49401ad4230",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 2,
+            "title": "Hôtel Costes: A Decade 1999–2009",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3ec9aca5-5a1d-4f64-8ba0-8919db11a033",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes: A Decade 1999–2009",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2009-11-16",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2009-11-16",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "e9712137-baf2-3337-8917-1708d13fd4f6",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "0d58f3e5-0e71-4c27-af7c-617ddcc91574",
+                    "number": "1",
+                    "title": "Adore",
+                    "length": 332480
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "6b3fa94b-f33b-4759-bd3f-e97cddf07e9d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes: A Decade 1999-2009",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3ec9aca5-5a1d-4f64-8ba0-8919db11a033",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes: A Decade 1999–2009",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 30,
+            "media": [
+              {
+                "id": "530fe679-6c08-38fa-b716-da76f4eb73e8",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "f36343d6-ac9a-443e-86e5-16453db8cf64",
+                    "number": "1",
+                    "title": "Adore",
+                    "length": 332480
+                  }
+                ],
+                "track-count": 30,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR08Q9900056"
+        ]
+      },
+      {
+        "id": "3ad37e87-baa5-4a52-a0ae-3ef694e14d6a",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 416866,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003-09-26",
+        "releases": [
+          {
+            "id": "bd08e532-2d03-48e8-b712-d2b572168150",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Versatile Past-Present-Future",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "119153ef-52d6-485f-a48d-9b3bf0dfba79",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Versatile Past-Present-Future",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2003-09-26",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2003-09-26",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "8555c6b2-0e0f-34c0-a450-f7b1fa280849",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d9bbc38c-c766-4acc-af53-c62f35acfa71",
+                    "number": "11",
+                    "title": "Adore",
+                    "length": 416866
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "51c8fe12-03e1-48c1-b2ec-f8bdeae6a1ff",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Versatile 15 Ans",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "844bb663-ce47-4083-a06f-d46ec4ec21b6",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Versatile 15 Ans",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2011-11-11",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2011-11-11",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "8d846743-970f-3cb6-9b6c-972ad53c5778",
+                "position": 1,
+                "track": [
+                  {
+                    "id": "4d50ebe5-1003-45ae-a8f1-f842ec40c06a",
+                    "number": "11",
+                    "title": "Adore",
+                    "length": 417000
+                  }
+                ],
+                "track-count": 21,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "355de142-a9bf-408a-bb31-6e2ddbc6d311",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002-09-24",
+        "releases": [
+          {
+            "id": "5c67bd3a-aaf8-49f3-8c95-351f55a35fdc",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Dream Therapy",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0e5c2da7-7db3-4a40-8e3e-adf7056ec537",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Dream Therapy",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2002-09-24",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2002-09-24",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "dbd4d1f3-309b-3be7-991e-393752892486",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3b5781a5-3068-405a-9b9b-9c2a8b0fe949",
+                    "number": "7",
+                    "title": "Adore"
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9d2d75c5-b882-4723-a25d-9c50480c87f2",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 320986,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1999-11-16",
+        "releases": [
+          {
+            "id": "579f8a38-dc43-442c-add8-d6fefc7aea3c",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "a4cb7a9a-ca72-34e8-b398-9213969aa130",
+            "count": 1,
+            "title": "Hôtel Costes 2 La Suite",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Stéphane Pompougnac",
+                "artist": {
+                  "id": "11bf566b-a73e-4e8c-ba82-83fdcddd0aed",
+                  "name": "Stéphane Pompougnac",
+                  "sort-name": "Pompougnac, Stéphane"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "931fed80-9231-3de9-8dc5-00cc9d6d9268",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hôtel Costes, Volume 2: La Suite",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1999-11-16",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999-11-16",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "3ac55f32-1eb6-369c-9efb-f2f5a77c10ed",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "8a2cf1c6-e615-4e82-b173-c5a212e4b0a6",
+                    "number": "7",
+                    "title": "Adore",
+                    "length": 320986
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "7caead76-697c-4856-af63-0f2b4f5c3636",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 379306,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002-07-09",
+        "releases": [
+          {
+            "id": "c21f8548-a797-4c9a-9637-1493c0ba266b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "016769ef-1a7a-37b4-b9e0-bb39ed7bff5d",
+            "count": 1,
+            "title": "King Britt Presents Scuba: Hidden Treasures",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Scuba",
+                "artist": {
+                  "id": "f6c2ccc9-9f52-4fa7-8aeb-de75b6f6ff63",
+                  "name": "Scuba",
+                  "sort-name": "Scuba",
+                  "disambiguation": "alias of DJ King Britt (Digable Planets)"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "977cdbbf-b337-372d-8fe6-b8ebe9619899",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "King Britt Presents Scuba: Hidden Treasures",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2002-07-09",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2002-07-09",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "cd872d45-9896-3580-9a8d-f40330bd9e10",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c082c0e1-18da-34d9-8f6e-17625ca271db",
+                    "number": "9",
+                    "title": "Adore",
+                    "length": 379306
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "df962aa8-691d-49ee-aa1c-d19c6822a2b8",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 406000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-11-03",
+        "releases": [
+          {
+            "id": "c7437715-57c1-4187-a417-c5ba59b069f4",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "French Touch, Volume 01: Electronic Music Made in France",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b8ca9cfd-efbc-4cb8-98ef-05ac0cfb2726",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "French Touch, Volume 01: Electronic Music Made in France",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014-11-03",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-11-03",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 60,
+            "media": [
+              {
+                "id": "04b275db-837d-4b82-80e4-c342441a2b2d",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "11e8bf80-ceb1-44dd-af05-406fb3a6daa8",
+                    "number": "32",
+                    "title": "Adore",
+                    "length": 406467
+                  }
+                ],
+                "track-count": 60,
+                "track-offset": 31
+              }
+            ]
+          },
+          {
+            "id": "7c4d8dc2-cec9-4a83-ab25-a223d2353932",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "French Touch, Volume 01: Electronic Music Made in France",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b8ca9cfd-efbc-4cb8-98ef-05ac0cfb2726",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "French Touch, Volume 01: Electronic Music Made in France",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014-11-03",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2014-11-03",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 67,
+            "media": [
+              {
+                "id": "c4b5211e-06e5-3235-b49a-ffc2b7de2342",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d7313998-769e-4521-886f-aa2940b6f136",
+                    "number": "16",
+                    "title": "Adore",
+                    "length": 406000
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 15
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR08Q9900056"
+        ]
+      },
+      {
+        "id": "dc22546d-02b9-4741-8c95-57c4589c6868",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 567280,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "releases": [
+          {
+            "id": "0aa33aff-6c02-41c0-ade8-9bff5ea92a55",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Sonido Horizontal",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "88646671-1df0-3240-9d8b-82c0dee9283b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Sonido Horizontal",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 13,
+            "media": [
+              {
+                "id": "2081598c-c521-3902-b071-0196cdc9d210",
+                "position": 1,
+                "track": [
+                  {
+                    "id": "027f1b69-d0c1-3fc4-928e-681cfdf8ea8b",
+                    "number": "13",
+                    "title": "Adore",
+                    "length": 567280
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 12
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "25f32d2d-1876-4f87-90bc-bfc7a414c098",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 412306,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000-06-11",
+        "releases": [
+          {
+            "id": "a1b8a94a-f158-4a72-bd8e-e36758dfe0e7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Afterdark: Paris",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a1a94451-c4e7-3a56-bd82-49b86734e4bf",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Afterdark: Paris",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2005",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2005",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 23,
+            "media": [
+              {
+                "id": "95ef441c-7b76-35fa-963e-8f010b69d515",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "77f175e7-808f-33ed-a221-abc68e0a1da3",
+                    "number": "13",
+                    "title": "Adore",
+                    "length": 415080
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 12
+              }
+            ]
+          },
+          {
+            "id": "7fa5ac24-ac01-43a4-834d-f1b413b51efc",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Elegant Lounge, Vol. 15",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b0fbb646-2121-4d8e-a6ce-bbc63782dd12",
+              "type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "primary-type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "title": "Elegant Lounge, Vol. 15",
+              "primary-type": "Other",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 50,
+            "media": [
+              {
+                "id": "0e686c26-596b-30cc-a8f8-8e972fc6abec",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "a621de21-b2c5-43a6-b52c-7f6d8779651d",
+                    "number": "26",
+                    "title": "Adore",
+                    "length": 408673
+                  }
+                ],
+                "track-count": 50,
+                "track-offset": 25
+              }
+            ]
+          },
+          {
+            "id": "a6694394-6918-4764-a2d0-27bf6b00fa14",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "Lounge Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a0eb44a0-6f4c-3fc3-91c5-f15b3c441d8d",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lounge Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2007-10-08",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2007-10-08",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 60,
+            "media": [
+              {
+                "id": "c45652f0-4b26-39e3-ad2b-71d6b78c9a95",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9f8fb325-c1b4-3f26-ba6a-49cd99389cea",
+                    "number": "4",
+                    "title": "Adore",
+                    "length": 409000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "7333e1c8-0313-44dc-a391-e3bffcfd3b32",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "Lounge Music: The Must Have Selection – Paris, Vol.2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d9545cbe-7012-4e67-a441-916129a0b7b6",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lounge Music: The Must Have Selection – Paris, Vol.2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2015",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2015",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 50,
+            "media": [
+              {
+                "id": "096244ec-7cf7-382f-85c4-2769941c6a6b",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "11c1761a-c908-49af-ab66-b0c87a4777ef",
+                    "number": "10",
+                    "title": "Adore",
+                    "length": 407986
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 9
+              }
+            ]
+          },
+          {
+            "id": "e0a4ed33-22dd-4103-8499-b26aed37b23e",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Lounge.Mp3",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ebc8ddd3-0929-3f07-ae16-c463dfa96298",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lounge.Mp3",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2007-12-07",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2007-12-07",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 34,
+            "media": [
+              {
+                "id": "cb5c3e10-ca31-3650-8877-dbf3c9a1ae2a",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d66cf764-3694-3f90-998e-97ee170ee6e0",
+                    "number": "1",
+                    "title": "Adore",
+                    "length": 408840
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "7a47eee1-a1d3-4231-9494-23230204e1ad",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Le Big Sloppy Kiss",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f72da9ee-44a0-3c5a-baba-01767032a72a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Le Big Sloppy Kiss",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000",
+            "country": "NO",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "6743d351-6f37-3049-9724-5041161fff4d",
+                  "name": "Norway",
+                  "sort-name": "Norway",
+                  "iso-3166-1-codes": [
+                    "NO"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "054569f8-a55a-31e6-821a-635dd39debac",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1f9c45c5-de47-3098-a928-55d58d3e62eb",
+                    "number": "6",
+                    "title": "Adore",
+                    "length": 414280
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "522f57f6-2e92-4925-90d6-ad4139f09670",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 25,
+            "title": "25 ans de Radio Nova",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "35b99f5b-c895-38da-a21c-2df28a2327a3",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "25 ans de Radio Nova",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-12-04",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2006-12-04",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 289,
+            "media": [
+              {
+                "id": "0d865a1b-7a7e-36a2-9c98-763753a54058",
+                "position": 20,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "702607b6-c9bb-39a2-bbc5-041d5a40a7b1",
+                    "number": "8",
+                    "title": "Adore",
+                    "length": 414213
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "212de9f8-1154-323d-a046-e00a9d813958",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "City Lounge",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3b0cec92-8e12-324e-b1f8-2e3aa3487c02",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "City Lounge",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2005-05-09",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2005-05-09",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              },
+              {
+                "date": "2005-07-25",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 60,
+            "media": [
+              {
+                "id": "a4b3a3f7-9d71-3ec6-952a-93077545682b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9d0780eb-a561-376a-a899-1dfa0344ef9d",
+                    "number": "5",
+                    "title": "Adore",
+                    "length": 412040
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "a0af59f4-37d1-49df-a55c-75267498ede8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "Trip-Hop: The Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "92a95a71-2885-4067-b0d4-c609f5ee63d3",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Trip-Hop: The Best Of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2012",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2012",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 50,
+            "media": [
+              {
+                "id": "0ec70eab-9151-39c0-b97c-e2f3a98a2021",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3cb19f21-5987-3afc-bb85-194268cad105",
+                    "number": "5",
+                    "title": "Adore",
+                    "length": 414000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "37d584b6-a431-455c-a311-ed35f455ff76",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Mandarin: Chinese Chilling Thrills",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "79d62273-d501-3612-907f-080ace29e03a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Mandarin: Chinese Chilling Thrills",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000-06-11",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2000-06-11",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "54a036df-de0b-38c9-9119-762e9d81d13b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f741f2de-fa0d-308c-9e82-3e6e7e69fa59",
+                    "number": "8",
+                    "title": "Adore",
+                    "length": 412306
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "0c6370d3-dbb8-44b8-ba54-a4273baa972a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "The Late Lounge",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "231f63b7-547b-3dca-bedc-e7dea8e01ce8",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Late Lounge",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2002-01-28",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2002-01-28",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 31,
+            "media": [
+              {
+                "id": "d01d1770-b3ec-360b-aae0-5a4ad27703a7",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5e4d72d1-6b7f-3db9-a470-a356984972b6",
+                    "number": "13",
+                    "title": "Adore",
+                    "length": 409800
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 12
+              }
+            ]
+          },
+          {
+            "id": "aa2cb0a9-5f60-44f1-aa36-9fc7d7ff0ddf",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Hi-Fidelity Lounge, Volume Two: Licensed to Chill",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfe51f4d-2f63-3311-8ece-a760fff5e1a7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Hi-Fidelity Lounge, Volume Two: Licensed to Chill",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000-11-14",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2000-11-14",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "415176ae-8d89-3712-981f-746b1ae4ddb2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "15df65b3-55db-332f-9101-fa87ae19ddff",
+                    "number": "4",
+                    "title": "Adore",
+                    "length": 414266
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "57d4dc9a-7bd3-489a-85bc-c4fb2b9f2085",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "Trip Hop Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6de60b4f-980a-38a8-9823-9ec8d004fae1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Trip Hop Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-06-26",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2006-06-26",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 60,
+            "media": [
+              {
+                "id": "f41f7242-c3b5-3eda-87c8-7018a8806214",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e9f88bc6-a9c2-34c3-a402-2564dad022ab",
+                    "number": "12",
+                    "title": "Adore",
+                    "length": 415000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 11
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 2,
+            "name": "electronic"
+          },
+          {
+            "count": 2,
+            "name": "downtempo"
+          },
+          {
+            "count": 1,
+            "name": "chillout"
+          },
+          {
+            "count": 1,
+            "name": "ambient"
+          },
+          {
+            "count": 1,
+            "name": "trip hop"
+          }
+        ]
+      },
+      {
+        "id": "ebf2e2ff-fa36-4ec9-8afa-d127f940865b",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 422200,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1999",
+        "releases": [
+          {
+            "id": "99677fc2-236c-4467-91a9-7d6a4a9f6273",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+            "count": 1,
+            "title": "Adore",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "I:Cube",
+                "artist": {
+                  "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                  "name": "I:Cube",
+                  "sort-name": "I:Cube",
+                  "disambiguation": "house music"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "82c7d356-27d3-34e9-a6fc-b5d6090abb1c",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Adore",
+              "primary-type": "Album"
+            },
+            "date": "1999",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1999",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "cd9ee76d-9045-38ed-8c8f-3787479a48d3",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d59c2bb2-2aff-32d8-9b5b-3eb3651e33ab",
+                    "number": "1",
+                    "title": "Adore",
+                    "length": 422200
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "3ce1c224-44f5-4d92-a737-56f7208f33cd",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Lead With the Bass Club 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c2132b72-68cd-3aa4-943a-541c2d0f2b90",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lead With the Bass Club 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "0afaf862-86df-3fd9-962c-7065067d2442",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "76108d05-cf24-3eca-bde1-c4eb9898fcf8",
+                    "number": "3",
+                    "title": "Adore",
+                    "length": 424200
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cd0e11a6-2468-4a78-99ac-0ab765486198",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 232000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2013",
+        "releases": [
+          {
+            "id": "ff3a042f-6aa3-4ae2-a2ce-0e6e71acd88d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "Lounge Classics",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cd6f7bff-6e10-492f-888f-480f9ea95aa2",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lounge Classics",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2013",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 50,
+            "media": [
+              {
+                "id": "f3e79d9e-a20f-32db-b022-5d093d8d2a2f",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "116b0ba3-7f8b-49b8-a810-96a60487ffa8",
+                    "number": "6",
+                    "title": "Adore",
+                    "length": 232000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "71965085-5902-45e4-8652-4b0ce6d1c1c0",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 377200,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2001-09-17",
+        "releases": [
+          {
+            "id": "cad8a8fe-a646-4363-86d2-d109d8399988",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Café Ibiza, Volume 5",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b9be6bd6-4dc7-3f1e-991a-97c801ff825f",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Café Ibiza, Volume 5",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2001-09-17",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2001-09-17",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 29,
+            "media": [
+              {
+                "id": "96e6a183-3eb3-3020-9e53-8716cec0ddae",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "39d65ac1-5c93-397e-8f9d-dd6413fd3b47",
+                    "number": "8",
+                    "title": "Adore",
+                    "length": 377200
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ef066ac3-cc74-4d89-acbe-be07356deb21",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 302000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2012-03-13",
+        "releases": [
+          {
+            "id": "5ecd9b46-b071-4033-ab31-ebdc64d6b28b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 5,
+            "title": "Lounge Anthology",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b45e49fe-9c38-4cbd-9f29-24071f0f02c9",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lounge Anthology",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2012-03-13",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2012-03-13",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 100,
+            "media": [
+              {
+                "id": "b7536843-d90a-3732-8672-88a28069af5f",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "35029119-fc62-4f99-9ec3-a355452a0809",
+                    "number": "10",
+                    "title": "Adore",
+                    "length": 302000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 9
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR6F31221330"
+        ]
+      },
+      {
+        "id": "456eaa5e-ff0a-46e4-b6fc-34c55ab4768f",
+        "score": 100,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore",
+        "length": 407000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2013-10-14",
+        "releases": [
+          {
+            "id": "2190210f-0a9f-41ea-8750-d1c8ca0b8fd5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "City Lounge, The Best Of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b992ec27-4dc4-4268-8e22-059c6b2f7599",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "City Lounge: The Best of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013-10-14",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2013-10-14",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 58,
+            "media": [
+              {
+                "id": "3da4a09b-5fe9-32e9-8e78-8369dd47d448",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "c4b63f55-1a18-4a14-9b6c-83b5b5400d50",
+                    "number": "11",
+                    "title": "Adore",
+                    "length": 407000
+                  }
+                ],
+                "track-count": 58,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "d0f4547f-c75b-41b9-9b1f-c0dd1406d823",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 4,
+            "title": "City Lounge: The Best of",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b992ec27-4dc4-4268-8e22-059c6b2f7599",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "City Lounge: The Best of",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2013-10",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2013-10",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 60,
+            "media": [
+              {
+                "id": "7437fad4-2669-33a2-a2c9-3b727fb388e3",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "df86446a-fca5-4e18-8e60-f728295b0f31",
+                    "number": "11",
+                    "title": "Adore",
+                    "length": 407000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 10
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR6F31374380"
+        ]
+      },
+      {
+        "id": "16478b9a-edb1-42b6-b1ef-448b0cb00e09",
+        "score": 89,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (P'taah remix)",
+        "length": 395000,
+        "disambiguation": "part of “Shibuya Flavas” DJ-mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000-08-23",
+        "releases": [
+          {
+            "id": "a7e5b365-a0e9-4d15-a9c8-2c564c08fcec",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Shibuya Flavas",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "520da6e4-452b-3600-8934-e7672a83ce4c",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Shibuya Flavas",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2000-08-23",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2000-08-23",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "503375ac-2296-3965-93e3-13cf06030559",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "0cdf4097-e5fe-306f-8c7a-2367f9db503f",
+                    "number": "12",
+                    "title": "Adore (P'taah remix)",
+                    "length": 395000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 11
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e15c4e54-965c-48a6-b4c0-5275d730e2fb",
+        "score": 85,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (remix by P'Taah)",
+        "length": 444000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000",
+        "releases": [
+          {
+            "id": "bf768b65-2f33-407f-b840-722a40c7c02e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+            "count": 1,
+            "title": "Remixes:1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "I:Cube",
+                "artist": {
+                  "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                  "name": "I:Cube",
+                  "sort-name": "I:Cube",
+                  "disambiguation": "house music"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "3c3f5927-6a2f-3272-a8af-9c9f8a3571a4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Remixes:1",
+              "primary-type": "EP",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2000",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "19f3a126-5464-3394-a087-0d71ef042965",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "d2350198-74f3-340b-b351-f92ff2f09739",
+                    "number": "A",
+                    "title": "Adore (remix by P'Taah)",
+                    "length": 444000
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR08Q0000095"
+        ]
+      },
+      {
+        "id": "2c4d4a1b-478c-4052-b9ab-a6a1b3498621",
+        "score": 82,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (King Britt's Scuba mix)",
+        "length": 440426,
+        "disambiguation": "part of “Off Limits 2” DJ-mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000-11-06",
+        "releases": [
+          {
+            "id": "4da93929-0663-4714-8050-81a5e102d889",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Off Limits 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4b200a4f-163a-3c23-9004-d194bf1b7f30",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Off Limits 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2000-11-06",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2000-11-06",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "ab7e665e-e4fb-384f-b701-5522e90f6dba",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "aa28169e-9195-3994-ac0a-7edbdbba1b66",
+                    "number": "5",
+                    "title": "Adore (King Britt's Scuba mix)",
+                    "length": 440426
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "7d614f5a-0b12-4c61-af8a-57f6df7874d5",
+        "score": 82,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (King Britt's Scuba mix)",
+        "length": 435000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000",
+        "releases": [
+          {
+            "id": "3119cd47-42f2-4032-b56e-fe16d9287861",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Aphrodisiac 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "52583fd4-fdd7-3de8-bf36-5ea89be971dc",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aphrodisiac 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2000",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "6856500b-3aa3-3e91-a3f9-af37d6af15c1",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "79ce06c1-38a1-3f32-b9d7-b3aba7c0a815",
+                    "number": "5",
+                    "title": "Adore (King Britt's Scuba mix)",
+                    "length": 435000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "4b458f9d-f03c-4e06-ac26-cb82e45a1c97",
+        "score": 82,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (King Britt’s Scuba mix)",
+        "length": 420760,
+        "disambiguation": "part of “Tropical Sound Forest” DJ-mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "releases": [
+          {
+            "id": "cf989b9d-c5d4-4d45-b6f2-009641b0ef76",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Tropical Sound Forest",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "39e2ad6e-58de-4fe0-98a3-cf507a58e74e",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Tropical Sound Forest",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "5f7164a0-f8b3-3399-9a8a-75ca0b42d0b2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d246d6ae-686e-48f6-9109-34cc7eaae847",
+                    "number": "10",
+                    "title": "Adore (King Britt’s Scuba mix)",
+                    "length": 420760
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dfda2b97-f9c0-4c7d-9402-d4d4ba02c5cc",
+        "score": 82,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (King Britt's Scuba mix)",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000-02-28",
+        "releases": [
+          {
+            "id": "0fb7086c-58af-4718-8ba1-6d2f4dfe17be",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+            "count": 1,
+            "title": "Remixes:2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "I:Cube",
+                "artist": {
+                  "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+                  "name": "I:Cube",
+                  "sort-name": "I:Cube",
+                  "disambiguation": "house music"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e2de5a78-ba17-31f2-8312-b12e7568da9e",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Remixes:2",
+              "primary-type": "EP",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2000-02-28",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2000-02-28",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 2,
+            "media": [
+              {
+                "id": "c5bf4afd-a598-3eb7-9e41-071121b8532b",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "af3c78b3-7536-3317-af1e-af6460eeef3f",
+                    "number": "A",
+                    "title": "Adore (King Britt's Scuba mix)"
+                  }
+                ],
+                "track-count": 2,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "28d349a1-82d6-4ad4-865a-04d0ad62a8d7",
+        "score": 82,
+        "artist-credit-id": "22b29f58-8252-3ad1-bce0-cd630bebd3b8",
+        "title": "Adore (King Britt's Scuba mix)",
+        "length": 307000,
+        "disambiguation": "DJ mix from \"Stockholm Mix Sessions 2\"",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000-08-08",
+        "releases": [
+          {
+            "id": "9f6c14cb-2038-4c9f-8965-66dd476d1aa4",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "643ce542-e540-3647-91e7-2fc306f0309f",
+            "count": 1,
+            "title": "Stockholm Mix Sessions 2",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Jesper Dahlbäck",
+                "artist": {
+                  "id": "71532bc4-5ad0-457e-b8c9-f171bd80fe4b",
+                  "name": "Jesper Dahlbäck",
+                  "sort-name": "Dahlbäck, Jesper"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "af0ba70a-6762-34dc-a782-662fba70aeef",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Stockholm Mix Sessions 2",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2000-08-08",
+            "country": "CA",
+            "release-events": [
+              {
+                "date": "2000-08-08",
+                "area": {
+                  "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+                  "name": "Canada",
+                  "sort-name": "Canada",
+                  "iso-3166-1-codes": [
+                    "CA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 14,
+            "media": [
+              {
+                "id": "36abcdac-742c-371c-86c0-b75b8f72faab",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "baad1cfa-4ef4-346d-863d-4eccb85fa0c1",
+                    "number": "1",
+                    "title": "Adore (King Britt's Scuba mix)",
+                    "length": 307000
+                  }
+                ],
+                "track-count": 14,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "43cf984c-8e26-403b-ba24-9a9fccd64e97",
+        "score": 81,
+        "artist-credit-id": "a8ff3e92-19c1-3d5e-9992-16b5429d6ac0",
+        "title": "Adore",
+        "length": 330360,
+        "disambiguation": "part of “Future Tropic” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " feat. ",
+            "name": "I:Cube",
+            "artist": {
+              "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+              "name": "I:Cube",
+              "sort-name": "I:Cube",
+              "disambiguation": "house music",
+              "aliases": [
+                {
+                  "sort-name": "L:Cube",
+                  "name": "L:Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "I-Cube",
+                  "name": "I-Cube",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "King Britt",
+            "artist": {
+              "id": "a6b6fbf2-fa4d-4a93-82e0-2551e361899a",
+              "name": "King Britt",
+              "sort-name": "Britt, King",
+              "aliases": [
+                {
+                  "sort-name": "Britt, King James",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "King James Britt",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2000",
+        "releases": [
+          {
+            "id": "e4d9865f-a5e8-43a7-be4e-4e82190f1b23",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "4f51cf6f-a60f-38fc-b3ad-137ec9a755b4",
+            "count": 1,
+            "title": "Future Tropic",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "DJ Fluid",
+                "artist": {
+                  "id": "b9d29f0b-0505-45a8-b179-abb4761de43d",
+                  "name": "DJ Fluid",
+                  "sort-name": "Fluid, DJ"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "234b9baf-6315-3a29-bc06-7e1985457cf7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Future Tropic",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2000",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2000",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "7fdb6b9c-81b4-366a-bf84-17d640fb23d1",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f1f1e05a-fcb6-34c3-8529-5de448523fe8",
+                    "number": "13",
+                    "title": "Adore",
+                    "length": 330360
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 12
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

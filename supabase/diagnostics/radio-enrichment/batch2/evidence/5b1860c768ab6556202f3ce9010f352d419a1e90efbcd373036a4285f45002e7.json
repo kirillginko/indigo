@@ -1,0 +1,177 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/2af7fd47-50fa-42db-a00f-8be6ed761ee5?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:49.503579+00:00",
+  "body": {
+    "video": false,
+    "isrcs": [
+      "NLBA32000266"
+    ],
+    "first-release-date": "2020-12-11",
+    "releases": [
+      {
+        "packaging": "None",
+        "quality": "normal",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "20in20b",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "type": null,
+              "name": "[Worldwide]"
+            },
+            "date": "2020-12-11"
+          }
+        ],
+        "barcode": "8718723161008",
+        "date": "2020-12-11",
+        "status": "Official",
+        "id": "2f136377-3050-446c-b5bf-6ccad98396d8",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "name": "klakson",
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "title": "20in20",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "packaging": "None",
+        "quality": "normal",
+        "id": "e2ea771c-dea2-492a-918f-caff106b1f3d",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2020-12-14",
+        "release-events": [
+          {
+            "date": "2020-12-14",
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "type-id": null
+            }
+          }
+        ],
+        "barcode": "8718723223874"
+      },
+      {
+        "packaging": "Cardboard/Paper Sleeve",
+        "quality": "normal",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "country": "PT",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "20in20",
+        "barcode": null,
+        "release-events": [
+          {
+            "area": {
+              "name": "Portugal",
+              "type": null,
+              "type-id": null,
+              "sort-name": "Portugal",
+              "iso-3166-1-codes": [
+                "PT"
+              ],
+              "disambiguation": "",
+              "id": "781b0c54-3d54-362d-a941-8a617def4992"
+            },
+            "date": "2020-12-14"
+          }
+        ],
+        "date": "2020-12-14",
+        "id": "b6c54c01-69c8-4bfa-9586-2f0ccfcf393f",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ],
+    "artist-credit": [
+      {
+        "artist": {
+          "name": "Sepehr",
+          "type": "Person",
+          "id": "a3e77268-597b-4ce8-8837-78b673e20114",
+          "disambiguation": "electronic musician Sepehr Alimagham",
+          "sort-name": "Sepehr",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US"
+        },
+        "joinphrase": "",
+        "name": "Sepehr"
+      }
+    ],
+    "id": "2af7fd47-50fa-42db-a00f-8be6ed761ee5",
+    "disambiguation": "",
+    "title": "N.W.O.",
+    "length": 339200
+  }
+}

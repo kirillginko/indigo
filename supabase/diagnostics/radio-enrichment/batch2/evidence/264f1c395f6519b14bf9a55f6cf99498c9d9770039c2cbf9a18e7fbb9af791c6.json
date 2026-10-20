@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/e2b1dde4-d85d-43b0-b3ae-1f115e56d70d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:02.345057+00:00",
+  "body": {
+    "id": "e2b1dde4-d85d-43b0-b3ae-1f115e56d70d",
+    "releases": [
+      {
+        "id": "240ded77-8de4-4987-b6cd-cdc6bea11022",
+        "release-events": [
+          {
+            "date": "1974",
+            "area": {
+              "disambiguation": "",
+              "name": "United States",
+              "type": null,
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "status": "Official",
+        "barcode": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "title": "Transition",
+        "quality": "normal",
+        "country": "US",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "Sonic pressing",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "packaging": "Cardboard/Paper Sleeve",
+        "date": "1974",
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "sort-name": "Mason, Barbara",
+              "type": "Person",
+              "name": "Barbara Mason",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": ""
+          }
+        ]
+      }
+    ],
+    "isrcs": [],
+    "first-release-date": "1974",
+    "title": "World in a Crisis",
+    "length": 205000,
+    "video": false,
+    "artist-credit": [
+      {
+        "name": "Barbara Mason",
+        "joinphrase": "",
+        "artist": {
+          "name": "Barbara Mason",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Mason, Barbara",
+          "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+          "disambiguation": "",
+          "country": "US"
+        }
+      }
+    ],
+    "disambiguation": ""
+  }
+}

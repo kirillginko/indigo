@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/82fc357b-dd29-4e4e-881b-0a6c3fd2512e?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:56.013900+00:00",
+  "body": {
+    "disambiguation": "part of “The Party Mix: Classic Soul” DJ-mix",
+    "video": false,
+    "isrcs": [],
+    "id": "82fc357b-dd29-4e4e-881b-0a6c3fd2512e",
+    "releases": [
+      {
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "country": null,
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86"
+            }
+          }
+        ],
+        "barcode": "654378612626",
+        "packaging": "Digipak",
+        "title": "The Party Mix: Classic Soul",
+        "id": "6a56263a-f9a3-4eb3-b775-c55bdad098e4",
+        "date": "2013-11-11",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "2013-11-11"
+          }
+        ],
+        "status": "Official",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "GB"
+      }
+    ],
+    "title": "Ruby Lee",
+    "first-release-date": "2013-11-11",
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "US",
+          "name": "Bill Withers",
+          "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9",
+          "disambiguation": "",
+          "sort-name": "Withers, Bill",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "joinphrase": "",
+        "name": "Bill Withers"
+      }
+    ],
+    "length": 189626
+  }
+}

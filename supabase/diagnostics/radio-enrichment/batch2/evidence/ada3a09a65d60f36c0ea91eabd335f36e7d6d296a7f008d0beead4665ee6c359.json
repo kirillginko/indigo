@@ -1,0 +1,238 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/a3e77268-597b-4ce8-8837-78b673e20114?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:50.578250+00:00",
+  "body": {
+    "gender": "Male",
+    "disambiguation": "electronic musician Sepehr Alimagham",
+    "begin-area": null,
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "sort-name": "Sepehr",
+    "country": "US",
+    "type": "Person",
+    "isnis": [],
+    "name": "Sepehr",
+    "tags": [],
+    "aliases": [
+      {
+        "type": "Legal name",
+        "name": "Sepehr Alimagham",
+        "ended": false,
+        "primary": null,
+        "end": null,
+        "begin": null,
+        "locale": null,
+        "sort-name": "Alimagham, Sepehr",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf"
+      }
+    ],
+    "end-area": null,
+    "id": "a3e77268-597b-4ce8-8837-78b673e20114",
+    "relations": [
+      {
+        "ended": false,
+        "artist": {
+          "sort-name": "Saffron Bloom",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": null,
+          "disambiguation": "",
+          "id": "5247dea6-7c25-439e-bc55-14a3ec92dad1",
+          "name": "Saffron Bloom",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "type": "is person",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "end": null,
+        "begin": null,
+        "target-type": "artist"
+      },
+      {
+        "url": {
+          "resource": "https://sepehr.bandcamp.com/",
+          "id": "3c6284f5-3365-41dd-8ec5-5ad9430d12f7"
+        },
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "bandcamp"
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "id": "b7ea6abd-62ed-4cc6-b443-65748196fedf",
+          "resource": "https://www.discogs.com/artist/3563778"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "ended": false,
+        "attribute-values": {},
+        "type": "discogs",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://open.spotify.com/artist/6O1tVpp8NoYMi9hNMVMEbz",
+          "id": "430548de-b137-47ca-9d05-611fa7600266"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "free streaming",
+        "attribute-values": {}
+      },
+      {
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "6aa8cf91-11a2-43da-ae50-a823ef9e62ce",
+          "resource": "https://www.deezer.com/artist/1691653"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "free streaming",
+        "attribute-values": {}
+      },
+      {
+        "ended": false,
+        "type": "purchase for download",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "url": {
+          "id": "9143cf15-8b7b-4746-9b64-9c7b4eb68e29",
+          "resource": "https://music.apple.com/gb/artist/393749816"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "end": null,
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "resource": "https://twitter.com/sepehr_sf",
+          "id": "86e03976-a599-41e6-8e05-e0150344c639"
+        },
+        "attribute-values": {},
+        "type": "social network",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "bc2865de-ba7c-4b3d-be54-612092f05f0c",
+          "resource": "https://www.facebook.com/SepehrMusicPage"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "direction": "forward",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "social network",
+        "ended": false
+      },
+      {
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "url": {
+          "id": "2aa07834-7127-4775-b88c-6cac0f85b0d9",
+          "resource": "https://soundcloud.com/sepehr-a"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "soundcloud",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "streaming",
+        "attribute-values": {},
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/393749816",
+          "id": "9143cf15-8b7b-4746-9b64-9c7b4eb68e29"
+        },
+        "direction": "forward"
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "life-span": {
+      "end": null,
+      "begin": null,
+      "ended": false
+    },
+    "area": {
+      "name": "United States",
+      "type": null,
+      "sort-name": "United States",
+      "type-id": null,
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "disambiguation": ""
+    },
+    "genres": [],
+    "ipis": []
+  }
+}

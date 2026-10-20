@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F5648334&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:42.035302+00:00",
+  "body": {
+    "id": "13fd6474-5822-4248-97c0-48418d7bf994",
+    "resource": "https://www.discogs.com/artist/5648334",
+    "relations": [
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "discogs",
+        "attribute-values": {},
+        "artist": {
+          "name": "ROSALÍA",
+          "type": "Person",
+          "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+          "disambiguation": "Spanish singer",
+          "sort-name": "ROSALÍA",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "ES"
+        },
+        "ended": false,
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "direction": "backward"
+      }
+    ]
+  }
+}

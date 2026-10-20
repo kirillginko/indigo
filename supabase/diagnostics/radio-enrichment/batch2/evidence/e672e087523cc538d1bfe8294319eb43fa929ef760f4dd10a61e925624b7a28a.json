@@ -1,0 +1,223 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/19992bab-ade9-46d1-843f-5232c3e5bf9f?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:11.659206+00:00",
+  "body": {
+    "id": "19992bab-ade9-46d1-843f-5232c3e5bf9f",
+    "releases": [
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "",
+        "id": "1ea2c6cf-7a94-4473-8447-cb142cb5c39f",
+        "release-events": [
+          {
+            "date": "1957",
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "name": "United States",
+              "type": null
+            }
+          }
+        ],
+        "disambiguation": "mono",
+        "title": "Exotica",
+        "quality": "normal",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "US",
+        "date": "1957",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "packaging": "Cardboard/Paper Sleeve",
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "artist": {
+              "disambiguation": "",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "name": "Martin Denny",
+              "sort-name": "Denny, Martin",
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83"
+            },
+            "joinphrase": ""
+          }
+        ]
+      },
+      {
+        "release-events": [
+          {
+            "date": "1959",
+            "area": {
+              "type-id": null,
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "2541251a-5527-43a2-a38e-d8cd295a82ef",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "US",
+        "quality": "normal",
+        "title": "Exotica",
+        "disambiguation": "stereo",
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1959",
+        "artist-credit": [
+          {
+            "name": "Martin Denny",
+            "joinphrase": "",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "sort-name": "Denny, Martin",
+              "name": "Martin Denny",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "disambiguation": ""
+            }
+          }
+        ]
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "sort-name": "Denny, Martin",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Martin Denny",
+              "type": "Person",
+              "country": "US",
+              "disambiguation": ""
+            },
+            "name": "Martin Denny"
+          }
+        ],
+        "date": "2008",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "mono",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "US",
+        "quality": "normal",
+        "title": "Exotica",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "602547825193",
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "2008",
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type": null,
+              "type-id": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "a025982a-b02a-4b32-92fd-3a3b36872c3b"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2016-06-25",
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            }
+          }
+        ],
+        "id": "09865570-5be0-4167-a0b5-4198cb8978a5",
+        "disambiguation": "mono, remastered",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "XW",
+        "quality": "normal",
+        "title": "Exotica",
+        "date": "2016-06-25",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Denny, Martin",
+              "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "name": "Martin Denny",
+              "country": "US",
+              "disambiguation": ""
+            },
+            "joinphrase": "",
+            "name": "Martin Denny"
+          }
+        ]
+      }
+    ],
+    "isrcs": [],
+    "length": 188967,
+    "first-release-date": "1957",
+    "title": "Stone God",
+    "disambiguation": "mono",
+    "video": false,
+    "artist-credit": [
+      {
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "name": "Martin Denny",
+          "sort-name": "Denny, Martin",
+          "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+          "disambiguation": "",
+          "country": "US"
+        },
+        "joinphrase": "",
+        "name": "Martin Denny"
+      }
+    ]
+  }
+}

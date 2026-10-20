@@ -1,0 +1,1021 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22African+Battle%22+AND+artist%3A%22Manu+Dibango%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:11.094617+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:10.915Z",
+    "count": 7,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "282f2596-50f4-4c5a-b88f-5758dba2f5fd",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "length": 181187,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006",
+        "releases": [
+          {
+            "id": "71b1ba92-2db0-49cb-becd-da033dd88537",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Africadelic",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d8b8a478-dc4d-4f11-a9f6-5e023b8a43eb",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africadelic",
+              "primary-type": "Album"
+            },
+            "date": "",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "d54cc4f8-5894-365d-b243-84741cddf893",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "1aeee6e0-e487-40da-a783-d77aa3c401eb",
+                    "number": "4",
+                    "title": "African Battle",
+                    "length": 180000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "30d7aed4-9816-4a80-8986-97fbd2007386",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Africadelic",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d8b8a478-dc4d-4f11-a9f6-5e023b8a43eb",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africadelic",
+              "primary-type": "Album"
+            },
+            "date": "2006",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2006",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "4d070724-15f6-3cd6-a888-87470dd0a573",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6bb17212-97fe-43ba-a4bc-b5f855f4e03b",
+                    "number": "4",
+                    "title": "African Battle",
+                    "length": 181187
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "3a1016be-addb-4e70-bc85-2bb7493ad718",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Africadelic",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d8b8a478-dc4d-4f11-a9f6-5e023b8a43eb",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africadelic",
+              "primary-type": "Album"
+            },
+            "date": "2021",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2021",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "d1f1d629-55c7-3023-97c0-e034f81cbb8c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "2347eda5-37b3-4dbe-b1ba-7aecc62e706e",
+                    "number": "4",
+                    "title": "African Battle",
+                    "length": 190000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "FR3M17200060"
+        ]
+      },
+      {
+        "id": "9f139ad0-ad89-4e42-ae8f-536eecb8015b",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "length": 187000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2017-07-31",
+        "releases": [
+          {
+            "id": "5c8d064d-e6e4-4aa7-866f-0604f695dfb1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "MindExpanders Volume 5 - Remastered",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f51b578a-42da-4f4d-b3e2-baab86df25fc",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "MindExpanders Volume 5 - Remastered",
+              "primary-type": "Album"
+            },
+            "date": "2017-07-31",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2017-07-31",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "d2bce0f9-3879-4bf5-85b5-aa675dcfbd7c",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "1d969e85-e98f-4cf4-a067-02688a48991d",
+                    "number": "10",
+                    "title": "African Battle",
+                    "length": 187000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 9
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBSMU1542012"
+        ]
+      },
+      {
+        "id": "5b594a55-e51e-43c2-9eec-175c9c826246",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003",
+        "releases": [
+          {
+            "id": "40afb209-9dd3-49ff-809c-3cb961e02693",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "222d6104-8b0d-33a7-a620-5bfaf02bfcd2",
+            "count": 1,
+            "title": "Uncle Junior's Friday Fish Fry (The Market)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Djinji Brown",
+                "artist": {
+                  "id": "9be0ce5c-c3e5-4778-8479-d648f6ada7db",
+                  "name": "Djinji Brown",
+                  "sort-name": "Brown, Djinji"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a9d5d136-9db4-4798-9a9a-73888fdc15a0",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Uncle Junior's Friday Fish Fry (The Market)",
+              "primary-type": "Album",
+              "secondary-types": [
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2003",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2003",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "29220d3c-24ed-31c1-8e1e-e9dcf1c6dcd0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5edfcd33-704f-4522-9de2-5f1a0cf50c6a",
+                    "number": "13",
+                    "title": "African Battle"
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 12
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "8a12754a-445d-4145-906d-76d5af3c3fd2",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "length": 148041,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2005",
+        "releases": [
+          {
+            "id": "f9ed7e5c-c480-4544-9826-22226c24d660",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 7,
+            "title": "Africa 100: The Indestructible Beat",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e3a713ef-ab42-31d5-a9e0-bb223e18ada9",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africa 100: The Indestructible Beat",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 99,
+            "media": [
+              {
+                "id": "6aa55a3f-df6e-3760-8186-b5bf66948043",
+                "position": 3,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "9d493226-b88f-459c-95b2-cd09784f68d7",
+                    "number": "10",
+                    "title": "African Battle",
+                    "length": 148041
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a4230a14-2248-463b-aa4b-2e3a0f40753d",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "length": 195000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1972",
+        "releases": [
+          {
+            "id": "2e66e3c6-5e14-44bc-a030-02f3f5132885",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Africadelic",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d8b8a478-dc4d-4f11-a9f6-5e023b8a43eb",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africadelic",
+              "primary-type": "Album"
+            },
+            "date": "1973",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1973",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "4edbf1e6-bd19-39e0-85be-a49afb0e2362",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "3abf23b8-6a4a-4422-b95f-6bfdfc992f0c",
+                    "number": "A4",
+                    "title": "African Battle",
+                    "length": 195000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "efa2e94d-85d5-4779-a17d-27ee31dd5822",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+            "count": 1,
+            "title": "Africadelic",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Manu Dibango",
+                "artist": {
+                  "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+                  "name": "Manu Dibango",
+                  "sort-name": "Dibango, Manu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d8b8a478-dc4d-4f11-a9f6-5e023b8a43eb",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africadelic",
+              "primary-type": "Album"
+            },
+            "date": "1972",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "1972",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "a7b9c036-7c36-3d67-afb6-f1ac73466a9b",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "4b9a5489-af5b-424b-821d-db3ba0b62ba7",
+                    "number": "A4",
+                    "title": "Thème N°4",
+                    "length": 195000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "e64e9971-f176-400c-8842-6abcc1491bb5",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "length": 134000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1998",
+        "releases": [
+          {
+            "id": "3611c16c-a71e-47d7-9d37-69a7cb03d9b0",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Africafunk: The Original Sound of 1970s Funky Africa",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "97b226a0-0da9-3c18-9259-ab82d5f5d808",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africafunk: The Original Sound of 1970s Funky Africa",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1998",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "6e2d9527-dea3-39ef-a8a0-a05342c77ebc",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "1fdd2c0c-b701-35b3-bf3c-0422d0b5e5d9",
+                    "number": "B1",
+                    "title": "African Battle",
+                    "length": 134000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "d067a1e4-0f73-4e19-85e9-06d980aef29f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Africafunk: The Original Sound of 1970s Funky Africa",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "97b226a0-0da9-3c18-9259-ab82d5f5d808",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Africafunk: The Original Sound of 1970s Funky Africa",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1998",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1998",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "bd68f5d4-857d-3acd-bdb8-5ef1fa91b6be",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "8bd18f0e-8604-3e4d-9002-21fc12f881b9",
+                    "number": "4",
+                    "title": "African Battle",
+                    "length": 148000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "afrobeat"
+          }
+        ]
+      },
+      {
+        "id": "cc45eb6c-9341-4e41-8ec9-80db42fdb42c",
+        "score": 100,
+        "artist-credit-id": "b7118e77-bce1-3b45-a0e4-9e44f9f460e2",
+        "title": "African Battle",
+        "length": 148360,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Manu Dibango",
+            "artist": {
+              "id": "826b488f-5164-45ca-abc4-ab11b3c321eb",
+              "name": "Manu Dibango",
+              "sort-name": "Dibango, Manu",
+              "aliases": [
+                {
+                  "sort-name": "Dibango, Manu",
+                  "name": "Dibango, Manu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Manu Dibangu",
+                  "name": "Manu Dibangu",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Emmanuel N'Djoké Dibango",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Emmanuel N'Djoké Dibango",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "releases": [
+          {
+            "id": "acc2738d-37f7-429f-b0a1-d153fcab190b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Afro Funk Explosion",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "0b5f0f96-9612-3df6-88ab-bc2e24912743",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Afro Funk Explosion",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 13,
+            "media": [
+              {
+                "id": "808d5211-b42d-39ed-ada2-05e6c63374fe",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b95146cb-b7b0-3725-a260-6d03f0c2400a",
+                    "number": "5",
+                    "title": "African Battle",
+                    "length": 148360
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

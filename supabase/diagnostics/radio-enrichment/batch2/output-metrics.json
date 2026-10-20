@@ -1,0 +1,23 @@
+{
+  "prepared_verified_artists": 21,
+  "review_artists": 19,
+  "verified_publisher_recording_ids": 58,
+  "new_recording_rows": 0,
+  "source_appearances": 886,
+  "source_episodes": 481,
+  "source_distinct_artist_title_pairs": 547,
+  "source_youtube_appearances": 435,
+  "source_unique_youtube_media_urls": 232,
+  "source_timed_radio_appearances": 451,
+  "artist_pages_with_source_playback_urls": 21,
+  "requests": {
+    "musicbrainz.org": 257,
+    "api.discogs.com": 34
+  },
+  "database_bytes": 396127379,
+  "logical_identity_growth_estimate_bytes": 5162,
+  "expected_portrait_jobs": 21,
+  "production_writes": 0,
+  "release_DIG_gain": "Not shipped: existing Debug identity gate remains",
+  "playback_validation": "URLs and existing reader responses; no audio fetched or full playback/region guarantee"
+}

@@ -1,0 +1,175 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/3fc14411-26a3-479d-807d-060b6b448739?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:20.831396+00:00",
+  "body": {
+    "title": "Julia",
+    "first-release-date": "1993-10-05",
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "US",
+          "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+          "name": "Ramsey Lewis",
+          "disambiguation": "",
+          "type": "Person",
+          "sort-name": "Lewis, Ramsey",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "joinphrase": "",
+        "name": "Ramsey Lewis"
+      }
+    ],
+    "length": 320000,
+    "disambiguation": "",
+    "video": false,
+    "releases": [
+      {
+        "disambiguation": "",
+        "country": "FR",
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "5c95259e-66d6-4dd1-9eee-8b418f9c5d9b",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "sort-name": "France",
+              "disambiguation": "",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "name": "France"
+            },
+            "date": "1993-10-05"
+          }
+        ],
+        "date": "1993-10-05",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Ramsey Lewis",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Lewis, Ramsey",
+              "type": "Person",
+              "name": "Ramsey Lewis",
+              "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+              "disambiguation": "",
+              "country": "US"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "011105974523",
+        "title": "Sky Islands"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "1993-10-05"
+          }
+        ],
+        "date": "1993-10-05",
+        "id": "f8f776a9-905f-49f5-88a9-633556f48533",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "US",
+              "disambiguation": "",
+              "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+              "name": "Ramsey Lewis",
+              "type": "Person",
+              "sort-name": "Lewis, Ramsey",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": "",
+            "name": "Ramsey Lewis"
+          }
+        ],
+        "packaging": "Jewel Case",
+        "barcode": "011105974226",
+        "quality": "normal",
+        "title": "Sky Islands",
+        "disambiguation": "",
+        "country": "GB",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a"
+      },
+      {
+        "title": "The In Crowd Anthology",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "sort-name": "Lewis, Ramsey",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "id": "fe19b809-e86c-4736-882a-53b72e23171b",
+              "name": "Ramsey Lewis",
+              "disambiguation": ""
+            },
+            "name": "Ramsey Lewis",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": null,
+        "barcode": "602498388631",
+        "id": "efe92c9f-56b6-42ad-ab2c-de60fa0d37bb",
+        "release-events": [
+          {
+            "date": "2006",
+            "area": {
+              "type-id": null,
+              "sort-name": "Europe",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "disambiguation": "",
+              "name": "Europe",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a"
+            }
+          }
+        ],
+        "date": "2006",
+        "packaging-id": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "country": "XE",
+        "disambiguation": ""
+      }
+    ],
+    "id": "3fc14411-26a3-479d-807d-060b6b448739",
+    "isrcs": []
+  }
+}

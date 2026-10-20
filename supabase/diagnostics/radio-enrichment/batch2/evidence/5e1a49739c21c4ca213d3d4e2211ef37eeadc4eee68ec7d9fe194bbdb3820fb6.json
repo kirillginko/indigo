@@ -1,0 +1,175 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/995e3fd3-4907-4894-a367-5632a4438654?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:39.682443+00:00",
+  "body": {
+    "title": "Hard Times",
+    "disambiguation": "",
+    "releases": [
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "disambiguation": "",
+        "title": "Il corpo",
+        "barcode": "",
+        "release-events": [
+          {
+            "date": "1974-03",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "sort-name": "Italy",
+              "name": "Italy",
+              "iso-3166-1-codes": [
+                "IT"
+              ],
+              "type-id": null,
+              "id": "c6500277-9a3d-349b-bf30-41afdbf42add"
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "sort-name": "Umiliani, Piero",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Piero Umiliani",
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "type": "Person",
+              "disambiguation": "",
+              "country": "IT"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "id": "3077b576-f689-4174-a362-b58bc7fa10c5",
+        "packaging": "Cardboard/Paper Sleeve",
+        "status": "Official",
+        "date": "1974-03",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "IT"
+      },
+      {
+        "barcode": "8019991210321",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "Italy",
+              "iso-3166-1-codes": [
+                "IT"
+              ],
+              "name": "Italy",
+              "type-id": null,
+              "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "1999"
+          }
+        ],
+        "disambiguation": "",
+        "title": "Easy Tempo, Volume 9: The Ultimate Cinematic Compendium",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "country": null,
+              "disambiguation": "add compilations to this artist"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "language": "ita",
+          "script": "Latn"
+        },
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "IT",
+        "id": "9f43d57c-f5c2-4034-af76-1c2923f44939",
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1999",
+        "status": "Official"
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "country": "IT",
+              "disambiguation": "",
+              "type": "Person",
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Piero Umiliani",
+              "sort-name": "Umiliani, Piero"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "title": "Il corpo",
+        "barcode": "8019991210512",
+        "release-events": [
+          {
+            "date": "1999",
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+              "sort-name": "Italy",
+              "type-id": null,
+              "name": "Italy",
+              "iso-3166-1-codes": [
+                "IT"
+              ]
+            }
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "IT",
+        "status": "Official",
+        "date": "1999",
+        "packaging-id": null,
+        "id": "55272f42-84e3-402b-b47a-2a5506415ce7",
+        "packaging": null
+      }
+    ],
+    "first-release-date": "1974-03",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Piero Umiliani",
+        "artist": {
+          "sort-name": "Umiliani, Piero",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Piero Umiliani",
+          "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+          "type": "Person",
+          "disambiguation": "",
+          "country": "IT"
+        }
+      }
+    ],
+    "video": false,
+    "id": "995e3fd3-4907-4894-a367-5632a4438654",
+    "length": 259666,
+    "isrcs": []
+  }
+}

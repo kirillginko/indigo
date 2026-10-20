@@ -1,0 +1,417 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/6aaa8e21-68b9-4de5-9372-772cd3e7d0f1?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:49.851107+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Group",
+          "sort-name": "Spirit",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": "US",
+          "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+          "name": "Spirit",
+          "disambiguation": "psychedelic rock"
+        },
+        "joinphrase": "",
+        "name": "Spirit"
+      }
+    ],
+    "length": 205333,
+    "title": "Space Child",
+    "first-release-date": "1996-10-22",
+    "disambiguation": "",
+    "video": false,
+    "isrcs": [
+      "USSM17000046"
+    ],
+    "releases": [
+      {
+        "disambiguation": "",
+        "country": "US",
+        "status": "Official",
+        "packaging-id": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "fab44256-31a5-42fd-8d07-780932cae387",
+        "date": "1996-10-22",
+        "release-events": [
+          {
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States"
+            },
+            "date": "1996-10-22"
+          }
+        ],
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "joinphrase": "",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Spirit"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "074646500323",
+        "title": "Twelve Dreams of Dr. Sardonicus"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe",
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "sort-name": "Europe"
+            },
+            "date": "1996"
+          }
+        ],
+        "date": "1996",
+        "id": "6da7c7cc-0a58-47dc-9bd4-37cd34644f04",
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Spirit",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "5099748517326",
+        "quality": "normal",
+        "title": "Twelve Dreams of Dr. Sardonicus",
+        "disambiguation": "",
+        "country": "XE",
+        "status": "Official",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null
+      },
+      {
+        "title": "Time Circle (1968–1972)",
+        "quality": "normal",
+        "packaging": null,
+        "barcode": "693723424026",
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Spirit"
+            },
+            "name": "Spirit",
+            "joinphrase": ""
+          }
+        ],
+        "id": "89b15299-824a-48bd-a9db-7ecee5fd589b",
+        "release-events": [
+          {
+            "date": "2008",
+            "area": {
+              "type-id": null,
+              "sort-name": "Germany",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type": null,
+              "name": "Germany",
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "2008",
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status": "Official",
+        "country": "DE",
+        "disambiguation": ""
+      },
+      {
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "GB",
+        "barcode": "886976469825",
+        "packaging": null,
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "joinphrase": "",
+            "artist": {
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Spirit",
+              "type": "Group"
+            }
+          }
+        ],
+        "quality": "normal",
+        "title": "Original Album Classics",
+        "date": "2011",
+        "release-events": [
+          {
+            "date": "2011",
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom"
+            }
+          }
+        ],
+        "id": "82bfb079-7b7a-4dad-b171-70c991f8e12b"
+      },
+      {
+        "title": "Twelve Dreams of Dr. Sardonicus",
+        "packaging": "None",
+        "barcode": "0074646500323",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Spirit",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Spirit",
+              "type": "Group",
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock",
+              "country": "US"
+            }
+          }
+        ],
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "2015-05-30",
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "type-id": null
+            }
+          }
+        ],
+        "date": "2015-05-30",
+        "id": "62a8eaee-5c39-4f35-b82e-9e40c467c0f9",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "country": "XW",
+        "disambiguation": ""
+      },
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "c1668fc7-8944-4a00-bc3e-46e8d861d211",
+        "status": "Official",
+        "country": "XE",
+        "disambiguation": "",
+        "title": "Original Album Classics",
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "disambiguation": "psychedelic rock",
+              "sort-name": "Spirit",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ],
+        "packaging": "Box",
+        "barcode": "888751057920",
+        "quality": "normal",
+        "date": "2016",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "sort-name": "Europe",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe",
+              "disambiguation": ""
+            },
+            "date": "2016"
+          }
+        ],
+        "id": "c1e30a56-a630-42a5-a33e-5da83fef6708"
+      },
+      {
+        "status": "Official",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "country": "XE",
+        "quality": "normal",
+        "barcode": "5013929471948",
+        "packaging": "Cardboard/Paper Sleeve",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "sort-name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "country": "US"
+            },
+            "name": "Spirit",
+            "joinphrase": ""
+          }
+        ],
+        "title": "It Shall Be: Ode & Epic Recordings 1968–1972",
+        "id": "51af57ec-497f-4780-b561-0b68fc66749c",
+        "date": "2018-03-16",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "name": "Europe",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type": null,
+              "sort-name": "Europe"
+            },
+            "date": "2018-03-16"
+          }
+        ]
+      },
+      {
+        "date": "2022-02-18",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": ""
+            },
+            "date": "2022-02-18"
+          }
+        ],
+        "id": "748cba06-f6be-47cd-99e4-9fb21372f09d",
+        "title": "Twelve Dreams of Dr. Sardonicus (deluxe edition)",
+        "packaging": "Jewel Case",
+        "barcode": "5013929479289",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "psychedelic rock",
+              "name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Spirit",
+              "type": "Group"
+            },
+            "name": "Spirit",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "country": "GB",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official"
+      }
+    ],
+    "id": "6aaa8e21-68b9-4de5-9372-772cd3e7d0f1"
+  }
+}

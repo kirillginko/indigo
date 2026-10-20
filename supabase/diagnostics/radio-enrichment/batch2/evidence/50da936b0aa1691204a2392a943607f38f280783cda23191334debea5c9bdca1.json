@@ -1,0 +1,160 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22All+In+Love+Is+Fair%22+AND+artist%3A%22Barbara+Mason%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:05.589553+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:05.511Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "d2f5f7eb-067b-4e1d-afd6-afcd868dd327",
+        "score": 100,
+        "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+        "title": "All in Love Is Fair",
+        "length": 232000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Barbara Mason",
+            "artist": {
+              "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+              "name": "Barbara Mason",
+              "sort-name": "Mason, Barbara",
+              "aliases": [
+                {
+                  "sort-name": "Barbera Mason",
+                  "name": "Barbera Mason",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1973",
+        "releases": [
+          {
+            "id": "20f4aec9-8ac7-4ea6-977a-74fe57188d99",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Lady Love",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "25c85b84-ca0c-3e85-b226-aa801705fc34",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lady Love",
+              "primary-type": "Album"
+            },
+            "date": "2009",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2009",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "a79bbed6-a7b9-31f1-9e16-e8143ba0f14a",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "bd51a79a-fbe5-41bd-9782-69a509318313",
+                    "number": "7",
+                    "title": "All in Love Is Fair",
+                    "length": 234000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 6
+              }
+            ]
+          },
+          {
+            "id": "6fa8efb8-0da9-426a-8573-7430eb5ed90b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "207a7483-712b-3f96-8e7e-3b97192f9df1",
+            "count": 1,
+            "title": "Lady Love",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Barbara Mason",
+                "artist": {
+                  "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+                  "name": "Barbara Mason",
+                  "sort-name": "Mason, Barbara"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "25c85b84-ca0c-3e85-b226-aa801705fc34",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Lady Love",
+              "primary-type": "Album"
+            },
+            "date": "1973",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1973",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "0d0c1321-cfd1-3a2f-ac9d-6a935a98a8b0",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "a35f12b3-d4d4-3595-900c-e43fea7dd5a2",
+                    "number": "B4",
+                    "title": "All in Love Is Fair",
+                    "length": 232000
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

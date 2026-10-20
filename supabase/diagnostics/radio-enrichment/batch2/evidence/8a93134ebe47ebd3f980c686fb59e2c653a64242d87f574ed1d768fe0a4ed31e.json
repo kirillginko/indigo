@@ -1,0 +1,705 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/fb564c4d-27f4-44be-9611-3362aeb13331?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:51.816394+00:00",
+  "body": {
+    "title": "The World Is a Ghetto",
+    "length": 247666,
+    "artist-credit": [
+      {
+        "artist": {
+          "disambiguation": "US funk/rock band",
+          "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+          "name": "War",
+          "country": "US",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "War",
+          "type": "Group"
+        },
+        "name": "War",
+        "joinphrase": ""
+      }
+    ],
+    "id": "fb564c4d-27f4-44be-9611-3362aeb13331",
+    "disambiguation": "single version",
+    "isrcs": [
+      "USRHD0703050"
+    ],
+    "video": false,
+    "releases": [
+      {
+        "id": "ba3caa4d-2f8f-4e4d-bd7c-a5a54bed5912",
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "1991",
+            "area": {
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "date": "1991",
+        "packaging-id": null,
+        "title": "Soul Hits of the '70s: Didn't It Blow Your Mind! Volume 10",
+        "disambiguation": "",
+        "barcode": "081227079024",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US"
+      },
+      {
+        "id": "91502341-0635-44d7-a896-19c602b5816b",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "status": "Official",
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "1991",
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null
+            }
+          }
+        ],
+        "date": "1991",
+        "title": "Sounds of the Seventies: 1973, Take Two",
+        "packaging-id": null,
+        "disambiguation": "",
+        "barcode": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null
+      },
+      {
+        "quality": "normal",
+        "status": "Official",
+        "id": "4bff907d-1533-4883-8525-ce8e92f29249",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "name": "War",
+              "disambiguation": "US funk/rock band",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            },
+            "joinphrase": "",
+            "name": "War"
+          }
+        ],
+        "release-events": [
+          {
+            "date": "1994-10-18",
+            "area": {
+              "type-id": null,
+              "sort-name": "United States",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "date": "1994-10-18",
+        "packaging-id": null,
+        "title": "Anthology 1970 - 1994",
+        "disambiguation": "",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "barcode": "081227177423",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "War",
+            "artist": {
+              "type": "Group",
+              "sort-name": "War",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "disambiguation": "US funk/rock band"
+            }
+          }
+        ],
+        "id": "38a9d2f9-f9e6-419e-b50b-becbb2a4d77b",
+        "quality": "normal",
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "1994",
+            "area": {
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "1994",
+        "packaging-id": null,
+        "title": "Anthology 1970 - 1994",
+        "disambiguation": "",
+        "barcode": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US"
+      },
+      {
+        "disambiguation": "",
+        "barcode": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Keep Case",
+        "country": "US",
+        "id": "98a780fa-c20a-409f-89e9-488434491edf",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "release-events": [
+          {
+            "date": "1996",
+            "area": {
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "1996",
+        "packaging-id": "bb14bb17-e8ad-375f-a3c6-b1f82fd2bcc4",
+        "title": "Solid Gold Soul 1973"
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "type-id": null
+            },
+            "date": "1996"
+          }
+        ],
+        "date": "1996",
+        "packaging-id": null,
+        "title": "The Best of War... and More, Volume 2",
+        "quality": "normal",
+        "status": "Official",
+        "artist-credit": [
+          {
+            "name": "War",
+            "joinphrase": "",
+            "artist": {
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "disambiguation": "US funk/rock band",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "War",
+              "name": "War",
+              "type": "Group"
+            }
+          }
+        ],
+        "id": "35e35616-7f1b-4bcb-80e3-a2724259db8b",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "barcode": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "barcode": "081227590321",
+        "quality": "normal",
+        "status": "Official",
+        "id": "de606630-347b-4d4e-8bb5-9f8b402f62d6",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "US funk/rock band",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "type": "Group",
+              "name": "War",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "War"
+            },
+            "joinphrase": "",
+            "name": "War"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "Grooves & Messages: The Greatest Hits of War",
+        "date": "1999-06-15",
+        "release-events": [
+          {
+            "date": "1999-06-15",
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "type-id": null,
+              "sort-name": "United States",
+              "name": "United States"
+            }
+          }
+        ]
+      },
+      {
+        "status": "Official",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "War",
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "name": "War",
+              "disambiguation": "US funk/rock band",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            }
+          }
+        ],
+        "id": "cc25e606-bbbd-44fd-9715-337ee82946a7",
+        "title": "The Very Best of War",
+        "packaging-id": "815b7785-8284-3926-8f04-e48bc6c4d102",
+        "date": "2003-07-15",
+        "release-events": [
+          {
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States"
+            },
+            "date": "2003-07-15"
+          }
+        ],
+        "disambiguation": "",
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Other",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "081227389529"
+      },
+      {
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "The Very Best Of War",
+        "date": "2003",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "disambiguation": "",
+              "type": null,
+              "type-id": null,
+              "sort-name": "Europe",
+              "name": "Europe"
+            },
+            "date": "2003"
+          }
+        ],
+        "id": "d872f755-9ef1-4331-b5f5-24dfef892543",
+        "artist-credit": [
+          {
+            "name": "War",
+            "joinphrase": "",
+            "artist": {
+              "name": "War",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "type": "Group",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "disambiguation": "US funk/rock band"
+            }
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "081227389529",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "country": "XE",
+        "disambiguation": ""
+      },
+      {
+        "id": "eb007601-98cb-41fa-ad70-12e8cfaf318f",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "War",
+            "artist": {
+              "disambiguation": "US funk/rock band",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "type": "Group",
+              "sort-name": "War",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "War"
+            }
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "date": "2010-10-02",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "sort-name": "United States",
+              "type-id": null,
+              "type": null
+            },
+            "date": "2010-10-02"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "Icon (The Hits)",
+        "disambiguation": "",
+        "barcode": "602527528854",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US"
+      },
+      {
+        "disambiguation": "",
+        "country": "US",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "602527528854",
+        "status": "Official",
+        "quality": "normal",
+        "id": "5a4d1ab6-a815-475a-8b42-e73cc3fa8df6",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "War",
+              "name": "War",
+              "disambiguation": "US funk/rock band",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            },
+            "joinphrase": "",
+            "name": "War"
+          }
+        ],
+        "title": "Icon (The Hits)",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "release-events": [
+          {
+            "area": {
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "type": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            },
+            "date": "2010-10-02"
+          }
+        ],
+        "date": "2010-10-02"
+      },
+      {
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": null,
+        "disambiguation": "",
+        "title": "The Hits",
+        "packaging-id": null,
+        "release-events": [
+          {
+            "date": "2010-11-02",
+            "area": {
+              "type-id": null,
+              "sort-name": "United States",
+              "name": "United States",
+              "type": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "2010-11-02",
+        "status": "Official",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "War",
+            "artist": {
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "disambiguation": "US funk/rock band",
+              "type": "Group",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "name": "War"
+            }
+          }
+        ],
+        "id": "fe00b297-be15-4948-8020-260c65e26f71"
+      },
+      {
+        "disambiguation": "",
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "barcode": "602527617442",
+        "status": "Official",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "name": "War",
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "name": "War",
+              "sort-name": "War",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "disambiguation": "US funk/rock band"
+            }
+          }
+        ],
+        "id": "70a4031e-77bd-439c-b63c-beb180341a20",
+        "title": "Icon 2: The Hits & More",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "2011",
+        "release-events": [
+          {
+            "date": "2011",
+            "area": {
+              "name": "United States",
+              "sort-name": "United States",
+              "type-id": null,
+              "type": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "date": "2014",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2014"
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "title": "Grooves & Messages: The Greatest Hits of War",
+        "id": "6e992dea-a224-4b3a-ae42-953c47ac205f",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "War",
+            "artist": {
+              "name": "War",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "US",
+              "sort-name": "War",
+              "type": "Group",
+              "disambiguation": "US funk/rock band",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            }
+          }
+        ],
+        "quality": "normal",
+        "status": "Official",
+        "barcode": "0602537473564",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "country": "XW",
+        "disambiguation": ""
+      }
+    ],
+    "first-release-date": "1991"
+  }
+}

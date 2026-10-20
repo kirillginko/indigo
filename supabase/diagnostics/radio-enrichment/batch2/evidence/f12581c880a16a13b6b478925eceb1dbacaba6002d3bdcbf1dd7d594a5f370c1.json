@@ -1,0 +1,403 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/54492185-df45-494f-b133-f52da3fba781?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:21.662553+00:00",
+  "body": {
+    "area": {
+      "sort-name": "United Kingdom",
+      "iso-3166-1-codes": [
+        "GB"
+      ],
+      "name": "United Kingdom",
+      "type-id": null,
+      "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+      "type": null,
+      "disambiguation": ""
+    },
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "relations": [
+      {
+        "source-credit": "",
+        "type": "is person",
+        "target-type": "artist",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "artist": {
+          "id": "d05aca2a-560c-4287-98c3-a1bd6e71cdbe",
+          "name": "Alina Astrova",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Astrova, Alina",
+          "country": "GB",
+          "disambiguation": "Estonian experimental musician and singer",
+          "type": "Person"
+        },
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "backward"
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0003744331",
+          "id": "342564e5-fe2d-4c41-b166-fdb5171e2059"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-type": "url",
+        "type": "allmusic",
+        "source-credit": ""
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "resource": "https://lolina.bandcamp.com/",
+          "id": "cdfe5938-2a1b-4844-a881-b70a90e2632d"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "type": "bandcamp",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "discogs",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "aee92142-88e9-45ae-9e6e-046a418ee9da",
+          "resource": "https://www.discogs.com/artist/4304488"
+        },
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "type": "free streaming",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "url": {
+          "resource": "https://open.spotify.com/artist/1jj1qbHgrDKYct7IJv5VQ8",
+          "id": "2bf286c8-db47-4a6b-98f8-1d0b5a78dd87"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "source-credit": "",
+        "type": "free streaming",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "5c8fd6f4-552a-4b94-91e9-6bdc190a4a7f",
+          "resource": "https://www.deezer.com/artist/4728337"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false
+      },
+      {
+        "attribute-values": {},
+        "type-id": "221132e9-e30e-43f2-a741-15afc4c5fa7c",
+        "target-type": "url",
+        "url": {
+          "resource": "https://web.archive.org/web/0/https://i.scdn.co/image/ab6761610000e5eb3e2eb038286d50384d850697",
+          "id": "4b519008-02ad-4e5e-ac4c-ea582a769cff"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "type": "image"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "url": {
+          "resource": "https://www.last.fm/music/Lolina",
+          "id": "c16fc5ac-7ff1-46cd-aaa7-4f86a78bdd9d"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "type": "last.fm",
+        "source-credit": ""
+      },
+      {
+        "type": "lyrics",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://genius.com/artists/Lolina",
+          "id": "84d38fec-1877-4205-a2be-dd456c287958"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "attribute-values": {}
+      },
+      {
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "33f519d0-067e-4dea-9edd-a9b38a07d2ff",
+          "resource": "https://rateyourmusic.com/artist/lolina"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.setlist.fm/setlists/lolina-4bc68b1a.html",
+          "id": "0a23e7ea-fb94-491d-8aef-ffe29a1aba83"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "bf5d0d5e-27a1-4e94-9df7-3cdc67b3b207",
+        "attribute-values": {},
+        "target-type": "url",
+        "type": "setlistfm",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "url": {
+          "id": "71b8e4ab-ff6f-4b03-be81-77ca74d4096f",
+          "resource": "https://twitter.com/lolina_relaxin"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "social network"
+      },
+      {
+        "source-credit": "",
+        "type": "songkick",
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.songkick.com/artists/9591069",
+          "id": "6c59fd0d-dd5d-4b9e-88cf-6f182d897674"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "type": "soundcloud",
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "url": {
+          "resource": "https://soundcloud.com/relaxinwithlolina",
+          "id": "d0c8e33a-b2e4-459a-b59b-d04a9fe63f60"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710"
+      },
+      {
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "41b21687-ece2-4be2-8c09-3436d73cd8fa",
+          "resource": "https://music.apple.com/us/artist/448258938"
+        },
+        "target-type": "url",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "type": "streaming",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "streaming",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "c4243c65-051f-478f-ac82-301fb744a43b",
+          "resource": "https://tidal.com/artist/5155162"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "source-credit": "",
+        "type": "video channel",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d86c9450-b6d0-4760-a275-e7547495b48b",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "url": {
+          "resource": "https://vimeo.com/lolinamusic",
+          "id": "bfa95594-15f9-4f6b-ae1a-4d2e453ead86"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "direction": "forward",
+        "url": {
+          "id": "56d2879a-44ff-4727-880c-1052e31bb28d",
+          "resource": "https://www.wikidata.org/wiki/Q108597646"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "target-type": "url",
+        "type": "wikidata",
+        "source-credit": ""
+      }
+    ],
+    "name": "Lolina",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "disambiguation": "Inga Copeland / Alina Astrova",
+    "aliases": [
+      {
+        "end": null,
+        "primary": null,
+        "type": "Artist name",
+        "locale": null,
+        "ended": false,
+        "begin": null,
+        "sort-name": "Balmainjeans",
+        "name": "Balmainjeans",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc"
+      }
+    ],
+    "gender": "Female",
+    "end-area": null,
+    "tags": [
+      {
+        "name": "experimental",
+        "count": 1
+      }
+    ],
+    "id": "54492185-df45-494f-b133-f52da3fba781",
+    "ipis": [],
+    "sort-name": "Lolina",
+    "begin-area": {
+      "type-id": null,
+      "type": null,
+      "name": "Samara",
+      "sort-name": "Samara",
+      "disambiguation": "",
+      "id": "afc021d0-d86e-4e4d-bace-c0c0c53c9580"
+    },
+    "life-span": {
+      "end": null,
+      "ended": false,
+      "begin": null
+    },
+    "genres": [
+      {
+        "count": 1,
+        "id": "68c81274-5770-4e7b-a4bf-ab0d7d425d99",
+        "disambiguation": "",
+        "name": "experimental"
+      }
+    ],
+    "isnis": [
+      "0000000465762989"
+    ],
+    "country": "GB",
+    "type": "Person"
+  }
+}

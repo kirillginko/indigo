@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/77c7d5af-6fb0-4ed6-9bdd-8b90d367ee5d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:59.607070+00:00",
+  "body": {
+    "isrcs": [],
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "name": "Budgie",
+        "joinphrase": "",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+          "type": "Person",
+          "name": "Budgie",
+          "sort-name": "Budgie",
+          "disambiguation": "Los Angeles-based hip-hop producer from London, England",
+          "country": "US"
+        }
+      }
+    ],
+    "title": "Higher",
+    "video": false,
+    "first-release-date": "2018-12-07",
+    "id": "77c7d5af-6fb0-4ed6-9bdd-8b90d367ee5d",
+    "releases": [
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": null
+        },
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "Los Angeles-based hip-hop producer from London, England",
+              "country": "US",
+              "sort-name": "Budgie",
+              "type": "Person",
+              "name": "Budgie",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c"
+            },
+            "joinphrase": "",
+            "name": "Budgie"
+          }
+        ],
+        "date": "2018-12-07",
+        "country": "XW",
+        "packaging-id": null,
+        "status": "Official",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "title": "Holy Ghost Zone",
+        "quality": "normal",
+        "id": "acec1964-720a-42d3-b987-fd27afd89164",
+        "release-events": [
+          {
+            "date": "2018-12-07",
+            "area": {
+              "type-id": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type": null,
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            }
+          }
+        ],
+        "barcode": null
+      }
+    ],
+    "length": 89337
+  }
+}

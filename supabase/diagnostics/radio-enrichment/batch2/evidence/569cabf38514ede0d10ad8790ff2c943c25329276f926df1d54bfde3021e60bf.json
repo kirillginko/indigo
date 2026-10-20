@@ -1,0 +1,2775 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%222+On%22+AND+artist%3A%22Tinashe%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:18.400668+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:18.211Z",
+    "count": 17,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "8d777963-dc53-46c7-812d-8007e574e18e",
+        "score": 100,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2015-05-01",
+        "releases": [
+          {
+            "id": "a032fd4b-a4bf-448a-b405-10e67f6734c3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Now 2015 Volume 1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "85ed7e7f-6301-48fe-95ae-25076b42b1a5",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Now 2015 Volume 1",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2015-05-01",
+            "country": "AU",
+            "release-events": [
+              {
+                "date": "2015-05-01",
+                "area": {
+                  "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+                  "name": "Australia",
+                  "sort-name": "Australia",
+                  "iso-3166-1-codes": [
+                    "AU"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "6ed0df56-0089-3df0-9721-0c0ab4179320",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c126f525-8a0f-4dfd-a848-a0caab1011b1",
+                    "number": "8",
+                    "title": "2 On"
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c6249b68-8eb7-4351-9099-86ef2a686dbd",
+        "score": 100,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On",
+        "length": 224560,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014",
+        "releases": [
+          {
+            "id": "84dec9eb-6913-473f-9573-5c893d1207f2",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Now That’s What I Call Music 68",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "bfa7debb-0693-43c8-b90a-01d6db239efe",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Now That’s What I Call Music 68",
+              "disambiguation": "South Africa",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014",
+            "country": "ZA",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+                  "name": "South Africa",
+                  "sort-name": "South Africa",
+                  "iso-3166-1-codes": [
+                    "ZA"
+                  ]
+                }
+              }
+            ],
+            "track-count": 42,
+            "media": [
+              {
+                "id": "ccecc608-fd4b-39cf-85dd-4b978c71e5e1",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c10c4aba-fa5e-48f9-9aed-111418ed0ff5",
+                    "number": "11",
+                    "title": "2 On",
+                    "length": 224560
+                  }
+                ],
+                "track-count": 21,
+                "track-offset": 10
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USRC11302197"
+        ]
+      },
+      {
+        "id": "5cce6bc0-4713-4af5-8220-049cedcad770",
+        "score": 100,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On",
+        "length": 219000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-11-17",
+        "releases": [
+          {
+            "id": "cca83bef-b12b-47d2-b853-19123e455069",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Essential R&B 2015",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a0dcda6c-5bcc-431e-89d0-cba61981aba1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Essential R&B 2015",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014-11-17",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014-11-17",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 40,
+            "media": [
+              {
+                "id": "72ae0181-d566-3e90-947f-ac6a93f10bcf",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "952b4b6b-75e0-4fa0-95fd-009790afabd0",
+                    "number": "11",
+                    "title": "2 On",
+                    "length": 219000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 10
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USRC11302196"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "pop"
+          },
+          {
+            "count": 2,
+            "name": "soul"
+          },
+          {
+            "count": 2,
+            "name": "r&b"
+          },
+          {
+            "count": 1,
+            "name": "contemporary r&b"
+          },
+          {
+            "count": 1,
+            "name": "urban soul"
+          }
+        ]
+      },
+      {
+        "id": "3b5d29c5-0fbc-41da-809c-ba1a95f1b7f4",
+        "score": 100,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On",
+        "length": 218413,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2015",
+        "releases": [
+          {
+            "id": "1cae026d-18f4-4cb4-b6bf-400413ff76b6",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "The Guestlist - The Exclusive Album",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "dbd9ba90-67c9-47cb-95e5-3acdc330fb9a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Guestlist - The Exclusive Album",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2015",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "2015",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 40,
+            "media": [
+              {
+                "id": "aab1aabf-b1b8-3fa7-85c0-b6969c0c3ff5",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e8ae00f5-ad43-47d6-af21-c26ec708b81b",
+                    "number": "9",
+                    "title": "2 On",
+                    "length": 218413
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c1422ddd-d470-4226-81d4-a9260c1c1f52",
+        "score": 100,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On",
+        "length": 230320,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-11-03",
+        "releases": [
+          {
+            "id": "5c98c696-24fd-4bfd-90c0-f7729b722871",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Planète Rap 2014 Vol. 3",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5ae21cc3-6a3e-40a2-8c13-526a1148faf0",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Planete Rap 2014 Vol. 3",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014-11-03",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2014-11-03",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "d9393473-7c47-3c6d-9229-6646bcd483fb",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "53c32075-b5ed-4611-88b6-cdccfce9d3c1",
+                    "number": "11",
+                    "title": "2 On",
+                    "length": 230320
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0158a473-0962-44a6-9ea0-9ebc3c23c021",
+        "score": 94,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On (remix)",
+        "length": 228000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2015-11-21",
+        "releases": [
+          {
+            "id": "e3891688-9f06-4d51-81f3-38c31751f4d2",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "fc06495b-51ae-3a09-9d55-1fc554cac2f4",
+            "count": 1,
+            "title": "Electro Party",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "DJ Hi Volume",
+                "artist": {
+                  "id": "d9b7f78d-5a5a-4e21-aba9-26ed20aa2351",
+                  "name": "DJ Hi Volume",
+                  "sort-name": "DJ Hi Volume"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "280731c7-7c0b-4a0f-a4b6-7c8a3df344b5",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Electro Party",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Mixtape/Street"
+              ],
+              "secondary-type-ids": [
+                "15c1b1f5-d893-3375-a1db-e180c5ae15ed"
+              ]
+            },
+            "date": "2015-11-21",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2015-11-21",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "13dd19a0-24b1-32e5-82c9-6b27ec8656e5",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "daa72f1b-13a3-437c-887e-150919b18706",
+                    "number": "2",
+                    "title": "2 On (remix)",
+                    "length": 228000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a4d641f6-7a81-4a8f-b45e-b5fc9d002889",
+        "score": 90,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On (Re-Drum)",
+        "length": 235000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2015-03-17",
+        "releases": [
+          {
+            "id": "0a22de8e-3ecf-4473-b478-0d490bbd6088",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "fe04cefd-7d50-36be-b7b7-6358d9ad1422",
+            "count": 1,
+            "title": "Spring Break 2015",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "DJ Kam Bennett",
+                "artist": {
+                  "id": "6878bd6c-07c4-4bb5-8afe-a890f0ae1443",
+                  "name": "DJ Kam Bennett",
+                  "sort-name": "DJ Kam Bennett"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a332f1c6-f77c-4a7e-be74-cb8571aee889",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Spring Break 2015",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Mixtape/Street"
+              ],
+              "secondary-type-ids": [
+                "15c1b1f5-d893-3375-a1db-e180c5ae15ed"
+              ]
+            },
+            "date": "2015-03-17",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2015-03-17",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 27,
+            "media": [
+              {
+                "id": "06fc0e0b-71b2-3230-b91c-b51d280c015e",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "973565b5-f482-4ba0-a66f-85914f7a22a3",
+                    "number": "1",
+                    "title": "2 On (Re-Drum)",
+                    "length": 235000
+                  }
+                ],
+                "track-count": 27,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9d9a7fcf-d30a-44ba-9534-984d0a8f6ac4",
+        "score": 90,
+        "artist-credit-id": "8646e48e-ba74-3a86-b38c-e03f97e7c3a5",
+        "title": "2 On",
+        "length": 166000,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": ", ",
+            "name": "Drake",
+            "artist": {
+              "id": "9fff2f8a-21e6-47de-a2b8-7f449929d43f",
+              "name": "Drake",
+              "sort-name": "Drake",
+              "disambiguation": "Canadian rapper",
+              "aliases": [
+                {
+                  "sort-name": "Drake",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "ドレイク",
+                  "locale": "ja_JP",
+                  "type": "Artist name",
+                  "primary": true,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Champagne Papi",
+                  "name": "Champagne Papi",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Graham, Aubrey Drake",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Aubrey Drake Graham",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "C. Papi",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "C. Papi",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2015-01-26",
+        "releases": [
+          {
+            "id": "2b01f5b6-7f17-4cdd-98cc-9bbe8313fbaf",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "d9e3db20-158c-3507-bbb9-eecc449f9e3d",
+            "count": 1,
+            "title": "From the Bottom to the Top",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "joinphrase": " / ",
+                "name": "DJ Smoke",
+                "artist": {
+                  "id": "032e63d5-a95f-4afb-8f04-c13803eeabd9",
+                  "name": "DJ Smoke",
+                  "sort-name": "Smoke, DJ",
+                  "disambiguation": "mixtape producer"
+                }
+              },
+              {
+                "name": "Drake",
+                "artist": {
+                  "id": "9fff2f8a-21e6-47de-a2b8-7f449929d43f",
+                  "name": "Drake",
+                  "sort-name": "Drake",
+                  "disambiguation": "Canadian rapper"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "8ab0c6fa-fc07-4410-85a6-75c7b0dabadd",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "From the Bottom to the Top",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Mixtape/Street"
+              ],
+              "secondary-type-ids": [
+                "15c1b1f5-d893-3375-a1db-e180c5ae15ed"
+              ]
+            },
+            "date": "2015-01-26",
+            "country": "FR",
+            "release-events": [
+              {
+                "date": "2015-01-26",
+                "area": {
+                  "id": "08310658-51eb-3801-80de-5a0739207115",
+                  "name": "France",
+                  "sort-name": "France",
+                  "iso-3166-1-codes": [
+                    "FR"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "9caff525-bd4e-32bc-8409-a4ff61eb0574",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c06fb51e-fe13-4636-863c-6394b9fd2153",
+                    "number": "24",
+                    "title": "2 On",
+                    "length": 166000
+                  }
+                ],
+                "track-count": 28,
+                "track-offset": 23
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "76ec5c16-4b76-474e-8d3e-79a1cf9fe48c",
+        "score": 87,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On (Boeboes 10K Flip)",
+        "length": 329000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-07-31",
+        "releases": [
+          {
+            "id": "6f4a18c3-4ce1-4627-8f31-8e0ca625e720",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Certified Clubtapes, Vol. 3",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7f253a67-ceb8-4922-ad09-d4fce1360a7b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Certified Clubtapes, Vol. 3",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Mixtape/Street"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "15c1b1f5-d893-3375-a1db-e180c5ae15ed"
+              ]
+            },
+            "date": "2014-07-31",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-07-31",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "962aba7b-5d11-38c4-9b08-d7ea5a63da54",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "4da35150-c28b-4942-9173-c1bfc3b15b05",
+                    "number": "7",
+                    "title": "2 On (Boeboes 10K Flip)",
+                    "length": 329000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2b18f022-01d8-4d2d-9ad7-d6c2609b6645",
+        "score": 85,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On (Yung Gud ☹ Remix)",
+        "length": 220000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020-08-11",
+        "releases": [
+          {
+            "id": "7d508c81-69c7-4468-8e0a-1aee7ddc1c12",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "b1aa8c98-a090-3393-b373-6f797a9c0322",
+            "count": 1,
+            "title": "Gud Discography",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Gud",
+                "artist": {
+                  "id": "0906a2cc-bba3-4ad8-b5d0-a84f8a975bed",
+                  "name": "Gud",
+                  "sort-name": "Gud",
+                  "disambiguation": "Sad Boys producer, formerly Yung Gud"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "bf97ab30-9d55-45e8-aa39-5f66ad5193fd",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Gud Discography",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2020-08-11",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2020-08-11",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 50,
+            "media": [
+              {
+                "id": "a4fc80be-af38-321e-bf1c-218b99e73a9f",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "6155bd29-374f-4845-a6d6-9455af2a1507",
+                    "number": "35",
+                    "title": "2 On (Yung Gud ☹ Remix)",
+                    "length": 220000
+                  }
+                ],
+                "track-count": 50,
+                "track-offset": 34
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "8d3cf65a-546b-4d50-93fb-dbae788d189a",
+        "score": 82,
+        "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+        "title": "2 On (Ruddyp & Carling Ruse remix)",
+        "length": 197564,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-08-10",
+        "releases": [
+          {
+            "id": "39068d08-8461-4110-bd44-d89d5c26acef",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "2 On (Ruddyp & Carling Ruse remix)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "55c72b10-183a-4d20-904d-b45654fa0982",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "2 On (Ruddyp & Carling Ruse remix)",
+              "primary-type": "Single"
+            },
+            "date": "2014-08-10",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-08-10",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "7f4377d7-f604-4dba-9af7-3b78ef3f269d",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "929bc1d0-6ca9-4beb-9d7d-e682df99d1e0",
+                    "number": "1",
+                    "title": "2 On (Ruddyp & Carling Ruse remix)",
+                    "length": 197564
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "alternative r&b"
+          }
+        ]
+      },
+      {
+        "id": "fb6a1752-c04c-440a-b8bb-3e7f3e17d3d1",
+        "score": 77,
+        "artist-credit-id": "3764c408-b795-34f9-b8b7-64c26382c046",
+        "title": "2 On (remix)",
+        "length": 253000,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " feat. ",
+            "name": "Claptomanik",
+            "artist": {
+              "id": "8f565670-8271-4ea4-9684-f944b0af039c",
+              "name": "Claptomanik",
+              "sort-name": "Claptomanik",
+              "disambiguation": "German producer",
+              "aliases": [
+                {
+                  "sort-name": "Jung, Wadim",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Wadim Jung",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014",
+        "releases": [
+          {
+            "id": "6cdc5bf7-f5ec-419f-acd0-ccddeff470b6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c7f8f17a-c961-3cf8-9f99-8cb03385bd70",
+            "count": 1,
+            "title": "Love & Rhodes",
+            "status": "Official",
+            "disambiguation": "Soundcloud version",
+            "artist-credit": [
+              {
+                "name": "Claptomanik",
+                "artist": {
+                  "id": "8f565670-8271-4ea4-9684-f944b0af039c",
+                  "name": "Claptomanik",
+                  "sort-name": "Claptomanik",
+                  "disambiguation": "German producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c5e89d95-d366-44ae-a08e-c684dfabec24",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Love & Rhodes",
+              "primary-type": "EP",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2014",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "b8e2a3f2-489c-3b50-b3cb-92c3c23a53f3",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "91c9d716-6083-4b81-acd9-db371c192bb2",
+                    "number": "2",
+                    "title": "2 On (remix)",
+                    "length": 278000
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 1
+              }
+            ]
+          },
+          {
+            "id": "a7d27244-9dcf-41d6-89e9-691db8a7762e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "c7f8f17a-c961-3cf8-9f99-8cb03385bd70",
+            "count": 1,
+            "title": "Love & Rhodes",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Claptomanik",
+                "artist": {
+                  "id": "8f565670-8271-4ea4-9684-f944b0af039c",
+                  "name": "Claptomanik",
+                  "sort-name": "Claptomanik",
+                  "disambiguation": "German producer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c5e89d95-d366-44ae-a08e-c684dfabec24",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Love & Rhodes",
+              "primary-type": "EP",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2014",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "9d32ca26-f189-344a-8485-e797a69daa1a",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "e4c2b71b-53c2-4e78-a636-db1945a62195",
+                    "number": "3",
+                    "title": "2 On (remix)",
+                    "length": 253000
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d28b31d8-fc18-4cf8-a1aa-bd865b3753cf",
+        "score": 77,
+        "artist-credit-id": "716982c1-3601-4b24-99c9-dbe942c0a082",
+        "title": "2 On",
+        "length": 240000,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " feat. ",
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Brooke Candy",
+            "artist": {
+              "id": "4298f9c0-4311-4411-9153-da73775b0b0c",
+              "name": "Brooke Candy",
+              "sort-name": "Candy, Brooke",
+              "disambiguation": "pop singer/rapper"
+            }
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "hip hop"
+          },
+          {
+            "count": 1,
+            "name": "rnb"
+          }
+        ]
+      },
+      {
+        "id": "13007634-6f32-4442-af9e-76bc6a35c83c",
+        "score": 77,
+        "artist-credit-id": "e9855908-aa4c-3397-a738-2f394109acc1",
+        "title": "2 On",
+        "length": 227000,
+        "disambiguation": "explicit",
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " feat. ",
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Schoolboy Q",
+            "artist": {
+              "id": "bce6d667-cde8-485e-b078-c0a05adea36d",
+              "name": "ScHoolboy Q",
+              "sort-name": "ScHoolboy Q",
+              "aliases": [
+                {
+                  "sort-name": "Hanley, Quincy",
+                  "name": "Quincy Hanley",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Hanley, Quincy Matthew",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Quincy Matthew Hanley",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-01-21",
+        "releases": [
+          {
+            "id": "b1848960-73ae-46ef-b65e-c7fdb5f1ecd3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e32f72fd-6f5f-42f1-a080-b209df246e47",
+            "count": 1,
+            "title": "2 On",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "joinphrase": " ft. ",
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              },
+              {
+                "name": "ScHoolboy Q",
+                "artist": {
+                  "id": "bce6d667-cde8-485e-b078-c0a05adea36d",
+                  "name": "ScHoolboy Q",
+                  "sort-name": "ScHoolboy Q"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "4c12c548-a6b4-4504-b73f-ed6383d3bf01",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "2 On",
+              "primary-type": "Single"
+            },
+            "track-count": 1,
+            "media": [
+              {
+                "id": "0dc3719f-a546-355b-beae-7fa2ff2340eb",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "a98ddd56-b210-477d-851f-930b009a49d8",
+                    "number": "1",
+                    "title": "2 On",
+                    "length": 230000
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "b215b5f2-62a3-451f-80c7-8a6e33e3d165",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Academia 2024/2025 - Treino Animado",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ce9a3e39-728e-432e-9ee4-8e0ec0c98e73",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Academia 2024/2025 - Treino Animado",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 45,
+            "media": [
+              {
+                "id": "e605e613-32a8-3ef1-a6bd-29ccdfbe7946",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "cc36b4a4-e7e0-4a4f-a75a-916e26b3bb40",
+                    "number": "44",
+                    "title": "2 On",
+                    "length": 226920
+                  }
+                ],
+                "track-count": 45,
+                "track-offset": 43
+              }
+            ]
+          },
+          {
+            "id": "011505e1-9dfe-49fd-8639-6cb11f65e1b6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "The Sound of Wireless",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "d26fd373-fe09-404d-a4fb-f700bcf5e7f7",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Sound of Wireless",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2015",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2015",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 40,
+            "media": [
+              {
+                "id": "3e45ddf0-c2be-3eb2-ab59-c2cfb77f524c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "b4c4aa3b-b52d-4735-b9f6-c458c055f043",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 225386
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "0866e549-61d3-4201-b710-aa44c435d3fc",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "Promo Only: Mainstream Radio, August 2014",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "46a21c9b-e019-4d1b-b154-320fc71c2b5d",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Promo Only: Mainstream Radio, August 2014",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2014-08-01",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2014-08-01",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 22,
+            "media": [
+              {
+                "id": "99d30938-2f95-3751-bacc-e33d39e19a3c",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "1324bdc5-dc98-4259-8321-41b5ea6a0a5a",
+                    "number": "21",
+                    "title": "2 On",
+                    "length": 226000
+                  }
+                ],
+                "track-count": 22,
+                "track-offset": 20
+              }
+            ]
+          },
+          {
+            "id": "88c8ab73-3232-478e-aa64-86ab5756fb24",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "date": "2014-10-03",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-10-03",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "25b95815-f924-30aa-a770-d93c9140ffb6",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "08f19893-b03f-4304-b94e-6ede9c08fa98",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "8e71860c-a772-49b4-b1a3-dfbeefb17620",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "The Beat Is Mine",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "bc473d23-71c5-4e7b-b6f8-ff46e4cece9a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Beat Is Mine",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 59,
+            "media": [
+              {
+                "id": "9510fd84-28a4-3a75-927f-2d71f32f5245",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "ada1e07d-01d0-42e1-884b-f1bf29532bdd",
+                    "number": "11",
+                    "title": "2 On",
+                    "length": 223897
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "e99243f8-1b09-49d3-82d3-cf15fd912575",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "date": "2014-10-03",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "2014-10-03",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 20,
+            "media": [
+              {
+                "id": "dfa333a2-e4a4-34e5-b8da-6029f57ebc3c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "dd079b2b-e9cf-42d8-b044-169216e54533",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "27926a06-83a3-42e1-8a37-8f5b4b909266",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "The Beat Is Mine",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "bc473d23-71c5-4e7b-b6f8-ff46e4cece9a",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Beat Is Mine",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "track-count": 60,
+            "media": [
+              {
+                "id": "da741a0b-1f8d-3fb0-9b43-eda31cb46a64",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "3e902b46-1bd6-4390-8368-8d9d0b590cb2",
+                    "number": "32",
+                    "title": "2 On",
+                    "length": 223897
+                  }
+                ],
+                "track-count": 60,
+                "track-offset": 31
+              }
+            ]
+          },
+          {
+            "id": "2b682fd6-372c-4990-b60d-b4e00bf9c046",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "date": "2014-10-06",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2014-10-06",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "ff96f0ba-1f9d-33da-a56c-00cab5170615",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "9350ac95-17b2-4879-bdad-7fbb24505725",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "0b4566cb-95ef-4637-bd75-11b7d628ec48",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "date": "2014-10-07",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2014-10-07",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 19,
+            "media": [
+              {
+                "id": "e5acce98-f4d8-3480-afb1-63e021de95ba",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "e7d366bd-1f80-48ff-aba8-f1532bdc6d57",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 19,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "22f97014-b1cf-4e6e-b3e4-147c7de05aef",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "date": "2014-10-07",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2014-10-07",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "b41ff492-41e0-3aff-96b5-1038c0964e0d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a6b3da27-a02d-4469-bbba-aa4ac84cc52d",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "85ad9080-d7a7-4540-aed5-b7807b2dcbc5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "date": "2016-09-29",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2016-09-29",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 18,
+            "media": [
+              {
+                "id": "6e5dd099-4389-3f47-91b4-beda5db7ad59",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "352401ac-0e43-46d9-84ef-71e8e07757a2",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 4
+              }
+            ]
+          },
+          {
+            "id": "394746fd-020e-46e7-96d7-28b08e2d925d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "8da0c01c-b7e7-3fa0-8959-b85bbfbe568b",
+            "count": 1,
+            "title": "Aquarius",
+            "status": "Official",
+            "disambiguation": "Google Play exclusive deluxe version",
+            "artist-credit": [
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "89c12bdc-9525-4d9d-bd4e-66e8ca16708d",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Aquarius",
+              "primary-type": "Album"
+            },
+            "track-count": 20,
+            "media": [
+              {
+                "id": "1b484459-546d-385c-baf9-3fddb84fba8e",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "36762326-771a-42b2-b606-2fe59d946191",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 227108
+                  }
+                ],
+                "track-count": 20,
+                "track-offset": 4
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "USRC11301176"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "pop"
+          },
+          {
+            "count": 1,
+            "name": "hip hop"
+          },
+          {
+            "count": 1,
+            "name": "contemporary r&b"
+          },
+          {
+            "count": 1,
+            "name": "alternative r&b"
+          },
+          {
+            "count": 1,
+            "name": "ratchet music"
+          }
+        ]
+      },
+      {
+        "id": "ff48d5f2-fff2-45b9-a2f0-3f395185feaf",
+        "score": 73,
+        "artist-credit-id": "0b0bfea4-bf84-36b7-b0d5-f476edee6335",
+        "title": "2 On",
+        "length": 281000,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " ft. ",
+            "name": "Drake",
+            "artist": {
+              "id": "9fff2f8a-21e6-47de-a2b8-7f449929d43f",
+              "name": "Drake",
+              "sort-name": "Drake",
+              "disambiguation": "Canadian rapper",
+              "aliases": [
+                {
+                  "sort-name": "Drake",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "ドレイク",
+                  "locale": "ja_JP",
+                  "type": "Artist name",
+                  "primary": true,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Champagne Papi",
+                  "name": "Champagne Papi",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Graham, Aubrey Drake",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Aubrey Drake Graham",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "C. Papi",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "C. Papi",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "joinphrase": ", ",
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "ScHoolboy Q",
+            "artist": {
+              "id": "bce6d667-cde8-485e-b078-c0a05adea36d",
+              "name": "ScHoolboy Q",
+              "sort-name": "ScHoolboy Q",
+              "aliases": [
+                {
+                  "sort-name": "Hanley, Quincy",
+                  "name": "Quincy Hanley",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Hanley, Quincy Matthew",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Quincy Matthew Hanley",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-08-26",
+        "releases": [
+          {
+            "id": "0c604164-e1d9-4e58-98dc-d905fd11f849",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "c4a830d6-bcd5-36a9-80bb-fecc6bc92825",
+            "count": 1,
+            "title": "Tuesday",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Drake",
+                "artist": {
+                  "id": "9fff2f8a-21e6-47de-a2b8-7f449929d43f",
+                  "name": "Drake",
+                  "sort-name": "Drake",
+                  "disambiguation": "Canadian rapper"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "1c2ec753-3800-4c22-87ca-8aae3471eb37",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Tuesday",
+              "primary-type": "EP",
+              "secondary-types": [
+                "Mixtape/Street"
+              ],
+              "secondary-type-ids": [
+                "15c1b1f5-d893-3375-a1db-e180c5ae15ed"
+              ]
+            },
+            "date": "2014-08-26",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-08-26",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "c369f303-2af0-3fef-bd51-5040b323ad66",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b267d5cd-305f-4d9e-a5f5-815f672b236f",
+                    "number": "5",
+                    "title": "2 On",
+                    "length": 281000
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "786aec78-8448-4d94-9e8d-e2efaffa6b74",
+        "score": 68,
+        "artist-credit-id": "e39b5309-4659-4513-927e-71f4a6acf351",
+        "title": "2 On (remix)",
+        "length": 137000,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " x ",
+            "name": "LL Cool J",
+            "artist": {
+              "id": "a4dd0e77-83b8-4e92-89b7-effb0e47fd8c",
+              "name": "LL Cool J",
+              "sort-name": "LL Cool J",
+              "aliases": [
+                {
+                  "sort-name": "エルエル・クール・ジェイ",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "エルエル・クール・ジェイ",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": true,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "J., L.L.Cool",
+                  "name": "L.L.Cool J.",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "LL Cool J.",
+                  "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                  "name": "LL Cool J.",
+                  "locale": null,
+                  "type": "Search hint",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "L. L. Cool J",
+                  "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                  "name": "L. L. Cool J",
+                  "locale": null,
+                  "type": "Search hint",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "L.L. Cool J",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "L.L. Cool J",
+                  "locale": "en",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Smith, J.T.",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "J.T. Smith",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Smith, Todd",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Todd Smith",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "James T. Smith",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "James T. Smith",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Smith, James Todd",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "James Todd Smith",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "LL Cool J & The Dream",
+                  "name": "LL Cool J & The Dream",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Ladies Love Cool James",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Ladies Love Cool James",
+                  "locale": "en",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2014-09-03",
+        "releases": [
+          {
+            "id": "d7a7aa69-5c69-4533-a2d8-f7a925b43401",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e39b5309-4659-4513-927e-71f4a6acf351",
+            "count": 1,
+            "title": "2 On (remix)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "joinphrase": " x ",
+                "name": "LL Cool J",
+                "artist": {
+                  "id": "a4dd0e77-83b8-4e92-89b7-effb0e47fd8c",
+                  "name": "LL Cool J",
+                  "sort-name": "LL Cool J"
+                }
+              },
+              {
+                "name": "Tinashe",
+                "artist": {
+                  "id": "396a9525-0994-4542-b480-c4587feeb476",
+                  "name": "Tinashe",
+                  "sort-name": "Tinashe",
+                  "disambiguation": "American R&B singer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f92bfe68-e4d4-4fed-9f5f-c94abdbb0484",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "2 On (remix)",
+              "primary-type": "Single",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "2014-09-03",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2014-09-03",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "3aa86986-f878-3de4-ac59-288364c3447a",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "c142ab7b-4c2b-4484-83f5-3e81b23c02fd",
+                    "number": "1",
+                    "title": "2 On (remix)",
+                    "length": 137000
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0b8eb2fe-b635-427f-a9f7-01a4f52b5862",
+        "score": 62,
+        "artist-credit-id": "b0805d22-f3bf-30de-8121-accaa104a28a",
+        "title": "2 On (10cust & Alirealquick remix)",
+        "length": 145000,
+        "disambiguation": "part of “Pride 2025” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " feat. ",
+            "name": "Tinashe",
+            "artist": {
+              "id": "396a9525-0994-4542-b480-c4587feeb476",
+              "name": "Tinashe",
+              "sort-name": "Tinashe",
+              "disambiguation": "American R&B singer",
+              "aliases": [
+                {
+                  "sort-name": "Jorgenson Kachingwe, Tinashe",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Tinashe Jorgenson Kachingwe",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "ScHoolboy Q",
+            "artist": {
+              "id": "bce6d667-cde8-485e-b078-c0a05adea36d",
+              "name": "ScHoolboy Q",
+              "sort-name": "ScHoolboy Q",
+              "aliases": [
+                {
+                  "sort-name": "Hanley, Quincy",
+                  "name": "Quincy Hanley",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Hanley, Quincy Matthew",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Quincy Matthew Hanley",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2025-06-01",
+        "releases": [
+          {
+            "id": "423632ec-bb1f-4cc7-b3b8-9f91402c35a3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "aa14081c-74bf-3c6f-b602-46bad14423e9",
+            "count": 1,
+            "title": "Pride 2025",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Alice Longyu Gao",
+                "artist": {
+                  "id": "a0b6734c-a0fb-4068-b667-06483ad73719",
+                  "name": "Alice Longyu Gao",
+                  "sort-name": "Gao, Alice Longyu"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "fbf14717-5571-4036-9bd0-5dbaee0932e1",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Pride 2025",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 26,
+            "media": [
+              {
+                "id": "4625a295-7410-4d1a-be1a-62e3958bac95",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "a16a48ad-75cb-41e0-a177-09128e48d44b",
+                    "number": "23",
+                    "title": "2 On (10cust & Alirealquick remix)",
+                    "length": 145000
+                  }
+                ],
+                "track-count": 26,
+                "track-offset": 22
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "US23A9832942"
+        ]
+      }
+    ]
+  }
+}

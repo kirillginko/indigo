@@ -1,0 +1,175 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/eec7e4d1-bf66-4238-b16d-c6491b51d2ab?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:53.647972+00:00",
+  "body": {
+    "releases": [
+      {
+        "date": "1975-05",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Spirit",
+              "country": "US",
+              "disambiguation": "psychedelic rock",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "type": "Group",
+              "name": "Spirit"
+            },
+            "joinphrase": "",
+            "name": "Spirit"
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status": "Official",
+        "packaging": "Cardboard/Paper Sleeve",
+        "title": "Spirit of ’76",
+        "disambiguation": "",
+        "barcode": "",
+        "id": "318f6886-6545-3846-a748-ccd17455d0b0",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "name": "United States"
+            },
+            "date": "1975-05"
+          }
+        ],
+        "quality": "normal"
+      },
+      {
+        "country": "GB",
+        "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+        "status": "Official",
+        "packaging": "Gatefold Cover",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Spirit",
+            "artist": {
+              "type": "Group",
+              "name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "country": "US",
+              "disambiguation": "psychedelic rock",
+              "sort-name": "Spirit"
+            }
+          }
+        ],
+        "date": "1975",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "",
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "1975",
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null
+            }
+          }
+        ],
+        "id": "d5df34c3-dcb3-4a8f-a0bd-fd7adfbba104",
+        "disambiguation": "",
+        "title": "Spirit of ’76"
+      },
+      {
+        "disambiguation": "",
+        "title": "Spirit of ’76",
+        "quality": "normal",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "type": null,
+              "name": "United Kingdom",
+              "type-id": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            },
+            "date": "2003"
+          }
+        ],
+        "id": "0d20b557-30a5-47fe-afa3-32791f4204a0",
+        "barcode": "5017261206053",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Spirit",
+            "artist": {
+              "type": "Group",
+              "name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "country": "US",
+              "disambiguation": "psychedelic rock",
+              "sort-name": "Spirit"
+            }
+          }
+        ],
+        "date": "2003",
+        "country": "GB",
+        "packaging-id": null,
+        "status": null,
+        "packaging": null,
+        "status-id": null
+      }
+    ],
+    "length": 205853,
+    "id": "eec7e4d1-bf66-4238-b16d-c6491b51d2ab",
+    "first-release-date": "1975-05",
+    "video": false,
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "name": "Spirit",
+        "joinphrase": "",
+        "artist": {
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+          "type": "Group",
+          "name": "Spirit",
+          "sort-name": "Spirit",
+          "country": "US",
+          "disambiguation": "psychedelic rock"
+        }
+      }
+    ],
+    "isrcs": [],
+    "title": "Feeling in Time"
+  }
+}

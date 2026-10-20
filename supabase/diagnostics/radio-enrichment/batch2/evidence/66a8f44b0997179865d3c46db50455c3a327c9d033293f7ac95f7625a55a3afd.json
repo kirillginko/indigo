@@ -1,0 +1,177 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/0c8e9b5e-b73b-4f5b-8268-24a0c4601331?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:06.038288+00:00",
+  "body": {
+    "first-release-date": "2003-01",
+    "releases": [
+      {
+        "date": "2003-01",
+        "release-events": [
+          {
+            "date": "2003-01",
+            "area": {
+              "disambiguation": "",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "type-id": null,
+              "sort-name": "France",
+              "type": null,
+              "name": "France"
+            }
+          }
+        ],
+        "barcode": "044006911328",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "92124c53-5ccd-4f5b-840b-41fefbf02453",
+        "status": "Official",
+        "quality": "normal",
+        "packaging": null,
+        "title": "Pop à Paris, Volume 5 : S.O.S. Mesdemoiselles",
+        "text-representation": {
+          "script": "Latn",
+          "language": "fra"
+        },
+        "country": "FR",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": null
+      },
+      {
+        "country": "XE",
+        "text-representation": {
+          "script": "Latn",
+          "language": "fra"
+        },
+        "title": "Pop à Paris Vol.5 S.O.S. mesdemoiselles",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": null,
+        "quality": "normal",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "80ecb967-c18d-499e-801a-4d8a352d8495",
+        "status": "Official",
+        "release-events": [
+          {
+            "area": {
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "sort-name": "Europe",
+              "type-id": null,
+              "name": "Europe",
+              "type": null
+            },
+            "date": "2010"
+          }
+        ],
+        "barcode": "044006911311",
+        "date": "2010"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "country": "XW",
+        "text-representation": {
+          "language": "fra",
+          "script": "Latn"
+        },
+        "title": "Pop à Paris - Sensationnel",
+        "packaging": "None",
+        "quality": "normal",
+        "status": "Official",
+        "id": "7f06c6ce-b63d-4180-96c7-a4aa47983ab8",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "00602488516365",
+        "release-events": [
+          {
+            "date": "2025-02-28",
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "sort-name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2025-02-28"
+      }
+    ],
+    "video": false,
+    "isrcs": [
+      "FRZ026601170"
+    ],
+    "length": 148040,
+    "title": "Seul",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Stone",
+        "artist": {
+          "name": "Stone",
+          "type": "Person",
+          "id": "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8",
+          "disambiguation": "1960s~2010s French variété singer Annie Gautrat / Stone & Charden",
+          "sort-name": "Stone",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "FR"
+        }
+      }
+    ],
+    "disambiguation": "",
+    "id": "0c8e9b5e-b73b-4f5b-8268-24a0c4601331"
+  }
+}

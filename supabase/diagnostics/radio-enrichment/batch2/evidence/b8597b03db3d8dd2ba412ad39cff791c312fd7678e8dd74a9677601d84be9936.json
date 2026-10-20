@@ -1,0 +1,308 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Continuum+1%22+AND+artist%3A%22Nala+Sinephro%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:28.907471+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:28.832Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "9c66ba84-8cc2-46a5-b57c-174eafd38821",
+        "score": 100,
+        "artist-credit-id": "407d948c-3757-30c2-968d-fb948a00f00d",
+        "title": "Continuum 1",
+        "length": 433760,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Nala Sinephro",
+            "artist": {
+              "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+              "name": "Nala Sinephro",
+              "sort-name": "Sinephro, Nala",
+              "disambiguation": "Caribbean-Belgian jazz artist",
+              "aliases": [
+                {
+                  "sort-name": "Sinephro",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Sinephro",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Sinephro Cool, Clara Joana Virginia",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Clara Joana Virginia Sinephro Cool",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Sinephro, Clara",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Clara Sinephro",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2024-08-07",
+        "releases": [
+          {
+            "id": "19cfb22c-574e-4f16-9bd5-8c37588af5a3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "407d948c-3757-30c2-968d-fb948a00f00d",
+            "count": 1,
+            "title": "Continuum 1",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Nala Sinephro",
+                "artist": {
+                  "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+                  "name": "Nala Sinephro",
+                  "sort-name": "Sinephro, Nala",
+                  "disambiguation": "Caribbean-Belgian jazz artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "fae1d7bf-ad18-49dd-8de1-15aaed01023a",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Continuum 1",
+              "primary-type": "Single"
+            },
+            "date": "2024-08-07",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2024-08-07",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "a22565c2-4272-3e05-b9d1-ef539e2470e8",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "119ba8ee-fe80-40a0-b453-a2bf2f7063c7",
+                    "number": "1",
+                    "title": "Continuum 1",
+                    "length": 433750
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "055e9a23-6bf1-4a42-b558-11aa2e0ed850",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "407d948c-3757-30c2-968d-fb948a00f00d",
+            "count": 1,
+            "title": "Endlessness",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Nala Sinephro",
+                "artist": {
+                  "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+                  "name": "Nala Sinephro",
+                  "sort-name": "Sinephro, Nala",
+                  "disambiguation": "Caribbean-Belgian jazz artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ed3161a7-d4fc-436a-9225-eec44f5bbcf9",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Endlessness",
+              "primary-type": "Album"
+            },
+            "date": "2024-09-06",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2024-09-06",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "7bf55604-9336-3e7e-8fb5-165f815adf5a",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "45376f33-9279-4670-977c-969ef029b8a3",
+                    "number": "1",
+                    "title": "Continuum 1",
+                    "length": 433760
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "ed69d708-3f8e-43f0-bd46-3bf3e65948b8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "407d948c-3757-30c2-968d-fb948a00f00d",
+            "count": 1,
+            "title": "Endlessness",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Nala Sinephro",
+                "artist": {
+                  "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+                  "name": "Nala Sinephro",
+                  "sort-name": "Sinephro, Nala",
+                  "disambiguation": "Caribbean-Belgian jazz artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ed3161a7-d4fc-436a-9225-eec44f5bbcf9",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Endlessness",
+              "primary-type": "Album"
+            },
+            "date": "2024-09-06",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2024-09-06",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 10,
+            "media": [
+              {
+                "id": "747b9797-64f8-33ce-b756-c3237a6a98e1",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b72b12a3-4298-4388-b807-c3e7429492ee",
+                    "number": "1",
+                    "title": "Continuum 1",
+                    "length": 434000
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "431d2e9d-580a-452c-b213-67da3ec292ec",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "407d948c-3757-30c2-968d-fb948a00f00d",
+            "count": 1,
+            "title": "Endlessness",
+            "status": "Official",
+            "disambiguation": "Black 2LP Vinyl",
+            "artist-credit": [
+              {
+                "name": "Nala Sinephro",
+                "artist": {
+                  "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+                  "name": "Nala Sinephro",
+                  "sort-name": "Sinephro, Nala",
+                  "disambiguation": "Caribbean-Belgian jazz artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ed3161a7-d4fc-436a-9225-eec44f5bbcf9",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Endlessness",
+              "primary-type": "Album"
+            },
+            "track-count": 10,
+            "media": [
+              {
+                "id": "43345b61-a67a-3c1b-a0d2-619bfe829678",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "333b8c1f-d0f5-470c-9a8c-776c67c1b258",
+                    "number": "A1",
+                    "title": "Continuum 1"
+                  }
+                ],
+                "track-count": 10,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBBPW2400849"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "ambient"
+          },
+          {
+            "count": 1,
+            "name": "jazz"
+          },
+          {
+            "count": 1,
+            "name": "contemporary jazz"
+          }
+        ]
+      }
+    ]
+  }
+}

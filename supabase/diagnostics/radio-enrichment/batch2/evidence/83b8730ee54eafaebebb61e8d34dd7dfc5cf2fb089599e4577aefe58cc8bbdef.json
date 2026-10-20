@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F3150192&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:11.084851+00:00",
+  "body": {
+    "resource": "https://www.discogs.com/artist/3150192",
+    "id": "0c8c7e7f-a96d-4718-87a2-6e6a0b1134e7",
+    "relations": [
+      {
+        "direction": "backward",
+        "type": "discogs",
+        "attributes": [],
+        "source-credit": "",
+        "artist": {
+          "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+          "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+          "name": "SOPHIE",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person",
+          "sort-name": "SOPHIE"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "target-type": "artist",
+        "ended": false,
+        "attribute-ids": {}
+      }
+    ]
+  }
+}

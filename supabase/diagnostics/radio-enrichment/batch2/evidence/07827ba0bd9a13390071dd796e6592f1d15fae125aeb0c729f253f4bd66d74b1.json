@@ -1,0 +1,261 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/b39bcc7b-f7ff-4040-b80d-639068c8dbdf?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:49.216150+00:00",
+  "body": {
+    "disambiguation": "",
+    "video": false,
+    "artist-credit": [
+      {
+        "name": "War",
+        "artist": {
+          "country": "US",
+          "disambiguation": "US funk/rock band",
+          "sort-name": "War",
+          "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+          "name": "War",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "joinphrase": ""
+      }
+    ],
+    "length": 447000,
+    "first-release-date": "1982",
+    "title": "Cinco de Mayo",
+    "isrcs": [],
+    "id": "b39bcc7b-f7ff-4040-b80d-639068c8dbdf",
+    "releases": [
+      {
+        "date": "1982",
+        "packaging": null,
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "War",
+              "type": "Group",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "sort-name": "War",
+              "disambiguation": "US funk/rock band",
+              "country": "US"
+            },
+            "name": "War"
+          }
+        ],
+        "barcode": null,
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "date": "1982",
+            "area": {
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "name": "United States",
+              "type": null,
+              "type-id": null
+            }
+          }
+        ],
+        "id": "3c2405ea-8ef5-43eb-813c-797427ef3536",
+        "disambiguation": "",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "title": "Outlaw"
+      },
+      {
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "US",
+        "quality": "normal",
+        "title": "Outlaw",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "1995",
+            "area": {
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "name": "United States",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "c0562613-acbb-3563-af57-ac958f8f5e2c",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": null,
+        "status": "Official",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "name": "War",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "disambiguation": "US funk/rock band",
+              "country": "US"
+            },
+            "name": "War"
+          }
+        ],
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1995"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "type": "Group",
+              "name": "War",
+              "country": "US",
+              "disambiguation": "US funk/rock band"
+            },
+            "joinphrase": "",
+            "name": "War"
+          }
+        ],
+        "date": "1995",
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "disambiguation": "",
+        "country": "US",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "quality": "normal",
+        "title": "Outlaw",
+        "status": "Official",
+        "barcode": "081227195625",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": ""
+            },
+            "date": "1995"
+          }
+        ],
+        "id": "42d36ec7-fe7e-413d-92c5-cae2e59e3031"
+      },
+      {
+        "status": "Official",
+        "barcode": "602527598642",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "c109eec9-fb1b-4f0f-b5ff-1c4707eb9938",
+        "release-events": [
+          {
+            "date": "1995",
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "disambiguation": "",
+        "quality": "normal",
+        "title": "Outlaw",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "date": "1995",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "packaging": "None",
+        "artist-credit": [
+          {
+            "name": "War",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "US funk/rock band",
+              "sort-name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "name": "War",
+              "type": "Group",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ]
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "US funk/rock band",
+              "country": "US",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "War",
+              "type": "Group",
+              "sort-name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            },
+            "joinphrase": "",
+            "name": "War"
+          }
+        ],
+        "date": "1995",
+        "packaging": null,
+        "packaging-id": null,
+        "disambiguation": "",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": null,
+        "title": "Outlaw",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "081227195625",
+        "release-events": [
+          {
+            "area": null,
+            "date": "1995"
+          }
+        ],
+        "id": "1948b2c6-d344-43ed-815d-469981581fda"
+      }
+    ]
+  }
+}

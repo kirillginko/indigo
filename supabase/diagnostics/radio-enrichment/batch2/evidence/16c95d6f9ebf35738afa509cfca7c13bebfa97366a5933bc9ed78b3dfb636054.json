@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/59f24e5b-468f-4560-aea5-5175d98aa994?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:23.317225+00:00",
+  "body": {
+    "disambiguation": "",
+    "video": false,
+    "id": "59f24e5b-468f-4560-aea5-5175d98aa994",
+    "releases": [
+      {
+        "text-representation": {
+          "script": null,
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": null,
+        "status": "Official",
+        "country": "ES",
+        "disambiguation": "",
+        "title": "Ibiza Magic (Chill Out Trick)",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "type": "Other"
+            }
+          }
+        ],
+        "packaging": null,
+        "barcode": "0843104299303",
+        "quality": "normal",
+        "date": "2002-01-29",
+        "release-events": [
+          {
+            "date": "2002-01-29",
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "ES"
+              ],
+              "type": null,
+              "sort-name": "Spain",
+              "disambiguation": "",
+              "id": "471c46a7-afc5-31c4-923c-d0444f5053a4",
+              "name": "Spain"
+            }
+          }
+        ],
+        "id": "48611693-8b51-48ac-ac7f-e851016aab25"
+      }
+    ],
+    "isrcs": [],
+    "artist-credit": [
+      {
+        "name": "I:Cube",
+        "joinphrase": "",
+        "artist": {
+          "sort-name": "I:Cube",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "FR",
+          "name": "I:Cube",
+          "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+          "disambiguation": "house music"
+        }
+      }
+    ],
+    "length": 261760,
+    "title": "Tropiq",
+    "first-release-date": "2002-01-29"
+  }
+}

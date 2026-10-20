@@ -1,0 +1,163 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Brother+Ed%22+AND+artist%3A%22Eddie+Harris%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:37.582730+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:37.508Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "1d3ee021-187b-419f-b3fa-f11045526b08",
+        "score": 100,
+        "artist-credit-id": "f9a54c55-69d1-3967-baff-4d00fd6ee13d",
+        "title": "Brother Ed",
+        "length": 421000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Eddie Harris",
+            "artist": {
+              "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+              "name": "Eddie Harris",
+              "sort-name": "Harris, Eddie",
+              "disambiguation": "saxophone, piano, vocals",
+              "aliases": [
+                {
+                  "sort-name": "Eddie Harri",
+                  "name": "Eddie Harri",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1964",
+        "releases": [
+          {
+            "id": "4e71c906-2a5e-4653-b3c9-5b41a735b816",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "f9a54c55-69d1-3967-baff-4d00fd6ee13d",
+            "count": 1,
+            "title": "Cool Sax Warm Heart",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Eddie Harris",
+                "artist": {
+                  "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+                  "name": "Eddie Harris",
+                  "sort-name": "Harris, Eddie",
+                  "disambiguation": "saxophone, piano, vocals"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "ef0554d8-d683-4546-861c-26acdf541034",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Cool Sax Warm Heart",
+              "primary-type": "Album"
+            },
+            "date": "1964",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1964",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 9,
+            "media": [
+              {
+                "id": "a0d3ac35-8398-3a68-87e5-70178dbe9b0c",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "d46c69d4-41ae-4547-bac5-9559774d4a47",
+                    "number": "B3",
+                    "title": "Brother Ed",
+                    "length": 421000
+                  }
+                ],
+                "track-count": 9,
+                "track-offset": 7
+              }
+            ]
+          },
+          {
+            "id": "7f47e150-5285-4e78-98d4-885882aaee46",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "f9a54c55-69d1-3967-baff-4d00fd6ee13d",
+            "count": 1,
+            "title": "Cool Sax, Warm Heart / From Hollywood to Broadway",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Eddie Harris",
+                "artist": {
+                  "id": "f9ba6d40-60f3-4c85-ac23-0bf67c3247e4",
+                  "name": "Eddie Harris",
+                  "sort-name": "Harris, Eddie",
+                  "disambiguation": "saxophone, piano, vocals"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "eb858f8a-7378-3f1f-80f2-d58dc55bf03b",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Cool Sax, Warm Heart / From Hollywood to Broadway",
+              "primary-type": "Album"
+            },
+            "date": "2002-11-22",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2002-11-22",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 21,
+            "media": [
+              {
+                "id": "c2a1ad43-53b3-3810-aa60-f346188d5c2a",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c6895461-f937-3595-9c62-c00394ec1810",
+                    "number": "8",
+                    "title": "Brother Ed",
+                    "length": 421333
+                  }
+                ],
+                "track-count": 21,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

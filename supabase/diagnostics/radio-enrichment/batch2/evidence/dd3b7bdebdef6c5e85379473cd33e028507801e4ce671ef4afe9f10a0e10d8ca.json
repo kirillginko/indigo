@@ -1,0 +1,248 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Tune+For+Us%22+AND+artist%3A%22Djrum%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:57.734521+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:57.630Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "096cf49d-5770-4342-bf5a-1f197563410e",
+        "score": 100,
+        "artist-credit-id": "377b71b7-19a8-384d-96d0-6004e8b4c0f6",
+        "title": "A Tune for Us",
+        "length": 353000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Djrum",
+            "artist": {
+              "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+              "name": "Djrum",
+              "sort-name": "Djrum"
+            }
+          }
+        ],
+        "first-release-date": "2025-01-22",
+        "releases": [
+          {
+            "id": "cb4ba530-d155-450a-a42b-057a2717879b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "100 Tracks: The 2025 Listening Guide",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "eddfcb6a-396d-4bb2-bc3c-9e7b0a7ce467",
+              "type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "primary-type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "title": "100 Tracks: The 2025 Listening Guide",
+              "primary-type": "Other",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2025-12-31",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2025-12-31",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 100,
+            "media": [
+              {
+                "id": "c3301e99-7f91-4a74-806e-ab4b41ceb9be",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "b4100a6e-8294-441f-a72f-69b5aed7d90b",
+                    "number": "27",
+                    "title": "A Tune for Us",
+                    "length": 353000
+                  }
+                ],
+                "track-count": 100,
+                "track-offset": 26
+              }
+            ]
+          },
+          {
+            "id": "3d3dd8c5-57fb-47d7-8a04-e485d8974b23",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "Under Tangled Silence",
+            "status": "Official",
+            "release-group": {
+              "id": "d8b7c986-89bd-4da4-a0aa-2255ed65136b",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Under Tangled Silence",
+              "primary-type": "Album"
+            },
+            "date": "2025-04-25",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2025-04-25",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 11,
+            "media": [
+              {
+                "id": "c7fdbb4c-fd4c-3427-9ee4-e8fd13c07821",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "eba85028-873d-48d0-8931-d26726316e8d",
+                    "number": "1",
+                    "title": "A Tune for Us",
+                    "length": 353213
+                  }
+                ],
+                "track-count": 11,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "d3052801-2d05-40e3-b14e-cc4435b0ef18",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "A Tune for Us",
+            "status": "Official",
+            "release-group": {
+              "id": "b5e9140d-5b66-4991-8a48-71d512febe74",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "A Tune for Us",
+              "primary-type": "Single"
+            },
+            "date": "2025-01-22",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2025-01-22",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "4e0f7d11-abbe-3b90-861e-71144542563e",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "c17adfe5-d473-4f73-84f9-485fcbd8ca90",
+                    "number": "1",
+                    "title": "A Tune for Us",
+                    "length": 353213
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "9ed2de7a-9efb-4180-80a0-51888853468a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "A Tune for Us",
+            "status": "Official",
+            "release-group": {
+              "id": "b5e9140d-5b66-4991-8a48-71d512febe74",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "A Tune for Us",
+              "primary-type": "Single"
+            },
+            "date": "2025-01-22",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2025-01-22",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 1,
+            "media": [
+              {
+                "id": "6f3cbb1d-9c41-3802-b9c3-933055f2d3a0",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "213cd80a-877a-44c9-a5de-ac2b69e7c019",
+                    "number": "1",
+                    "title": "A Tune for Us",
+                    "length": 353000
+                  }
+                ],
+                "track-count": 1,
+                "track-offset": 0
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBEXH2401980"
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "modern classical"
+          }
+        ]
+      }
+    ]
+  }
+}

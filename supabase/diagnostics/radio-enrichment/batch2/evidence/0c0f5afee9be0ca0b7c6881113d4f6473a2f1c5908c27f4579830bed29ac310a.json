@@ -1,0 +1,273 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/e5a6a011-73e8-4c66-9dd2-de95161c6caa?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:09.486517+00:00",
+  "body": {
+    "releases": [
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Solange",
+            "artist": {
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "sort-name": "Solange",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "type": "Person",
+              "name": "Solange"
+            }
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "title": "A Seat at the Table",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "packaging": "None",
+        "quality": "normal",
+        "id": "3e3c90cd-0c0c-4beb-8f7b-b95a076c89eb",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2016-09-30",
+        "barcode": "886446143170",
+        "release-events": [
+          {
+            "date": "2016-09-30",
+            "area": {
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "name": "[Worldwide]",
+              "type": null
+            }
+          }
+        ]
+      },
+      {
+        "quality": "normal",
+        "packaging": null,
+        "title": "A Seat at the Table",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Solange",
+            "artist": {
+              "type": "Person",
+              "name": "Solange",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "sort-name": "Solange",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US"
+            }
+          }
+        ],
+        "date": "2016-09-30",
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "name": "[Worldwide]",
+              "type": null
+            },
+            "date": "2016-09-30"
+          }
+        ],
+        "barcode": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "76b1b676-37ec-4357-b8a3-5f2e564eb0d3"
+      },
+      {
+        "packaging": "Digipak",
+        "quality": "normal",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "artist-credit": [
+          {
+            "name": "Solange",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "sort-name": "Solange",
+              "name": "Solange",
+              "type": "Person"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "country": "US",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "A Seat at the Table",
+        "barcode": "889853874620",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            },
+            "date": "2016-11-18"
+          }
+        ],
+        "date": "2016-11-18",
+        "status": "Official",
+        "id": "8311bc5e-45fa-44b5-926f-2e1b8c00b1d5",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "country": "XE",
+        "title": "A Seat at the Table",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "artist-credit": [
+          {
+            "name": "Solange",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "sort-name": "Solange",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "name": "Solange",
+              "type": "Person"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "quality": "normal",
+        "packaging": "Digipak",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "bed36cc4-4ba0-4db6-98d6-603a583af0d2",
+        "barcode": "889853874620",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "Europe",
+              "sort-name": "Europe",
+              "type-id": null,
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XE"
+              ]
+            },
+            "date": "2016-11-18"
+          }
+        ],
+        "date": "2016-11-18"
+      },
+      {
+        "quality": "normal",
+        "packaging": "Cardboard/Paper Sleeve",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "A Seat At The Table",
+        "country": "US",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Solange",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "US",
+              "sort-name": "Solange",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "type": "Person",
+              "name": "Solange"
+            }
+          }
+        ],
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "date": "2016-12-09",
+        "release-events": [
+          {
+            "area": {
+              "name": "United States",
+              "type": null,
+              "sort-name": "United States",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            },
+            "date": "2016-12-09"
+          }
+        ],
+        "barcode": "889853874712",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "11b5b711-19dc-4a87-bae8-11dbf7eaad24",
+        "status": "Official"
+      }
+    ],
+    "first-release-date": "2016-09-30",
+    "video": false,
+    "isrcs": [
+      "USSM11607814"
+    ],
+    "disambiguation": "",
+    "id": "e5a6a011-73e8-4c66-9dd2-de95161c6caa",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Solange",
+        "artist": {
+          "name": "Solange",
+          "type": "Person",
+          "disambiguation": "US RnB vocalist Solange Knowles",
+          "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "sort-name": "Solange"
+        }
+      }
+    ],
+    "length": 264000,
+    "title": "Where Do We Go"
+  }
+}

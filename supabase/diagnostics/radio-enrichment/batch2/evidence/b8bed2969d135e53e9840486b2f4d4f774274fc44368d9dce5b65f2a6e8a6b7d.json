@@ -1,0 +1,108 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Betrayal%22+AND+artist%3A%22Lolina%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:23.506348+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:23.435Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "dde0b79d-28ef-4d6c-910f-c8331d36d78a",
+        "score": 100,
+        "artist-credit-id": "1253a9dd-6d2d-3d02-bdb7-3ff4ca7b31da",
+        "title": "Betrayal",
+        "length": 321392,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Lolina",
+            "artist": {
+              "id": "54492185-df45-494f-b133-f52da3fba781",
+              "name": "Lolina",
+              "sort-name": "Lolina",
+              "disambiguation": "Inga Copeland / Alina Astrova",
+              "aliases": [
+                {
+                  "sort-name": "Balmainjeans",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Balmainjeans",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2018-03-14",
+        "releases": [
+          {
+            "id": "2130e7e5-581e-4907-ba40-11e6f71d6e46",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "1253a9dd-6d2d-3d02-bdb7-3ff4ca7b31da",
+            "count": 1,
+            "title": "The Smoke",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Lolina",
+                "artist": {
+                  "id": "54492185-df45-494f-b133-f52da3fba781",
+                  "name": "Lolina",
+                  "sort-name": "Lolina",
+                  "disambiguation": "Inga Copeland / Alina Astrova"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "601fc026-1336-4349-bbbc-94a1c59a423e",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Smoke",
+              "primary-type": "Album"
+            },
+            "date": "2018-03-14",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2018-03-14",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 8,
+            "media": [
+              {
+                "id": "7f4d06b7-5a65-3655-bb21-1399f0a75965",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "260a25c0-b6dd-4362-9467-c2baa20f2623",
+                    "number": "8",
+                    "title": "Betrayal",
+                    "length": 321392
+                  }
+                ],
+                "track-count": 8,
+                "track-offset": 7
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "NLM971800066"
+        ]
+      }
+    ]
+  }
+}

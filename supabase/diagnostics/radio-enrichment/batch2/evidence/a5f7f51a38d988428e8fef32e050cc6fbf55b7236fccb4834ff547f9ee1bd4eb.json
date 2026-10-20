@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Little+Suntin+Suntin++Mogier+Edit%22+AND+artist%3A%22Paul+Johnson%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:39.804007+00:00",
+  "body": {
+    "created": "2026-10-20T01:21:39.731Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

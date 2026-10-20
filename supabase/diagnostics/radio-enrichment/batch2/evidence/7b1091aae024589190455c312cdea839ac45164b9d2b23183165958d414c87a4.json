@@ -1,0 +1,668 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/1dbdc230-fe9c-4d71-b72e-88ba98800167?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:02.241615+00:00",
+  "body": {
+    "tags": [
+      {
+        "name": "jazz",
+        "count": 3
+      },
+      {
+        "name": "jazz-funk",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "pianist"
+      },
+      {
+        "count": 2,
+        "name": "soul jazz"
+      }
+    ],
+    "relations": [
+      {
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+        },
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "forward",
+        "target-credit": "",
+        "artist": {
+          "sort-name": "Brown, Ray, Trio, The",
+          "id": "a8cde19d-bd55-4be7-ba34-64049d121587",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "name": "The Ray Brown Trio",
+          "country": "US",
+          "disambiguation": ""
+        },
+        "end": null,
+        "attribute-credits": {},
+        "attributes": [
+          "piano"
+        ],
+        "type": "member of band",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "artist"
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "artist",
+        "type": "member of band",
+        "artist": {
+          "id": "c528680e-710c-46c8-aaad-efc6940104ad",
+          "sort-name": "Harris, Gene and Philip Morris Superband, The",
+          "name": "Gene Harris and the Philip Morris Superband",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "country": null,
+          "disambiguation": ""
+        },
+        "end": null,
+        "attributes": [
+          "piano"
+        ],
+        "attribute-credits": {},
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+        },
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "direction": "forward"
+      },
+      {
+        "attributes": [
+          "piano"
+        ],
+        "attribute-credits": {},
+        "end": null,
+        "artist": {
+          "country": null,
+          "disambiguation": "",
+          "sort-name": "Harris, Gene Quartet, The",
+          "id": "f99c1134-b48e-4659-8128-712264f02431",
+          "name": "The Gene Harris Quartet",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "ended": false,
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+        },
+        "target-type": "artist",
+        "begin": null,
+        "source-credit": "",
+        "type": "member of band"
+      },
+      {
+        "type": "member of band",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "artist",
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+        },
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "direction": "forward",
+        "artist": {
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "name": "Blue Note All-Stars",
+          "sort-name": "Blue Note All-Stars",
+          "id": "2f32fbfb-8af6-4ad7-9ffe-a6ce97536c3c",
+          "disambiguation": "",
+          "country": null
+        },
+        "end": null,
+        "attributes": [
+          "piano"
+        ],
+        "attribute-credits": {}
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {
+          "electric piano": "75b8297f-d9fe-455d-85cf-d62843f14da5"
+        },
+        "attribute-credits": {},
+        "attributes": [
+          "electric piano"
+        ],
+        "end": null,
+        "artist": {
+          "country": null,
+          "disambiguation": "",
+          "sort-name": "Blue Note All-Stars",
+          "id": "2f32fbfb-8af6-4ad7-9ffe-a6ce97536c3c",
+          "name": "Blue Note All-Stars",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "type": "member of band",
+        "target-type": "artist",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+        },
+        "attributes": [
+          "piano"
+        ],
+        "attribute-credits": {},
+        "artist": {
+          "country": null,
+          "disambiguation": "",
+          "id": "27987765-e687-4cd6-9c27-c8bc74798945",
+          "sort-name": "Harris, Gene, /, Hamilton, Scott, Quintet, The",
+          "type": "Group",
+          "name": "The Gene Harris / Scott Hamilton Quintet",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "end": null,
+        "type": "member of band",
+        "target-type": "artist",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "target-type": "artist",
+        "begin": null,
+        "source-credit": "",
+        "type": "member of band",
+        "attributes": [
+          "eponymous",
+          "original"
+        ],
+        "end": null,
+        "artist": {
+          "country": "US",
+          "disambiguation": "",
+          "id": "9b58e361-c3ba-41bb-b35f-edbcc1c96c82",
+          "sort-name": "Harris, Gene & Three Sounds, The",
+          "name": "Gene Harris & The Three Sounds",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c",
+          "eponymous": "15eea3b8-5655-43c8-b2c2-dd03c901a79b"
+        }
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "artist",
+        "type": "member of band",
+        "end": null,
+        "artist": {
+          "name": "The Three Sounds",
+          "type": "Group",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "Three Sounds, The",
+          "id": "cf2115e9-fa60-4561-8b6e-f72d34ad800e",
+          "disambiguation": "",
+          "country": "US"
+        },
+        "attribute-credits": {},
+        "attributes": [
+          "piano"
+        ],
+        "attribute-ids": {
+          "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": true,
+        "attribute-values": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821"
+      },
+      {
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "type": "Person",
+          "name": "Niki Haris",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Haris, Niki",
+          "id": "7c1b19e3-df73-4e96-a9fc-c9b7e86cde24",
+          "disambiguation": "US singer and dancer",
+          "country": "US"
+        },
+        "end": null,
+        "type": "parent",
+        "target-type": "artist",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "allmusic",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "67806e8c-ed82-4191-bff1-8e2a1c48b51f",
+          "resource": "https://www.allmusic.com/artist/mn0000802745"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.discogs.com/artist/29966",
+          "id": "7a5c7a1e-0705-425f-a95a-f55ff0e0eead"
+        },
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "discogs"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "5cd10551-68ff-4f4a-ad2b-3a698262de9d",
+          "resource": "https://open.spotify.com/artist/7HZokAjDop6Gjgtghfr8lp"
+        },
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "free streaming",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://www.deezer.com/artist/2450",
+          "id": "4e1f42a4-984c-4353-b7ca-4f0951fc61c4"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "type": "IMDb",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.imdb.com/name/nm0010188/",
+          "id": "e39a28ea-9fc7-4f63-9eda-0397b5529efd"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "http://www.geneharris.org/",
+          "id": "28033572-0eb2-454f-9a2c-cd8738c86da8"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "direction": "forward",
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "official homepage"
+      },
+      {
+        "url": {
+          "id": "8652f15b-d622-404b-ad5e-c8c7220d1a19",
+          "resource": "http://id.loc.gov/authorities/names/n85174270"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "other databases",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "type": "other databases",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb138949875",
+          "id": "f666ae52-80f1-4620-bb0e-515da85c65ca"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "other databases",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "63078ad6-3ad0-471a-9a10-478a8ac52a4e",
+          "resource": "https://d-nb.info/gnd/134398424"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "type": "other databases",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "http://snaccooperative.org/ark:/99166/w64761gf",
+          "id": "0702c6ff-691f-49b3-b4b5-82bef6b0145b"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/gene-harris",
+          "id": "58e0af8f-2a73-4d11-b004-76f53a2babf7"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "attributes": [],
+        "type": "other databases",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-n85174270",
+          "id": "d74c5f61-2fff-484b-8265-96351f919706"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "other databases",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null
+      },
+      {
+        "type": "songkick",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.songkick.com/artists/526367",
+          "id": "2df46bc9-5f56-4eae-be87-113afa381ed5"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "4dabde16-dea2-4b61-a361-125fd9dfabee",
+          "resource": "https://tidal.com/artist/3505330"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "streaming",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "ea8fad47-5498-4bdb-8869-40286d646336",
+          "resource": "http://viaf.org/viaf/104826852"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "VIAF",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "wikidata",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q1374734",
+          "id": "7c5c36b6-d91b-4483-b143-133aaf1db961"
+        },
+        "attribute-ids": {}
+      }
+    ],
+    "isnis": [
+      "0000000114541818"
+    ],
+    "area": {
+      "disambiguation": "",
+      "type-id": null,
+      "name": "United States",
+      "type": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "sort-name": "United States",
+      "iso-3166-1-codes": [
+        "US"
+      ]
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "genres": [
+      {
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "count": 3,
+        "name": "jazz",
+        "disambiguation": ""
+      },
+      {
+        "count": 1,
+        "id": "f3c43ae8-839a-4523-b295-cfa4eba6c911",
+        "name": "jazz-funk",
+        "disambiguation": ""
+      },
+      {
+        "id": "e70f0aa3-9531-448c-8182-7ff34e3d74f8",
+        "count": 2,
+        "disambiguation": "",
+        "name": "soul jazz"
+      }
+    ],
+    "aliases": [
+      {
+        "begin": null,
+        "locale": null,
+        "end": null,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "ended": false,
+        "type": "Legal name",
+        "name": "Eugene Haire",
+        "sort-name": "Eugene Haire",
+        "primary": null
+      },
+      {
+        "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+        "ended": false,
+        "type": "Search hint",
+        "name": "Gene Haris",
+        "sort-name": "Gene Haris",
+        "primary": null,
+        "begin": null,
+        "locale": null,
+        "end": null
+      },
+      {
+        "begin": null,
+        "end": null,
+        "locale": null,
+        "ended": false,
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "Gene Harris",
+        "type": "Artist name",
+        "primary": null,
+        "sort-name": "Gene Harris"
+      }
+    ],
+    "ipis": [
+      "00013197014"
+    ],
+    "life-span": {
+      "ended": true,
+      "begin": "1933-09-01",
+      "end": "2000-01-16"
+    },
+    "end-area": {
+      "type": null,
+      "name": "Boise",
+      "disambiguation": "",
+      "type-id": null,
+      "sort-name": "Boise",
+      "id": "0975b71a-995a-4f7b-a1c3-41e302ba4dc6"
+    },
+    "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+    "sort-name": "Harris, Gene",
+    "name": "Gene Harris",
+    "type": "Person",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "gender": "Male",
+    "country": "US",
+    "begin-area": {
+      "sort-name": "Michigan",
+      "id": "29fa065f-a568-418c-98b9-5023f64d9312",
+      "type-id": null,
+      "type": null,
+      "name": "Michigan",
+      "iso-3166-2-codes": [
+        "US-MI"
+      ],
+      "disambiguation": ""
+    },
+    "disambiguation": ""
+  }
+}

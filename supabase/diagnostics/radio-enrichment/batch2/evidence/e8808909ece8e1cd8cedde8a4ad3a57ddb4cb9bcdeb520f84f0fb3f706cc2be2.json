@@ -1,0 +1,52 @@
+{
+  "url": "https://api.discogs.com/artists/5975825",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:17.714238+00:00",
+  "body": {
+    "name": "Priori (2)",
+    "id": 5975825,
+    "resource_url": "https://api.discogs.com/artists/5975825",
+    "uri": "https://www.discogs.com/artist/5975825-Priori-2",
+    "releases_url": "https://api.discogs.com/artists/5975825/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/wwyy7Mgj0DJhKTBS7G-PVH84tRibkd888lVYY9MCCJE/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU5NzU4/MjUtMTYxNTE2ODEz/MC00MDc3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/wwyy7Mgj0DJhKTBS7G-PVH84tRibkd888lVYY9MCCJE/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU5NzU4/MjUtMTYxNTE2ODEz/MC00MDc3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/raokl_uMjlZJfbRbmc-kDJy7w2QXMhtOr6jzrCwkvIc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU5NzU4/MjUtMTYxNTE2ODEz/MC00MDc3LmpwZWc.jpeg",
+        "width": 450,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/IXlMk-Vc1jJJ95scAqeSQF3ByM_39HrVxzlZDHkmMB4/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU5NzU4/MjUtMTYyOTk2NDA2/OS00OTk3LnBuZw.jpeg",
+        "resource_url": "https://i.discogs.com/IXlMk-Vc1jJJ95scAqeSQF3ByM_39HrVxzlZDHkmMB4/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU5NzU4/MjUtMTYyOTk2NDA2/OS00OTk3LnBuZw.jpeg",
+        "uri150": "https://i.discogs.com/5rEReUU2nKwELISLBvp7rYIZpjQlraxOl-15v9FGkPE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU5NzU4/MjUtMTYyOTk2NDA2/OS00OTk3LnBuZw.jpeg",
+        "width": 600,
+        "height": 600
+      }
+    ],
+    "realname": "Francis Latreille",
+    "profile": "DJ and producer based in Montreal, Canada. Co-founder of [l=NAFF].",
+    "urls": [
+      "https://soundcloud.com/priori-ties",
+      "https://www.facebook.com/pri0ri",
+      "https://prioricamp.bandcamp.com",
+      "https://www.instagram.com/priori_tize/",
+      "https://ra.co/dj/priori"
+    ],
+    "aliases": [
+      {
+        "id": 6337381,
+        "name": "Francis Latreille (2)",
+        "resource_url": "https://api.discogs.com/artists/6337381"
+      },
+      {
+        "id": 8056519,
+        "name": "RED (143)",
+        "resource_url": "https://api.discogs.com/artists/8056519"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

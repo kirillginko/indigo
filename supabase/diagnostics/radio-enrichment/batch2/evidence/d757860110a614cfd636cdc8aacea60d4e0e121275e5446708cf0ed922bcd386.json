@@ -1,0 +1,188 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22And+Both+His+Sons%22+AND+artist%3A%22Blawan%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:51.903921+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:51.831Z",
+    "count": 2,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "530b40f2-71fc-403d-b8b8-c6a0e7df0a9b",
+        "score": 100,
+        "artist-credit-id": "414aa9f5-04d8-3ef8-ae24-3df9c6126f21",
+        "title": "And Both His Sons",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Blawan",
+            "artist": {
+              "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+              "name": "Blawan",
+              "sort-name": "Blawan",
+              "disambiguation": "British techno producer & DJ"
+            }
+          }
+        ],
+        "first-release-date": "2012-08-25",
+        "releases": [
+          {
+            "id": "0b46c89a-a1a0-4b45-9e2b-e6cfca0c5303",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "count": 1,
+            "title": "His He She & She",
+            "status": "Official",
+            "release-group": {
+              "id": "610db8e0-4661-49e2-96db-0e6cc8662728",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "His He She & She",
+              "primary-type": "EP"
+            },
+            "date": "2012-08-25",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2012-08-25",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "7c78f20f-88e6-3797-91af-47d4b3fb0180",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "327855e2-cf3b-3e34-bb71-1fc49cbf5ae2",
+                    "number": "B2",
+                    "title": "And Both His Sons"
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 3,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "industrial"
+          },
+          {
+            "count": 3,
+            "name": "techno"
+          }
+        ]
+      },
+      {
+        "id": "8a609e10-837d-4e07-b75a-305658ba90ea",
+        "score": 100,
+        "artist-credit-id": "414aa9f5-04d8-3ef8-ae24-3df9c6126f21",
+        "title": "And Both His Sons",
+        "length": 121000,
+        "disambiguation": "part of a “FabricLive 67: Ben UFO” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Blawan",
+            "artist": {
+              "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+              "name": "Blawan",
+              "sort-name": "Blawan",
+              "disambiguation": "British techno producer & DJ"
+            }
+          }
+        ],
+        "first-release-date": "2013-01-21",
+        "releases": [
+          {
+            "id": "33677dbc-620c-4f31-8efe-2321c2a6b333",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "ea99169e-aaff-3972-a0a5-5719f593821b",
+            "count": 1,
+            "title": "FabricLive 67: Ben UFO",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Ben UFO",
+                "artist": {
+                  "id": "d355730f-895c-4a9a-951b-d36c3b16a8a2",
+                  "name": "Ben UFO",
+                  "sort-name": "Ben UFO"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "c0f28279-b8dc-45b1-92cd-74455b2425a0",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "FabricLive 67: Ben UFO",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2013-01-21",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2013-01-21",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "4b4a8af1-ad17-300b-9236-9555b908705c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c904fb87-cfce-378b-b6ec-5db222e9f950",
+                    "number": "24",
+                    "title": "And Both His Sons",
+                    "length": 121000
+                  }
+                ],
+                "track-count": 28,
+                "track-offset": 23
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 1,
+            "name": "bass"
+          }
+        ]
+      }
+    ]
+  }
+}

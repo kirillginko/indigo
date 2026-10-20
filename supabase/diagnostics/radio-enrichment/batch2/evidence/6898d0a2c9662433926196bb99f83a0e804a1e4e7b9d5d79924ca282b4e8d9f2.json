@@ -1,0 +1,286 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/1c442496-a7c4-430b-bf78-b53549e0666c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:03.916035+00:00",
+  "body": {
+    "first-release-date": "2016-09-30",
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "US",
+          "disambiguation": "US RnB vocalist Solange Knowles",
+          "type": "Person",
+          "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+          "name": "Solange",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Solange"
+        },
+        "name": "Solange",
+        "joinphrase": " feat. "
+      },
+      {
+        "joinphrase": "",
+        "name": "Lil Wayne",
+        "artist": {
+          "sort-name": "Lil Wayne",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Lil Wayne",
+          "id": "ac9a487a-d9d2-4f27-bb23-0f4686488345",
+          "type": "Person",
+          "disambiguation": "",
+          "country": "US"
+        }
+      }
+    ],
+    "releases": [
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "A Seat at the Table",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null
+            },
+            "date": "2016-09-30"
+          }
+        ],
+        "barcode": "886446143170",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "country": "US",
+              "sort-name": "Solange",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Solange",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+            },
+            "name": "Solange",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": "None",
+        "id": "3e3c90cd-0c0c-4beb-8f7b-b95a076c89eb",
+        "status": "Official",
+        "date": "2016-09-30",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": "XW",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "packaging": null,
+        "id": "76b1b676-37ec-4357-b8a3-5f2e564eb0d3",
+        "status": "Official",
+        "packaging-id": null,
+        "date": "2016-09-30",
+        "country": "XW",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "A Seat at the Table",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "2016-09-30",
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+              "name": "Solange",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Solange",
+              "country": "US",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "type": "Person"
+            },
+            "name": "Solange",
+            "joinphrase": ""
+          }
+        ]
+      },
+      {
+        "status": "Official",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "date": "2016-11-18",
+        "packaging": "Digipak",
+        "id": "8311bc5e-45fa-44b5-926f-2e1b8c00b1d5",
+        "country": "US",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "country": "US",
+              "sort-name": "Solange",
+              "name": "Solange",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+            },
+            "name": "Solange",
+            "joinphrase": ""
+          }
+        ],
+        "title": "A Seat at the Table",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "2016-11-18",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "type-id": null,
+              "disambiguation": "",
+              "type": null
+            }
+          }
+        ],
+        "barcode": "889853874620"
+      },
+      {
+        "status": "Official",
+        "date": "2016-11-18",
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "packaging": "Digipak",
+        "id": "bed36cc4-4ba0-4db6-98d6-603a583af0d2",
+        "country": "XE",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Solange",
+            "artist": {
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Solange",
+              "sort-name": "Solange",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+            }
+          }
+        ],
+        "title": "A Seat at the Table",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "type-id": null,
+              "name": "Europe",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "sort-name": "Europe",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a"
+            },
+            "date": "2016-11-18"
+          }
+        ],
+        "barcode": "889853874620"
+      },
+      {
+        "country": "US",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "date": "2016-12-09",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "packaging": "Cardboard/Paper Sleeve",
+        "id": "11b5b711-19dc-4a87-bae8-11dbf7eaad24",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Solange",
+            "artist": {
+              "type": "Person",
+              "country": "US",
+              "disambiguation": "US RnB vocalist Solange Knowles",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Solange",
+              "sort-name": "Solange",
+              "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca"
+            }
+          }
+        ],
+        "title": "A Seat At The Table",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "2016-12-09"
+          }
+        ],
+        "barcode": "889853874712",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      }
+    ],
+    "title": "Mad",
+    "disambiguation": "",
+    "isrcs": [
+      "USSM11607809"
+    ],
+    "length": 235000,
+    "video": false,
+    "id": "1c442496-a7c4-430b-bf78-b53549e0666c"
+  }
+}

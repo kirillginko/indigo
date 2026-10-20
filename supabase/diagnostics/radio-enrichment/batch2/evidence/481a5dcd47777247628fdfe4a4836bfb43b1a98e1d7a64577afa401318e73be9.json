@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/f7212871-a315-4e77-990f-5a63db978982?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:08.930396+00:00",
+  "body": {
+    "video": false,
+    "releases": [
+      {
+        "disambiguation": "",
+        "country": "GB",
+        "packaging": null,
+        "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "",
+        "status": "Bootleg",
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "type": "Other"
+            }
+          }
+        ],
+        "id": "7f7d6136-2b44-48b7-80e9-9d3b7a4465e7",
+        "title": "Never Mind the Bootlegs",
+        "packaging-id": null,
+        "date": "2002",
+        "release-events": [
+          {
+            "date": "2002",
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "type": null,
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom"
+            }
+          }
+        ]
+      }
+    ],
+    "first-release-date": "2002",
+    "id": "f7212871-a315-4e77-990f-5a63db978982",
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Person",
+          "name": "Squarepusher",
+          "sort-name": "Squarepusher",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "disambiguation": "",
+          "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+        },
+        "joinphrase": "",
+        "name": "Squarepusher"
+      }
+    ],
+    "disambiguation": "",
+    "isrcs": [],
+    "title": "Come on My Selector",
+    "length": null
+  }
+}

@@ -1,0 +1,369 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/979d10bc-d1b9-41b1-8a87-7a7c68cbd885?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:26.577249+00:00",
+  "body": {
+    "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+    "isnis": [
+      "0000000001245609"
+    ],
+    "relations": [
+      {
+        "begin": null,
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "artist": {
+          "sort-name": "Chaix, Nicolas",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "FR",
+          "name": "Nicolas Chaix",
+          "id": "595da57b-cc05-484d-a043-951e48ae1fd9",
+          "disambiguation": ""
+        },
+        "end": null,
+        "target-credit": "",
+        "attribute-values": {},
+        "target-type": "artist",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "backward",
+        "type": "is person",
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0001002328",
+          "id": "f9990a37-0967-475b-9220-cf26736d7c8a"
+        },
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "direction": "forward",
+        "type": "allmusic",
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type": "bandcamp",
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "end": null,
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "begin": null,
+        "url": {
+          "id": "2d6e5c8b-3dea-465b-9a58-06e1615b7215",
+          "resource": "https://icube.bandcamp.com/"
+        },
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url"
+      },
+      {
+        "direction": "forward",
+        "type": "discogs",
+        "attributes": [],
+        "source-credit": "",
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "target-credit": "",
+        "url": {
+          "id": "a0079ddf-b03e-4147-bacd-b3df066d1634",
+          "resource": "https://www.discogs.com/artist/1029"
+        },
+        "attribute-values": {},
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "url": {
+          "id": "c780e62d-8e8a-4c02-8d30-1f0a16d699cf",
+          "resource": "https://open.spotify.com/artist/2HNNSjjaK20NZ9PDZ2EMwU"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "target-type": "url",
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type": "free streaming",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": []
+      },
+      {
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type": "free streaming",
+        "attribute-values": {},
+        "target-type": "url",
+        "attribute-ids": {},
+        "ended": false,
+        "begin": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "end": null,
+        "target-credit": "",
+        "url": {
+          "id": "eff661c8-7c80-4cfe-8c99-69d74fc3315d",
+          "resource": "https://www.deezer.com/artist/5888"
+        }
+      },
+      {
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "url": {
+          "id": "c228079a-b192-4cc8-a19a-53b4f873e195",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb14005291m"
+        },
+        "begin": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "end": null,
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "type": "other databases",
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "target-credit": "",
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/i_cube",
+          "id": "5e8092aa-d4be-49d7-bdc8-275a09f6baed"
+        },
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type": "other databases"
+      },
+      {
+        "type": "purchase for download",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "url": {
+          "id": "ed5eaa0d-e740-491c-81e4-e4e8edf5578f",
+          "resource": "https://music.apple.com/gb/artist/5611780"
+        },
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "attribute-values": {}
+      },
+      {
+        "attribute-values": {},
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "end": null,
+        "target-credit": "",
+        "url": {
+          "id": "35d8cf55-a23c-4026-9ebc-01a64172807f",
+          "resource": "https://open.qobuz.com/artist/41831"
+        },
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type": "purchase for download"
+      },
+      {
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "af509535-fc0c-4861-9ebe-fe5c7ea8f124",
+          "resource": "https://www.traxsource.com/artist/11976"
+        },
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "direction": "forward",
+        "type": "purchase for download",
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "type": "streaming",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/415177451",
+          "id": "88397351-d87d-41c8-bebf-60ff2bc616cc"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      },
+      {
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type": "streaming",
+        "attribute-values": {},
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/5611780",
+          "id": "ed5eaa0d-e740-491c-81e4-e4e8edf5578f"
+        }
+      },
+      {
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type": "streaming",
+        "attribute-values": {},
+        "target-type": "url",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "url": {
+          "id": "35d8cf55-a23c-4026-9ebc-01a64172807f",
+          "resource": "https://open.qobuz.com/artist/41831"
+        }
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "type": "streaming",
+        "direction": "forward",
+        "target-type": "url",
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "url": {
+          "id": "5a67f39e-2de4-46de-834c-3a5090364e1b",
+          "resource": "https://tidal.com/artist/3712010"
+        },
+        "begin": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "end": null,
+        "target-credit": ""
+      },
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "target-type": "url",
+        "attribute-values": {},
+        "url": {
+          "id": "3c7ca855-0194-4d82-a881-940a5e930f6f",
+          "resource": "https://www.wikidata.org/wiki/Q3146479"
+        },
+        "end": null,
+        "target-credit": "",
+        "begin": null,
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "source-credit": "",
+        "attributes": [],
+        "type": "wikidata",
+        "direction": "forward"
+      }
+    ],
+    "area": {
+      "disambiguation": "",
+      "id": "08310658-51eb-3801-80de-5a0739207115",
+      "name": "France",
+      "type-id": null,
+      "iso-3166-1-codes": [
+        "FR"
+      ],
+      "type": null,
+      "sort-name": "France"
+    },
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "genres": [],
+    "gender": "Male",
+    "sort-name": "I:Cube",
+    "life-span": {
+      "begin": null,
+      "end": null,
+      "ended": false
+    },
+    "name": "I:Cube",
+    "disambiguation": "house music",
+    "country": "FR",
+    "tags": [],
+    "ipis": [],
+    "aliases": [
+      {
+        "ended": false,
+        "name": "I-Cube",
+        "locale": null,
+        "type": null,
+        "primary": null,
+        "sort-name": "I-Cube",
+        "type-id": null,
+        "begin": null,
+        "end": null
+      },
+      {
+        "begin": null,
+        "type-id": null,
+        "end": null,
+        "sort-name": "L:Cube",
+        "primary": null,
+        "type": null,
+        "locale": null,
+        "name": "L:Cube",
+        "ended": false
+      }
+    ],
+    "begin-area": {
+      "name": "Paris",
+      "id": "dc10c22b-e510-4006-8b7f-fecb4f36436e",
+      "disambiguation": "",
+      "type-id": null,
+      "iso-3166-2-codes": [
+        "FR-75"
+      ],
+      "sort-name": "Paris",
+      "type": null
+    },
+    "end-area": null,
+    "type": "Person"
+  }
+}

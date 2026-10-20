@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/f7ef58bc-15c2-4f64-8c47-0215ab728672?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:54.234895+00:00",
+  "body": {
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Djrum",
+          "type": "Person",
+          "sort-name": "Djrum",
+          "country": "GB",
+          "disambiguation": ""
+        },
+        "name": "Djrum",
+        "joinphrase": ""
+      }
+    ],
+    "disambiguation": "",
+    "isrcs": [],
+    "title": "Plantain",
+    "video": false,
+    "first-release-date": "2015-03-09",
+    "releases": [
+      {
+        "quality": "normal",
+        "release-events": [
+          {
+            "date": "2015-03-09",
+            "area": {
+              "name": "[Worldwide]",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": "",
+              "sort-name": "[Worldwide]"
+            }
+          }
+        ],
+        "id": "5c7572d6-890e-492d-b904-74e899040740",
+        "barcode": null,
+        "disambiguation": "",
+        "title": "Plantain / What I Was Doing When I Was Doing What I Was Doing",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": "XW",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Djrum",
+              "type": "Person",
+              "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "country": "GB",
+              "sort-name": "Djrum"
+            },
+            "name": "Djrum",
+            "joinphrase": ""
+          }
+        ],
+        "date": "2015-03-09"
+      }
+    ],
+    "length": 516282,
+    "id": "f7ef58bc-15c2-4f64-8c47-0215ab728672"
+  }
+}

@@ -1,0 +1,685 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/3ad4bec5-b791-4f3a-a1ee-8462b9d5deec?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:06.730091+00:00",
+  "body": {
+    "video": false,
+    "isrcs": [
+      "GBBPW0300260"
+    ],
+    "releases": [
+      {
+        "date": "2004-03-03",
+        "barcode": "4523132120829",
+        "release-events": [
+          {
+            "date": "2004-03-03",
+            "area": {
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "disambiguation": "",
+              "sort-name": "Japan",
+              "type-id": null,
+              "name": "Japan",
+              "type": null
+            }
+          }
+        ],
+        "id": "6b375c24-ea00-3134-a153-fe0ecfb85702",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "quality": "normal",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Squarepusher",
+            "artist": {
+              "type": "Person",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Ultravisitor",
+        "country": "JP"
+      },
+      {
+        "status": "Official",
+        "id": "bc6a7ed3-e575-3a55-bf06-96c9ba6c1bdb",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "801061811723",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "type": null,
+              "name": "United Kingdom"
+            },
+            "date": "2004-03-08"
+          }
+        ],
+        "date": "2004-03-08",
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "joinphrase": "",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "disambiguation": "",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Squarepusher",
+              "type": "Person",
+              "name": "Squarepusher"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "GB",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Ultravisitor",
+        "packaging": null,
+        "quality": "normal"
+      },
+      {
+        "packaging": null,
+        "quality": "normal",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Squarepusher",
+              "type": "Person",
+              "sort-name": "Squarepusher",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+            },
+            "joinphrase": "",
+            "name": "Squarepusher"
+          }
+        ],
+        "disambiguation": "",
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Ultravisitor",
+        "barcode": "801061011710",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom",
+              "type": null
+            },
+            "date": "2004-03-08"
+          }
+        ],
+        "date": "2004-03-08",
+        "status": "Official",
+        "id": "73f734ae-cfc6-4f2d-8b3e-c02efef3da94",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "date": "2004-03-08",
+        "barcode": "801061011727",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "type": null,
+              "name": "United Kingdom"
+            },
+            "date": "2004-03-08"
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "426f0e00-b541-461d-9747-9d861ed75141",
+        "quality": "normal",
+        "packaging": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Ultravisitor",
+        "country": "GB",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Squarepusher",
+              "type": "Person",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "sort-name": "Squarepusher"
+            },
+            "joinphrase": "",
+            "name": "Squarepusher"
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": ""
+      },
+      {
+        "date": "2004-03-09",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "type": null,
+              "name": "United States"
+            },
+            "date": "2004-03-09"
+          }
+        ],
+        "barcode": "",
+        "status": "Promotion",
+        "id": "3c8d299d-d009-3783-9dd6-53f4938b9a7c",
+        "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+        "packaging": "Jewel Case",
+        "quality": "normal",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+            },
+            "name": "Squarepusher",
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Ultravisitor",
+        "country": "US"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "88fdf3d0-6f82-4947-9af2-e1cb793b94fc",
+        "release-events": [
+          {
+            "date": "2006-10-10",
+            "area": {
+              "type": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "type-id": null
+            }
+          }
+        ],
+        "barcode": "602517084186",
+        "date": "2006-10-10",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Marie Antoinette",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "quality": "normal",
+        "packaging": "Jewel Case"
+      },
+      {
+        "date": "2006-11",
+        "release-events": [
+          {
+            "date": "2006-11",
+            "area": {
+              "sort-name": "Europe",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "type": null,
+              "name": "Europe"
+            }
+          }
+        ],
+        "barcode": "602517084186",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "91659195-c2ee-4506-8672-40afed186fb7",
+        "status": "Official",
+        "quality": "normal",
+        "packaging": "Jewel Case",
+        "text-representation": {
+          "script": null,
+          "language": "eng"
+        },
+        "title": "Marie Antoinette",
+        "country": "XE",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a"
+      },
+      {
+        "id": "d72d3050-1374-40e4-9d35-6ca7d837169c",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2006-12-13",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2006-12-13",
+            "area": {
+              "type-id": null,
+              "sort-name": "Japan",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "disambiguation": "",
+              "name": "Japan",
+              "type": null
+            }
+          }
+        ],
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "title": "Marie Antoinette: Original Motion Picture Soundtrack",
+        "country": "JP",
+        "packaging": null,
+        "quality": "normal"
+      },
+      {
+        "date": "2019-03-29",
+        "release-events": [
+          {
+            "date": "2019-03-29",
+            "area": null
+          }
+        ],
+        "barcode": "602577597572",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "c6a30c75-db75-4f69-9fdf-c9bb9953b733",
+        "status": "Official",
+        "quality": "normal",
+        "packaging": "None",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Marie Antoinette",
+        "country": null,
+        "disambiguation": "",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            }
+          }
+        ]
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "ec1113d5-fb3f-4388-9b14-18743684c9a7",
+        "release-events": [
+          {
+            "date": "2020-12-01",
+            "area": {
+              "type": null,
+              "name": "[Worldwide]",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            }
+          }
+        ],
+        "barcode": "0801061011734",
+        "date": "2020-12-01",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Ultravisitor",
+        "disambiguation": "",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Squarepusher",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "sort-name": "Squarepusher",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+            },
+            "name": "Squarepusher",
+            "joinphrase": ""
+          }
+        ],
+        "quality": "normal",
+        "packaging": "None"
+      },
+      {
+        "packaging": "None",
+        "quality": "normal",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Squarepusher",
+              "name": "Squarepusher",
+              "type": "Person"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "country": "XW",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Ultravisitor (20th Anniversary Edition)",
+        "barcode": "5056614799248",
+        "release-events": [
+          {
+            "date": "2024-10-25",
+            "area": {
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "type": null,
+              "name": "[Worldwide]"
+            }
+          }
+        ],
+        "date": "2024-10-25",
+        "status": "Official",
+        "id": "3f8f1493-cf20-4134-a7a8-967177418009",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "packaging": "Other",
+        "quality": "normal",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Squarepusher",
+              "type": "Person",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc"
+            },
+            "joinphrase": "",
+            "name": "Squarepusher"
+          }
+        ],
+        "packaging-id": "815b7785-8284-3926-8f04-e48bc6c4d102",
+        "title": "Ultravisitor (20th Anniversary Edition)",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "date": "2024-10-25",
+        "release-events": [
+          {
+            "area": {
+              "name": "[Worldwide]",
+              "type": null,
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XW"
+              ]
+            },
+            "date": "2024-10-25"
+          }
+        ],
+        "barcode": "5056614797688",
+        "id": "b3040a61-3daa-4533-97d6-4ecebe1f336e",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "date": "2024-10-25",
+        "release-events": [
+          {
+            "date": "2024-10-25",
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+            }
+          }
+        ],
+        "barcode": "5056614798586",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "2efb8b9f-2d1c-42b9-b101-d3d94dbc66c1",
+        "quality": "normal",
+        "packaging": "Other",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Ultravisitor (20th Anniversary Edition)",
+        "country": "GB",
+        "disambiguation": "",
+        "packaging-id": "815b7785-8284-3926-8f04-e48bc6c4d102",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Squarepusher",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "type": "Person",
+              "name": "Squarepusher"
+            },
+            "joinphrase": "",
+            "name": "Squarepusher"
+          }
+        ]
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Ultravisitor (remastered)",
+        "country": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Squarepusher",
+            "artist": {
+              "disambiguation": "",
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "sort-name": "Squarepusher",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "name": "Squarepusher",
+              "type": "Person"
+            }
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "quality": "normal",
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "74ca4800-6ce3-4d75-ac63-21b5cfa0b3fa",
+        "status": "Official",
+        "date": "2024-10-25",
+        "barcode": "5056614799255",
+        "release-events": [
+          {
+            "date": "2024-10-25",
+            "area": null
+          }
+        ]
+      }
+    ],
+    "first-release-date": "2004-03-03",
+    "id": "3ad4bec5-b791-4f3a-a1ee-8462b9d5deec",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Person",
+          "name": "Squarepusher",
+          "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+          "disambiguation": "",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "GB",
+          "sort-name": "Squarepusher"
+        },
+        "joinphrase": "",
+        "name": "Squarepusher"
+      }
+    ],
+    "title": "Tommib Help Buss",
+    "length": 130440
+  }
+}

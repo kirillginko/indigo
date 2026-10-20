@@ -1,0 +1,175 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/9e8bbbd7-fd46-4c80-bd75-1a5df2ccedd6?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:51.973227+00:00",
+  "body": {
+    "isrcs": [],
+    "video": false,
+    "id": "9e8bbbd7-fd46-4c80-bd75-1a5df2ccedd6",
+    "length": 144466,
+    "releases": [
+      {
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "id": "ddf5a3ef-1f83-4bec-a2eb-bba32a218cf0",
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1991",
+        "status": "Official",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "1991",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "type-id": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "Time Circle",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "country": "US",
+              "disambiguation": "psychedelic rock",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Spirit",
+              "sort-name": "Spirit",
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3"
+            },
+            "name": "Spirit",
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "disambiguation": "Matrix / Runout (CD 1): 1-02-471268-10 12 A2 DADC AUSTRIA; Matrix / Runout (CD 2): 2-02-471268-10 13 A1 DADC AUSTRIA",
+        "title": "Time Circle",
+        "barcode": "5099747126826",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "name": "Europe",
+              "sort-name": "Europe"
+            },
+            "date": "1991"
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Spirit",
+              "country": "US",
+              "disambiguation": "psychedelic rock",
+              "type": "Group"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XE",
+        "id": "f908d2f9-763d-4a04-8c7b-96d21758be52",
+        "packaging": "Jewel Case",
+        "status": "Official",
+        "date": "1991",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a"
+      },
+      {
+        "id": "89b15299-824a-48bd-a9db-7ecee5fd589b",
+        "packaging": null,
+        "status": "Official",
+        "packaging-id": null,
+        "date": "2008",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "DE",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "disambiguation": "",
+        "title": "Time Circle (1968–1972)",
+        "barcode": "693723424026",
+        "release-events": [
+          {
+            "date": "2008",
+            "area": {
+              "sort-name": "Germany",
+              "name": "Germany",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "type-id": null,
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Spirit",
+            "artist": {
+              "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+              "sort-name": "Spirit",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Spirit",
+              "disambiguation": "psychedelic rock",
+              "country": "US",
+              "type": "Group"
+            }
+          }
+        ]
+      }
+    ],
+    "artist-credit": [
+      {
+        "artist": {
+          "id": "ca5db97b-ba17-4e85-a876-46065e2052b3",
+          "name": "Spirit",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "sort-name": "Spirit",
+          "country": "US",
+          "disambiguation": "psychedelic rock",
+          "type": "Group"
+        },
+        "name": "Spirit",
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "1991",
+    "title": "Fog",
+    "disambiguation": ""
+  }
+}

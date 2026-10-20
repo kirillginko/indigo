@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Friend+Feat+Natanya%22+AND+artist%3A%22Budgie%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:02.291892+00:00",
+  "body": {
+    "created": "2026-10-20T01:25:02.220Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "url": "https://api.discogs.com/artists/2835065",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:36.063200+00:00",
+  "body": {
+    "name": "Moin (2)",
+    "id": 2835065,
+    "resource_url": "https://api.discogs.com/artists/2835065",
+    "uri": "https://www.discogs.com/artist/2835065-Moin-2",
+    "releases_url": "https://api.discogs.com/artists/2835065/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/XIqynTihTLhmP01sEEsymg2t0LGFqT5-JM0GWZq2VfM/rs:fit/g:sm/q:90/h:397/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTc0NDgwMzAy/NS01MDgwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/XIqynTihTLhmP01sEEsymg2t0LGFqT5-JM0GWZq2VfM/rs:fit/g:sm/q:90/h:397/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTc0NDgwMzAy/NS01MDgwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/8PbD13NDkA05UWWY0KoT2fu9bAoAlh16Cx0Mg03KCW0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTc0NDgwMzAy/NS01MDgwLmpwZWc.jpeg",
+        "width": 600,
+        "height": 397
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/xaod6KXEvaaJgMxD_Qf5RuKKF6cDH1uO7eiA6uYZnEs/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2ODk5/NS00NDQwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/xaod6KXEvaaJgMxD_Qf5RuKKF6cDH1uO7eiA6uYZnEs/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2ODk5/NS00NDQwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/EXFrRWoI5NhSsBBF_i-bKVCfxy0FTw4tHzmcNeqSaRw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2ODk5/NS00NDQwLmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/rdMb_aXm-Bg8_y1SxpjQP21HfnZJahMy26eYOt8SfGc/rs:fit/g:sm/q:90/h:392/w:590/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2ODk5/OC0yMDk0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/rdMb_aXm-Bg8_y1SxpjQP21HfnZJahMy26eYOt8SfGc/rs:fit/g:sm/q:90/h:392/w:590/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2ODk5/OC0yMDk0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/sqvw2xjf5uVwFoaQZRKpGOngOcCunYrV_TM_Vk7ctYo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2ODk5/OC0yMDk0LmpwZWc.jpeg",
+        "width": 590,
+        "height": 392
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/eyU22t5xp_GOQYvU7Zie78LZZDh0Tghw6JIOyQGkdhA/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2OTAw/MS0zMjkzLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/eyU22t5xp_GOQYvU7Zie78LZZDh0Tghw6JIOyQGkdhA/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2OTAw/MS0zMjkzLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/kDBSxs0RcLOw3fMp62--3B1sM6bsZG4Tr1cVcTqt7uc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI4MzUw/NjUtMTYyMzA2OTAw/MS0zMjkzLmpwZWc.jpeg",
+        "width": 600,
+        "height": 400
+      }
+    ],
+    "profile": "Experimental rock project from London, UK.\r\n\r\nSide-project of [a=Raime], originally being its alias as also a duo of Joe Andrews and Tom Halstead. Later expanded to a trio when long time collaborator and percussionist Valentina Magaletti also joined the project.",
+    "urls": [
+      "https://m-o-i-n.bandcamp.com",
+      "https://www.instagram.com/moin_band/"
+    ],
+    "aliases": [
+      {
+        "id": 5368262,
+        "name": "Yally (2)",
+        "resource_url": "https://api.discogs.com/artists/5368262"
+      }
+    ],
+    "members": [
+      {
+        "id": 1334952,
+        "name": "Valentina Magaletti",
+        "resource_url": "https://api.discogs.com/artists/1334952",
+        "active": true
+      },
+      {
+        "id": 3051695,
+        "name": "Tom Halstead (2)",
+        "resource_url": "https://api.discogs.com/artists/3051695",
+        "active": true
+      },
+      {
+        "id": 3051782,
+        "name": "Joe Andrews (3)",
+        "resource_url": "https://api.discogs.com/artists/3051782",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

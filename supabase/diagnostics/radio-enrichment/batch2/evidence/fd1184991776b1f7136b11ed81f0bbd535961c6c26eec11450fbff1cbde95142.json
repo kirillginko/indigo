@@ -1,0 +1,424 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/ed19b934-f1a8-4b04-aa74-6f9033caed26?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:55.397632+00:00",
+  "body": {
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "608b0471-7531-4854-a348-e698c69cb699",
+        "name": "ambient",
+        "count": 2
+      },
+      {
+        "name": "dubstep",
+        "disambiguation": "",
+        "id": "1b50083b-1afa-4778-82c8-548b309af783",
+        "count": 2
+      },
+      {
+        "count": 2,
+        "disambiguation": "",
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4",
+        "name": "electronic"
+      },
+      {
+        "disambiguation": "",
+        "id": "8eb583f1-4fd7-460c-8246-dcdccc0e3ef9",
+        "name": "idm",
+        "count": 2
+      },
+      {
+        "count": 2,
+        "disambiguation": "",
+        "id": "41fe3260-fcc1-450b-bd5a-803886c56912",
+        "name": "techno"
+      }
+    ],
+    "ipis": [],
+    "area": {
+      "iso-3166-1-codes": [
+        "GB"
+      ],
+      "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+      "disambiguation": "",
+      "sort-name": "United Kingdom",
+      "type-id": null,
+      "name": "United Kingdom",
+      "type": null
+    },
+    "life-span": {
+      "begin": null,
+      "end": null,
+      "ended": false
+    },
+    "relations": [
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "artist": {
+          "id": "6f9a19a5-e24d-44c7-9a33-d3bcd81ae6f4",
+          "disambiguation": "electronic music producer & DJ",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Manuel, Felix",
+          "name": "Felix Manuel",
+          "type": "Person"
+        },
+        "ended": false,
+        "type": "is person",
+        "attribute-values": {},
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "begin": null,
+        "end": null,
+        "target-type": "artist",
+        "direction": "backward"
+      },
+      {
+        "attribute-values": {},
+        "type": "allmusic",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "fb240241-9d07-4b58-b2ec-970612b668f7",
+          "resource": "https://www.allmusic.com/artist/mn0002995186"
+        }
+      },
+      {
+        "ended": false,
+        "type": "bandcamp",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "url": {
+          "resource": "https://djrum.bandcamp.com/",
+          "id": "4f862b24-3806-497f-8da5-1f98e902d58f"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      },
+      {
+        "attribute-values": {},
+        "type": "BBC Music page",
+        "ended": true,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "end": "2020-11-19",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "729ca903-9308-421a-9a47-dcbe3e59f43a",
+          "resource": "https://www.bbc.co.uk/music/artists/ed19b934-f1a8-4b04-aa74-6f9033caed26"
+        },
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "url": {
+          "resource": "https://www.discogs.com/artist/1762528",
+          "id": "c23f972c-c1b0-4207-96df-045d23c99f81"
+        },
+        "attribute-values": {},
+        "type": "discogs",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://open.spotify.com/artist/4HwlolvniI44ETSg5tajeZ",
+          "id": "75c35742-4bd2-4a77-a6d8-006b0092279d"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "8b6e3e00-4dcc-4935-b5ca-70ab0026018a",
+          "resource": "https://www.deezer.com/artist/3978191"
+        },
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "url": {
+          "resource": "https://www.last.fm/music/Djrum",
+          "id": "31266278-8566-4ee5-8e1f-6f963999f0fb"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "last.fm",
+        "attribute-values": {}
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "a86d96b8-e22d-4a29-a427-63f633d270da",
+          "resource": "https://rateyourmusic.com/artist/djrum"
+        },
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "type": "other databases",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "6b901f5a-e53e-4245-98f8-8f3269a4a3c7",
+          "resource": "https://www.whosampled.com/DjRum/"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      },
+      {
+        "direction": "forward",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "a00ac920-fa59-44a8-9fad-21027fcf7794",
+          "resource": "https://itunes.apple.com/us/artist/id457834696"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "purchase for download",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "purchase for download",
+        "attribute-values": {},
+        "url": {
+          "id": "22dbef1c-3f07-4de5-afb7-b4f29a096e63",
+          "resource": "https://www.beatport.com/artist/djrum/267703"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "type": "purchase for download",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.junodownload.com/artists/Djrum/releases/",
+          "id": "fa7d8805-61e6-4c82-babb-c16d0f5c938f"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203"
+      },
+      {
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.facebook.com/DjrumMusic",
+          "id": "d09f2758-2bfd-420e-816d-fed2856c6121"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "social network",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.songkick.com/artists/2854071",
+          "id": "c1359c8d-edc7-45d4-b8ee-5ed68fbb9d99"
+        },
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "songkick",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "soundcloud",
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "url": {
+          "id": "3898cdd8-9ca3-4681-b8eb-8142a38bad29",
+          "resource": "https://soundcloud.com/djrum"
+        },
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {},
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/457834696",
+          "id": "e3104b61-9030-4f09-a8af-583c00d0b99f"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "fae47ea6-f657-426e-b3f2-e47b1f7863b5",
+          "resource": "https://tidal.com/artist/4717306"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {}
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "id": "ed19b934-f1a8-4b04-aa74-6f9033caed26",
+    "end-area": null,
+    "aliases": [],
+    "tags": [
+      {
+        "name": "ambient",
+        "count": 2
+      },
+      {
+        "count": 2,
+        "name": "dubstep"
+      },
+      {
+        "count": 2,
+        "name": "electronic"
+      },
+      {
+        "count": 2,
+        "name": "idm"
+      },
+      {
+        "name": "techno",
+        "count": 2
+      }
+    ],
+    "isnis": [
+      "0000000372724908"
+    ],
+    "type": "Person",
+    "name": "Djrum",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "country": "GB",
+    "sort-name": "Djrum",
+    "gender": "Male",
+    "disambiguation": "",
+    "begin-area": null
+  }
+}

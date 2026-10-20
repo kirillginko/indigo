@@ -1,0 +1,647 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Cantata+Per+Maryam%22+AND+artist%3A%22Piero+Umiliani%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:42.522701+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:42.447Z",
+    "count": 5,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "e284280f-e244-4425-8a16-2224b35dac81",
+        "score": 100,
+        "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+        "title": "Cantata per Maryam",
+        "length": 114000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "name": "Piero Umiliani",
+              "sort-name": "Umiliani, Piero",
+              "aliases": [
+                {
+                  "sort-name": "Piero Umilani",
+                  "name": "Piero Umilani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Piero Umliani",
+                  "name": "Piero Umliani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003",
+        "releases": [
+          {
+            "id": "03d839e8-77f8-400b-9636-b292cb33aee8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La ragazza fuori strada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "973aa5c2-a4d3-40e2-b361-acef1554dc4b",
+              "type-id": "22a628ad-c082-3c4f-b1b6-d41665107b88",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La ragazza fuori strada",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Soundtrack"
+              ],
+              "secondary-type-ids": [
+                "22a628ad-c082-3c4f-b1b6-d41665107b88"
+              ]
+            },
+            "date": "2003",
+            "country": "IT",
+            "release-events": [
+              {
+                "date": "2003",
+                "area": {
+                  "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+                  "name": "Italy",
+                  "sort-name": "Italy",
+                  "iso-3166-1-codes": [
+                    "IT"
+                  ]
+                }
+              }
+            ],
+            "track-count": 24,
+            "media": [
+              {
+                "id": "71b170b1-faa0-3943-85b3-0e7a9e4959f0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "6e8c7edd-fb55-322c-9955-4298d14d6a43",
+                    "number": "23",
+                    "title": "Cantata per Maryam",
+                    "length": 114000
+                  }
+                ],
+                "track-count": 24,
+                "track-offset": 22
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f96e03fc-8715-45f8-889e-be860bd06f0d",
+        "score": 100,
+        "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+        "title": "Cantata per Maryam",
+        "length": 113000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "name": "Piero Umiliani",
+              "sort-name": "Umiliani, Piero",
+              "aliases": [
+                {
+                  "sort-name": "Piero Umilani",
+                  "name": "Piero Umilani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Piero Umliani",
+                  "name": "Piero Umliani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1973-09",
+        "releases": [
+          {
+            "id": "e5f06cc9-5fd6-4ec0-8329-a21fbe9542ab",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La Ragazza Fuoristrada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a927b916-a6ab-4ea4-82fd-40edbf5aa703",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La Ragazza Fuoristrada",
+              "primary-type": "Album"
+            },
+            "date": "2015-05-12",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2015-05-12",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 24,
+            "media": [
+              {
+                "id": "4eceacdb-b829-3236-8a31-9a109aeac2c5",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "59c8f585-4c58-4c7f-8c1e-f94af6089ebd",
+                    "number": "11",
+                    "title": "Cantata per Maryam",
+                    "length": 114000
+                  }
+                ],
+                "track-count": 24,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "dae6bff8-8bb1-418d-a12d-85dbcde91974",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La Ragazza Fuoristrada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a927b916-a6ab-4ea4-82fd-40edbf5aa703",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La Ragazza Fuoristrada",
+              "primary-type": "Album"
+            },
+            "date": "1973-09",
+            "country": "IT",
+            "release-events": [
+              {
+                "date": "1973-09",
+                "area": {
+                  "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+                  "name": "Italy",
+                  "sort-name": "Italy",
+                  "iso-3166-1-codes": [
+                    "IT"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "f3cc6d46-ef5e-38b7-8818-495236357e7e",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "55442aa0-c85f-4d1a-a96b-2915d2f93fdd",
+                    "number": "B5",
+                    "title": "Cantata per Maryam",
+                    "length": 113000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "3b14fcb8-869f-4451-be84-45e6d414ffca",
+        "score": 100,
+        "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+        "title": "Cantata per Maryam",
+        "length": 113000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "name": "Piero Umiliani",
+              "sort-name": "Umiliani, Piero",
+              "aliases": [
+                {
+                  "sort-name": "Piero Umilani",
+                  "name": "Piero Umilani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Piero Umliani",
+                  "name": "Piero Umliani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1973-09",
+        "releases": [
+          {
+            "id": "4e333081-1112-4ef3-9853-be3b0cd663b8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La ragazza fuori strada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "973aa5c2-a4d3-40e2-b361-acef1554dc4b",
+              "type-id": "22a628ad-c082-3c4f-b1b6-d41665107b88",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La ragazza fuori strada",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Soundtrack"
+              ],
+              "secondary-type-ids": [
+                "22a628ad-c082-3c4f-b1b6-d41665107b88"
+              ]
+            },
+            "date": "1973-09",
+            "country": "IT",
+            "release-events": [
+              {
+                "date": "1973-09",
+                "area": {
+                  "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+                  "name": "Italy",
+                  "sort-name": "Italy",
+                  "iso-3166-1-codes": [
+                    "IT"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "f2016d91-1dd9-4884-8345-a8abadd43ca2",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "fd8e7ae7-f43a-4197-9ea9-e677fede7c09",
+                    "number": "B5",
+                    "title": "Cantata per Maryam",
+                    "length": 113000
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 10
+              }
+            ]
+          },
+          {
+            "id": "03d839e8-77f8-400b-9636-b292cb33aee8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La ragazza fuori strada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "973aa5c2-a4d3-40e2-b361-acef1554dc4b",
+              "type-id": "22a628ad-c082-3c4f-b1b6-d41665107b88",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La ragazza fuori strada",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Soundtrack"
+              ],
+              "secondary-type-ids": [
+                "22a628ad-c082-3c4f-b1b6-d41665107b88"
+              ]
+            },
+            "date": "2003",
+            "country": "IT",
+            "release-events": [
+              {
+                "date": "2003",
+                "area": {
+                  "id": "c6500277-9a3d-349b-bf30-41afdbf42add",
+                  "name": "Italy",
+                  "sort-name": "Italy",
+                  "iso-3166-1-codes": [
+                    "IT"
+                  ]
+                }
+              }
+            ],
+            "track-count": 24,
+            "media": [
+              {
+                "id": "71b170b1-faa0-3943-85b3-0e7a9e4959f0",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "d974d889-446f-34a9-aad7-ce01cf5a01fb",
+                    "number": "10",
+                    "title": "Cantata per Maryam",
+                    "length": 113000
+                  }
+                ],
+                "track-count": 24,
+                "track-offset": 9
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c82229bf-d19b-495d-b702-8500350e8683",
+        "score": 100,
+        "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+        "title": "Cantata per Maryam",
+        "length": 116373,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "name": "Piero Umiliani",
+              "sort-name": "Umiliani, Piero",
+              "aliases": [
+                {
+                  "sort-name": "Piero Umilani",
+                  "name": "Piero Umilani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Piero Umliani",
+                  "name": "Piero Umliani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2009-10-22",
+        "releases": [
+          {
+            "id": "3e8e1c55-50f7-4e56-a36e-a85ef71789b5",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La ragazza fuori strada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "973aa5c2-a4d3-40e2-b361-acef1554dc4b",
+              "type-id": "22a628ad-c082-3c4f-b1b6-d41665107b88",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La ragazza fuori strada",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Soundtrack"
+              ],
+              "secondary-type-ids": [
+                "22a628ad-c082-3c4f-b1b6-d41665107b88"
+              ]
+            },
+            "date": "2009-10-22",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2009-10-22",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "aedaa5bc-f86a-4e2f-8b41-9f01c8e4f0e9",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "da2d9bfd-4c15-48d2-845a-78bc0306cf0c",
+                    "number": "11",
+                    "title": "Cantata per Maryam",
+                    "length": 116373
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "403cc8ea-912f-4574-bb56-d1e5d895010e",
+        "score": 88,
+        "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+        "title": "Cantata per Maryam (alternative take)",
+        "length": 113000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Piero Umiliani",
+            "artist": {
+              "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+              "name": "Piero Umiliani",
+              "sort-name": "Umiliani, Piero",
+              "aliases": [
+                {
+                  "sort-name": "Piero Umilani",
+                  "name": "Piero Umilani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Piero Umliani",
+                  "name": "Piero Umliani",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2015-05-12",
+        "releases": [
+          {
+            "id": "e5f06cc9-5fd6-4ec0-8329-a21fbe9542ab",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "e61aa3e7-22a6-3b9b-a78d-de4062d583dc",
+            "count": 1,
+            "title": "La Ragazza Fuoristrada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Piero Umiliani",
+                "artist": {
+                  "id": "806b793c-fb2c-401e-be44-f753c0ea2f15",
+                  "name": "Piero Umiliani",
+                  "sort-name": "Umiliani, Piero"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "a927b916-a6ab-4ea4-82fd-40edbf5aa703",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "La Ragazza Fuoristrada",
+              "primary-type": "Album"
+            },
+            "date": "2015-05-12",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2015-05-12",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 24,
+            "media": [
+              {
+                "id": "4eceacdb-b829-3236-8a31-9a109aeac2c5",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "c303cda3-4017-49ea-8903-f1c62a03bc0f",
+                    "number": "16",
+                    "title": "Cantata per Maryam (alternative take)",
+                    "length": 113000
+                  }
+                ],
+                "track-count": 24,
+                "track-offset": 15
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

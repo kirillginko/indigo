@@ -1,0 +1,88 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Bipayan%22+AND+artist%3A%22Sepehr%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:53.789086+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:53.716Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "a4ff863a-43e3-46dc-8014-647948395bed",
+        "score": 100,
+        "artist-credit-id": "c5b62a05-d51f-3abf-9acd-87ae3d240170",
+        "title": "Bipayan",
+        "length": 358000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Sepehr",
+            "artist": {
+              "id": "a3e77268-597b-4ce8-8837-78b673e20114",
+              "name": "Sepehr",
+              "sort-name": "Sepehr",
+              "disambiguation": "electronic musician Sepehr Alimagham",
+              "aliases": [
+                {
+                  "sort-name": "Alimagham, Sepehr",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Sepehr Alimagham",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2021-10-07",
+        "releases": [
+          {
+            "id": "efb274aa-13cd-44e8-8989-6768dacfff2d",
+            "artist-credit-id": "c5b62a05-d51f-3abf-9acd-87ae3d240170",
+            "count": 1,
+            "title": "Survivalism",
+            "artist-credit": [
+              {
+                "name": "Sepehr",
+                "artist": {
+                  "id": "a3e77268-597b-4ce8-8837-78b673e20114",
+                  "name": "Sepehr",
+                  "sort-name": "Sepehr",
+                  "disambiguation": "electronic musician Sepehr Alimagham"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5d9208d5-935d-4122-a58b-1710d829f230",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Survivalism",
+              "primary-type": "EP"
+            },
+            "track-count": 6,
+            "media": [
+              {
+                "id": "e5bb39c2-e230-4e62-aa87-3089f0ec14a0",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "ee53011e-7c48-46b6-89b1-f66d20878943",
+                    "number": "B2",
+                    "title": "Bipayan",
+                    "length": 358000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 4
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

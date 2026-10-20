@@ -1,0 +1,101 @@
+{
+  "url": "https://api.discogs.com/artists/48720",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:04.684957+00:00",
+  "body": {
+    "name": "Barbara Mason",
+    "id": 48720,
+    "resource_url": "https://api.discogs.com/artists/48720",
+    "uri": "https://www.discogs.com/artist/48720-Barbara-Mason",
+    "releases_url": "https://api.discogs.com/artists/48720/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/eMB7oqHLO5BiWxjdeoqsDmSMgWGvjAQZ-MpGqCwY93A/rs:fit/g:sm/q:90/h:410/w:382/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2NDQ4NzA0MDct/NDk5MC5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/eMB7oqHLO5BiWxjdeoqsDmSMgWGvjAQZ-MpGqCwY93A/rs:fit/g:sm/q:90/h:410/w:382/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2NDQ4NzA0MDct/NDk5MC5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/v5felGKvxc9FZzm12erQI-BGE2mEoVx-rLEyoHvrDa0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2NDQ4NzA0MDct/NDk5MC5qcGVn.jpeg",
+        "width": 382,
+        "height": 410
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/vWjCiVgbgWlQG5gfwPvszXRYZo4zOchVgmuyvWLx9M0/rs:fit/g:sm/q:90/h:600/w:470/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2MTgyODAzMTMt/NTc5NS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/vWjCiVgbgWlQG5gfwPvszXRYZo4zOchVgmuyvWLx9M0/rs:fit/g:sm/q:90/h:600/w:470/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2MTgyODAzMTMt/NTc5NS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/SSWxJvrVWWVzS5g88bg6zcQX0lM6n2Umr2WCqlWg0gE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2MTgyODAzMTMt/NTc5NS5qcGVn.jpeg",
+        "width": 470,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/DzVuSD_Lj8by1XTLvSCOdGNna3B96TCq4UgeJ2FtHFE/rs:fit/g:sm/q:90/h:468/w:403/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2Njg2NTE5OTUt/NjUzMy5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/DzVuSD_Lj8by1XTLvSCOdGNna3B96TCq4UgeJ2FtHFE/rs:fit/g:sm/q:90/h:468/w:403/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2Njg2NTE5OTUt/NjUzMy5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/Or6d-NGmCQx2fbvZLgJDVhwf6clbIaOufShz9KQtaj0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2Njg2NTE5OTUt/NjUzMy5qcGVn.jpeg",
+        "width": 403,
+        "height": 468
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/kbCVTjLm-zVeZQ4IYeea17CwsGzFTyeOoBFQrBG7cyU/rs:fit/g:sm/q:90/h:400/w:252/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2Njg2NTE5OTct/MzU5Mi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/kbCVTjLm-zVeZQ4IYeea17CwsGzFTyeOoBFQrBG7cyU/rs:fit/g:sm/q:90/h:400/w:252/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2Njg2NTE5OTct/MzU5Mi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/vYl-c5nyedpD3o3cHhqmBRysvhc3_8AoU-v68nnGxk8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE2Njg2NTE5OTct/MzU5Mi5qcGVn.jpeg",
+        "width": 252,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/-4MA-KHfD-g2-CDt1yiVg86iWJjHzb2NkS5t7j-muQc/rs:fit/g:sm/q:90/h:454/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE1MDIxNTI0MjAt/NTYwNS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/-4MA-KHfD-g2-CDt1yiVg86iWJjHzb2NkS5t7j-muQc/rs:fit/g:sm/q:90/h:454/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE1MDIxNTI0MjAt/NTYwNS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/HvFKOpUbNoSOIVq-ZBFmXHmLVbQ5SujVfz5586kHsgQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTE1MDIxNTI0MjAt/NTYwNS5qcGVn.jpeg",
+        "width": 600,
+        "height": 454
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/z2A2dmRJ74DElHnZKE59LYc9JADPzzBsQw98V8_2Qo8/rs:fit/g:sm/q:90/h:198/w:167/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTEwOTcxMDAwOTgu/anBn.jpeg",
+        "resource_url": "https://i.discogs.com/z2A2dmRJ74DElHnZKE59LYc9JADPzzBsQw98V8_2Qo8/rs:fit/g:sm/q:90/h:198/w:167/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTEwOTcxMDAwOTgu/anBn.jpeg",
+        "uri150": "https://i.discogs.com/1EzmnHGpkDdFUDdmIhIJk25plIMtPdBc00Iy4nY2b-g/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTEwOTcxMDAwOTgu/anBn.jpeg",
+        "width": 167,
+        "height": 198
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/JnYbCRHRBGmXOBA94CRJpATNPWbWgDonVsq7ybYEWxs/rs:fit/g:sm/q:90/h:470/w:330/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTEyODk0ODAyOTcu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/JnYbCRHRBGmXOBA94CRJpATNPWbWgDonVsq7ybYEWxs/rs:fit/g:sm/q:90/h:470/w:330/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTEyODk0ODAyOTcu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/4Bqq7qt73AjxgoRSUoL-5kquvFNzUD3Oh72Z6_m26cA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTEyODk0ODAyOTcu/anBlZw.jpeg",
+        "width": 330,
+        "height": 470
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/44EqzhTOUxEN1SoydB7oiDqtqc0CEZHNPFMjelyJNcI/rs:fit/g:sm/q:90/h:600/w:393/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTExNzUxMDYxNDAu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/44EqzhTOUxEN1SoydB7oiDqtqc0CEZHNPFMjelyJNcI/rs:fit/g:sm/q:90/h:600/w:393/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTExNzUxMDYxNDAu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/ukoRcYF9GDZ_VccPYcz8kPQ8Y98BQHoDA403i1nQGoM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ4NzIw/LTExNzUxMDYxNDAu/anBlZw.jpeg",
+        "width": 393,
+        "height": 600
+      }
+    ],
+    "realname": "Barbara Mason",
+    "profile": "[b]Soul - funk - disco singer - songwriter[/b]\r\n\r\nBorn on 9 August 1947 in Philadelphia, Pennsylvania.\r\nHer highlights include her first hit \"Yes I'm Ready\" (1965), her cover of the [a=Curtis Mayfield] standard \"Give Me Your Love\" (1973) and synth soul classic \"Another Man\" (1984).\r\nBarbara Mason, one of the few ladies of Soul who not only sang but wrote a great portion of her material, began to \"mess\" with her grandmother's piano at the tender age of twelve. While still in school, Barbara formed several groups, comprised of both male and female members. Barbara, the lead singer, would come up with the songs, accompany on the piano and naturally win many of the local talent shows, which were held at a playground near her house every summer. Her next door neighbor was [a=Earl Oxidine] of the [a=4 Larks], a vocal group from Philly and it was another member of that constellation, [a=Weldon Arthur McDougal III], who offered Barbara to perform during odd spots and intervals on the [a=4 Larks]' shows in various nightclubs around the Philadelphia area. [a=Weldon Arthur McDougal III] also introduced Barbara to [a=Jimmy Bishop], one of the most popular DJ's in Philadelphia at the time. [a=Jimmy Bishop] was suitably impressed with Barbara's easily identifiable, innocent-sounding voice and self-penned material and after aiding in the financing of her debut single \"Trouble Child\" on the local [l=Crusader Records] label, Bishop signed her to his [l=Arctic Record Company]. Barbara left the entertainment industry in the early eighties and instead chose to concentrate on forming and developing her publishing company, Marc James Music, named after her son. But in 1992, Barbara was invited to perform at the famous Greek Theatre in Los Angeles and has since then been regularly returning to the venues on the American west coast.",
+    "urls": [
+      "http://en.wikipedia.org/wiki/Barbara_Mason",
+      "https://fromthevaults-boppinbob.blogspot.com/2019/08/barbara-mason-born-9-august-1947.html",
+      "http://www.myspace.com/barbaramason",
+      "http://www.whosampled.com/Barbara-Mason/"
+    ],
+    "namevariations": [
+      "\"Lady Love\" Barbara Mason",
+      "B Mason",
+      "B, Mason",
+      "B.  Mason",
+      "B. Mason",
+      "B.Mason",
+      "Barbara",
+      "Barbare Mason",
+      "Barbera Mason",
+      "Barbra Mason",
+      "Mason",
+      "Mason, Barbara"
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

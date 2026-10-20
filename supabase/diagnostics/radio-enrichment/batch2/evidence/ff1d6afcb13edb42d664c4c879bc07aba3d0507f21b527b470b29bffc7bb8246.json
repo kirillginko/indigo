@@ -1,0 +1,170 @@
+{
+  "url": "https://api.discogs.com/artists/269",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:11.381621+00:00",
+  "body": {
+    "name": "Squarepusher",
+    "id": 269,
+    "resource_url": "https://api.discogs.com/artists/269",
+    "uri": "https://www.discogs.com/artist/269-Squarepusher",
+    "releases_url": "https://api.discogs.com/artists/269/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/0jmwXC0JLISiLU8BMUG3fQIEsBr-MtZu_t0NbPkLpyw/rs:fit/g:sm/q:90/h:600/w:552/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTE5OTM4NjU2LTMw/MTMuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/0jmwXC0JLISiLU8BMUG3fQIEsBr-MtZu_t0NbPkLpyw/rs:fit/g:sm/q:90/h:600/w:552/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTE5OTM4NjU2LTMw/MTMuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/PjvCBSvdwD7tHyVJ420uIRZ8WyUZ8UqJ5OfZHAMlCYY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTE5OTM4NjU2LTMw/MTMuanBlZw.jpeg",
+        "width": 552,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/5W5HXCvUKPN7VxFPmhKlssuHsBemsnQYe9W9NBXmR_A/rs:fit/g:sm/q:90/h:351/w:350/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MDgwMzQxNDM3Lmpw/Zw.jpeg",
+        "resource_url": "https://i.discogs.com/5W5HXCvUKPN7VxFPmhKlssuHsBemsnQYe9W9NBXmR_A/rs:fit/g:sm/q:90/h:351/w:350/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MDgwMzQxNDM3Lmpw/Zw.jpeg",
+        "uri150": "https://i.discogs.com/NxCx1YxEQetOrmZoNCYajonYulszpuCvKd6rrLeLEiI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MDgwMzQxNDM3Lmpw/Zw.jpeg",
+        "width": 350,
+        "height": 351
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/60Qc_RZdqeSD6R--LflN01IE5JNFPGwtUvRciog3w4g/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NjU1NTkxMzU2LTM2/MzIuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/60Qc_RZdqeSD6R--LflN01IE5JNFPGwtUvRciog3w4g/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NjU1NTkxMzU2LTM2/MzIuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/vSSPSbsmwpKDsvO5DCGDpFF5Vxv7c15v1Em93pD-Umc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NjU1NTkxMzU2LTM2/MzIuanBlZw.jpeg",
+        "width": 600,
+        "height": 337
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/PVUtgtyufVd281ghLUG_Qd_U6E4PLGOOxjxG96njtTM/rs:fit/g:sm/q:90/h:535/w:401/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDI5Mzk1NTAyLTYw/MjMuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/PVUtgtyufVd281ghLUG_Qd_U6E4PLGOOxjxG96njtTM/rs:fit/g:sm/q:90/h:535/w:401/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDI5Mzk1NTAyLTYw/MjMuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/cLZoxTtG4DsUrqiLXNcEYIOZOY2aQ6K9I7Pf0yROIe0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDI5Mzk1NTAyLTYw/MjMuanBlZw.jpeg",
+        "width": 401,
+        "height": 535
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/eLDtaRM3yVgRKOqzorHK4ZcCY_CJHEQUhlRRWC_KeSY/rs:fit/g:sm/q:90/h:513/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDI5Mzk1NjcwLTE4/MTUuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/eLDtaRM3yVgRKOqzorHK4ZcCY_CJHEQUhlRRWC_KeSY/rs:fit/g:sm/q:90/h:513/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDI5Mzk1NjcwLTE4/MTUuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/o2zeYsVuxyac5cAcPPFHtOQ5rC03q2U28LyoOvL3Rq0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDI5Mzk1NjcwLTE4/MTUuanBlZw.jpeg",
+        "width": 600,
+        "height": 513
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/2yemygBOhIADi-FaiALoBkQQ7u1GLCKUWOEPEz6YoxY/rs:fit/g:sm/q:90/h:502/w:280/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTk0MDU3MjUzLTgw/OTUuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/2yemygBOhIADi-FaiALoBkQQ7u1GLCKUWOEPEz6YoxY/rs:fit/g:sm/q:90/h:502/w:280/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTk0MDU3MjUzLTgw/OTUuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/K8Dn5Fsm2WjMaNiFgp4G_SoPyE50WWLovLjbcec6j7w/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTk0MDU3MjUzLTgw/OTUuanBlZw.jpeg",
+        "width": 280,
+        "height": 502
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Zm1ByMMDR8NOTO3Re49eat-SP_hshWU9gwE2QipipjI/rs:fit/g:sm/q:90/h:399/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0w/MDQuanBn.jpeg",
+        "resource_url": "https://i.discogs.com/Zm1ByMMDR8NOTO3Re49eat-SP_hshWU9gwE2QipipjI/rs:fit/g:sm/q:90/h:399/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0w/MDQuanBn.jpeg",
+        "uri150": "https://i.discogs.com/F_M65ma25_Ook2f0ARw9A5uvB91uuXTb3i4d7-w93Dc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0w/MDQuanBn.jpeg",
+        "width": 300,
+        "height": 399
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/TooLX4q6aMAupCXMqCJPuj3QeDfoDKgZZ9aGBv3Mm_E/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NjU1NTkxMDI2LTM1/NDMuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/TooLX4q6aMAupCXMqCJPuj3QeDfoDKgZZ9aGBv3Mm_E/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NjU1NTkxMDI2LTM1/NDMuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/grcEx77jdaUzwsHF5I3E7ce6tQNJoeaGk7e77FIyKX4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NjU1NTkxMDI2LTM1/NDMuanBlZw.jpeg",
+        "width": 600,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/kI_ZqwfGWISwoSsuStFfdg0kW522hjAkQy2ynncZLLs/rs:fit/g:sm/q:90/h:190/w:206/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0w/MDUuanBn.jpeg",
+        "resource_url": "https://i.discogs.com/kI_ZqwfGWISwoSsuStFfdg0kW522hjAkQy2ynncZLLs/rs:fit/g:sm/q:90/h:190/w:206/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0w/MDUuanBn.jpeg",
+        "uri150": "https://i.discogs.com/1wOAU_qB0RTd8RBCBBXLINvRJspqjkd4T3TxdJfvvSc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0w/MDUuanBn.jpeg",
+        "width": 206,
+        "height": 190
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/scKHG3e-yUkNuQ-U6YQ9ca9JuiRJfARRd1B44_s2qJo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MjQ5NzI1MTg5LnBu/Zw.jpeg",
+        "resource_url": "https://i.discogs.com/scKHG3e-yUkNuQ-U6YQ9ca9JuiRJfARRd1B44_s2qJo/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MjQ5NzI1MTg5LnBu/Zw.jpeg",
+        "uri150": "https://i.discogs.com/woSnRLxnzp4dPyKpr8Fs8DykBZtOd6PW9uuO1iYCf5Y/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MjQ5NzI1MTg5LnBu/Zw.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ucD00FcNpjwPLsj2qxlyXb38XsnyYUV97vK-9UzZtdc/rs:fit/g:sm/q:90/h:181/w:220/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTYzMzc1MjY4LTgw/NTUuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/ucD00FcNpjwPLsj2qxlyXb38XsnyYUV97vK-9UzZtdc/rs:fit/g:sm/q:90/h:181/w:220/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTYzMzc1MjY4LTgw/NTUuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/fSuCUu05QB-NkJEYnyEc_B_12Pt64xuUy-EPO06koho/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NTYzMzc1MjY4LTgw/NTUuanBlZw.jpeg",
+        "width": 220,
+        "height": 181
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/1jTZAeDk8nemwX9j0MEopKO7VzeI2AZrUmzsvBUz6E0/rs:fit/g:sm/q:90/h:240/w:199/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MTA0NzI1NjAwLmpw/Zw.jpeg",
+        "resource_url": "https://i.discogs.com/1jTZAeDk8nemwX9j0MEopKO7VzeI2AZrUmzsvBUz6E0/rs:fit/g:sm/q:90/h:240/w:199/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MTA0NzI1NjAwLmpw/Zw.jpeg",
+        "uri150": "https://i.discogs.com/SddwgsosCLyg1HbFJYn6O0j4DwBzgHSp1l9syXXdHIU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/MTA0NzI1NjAwLmpw/Zw.jpeg",
+        "width": 199,
+        "height": 240
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/UdTqTMK1q6-A6XrjR3z0901vJ9BBEPGl8ZJRsTn0ZV4/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDE4MTcwNTU1LTIy/OTkuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/UdTqTMK1q6-A6XrjR3z0901vJ9BBEPGl8ZJRsTn0ZV4/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDE4MTcwNTU1LTIy/OTkuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/nvndUwmM6EcomVFbrNBM38KW1kUmtU5OealDZtx-_dk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDE4MTcwNTU1LTIy/OTkuanBlZw.jpeg",
+        "width": 600,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/SloN321VEIhqpwx-42IkN-BqKPSDFBxRJ7y0RDgKCu0/rs:fit/g:sm/q:90/h:395/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDE0MTkwOTQ4LTky/MjkuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/SloN321VEIhqpwx-42IkN-BqKPSDFBxRJ7y0RDgKCu0/rs:fit/g:sm/q:90/h:395/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDE0MTkwOTQ4LTky/MjkuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/_6G8H5081v37tLGt9EGv2Dadlulyc-53pHlU42P1gzc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI2OS0x/NDE0MTkwOTQ4LTky/MjkuanBlZw.jpeg",
+        "width": 600,
+        "height": 395
+      }
+    ],
+    "realname": "Thomas Jenkinson",
+    "profile": "The performing pseudonym of [a=Tom Jenkinson], an English electronic music artist signed to [l=Warp Records]. He specialises in the electronic music genres of drum 'n' bass and acid with a significant jazz influence.\r\n\r\nBorn: 17 January 1975, Chelmsford, Essex, UK.\r\n\r\nOlder brother of [a=Andy Jenkinson].",
+    "urls": [
+      "http://squarepusher.net",
+      "http://www.vicacid.org",
+      "http://warp.net/artists/91409-squarepusher",
+      "http://squarepusher.bandcamp.com",
+      "http://www.facebook.com/squarepusher",
+      "http://www.songkick.com/artists/210867-squarepusher",
+      "http://soundcloud.com/squarepusher/tracks",
+      "http://twitter.com/squarepusher",
+      "http://en.wikipedia.org/wiki/Squarepusher",
+      "http://www.youtube.com/user/squarepushermusic",
+      "https://www.instagram.com/sqpusher/"
+    ],
+    "namevariations": [
+      "Square Pusher",
+      "Squarepusher_",
+      "スクエアプッシャー",
+      "スクエイプッシャー"
+    ],
+    "aliases": [
+      {
+        "id": 268,
+        "name": "Tom Jenkinson",
+        "resource_url": "https://api.discogs.com/artists/268"
+      },
+      {
+        "id": 1861,
+        "name": "Chaos A.D.",
+        "resource_url": "https://api.discogs.com/artists/1861"
+      },
+      {
+        "id": 16983,
+        "name": "Duke Of Harringay",
+        "resource_url": "https://api.discogs.com/artists/16983"
+      },
+      {
+        "id": 12965727,
+        "name": "Stereotype (24)",
+        "resource_url": "https://api.discogs.com/artists/12965727"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

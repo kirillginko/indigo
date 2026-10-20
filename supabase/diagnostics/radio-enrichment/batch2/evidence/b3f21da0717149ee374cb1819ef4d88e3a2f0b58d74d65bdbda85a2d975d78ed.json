@@ -1,0 +1,984 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/396a9525-0994-4542-b480-c4587feeb476?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:16.709864+00:00",
+  "body": {
+    "ipis": [
+      "00593900722",
+      "00593900820"
+    ],
+    "type": "Person",
+    "aliases": [
+      {
+        "sort-name": "Jorgenson Kachingwe, Tinashe",
+        "name": "Tinashe Jorgenson Kachingwe",
+        "type": "Legal name",
+        "primary": null,
+        "end": null,
+        "ended": false,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "locale": null,
+        "begin": null
+      }
+    ],
+    "tags": [
+      {
+        "count": 3,
+        "name": "alternative r&b"
+      },
+      {
+        "name": "contemporary r&b",
+        "count": 3
+      },
+      {
+        "count": 2,
+        "name": "electronic"
+      },
+      {
+        "count": 2,
+        "name": "hip hop"
+      },
+      {
+        "count": 4,
+        "name": "pop"
+      },
+      {
+        "count": 1,
+        "name": "r&b"
+      },
+      {
+        "count": 1,
+        "name": "soul"
+      },
+      {
+        "name": "trap soul",
+        "count": 1
+      }
+    ],
+    "end-area": null,
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "life-span": {
+      "begin": "1993-02-06",
+      "end": null,
+      "ended": false
+    },
+    "isnis": [
+      "000000010834165X"
+    ],
+    "country": "US",
+    "genres": [
+      {
+        "disambiguation": "",
+        "name": "alternative r&b",
+        "count": 3,
+        "id": "4e03fb35-d571-4111-824d-88c9f8a3d0c9"
+      },
+      {
+        "count": 3,
+        "id": "4bb4043a-0ee5-4b84-93fa-6ba4567a6ba0",
+        "name": "contemporary r&b",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "name": "electronic",
+        "count": 2,
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4"
+      },
+      {
+        "disambiguation": "",
+        "count": 2,
+        "id": "52faa157-6bad-4d86-a0ab-d4dec7d2513c",
+        "name": "hip hop"
+      },
+      {
+        "id": "911c7bbb-172d-4df8-9478-dbff4296e791",
+        "count": 4,
+        "name": "pop",
+        "disambiguation": ""
+      },
+      {
+        "count": 1,
+        "id": "31be54b2-4d0c-42df-aa44-c496c7b4c3c3",
+        "name": "r&b",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "name": "soul",
+        "count": 1,
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827"
+      },
+      {
+        "disambiguation": "",
+        "name": "trap soul",
+        "id": "bbfa4b39-8bb2-47e0-b457-55fee5e51511",
+        "count": 1
+      }
+    ],
+    "name": "Tinashe",
+    "area": {
+      "disambiguation": "",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "sort-name": "United States",
+      "type": null,
+      "name": "United States",
+      "type-id": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98"
+    },
+    "relations": [
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "backward",
+        "target-type": "artist",
+        "attributes": [],
+        "artist": {
+          "name": "Quiet Child",
+          "type": "Person",
+          "id": "7c3f765d-93cf-4759-83c3-35f8ce5f9c7e",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": null,
+          "disambiguation": "R&B producer/songwriter",
+          "sort-name": "Quiet Child"
+        },
+        "target-credit": "",
+        "type-id": "b42b7966-b904-449e-b8f9-8c7297b863d0",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "type": "sibling",
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0003236942",
+          "id": "8166c02b-9086-4385-a3fb-568ac411036f"
+        },
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "type": "allmusic",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "url": {
+          "id": "b0e697d5-46fa-4251-9bfe-d7398d81a842",
+          "resource": "https://www.bandsintown.com/a/293753"
+        },
+        "type-id": "ea45ed3d-2d5e-456e-8c32-94b6f51426e2",
+        "type": "bandsintown",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "url": {
+          "id": "cf21625d-41cb-45ef-a78f-f9ac494f772d",
+          "resource": "https://www.bbc.co.uk/music/artists/396a9525-0994-4542-b480-c4587feeb476"
+        },
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "type": "BBC Music page",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "end": "2020-11-19",
+        "ended": true,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "url": {
+          "resource": "http://tinashenow.tumblr.com/",
+          "id": "66613146-450e-4f9b-b331-0266d349b238"
+        },
+        "type-id": "eb535226-f8ca-499d-9b18-6a144df4ae6f",
+        "type": "blog",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": [],
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "url": {
+          "id": "b1f23523-b183-4b8c-a2f2-b95f0723271d",
+          "resource": "https://www.discogs.com/artist/3519986"
+        },
+        "type": "discogs",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "type": "fanpage",
+        "type-id": "f484f897-81cc-406e-96f9-cd799a04ee24",
+        "url": {
+          "resource": "https://songstats.com/artist/dx2amw71/tinashe",
+          "id": "07e77157-eab7-4379-a89c-aedcafa15905"
+        },
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "url": {
+          "resource": "https://open.spotify.com/artist/0NIIxcxNHmOoyBx03SfTCD",
+          "id": "6fef971a-2841-4ab8-96e7-3e93c2a1e055"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "resource": "https://www.deezer.com/artist/345052",
+          "id": "425be9f8-c875-4296-980d-794d7e96c8c8"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming"
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attributes": [],
+        "type": "IMDb",
+        "url": {
+          "id": "3e60df89-8593-4996-8d4d-41f9802a586b",
+          "resource": "https://www.imdb.com/name/nm0434186/"
+        },
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attributes": [
+          "video"
+        ],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {
+          "video": "112054d5-e706-4dd8-99ea-09aabee36cd6"
+        },
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.grammy.com/news/tinashe-nasty-quantum-baby-interview/",
+          "id": "1ea43d0b-4422-4832-9b4a-d0041b8f44c3"
+        },
+        "type-id": "1f171391-1f98-4f45-b191-038ec3b12395",
+        "type": "interview"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "id": "7eacbd12-d437-4dab-8111-d741118ee371",
+          "resource": "https://www.last.fm/music/Tinashe"
+        },
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "type": "last.fm",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "lyrics",
+        "url": {
+          "id": "95fa96c4-f179-4dbd-95b5-9e8d2958fa61",
+          "resource": "https://genius.com/artists/Tinashe"
+        },
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "url": {
+          "id": "ecfd7825-9a7f-403e-a317-80070e0bee5d",
+          "resource": "https://myspace.com/tinashemusic"
+        },
+        "type": "myspace"
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "official homepage",
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "url": {
+          "resource": "http://tinashenow.com/",
+          "id": "797cbe86-b85f-45fd-a0f4-2659feb20a07"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": ""
+      },
+      {
+        "type": "official homepage",
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "url": {
+          "id": "5e982018-f530-4144-be70-9992f0c88830",
+          "resource": "http://www.tinashenow.com/"
+        },
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/no2014166117",
+          "id": "fdb05612-fa6d-43f8-a93d-6aba0cdfaa27"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "other databases",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb162509136",
+          "id": "41df182e-8568-4997-9fea-b6e148fed5a0"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "8a742fc6-3005-46c0-af05-3bcae756239a",
+          "resource": "https://d-nb.info/gnd/1062620658"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": ""
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "other databases",
+        "url": {
+          "resource": "https://imvdb.com/n/tinashe",
+          "id": "1bbb4521-a411-4122-bbc5-5db61c357457"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attributes": [],
+        "type": "other databases",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/tinashe-1",
+          "id": "d10b0c8c-fa3d-459d-984b-f32f335dbe3e"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attributes": [],
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "7bbca022-372d-4bf9-8750-6ffad478b4e7",
+          "resource": "https://www.musik-sammler.de/artist/tinashe/"
+        },
+        "type": "other databases",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {}
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "755b623c-2425-44e3-8590-0284786838a0",
+          "resource": "https://www.whosampled.com/Tinashe/"
+        },
+        "type": "other databases"
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-no2014166117",
+          "id": "d3960850-b43f-4139-b59d-6a2fb387d1a7"
+        },
+        "type": "other databases"
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": true,
+        "end": "2020-10-12",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "purchase for download",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "resource": "https://play.google.com/store/music/artist?id=Aiucx4fzwt3ebus7pwyulc3ky7y",
+          "id": "b5b63196-f525-47f9-bba7-740cdc5199d9"
+        }
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "resource": "https://itunes.apple.com/gh/artist/id464835513",
+          "id": "bf3649c3-6db5-4583-af0b-a784f11ffabc"
+        },
+        "type": "purchase for download"
+      },
+      {
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "resource": "https://mora.jp/artist/423079/",
+          "id": "c9b2787c-05ad-467c-8385-197f08ff2a31"
+        },
+        "type": "purchase for download"
+      },
+      {
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attributes": [],
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "7f060df6-8871-477b-8b85-916d5bc1ef70",
+          "resource": "https://open.qobuz.com/artist/1002688"
+        },
+        "type": "purchase for download",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {}
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "id": "ec4b5615-fcd1-44a8-8609-5f5892899d71",
+          "resource": "https://ototoy.jp/_/default/a/919928"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "type": "purchase for download",
+        "attributes": [],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {}
+      },
+      {
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "f9d81a39-ca31-4f1e-8530-f95c2dff1973",
+          "resource": "https://www.7digital.com/artist/tinashe"
+        },
+        "type": "purchase for download"
+      },
+      {
+        "type": "purchase for download",
+        "url": {
+          "id": "9deba141-d6c2-476b-96dd-6f7761332e6f",
+          "resource": "https://www.beatport.com/artist/tinashe/130928"
+        },
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attributes": []
+      },
+      {
+        "type": "secondhandsongs",
+        "url": {
+          "resource": "https://secondhandsongs.com/artist/94976",
+          "id": "faed3fe2-5084-4e06-901b-58344ce2e9a0"
+        },
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "type": "setlistfm",
+        "type-id": "bf5d0d5e-27a1-4e94-9df7-3cdc67b3b207",
+        "url": {
+          "id": "b6d8ef1c-11a3-4401-aeba-495f7f1c1f9d",
+          "resource": "https://www.setlist.fm/setlists/tinashe-3bdaf85c.html"
+        },
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "social network",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "id": "26350f4b-e363-4f9c-b161-83770a8492a6",
+          "resource": "https://twitter.com/Tinashe"
+        }
+      },
+      {
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "url": {
+          "id": "f35aa512-f68f-4e13-9c85-69a4d84eaa1e",
+          "resource": "https://www.facebook.com/OfficialTinashe"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "type": "social network",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "social network",
+        "url": {
+          "resource": "https://www.instagram.com/tinashenow/",
+          "id": "5d34a802-5184-41c9-a6d6-a12b1804d763"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attributes": [],
+        "type": "songkick",
+        "url": {
+          "id": "417c05ec-c9a6-4471-ac68-390acda38b4b",
+          "resource": "https://www.songkick.com/artists/2020878"
+        },
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "url": {
+          "resource": "https://soundcloud.com/tinashenow",
+          "id": "d78c5b88-5d2b-40d7-8241-f820f08a9abc"
+        },
+        "type": "soundcloud"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "id": "0072be38-b6a0-4bcb-9d7d-6e304f30dbba",
+          "resource": "https://music.apple.com/gb/artist/464835513"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "type": "streaming",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": [],
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "9ee0b145-9afa-41df-ab67-d50e88a6b420",
+          "resource": "https://music.apple.com/us/artist/464835513"
+        },
+        "type": "streaming",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "id": "7f060df6-8871-477b-8b85-916d5bc1ef70",
+          "resource": "https://open.qobuz.com/artist/1002688"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "type": "streaming"
+      },
+      {
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://tidal.com/artist/5222063",
+          "id": "6cdc2767-9a40-4883-96ce-7065ef5838ec"
+        },
+        "type": "streaming"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "resource": "http://viaf.org/viaf/160827051",
+          "id": "ec976d47-ca87-4aa3-8842-586781ce6990"
+        },
+        "type": "VIAF",
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "wikidata",
+        "url": {
+          "id": "f83e0004-b0cf-4359-bfd0-08c380702603",
+          "resource": "https://www.wikidata.org/wiki/Q434745"
+        },
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698"
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "url": {
+          "resource": "https://www.youtube.com/channel/UCgyMPfJl7ynJRfE2jQ18rJw",
+          "id": "b18b42cc-b70e-405b-b121-bd26bf3ebaee"
+        },
+        "type": "youtube"
+      },
+      {
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "attributes": [],
+        "type": "youtube",
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "url": {
+          "resource": "https://www.youtube.com/channel/UC-W8ijF4CaFAwqNUpB__qPg",
+          "id": "2ae1ef3c-e2b9-4e5a-9c9c-e0317eb5bd83"
+        },
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null
+      }
+    ],
+    "disambiguation": "American R&B singer",
+    "sort-name": "Tinashe",
+    "begin-area": {
+      "disambiguation": "",
+      "sort-name": "Lexington",
+      "name": "Lexington",
+      "type": null,
+      "id": "4551ede8-589a-4776-8120-bf43e53c927b",
+      "type-id": null
+    },
+    "id": "396a9525-0994-4542-b480-c4587feeb476",
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "gender": "Female"
+  }
+}

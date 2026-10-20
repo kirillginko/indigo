@@ -1,0 +1,39 @@
+{
+  "url": "https://api.discogs.com/artists/4981772",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:00.342903+00:00",
+  "body": {
+    "name": "Klein (11)",
+    "id": 4981772,
+    "resource_url": "https://api.discogs.com/artists/4981772",
+    "uri": "https://www.discogs.com/artist/4981772-Klein-11",
+    "releases_url": "https://api.discogs.com/artists/4981772/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/AIrPVQOqcdoSIlz6EwMCi2FK3hHpTcXrGbF9jOD7sRQ/rs:fit/g:sm/q:90/h:600/w:495/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ5ODE3/NzItMTU4ODQyMjQ4/NS00ODE3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/AIrPVQOqcdoSIlz6EwMCi2FK3hHpTcXrGbF9jOD7sRQ/rs:fit/g:sm/q:90/h:600/w:495/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ5ODE3/NzItMTU4ODQyMjQ4/NS00ODE3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/npYiAv8QYz-UMhvdvCwkSxC0MzdiI7ZPlvkI-Hjy59U/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ5ODE3/NzItMTU4ODQyMjQ4/NS00ODE3LmpwZWc.jpeg",
+        "width": 495,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/7edRH3gkmz8iSUyUFkBKGcjATaxu5BQzMbptqa2Yktk/rs:fit/g:sm/q:90/h:600/w:539/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ5ODE3/NzItMTY2Mzg0MDgz/My00MDYwLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/7edRH3gkmz8iSUyUFkBKGcjATaxu5BQzMbptqa2Yktk/rs:fit/g:sm/q:90/h:600/w:539/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ5ODE3/NzItMTY2Mzg0MDgz/My00MDYwLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/les18eaU8Zy2M7P0EFJ5Vp_IfTJz8Pehwak_91V2YIc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTQ5ODE3/NzItMTY2Mzg0MDgz/My00MDYwLmpwZWc.jpeg",
+        "width": 539,
+        "height": 600
+      }
+    ],
+    "profile": "Musician from London via Clovelly.",
+    "urls": [
+      "https://klein1997.bandcamp.com/",
+      "https://www.youtube.com/channel/UCHGzELDZdJgIOojThONjN5g",
+      "http://therealjist.club",
+      "https://en.wikipedia.org/wiki/Klein_(musician)",
+      "https://wahalawahalawahala.org/"
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

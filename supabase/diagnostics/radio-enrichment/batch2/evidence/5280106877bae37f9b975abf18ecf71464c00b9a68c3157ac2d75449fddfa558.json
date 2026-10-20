@@ -1,0 +1,742 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/4d86ad4e-28d8-4e9f-8cf4-735c57060fdc?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:10.233508+00:00",
+  "body": {
+    "name": "Squarepusher",
+    "genres": [
+      {
+        "disambiguation": "",
+        "name": "drill and bass",
+        "id": "6732427a-0d04-4a15-b9e5-b4b5b9532f8f",
+        "count": 5
+      },
+      {
+        "count": 4,
+        "id": "462f9321-6103-49c9-b6db-96219bce6f62",
+        "name": "drum and bass",
+        "disambiguation": ""
+      },
+      {
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4",
+        "count": 7,
+        "name": "electronic",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "name": "glitch",
+        "count": 2,
+        "id": "18b010d7-7d85-4445-a4a8-1889a4688308"
+      },
+      {
+        "count": 8,
+        "id": "8eb583f1-4fd7-460c-8246-dcdccc0e3ef9",
+        "name": "idm",
+        "disambiguation": ""
+      },
+      {
+        "name": "jazz fusion",
+        "id": "2377ff19-83e7-4873-b425-dce6d1ad4ef4",
+        "count": 3,
+        "disambiguation": ""
+      }
+    ],
+    "area": {
+      "type": null,
+      "name": "Sheffield",
+      "type-id": null,
+      "id": "3ce737cb-f5bb-403d-a98a-e0602670229f",
+      "iso-3166-2-codes": [
+        "GB-SHF"
+      ],
+      "disambiguation": "",
+      "sort-name": "Sheffield"
+    },
+    "relations": [
+      {
+        "target-credit": "",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "bd382dfb-881d-46de-b565-05b2fe158b06",
+          "type": "Person",
+          "name": "Tom Jenkinson",
+          "sort-name": "Jenkinson, Tom",
+          "country": "GB",
+          "disambiguation": "Squarepusher"
+        },
+        "type": "is person",
+        "attribute-ids": {},
+        "source-credit": "",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "ended": false,
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "target-type": "artist",
+        "direction": "backward"
+      },
+      {
+        "attribute-values": {},
+        "begin": "2009",
+        "target-type": "artist",
+        "direction": "forward",
+        "artist": {
+          "type": "Group",
+          "name": "Shobaleader One",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "943b27df-7d31-4fd7-82c9-99d6b6ef34b3",
+          "country": "GB",
+          "disambiguation": "",
+          "sort-name": "Shobaleader One"
+        },
+        "type": "member of band",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attributes": [
+          "bass guitar",
+          "original"
+        ],
+        "target-credit": "",
+        "attribute-credits": {},
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c",
+          "bass guitar": "17f9f065-2312-4a24-8309-6f6dd63e2e33"
+        },
+        "source-credit": "",
+        "ended": false,
+        "end": null
+      },
+      {
+        "type": "allmusic",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "a1069350-750e-4233-8a65-c7051f3e558f",
+          "resource": "https://www.allmusic.com/artist/mn0000158849"
+        },
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type": "bandcamp",
+        "url": {
+          "id": "212c2b6f-5198-4cec-9b5f-b69bff28ca0b",
+          "resource": "https://squarepusher.bandcamp.com/"
+        },
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "url": {
+          "resource": "https://www.bbc.co.uk/music/artists/4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+          "id": "50ebb2c4-d9ff-4199-8904-7aa518a5610b"
+        },
+        "type": "BBC Music page",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "ended": true,
+        "end": "2020-11-19",
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "attributes": [],
+        "url": {
+          "resource": "https://www.discogs.com/artist/269",
+          "id": "40ab20fc-c0c9-472f-ab33-012d02cceee7"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "type": "discogs",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {}
+      },
+      {
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": [],
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "resource": "https://open.spotify.com/artist/4mtHSXwIHihO6MWNq5Qoko",
+          "id": "9ab00dea-2c0c-4eef-ac9a-d408c481c7d6"
+        },
+        "type": "free streaming",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "url": {
+          "resource": "https://www.deezer.com/artist/1604",
+          "id": "451d9d5e-2385-498f-adb7-bade7acff825"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "type": "free streaming",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "IMDb",
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "url": {
+          "resource": "https://www.imdb.com/name/nm1564683/",
+          "id": "8f754f48-669a-4570-94dd-17662aacc274"
+        },
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "last.fm",
+        "url": {
+          "resource": "https://www.last.fm/music/Squarepusher",
+          "id": "b8834b59-e3de-44a1-8b3f-a034cf9e452a"
+        },
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "myspace",
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "url": {
+          "id": "0513eca0-923e-4597-9b1c-dcf9a4ded26b",
+          "resource": "https://myspace.com/doyouknowsquarepusher"
+        }
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "official homepage",
+        "url": {
+          "resource": "http://www.squarepusher.net/",
+          "id": "8229155c-78c1-4bea-9464-f82d48d2a23d"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "id": "29ad03b1-64ab-4995-95a2-5bd73ce14a17",
+          "resource": "http://www.warprecords.com/news/?filter=sqp"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "type": "official homepage",
+        "attributes": [],
+        "end": null,
+        "ended": true,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "other databases",
+        "url": {
+          "id": "afb022e6-9e87-4bd8-a0d2-69a8bc5c44a8",
+          "resource": "http://id.loc.gov/authorities/names/no2002088368"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false
+      },
+      {
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attributes": [],
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "http://musicmoz.org/Bands_and_Artists/S/Squarepusher/",
+          "id": "ff92c92f-9b7c-4fe7-9320-0ca7479c04c6"
+        },
+        "type": "other databases",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {}
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "fc4c6869-0f5e-4a61-ab45-cbd089d76649",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb140243467"
+        },
+        "type": "other databases",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": []
+      },
+      {
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "attributes": [],
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://d-nb.info/gnd/135127319",
+          "id": "fd0740b8-8fed-4288-a16a-741d5f465672"
+        },
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "id": "5e66ac0c-dd83-4eac-9464-70d7db10c1ac",
+          "resource": "https://rateyourmusic.com/artist/squarepusher"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "attributes": [],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {}
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "other databases",
+        "url": {
+          "id": "176f4835-523b-4376-9bb4-d86ac113c0d7",
+          "resource": "https://www.muziekweb.nl/Link/M00000290040/"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "other databases",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-no2002088368",
+          "id": "80d8d5fc-d639-4be3-848d-db1039bd8181"
+        }
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "20ad662d-1809-4cf4-9f94-611f839fa305",
+          "resource": "https://open.qobuz.com/artist/53272"
+        },
+        "type": "purchase for download",
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "type": "secondhandsongs",
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "url": {
+          "resource": "https://secondhandsongs.com/artist/10528",
+          "id": "187c9812-5616-4dbe-bdea-a457024d7878"
+        },
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "resource": "https://twitter.com/SQUAREPUSHER",
+          "id": "2cbabd53-98eb-4660-ac77-9ee01c368cf3"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "type": "social network"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "id": "8de20de5-f545-4f65-b4d1-9cdf2114b145",
+          "resource": "https://www.facebook.com/squarepusher"
+        },
+        "type": "social network",
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.songkick.com/artists/210867",
+          "id": "79b026f0-88d7-463a-a57f-fafb0e3758dc"
+        },
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "type": "songkick",
+        "attributes": [],
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {}
+      },
+      {
+        "type": "streaming",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/4514377",
+          "id": "898e8175-235e-4b41-bc9a-9526491b7777"
+        },
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attributes": [],
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://music.apple.com/us/artist/4514377",
+          "id": "3a56e20f-1c9e-4080-9c74-a6b4917ae9be"
+        },
+        "type": "streaming",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {}
+      },
+      {
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/53272",
+          "id": "20ad662d-1809-4cf4-9f94-611f839fa305"
+        },
+        "type": "streaming",
+        "attributes": [],
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "url": {
+          "id": "86d28c61-ec6a-4bdc-93f6-b7a514fd8c56",
+          "resource": "https://tidal.com/artist/3566512"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "type": "streaming",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": []
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "VIAF",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "resource": "http://viaf.org/viaf/54345791",
+          "id": "097fab69-f918-438a-acc2-388e0f16ffe9"
+        }
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "wikidata",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q553861",
+          "id": "cb584709-77d4-4957-8f74-d571c27b36cf"
+        },
+        "attributes": [],
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null
+      },
+      {
+        "type": "youtube",
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "url": {
+          "id": "d348db2b-ca0b-4a9d-88cb-18ac0c90fb9a",
+          "resource": "https://www.youtube.com/channel/UCMBGYerL97F0TaInwrlpvZQ"
+        },
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "attributes": []
+      }
+    ],
+    "disambiguation": "",
+    "sort-name": "Squarepusher",
+    "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+    "begin-area": {
+      "disambiguation": "",
+      "sort-name": "Chelmsford",
+      "name": "Chelmsford",
+      "type": null,
+      "id": "31c73193-85c6-4a15-ae27-61c173e30c81",
+      "type-id": null
+    },
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "gender": "Male",
+    "aliases": [
+      {
+        "begin": null,
+        "locale": null,
+        "ended": false,
+        "type-id": null,
+        "end": null,
+        "primary": null,
+        "type": null,
+        "name": "Square Pusher",
+        "sort-name": "Square Pusher"
+      },
+      {
+        "type": null,
+        "name": "Stereotype",
+        "type-id": null,
+        "ended": false,
+        "end": null,
+        "primary": null,
+        "sort-name": "Stereotype",
+        "locale": null,
+        "begin": null
+      },
+      {
+        "begin": null,
+        "locale": "ja",
+        "sort-name": "スクエアプッシャー",
+        "primary": false,
+        "end": null,
+        "ended": false,
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "スクエアプッシャー",
+        "type": "Artist name"
+      }
+    ],
+    "type": "Person",
+    "ipis": [
+      "00261317098",
+      "00261317196"
+    ],
+    "tags": [
+      {
+        "name": "drill and bass",
+        "count": 5
+      },
+      {
+        "count": 4,
+        "name": "drum and bass"
+      },
+      {
+        "count": 7,
+        "name": "electronic"
+      },
+      {
+        "count": 2,
+        "name": "glitch"
+      },
+      {
+        "name": "idm",
+        "count": 8
+      },
+      {
+        "count": 3,
+        "name": "jazz fusion"
+      }
+    ],
+    "end-area": null,
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "life-span": {
+      "ended": false,
+      "end": null,
+      "begin": "1975-01-17"
+    },
+    "isnis": [
+      "0000000462048595"
+    ],
+    "country": "GB"
+  }
+}

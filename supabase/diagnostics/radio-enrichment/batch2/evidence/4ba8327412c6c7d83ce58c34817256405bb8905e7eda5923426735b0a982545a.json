@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/bca6597a-3781-4ce2-844c-332fc6fa9184?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:24.350253+00:00",
+  "body": {
+    "video": false,
+    "disambiguation": "",
+    "releases": [
+      {
+        "packaging-id": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status": "Official",
+        "country": "GB",
+        "disambiguation": "",
+        "title": "Millennium Jazz Three",
+        "quality": "normal",
+        "barcode": "5033154606649",
+        "packaging": null,
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "country": null
+            }
+          }
+        ],
+        "id": "a1253dec-ae96-4a68-bf0d-b567ccbab653",
+        "release-events": [
+          {
+            "date": "2000",
+            "area": {
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom"
+            }
+          }
+        ],
+        "date": "2000"
+      }
+    ],
+    "id": "bca6597a-3781-4ce2-844c-332fc6fa9184",
+    "isrcs": [],
+    "title": "La La La",
+    "first-release-date": "2000",
+    "artist-credit": [
+      {
+        "name": "I:Cube",
+        "joinphrase": "",
+        "artist": {
+          "sort-name": "I:Cube",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "FR",
+          "name": "I:Cube",
+          "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+          "disambiguation": "house music"
+        }
+      }
+    ],
+    "length": 280000
+  }
+}

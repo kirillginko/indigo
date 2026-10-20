@@ -1,0 +1,286 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/4d761a73-cce1-4940-89f9-520000a50e11?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:54.970589+00:00",
+  "body": {
+    "first-release-date": "2014-06-23",
+    "artist-credit": [
+      {
+        "joinphrase": " with ",
+        "artist": {
+          "type": "Person",
+          "country": "US",
+          "disambiguation": "",
+          "name": "Bill Withers",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Withers, Bill",
+          "id": "fd1a2d9d-9bb6-44de-83a3-41560658aba9"
+        },
+        "name": "Bill Withers"
+      },
+      {
+        "name": "Studio Rio",
+        "artist": {
+          "id": "8d35e82f-3bb0-45cd-8b83-72bc710bac5f",
+          "sort-name": "Studio Rio",
+          "name": "Studio Rio",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "disambiguation": "",
+          "country": null,
+          "type": "Group"
+        },
+        "joinphrase": ""
+      }
+    ],
+    "releases": [
+      {
+        "country": "XW",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "2014-06-23",
+        "status": "Official",
+        "packaging": "Jewel Case",
+        "id": "e37ea238-d7dd-4f06-82ec-a4afc75ad1bc",
+        "artist-credit": [
+          {
+            "name": "Studio Rio",
+            "artist": {
+              "country": null,
+              "disambiguation": "",
+              "type": "Group",
+              "id": "8d35e82f-3bb0-45cd-8b83-72bc710bac5f",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Studio Rio",
+              "sort-name": "Studio Rio"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f"
+            },
+            "date": "2014-06-23"
+          }
+        ],
+        "barcode": "888430321427",
+        "title": "Studio Rio Presents: The Brazil Connection",
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "name": "Various Artists",
+              "sort-name": "Various Artists"
+            },
+            "name": "Various Artists"
+          }
+        ],
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2014",
+            "area": {
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "Brazil",
+        "text-representation": {
+          "language": "eng",
+          "script": null
+        },
+        "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+        "quality": "normal",
+        "country": "GB",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "date": "2014",
+        "status": "Promotion",
+        "id": "3379058c-2ba1-49e3-bd6a-e7e20fa490f5",
+        "packaging": "Cardboard/Paper Sleeve"
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Studio Rio Presents: The Brazil Connection",
+        "disambiguation": "",
+        "release-events": [
+          {
+            "date": "2014",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "TH"
+              ],
+              "name": "Thailand",
+              "sort-name": "Thailand",
+              "id": "ce209e56-cda5-358e-96db-830e3405b675"
+            }
+          }
+        ],
+        "barcode": "8884303214270",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Studio Rio",
+            "artist": {
+              "id": "8d35e82f-3bb0-45cd-8b83-72bc710bac5f",
+              "sort-name": "Studio Rio",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "Studio Rio",
+              "disambiguation": "",
+              "country": null,
+              "type": "Group"
+            }
+          }
+        ],
+        "packaging": "Jewel Case",
+        "id": "c3f30831-24e5-49f8-b3ff-ba532d8460c0",
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "2014",
+        "country": "TH",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "DE",
+        "id": "126d20e2-2165-4b4e-8a62-862ea3b4722f",
+        "packaging": "Gatefold Cover",
+        "status": "Official",
+        "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+        "date": "2016-06-17",
+        "disambiguation": "",
+        "title": "Ultimate Brazil",
+        "barcode": "889853222629",
+        "release-events": [
+          {
+            "date": "2016-06-17",
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "sort-name": "Germany",
+              "type-id": null,
+              "name": "Germany",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad"
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type": "Other",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            },
+            "name": "Various Artists"
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "por"
+        }
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f"
+            },
+            "date": "2024-10-04"
+          }
+        ],
+        "barcode": null,
+        "title": "Mr Bongo Record Club, Vol. 7",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "type": "Other",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            }
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "id": "a4fac76c-c4e7-4b87-bf42-57d1d322f625",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2024-10-04",
+        "status": "Official"
+      }
+    ],
+    "title": "Lovely Day",
+    "disambiguation": "",
+    "isrcs": [
+      "USSM11401532"
+    ],
+    "length": 237933,
+    "video": false,
+    "id": "4d761a73-cce1-4940-89f9-520000a50e11"
+  }
+}

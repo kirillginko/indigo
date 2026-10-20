@@ -1,0 +1,320 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%221000+Rads%22+AND+artist%3A%22David+Axelrod%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:46.811308+00:00",
+  "body": {
+    "created": "2026-10-20T01:23:46.736Z",
+    "count": 2,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "8b77a1b0-39f4-405f-98fe-e5d439dd3c47",
+        "score": 100,
+        "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+        "title": "1000 Rads",
+        "length": 483000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "artist": {
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "name": "David Axelrod",
+              "sort-name": "Axelrod, David",
+              "disambiguation": "baroque pop composer",
+              "aliases": [
+                {
+                  "sort-name": "Axelrod, D.",
+                  "name": "D. Axelrod",
+                  "locale": "en",
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006-02-27",
+        "releases": [
+          {
+            "id": "133ade3e-ed55-4a9c-bcde-55401112157f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 2,
+            "title": "The Edge of Music: An Exploration of 50 Years in Music",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "5c3ecf35-4098-3932-bd84-6fb76a17e137",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Edge of Music: An Exploration of 50 Years in Music",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-02-27",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2006-02-27",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 26,
+            "media": [
+              {
+                "id": "8135292a-675b-368f-a79e-c4e08aa5b80c",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "35380046-a0e4-3738-9299-f18f7d2d8ea5",
+                    "number": "6",
+                    "title": "1000 Rads",
+                    "length": 483000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "616c86cd-d008-432b-bb7d-2d68f778c194",
+        "score": 100,
+        "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+        "title": "1000 Rads",
+        "length": 490000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "David Axelrod",
+            "artist": {
+              "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+              "name": "David Axelrod",
+              "sort-name": "Axelrod, David",
+              "disambiguation": "baroque pop composer",
+              "aliases": [
+                {
+                  "sort-name": "Axelrod, D.",
+                  "name": "D. Axelrod",
+                  "locale": "en",
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1975",
+        "releases": [
+          {
+            "id": "a2db8f90-1f3b-38a9-9ff6-7c943162bdb3",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Seriously Deep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "108c7feb-fd79-4d9e-aa6e-4a3ee202a964",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Seriously Deep",
+              "primary-type": "Album"
+            },
+            "date": "2008-04-08",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2008-04-08",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 6,
+            "media": [
+              {
+                "id": "ec4da4ad-d625-362f-b2a2-be3060c45665",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "fb2b1162-4b82-3f9c-9b4e-3180e629aafe",
+                    "number": "3",
+                    "title": "1000 Rads",
+                    "length": 490000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "02f4f8df-15d8-48aa-8324-96cb53b97417",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Seriously Deep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "108c7feb-fd79-4d9e-aa6e-4a3ee202a964",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Seriously Deep",
+              "primary-type": "Album"
+            },
+            "date": "2008",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2008",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 6,
+            "media": [
+              {
+                "id": "d38a252e-6df7-3e63-be69-255d97718235",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "0566ff96-1523-345c-997e-50d132457fc3",
+                    "number": "3",
+                    "title": "1000 Rads",
+                    "length": 490000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 2
+              }
+            ]
+          },
+          {
+            "id": "bef7cfd4-01ca-4855-a188-7b5b97e09a1d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "9a390f67-e7cf-3117-b0b0-7927b4ce783d",
+            "count": 1,
+            "title": "Seriously Deep",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "David Axelrod",
+                "artist": {
+                  "id": "d5c756c1-4872-457b-8f00-d620547cbb85",
+                  "name": "David Axelrod",
+                  "sort-name": "Axelrod, David",
+                  "disambiguation": "baroque pop composer"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "108c7feb-fd79-4d9e-aa6e-4a3ee202a964",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Seriously Deep",
+              "primary-type": "Album"
+            },
+            "date": "1975",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1975",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 6,
+            "media": [
+              {
+                "id": "2f7ab117-82b4-369b-97b8-65691c52babe",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "a2af4db7-15ce-311f-b563-06c2e79397f8",
+                    "number": "A3",
+                    "title": "1000 Rads",
+                    "length": 490000
+                  }
+                ],
+                "track-count": 6,
+                "track-offset": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

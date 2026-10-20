@@ -1,0 +1,207 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/19583b63-ae19-49fe-9868-a4bd9569ad9c?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:00.157496+00:00",
+  "body": {
+    "begin-area": {
+      "type-id": null,
+      "disambiguation": "Greater London",
+      "type": null,
+      "name": "London",
+      "id": "f03d09b3-39dc-4083-afd6-159e3f0d462f",
+      "sort-name": "London"
+    },
+    "disambiguation": "Los Angeles-based hip-hop producer from London, England",
+    "country": "US",
+    "gender": "Male",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "type": "Person",
+    "name": "Budgie",
+    "sort-name": "Budgie",
+    "id": "19583b63-ae19-49fe-9868-a4bd9569ad9c",
+    "end-area": null,
+    "life-span": {
+      "end": null,
+      "begin": null,
+      "ended": false
+    },
+    "ipis": [],
+    "aliases": [],
+    "genres": [],
+    "area": {
+      "type": null,
+      "name": "Los Angeles",
+      "disambiguation": "",
+      "type-id": null,
+      "id": "1f40c6e1-47ba-4e35-996f-fe6ee5840e62",
+      "sort-name": "Los Angeles"
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "isnis": [],
+    "relations": [
+      {
+        "type": "bandcamp",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://budgiefirebeats.bandcamp.com/",
+          "id": "9c335bf6-2abd-48e8-be61-584e2ed391c5"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "67431e5e-5b30-4b04-85c5-7219e5858dc8",
+          "resource": "https://www.discogs.com/artist/317252"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "attributes": [],
+        "type": "discogs",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "type": "free streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.deezer.com/artist/10188",
+          "id": "87b15cab-c1e2-400b-ad31-96a3de14ba23"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://imvdb.com/n/budgie",
+          "id": "a2c8615c-413d-4a69-971b-57d0e3035751"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "type": "other databases",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "4fa8084c-0bfe-468c-a5a8-2f0e683e5cbd",
+          "resource": "https://itunes.apple.com/us/artist/id5216839"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "purchase for download"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "social network",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://twitter.com/budgiefirebeats",
+          "id": "6f98f908-17fb-4083-a148-f39c4f0e533a"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "url": {
+          "id": "eac5da45-c97d-4d1d-a2ea-d50b6fb7d550",
+          "resource": "https://www.instagram.com/budgeboogie/"
+        },
+        "attribute-ids": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "social network",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://soundcloud.com/budgiefirebeats",
+          "id": "a01ac27d-df5f-400e-a2e6-b28ef73e0878"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "soundcloud"
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "streaming",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://tidal.com/artist/4224886",
+          "id": "1393981d-06ad-4ef7-9ff7-3268b48ae348"
+        }
+      }
+    ],
+    "tags": []
+  }
+}

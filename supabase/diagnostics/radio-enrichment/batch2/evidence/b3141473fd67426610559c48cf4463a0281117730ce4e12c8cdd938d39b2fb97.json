@@ -1,0 +1,56 @@
+{
+  "url": "https://api.discogs.com/artists/317252",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:01.394801+00:00",
+  "body": {
+    "name": "Budgie (3)",
+    "id": 317252,
+    "resource_url": "https://api.discogs.com/artists/317252",
+    "uri": "https://www.discogs.com/artist/317252-Budgie-3",
+    "releases_url": "https://api.discogs.com/artists/317252/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/aQBf8d5VQiGR8JKM5FHSEprdK0NtWCH1TSKa6MBIUqE/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNzI1/Mi0xNTQ3NjcwNjQ0/LTkxNTEuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/aQBf8d5VQiGR8JKM5FHSEprdK0NtWCH1TSKa6MBIUqE/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNzI1/Mi0xNTQ3NjcwNjQ0/LTkxNTEuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/y3r65tugNhb7jAMhSSOs0t4JeL0MTzUV4pSaxSBrdEA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNzI1/Mi0xNTQ3NjcwNjQ0/LTkxNTEuanBlZw.jpeg",
+        "width": 600,
+        "height": 597
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/8h0sy8zct2MkaNz8NQ8loeTNFoTOcqqePO-57osrVjA/rs:fit/g:sm/q:90/h:500/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNzI1/Mi0xNDEwNTE4NjEx/LTI4MzkuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/8h0sy8zct2MkaNz8NQ8loeTNFoTOcqqePO-57osrVjA/rs:fit/g:sm/q:90/h:500/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNzI1/Mi0xNDEwNTE4NjEx/LTI4MzkuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/gl7Xi3_0UHO64C3pgJQk9EJ3ILytnlj6LveoTOkuUf0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTMxNzI1/Mi0xNDEwNTE4NjEx/LTI4MzkuanBlZw.jpeg",
+        "width": 500,
+        "height": 500
+      }
+    ],
+    "realname": "Benjamin Scholefield",
+    "profile": "Formerly London-based DJ and producer, now in Los Angeles.\r\nSon of [l=Honest Jon's Records] co-owner Alan Scholefield.",
+    "urls": [
+      "https://budgiefirebeats.bandcamp.com",
+      "https://instagram.com/budgeboogie",
+      "https://twitter.com/budgiefirebeats",
+      "https://soundcloud.com/budgiefirebeats",
+      "https://www.mixcloud.com/budgiefirebeats"
+    ],
+    "namevariations": [
+      "Budgie",
+      "Budgie Beats"
+    ],
+    "aliases": [
+      {
+        "id": 7448823,
+        "name": "Benjamin Scholefield",
+        "resource_url": "https://api.discogs.com/artists/7448823"
+      },
+      {
+        "id": 7527987,
+        "name": "Ben Scholefield",
+        "resource_url": "https://api.discogs.com/artists/7527987"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

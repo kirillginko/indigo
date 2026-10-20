@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/034eb957-fe7b-4f2a-a1c5-aa1a68e0fc57?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:59.176979+00:00",
+  "body": {
+    "title": "Benjamin",
+    "first-release-date": "2010-06-14",
+    "artist-credit": [
+      {
+        "name": "Les McCann",
+        "joinphrase": "",
+        "artist": {
+          "country": "US",
+          "id": "bc16d640-a069-42ec-a8c1-c24fd5c3d206",
+          "name": "Les McCann",
+          "disambiguation": "",
+          "type": "Person",
+          "sort-name": "McCann, Les",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        }
+      }
+    ],
+    "length": null,
+    "disambiguation": "part of “RA.211” DJ-mix",
+    "video": false,
+    "isrcs": [],
+    "releases": [
+      {
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Jaar, Nicolas",
+              "type": "Person",
+              "disambiguation": "",
+              "name": "Nicolas Jaar",
+              "id": "06e99a1b-4020-4380-ab27-1a3e0c5e557c",
+              "country": "US"
+            },
+            "joinphrase": "",
+            "name": "Nicolas Jaar"
+          }
+        ],
+        "barcode": null,
+        "packaging": "None",
+        "title": "RA.211",
+        "id": "f510ed0b-43e9-48d0-8724-fa1cb9e91099",
+        "release-events": [
+          {
+            "date": "2010-06-14",
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type": null,
+              "sort-name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "name": "United Kingdom",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "date": "2010-06-14",
+        "status": "Official",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "disambiguation": "",
+        "country": "GB"
+      }
+    ],
+    "id": "034eb957-fe7b-4f2a-a1c5-aa1a68e0fc57"
+  }
+}

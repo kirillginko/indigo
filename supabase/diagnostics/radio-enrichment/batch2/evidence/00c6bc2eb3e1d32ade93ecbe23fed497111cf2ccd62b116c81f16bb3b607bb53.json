@@ -1,0 +1,177 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/11ea8e82-ad0d-4fc3-a597-5d912f607a3c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:38.793481+00:00",
+  "body": {
+    "isrcs": [
+      "ES5021800569"
+    ],
+    "releases": [
+      {
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "packaging": "None",
+        "date": "2018-11-02",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "name": "ROSALÍA",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "country": "ES"
+            },
+            "joinphrase": "",
+            "name": "ROSALÍA"
+          }
+        ],
+        "id": "97385235-42ba-4a83-8002-5b9e5e4f0d16",
+        "release-events": [
+          {
+            "date": "2018-11-02",
+            "area": {
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "886447217139",
+        "quality": "normal",
+        "title": "EL MAL QUERER",
+        "text-representation": {
+          "language": "spa",
+          "script": "Latn"
+        },
+        "country": "XW",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "title": "EL MAL QUERER",
+        "quality": "normal",
+        "text-representation": {
+          "script": "Latn",
+          "language": "spa"
+        },
+        "country": "ES",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "190758879628",
+        "status": "Official",
+        "id": "ce7591dd-625d-4697-90f1-57245b08e206",
+        "release-events": [
+          {
+            "date": "2018-11-02",
+            "area": {
+              "disambiguation": "",
+              "type-id": null,
+              "type": null,
+              "name": "Spain",
+              "sort-name": "Spain",
+              "id": "471c46a7-afc5-31c4-923c-d0444f5053a4",
+              "iso-3166-1-codes": [
+                "ES"
+              ]
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "joinphrase": "",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "sort-name": "ROSALÍA",
+              "name": "ROSALÍA",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "ES",
+              "disambiguation": "Spanish singer"
+            }
+          }
+        ],
+        "date": "2018-11-02",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case"
+      },
+      {
+        "title": "EL MAL QUERER",
+        "quality": "normal",
+        "text-representation": {
+          "script": "Latn",
+          "language": "spa"
+        },
+        "country": "XE",
+        "disambiguation": "",
+        "id": "5fdcd1ae-93b0-462f-b11e-405ff1485e4a",
+        "release-events": [
+          {
+            "date": "2018",
+            "area": {
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "sort-name": "Europe",
+              "name": "Europe",
+              "type": null,
+              "type-id": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "barcode": "190759242827",
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "disambiguation": "Spanish singer",
+              "country": "ES",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "ROSALÍA",
+              "type": "Person",
+              "sort-name": "ROSALÍA",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": "dfb7da53-866f-4dfd-a016-80bafaeff3db",
+        "packaging": "Super Jewel Box",
+        "date": "2018"
+      }
+    ],
+    "id": "11ea8e82-ad0d-4fc3-a597-5d912f607a3c",
+    "disambiguation": "",
+    "video": false,
+    "artist-credit": [
+      {
+        "name": "ROSALÍA",
+        "joinphrase": "",
+        "artist": {
+          "name": "ROSALÍA",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "ROSALÍA",
+          "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+          "disambiguation": "Spanish singer",
+          "country": "ES"
+        }
+      }
+    ],
+    "length": 144000,
+    "title": "DE AQUÍ NO SALES (Cap.4: Disputa)",
+    "first-release-date": "2018-11-02"
+  }
+}

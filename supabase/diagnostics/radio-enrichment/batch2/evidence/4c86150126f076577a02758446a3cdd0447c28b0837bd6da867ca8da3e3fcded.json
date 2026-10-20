@@ -1,0 +1,1232 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+Nation+Rejects%22+AND+artist%3A%22Art+Of+Noise%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:32.071549+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:31.885Z",
+    "count": 2,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "0cd2543f-ea28-47c0-bf47-176152a0c24b",
+        "score": 100,
+        "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+        "title": "A Nation Rejects",
+        "length": 285333,
+        "disambiguation": "Ambient Collection remix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "aliases": [
+                {
+                  "sort-name": "The Art Of Noise",
+                  "name": "The Art Of Noise",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1990-10-05",
+        "releases": [
+          {
+            "id": "f1dde109-7471-4aa6-b243-c67aec653ace",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 3,
+            "title": "State of the Art",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7d525279-a406-4b9e-a591-d4317a55f090",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "State of the Art",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997-08-04",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1997-08-04",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 38,
+            "media": [
+              {
+                "id": "75343d0b-33d2-462c-acde-0a40d67c83b2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "005727ec-d6e2-4725-ba80-adfe42ed2bc3",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "37b36d95-f93c-4b9c-9ae0-88e8bd486de6",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1991-04-01",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1991-04-01",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "cec0eeec-2d34-35bf-b54b-94ede6cec04d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a26dd1f2-f706-430c-b3b4-64e2b3ad39c7",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "022f8f66-cf1a-4c81-b43b-9da4d2757951",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "track-count": 13,
+            "media": [
+              {
+                "id": "87cbd77f-d1d1-33c7-8c27-8ca0bad77a36",
+                "position": 1,
+                "format": "Cassette",
+                "track": [
+                  {
+                    "id": "f106801e-efc1-4cf5-934a-da64208ea38d",
+                    "number": "B6",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "fb315a87-1df7-43ce-8309-770ab6a6b649",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "ea164120-11f8-3896-8964-2aac891c332c",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f668459a-4220-4310-bdeb-b6378103f7aa",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 286000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "4c4a682f-b457-46be-a243-b2ef7d754e8b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "3488d8b0-141c-382b-979d-b50484e6edd9",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "1410a116-bae8-47c2-ba93-fc0cf63ae3d2",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 286000
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "30df7989-f6ec-489f-8feb-84f886287c52",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "5aa64dd3-2fa8-3d83-9bdc-f9e6cadc9551",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "4838f79c-418c-42f3-945b-0af6d9ca5d21",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "f21056a2-8552-3421-8dac-fe92e49d2291",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990-10-05",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990-10-05",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "26c9e196-bfeb-320c-b74d-9396c05b337b",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "fa6397b8-aa7a-39ea-adb2-0095e7ba8104",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "09cd994f-5aee-4105-8fbc-f5da3a932435",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990-10-05",
+            "country": "XE",
+            "release-events": [
+              {
+                "date": "1990-10-05",
+                "area": {
+                  "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+                  "name": "Europe",
+                  "sort-name": "Europe",
+                  "iso-3166-1-codes": [
+                    "XE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "8fa24f20-e688-37d3-9e0b-f882cb59672e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "3c59daf8-dfd2-3f39-926f-6119c643bea3",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "2b5694d2-3dcf-4b12-a8bf-4fd591f2b581",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "28bec82b-3842-30a4-909f-50b427a725ca",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art Of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "38f37089-77da-4370-bae6-06d7a740fdb6",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "3b1a677b-c8dc-4eff-960a-429cc283dd55",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285200
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "90fe3896-08d9-4c23-96ea-21e11db498bd",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "85e9786d-bdba-474e-b162-3238b2aba859",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a5ef2541-785a-4655-b13e-78608271220b",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "261e9a3b-28d3-3d31-b494-8f31c39c3665",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d0acc289-70fe-309a-9ebe-34ed83fd8800",
+            "count": 1,
+            "title": "The Ambient Collection",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "cfab94df-b416-3ae7-aa25-1745d3056294",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The Ambient Collection",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation",
+                "Remix",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0c60f497-ff81-3818-befd-abfc84a4858b",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "1990",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1990",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 13,
+            "media": [
+              {
+                "id": "1fa97ffc-69fe-33fa-84c6-3e442106b700",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "44078ddc-5df6-3487-a369-0e6066b606e4",
+                    "number": "12",
+                    "title": "A Nation Rejects",
+                    "length": 285333
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 11
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBAHT1500178"
+        ],
+        "tags": [
+          {
+            "count": 3,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "downtempo"
+          },
+          {
+            "count": 3,
+            "name": "ambient"
+          },
+          {
+            "count": 1,
+            "name": "electronica"
+          },
+          {
+            "count": 1,
+            "name": "synth-pop"
+          }
+        ]
+      },
+      {
+        "id": "45e12bb2-ed60-4784-8307-4a4c841ecf2a",
+        "score": 94,
+        "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+        "title": "A Nation Rejects",
+        "length": 178000,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "The Art of Noise",
+            "artist": {
+              "id": "be899560-1570-402e-9f95-3182898a8b70",
+              "name": "Art of Noise",
+              "sort-name": "Art of Noise",
+              "aliases": [
+                {
+                  "sort-name": "The Art Of Noise",
+                  "name": "The Art Of Noise",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1986",
+        "releases": [
+          {
+            "id": "d678a917-ee45-4f60-9b81-677a022204c2",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "dac8f070-5f43-306d-9154-02cc3402aba0",
+            "count": 1,
+            "title": "Paranoimia (The Paranoid Mix)",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "joinphrase": " with ",
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              },
+              {
+                "name": "Max Headroom",
+                "artist": {
+                  "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+                  "name": "Max Headroom",
+                  "sort-name": "Headroom, Max",
+                  "disambiguation": "titular character from \"Max Headroom\""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "19407c45-cae7-3bbb-b11c-4efe09eb141e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Paranoimia",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "98c778e0-a914-4d94-8a29-6f065cbcf603",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "329d8370-996b-4f87-baf4-dd61aece8516",
+                    "number": "B3",
+                    "title": "A Nation Rejects",
+                    "length": 178000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "e52f30dd-9374-470e-a2de-ab7fc9ea2c7d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "disambiguation": "deluxe edition",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "2017-05-19",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2017-05-19",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 35,
+            "media": [
+              {
+                "id": "47961b60-b55a-3a48-b82d-b5ad4d3f25f1",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "618810a6-811b-443a-9552-1da50911df47",
+                    "number": "17",
+                    "title": "A Nation Rejects (2017 remastered version)",
+                    "length": 177563
+                  }
+                ],
+                "track-count": 35,
+                "track-offset": 16
+              }
+            ]
+          },
+          {
+            "id": "586679c8-c3b9-43e6-be0b-50e04095f861",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 2,
+            "title": "In Visible Silence",
+            "status": "Official",
+            "disambiguation": "deluxe edition",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "32602c3f-9c01-3f47-b069-38a6ba02f226",
+              "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "In Visible Silence",
+              "primary-type": "Album"
+            },
+            "date": "2017-05-19",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2017-05-19",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 35,
+            "media": [
+              {
+                "id": "c736ccf2-40af-39ed-9df6-e965189138a2",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "5abf6161-f728-4f11-8e5f-9d20b8952d3a",
+                    "number": "17",
+                    "title": "A Nation Rejects",
+                    "length": 178000
+                  }
+                ],
+                "track-count": 18,
+                "track-offset": 16
+              }
+            ]
+          },
+          {
+            "id": "80008f8a-fbf8-4883-b657-a32483afff0e",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "dac8f070-5f43-306d-9154-02cc3402aba0",
+            "count": 1,
+            "title": "Paranoimia",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "joinphrase": " with ",
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              },
+              {
+                "name": "Max Headroom",
+                "artist": {
+                  "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+                  "name": "Max Headroom",
+                  "sort-name": "Headroom, Max",
+                  "disambiguation": "titular character from \"Max Headroom\""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "19407c45-cae7-3bbb-b11c-4efe09eb141e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Paranoimia",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "ca615dea-f397-3d8e-baf0-ace53bc63d10",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "7971497f-c9b7-30c4-a9e0-0b30af9c1d07",
+                    "number": "B3",
+                    "title": "A Nation Rejects",
+                    "length": 178000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "2be9de5c-af76-4cf3-8d9d-c566a2a1c0f8",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "dac8f070-5f43-306d-9154-02cc3402aba0",
+            "count": 1,
+            "title": "Paranoimia",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "joinphrase": " with ",
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              },
+              {
+                "name": "Max Headroom",
+                "artist": {
+                  "id": "0671bf0b-784b-45e9-975c-3173f12f9679",
+                  "name": "Max Headroom",
+                  "sort-name": "Headroom, Max",
+                  "disambiguation": "titular character from \"Max Headroom\""
+                }
+              }
+            ],
+            "release-group": {
+              "id": "19407c45-cae7-3bbb-b11c-4efe09eb141e",
+              "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+              "title": "Paranoimia",
+              "primary-type": "Single"
+            },
+            "date": "1986",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1986",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 4,
+            "media": [
+              {
+                "id": "9777d5cd-8854-3349-9bf9-691d6f2f53ed",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "194c244d-5390-392e-9e5b-b75548d382ab",
+                    "number": "B3",
+                    "title": "A Nation Rejects",
+                    "length": 178000
+                  }
+                ],
+                "track-count": 4,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "2262a1b6-35e1-4bbb-acd6-0055fa0790cf",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "911f5a04-dc6a-37c9-ba0c-e986f314c6fd",
+            "count": 1,
+            "title": "The FON Mixes",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "The Art of Noise",
+                "artist": {
+                  "id": "be899560-1570-402e-9f95-3182898a8b70",
+                  "name": "Art of Noise",
+                  "sort-name": "Art of Noise"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "eef42fbd-1153-33b0-805d-6310a5b29768",
+              "type-id": "0c60f497-ff81-3818-befd-abfc84a4858b",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "The FON Mixes",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Remix"
+              ],
+              "secondary-type-ids": [
+                "0c60f497-ff81-3818-befd-abfc84a4858b"
+              ]
+            },
+            "date": "1992-02-21",
+            "country": "JP",
+            "release-events": [
+              {
+                "date": "1992-02-21",
+                "area": {
+                  "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+                  "name": "Japan",
+                  "sort-name": "Japan",
+                  "iso-3166-1-codes": [
+                    "JP"
+                  ]
+                }
+              }
+            ],
+            "track-count": 17,
+            "media": [
+              {
+                "id": "e4534464-7f10-370f-b33f-619b079da26e",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "c72b54e5-7050-4665-833e-c44b1f0ea201",
+                    "number": "15",
+                    "title": "A Nation Rejects",
+                    "length": 178000
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 14
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "GBAHT1700129"
+        ],
+        "tags": [
+          {
+            "count": 2,
+            "name": "electronic"
+          },
+          {
+            "count": 1,
+            "name": "ambient"
+          },
+          {
+            "count": 2,
+            "name": "synth-pop"
+          }
+        ]
+      }
+    ]
+  }
+}

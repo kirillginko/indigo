@@ -1,0 +1,126 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22A+PALE++OVERMONO+EDIT%22+AND+artist%3A%22Rosal%C3%ADa%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:43.129074+00:00",
+  "body": {
+    "created": "2026-10-20T01:22:43.056Z",
+    "count": 1,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "6451d0ae-2274-48d4-be3c-663334d65768",
+        "score": 100,
+        "artist-credit-id": "9c60b206-e4fe-3202-9ce4-a44c95bfd1fc",
+        "title": "A Palé (Overmono edit)",
+        "length": 269000,
+        "disambiguation": "part of “FeelMyBicep Radio, Vol. 3” DJ‐mix",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "artist": {
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "disambiguation": "Spanish singer",
+              "aliases": [
+                {
+                  "sort-name": "ROSALÍA, LA",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "LA ROSALÍA",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Vila Tobella, Rosalía",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Rosalía Vila Tobella",
+                  "locale": null,
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": "1993",
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2020",
+        "releases": [
+          {
+            "id": "6df3f0c6-125d-42f7-a9f8-0744fe5df8bf",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d5b65c82-6539-39e6-94b4-6cad47a4a7cc",
+            "count": 1,
+            "title": "FeelMyBicep Radio, Vol. 3",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Bicep",
+                "artist": {
+                  "id": "10e8f0df-90f9-4957-aedd-c4e0d187e3a8",
+                  "name": "Bicep",
+                  "sort-name": "Bicep"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "b09e365f-38d8-469a-8963-1eb6a250a565",
+              "type-id": "3b2e49e1-2875-37b8-9fa9-1f7cf3f49900",
+              "primary-type-id": "3b2e49e1-2875-37b8-9fa9-1f7cf3f49900",
+              "title": "FeelMyBicep Radio, Vol. 3",
+              "primary-type": "Broadcast",
+              "secondary-types": [
+                "Compilation",
+                "DJ-mix"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+                "0d47f47a-3fe5-3d69-ac9d-d566c23968bf"
+              ]
+            },
+            "date": "2020",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "2020",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 16,
+            "media": [
+              {
+                "id": "0e534b80-715c-45b7-a426-34e645e5482b",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "228b48b4-7459-4df3-8e02-ad3416738c97",
+                    "number": "12",
+                    "title": "A Palé (Overmono edit)",
+                    "length": 269000
+                  }
+                ],
+                "track-count": 16,
+                "track-offset": 11
+              }
+            ]
+          }
+        ],
+        "isrcs": [
+          "US23A1520191"
+        ]
+      }
+    ]
+  }
+}

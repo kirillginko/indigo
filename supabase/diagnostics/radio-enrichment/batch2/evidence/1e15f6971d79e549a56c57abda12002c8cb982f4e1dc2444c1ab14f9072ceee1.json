@@ -1,0 +1,963 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/25f3abd9-63b5-471a-bd25-feb9672dfa11?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:41.194548+00:00",
+  "body": {
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "country": "ES",
+    "sort-name": "ROSALÍA",
+    "disambiguation": "Spanish singer",
+    "gender": "Female",
+    "begin-area": {
+      "disambiguation": "",
+      "id": "4ec297ff-610d-4da2-a173-f8137e66a52d",
+      "name": "Sant Cugat del Vallès",
+      "type": null,
+      "sort-name": "Sant Cugat del Vallès",
+      "type-id": null
+    },
+    "end-area": null,
+    "aliases": [
+      {
+        "sort-name": "ROSALÍA, LA",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "begin": null,
+        "end": null,
+        "locale": null,
+        "ended": false,
+        "primary": null,
+        "type": "Artist name",
+        "name": "LA ROSALÍA"
+      },
+      {
+        "locale": null,
+        "end": null,
+        "begin": "1993",
+        "sort-name": "Vila Tobella, Rosalía",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "type": "Legal name",
+        "name": "Rosalía Vila Tobella",
+        "primary": null,
+        "ended": false
+      }
+    ],
+    "tags": [
+      {
+        "count": 2,
+        "name": "english"
+      },
+      {
+        "count": 2,
+        "name": "female vocals"
+      },
+      {
+        "name": "flamenco",
+        "count": 5
+      },
+      {
+        "count": 2,
+        "name": "flamenco pop"
+      },
+      {
+        "name": "hip hop",
+        "count": 1
+      },
+      {
+        "name": "latin",
+        "count": 2
+      },
+      {
+        "count": 2,
+        "name": "latin pop"
+      },
+      {
+        "name": "pop",
+        "count": 1
+      },
+      {
+        "count": 3,
+        "name": "reggaeton"
+      },
+      {
+        "name": "singer-songwriter",
+        "count": 1
+      },
+      {
+        "name": "spanish",
+        "count": 2
+      }
+    ],
+    "type": "Person",
+    "name": "ROSALÍA",
+    "isnis": [
+      "0000000467333387"
+    ],
+    "relations": [
+      {
+        "direction": "backward",
+        "type-id": "fd3927ba-fd51-4fa9-bcc2-e83637896fe8",
+        "target-type": "artist",
+        "end": "2018-05",
+        "begin": "2016",
+        "ended": true,
+        "artist": {
+          "id": "46d3689c-23e6-46f7-8ad6-c12f13ac9dea",
+          "disambiguation": "",
+          "sort-name": "C. Tangana",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "ES",
+          "type": "Person",
+          "name": "C. Tangana"
+        },
+        "attribute-values": {},
+        "type": "involved with",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "direction": "backward",
+        "target-type": "artist",
+        "begin": "2019",
+        "end": "2023-07",
+        "type-id": "fd3927ba-fd51-4fa9-bcc2-e83637896fe8",
+        "type": "involved with",
+        "attribute-values": {},
+        "artist": {
+          "type": "Person",
+          "name": "Rauw Alejandro",
+          "id": "197b70c7-8910-4030-ad03-632d82aa40e3",
+          "disambiguation": "Puerto Rican rapper",
+          "sort-name": "Rauw Alejandro",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "PR"
+        },
+        "ended": true,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": ""
+      },
+      {
+        "end": "2021",
+        "begin": "2021",
+        "target-type": "artist",
+        "type-id": "fd3927ba-fd51-4fa9-bcc2-e83637896fe8",
+        "direction": "backward",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "involved with",
+        "ended": true,
+        "artist": {
+          "name": "Hunter Schafer",
+          "type": "Person",
+          "disambiguation": "actress & model",
+          "id": "74faa5f6-144d-457d-bf0b-19d65f90c78c",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Schafer, Hunter"
+        }
+      },
+      {
+        "type-id": "b42b7966-b904-449e-b8f9-8c7297b863d0",
+        "target-type": "artist",
+        "end": null,
+        "begin": null,
+        "direction": "backward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "artist": {
+          "name": "Pilar Vila Tobella",
+          "type": "Person",
+          "sort-name": "Vila Tobella, Pilar",
+          "country": "ES",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "Rosalía’s sister",
+          "id": "2da62cb3-abd2-4ee5-a2d6-8fbbde93bc38"
+        },
+        "attribute-values": {},
+        "type": "sibling"
+      },
+      {
+        "type": "allmusic",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "url": {
+          "id": "7da3a1e0-5213-4ed6-8d29-2441da2dfb86",
+          "resource": "https://www.allmusic.com/artist/mn0003596740"
+        }
+      },
+      {
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "attribute-values": {},
+        "type": "bandsintown",
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "ea45ed3d-2d5e-456e-8c32-94b6f51426e2",
+        "url": {
+          "id": "57fbbab4-5a6d-4983-bbe6-8e91299d0de8",
+          "resource": "https://www.bandsintown.com/a/703790"
+        },
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "type": "biography",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "direction": "forward",
+        "type-id": "78f75830-94e1-4138-8f8a-643e3bb21ce5",
+        "url": {
+          "resource": "https://laut.de/Rosalia",
+          "id": "d88431dc-37c1-470e-9c07-54c4d465dd7f"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "discogs",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "13fd6474-5822-4248-97c0-48418d7bf994",
+          "resource": "https://www.discogs.com/artist/5648334"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "direction": "forward"
+      },
+      {
+        "type": "free streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "4752720a-2d83-435a-bb4b-43b6df05b960",
+          "resource": "https://audiomack.com/rosalia"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://music.yandex.com/artist/8991475",
+          "id": "af9490e0-21fa-45c9-a589-5dcb91a22cc9"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://open.spotify.com/artist/7ltDVBr6mKbRvohxheJ9h1",
+          "id": "58ab2b04-1ab0-4bc3-8708-8135015b2a85"
+        },
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "type": "free streaming",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "ended": false,
+        "type": "free streaming",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "url": {
+          "id": "aa6c1cbb-71bf-4fc0-93cc-55a87a89ec3b",
+          "resource": "https://www.deezer.com/artist/554792"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "type": "IMDb",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "dbea2894-af0c-418d-bd4f-b72ef91f649a",
+          "resource": "https://www.imdb.com/name/nm8837492/"
+        },
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c"
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "last.fm",
+        "attribute-values": {},
+        "ended": false,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "url": {
+          "resource": "https://www.last.fm/music/Rosal%C3%ADa",
+          "id": "d9145ade-2276-404c-b62c-3cf597420d38"
+        },
+        "direction": "forward"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "url": {
+          "resource": "https://genius.com/artists/Rosalia",
+          "id": "fff54346-73b8-4900-acec-be57d72f35c6"
+        },
+        "attribute-values": {},
+        "type": "lyrics",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "url": {
+          "id": "81013e2b-dec9-4c3a-8824-2073e1bb2e04",
+          "resource": "https://www.rosalia.com/"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "official homepage"
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "a498e7b3-0c9a-4a59-b650-0506e390f5ec",
+          "resource": "http://id.loc.gov/authorities/names/no2018161169"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb17847696j",
+          "id": "1d552ffd-7a87-4824-b37f-d6258df6f6d4"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://d-nb.info/gnd/1231491930",
+          "id": "eb7b5ded-9278-49d1-a3a8-da3cf6b88630"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "other databases",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "2bc855ba-c68e-420d-8691-1eb94812b0eb",
+          "resource": "https://id.oclc.org/worldcat/entity/E39PBJpytDPr7Vwmw4YRwHhfv3"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "other databases",
+        "attribute-values": {}
+      },
+      {
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://imvdb.com/n/rosalia",
+          "id": "67ef1063-c197-49b7-a345-7bec7a9831b8"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "direction": "forward",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": false
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/rosalia-1",
+          "id": "5fc327ff-e6fa-43a2-9c7b-51a57721b8bd"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "other databases",
+        "url": {
+          "id": "b87bfedd-6d31-442c-bec7-725237ab5d9b",
+          "resource": "https://www.musik-sammler.de/artist/548582/"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "type": "other databases",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://www.themoviedb.org/person/2231189",
+          "id": "c50436fc-d0c8-4831-ba7b-8d42a3543d66"
+        }
+      },
+      {
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "type": "other databases",
+        "attribute-values": {},
+        "ended": true,
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-no2018161169/",
+          "id": "e43ea441-57d6-4c92-b58d-4443b4bb80a1"
+        },
+        "direction": "forward"
+      },
+      {
+        "attribute-values": {},
+        "type": "purchase for download",
+        "ended": false,
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "a923ff1d-b217-403f-ad8c-1f2436fd6447",
+          "resource": "https://itunes.apple.com/us/artist/id313845115"
+        }
+      },
+      {
+        "type": "purchase for download",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "url": {
+          "id": "52de132c-8f92-4fde-ae9d-df3b1b973c53",
+          "resource": "https://www.qobuz.com/us-en/interpreter/rosalia/219860"
+        }
+      },
+      {
+        "direction": "forward",
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "url": {
+          "id": "6f4fff36-6b13-416b-a12f-9bf2a4175159",
+          "resource": "https://secondhandsongs.com/artist/112184"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "type": "secondhandsongs",
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": ""
+      },
+      {
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "setlistfm",
+        "type-id": "bf5d0d5e-27a1-4e94-9df7-3cdc67b3b207",
+        "url": {
+          "id": "0781a1b5-5335-4338-a493-98b335bd31fb",
+          "resource": "https://www.setlist.fm/setlists/rosalia-13c3511d.html"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "social network",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "id": "b04813ed-9959-4dd8-a77a-2589b7e62add",
+          "resource": "https://giphy.com/rosalia"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward"
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "social network",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://twitter.com/rosalia",
+          "id": "d4c31469-1760-4839-ba21-81e66854af02"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "begin": null,
+        "end": null,
+        "target-type": "url"
+      },
+      {
+        "ended": false,
+        "attribute-values": {},
+        "type": "social network",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "direction": "forward",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "id": "d4f3e5c5-6e59-446b-86f3-fa2e1c8c1cfa",
+          "resource": "https://www.facebook.com/rosalia.vt"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null
+      },
+      {
+        "ended": false,
+        "type": "social network",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "direction": "forward",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "id": "cb17fb2d-b699-4c1c-9cae-ddbc9afac409",
+          "resource": "https://www.instagram.com/rosalia.vt/"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null
+      },
+      {
+        "attribute-values": {},
+        "type": "social network",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.tiktok.com/@rosalia",
+          "id": "82451740-a6b2-4305-a09f-d78fd7eaf08c"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "songkick",
+        "url": {
+          "id": "aa6db17e-bb1f-45b6-8b69-ed5764752d83",
+          "resource": "https://www.songkick.com/artists/786955"
+        },
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "url": {
+          "id": "a7825ab8-d093-498e-a1be-5395521a1b47",
+          "resource": "https://soundcloud.com/rosaliaofficial"
+        },
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "soundcloud"
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "url": {
+          "id": "e4e987a5-88c4-4772-bd25-267e3a81f2c1",
+          "resource": "https://music.apple.com/es/artist/313845115"
+        },
+        "target-type": "url",
+        "end": null,
+        "begin": null,
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "streaming",
+        "attribute-values": {}
+      },
+      {
+        "type": "streaming",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://tidal.com/artist/4748331",
+          "id": "46af16cf-efb9-4b98-aeb9-b83a256b7004"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161"
+      },
+      {
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "id": "52de132c-8f92-4fde-ae9d-df3b1b973c53",
+          "resource": "https://www.qobuz.com/us-en/interpreter/rosalia/219860"
+        },
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "type": "streaming",
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "resource": "http://viaf.org/viaf/2908152331602403260002",
+          "id": "7e66890a-7d68-4ad0-9d01-5fc4131f0c88"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "ended": false,
+        "type": "VIAF",
+        "attribute-values": {},
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {}
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "type": "wikidata",
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "url": {
+          "id": "93f86324-c243-4c48-9a98-0b4e4690649d",
+          "resource": "https://www.wikidata.org/wiki/Q28843759"
+        },
+        "target-type": "url",
+        "begin": null,
+        "end": null,
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "attributes": [],
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type": "youtube",
+        "url": {
+          "id": "fdd3f9cc-5249-47f9-a361-9017980a686a",
+          "resource": "https://www.youtube.com/channel/UCQt9awGIFZeldFsATZNeJag"
+        },
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "type": "youtube",
+        "attribute-values": {},
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "end": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.youtube.com/channel/UCy2bCk5KnIfjmWYFHMZcd5w",
+          "id": "ceb6c4d3-7990-4a6a-98fb-50cfc3e84c20"
+        },
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0"
+      }
+    ],
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+    "genres": [
+      {
+        "name": "flamenco",
+        "id": "961c6dad-8cf0-47ab-bc09-ccd011f9ef28",
+        "disambiguation": "",
+        "count": 5
+      },
+      {
+        "name": "flamenco pop",
+        "id": "c0fc336d-506d-443d-b335-32d81f416466",
+        "disambiguation": "",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "hip hop",
+        "id": "52faa157-6bad-4d86-a0ab-d4dec7d2513c",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "id": "7369bb8b-3399-4180-8cb2-4e37e0e7b0e7",
+        "name": "latin",
+        "count": 2
+      },
+      {
+        "id": "2b9b7ea8-cb90-428c-adb2-d55b2faa4f1d",
+        "disambiguation": "",
+        "name": "latin pop",
+        "count": 2
+      },
+      {
+        "disambiguation": "",
+        "id": "911c7bbb-172d-4df8-9478-dbff4296e791",
+        "name": "pop",
+        "count": 1
+      },
+      {
+        "id": "bb14fb18-af6b-4547-9130-47fc4b208f48",
+        "disambiguation": "",
+        "name": "reggaeton",
+        "count": 3
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "455f264b-db00-4716-991d-fbd32dc24523",
+        "name": "singer-songwriter"
+      }
+    ],
+    "ipis": [
+      "00708018266"
+    ],
+    "area": {
+      "type-id": null,
+      "sort-name": "Spain",
+      "disambiguation": "",
+      "id": "471c46a7-afc5-31c4-923c-d0444f5053a4",
+      "iso-3166-1-codes": [
+        "ES"
+      ],
+      "name": "Spain",
+      "type": null
+    },
+    "life-span": {
+      "ended": false,
+      "end": null,
+      "begin": "1992-09-25"
+    }
+  }
+}

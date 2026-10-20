@@ -1,0 +1,932 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/410e7fd3-b865-4fa0-bb18-1b7fd53382ca?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:10.890871+00:00",
+  "body": {
+    "area": {
+      "disambiguation": "",
+      "type": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "name": "United States",
+      "type-id": null,
+      "sort-name": "United States"
+    },
+    "name": "Solange",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "relations": [
+      {
+        "type": "married",
+        "source-credit": "",
+        "ended": true,
+        "target-credit": "",
+        "begin": "2014-11-16",
+        "attribute-ids": {},
+        "attributes": [],
+        "end": "2019",
+        "direction": "backward",
+        "target-type": "artist",
+        "type-id": "b2bf7a5d-2da6-4742-baf4-e38d8a7ad029",
+        "artist": {
+          "id": "99654db0-5a28-456a-b999-254033c16b6c",
+          "name": "Alan Ferguson",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Ferguson, Alan",
+          "country": "US",
+          "disambiguation": "music video director",
+          "type": "Person"
+        },
+        "attribute-values": {}
+      },
+      {
+        "type": "parent",
+        "source-credit": "",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": "1986-06-24",
+        "direction": "backward",
+        "attributes": [],
+        "end": null,
+        "target-type": "artist",
+        "attribute-values": {},
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "artist": {
+          "disambiguation": "",
+          "country": "US",
+          "type": "Person",
+          "id": "03d57022-4b65-44fe-8e1f-8bcc7a35ff09",
+          "sort-name": "Knowles, Tina",
+          "name": "Tina Knowles",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        }
+      },
+      {
+        "artist": {
+          "sort-name": "Knowles, Mathew",
+          "name": "Mathew Knowles",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "8a78b436-b2c4-4391-bc48-8fc87232e5dc",
+          "type": "Person",
+          "disambiguation": "Beyoncé and Solange’s father",
+          "country": "US"
+        },
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [],
+        "direction": "backward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "parent"
+      },
+      {
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "artist": {
+          "sort-name": "Smith, Julez",
+          "name": "Julez Smith",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "094c5543-d484-4b3a-af86-a4282d83eba1",
+          "type": "Person",
+          "disambiguation": "American rapper; son of Solange",
+          "country": "US"
+        },
+        "type-id": "9421ca84-934f-49fe-9e66-dea242430406",
+        "target-type": "artist",
+        "type": "parent",
+        "source-credit": ""
+      },
+      {
+        "artist": {
+          "type": "Person",
+          "disambiguation": "",
+          "country": "US",
+          "sort-name": "Beyoncé",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Beyoncé",
+          "id": "859d0860-d480-4efd-970c-c05d5f1776b8"
+        },
+        "type-id": "b42b7966-b904-449e-b8f9-8c7297b863d0",
+        "attribute-values": {},
+        "target-type": "artist",
+        "end": null,
+        "attributes": [],
+        "direction": "backward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "sibling"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.allmusic.com/artist/mn0000041462",
+          "id": "734df79e-d836-4882-8ef3-fe94c57c8591"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "source-credit": "",
+        "type": "allmusic"
+      },
+      {
+        "source-credit": "Solange Knowles",
+        "type": "allmusic",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "7db13d0f-7756-4b62-b2b2-c1188084d680",
+          "resource": "https://www.allmusic.com/artist/mn0002915013"
+        },
+        "direction": "forward",
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.discogs.com/artist/160408",
+          "id": "ac509b7a-83d8-4f84-aebd-2d89f9a11339"
+        },
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "discogs"
+      },
+      {
+        "type": "discogs",
+        "source-credit": "Solange Knowles",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "8638d56f-0e17-4c86-8341-787c801a398d",
+          "resource": "https://www.discogs.com/artist/587458"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attribute-values": {},
+        "target-type": "url"
+      },
+      {
+        "type": "free streaming",
+        "source-credit": "",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "f51e448b-d959-498d-99b2-ab409c990aa5",
+          "resource": "https://open.spotify.com/artist/2auiVi8sUZo17dLy1HwrTU"
+        },
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "target-type": "url"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "f5c6716f-28ae-4570-a9c0-dce92750de7e",
+          "resource": "https://www.deezer.com/artist/110703"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.deezer.com/artist/11634821",
+          "id": "5aacf7a0-446b-46d2-8838-e8193f9e720a"
+        },
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "free streaming"
+      },
+      {
+        "source-credit": "",
+        "type": "IMDb",
+        "attribute-values": {},
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "target-type": "url",
+        "url": {
+          "resource": "https://www.imdb.com/name/nm1090271/",
+          "id": "fc746dd0-4712-4a9e-b1ba-9578e731d4b3"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.last.fm/music/Solange",
+          "id": "c51e98a5-ac63-42db-8e6e-84da729ba85d"
+        },
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "last.fm"
+      },
+      {
+        "url": {
+          "id": "6d73595f-a666-419d-b56e-0e965749438f",
+          "resource": "https://genius.com/artists/Solange"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "e4d73442-3762-45a8-905c-401da65544ed",
+        "target-type": "url",
+        "type": "lyrics",
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "type-id": "bac47923-ecde-4b59-822e-d08f0cd10156",
+        "attribute-values": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "f34e2012-32e6-4efb-a962-d7ba770ebfdf",
+          "resource": "https://myspace.com/solange"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "type": "myspace"
+      },
+      {
+        "type": "official homepage",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "http://www.solangemusic.com/",
+          "id": "2d1e6d49-bd37-458d-a94d-f605c60d1e6f"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "target-type": "url"
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/no2002063832",
+          "id": "6cc31800-eb85-4841-a7e8-cb575cbc5056"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "type": "other databases",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "4979cceb-ad85-4cab-a0c7-caf9caaa2a31",
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb155235994"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "type": "other databases",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://d-nb.info/gnd/135330076",
+          "id": "c4f187d8-f15c-4852-8a60-674a72268901"
+        }
+      },
+      {
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/solange",
+          "id": "8455db6e-7dbb-40ed-bdec-ea9fda80e7a1"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "source-credit": "",
+        "type": "other databases"
+      },
+      {
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "27403544-f5a6-4a27-9535-0229db2d2cce",
+          "resource": "https://www.worldcat.org/identities/lccn-no2002063832"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-values": {},
+        "type": "other databases",
+        "source-credit": ""
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "7f56d5b9-3efb-4fe7-a0f5-9b298a764287",
+          "resource": "https://itunes.apple.com/artist/id927803"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url"
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "0fa6dd77-1185-4631-a771-94a149f88afe",
+          "resource": "https://open.qobuz.com/artist/65681"
+        },
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "target-type": "url"
+      },
+      {
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "92676ddd-a5ef-4707-9599-7e9add97f620",
+          "resource": "https://www.qobuz.com/us-en/interpreter/solange/65681"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-values": {},
+        "type": "purchase for download",
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "type": "social network",
+        "target-type": "url",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "f0984482-d329-49e2-bcb1-82b1d66f5c43",
+          "resource": "https://twitter.com/solangeknowles"
+        },
+        "direction": "forward"
+      },
+      {
+        "target-type": "url",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.facebook.com/solange",
+          "id": "87906edb-fb71-48fc-ae4b-45802a24ae00"
+        },
+        "source-credit": "",
+        "type": "social network"
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "url": {
+          "resource": "https://www.instagram.com/solangeknowles/",
+          "id": "acb81b38-9598-44dc-9242-ece5d70da121"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "source-credit": "",
+        "type": "social network"
+      },
+      {
+        "target-type": "url",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": true,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.instagram.com/saintrecords/",
+          "id": "9b61d595-46d5-481d-83bf-b70b78716fdc"
+        },
+        "direction": "forward",
+        "source-credit": "",
+        "type": "social network"
+      },
+      {
+        "type": "songkick",
+        "source-credit": "",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "a684be21-345b-4f50-8d21-8f8d0a009183",
+          "resource": "https://www.songkick.com/artists/131614"
+        },
+        "attributes": [],
+        "end": null,
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58"
+      },
+      {
+        "type": "soundcloud",
+        "source-credit": "",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "0e552dad-b385-4781-b2a0-aa4a4b9180d3",
+          "resource": "https://soundcloud.com/solangeknowles"
+        },
+        "direction": "forward",
+        "target-type": "url",
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "attribute-values": {}
+      },
+      {
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "direction": "forward",
+        "url": {
+          "id": "7d1ecb6b-38aa-478f-b01a-a36619dc2dda",
+          "resource": "https://music.apple.com/us/artist/927803"
+        },
+        "attributes": [],
+        "end": null,
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/65681",
+          "id": "0fa6dd77-1185-4631-a771-94a149f88afe"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "streaming",
+        "target-type": "url",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://tidal.com/artist/48361222",
+          "id": "b44fc61a-0d8f-4ab3-a7e2-83e9b9de69e9"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "target-type": "url",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "b5f0b59a-16c4-4509-ba0b-238be6f82ef5",
+          "resource": "https://tidal.com/artist/5017"
+        },
+        "direction": "forward",
+        "begin": null,
+        "target-credit": "",
+        "ended": false,
+        "attribute-ids": {},
+        "source-credit": "",
+        "type": "streaming"
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "url": {
+          "resource": "https://www.qobuz.com/us-en/interpreter/solange/65681",
+          "id": "92676ddd-a5ef-4707-9599-7e9add97f620"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "type": "VIAF",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "e83498e6-f3df-4315-aa86-24117c84674f",
+          "resource": "http://viaf.org/viaf/29839991"
+        },
+        "target-credit": "",
+        "ended": false,
+        "begin": null,
+        "attribute-ids": {}
+      },
+      {
+        "type": "wikidata",
+        "source-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "900ffbfe-7984-44d9-9acb-4c6d81656691",
+          "resource": "https://www.wikidata.org/wiki/Q231228"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "target-type": "url"
+      },
+      {
+        "attribute-values": {},
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "target-type": "url",
+        "direction": "forward",
+        "url": {
+          "id": "3503e06b-96ca-44a8-b54c-8aaf3922491d",
+          "resource": "https://www.youtube.com/channel/UCw-V8JzLMOsgPLLFZViVklw"
+        },
+        "attributes": [],
+        "end": null,
+        "attribute-ids": {},
+        "ended": false,
+        "target-credit": "",
+        "begin": null,
+        "source-credit": "",
+        "type": "youtube"
+      },
+      {
+        "source-credit": "",
+        "type": "youtube",
+        "attribute-values": {},
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "target-type": "url",
+        "url": {
+          "id": "19531a77-8080-4213-bd5b-31e6ec12d6c1",
+          "resource": "https://www.youtube.com/user/solangeknowlesmusic"
+        },
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "begin": null,
+        "target-credit": "",
+        "ended": false
+      },
+      {
+        "source-credit": "",
+        "type": "youtube",
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "attribute-values": {},
+        "target-type": "url",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "url": {
+          "id": "96c58b4d-372f-4a5a-b165-db4d90458466",
+          "resource": "https://www.youtube.com/user/SolangeKnowlesVEVO"
+        },
+        "target-credit": "",
+        "begin": null,
+        "ended": false,
+        "attribute-ids": {}
+      }
+    ],
+    "gender": "Female",
+    "disambiguation": "US RnB vocalist Solange Knowles",
+    "aliases": [
+      {
+        "end": null,
+        "type": "Artist name",
+        "primary": null,
+        "begin": null,
+        "ended": false,
+        "locale": null,
+        "name": "Solange Knowles",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "sort-name": "Knowles, Solange"
+      },
+      {
+        "name": "Solange Knowles Ferguson",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "sort-name": "Ferguson, Solange Knowles",
+        "primary": null,
+        "end": null,
+        "type": "Legal name",
+        "ended": false,
+        "begin": "2014-11-16",
+        "locale": null
+      },
+      {
+        "end": "2007",
+        "primary": null,
+        "type": null,
+        "ended": true,
+        "begin": "2004",
+        "locale": null,
+        "sort-name": "Knowles-Smith, Solange",
+        "name": "Solange Knowles-Smith",
+        "type-id": null
+      },
+      {
+        "sort-name": "Knowles, Solange Piaget",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "name": "Solange Piaget Knowles",
+        "end": null,
+        "primary": null,
+        "type": "Legal name",
+        "begin": "1986-06-24",
+        "ended": false,
+        "locale": null
+      }
+    ],
+    "end-area": null,
+    "tags": [
+      {
+        "count": 1,
+        "name": "alternative r&b"
+      },
+      {
+        "name": "contemporary r&b",
+        "count": 1
+      },
+      {
+        "name": "hip hop",
+        "count": 1
+      },
+      {
+        "name": "neo soul",
+        "count": 2
+      },
+      {
+        "name": "pop",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "r&b"
+      },
+      {
+        "count": 2,
+        "name": "soul"
+      }
+    ],
+    "ipis": [
+      "00428984607"
+    ],
+    "id": "410e7fd3-b865-4fa0-bb18-1b7fd53382ca",
+    "begin-area": {
+      "name": "Houston",
+      "type": null,
+      "type-id": null,
+      "sort-name": "Houston",
+      "disambiguation": "",
+      "id": "c920948b-83e3-40b7-8fe9-9ab5abaac55b"
+    },
+    "sort-name": "Solange",
+    "genres": [
+      {
+        "name": "alternative r&b",
+        "disambiguation": "",
+        "id": "4e03fb35-d571-4111-824d-88c9f8a3d0c9",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "4bb4043a-0ee5-4b84-93fa-6ba4567a6ba0",
+        "name": "contemporary r&b"
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "52faa157-6bad-4d86-a0ab-d4dec7d2513c",
+        "name": "hip hop"
+      },
+      {
+        "count": 2,
+        "disambiguation": "",
+        "id": "286f9168-9c46-4e41-94a1-1aa4aeb93b8c",
+        "name": "neo soul"
+      },
+      {
+        "name": "pop",
+        "id": "911c7bbb-172d-4df8-9478-dbff4296e791",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "disambiguation": "",
+        "id": "31be54b2-4d0c-42df-aa44-c496c7b4c3c3",
+        "name": "r&b"
+      },
+      {
+        "count": 2,
+        "disambiguation": "",
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827",
+        "name": "soul"
+      }
+    ],
+    "isnis": [
+      "0000000116144576"
+    ],
+    "country": "US",
+    "life-span": {
+      "begin": "1986-06-24",
+      "ended": false,
+      "end": null
+    },
+    "type": "Person"
+  }
+}

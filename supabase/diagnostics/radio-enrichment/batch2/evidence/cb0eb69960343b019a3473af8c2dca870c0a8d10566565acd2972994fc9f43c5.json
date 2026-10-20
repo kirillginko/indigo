@@ -1,0 +1,381 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/da943be1-5611-4bf9-ac4c-0eef1bc0c16b?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:06.782721+00:00",
+  "body": {
+    "type": "Person",
+    "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+    "name": "MIKE",
+    "gender": "Male",
+    "end-area": null,
+    "sort-name": "MIKE",
+    "id": "da943be1-5611-4bf9-ac4c-0eef1bc0c16b",
+    "disambiguation": "New York rapper, founder of 10k",
+    "begin-area": {
+      "sort-name": "Livingston",
+      "id": "a5588c02-bd0d-4b05-96bb-f7aaf42854c6",
+      "disambiguation": "",
+      "type": null,
+      "name": "Livingston",
+      "type-id": null
+    },
+    "country": "US",
+    "area": {
+      "sort-name": "New York",
+      "id": "74e50e58-5deb-4b99-93a2-decbb365c07f",
+      "type-id": null,
+      "name": "New York",
+      "type": null,
+      "disambiguation": ""
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "genres": [
+      {
+        "name": "alternative hip hop",
+        "disambiguation": "",
+        "count": 3,
+        "id": "924943cd-73c8-45c0-96eb-74f2a15e5d6e"
+      },
+      {
+        "disambiguation": "",
+        "name": "conscious hip hop",
+        "count": 3,
+        "id": "c0e73bb6-37a4-485e-aaea-11c63b40c9f3"
+      },
+      {
+        "name": "drumless hip hop",
+        "disambiguation": "",
+        "id": "9e4c8b90-75d8-4dc9-a5a8-0d09285773dd",
+        "count": 2
+      },
+      {
+        "name": "experimental hip hop",
+        "disambiguation": "",
+        "id": "13a4ac4a-8291-4a03-ab7b-311dec6457de",
+        "count": 3
+      },
+      {
+        "count": 4,
+        "id": "52faa157-6bad-4d86-a0ab-d4dec7d2513c",
+        "disambiguation": "",
+        "name": "hip hop"
+      },
+      {
+        "disambiguation": "",
+        "name": "jazz rap",
+        "id": "6061fb1b-d733-4643-a3d4-940c9a5e2ab8",
+        "count": 1
+      }
+    ],
+    "tags": [
+      {
+        "name": "alternative hip hop",
+        "count": 3
+      },
+      {
+        "name": "conscious hip hop",
+        "count": 3
+      },
+      {
+        "count": 2,
+        "name": "drumless hip hop"
+      },
+      {
+        "count": 3,
+        "name": "experimental hip hop"
+      },
+      {
+        "name": "hip hop",
+        "count": 4
+      },
+      {
+        "name": "jazz rap",
+        "count": 1
+      }
+    ],
+    "isnis": [],
+    "relations": [
+      {
+        "attribute-ids": {},
+        "direction": "backward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "ended": false,
+        "end": null,
+        "artist": {
+          "disambiguation": "",
+          "country": "US",
+          "name": "Michael Jordan Bonema",
+          "type": "Person",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Bonema, Michael Jordan",
+          "id": "07c4fd70-bb5d-4745-b5a4-c47ff52eb693"
+        },
+        "attributes": [],
+        "type": "is person",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "artist"
+      },
+      {
+        "artist": {
+          "id": "da1e6981-2bef-4b91-9581-eb5f5620248d",
+          "sort-name": "SLUMS",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "name": "[sLUms].",
+          "country": "US",
+          "disambiguation": "NYC based rap collective"
+        },
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "direction": "forward",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "artist",
+        "type": "member of band"
+      },
+      {
+        "type": "allmusic",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "id": "7b725bfa-6745-4386-9da6-f631542d804c",
+          "resource": "https://www.allmusic.com/artist/mn0003678202"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "attribute-ids": {},
+        "url": {
+          "id": "9ccf8e93-847f-42fd-be18-e06a09102503",
+          "resource": "https://mikelikesrap.bandcamp.com/"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "bandcamp",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "type": "discogs",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "da667aa4-29d8-4e10-a9a9-c9e5337baa72",
+          "resource": "https://www.discogs.com/artist/5852757"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "attribute-ids": {},
+        "url": {
+          "id": "444367bc-887e-48c8-b6e8-e81f45d2af01",
+          "resource": "https://open.spotify.com/artist/1wlzPS1hSNrkriIIwLFTmU"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "ended": false,
+        "end": null,
+        "attributes": [],
+        "type": "free streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "type": "free streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "url": {
+          "id": "f1b443a7-a4fc-4ca2-80d7-c654eabcd0e0",
+          "resource": "https://www.deezer.com/artist/142759"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "purchase for download",
+        "attributes": [],
+        "end": null,
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-ids": {},
+        "url": {
+          "id": "cfbcc909-0243-45e8-88be-62e0a0b3fcc6",
+          "resource": "https://itunes.apple.com/us/artist/id1253023714"
+        }
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "purchase for download",
+        "attributes": [],
+        "end": null,
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "attribute-ids": {},
+        "url": {
+          "id": "f57c530c-445b-4328-9543-ecf565125bc3",
+          "resource": "https://www.beatport.com/artist/mike/11168"
+        }
+      },
+      {
+        "type": "social network",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "id": "1fc1a965-9033-4f7a-afbe-c1e6adde848b",
+          "resource": "https://www.instagram.com/mikelikesrap/"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "url": {
+          "resource": "https://soundcloud.com/t6mikee",
+          "id": "78405c8d-841a-46bc-bab2-221ad66de4ff"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": [],
+        "type": "soundcloud",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "type": "streaming",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://music.apple.com/gb/artist/1253023714",
+          "id": "221cbd66-e08b-4976-ae58-c1aa56b1cece"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "url": {
+          "id": "fd3fc84c-5f85-4802-9333-8e4bc979839d",
+          "resource": "https://tidal.com/artist/36706055"
+        },
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "streaming",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url"
+      },
+      {
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q67407164",
+          "id": "f024e762-66e2-452b-b3c3-86c7db49d2c4"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": [],
+        "type": "wikidata",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      }
+    ],
+    "ipis": [],
+    "life-span": {
+      "ended": false,
+      "begin": "1998-10-13",
+      "end": null
+    },
+    "aliases": [
+      {
+        "sort-name": "Bonema, Michael Jordan",
+        "primary": null,
+        "name": "Michael Jordan Bonema",
+        "type": "Legal name",
+        "ended": false,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "end": null,
+        "locale": null,
+        "begin": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F7142&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:31.203555+00:00",
+  "body": {
+    "relations": [
+      {
+        "direction": "backward",
+        "target-type": "artist",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "ended": false,
+        "end": null,
+        "type": "discogs",
+        "attribute-ids": {},
+        "source-credit": "",
+        "artist": {
+          "sort-name": "Art of Noise",
+          "disambiguation": "",
+          "country": "GB",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "be899560-1570-402e-9f95-3182898a8b70",
+          "type": "Group",
+          "name": "Art of Noise"
+        },
+        "target-credit": ""
+      }
+    ],
+    "id": "51218a4f-7863-4dcc-90cf-22a4362150f2",
+    "resource": "https://www.discogs.com/artist/7142"
+  }
+}

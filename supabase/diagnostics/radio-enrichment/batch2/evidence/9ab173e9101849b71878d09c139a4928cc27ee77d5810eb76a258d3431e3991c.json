@@ -1,0 +1,175 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/5082b971-b828-433a-b298-d6e4a504bde0?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:19:58.022068+00:00",
+  "body": {
+    "id": "5082b971-b828-433a-b298-d6e4a504bde0",
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "name": "Klein",
+          "type": "Person",
+          "disambiguation": "UK singer-songwriter and producer",
+          "id": "760e95ff-c503-4567-8109-759b9594c182",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Klein"
+        },
+        "name": "Klein",
+        "joinphrase": ""
+      }
+    ],
+    "length": 390573,
+    "title": "Claim It",
+    "releases": [
+      {
+        "date": "2019-09-06",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "disambiguation": "",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "type": null,
+              "name": "[Worldwide]"
+            },
+            "date": "2019-09-06"
+          }
+        ],
+        "barcode": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "19adf8f7-8d92-4754-9f7f-8c590b285386",
+        "quality": "normal",
+        "packaging": "None",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Lifetime",
+        "country": "XW",
+        "disambiguation": "",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Klein",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "GB",
+              "disambiguation": "UK singer-songwriter and producer",
+              "id": "760e95ff-c503-4567-8109-759b9594c182",
+              "type": "Person",
+              "name": "Klein"
+            },
+            "name": "Klein",
+            "joinphrase": ""
+          }
+        ]
+      },
+      {
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Bleep 100 Tracks 2019",
+        "country": "GB",
+        "packaging": "None",
+        "quality": "normal",
+        "status": "Official",
+        "id": "64186698-4d71-4ad5-8c11-d0b8887888c9",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2019-12-26",
+        "release-events": [
+          {
+            "area": {
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "name": "United Kingdom",
+              "type": null
+            },
+            "date": "2019-12-26"
+          }
+        ],
+        "barcode": ""
+      },
+      {
+        "packaging": null,
+        "quality": "normal",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Person",
+              "name": "Klein",
+              "disambiguation": "UK singer-songwriter and producer",
+              "id": "760e95ff-c503-4567-8109-759b9594c182",
+              "country": "GB",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "Klein"
+            },
+            "joinphrase": "",
+            "name": "Klein"
+          }
+        ],
+        "disambiguation": "",
+        "country": "GB",
+        "title": "Lifetime",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2020-04-08",
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            }
+          }
+        ],
+        "date": "2020-04-08",
+        "status": "Official",
+        "id": "70fd0e5f-5ed4-456c-a687-d8f7845304cb",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ],
+    "first-release-date": "2019-09-06",
+    "isrcs": [],
+    "video": false
+  }
+}

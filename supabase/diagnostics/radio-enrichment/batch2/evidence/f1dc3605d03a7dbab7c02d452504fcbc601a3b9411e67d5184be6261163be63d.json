@@ -1,0 +1,659 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/e81c5032-10d2-4c14-bd5e-7b8826cc121f?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:26.081555+00:00",
+  "body": {
+    "video": false,
+    "isrcs": [],
+    "first-release-date": "2000-06-11",
+    "releases": [
+      {
+        "packaging": null,
+        "quality": "normal",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Mandarin: Chinese Chilling Thrills",
+        "country": "DE",
+        "date": "2000-06-11",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "Germany",
+              "type-id": null,
+              "sort-name": "Germany",
+              "iso-3166-1-codes": [
+                "DE"
+              ],
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "disambiguation": ""
+            },
+            "date": "2000-06-11"
+          }
+        ],
+        "barcode": "731456016122",
+        "id": "37d584b6-a431-455c-a311-ed35f455ff76",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "country": "US",
+        "title": "Hi-Fidelity Lounge, Volume Two: Licensed to Chill",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "quality": "normal",
+        "packaging": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "aa2cb0a9-5f60-44f1-aa36-9fc7d7ff0ddf",
+        "status": "Official",
+        "barcode": "718755057926",
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "type": null
+            },
+            "date": "2000-11-14"
+          }
+        ],
+        "date": "2000-11-14"
+      },
+      {
+        "packaging": null,
+        "quality": "normal",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "name": "Various Artists",
+              "type": "Other"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "country": "NO",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Le Big Sloppy Kiss",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "6743d351-6f37-3049-9724-5041161fff4d",
+              "iso-3166-1-codes": [
+                "NO"
+              ],
+              "type-id": null,
+              "sort-name": "Norway",
+              "name": "Norway",
+              "type": null
+            },
+            "date": "2000"
+          }
+        ],
+        "barcode": null,
+        "date": "2000",
+        "id": "7a47eee1-a1d3-4231-9494-23230204e1ad",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "id": "0c6370d3-dbb8-44b8-ba54-a4273baa972a",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2002-01-28",
+        "barcode": "822334003829",
+        "release-events": [
+          {
+            "area": {
+              "name": "United Kingdom",
+              "type": null,
+              "type-id": null,
+              "sort-name": "United Kingdom",
+              "disambiguation": "",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "iso-3166-1-codes": [
+                "GB"
+              ]
+            },
+            "date": "2002-01-28"
+          }
+        ],
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "sort-name": "Various Artists",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "The Late Lounge",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "GB",
+        "packaging": null,
+        "quality": "normal"
+      },
+      {
+        "date": "2005-05-09",
+        "barcode": "3596971050122",
+        "release-events": [
+          {
+            "date": "2005-05-09",
+            "area": {
+              "type-id": null,
+              "sort-name": "France",
+              "disambiguation": "",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "name": "France",
+              "type": null
+            }
+          },
+          {
+            "date": "2005-07-25",
+            "area": {
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "type": null,
+              "name": "United Kingdom"
+            }
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "212de9f8-1154-323d-a046-e00a9d813958",
+        "status": "Official",
+        "quality": "normal",
+        "packaging": "Other",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "City Lounge",
+        "country": "FR",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": "815b7785-8284-3926-8f04-e48bc6c4d102",
+        "disambiguation": ""
+      },
+      {
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "title": "Afterdark: Paris",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "US",
+        "packaging": null,
+        "quality": "normal",
+        "status": "Official",
+        "id": "a1b8a94a-f158-4a72-bd8e-e36758dfe0e7",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2005",
+        "barcode": null,
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "United States",
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type": null,
+              "name": "United States"
+            },
+            "date": "2005"
+          }
+        ]
+      },
+      {
+        "quality": "normal",
+        "packaging": null,
+        "country": "FR",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Trip Hop Anthology",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Various Artists",
+              "type": "Other",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "country": null,
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "sort-name": "Various Artists"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "barcode": "3596971160821",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "disambiguation": "",
+              "sort-name": "France",
+              "type-id": null,
+              "name": "France",
+              "type": null
+            },
+            "date": "2006-06-26"
+          }
+        ],
+        "date": "2006-06-26",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "57d4dc9a-7bd3-489a-85bc-c4fb2b9f2085"
+      },
+      {
+        "packaging": null,
+        "quality": "normal",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Various Artists",
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "text-representation": {
+          "language": "fra",
+          "script": "Latn"
+        },
+        "title": "25 ans de Radio Nova",
+        "country": "FR",
+        "date": "2006-12-04",
+        "barcode": "3596971200220",
+        "release-events": [
+          {
+            "date": "2006-12-04",
+            "area": {
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "disambiguation": "",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "type-id": null,
+              "sort-name": "France",
+              "type": null,
+              "name": "France"
+            }
+          }
+        ],
+        "id": "522f57f6-2e92-4925-90d6-ad4139f09670",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists",
+              "type": "Other",
+              "name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "country": "FR",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Lounge Anthology",
+        "packaging": null,
+        "quality": "normal",
+        "status": "Official",
+        "id": "a6694394-6918-4764-a2d0-27bf6b00fa14",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "France",
+              "name": "France",
+              "type": null
+            },
+            "date": "2007-10-08"
+          }
+        ],
+        "barcode": "3596971272722",
+        "date": "2007-10-08"
+      },
+      {
+        "id": "e0a4ed33-22dd-4103-8499-b26aed37b23e",
+        "status": null,
+        "status-id": null,
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "United Kingdom"
+            },
+            "date": "2007-12-07"
+          }
+        ],
+        "barcode": null,
+        "date": "2007-12-07",
+        "disambiguation": "",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "country": "GB",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Lounge.Mp3",
+        "packaging": null,
+        "quality": "normal"
+      },
+      {
+        "barcode": "3596972568121",
+        "release-events": [
+          {
+            "date": "2012",
+            "area": {
+              "sort-name": "France",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "disambiguation": "",
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "name": "France",
+              "type": null
+            }
+          }
+        ],
+        "date": "2012",
+        "status": "Official",
+        "id": "a0af59f4-37d1-49df-a55c-75267498ede8",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "quality": "normal",
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Other",
+              "name": "Various Artists",
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": "",
+            "name": "Various Artists"
+          }
+        ],
+        "disambiguation": "",
+        "country": "FR",
+        "text-representation": {
+          "language": "mul",
+          "script": "Latn"
+        },
+        "title": "Trip-Hop: The Best Of"
+      },
+      {
+        "id": "7fa5ac24-ac01-43a4-834d-f1b413b51efc",
+        "status": "Bootleg",
+        "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+        "barcode": "",
+        "release-events": [
+          {
+            "date": "2013",
+            "area": null
+          }
+        ],
+        "date": "2013",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "name": "Various Artists"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": null,
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Elegant Lounge, Vol. 15",
+        "packaging": null,
+        "quality": "normal"
+      },
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "add compilations to this artist",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "sort-name": "Various Artists",
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "country": null,
+              "type": "Other",
+              "name": "Various Artists"
+            },
+            "name": "Various Artists",
+            "joinphrase": ""
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "country": "FR",
+        "text-representation": {
+          "language": "mul",
+          "script": "Latn"
+        },
+        "title": "Lounge Music: The Must Have Selection – Paris, Vol.2",
+        "packaging": null,
+        "quality": "normal",
+        "id": "7333e1c8-0313-44dc-a391-e3bffcfd3b32",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "barcode": "3596973208422",
+        "release-events": [
+          {
+            "date": "2015",
+            "area": {
+              "name": "France",
+              "type": null,
+              "id": "08310658-51eb-3801-80de-5a0739207115",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "FR"
+              ],
+              "type-id": null,
+              "sort-name": "France"
+            }
+          }
+        ],
+        "date": "2015"
+      }
+    ],
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "I:Cube",
+        "artist": {
+          "name": "I:Cube",
+          "type": "Person",
+          "disambiguation": "house music",
+          "id": "979d10bc-d1b9-41b1-8a87-7a7c68cbd885",
+          "sort-name": "I:Cube",
+          "country": "FR",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        }
+      }
+    ],
+    "id": "25f32d2d-1876-4f87-90bc-bfc7a414c098",
+    "disambiguation": "",
+    "title": "Adore",
+    "length": 412306
+  }
+}

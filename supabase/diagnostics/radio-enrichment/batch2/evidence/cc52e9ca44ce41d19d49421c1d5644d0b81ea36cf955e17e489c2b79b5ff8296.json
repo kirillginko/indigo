@@ -1,0 +1,1034 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/3e6bbdb8-66c8-439c-a3d9-87391ce88740?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:53.138477+00:00",
+  "body": {
+    "relations": [
+      {
+        "artist": {
+          "id": "70ac2314-d7d8-4435-b56c-9bad9a516642",
+          "disambiguation": "",
+          "type": "Person",
+          "country": "GB",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Burdon, Eric",
+          "name": "Eric Burdon"
+        },
+        "source-credit": "",
+        "direction": "backward",
+        "attributes": [],
+        "begin": "1969",
+        "ended": true,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "end": "1971",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "type": "member of band",
+        "target-credit": ""
+      },
+      {
+        "target-type": "artist",
+        "target-credit": "",
+        "type": "member of band",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "ended": true,
+        "attributes": [],
+        "begin": "1969",
+        "end": "1979",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "artist": {
+          "name": "B.B. Dickerson",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Dickerson, B.B.",
+          "type": "Person",
+          "id": "f1f53999-8a59-4dd5-b260-e744c6fea307",
+          "disambiguation": ""
+        },
+        "direction": "backward",
+        "source-credit": ""
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "type": "member of band",
+        "target-credit": "",
+        "artist": {
+          "id": "b202c59a-bee0-40f6-a982-2e17590fc2f7",
+          "disambiguation": "US saxophonist & flutist, member of War",
+          "type": "Person",
+          "name": "Charles Miller",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Miller, Charles"
+        },
+        "source-credit": "",
+        "direction": "backward",
+        "attributes": [],
+        "ended": true,
+        "begin": "1969",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "end": "1979"
+      },
+      {
+        "type": "member of band",
+        "target-credit": "",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "end": "1983",
+        "begin": "1969",
+        "attributes": [],
+        "ended": true,
+        "source-credit": "",
+        "direction": "backward",
+        "artist": {
+          "id": "f2965ab0-4b6b-4144-912c-01a51d25cc00",
+          "disambiguation": "",
+          "name": "Harold Brown",
+          "sort-name": "Brown, Harold",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "type": "Person"
+        }
+      },
+      {
+        "direction": "backward",
+        "source-credit": "",
+        "artist": {
+          "sort-name": "Allen, Papa Dee",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "name": "Papa Dee Allen",
+          "type": "Person",
+          "disambiguation": "",
+          "id": "93fa6e19-3dc2-41a3-9498-afda00c3994f"
+        },
+        "end": "1988",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": true,
+        "attributes": [],
+        "begin": "1969",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-credit": "",
+        "type": "member of band",
+        "target-type": "artist"
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "target-credit": "",
+        "type": "member of band",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "sort-name": "Oskar, Lee",
+          "name": "Lee Oskar",
+          "type": "Person",
+          "disambiguation": "",
+          "id": "e393f079-cc8d-4955-98bd-ccd82cec7524"
+        },
+        "direction": "backward",
+        "source-credit": "",
+        "attributes": [],
+        "begin": "1969",
+        "ended": true,
+        "end": "1994",
+        "attribute-ids": {},
+        "attribute-values": {}
+      },
+      {
+        "artist": {
+          "name": "Howard E. Scott",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "sort-name": "Scott, Howard E.",
+          "type": "Person",
+          "disambiguation": "US funk/rock guitarist, member of War",
+          "id": "38c95f64-0c08-4e05-a119-98506d13deaf"
+        },
+        "source-credit": "",
+        "direction": "backward",
+        "attributes": [],
+        "ended": true,
+        "begin": "1969",
+        "attribute-ids": {},
+        "attribute-values": {},
+        "end": "1994",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "type": "member of band",
+        "target-credit": ""
+      },
+      {
+        "attributes": [],
+        "begin": "1969",
+        "ended": false,
+        "attribute-values": {},
+        "attribute-ids": {},
+        "end": null,
+        "artist": {
+          "type": "Person",
+          "sort-name": "Jordan, Lonnie",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "name": "Lonnie Jordan",
+          "disambiguation": "",
+          "id": "a8cd7b65-7d99-4288-989f-7b657e2316e1"
+        },
+        "source-credit": "",
+        "direction": "backward",
+        "target-type": "artist",
+        "type": "member of band",
+        "target-credit": "",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821"
+      },
+      {
+        "end": "1984",
+        "attribute-values": {},
+        "attribute-ids": {
+          "original": "4fd3b255-a7d7-4424-9a63-40fa543b601c"
+        },
+        "ended": true,
+        "attributes": [
+          "original"
+        ],
+        "begin": "1979",
+        "direction": "backward",
+        "source-credit": "",
+        "artist": {
+          "name": "Luther Rabb",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Rabb, Luther",
+          "type": "Person",
+          "id": "8e1acabd-fde7-4845-be8d-944f9bca18f8",
+          "disambiguation": ""
+        },
+        "target-credit": "",
+        "type": "member of band",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821"
+      },
+      {
+        "artist": {
+          "id": "2a9a46c9-412d-4150-b559-7da06aade650",
+          "disambiguation": "percussion",
+          "sort-name": "Rodriguez, Sal",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Sal Rodriguez",
+          "type": "Person"
+        },
+        "direction": "backward",
+        "source-credit": "",
+        "ended": false,
+        "attributes": [],
+        "begin": "1990",
+        "end": null,
+        "attribute-values": {},
+        "attribute-ids": {},
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "target-credit": "",
+        "type": "member of band"
+      },
+      {
+        "target-type": "artist",
+        "type": "member of band",
+        "target-credit": "",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attributes": [
+          "flute"
+        ],
+        "begin": "1993",
+        "ended": true,
+        "attribute-values": {},
+        "attribute-ids": {
+          "flute": "540280f1-d6cf-46bf-968b-695e99e216d7"
+        },
+        "attribute-credits": {},
+        "end": "1995",
+        "artist": {
+          "id": "c003f119-81a7-4b6c-b337-657b8cc3fb90",
+          "disambiguation": "woodwind player, member of War",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "sort-name": "Green, Charles",
+          "name": "Charles Green",
+          "type": "Person"
+        },
+        "source-credit": "",
+        "direction": "backward"
+      },
+      {
+        "type": "member of band",
+        "target-credit": "",
+        "target-type": "artist",
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "attribute-values": {},
+        "attribute-ids": {
+          "saxophone": "a9ed16cd-b8cb-4256-9c41-93f5f0458c49"
+        },
+        "end": "1995",
+        "attribute-credits": {},
+        "attributes": [
+          "saxophone"
+        ],
+        "begin": "1993",
+        "ended": true,
+        "source-credit": "",
+        "direction": "backward",
+        "artist": {
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Green, Charles",
+          "name": "Charles Green",
+          "type": "Person",
+          "disambiguation": "woodwind player, member of War",
+          "id": "c003f119-81a7-4b6c-b337-657b8cc3fb90"
+        }
+      },
+      {
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "target-type": "artist",
+        "target-credit": "",
+        "type": "member of band",
+        "artist": {
+          "type": "Person",
+          "sort-name": "Urquidi, David",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "David Urquidi",
+          "id": "032b97e0-6325-45fa-ac65-ce6615a43d22",
+          "disambiguation": ""
+        },
+        "direction": "backward",
+        "source-credit": "",
+        "begin": "2011",
+        "attributes": [
+          "saxophone"
+        ],
+        "ended": false,
+        "end": null,
+        "attribute-credits": {},
+        "attribute-ids": {
+          "saxophone": "a9ed16cd-b8cb-4256-9c41-93f5f0458c49"
+        },
+        "attribute-values": {}
+      },
+      {
+        "source-credit": "",
+        "direction": "backward",
+        "artist": {
+          "id": "5b17b9f6-a4be-4eb6-ac59-0a71d205a8a8",
+          "disambiguation": "US percussionist",
+          "type": "Person",
+          "sort-name": "Reyes, Marcos J.",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "country": "US",
+          "name": "Marcos J. Reyes"
+        },
+        "attribute-values": {},
+        "attribute-ids": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "ended": false,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "type": "member of band",
+        "target-credit": "",
+        "target-type": "artist"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "type": "allmusic",
+        "url": {
+          "id": "a4db3050-80c5-46aa-a097-c42a22a9f4bb",
+          "resource": "https://www.allmusic.com/artist/mn0000191947"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "begin": null,
+        "attributes": [],
+        "end": "2020-11-19",
+        "attribute-values": {},
+        "source-credit": "",
+        "url": {
+          "resource": "https://www.bbc.co.uk/music/artists/3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+          "id": "df27a283-cba0-4d8e-a1f2-c700a08d191c"
+        },
+        "type": "BBC Music page",
+        "ended": true,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.discogs.com/artist/1287974",
+          "id": "6ae7cc04-bbcd-436d-aa3d-1167ab36a82b"
+        },
+        "type": "discogs",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": "Eric Burdon & War",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "url": {
+          "resource": "https://www.discogs.com/artist/9707",
+          "id": "c93648b2-4bc1-4fa0-9d1e-b5a73113a0a8"
+        },
+        "type": "discogs",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "source-credit": "",
+        "url": {
+          "id": "e53606f0-1aa7-4640-890a-28109838714f",
+          "resource": "https://open.spotify.com/artist/3ICyfoySNDZqtBVmaBT84I"
+        },
+        "type": "free streaming",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "url": {
+          "id": "0d13e331-3f83-449d-ba37-e10143bf01b0",
+          "resource": "https://www.deezer.com/artist/10129"
+        },
+        "type": "free streaming",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "url": {
+          "id": "71ac3849-f924-400f-8539-7b87b489b8c9",
+          "resource": "http://www.pandora.com/war"
+        },
+        "type": "free streaming",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "source-credit": ""
+      },
+      {
+        "url": {
+          "id": "816e65df-7125-414f-a437-fb0d55302b64",
+          "resource": "https://www.imdb.com/name/nm0911271/"
+        },
+        "type": "IMDb",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "94c8b0cc-4477-4106-932c-da60e63de61c",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "http://www.war.com/",
+          "id": "2bef0a05-b711-4709-b2af-1ca8e0401288"
+        },
+        "type": "official homepage"
+      },
+      {
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "http://id.loc.gov/authorities/names/n93004995",
+          "id": "04d28973-9d81-4008-ad34-265bc0494aa9"
+        },
+        "type": "other databases"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "resource": "https://catalogue.bnf.fr/ark:/12148/cb13907396h",
+          "id": "0494e837-867c-43d2-a986-93b87c9199c9"
+        },
+        "type": "other databases",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "type": "other databases",
+        "url": {
+          "resource": "https://d-nb.info/gnd/5549525-4",
+          "id": "221bac91-49a8-4222-9993-80798d6572f5"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/war",
+          "id": "44ae4e26-ae88-4489-b161-2fdcc070461d"
+        },
+        "type": "other databases"
+      },
+      {
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "id": "852281d0-5942-4a07-adc3-3c4b3f4c2aed",
+          "resource": "https://www.musik-sammler.de/artist/war/"
+        },
+        "type": "other databases",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-credit": "",
+        "target-type": "url"
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "type": "other databases",
+        "url": {
+          "id": "ab0d4142-179f-4d9f-9145-9b6afbf36e84",
+          "resource": "https://www.worldcat.org/identities/lccn-n93004995"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "type": "purchase for download",
+        "url": {
+          "id": "2215a85c-d4eb-4592-9212-b624e1efd3a4",
+          "resource": "https://itunes.apple.com/us/artist/id261730408"
+        },
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null
+      },
+      {
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "url": {
+          "id": "c7644a97-e902-48e9-ab24-ce200f959376",
+          "resource": "https://open.qobuz.com/artist/62212"
+        },
+        "type": "purchase for download",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "id": "cf6a29f7-872b-41da-b378-503c5d1a27ef",
+          "resource": "https://www.beatport.com/artist/war/87720"
+        },
+        "type": "purchase for download"
+      },
+      {
+        "type": "purchase for download",
+        "url": {
+          "id": "21c36b75-c2bb-4e8f-a90d-c6557e8abf5d",
+          "resource": "https://www.qobuz.com/us-en/interpreter/war/62212"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "type": "purchase for mail-order",
+        "url": {
+          "id": "ff40a454-2f1f-4a3e-8061-f3e9a196fe51",
+          "resource": "https://www.amazon.com/-/e/B000AQ3524"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type-id": "611b1862-67af-4253-a64f-34adba305d1d",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "type": "social network",
+        "url": {
+          "resource": "https://twitter.com/wartheband",
+          "id": "13f5bc29-5f10-43c6-9313-75fbcd476e25"
+        },
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770"
+      },
+      {
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "resource": "https://www.facebook.com/WARTHEBAND",
+          "id": "19103a98-fc3a-459d-a850-7d8d194161f9"
+        },
+        "type": "social network"
+      },
+      {
+        "url": {
+          "id": "76d50a03-46da-4db2-891f-009dd2175130",
+          "resource": "https://www.songkick.com/artists/339429"
+        },
+        "type": "songkick",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "url": {
+          "id": "a65bf915-cac6-4aa1-9dd2-d9c3c0438151",
+          "resource": "https://music.apple.com/fr/artist/261730408"
+        },
+        "type": "streaming",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "type": "streaming",
+        "url": {
+          "resource": "https://music.apple.com/us/artist/261730408",
+          "id": "6faacd53-ec2d-4b68-88ca-45f5b106500e"
+        },
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.qobuz.com/artist/62212",
+          "id": "c7644a97-e902-48e9-ab24-ce200f959376"
+        },
+        "type": "streaming"
+      },
+      {
+        "url": {
+          "id": "62ec0d98-b6a4-4a12-82bc-8e53f653d872",
+          "resource": "https://tidal.com/artist/3522622"
+        },
+        "type": "streaming",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "source-credit": ""
+      },
+      {
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-type": "url",
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.qobuz.com/us-en/interpreter/war/62212",
+          "id": "21c36b75-c2bb-4e8f-a90d-c6557e8abf5d"
+        },
+        "type": "streaming"
+      },
+      {
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type": "VIAF",
+        "url": {
+          "resource": "http://viaf.org/viaf/144172265",
+          "id": "be45f098-5e85-4f9b-863e-9d98a4e209b3"
+        }
+      },
+      {
+        "type": "wikidata",
+        "url": {
+          "id": "017951ba-281c-4d1d-804d-a257f53c27c4",
+          "resource": "https://www.wikidata.org/wiki/Q2295871"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": ""
+      }
+    ],
+    "tags": [
+      {
+        "name": "2008 universal fire victim",
+        "count": 1
+      },
+      {
+        "name": "classic pop and rock",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "funk"
+      },
+      {
+        "count": 2,
+        "name": "psychedelic rock"
+      },
+      {
+        "name": "rock",
+        "count": 1
+      }
+    ],
+    "genres": [
+      {
+        "disambiguation": "",
+        "id": "fe4ba6a1-9873-4fd0-a12b-a70c81818514",
+        "count": 1,
+        "name": "funk"
+      },
+      {
+        "id": "146ef761-5ad9-48b4-b0b3-483104f7da48",
+        "count": 2,
+        "disambiguation": "",
+        "name": "psychedelic rock"
+      },
+      {
+        "disambiguation": "",
+        "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+        "count": 1,
+        "name": "rock"
+      }
+    ],
+    "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+    "gender-id": null,
+    "begin-area": {
+      "type-id": null,
+      "sort-name": "Long Beach",
+      "name": "Long Beach",
+      "id": "e183ffae-1d35-4c78-b552-957535e40af1",
+      "type": null,
+      "disambiguation": ""
+    },
+    "name": "War",
+    "type": "Group",
+    "aliases": [
+      {
+        "ended": true,
+        "begin": "1969",
+        "end": "1970",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "primary": null,
+        "sort-name": "Eric Burdon & War",
+        "locale": null,
+        "name": "Eric Burdon & War",
+        "type": "Artist name"
+      },
+      {
+        "ended": true,
+        "begin": "1976",
+        "end": "1976",
+        "type": "Artist name",
+        "primary": null,
+        "sort-name": "Eric Burdon & War",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "Eric Burdon & War",
+        "locale": null
+      },
+      {
+        "end": null,
+        "ended": false,
+        "begin": null,
+        "type": "Search hint",
+        "locale": null,
+        "name": "Eric Burdon and War",
+        "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+        "primary": null,
+        "sort-name": "Eric Burdon and War"
+      },
+      {
+        "end": "1975",
+        "begin": "1971",
+        "ended": true,
+        "locale": null,
+        "name": "War",
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "primary": null,
+        "sort-name": "War",
+        "type": "Artist name"
+      },
+      {
+        "type": "Artist name",
+        "sort-name": "War",
+        "primary": null,
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "name": "War",
+        "locale": null,
+        "begin": "1976",
+        "ended": false,
+        "end": null
+      }
+    ],
+    "isnis": [
+      "0000000109440393"
+    ],
+    "disambiguation": "US funk/rock band",
+    "life-span": {
+      "end": "1994",
+      "ended": true,
+      "begin": "1969"
+    },
+    "ipis": [],
+    "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+    "country": "US",
+    "sort-name": "War",
+    "area": {
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "id": "489ce91b-6658-3307-9877-795b68554c98",
+      "disambiguation": "",
+      "type": null,
+      "sort-name": "United States",
+      "type-id": null,
+      "name": "United States"
+    },
+    "end-area": {
+      "type": null,
+      "disambiguation": "",
+      "id": "1f40c6e1-47ba-4e35-996f-fe6ee5840e62",
+      "name": "Los Angeles",
+      "type-id": null,
+      "sort-name": "Los Angeles"
+    },
+    "gender": null
+  }
+}

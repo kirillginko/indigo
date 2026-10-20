@@ -1,0 +1,205 @@
+{
+  "url": "https://api.discogs.com/artists/98545",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:17.923619+00:00",
+  "body": {
+    "name": "The S.O.S. Band",
+    "id": 98545,
+    "resource_url": "https://api.discogs.com/artists/98545",
+    "uri": "https://www.discogs.com/artist/98545-The-SOS-Band",
+    "releases_url": "https://api.discogs.com/artists/98545/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/me0Kq9yW0uB6hiIjyvZMEFH0k_u1VvjO5FNF9zYXBi8/rs:fit/g:sm/q:90/h:300/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0NzY5MzMyNTkt/ODIwNi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/me0Kq9yW0uB6hiIjyvZMEFH0k_u1VvjO5FNF9zYXBi8/rs:fit/g:sm/q:90/h:300/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0NzY5MzMyNTkt/ODIwNi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/8MOUsA6eHn74Af1bGr6iuLu261Hm7WI3y1J3IQWXGmo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0NzY5MzMyNTkt/ODIwNi5qcGVn.jpeg",
+        "width": 600,
+        "height": 300
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/2ELvOfGZTlMG6wApzssR1b73Gzy-o982yxNnF3yjY4E/rs:fit/g:sm/q:90/h:436/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNzIwMDEzMjEu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/2ELvOfGZTlMG6wApzssR1b73Gzy-o982yxNnF3yjY4E/rs:fit/g:sm/q:90/h:436/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNzIwMDEzMjEu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/46zxu_Ffb68YIs3DRpREt3PiUTqNKTWCHA2BPRb1wZY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNzIwMDEzMjEu/anBlZw.jpeg",
+        "width": 600,
+        "height": 436
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/I5rsNC_zT09wf8rJMcyXze63qdbv8NRRrCD-de8MmCY/rs:fit/g:sm/q:90/h:481/w:474/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0MDQzOTAwNDYt/NDc5OC5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/I5rsNC_zT09wf8rJMcyXze63qdbv8NRRrCD-de8MmCY/rs:fit/g:sm/q:90/h:481/w:474/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0MDQzOTAwNDYt/NDc5OC5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/W8LvKKGefHwm0tuUOYHQGNncHYCBdl8IaT6kakZic9s/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0MDQzOTAwNDYt/NDc5OC5qcGVn.jpeg",
+        "width": 474,
+        "height": 481
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ACSkfkX9fhR7ltue0faF-Nt51V-x6nfh7gP776uGh-M/rs:fit/g:sm/q:90/h:600/w:595/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNzIwMDEzNDUu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/ACSkfkX9fhR7ltue0faF-Nt51V-x6nfh7gP776uGh-M/rs:fit/g:sm/q:90/h:600/w:595/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNzIwMDEzNDUu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/Ye9RmUeV_8HeDs9YQHpEzJpUI1aEznPSAi1ToLSVidc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNzIwMDEzNDUu/anBlZw.jpeg",
+        "width": 595,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/DeVWpU_lp5UbfcY_QfUgvKZJ5l9BAL2ms5XqN4xnNNk/rs:fit/g:sm/q:90/h:190/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEwODUwODkxMzEu/Z2lm.jpeg",
+        "resource_url": "https://i.discogs.com/DeVWpU_lp5UbfcY_QfUgvKZJ5l9BAL2ms5XqN4xnNNk/rs:fit/g:sm/q:90/h:190/w:300/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEwODUwODkxMzEu/Z2lm.jpeg",
+        "uri150": "https://i.discogs.com/qi2a0h8_ExAq570qPXWa8w-W2IRMHS6TgCA1AwjGONg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEwODUwODkxMzEu/Z2lm.jpeg",
+        "width": 300,
+        "height": 190
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/r6BvYTVc8duzLwTnjYF-JCjMYFHg-_exKeLDp-z395M/rs:fit/g:sm/q:90/h:382/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyOTM1MjQxMTEu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/r6BvYTVc8duzLwTnjYF-JCjMYFHg-_exKeLDp-z395M/rs:fit/g:sm/q:90/h:382/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyOTM1MjQxMTEu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/cJeSIPJj7Tp21rjcdkkpv3zMfOf_e6QhgaVbm6RcZ2k/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyOTM1MjQxMTEu/anBlZw.jpeg",
+        "width": 453,
+        "height": 382
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/urnFaPqlUfV_zVli7fcRPMEa_o83ULfAGzxbeWI4dDI/rs:fit/g:sm/q:90/h:404/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyOTM2MjYyNjAu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/urnFaPqlUfV_zVli7fcRPMEa_o83ULfAGzxbeWI4dDI/rs:fit/g:sm/q:90/h:404/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyOTM2MjYyNjAu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/27wm4pWA3q1mH4CEy9zogUpH4bMtmFxFuas4IlovfTc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyOTM2MjYyNjAu/anBlZw.jpeg",
+        "width": 500,
+        "height": 404
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/NdCZh8ioI-eIxmW_5GUiyt2r6oz_kyALJ7SFnOqBYdw/rs:fit/g:sm/q:90/h:600/w:519/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNTA1ODc0NDEu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/NdCZh8ioI-eIxmW_5GUiyt2r6oz_kyALJ7SFnOqBYdw/rs:fit/g:sm/q:90/h:600/w:519/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNTA1ODc0NDEu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/c9dzk41LmlZI4u2nAV7j9n8TVHqFtvabKDN8jIbTSWY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEyNTA1ODc0NDEu/anBlZw.jpeg",
+        "width": 519,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/KZ6KDI8dY96-EInujWOIN1kCht4ugftSbZ3ifh_CiiM/rs:fit/g:sm/q:90/h:501/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEzNDQ0OTIxMjEt/MTE3OS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/KZ6KDI8dY96-EInujWOIN1kCht4ugftSbZ3ifh_CiiM/rs:fit/g:sm/q:90/h:501/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEzNDQ0OTIxMjEt/MTE3OS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/ceCn5Y9XsDbHS3xw115zX8a-rhz94jJP_ic2IruzzyU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTEzNDQ0OTIxMjEt/MTE3OS5qcGVn.jpeg",
+        "width": 600,
+        "height": 501
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/xRyGDcICsq7f_6-8kTH5DZothnrvs20-1qcvs7ireno/rs:fit/g:sm/q:90/h:338/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0NjUzNzU3MDIt/OTAwNC5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/xRyGDcICsq7f_6-8kTH5DZothnrvs20-1qcvs7ireno/rs:fit/g:sm/q:90/h:338/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0NjUzNzU3MDIt/OTAwNC5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/9DQ-q76aCKhXR4qKQRKOxkUuUxvY7A5i-ggaHlhLRjE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE0NjUzNzU3MDIt/OTAwNC5qcGVn.jpeg",
+        "width": 600,
+        "height": 338
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/dKnYSXVdPTxI14Dx_jQnmThNGU3qtUS5KlZRBeEfAOE/rs:fit/g:sm/q:90/h:374/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE2OTUxMzQwODQt/Njk1Mi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/dKnYSXVdPTxI14Dx_jQnmThNGU3qtUS5KlZRBeEfAOE/rs:fit/g:sm/q:90/h:374/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE2OTUxMzQwODQt/Njk1Mi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/MGtiFveC85hiLv81-P5wW0d2r_2F2ekP9XNSVE7e4hc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTk4NTQ1/LTE2OTUxMzQwODQt/Njk1Mi5qcGVn.jpeg",
+        "width": 600,
+        "height": 374
+      }
+    ],
+    "profile": "American R&B and electro-funk band. Original bandname \"Santa Monica\" was changed to \"The S.O.S. Band\" by Sigidi Bashir Abdullah during the recording sessions for \"Take Your Time (Do It Right)\" (1979). It originally stood for \"sounds of success.\"",
+    "urls": [
+      "http://www.thesosband.com",
+      "",
+      "http://www.facebook.com/therealsosband",
+      "",
+      "http://www.soulwalking.co.uk/S.O.S%20Band.html",
+      "",
+      "http://en.wikipedia.org/wiki/The_S.O.S._Band"
+    ],
+    "namevariations": [
+      "S.O.S Band",
+      "S.O.S.",
+      "S.O.S. Band",
+      "S.O.S. バンド",
+      "S.O.S.. Band",
+      "S.O.S.バンド",
+      "S.O.S.バンド = S.O.S. Band",
+      "SOS",
+      "SOS Band",
+      "SOS-Band",
+      "Sos Band",
+      "The S.O.S Band",
+      "The S.O.S. Band Too",
+      "The S.O.S.Band",
+      "The SOS Band",
+      "The Sos Band"
+    ],
+    "members": [
+      {
+        "id": 39477,
+        "name": "Penny Ford",
+        "resource_url": "https://api.discogs.com/artists/39477",
+        "active": false
+      },
+      {
+        "id": 231933,
+        "name": "Jason Bryant",
+        "resource_url": "https://api.discogs.com/artists/231933",
+        "active": true
+      },
+      {
+        "id": 251264,
+        "name": "Mary Davis",
+        "resource_url": "https://api.discogs.com/artists/251264",
+        "active": true
+      },
+      {
+        "id": 324589,
+        "name": "Bruno Speight",
+        "resource_url": "https://api.discogs.com/artists/324589",
+        "active": true
+      },
+      {
+        "id": 412112,
+        "name": "Billy Ellis",
+        "resource_url": "https://api.discogs.com/artists/412112",
+        "active": true
+      },
+      {
+        "id": 653662,
+        "name": "John Alexander Simpson",
+        "resource_url": "https://api.discogs.com/artists/653662",
+        "active": true
+      },
+      {
+        "id": 653663,
+        "name": "Willie Killebrew",
+        "resource_url": "https://api.discogs.com/artists/653663",
+        "active": true
+      },
+      {
+        "id": 653668,
+        "name": "James Earl Jones III",
+        "resource_url": "https://api.discogs.com/artists/653668",
+        "active": true
+      },
+      {
+        "id": 726697,
+        "name": "Fredi Grace",
+        "resource_url": "https://api.discogs.com/artists/726697",
+        "active": false
+      },
+      {
+        "id": 910807,
+        "name": "Jerome Thomas",
+        "resource_url": "https://api.discogs.com/artists/910807",
+        "active": true
+      },
+      {
+        "id": 1112859,
+        "name": "Abdul Ra'oof",
+        "resource_url": "https://api.discogs.com/artists/1112859",
+        "active": true
+      },
+      {
+        "id": 18018096,
+        "name": "Chandra Currelley",
+        "resource_url": "https://api.discogs.com/artists/18018096",
+        "active": false
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "url": "https://api.discogs.com/artists/55738",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:24.470948+00:00",
+  "body": {
+    "name": "Ramsey Lewis",
+    "id": 55738,
+    "resource_url": "https://api.discogs.com/artists/55738",
+    "uri": "https://www.discogs.com/artist/55738-Ramsey-Lewis",
+    "releases_url": "https://api.discogs.com/artists/55738/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/TMa35Ai0FvSqg2LdUJpG9xtfGruXnr_LptYOzIWTOR0/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5OTgt/MzYyMC5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/TMa35Ai0FvSqg2LdUJpG9xtfGruXnr_LptYOzIWTOR0/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5OTgt/MzYyMC5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/03gOV6XrxPASTCUKeEX905ELLNidO52ezeInPNKW7Vc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5OTgt/MzYyMC5qcGVn.jpeg",
+        "width": 600,
+        "height": 337
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/cfjzERS6z4Pr-aWS_OPVxaYEgxp5JrvMXNT0Tc1DHpk/rs:fit/g:sm/q:90/h:447/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDUwMDgt/MzYyNS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/cfjzERS6z4Pr-aWS_OPVxaYEgxp5JrvMXNT0Tc1DHpk/rs:fit/g:sm/q:90/h:447/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDUwMDgt/MzYyNS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/zK3Xw_CQozsPunnjp6Hm-FoIl6qLNfrBK7ncjAipjq4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDUwMDgt/MzYyNS5qcGVn.jpeg",
+        "width": 600,
+        "height": 447
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/m9Fh92dBgPGVz02Rg-Q2qwiwdyzj6wtixtuv5bhYbcs/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ4Mjct/MTE4MS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/m9Fh92dBgPGVz02Rg-Q2qwiwdyzj6wtixtuv5bhYbcs/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ4Mjct/MTE4MS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/faX-IQDL0c1V2_bhiKNJXLuGSKE2MM7dXbsl3VbJBuI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ4Mjct/MTE4MS5qcGVn.jpeg",
+        "width": 599,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/g-_twk55sGT15K2SWMTZTj6XAzfnGihSeE8_VuT1WHI/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5MDIt/MzA3Ni5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/g-_twk55sGT15K2SWMTZTj6XAzfnGihSeE8_VuT1WHI/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5MDIt/MzA3Ni5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/eMVxGrn6eLS6jZasSREgaNdexrPUanzREe4PWzjhRRU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5MDIt/MzA3Ni5qcGVn.jpeg",
+        "width": 600,
+        "height": 337
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/-fAKRZocBrWkaSQXIc53SpIAigZRIjvY7W-Dylh9-cA/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5MDEt/NTQxMi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/-fAKRZocBrWkaSQXIc53SpIAigZRIjvY7W-Dylh9-cA/rs:fit/g:sm/q:90/h:337/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5MDEt/NTQxMi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/IPkSBGGCQmtsudlDS5W5wQoR8SMnvK-LXfAVE-kMiuI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ5MDEt/NTQxMi5qcGVn.jpeg",
+        "width": 600,
+        "height": 337
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/7jL0mnXpFIZSmpCN6AhLwQkTq3mOieROB7Wg48pzPZI/rs:fit/g:sm/q:90/h:267/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzIzMTUu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/7jL0mnXpFIZSmpCN6AhLwQkTq3mOieROB7Wg48pzPZI/rs:fit/g:sm/q:90/h:267/w:400/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzIzMTUu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/W1Qao7eryEs0GbyWDet8BpI0dCxPWGYYmboSgiwpz0I/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzIzMTUu/anBlZw.jpeg",
+        "width": 400,
+        "height": 267
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/6Kbpbi7dtJvasd6vWNTF2m6zAusKdDLukLpjnPRv45A/rs:fit/g:sm/q:90/h:600/w:409/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1NTI0MTUxNzMt/NzM3MC5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/6Kbpbi7dtJvasd6vWNTF2m6zAusKdDLukLpjnPRv45A/rs:fit/g:sm/q:90/h:600/w:409/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1NTI0MTUxNzMt/NzM3MC5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/v8S1PRwJrpZ02DJ5XHdD-qGGEF7uahLR9u6nHzZMWfA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1NTI0MTUxNzMt/NzM3MC5qcGVn.jpeg",
+        "width": 409,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/BeDmq1YNW1xRaw2VYcsniLnrCZJoUDlz9LO_jgpHOXA/rs:fit/g:sm/q:90/h:600/w:481/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ4Mjct/OTgyMS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/BeDmq1YNW1xRaw2VYcsniLnrCZJoUDlz9LO_jgpHOXA/rs:fit/g:sm/q:90/h:600/w:481/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ4Mjct/OTgyMS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/IZXffWePSzbcIO7QNuj6KCojcXxSXTPdbhBEql7a6Cg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTE1MDU3NDQ4Mjct/OTgyMS5qcGVn.jpeg",
+        "width": 481,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/-rUGPRO_imMvHZn7FNR0rN0YyHocRsNiLRZFXyBug3Q/rs:fit/g:sm/q:90/h:257/w:208/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzE5NjAu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/-rUGPRO_imMvHZn7FNR0rN0YyHocRsNiLRZFXyBug3Q/rs:fit/g:sm/q:90/h:257/w:208/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzE5NjAu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/xpgC5gp4RjZACo_pniH-AZIR9bw_C48TftVNhw69lAk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzE5NjAu/anBlZw.jpeg",
+        "width": 208,
+        "height": 257
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/OraJ-0fzcQf3xZ_FKXkifYrNRqTkTp4ZI-22_iZgY6A/rs:fit/g:sm/q:90/h:149/w:123/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExMDM3MjgyMjEu/anBn.jpeg",
+        "resource_url": "https://i.discogs.com/OraJ-0fzcQf3xZ_FKXkifYrNRqTkTp4ZI-22_iZgY6A/rs:fit/g:sm/q:90/h:149/w:123/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExMDM3MjgyMjEu/anBn.jpeg",
+        "uri150": "https://i.discogs.com/25kwYTTnSw3k6G88fQAHBGGQvuXbPJNbArT9fx2JNiA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExMDM3MjgyMjEu/anBn.jpeg",
+        "width": 123,
+        "height": 149
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/YngbDU6e5dZjt15GE5LlgAhZV4GG7mJdANX-Y8O4uTw/rs:fit/g:sm/q:90/h:200/w:195/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzIxMDcu/anBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/YngbDU6e5dZjt15GE5LlgAhZV4GG7mJdANX-Y8O4uTw/rs:fit/g:sm/q:90/h:200/w:195/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzIxMDcu/anBlZw.jpeg",
+        "uri150": "https://i.discogs.com/-maaKhiTPhoeFyN_Ggh_bQz4y2U8k1Osj-yMrQQaGng/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExNjcyNzIxMDcu/anBlZw.jpeg",
+        "width": 195,
+        "height": 200
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/FKnw9VMCtLwPvFphmuStOGDvLg6uAq60UIzVBXYo5V8/rs:fit/g:sm/q:90/h:211/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExMDgyOTQwOTku/anBn.jpeg",
+        "resource_url": "https://i.discogs.com/FKnw9VMCtLwPvFphmuStOGDvLg6uAq60UIzVBXYo5V8/rs:fit/g:sm/q:90/h:211/w:200/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExMDgyOTQwOTku/anBn.jpeg",
+        "uri150": "https://i.discogs.com/vneWvlr99etZkPDQAbgV8SSA7wNR6uwHX06QWI6JsJE/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU1NzM4/LTExMDgyOTQwOTku/anBn.jpeg",
+        "width": 200,
+        "height": 211
+      }
+    ],
+    "realname": "Ramsey Emmanuel Lewis Jr.",
+    "profile": "American jazz pianist and keyboardist, born May 27, 1935 in Chicago, Illinois, USA, died September 12, 2022 in Chicago, Illinois, USA.",
+    "urls": [
+      "https://www.ramseylewis.com/",
+      "https://ramseylewis.bandcamp.com/",
+      "https://en.wikipedia.org/wiki/Ramsey_Lewis",
+      "https://www.imdb.com/name/nm0507640/",
+      "http://www.facebook.com/RamseyLewisJazz",
+      "https://x.com/RamseyLewis",
+      "https://www.youtube.com/user/TheRamseyLewis",
+      "https://www.dailymotion.com/user/RamseyLewis",
+      "https://www.whosampled.com/Ramsey-Lewis/"
+    ],
+    "namevariations": [
+      "Davis",
+      "Lewis",
+      "R. Lewis",
+      "R. Lewis Jr.",
+      "R.E. Lewis Jr.",
+      "R.E. Lewis, Jr.",
+      "R.Lewis",
+      "Ramesy Lewis",
+      "Ramsel Lewis",
+      "Ramsey",
+      "Ramsey - Lewis",
+      "Ramsey / Lewis",
+      "Ramsey E. Lewis, Jr.",
+      "Ramsey Lewis Jr.",
+      "Ramsey Lewis, Jr.",
+      "Remsey Lewis",
+      "Remsy Lewis",
+      "Р. Луис",
+      "ラムゼイ・ルイス",
+      "ラムゼイ・ルイス・トリオ"
+    ],
+    "groups": [
+      {
+        "id": 89885,
+        "name": "Urban Knights",
+        "resource_url": "https://api.discogs.com/artists/89885",
+        "active": true
+      },
+      {
+        "id": 149249,
+        "name": "The Ramsey Lewis Trio",
+        "resource_url": "https://api.discogs.com/artists/149249",
+        "active": true
+      },
+      {
+        "id": 1042141,
+        "name": "Max Roach Quintet",
+        "resource_url": "https://api.discogs.com/artists/1042141",
+        "active": false
+      },
+      {
+        "id": 2206975,
+        "name": "Ramsey Lewis Quintet",
+        "resource_url": "https://api.discogs.com/artists/2206975",
+        "active": true
+      },
+      {
+        "id": 4804664,
+        "name": "Ramsey Lewis Quartet",
+        "resource_url": "https://api.discogs.com/artists/4804664",
+        "active": true
+      },
+      {
+        "id": 4852411,
+        "name": "Ramsey Lewis And His Electric Band",
+        "resource_url": "https://api.discogs.com/artists/4852411",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

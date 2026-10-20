@@ -1,0 +1,99 @@
+{
+  "url": "https://api.discogs.com/artists/630311",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:08.194953+00:00",
+  "body": {
+    "name": "Stone (14)",
+    "id": 630311,
+    "resource_url": "https://api.discogs.com/artists/630311",
+    "uri": "https://www.discogs.com/artist/630311-Stone-14",
+    "releases_url": "https://api.discogs.com/artists/630311/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/26TZmSduK5QRWpj185Qug4q0va6fyc5hPnWUZLjK3Hw/rs:fit/g:sm/q:90/h:600/w:545/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNzE5MjI3NzI3/LTc2OTMucG5n.jpeg",
+        "resource_url": "https://i.discogs.com/26TZmSduK5QRWpj185Qug4q0va6fyc5hPnWUZLjK3Hw/rs:fit/g:sm/q:90/h:600/w:545/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNzE5MjI3NzI3/LTc2OTMucG5n.jpeg",
+        "uri150": "https://i.discogs.com/huiiWdfIBujBS2WmZlT3OhkGb9Bx6LmTrCcFnU41Xgc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNzE5MjI3NzI3/LTc2OTMucG5n.jpeg",
+        "width": 545,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/g1UGHnQL36Ux0m0qFb93dQCqbYXocsX3skmJIVM7rm8/rs:fit/g:sm/q:90/h:474/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNDU1OTE1MDM2/LTUzNjguanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/g1UGHnQL36Ux0m0qFb93dQCqbYXocsX3skmJIVM7rm8/rs:fit/g:sm/q:90/h:474/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNDU1OTE1MDM2/LTUzNjguanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/9Op1-F0Q4xDAvWzcPO_1BpiGDwh-wiyRcBAmGRRVI9w/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNDU1OTE1MDM2/LTUzNjguanBlZw.jpeg",
+        "width": 600,
+        "height": 474
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/zJLD8M4Grzd3qkfmojR20JMFC8Nzojh-t2WVNcsCerE/rs:fit/g:sm/q:90/h:345/w:335/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2Mjk1/LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/zJLD8M4Grzd3qkfmojR20JMFC8Nzojh-t2WVNcsCerE/rs:fit/g:sm/q:90/h:345/w:335/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2Mjk1/LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/WUpiEH8pc8yrJprbx0G1HF1ZSUyxm3Razu2bqP5R0eA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2Mjk1/LmpwZWc.jpeg",
+        "width": 335,
+        "height": 345
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/X5IaaG0cjuYWtXImJJYbZI3i33thc69RsFK1Ovix8x0/rs:fit/g:sm/q:90/h:305/w:462/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNjM3NDcxNzQy/LTk4MTkucG5n.jpeg",
+        "resource_url": "https://i.discogs.com/X5IaaG0cjuYWtXImJJYbZI3i33thc69RsFK1Ovix8x0/rs:fit/g:sm/q:90/h:305/w:462/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNjM3NDcxNzQy/LTk4MTkucG5n.jpeg",
+        "uri150": "https://i.discogs.com/B7J4d0AXMLyyj_-yZB9bopvZx_kj9IrwQoPU9gDqMdo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNjM3NDcxNzQy/LTk4MTkucG5n.jpeg",
+        "width": 462,
+        "height": 305
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/d5bm9kDhGtFGScKvhQAPLBHy1UU2I56UzWQz4SC9lQ0/rs:fit/g:sm/q:90/h:339/w:323/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2MjY3/LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/d5bm9kDhGtFGScKvhQAPLBHy1UU2I56UzWQz4SC9lQ0/rs:fit/g:sm/q:90/h:339/w:323/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2MjY3/LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/HJBH41-E8MmpyDC8EkLNz2Sk3c9KpCxuMJDkV-pK79s/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2MjY3/LmpwZWc.jpeg",
+        "width": 323,
+        "height": 339
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/G5cZJRp2BV7QMZtoUynTSWRfRjxnEqNisprVhUZqm_U/rs:fit/g:sm/q:90/h:343/w:337/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2MzA5/LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/G5cZJRp2BV7QMZtoUynTSWRfRjxnEqNisprVhUZqm_U/rs:fit/g:sm/q:90/h:343/w:337/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2MzA5/LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Te82h_5OpFsnH3eUS6wRvAoH1-2M0mD5sWU2yDBsuVg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xMjgyOTE2MzA5/LmpwZWc.jpeg",
+        "width": 337,
+        "height": 343
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/WLxgMbeWw6wuWhDJ6H5IhGH7n3e_6gOqYkKmLOkUwBY/rs:fit/g:sm/q:90/h:442/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNDcxOTc0MzI0/LTUxNTMuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/WLxgMbeWw6wuWhDJ6H5IhGH7n3e_6gOqYkKmLOkUwBY/rs:fit/g:sm/q:90/h:442/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNDcxOTc0MzI0/LTUxNTMuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/II43C9B1ZrkUcDBlQmYaoDdQDVgVoq00un1fTcWGyrw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNDcxOTc0MzI0/LTUxNTMuanBlZw.jpeg",
+        "width": 600,
+        "height": 442
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/qP7qUNl-dU73S-mb8e4XvaNf4KApqIaq0Q1yjUZKE8E/rs:fit/g:sm/q:90/h:600/w:383/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNzEyMzk3NzYx/LTEyOTAuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/qP7qUNl-dU73S-mb8e4XvaNf4KApqIaq0Q1yjUZKE8E/rs:fit/g:sm/q:90/h:600/w:383/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNzEyMzk3NzYx/LTEyOTAuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/jw_Cqf6MOb4lOu8qQQeWPQKifdnjwzoDupYCkXUG-sU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTYzMDMx/MS0xNzEyMzk3NzYx/LTEyOTAuanBlZw.jpeg",
+        "width": 383,
+        "height": 600
+      }
+    ],
+    "realname": "Annie Gautrat",
+    "profile": "French singer, born July 31th 1947 in Paris,\r\nEx wife of [a282490], married with [a2653050].",
+    "namevariations": [
+      "Stone",
+      "ストーン"
+    ],
+    "groups": [
+      {
+        "id": 468101,
+        "name": "Stone Et Eric Charden",
+        "resource_url": "https://api.discogs.com/artists/468101",
+        "active": true
+      },
+      {
+        "id": 1167117,
+        "name": "Electrogène",
+        "resource_url": "https://api.discogs.com/artists/1167117",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

@@ -1,0 +1,465 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/46a4b150-be30-44b3-a337-e06a72657d33?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:26.808549+00:00",
+  "body": {
+    "end-area": null,
+    "sort-name": "Sinephro, Nala",
+    "id": "46a4b150-be30-44b3-a337-e06a72657d33",
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "type": "Person",
+    "name": "Nala Sinephro",
+    "gender": "Female",
+    "country": "BE",
+    "disambiguation": "Caribbean-Belgian jazz artist",
+    "begin-area": null,
+    "tags": [
+      {
+        "count": 1,
+        "name": "ambient"
+      },
+      {
+        "name": "ambient jazz",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "electronic"
+      },
+      {
+        "name": "experimental jazz",
+        "count": 2
+      },
+      {
+        "count": 2,
+        "name": "improvisation"
+      },
+      {
+        "count": 3,
+        "name": "jazz"
+      }
+    ],
+    "isnis": [
+      "0000000503988787"
+    ],
+    "relations": [
+      {
+        "type": "allmusic",
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "attribute-ids": {},
+        "url": {
+          "id": "5c23065b-307a-473e-bdf6-9f8145192cf2",
+          "resource": "https://www.allmusic.com/artist/mn0004099725"
+        },
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-values": {},
+        "ended": false,
+        "end": null,
+        "attributes": []
+      },
+      {
+        "url": {
+          "id": "a33485e4-5e53-4da7-a8f4-9b49ac017b90",
+          "resource": "https://nalasinephro.bandcamp.com/"
+        },
+        "attribute-ids": {},
+        "type-id": "c550166e-0548-4a18-b1d4-e2ae423a3e88",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "end": null,
+        "attributes": [],
+        "type": "bandcamp",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url"
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.discogs.com/artist/8270419",
+          "id": "80e9cf66-2dd6-4de2-855c-fe7450655e0f"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "target-credit": "",
+        "direction": "forward",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "discogs"
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "free streaming",
+        "attributes": [],
+        "end": null,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://open.spotify.com/artist/2h5syT5XdsQgKLq8Yn1klO",
+          "id": "0108842c-09ca-4078-b283-b1dfdf087f9f"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "resource": "https://www.deezer.com/artist/130469482",
+          "id": "a6403d63-4672-45ff-ad0a-cc0a2de5d393"
+        },
+        "attribute-ids": {},
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "free streaming"
+      },
+      {
+        "type": "last.fm",
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "759720c4-7e52-4372-8e3c-af377441febf",
+          "resource": "https://www.last.fm/music/Nala+Sinephro"
+        },
+        "attribute-ids": {},
+        "attributes": [],
+        "end": null
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "official homepage",
+        "attributes": [],
+        "end": null,
+        "target-credit": "",
+        "direction": "forward",
+        "attribute-values": {},
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "7d9b8acc-4d13-4ac6-8851-d7c3b7f94f58",
+          "resource": "https://www.nalasinephro.com/"
+        }
+      },
+      {
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "id": "04f7e5c7-1d6f-4e0d-b116-ac6ff35e09ca",
+          "resource": "https://rateyourmusic.com/artist/nala-sinephro"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "other databases",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "type": "purchase for download",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "url": {
+          "resource": "https://itunes.apple.com/be/artist/id1558952230",
+          "id": "fd9e434f-09ff-4544-b098-8f1be5c06dc4"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "direction": "forward",
+        "target-credit": "",
+        "end": null,
+        "attributes": []
+      },
+      {
+        "target-credit": "",
+        "direction": "forward",
+        "ended": false,
+        "attribute-values": {},
+        "type-id": "bf5d0d5e-27a1-4e94-9df7-3cdc67b3b207",
+        "attribute-ids": {},
+        "url": {
+          "id": "2b4ab7cb-d6fa-4969-8dd7-d3679a3eb22e",
+          "resource": "https://www.setlist.fm/setlists/nala-sinephro-53f3e3ed.html"
+        },
+        "attributes": [],
+        "end": null,
+        "type": "setlistfm",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "type": "social network",
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "target-credit": "",
+        "direction": "forward",
+        "url": {
+          "resource": "https://www.instagram.com/nalasinephro/",
+          "id": "8aa63ab5-5d77-40f0-b6cb-9221cbf0c51a"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "songkick",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "e1bac6cb-ebf3-41c7-91f7-139e70a57bed",
+          "resource": "https://www.songkick.com/artists/10157760"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "aac9c4bc-a5b9-30b8-9839-e3ac314c6e58"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "soundcloud",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://soundcloud.com/sinephro",
+          "id": "e4683bd2-241a-4319-941d-6207f2447344"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "ended": false,
+        "direction": "forward",
+        "target-credit": ""
+      },
+      {
+        "target-type": "url",
+        "source-credit": "",
+        "begin": null,
+        "type": "streaming",
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "direction": "forward",
+        "target-credit": "",
+        "url": {
+          "id": "4a1959df-ef22-462d-8861-c34e08187186",
+          "resource": "https://music.apple.com/gb/artist/1558952230"
+        },
+        "attribute-ids": {}
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "streaming",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://music.apple.com/us/artist/1558952230",
+          "id": "170b80c9-7c2f-4271-8822-d472854b550c"
+        },
+        "attribute-ids": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "attribute-values": {},
+        "ended": false,
+        "target-credit": "",
+        "direction": "forward"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "streaming",
+        "end": null,
+        "attributes": [],
+        "attribute-ids": {},
+        "url": {
+          "id": "06ecc611-091d-48a0-88bd-558dbb777d26",
+          "resource": "https://tidal.com/artist/24475770"
+        },
+        "direction": "forward",
+        "target-credit": "",
+        "attribute-values": {},
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "ended": false
+      },
+      {
+        "type": "VIAF",
+        "target-type": "url",
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "direction": "forward",
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "attribute-values": {},
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "http://viaf.org/viaf/1516163706851729422097",
+          "id": "a93851f6-42ce-4213-87b6-34911cef1e92"
+        },
+        "attributes": [],
+        "end": null
+      },
+      {
+        "end": null,
+        "attributes": [],
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q109615751",
+          "id": "984bb2fb-8355-4516-b4ca-3724a8d9600a"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "direction": "forward",
+        "target-credit": "",
+        "source-credit": "",
+        "begin": null,
+        "target-type": "url",
+        "type": "wikidata"
+      },
+      {
+        "begin": null,
+        "source-credit": "",
+        "target-type": "url",
+        "type": "youtube",
+        "end": null,
+        "attributes": [],
+        "url": {
+          "id": "d9bf2566-792f-48fc-9d7e-92610c83c704",
+          "resource": "https://www.youtube.com/channel/UCSJR5QVczbr3fEDvwYxagPw"
+        },
+        "attribute-ids": {},
+        "attribute-values": {},
+        "ended": false,
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "target-credit": "",
+        "direction": "forward"
+      }
+    ],
+    "area": {
+      "type-id": null,
+      "name": "Belgium",
+      "type": null,
+      "id": "5b8a5ee5-0bb3-34cf-9a75-c27c44e341fc",
+      "sort-name": "Belgium",
+      "iso-3166-1-codes": [
+        "BE"
+      ],
+      "disambiguation": ""
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "genres": [
+      {
+        "count": 1,
+        "id": "608b0471-7531-4854-a348-e698c69cb699",
+        "name": "ambient",
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "name": "electronic",
+        "count": 2,
+        "id": "89255676-1f14-4dd8-bbad-fca839d6aff4"
+      },
+      {
+        "disambiguation": "",
+        "name": "jazz",
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "count": 3
+      }
+    ],
+    "aliases": [
+      {
+        "name": "Clara Joana Virginia Sinephro Cool",
+        "type": "Legal name",
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "ended": false,
+        "sort-name": "Sinephro Cool, Clara Joana Virginia",
+        "primary": null,
+        "end": null,
+        "locale": null,
+        "begin": null
+      },
+      {
+        "ended": false,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "name": "Clara Sinephro",
+        "type": "Legal name",
+        "sort-name": "Sinephro, Clara",
+        "primary": null,
+        "begin": null,
+        "locale": null,
+        "end": null
+      },
+      {
+        "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+        "ended": false,
+        "name": "Sinephro",
+        "type": "Artist name",
+        "primary": null,
+        "sort-name": "Sinephro",
+        "begin": null,
+        "locale": null,
+        "end": null
+      }
+    ],
+    "ipis": [
+      "00852011868"
+    ],
+    "life-span": {
+      "ended": false,
+      "end": null,
+      "begin": "1996-06"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/294c1c6f-f27c-42ee-aa88-ed19f282e267?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:45.108571+00:00",
+  "body": {
+    "isrcs": [],
+    "length": null,
+    "video": false,
+    "id": "294c1c6f-f27c-42ee-aa88-ed19f282e267",
+    "artist-credit": [
+      {
+        "name": "Blawan",
+        "artist": {
+          "id": "c27d4389-390e-497c-9a41-dd446ace742c",
+          "sort-name": "Blawan",
+          "name": "Blawan",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "disambiguation": "British techno producer & DJ",
+          "country": "GB",
+          "type": "Person"
+        },
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "2012",
+    "releases": [
+      {
+        "id": "687375de-9840-4675-9b20-71c0bc4342b9",
+        "packaging": null,
+        "date": "2012",
+        "packaging-id": null,
+        "status": null,
+        "status-id": null,
+        "quality": "normal",
+        "country": "GB",
+        "text-representation": {
+          "script": null,
+          "language": null
+        },
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "2012",
+            "area": {
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "name": "United Kingdom",
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "Humanity Test",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "GB",
+              "disambiguation": "UK electronic musician & DJ Anthony Child",
+              "type": "Person",
+              "id": "dcc5653c-3e3f-4666-a520-45fb032694a7",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Surgeon",
+              "sort-name": "Surgeon"
+            },
+            "name": "Surgeon",
+            "joinphrase": ""
+          }
+        ]
+      }
+    ],
+    "title": "Why They Hide Their Bodies Under My Garage",
+    "disambiguation": ""
+  }
+}

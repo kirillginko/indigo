@@ -1,0 +1,382 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/0773e58b-1a46-4fe9-bcc1-c6f384daf4bc?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:54.940861+00:00",
+  "body": {
+    "disambiguation": "",
+    "sort-name": "Hand, Kelli",
+    "genres": [],
+    "name": "Kelli Hand",
+    "area": {
+      "disambiguation": "",
+      "iso-3166-1-codes": [
+        "US"
+      ],
+      "sort-name": "United States",
+      "type": null,
+      "name": "United States",
+      "type-id": null,
+      "id": "489ce91b-6658-3307-9877-795b68554c98"
+    },
+    "relations": [
+      {
+        "type": "is person",
+        "attribute-ids": {},
+        "source-credit": "",
+        "type-id": "dd9886f2-1dfe-4270-97db-283f6839a666",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "artist": {
+          "id": "9a37a42b-6f86-48cd-84ec-9870860e752b",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Etat Solide",
+          "type": "Person",
+          "sort-name": "Etat Solide",
+          "disambiguation": "",
+          "country": "US"
+        },
+        "attributes": [],
+        "target-type": "artist",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "artist",
+        "attributes": [],
+        "direction": "forward",
+        "target-credit": "",
+        "artist": {
+          "country": "US",
+          "disambiguation": "",
+          "sort-name": "Rhythm Formation",
+          "name": "Rhythm Formation",
+          "type": "Group",
+          "id": "6cc12e14-16a8-4794-b2f6-1f7bca43ace4",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+        },
+        "type": "member of band",
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "type-id": "5be4c609-9afa-4ea0-910b-12ffb71e3821",
+        "end": null
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "discogs",
+        "url": {
+          "resource": "https://www.discogs.com/artist/1164",
+          "id": "85925cbc-286c-4999-b97b-037a8313900a"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": ""
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "official homepage",
+        "url": {
+          "resource": "http://www.k-handmusic.com/",
+          "id": "7f78bf5a-c24f-446c-8347-0e099cd65471"
+        },
+        "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2b15",
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": ""
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "id": "f3c95586-d6d3-4e13-93d8-33a8463e15c5",
+          "resource": "http://id.loc.gov/authorities/names/no2013086495"
+        },
+        "type": "other databases",
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "other databases",
+        "url": {
+          "resource": "https://d-nb.info/gnd/135059151",
+          "id": "fba11118-97f4-4750-b234-2eb853ec633e"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55"
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "url": {
+          "resource": "https://ra.co/dj/kellihand",
+          "id": "14eb4015-265e-4a27-8647-87721908911c"
+        },
+        "type": "other databases",
+        "attributes": [],
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "target-credit": ""
+      },
+      {
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "type": "other databases",
+        "url": {
+          "resource": "https://rateyourmusic.com/artist/k_hand",
+          "id": "972b3435-6112-4e1b-a5f1-5073be0d329a"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attributes": [],
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "target-credit": ""
+      },
+      {
+        "target-credit": "",
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "attributes": [],
+        "url": {
+          "id": "3fb6d08f-f85d-4429-b998-02d9eb36bf3d",
+          "resource": "https://www.worldcat.org/identities/lccn-no2013086495"
+        },
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "type": "other databases",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url"
+      },
+      {
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false,
+        "attributes": [],
+        "type": "social network",
+        "url": {
+          "id": "c527da5a-480d-4ebb-be5a-3b6989245685",
+          "resource": "https://twitter.com/khandmusic"
+        },
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward"
+      },
+      {
+        "type": "social network",
+        "type-id": "99429741-f3f6-484b-84f8-23af51991770",
+        "url": {
+          "id": "fd4eea0a-08df-435d-a68d-6511c2e5797f",
+          "resource": "https://www.facebook.com/khandmusic"
+        },
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-values": {},
+        "begin": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "ended": false,
+        "end": null,
+        "target-credit": "",
+        "attributes": []
+      },
+      {
+        "attribute-values": {},
+        "begin": null,
+        "target-type": "url",
+        "direction": "forward",
+        "type": "soundcloud",
+        "url": {
+          "id": "e66678d4-3c95-45c2-b8d7-24ebe7d05aa4",
+          "resource": "https://soundcloud.com/khand"
+        },
+        "type-id": "89e4a949-0976-440d-bda1-5f772c1e5710",
+        "attributes": [],
+        "target-credit": "",
+        "source-credit": "",
+        "attribute-ids": {},
+        "end": null,
+        "ended": false
+      },
+      {
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "url": {
+          "id": "73a8ca1b-f0e8-46b9-bf65-6b988d8ba83b",
+          "resource": "http://viaf.org/viaf/305202750"
+        },
+        "type": "VIAF",
+        "begin": null,
+        "attribute-values": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "ended": false,
+        "end": null,
+        "attribute-ids": {},
+        "source-credit": "",
+        "attributes": []
+      },
+      {
+        "direction": "forward",
+        "target-type": "url",
+        "begin": null,
+        "attribute-values": {},
+        "url": {
+          "resource": "https://www.wikidata.org/wiki/Q15284080",
+          "id": "93bc7f27-5bcb-465e-b072-2f1e42124d57"
+        },
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "type": "wikidata",
+        "attributes": [],
+        "end": null,
+        "ended": false,
+        "source-credit": "",
+        "attribute-ids": {},
+        "target-credit": ""
+      }
+    ],
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "gender": "Female",
+    "begin-area": {
+      "type": null,
+      "name": "Detroit",
+      "type-id": null,
+      "id": "b03ff310-d8e2-45cf-9455-769f76641eb2",
+      "disambiguation": "",
+      "sort-name": "Detroit"
+    },
+    "id": "0773e58b-1a46-4fe9-bcc1-c6f384daf4bc",
+    "ipis": [
+      "00233047009"
+    ],
+    "type": "Person",
+    "aliases": [
+      {
+        "name": "K Hand",
+        "type": null,
+        "end": null,
+        "primary": null,
+        "type-id": null,
+        "ended": false,
+        "sort-name": "K Hand",
+        "locale": null,
+        "begin": null
+      },
+      {
+        "sort-name": "K Hand Project No 4",
+        "end": null,
+        "primary": null,
+        "type-id": null,
+        "ended": false,
+        "name": "K Hand Project No 4",
+        "type": null,
+        "begin": null,
+        "locale": null
+      },
+      {
+        "locale": null,
+        "begin": null,
+        "name": "K-Hand",
+        "type": null,
+        "primary": null,
+        "end": null,
+        "type-id": null,
+        "ended": false,
+        "sort-name": "K-Hand"
+      },
+      {
+        "begin": null,
+        "locale": null,
+        "sort-name": "Hand, K.",
+        "end": null,
+        "primary": null,
+        "ended": false,
+        "type-id": null,
+        "name": "K. Hand",
+        "type": null
+      },
+      {
+        "name": "Kelli Maria Hand",
+        "type": "Legal name",
+        "primary": null,
+        "end": null,
+        "ended": false,
+        "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+        "sort-name": "Hand, Kelli Maria",
+        "locale": null,
+        "begin": null
+      }
+    ],
+    "tags": [
+      {
+        "count": 1,
+        "name": "warp"
+      }
+    ],
+    "end-area": {
+      "name": "Detroit",
+      "type": null,
+      "id": "b03ff310-d8e2-45cf-9455-769f76641eb2",
+      "type-id": null,
+      "disambiguation": "",
+      "sort-name": "Detroit"
+    },
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "country": "US",
+    "life-span": {
+      "begin": "1964-09-15",
+      "end": "2021-08-03",
+      "ended": true
+    },
+    "isnis": [
+      "0000000055543310"
+    ]
+  }
+}

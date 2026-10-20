@@ -1,0 +1,79 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/f00363cc-efe2-4cdf-a407-02ebc0c9867c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:17.807428+00:00",
+  "body": {
+    "id": "f00363cc-efe2-4cdf-a407-02ebc0c9867c",
+    "length": 218000,
+    "releases": [
+      {
+        "date": "1999",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "NL",
+              "disambiguation": "",
+              "sort-name": "Earth and Fire",
+              "type": "Group",
+              "name": "Earth and Fire",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "251e5d69-b1b5-44b4-bd5b-280440cb4b44"
+            },
+            "name": "Earth & Fire",
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "country": "NL",
+        "title": "Wild and Exciting",
+        "disambiguation": "",
+        "barcode": "731455909029",
+        "id": "e9fb4d0d-f414-42ea-b28b-780624dcc2b2",
+        "release-events": [
+          {
+            "date": "1999",
+            "area": {
+              "name": "Netherlands",
+              "type": null,
+              "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "NL"
+              ],
+              "disambiguation": "",
+              "sort-name": "Netherlands"
+            }
+          }
+        ],
+        "quality": "normal"
+      }
+    ],
+    "first-release-date": "1999",
+    "video": false,
+    "title": "What's Your Name",
+    "isrcs": [],
+    "artist-credit": [
+      {
+        "artist": {
+          "sort-name": "Earth and Fire",
+          "disambiguation": "",
+          "country": "NL",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "251e5d69-b1b5-44b4-bd5b-280440cb4b44",
+          "type": "Group",
+          "name": "Earth and Fire"
+        },
+        "joinphrase": "",
+        "name": "Earth & Fire"
+      }
+    ],
+    "disambiguation": ""
+  }
+}

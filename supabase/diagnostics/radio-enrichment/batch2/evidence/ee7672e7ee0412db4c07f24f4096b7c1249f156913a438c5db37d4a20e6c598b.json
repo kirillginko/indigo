@@ -1,0 +1,51 @@
+{
+  "url": "https://api.discogs.com/artists/5648334",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:42.217255+00:00",
+  "body": {
+    "name": "Rosalía (3)",
+    "id": 5648334,
+    "resource_url": "https://api.discogs.com/artists/5648334",
+    "uri": "https://www.discogs.com/artist/5648334-Rosalía-3",
+    "releases_url": "https://api.discogs.com/artists/5648334/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/xj3GJ7veXxo10-K9hB0aFl3qF-M8RuFEkhRZv30oadw/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU2NDgz/MzQtMTc5MDYzNjg1/NC02MDQ1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/xj3GJ7veXxo10-K9hB0aFl3qF-M8RuFEkhRZv30oadw/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU2NDgz/MzQtMTc5MDYzNjg1/NC02MDQ1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/H_tAuIwa9-cfPjbBlJTVoKZjRuntMq5KZCeC-NLOkAU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTU2NDgz/MzQtMTc5MDYzNjg1/NC02MDQ1LmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      }
+    ],
+    "realname": "Rosalía Vila Tobella",
+    "profile": "Rosalia Vila Tobella (born 25 September 1992, in Sant Cugat del Vallès, Barcelona), known mononymously as Rosalía, is a Spanish singer, songwriter, producer, actress and musician.\r\nShe has become known for her modern approach of flamenco music and for her genre-bending musical styles, evolving from folk to the mainstream and avant-pop.",
+    "urls": [
+      "https://rosalia.com/",
+      "https://open.spotify.com/artist/7ltDVBr6mKbRvohxheJ9h1?autoplay=true&v=A",
+      "https://www.youtube.com/channel/UCQt9awGIFZeldFsATZNeJag",
+      "https://twitter.com/rosalia",
+      "https://www.instagram.com/rosalia.vt/",
+      "https://www.instagram.com/holamotomami/",
+      "https://www.facebook.com/musicarosaliabarcelona/",
+      "https://en.wikipedia.org/wiki/Rosal%C3%ADa_Vila",
+      "https://www.tiktok.com/@rosalia?lang=es",
+      "https://www.setlist.fm/setlists/rosalia-13c3511d.html",
+      "https://www.rosaliabarcelona.com/"
+    ],
+    "namevariations": [
+      "ROSALÍA",
+      "Rosalia",
+      "Rosalía",
+      "ロザリア"
+    ],
+    "aliases": [
+      {
+        "id": 7123404,
+        "name": "Rosalía Vila Tobella",
+        "resource_url": "https://api.discogs.com/artists/7123404"
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

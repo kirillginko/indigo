@@ -1,0 +1,215 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/4c9da3fc-868b-4d3d-9872-328a15db00ca?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:48.092664+00:00",
+  "body": {
+    "title": "U-2 (medley): a. U-2 (part 1) / b. Automatic Eyes / c. U-2 (part 2) / d. U-2 (part 3)",
+    "disambiguation": "",
+    "first-release-date": "1983",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "artist": {
+          "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "name": "War",
+          "sort-name": "War",
+          "country": "US",
+          "disambiguation": "US funk/rock band",
+          "type": "Group"
+        },
+        "name": "War"
+      }
+    ],
+    "releases": [
+      {
+        "artist-credit": [
+          {
+            "artist": {
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "name": "War",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "country": "US",
+              "disambiguation": "US funk/rock band",
+              "type": "Group"
+            },
+            "name": "War",
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "title": "Life (Is So Strange)",
+        "barcode": null,
+        "release-events": [
+          {
+            "date": "1983",
+            "area": {
+              "type-id": null,
+              "name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "US",
+        "status": "Official",
+        "date": "1983",
+        "packaging-id": null,
+        "id": "72cb1925-80cd-434b-a2b5-8f5342fdf120",
+        "packaging": null
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "country": "US",
+              "disambiguation": "US funk/rock band",
+              "name": "War",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            },
+            "name": "War"
+          }
+        ],
+        "release-events": [
+          {
+            "date": "1996",
+            "area": {
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "sort-name": "United States",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "name": "United States",
+              "type-id": null,
+              "disambiguation": "",
+              "type": null
+            }
+          }
+        ],
+        "barcode": "081227228828",
+        "title": "Life (Is So Strange)",
+        "disambiguation": "",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "1996",
+        "status": "Official",
+        "packaging": "Jewel Case",
+        "id": "f456d567-55b9-44af-acae-425089b1dfb2",
+        "country": "US",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "country": null,
+        "status-id": null,
+        "quality": "normal",
+        "packaging-id": null,
+        "date": "1996",
+        "status": null,
+        "packaging": null,
+        "id": "bc45cd42-a6f8-4470-8fb6-12bc3d65e77d",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type": "Group",
+              "country": "US",
+              "disambiguation": "US funk/rock band",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "War",
+              "sort-name": "War",
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740"
+            },
+            "name": "War"
+          }
+        ],
+        "release-events": [
+          {
+            "area": null,
+            "date": "1996"
+          }
+        ],
+        "barcode": "743213073828",
+        "title": "Life (Is So Strange)",
+        "disambiguation": "",
+        "text-representation": {
+          "script": null,
+          "language": null
+        }
+      },
+      {
+        "date": "2010-12-07",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "id": "97d2ac4c-c6e3-434b-a790-3051d2a8e378",
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "XW",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "name": "War",
+            "artist": {
+              "id": "3e6bbdb8-66c8-439c-a3d9-87391ce88740",
+              "sort-name": "War",
+              "name": "War",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "disambiguation": "US funk/rock band",
+              "country": "US",
+              "type": "Group"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "barcode": "602527595061",
+        "release-events": [
+          {
+            "date": "2010-12-07",
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "Life (Is So Strange)"
+      }
+    ],
+    "length": 591000,
+    "video": false,
+    "id": "4c9da3fc-868b-4d3d-9872-328a15db00ca",
+    "isrcs": [
+      "USRHD0702973"
+    ]
+  }
+}

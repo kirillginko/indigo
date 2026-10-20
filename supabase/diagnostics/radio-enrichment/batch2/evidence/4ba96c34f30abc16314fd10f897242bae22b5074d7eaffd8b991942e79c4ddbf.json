@@ -1,0 +1,223 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/514a7a99-aca2-4a86-8ee1-f094e5ef3e08?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:28.904526+00:00",
+  "body": {
+    "releases": [
+      {
+        "status": "Official",
+        "barcode": "4988064114450",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "38a2215d-da6e-4de3-9441-b3afbe78e54f",
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "sort-name": "Japan",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type-id": null,
+              "type": null,
+              "name": "Japan"
+            },
+            "date": "1996-05-22"
+          }
+        ],
+        "disambiguation": "",
+        "title": "The Other Side of Me and Mores",
+        "quality": "normal",
+        "country": "JP",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "date": "1996-05-22",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "packaging": "Jewel Case",
+        "artist-credit": [
+          {
+            "name": "Paul Johnson",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "Chicago house music DJ/producer",
+              "sort-name": "Johnson, Paul",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "type": "Person",
+              "name": "Paul Johnson",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ]
+      },
+      {
+        "date": "1996",
+        "packaging": "Cardboard/Paper Sleeve",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "artist-credit": [
+          {
+            "name": "Paul Johnson",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "Chicago house music DJ/producer",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "sort-name": "Johnson, Paul",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Paul Johnson",
+              "type": "Person"
+            }
+          }
+        ],
+        "barcode": "765257075910",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": ""
+            },
+            "date": "1996"
+          }
+        ],
+        "id": "22351844-8b92-4969-be3f-4b7cb1dd030e",
+        "disambiguation": "",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "The Other Side of Me",
+        "quality": "normal"
+      },
+      {
+        "packaging": null,
+        "packaging-id": null,
+        "date": "1996",
+        "artist-credit": [
+          {
+            "name": "Paul Johnson",
+            "joinphrase": "",
+            "artist": {
+              "country": "US",
+              "disambiguation": "Chicago house music DJ/producer",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "sort-name": "Johnson, Paul",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "type": "Person",
+              "name": "Paul Johnson"
+            }
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "type-id": null,
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": ""
+            },
+            "date": "1996"
+          }
+        ],
+        "id": "2b6d2986-3644-4050-a87b-5c508b2d1ca5",
+        "status": "Official",
+        "barcode": null,
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "quality": "normal",
+        "title": "The Other Side of Me",
+        "disambiguation": ""
+      },
+      {
+        "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+        "status": "Promotion",
+        "barcode": "",
+        "release-events": [
+          {
+            "date": "1996",
+            "area": {
+              "sort-name": "Japan",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "type-id": null,
+              "type": null,
+              "name": "Japan",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "758b90dc-7681-4cf6-8e81-fbac1c8cd4d2",
+        "disambiguation": "mispress",
+        "text-representation": {
+          "language": null,
+          "script": null
+        },
+        "country": "JP",
+        "title": "The Other Side of Me - The Album",
+        "quality": "normal",
+        "date": "1996",
+        "packaging": null,
+        "packaging-id": null,
+        "artist-credit": [
+          {
+            "artist": {
+              "disambiguation": "Chicago house music DJ/producer",
+              "country": "US",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Paul Johnson",
+              "type": "Person",
+              "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+              "sort-name": "Johnson, Paul"
+            },
+            "joinphrase": "",
+            "name": "Paul Johnson"
+          }
+        ]
+      }
+    ],
+    "id": "514a7a99-aca2-4a86-8ee1-f094e5ef3e08",
+    "isrcs": [],
+    "length": 335000,
+    "first-release-date": "1996-05-22",
+    "title": "EQ",
+    "disambiguation": "",
+    "video": false,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "artist": {
+          "disambiguation": "Chicago house music DJ/producer",
+          "country": "US",
+          "type": "Person",
+          "name": "Paul Johnson",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "07065c90-1519-4bd9-8259-9872f3c9a776",
+          "sort-name": "Johnson, Paul"
+        },
+        "name": "Paul Johnson"
+      }
+    ]
+  }
+}

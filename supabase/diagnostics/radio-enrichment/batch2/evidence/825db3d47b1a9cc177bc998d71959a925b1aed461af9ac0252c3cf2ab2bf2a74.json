@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F630311&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:08.015295+00:00",
+  "body": {
+    "relations": [
+      {
+        "artist": {
+          "country": "FR",
+          "disambiguation": "1960s~2010s French variété singer Annie Gautrat / Stone & Charden",
+          "id": "ccf5389c-1cbe-4f86-8c92-cae8b87aaff8",
+          "name": "Stone",
+          "type": "Person",
+          "sort-name": "Stone",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+        },
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "begin": null,
+        "target-credit": "",
+        "end": null,
+        "target-type": "artist",
+        "attribute-ids": {},
+        "ended": false,
+        "attribute-values": {},
+        "type": "discogs",
+        "direction": "backward",
+        "source-credit": "",
+        "attributes": []
+      }
+    ],
+    "id": "5997d89f-ea48-4f7d-8fc2-3648a29e2429",
+    "resource": "https://www.discogs.com/artist/630311"
+  }
+}

@@ -1,0 +1,321 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/66ae17e6-659f-44c1-ac31-80df97c8663d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:00.871124+00:00",
+  "body": {
+    "length": 160800,
+    "title": "Losalamitoslatinfunklovesong",
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Gene Harris",
+        "artist": {
+          "type": "Person",
+          "name": "Gene Harris",
+          "sort-name": "Harris, Gene",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "1dbdc230-fe9c-4d71-b72e-88ba98800167",
+          "disambiguation": ""
+        }
+      }
+    ],
+    "id": "66ae17e6-659f-44c1-ac31-80df97c8663d",
+    "disambiguation": "",
+    "first-release-date": "2005-04-22",
+    "releases": [
+      {
+        "status": "Official",
+        "id": "3a2326a4-440c-38e0-be5c-9286e694a4bd",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2005-04-22",
+        "barcode": "724347446429",
+        "release-events": [
+          {
+            "area": {
+              "name": "Germany",
+              "type": null,
+              "sort-name": "Germany",
+              "type-id": null,
+              "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "DE"
+              ]
+            },
+            "date": "2005-04-22"
+          }
+        ],
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "name": "Jazzanova",
+              "disambiguation": "",
+              "id": "b5a6ea29-3065-4869-ac66-a44002e55d4d",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "DE",
+              "sort-name": "Jazzanova"
+            },
+            "joinphrase": "",
+            "name": "Jazzanova"
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Blue Note Trip, Volume 4: Lookin' Back / Movin' On",
+        "country": "DE",
+        "packaging": null,
+        "quality": "normal"
+      },
+      {
+        "date": "2005-05-09",
+        "release-events": [
+          {
+            "date": "2005-05-09",
+            "area": {
+              "type-id": null,
+              "sort-name": "Netherlands",
+              "iso-3166-1-codes": [
+                "NL"
+              ],
+              "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+              "disambiguation": "",
+              "name": "Netherlands",
+              "type": null
+            }
+          }
+        ],
+        "barcode": "724347446122",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "57bbc62b-860a-4565-9ddd-d9e70f45b60f",
+        "quality": "normal",
+        "packaging": null,
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "title": "Blue Note Trip, Volume 4: Lookin' Back / Movin' On",
+        "country": "NL",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Jazzanova",
+              "type": "Group",
+              "sort-name": "Jazzanova",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "DE",
+              "id": "b5a6ea29-3065-4869-ac66-a44002e55d4d",
+              "disambiguation": ""
+            },
+            "joinphrase": "",
+            "name": "Jazzanova"
+          }
+        ],
+        "packaging-id": null
+      },
+      {
+        "quality": "normal",
+        "packaging": "Jewel Case",
+        "country": "US",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "title": "Blue Note Trip, Volume 4: Lookin' Back / Movin' On",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Jazzanova",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "DE",
+              "disambiguation": "",
+              "id": "b5a6ea29-3065-4869-ac66-a44002e55d4d",
+              "name": "Jazzanova",
+              "type": "Group"
+            },
+            "name": "Jazzanova",
+            "joinphrase": ""
+          }
+        ],
+        "disambiguation": "",
+        "barcode": "094633049826",
+        "release-events": [
+          {
+            "date": "2005-09-13",
+            "area": {
+              "type": null,
+              "name": "United States",
+              "type-id": null,
+              "sort-name": "United States",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "date": "2005-09-13",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "id": "79d7c880-a6dd-354f-b960-5885103f36c5",
+        "status": "Official"
+      },
+      {
+        "id": "44de9af4-e258-44aa-b3ae-69c2f36887f5",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2005",
+        "release-events": [
+          {
+            "date": "2005",
+            "area": {
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "disambiguation": "",
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type-id": null,
+              "sort-name": "United States",
+              "name": "United States",
+              "type": null
+            }
+          }
+        ],
+        "barcode": "",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "name": "Jazzanova",
+            "joinphrase": "",
+            "artist": {
+              "name": "Jazzanova",
+              "type": "Group",
+              "country": "DE",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "sort-name": "Jazzanova",
+              "id": "b5a6ea29-3065-4869-ac66-a44002e55d4d",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "Blue Note Trip, Volume 4: Lookin' Back / Movin' On",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "US",
+        "packaging": "Jewel Case",
+        "quality": "normal"
+      },
+      {
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "type": "Group",
+              "name": "Jazzanova",
+              "id": "b5a6ea29-3065-4869-ac66-a44002e55d4d",
+              "disambiguation": "",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "DE",
+              "sort-name": "Jazzanova"
+            },
+            "joinphrase": "",
+            "name": "Jazzanova"
+          }
+        ],
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "title": "Blue Note Trip, Volume 4: Lookin' Back / Movin' On",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "country": "GB",
+        "packaging": "Jewel Case",
+        "quality": "normal",
+        "id": "339a5b7d-da89-41c3-b72b-dee244d94e09",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "date": "2005",
+        "release-events": [
+          {
+            "area": {
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom",
+              "type-id": null,
+              "type": null,
+              "name": "United Kingdom"
+            },
+            "date": "2005"
+          }
+        ],
+        "barcode": "724347446429"
+      },
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "id": "f8f1b3e6-5d57-4d12-9c03-07aa3bdc2a1c",
+        "barcode": "724347462016",
+        "release-events": [
+          {
+            "date": "2005",
+            "area": {
+              "type": null,
+              "name": "Netherlands",
+              "iso-3166-1-codes": [
+                "NL"
+              ],
+              "id": "ef1b7cc0-cd26-36f4-8ea0-04d9623786c7",
+              "disambiguation": "",
+              "type-id": null,
+              "sort-name": "Netherlands"
+            }
+          }
+        ],
+        "date": "2005",
+        "country": "NL",
+        "title": "Blue Note Trip: Movin' On",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Jazzanova",
+            "artist": {
+              "id": "b5a6ea29-3065-4869-ac66-a44002e55d4d",
+              "disambiguation": "",
+              "sort-name": "Jazzanova",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "DE",
+              "name": "Jazzanova",
+              "type": "Group"
+            }
+          }
+        ],
+        "packaging-id": null,
+        "disambiguation": "Unmixed",
+        "quality": "normal",
+        "packaging": null
+      }
+    ],
+    "video": false,
+    "isrcs": [
+      "USBN29400150"
+    ]
+  }
+}

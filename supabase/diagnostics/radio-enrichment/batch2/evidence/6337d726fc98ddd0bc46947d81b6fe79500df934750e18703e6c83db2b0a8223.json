@@ -1,0 +1,113 @@
+{
+  "url": "https://api.discogs.com/artists/1300441",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:34.007011+00:00",
+  "body": {
+    "name": "SALEM (6)",
+    "id": 1300441,
+    "resource_url": "https://api.discogs.com/artists/1300441",
+    "uri": "https://www.discogs.com/artist/1300441-SALEM-6",
+    "releases_url": "https://api.discogs.com/artists/1300441/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/p8mXIgMn36E7Yr8grRiwP4fsXO9owHrpjfHHr9tNhEI/rs:fit/g:sm/q:90/h:600/w:397/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTY0Mjk2MzYy/NS03NzY3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/p8mXIgMn36E7Yr8grRiwP4fsXO9owHrpjfHHr9tNhEI/rs:fit/g:sm/q:90/h:600/w:397/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTY0Mjk2MzYy/NS03NzY3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/z6z5pbc4EShgEV6TIo8a9UqD6XamTV9z_zX7P6rHrn8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTY0Mjk2MzYy/NS03NzY3LmpwZWc.jpeg",
+        "width": 397,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Hwt-TVd2beOpxsD_BCiKcBOue5wHqlmj2N9Dbcy0OiE/rs:fit/g:sm/q:90/h:396/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTYxOTU4NTU0/NC0yODg3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/Hwt-TVd2beOpxsD_BCiKcBOue5wHqlmj2N9Dbcy0OiE/rs:fit/g:sm/q:90/h:396/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTYxOTU4NTU0/NC0yODg3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/HtgiDpVh1CUT9x98F7Kw1WOadV1m_3hY3PC7qlSNj4I/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTYxOTU4NTU0/NC0yODg3LmpwZWc.jpeg",
+        "width": 600,
+        "height": 396
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/RX9KgGXX__vranInltOeb2jSJGauJ1sidQMwYH-9edI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTMzMTA1NDQ3/Mi5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/RX9KgGXX__vranInltOeb2jSJGauJ1sidQMwYH-9edI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTMzMTA1NDQ3/Mi5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/gXoaVQjvLP9-WhGw85_1QhTsGt8EltISQcfkCJSLIPg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTMzMTA1NDQ3/Mi5qcGVn.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ybcaSJyXTmYBxK8BF_kx2c2Y2eC9zBjCGcDsQitGC4E/rs:fit/g:sm/q:90/h:333/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTYyOTk4MjA0/MS0zODg5LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/ybcaSJyXTmYBxK8BF_kx2c2Y2eC9zBjCGcDsQitGC4E/rs:fit/g:sm/q:90/h:333/w:500/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTYyOTk4MjA0/MS0zODg5LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/7meA_GB-oPQwffeTBrG7MNcMGSySq7jXJQ3NKCC7_Aw/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTYyOTk4MjA0/MS0zODg5LmpwZWc.jpeg",
+        "width": 500,
+        "height": 333
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/CZw7vyhx-Pby8s00GHqDs87rVOyvACkr27JSOKgsbSw/rs:fit/g:sm/q:90/h:412/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTQ3MTg4MjMy/OC00MTI0LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/CZw7vyhx-Pby8s00GHqDs87rVOyvACkr27JSOKgsbSw/rs:fit/g:sm/q:90/h:412/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTQ3MTg4MjMy/OC00MTI0LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/ZvK-q26HuWoRVqlKvXoL1hFXE1Nz_LePGbcAg-nQoyk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTQ3MTg4MjMy/OC00MTI0LmpwZWc.jpeg",
+        "width": 600,
+        "height": 412
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/SfBrL-5y_fIU60SJ0IUwFAXJCiyQrC1qLx-ALs_xQko/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTQ3MTg4MjEw/MC04MTYyLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/SfBrL-5y_fIU60SJ0IUwFAXJCiyQrC1qLx-ALs_xQko/rs:fit/g:sm/q:90/h:400/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTQ3MTg4MjEw/MC04MTYyLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/D6j3NGaK4KtkJsR6DUxQBO1XQn-EAbD3n665IXKCJHI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTQ3MTg4MjEw/MC04MTYyLmpwZWc.jpeg",
+        "width": 600,
+        "height": 400
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ym68AuTzjf0-Ne1nSAeKCIvLYNdGFRpBRkvfS5hOsFU/rs:fit/g:sm/q:90/h:353/w:530/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTI4MTgxODEz/MS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/ym68AuTzjf0-Ne1nSAeKCIvLYNdGFRpBRkvfS5hOsFU/rs:fit/g:sm/q:90/h:353/w:530/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTI4MTgxODEz/MS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/UUPzMnK1dM4JIVRNjhEo73DbtPjCDekWN24Spt_FfRo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTI4MTgxODEz/MS5qcGVn.jpeg",
+        "width": 530,
+        "height": 353
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/a3CDvYrXs0eS7TWrE-8OGKMv2ACLPE5jT816W6Gm84s/rs:fit/g:sm/q:90/h:360/w:540/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTI0ODQ2MjAx/OS5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/a3CDvYrXs0eS7TWrE-8OGKMv2ACLPE5jT816W6Gm84s/rs:fit/g:sm/q:90/h:360/w:540/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTI0ODQ2MjAx/OS5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/dI-us9AeHBkzhpyMcHYRGBY5xEHRPVmEKXe_1EPX-hA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEzMDA0/NDEtMTI0ODQ2MjAx/OS5qcGVn.jpeg",
+        "width": 540,
+        "height": 360
+      }
+    ],
+    "profile": "US band from Traverse City and Chicago, founded 2006.",
+    "urls": [
+      "http://www.s4lem.com/",
+      "https://www.facebook.com/SALEMGROUP/",
+      "http://www.myspace.com/s4lem",
+      "https://s4lem.bandcamp.com",
+      "http://en.wikipedia.org/wiki/Salem_(Michigan_band)"
+    ],
+    "namevariations": [
+      "$4L3M",
+      "$4LEM",
+      "S4LEM",
+      "Salem"
+    ],
+    "members": [
+      {
+        "id": 1703817,
+        "name": "Heather Marlatt",
+        "resource_url": "https://api.discogs.com/artists/1703817",
+        "active": false
+      },
+      {
+        "id": 2191342,
+        "name": "Jack Donoghue",
+        "resource_url": "https://api.discogs.com/artists/2191342",
+        "active": true
+      },
+      {
+        "id": 2478163,
+        "name": "John Holland (5)",
+        "resource_url": "https://api.discogs.com/artists/2478163",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

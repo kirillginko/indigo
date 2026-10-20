@@ -1,0 +1,69 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/bee0af84-b672-428b-935c-956269876b3d?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:13.852092+00:00",
+  "body": {
+    "length": 181706,
+    "artist-credit": [
+      {
+        "joinphrase": "",
+        "name": "Martin Denny",
+        "artist": {
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "Denny, Martin",
+          "type": "Person",
+          "disambiguation": "",
+          "name": "Martin Denny",
+          "id": "186edc09-db32-4d4f-ba71-eed418630c83",
+          "country": "US"
+        }
+      }
+    ],
+    "first-release-date": "2012-06-08",
+    "title": "Martinique",
+    "id": "bee0af84-b672-428b-935c-956269876b3d",
+    "releases": [
+      {
+        "title": "Caro Emerald Presents: Drum Rolls & Heart Breaks",
+        "quality": "normal",
+        "packaging": "Digipak",
+        "barcode": "0600753385791",
+        "artist-credit": [
+          {
+            "name": "Caro Emerald",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Emerald, Caro",
+              "type": "Person",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "NL",
+              "name": "Caro Emerald",
+              "id": "38bbbd07-9d89-4ff1-9a4e-28e48f57d63a",
+              "disambiguation": ""
+            }
+          }
+        ],
+        "id": "84115a85-f587-4b22-9d1a-f0bd62e25fd9",
+        "date": "2012-06-08",
+        "release-events": [
+          {
+            "area": null,
+            "date": "2012-06-08"
+          }
+        ],
+        "packaging-id": "8f931351-d2e2-310f-afc6-37b89ddba246",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "status": "Official",
+        "country": null,
+        "disambiguation": ""
+      }
+    ],
+    "isrcs": [],
+    "disambiguation": "",
+    "video": false
+  }
+}

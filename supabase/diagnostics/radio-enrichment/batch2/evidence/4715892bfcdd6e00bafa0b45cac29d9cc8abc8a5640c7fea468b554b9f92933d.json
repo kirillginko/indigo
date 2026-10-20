@@ -1,0 +1,125 @@
+{
+  "url": "https://api.discogs.com/artists/29966",
+  "status": 200,
+  "checked_at": "2026-10-20T01:21:03.214729+00:00",
+  "body": {
+    "name": "Gene Harris",
+    "id": 29966,
+    "resource_url": "https://api.discogs.com/artists/29966",
+    "uri": "https://www.discogs.com/artist/29966-Gene-Harris",
+    "releases_url": "https://api.discogs.com/artists/29966/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/iaXFDc9Ic5TQLvIQhIxQkyy5i5y6pJnPUNmvhG86bmU/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI5OTY2/LTE3MjE2MzIzMjgt/NDk5MC5qcGVn.jpeg",
+        "resource_url": "https://i.discogs.com/iaXFDc9Ic5TQLvIQhIxQkyy5i5y6pJnPUNmvhG86bmU/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI5OTY2/LTE3MjE2MzIzMjgt/NDk5MC5qcGVn.jpeg",
+        "uri150": "https://i.discogs.com/H_VfFSvrth-zhzDjD1G2wqklHKQfzzY7GTMKsjdjnf0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI5OTY2/LTE3MjE2MzIzMjgt/NDk5MC5qcGVn.jpeg",
+        "width": 600,
+        "height": 600
+      }
+    ],
+    "realname": "Eugene Haire",
+    "profile": "American jazz pianist and keyboard player.\nBorn on 1 September 1933 in Benton Harbor, Michigan, USA.\nDied on 16 January 2000 in Boise, Idaho, USA. \nFather of [a58266].\n",
+    "urls": [
+      "https://web.archive.org/web/20150511153156/http://www.geneharris.org/",
+      "https://www.bluenote.com/artist/gene-harris/",
+      "https://en.wikipedia.org/wiki/Gene_Harris",
+      "https://www.allmusic.com/artist/gene-harris-mn0000802745",
+      "https://boise.citycast.fm/boise-history/history-gene-harris-boise-soul-jazz-pianist",
+      "https://www.boisestate.edu/geneharris/",
+      "https://www.paulkreibich.com/groove-notes-blog/memories-of-gene-harris-1933-2000",
+      "https://web.archive.org/web/20150906021722/http://www.jazz.com/encyclopedia/harris-gene-haire-eugene"
+    ],
+    "namevariations": [
+      "C. Harris",
+      "E. Haire",
+      "Eddie Harris",
+      "Eugene Haire",
+      "G. Haire",
+      "G. Harris",
+      "Gene G. Harris",
+      "Gene Haire",
+      "Gene Harrris",
+      "Haire",
+      "Harris",
+      "unknown",
+      "Дж. Харрис",
+      "ジーン・ハリス"
+    ],
+    "groups": [
+      {
+        "id": 296953,
+        "name": "Ray Brown Trio",
+        "resource_url": "https://api.discogs.com/artists/296953",
+        "active": false
+      },
+      {
+        "id": 359857,
+        "name": "The Three Sounds",
+        "resource_url": "https://api.discogs.com/artists/359857",
+        "active": true
+      },
+      {
+        "id": 989044,
+        "name": "The Gene Harris Quartet",
+        "resource_url": "https://api.discogs.com/artists/989044",
+        "active": true
+      },
+      {
+        "id": 989045,
+        "name": "The Gene Harris All Star Big Band",
+        "resource_url": "https://api.discogs.com/artists/989045",
+        "active": true
+      },
+      {
+        "id": 989048,
+        "name": "The Gene Harris Trio Plus One",
+        "resource_url": "https://api.discogs.com/artists/989048",
+        "active": true
+      },
+      {
+        "id": 2086330,
+        "name": "The Philip Morris Superband",
+        "resource_url": "https://api.discogs.com/artists/2086330",
+        "active": true
+      },
+      {
+        "id": 2421070,
+        "name": "The Gene Harris/Scott Hamilton Quintet",
+        "resource_url": "https://api.discogs.com/artists/2421070",
+        "active": true
+      },
+      {
+        "id": 2641935,
+        "name": "Ray Brown's All Stars",
+        "resource_url": "https://api.discogs.com/artists/2641935",
+        "active": true
+      },
+      {
+        "id": 2913097,
+        "name": "The Gene Harris Trio",
+        "resource_url": "https://api.discogs.com/artists/2913097",
+        "active": true
+      },
+      {
+        "id": 3188969,
+        "name": "Concord Jazz All Stars",
+        "resource_url": "https://api.discogs.com/artists/3188969",
+        "active": true
+      },
+      {
+        "id": 3518963,
+        "name": "Nat Adderley Quartet",
+        "resource_url": "https://api.discogs.com/artists/3518963",
+        "active": true
+      },
+      {
+        "id": 18230334,
+        "name": "Mel Rhyne Sextet",
+        "resource_url": "https://api.discogs.com/artists/18230334",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "url": "https://api.discogs.com/artists/270578",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:56.637047+00:00",
+  "body": {
+    "name": "Spirit (8)",
+    "id": 270578,
+    "resource_url": "https://api.discogs.com/artists/270578",
+    "uri": "https://www.discogs.com/artist/270578-Spirit-8",
+    "releases_url": "https://api.discogs.com/artists/270578/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/c2UTibVcbnSWETvSvjv50afvVDc5grD6WN4X9tQuL0g/rs:fit/g:sm/q:90/h:600/w:426/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xMzQ5MjI0NjU2/LTYxMzcuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/c2UTibVcbnSWETvSvjv50afvVDc5grD6WN4X9tQuL0g/rs:fit/g:sm/q:90/h:600/w:426/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xMzQ5MjI0NjU2/LTYxMzcuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/HUyJJCcZwzo53gGSJnnuN2UrnlObD2GlcmxXZMPXJiA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xMzQ5MjI0NjU2/LTYxMzcuanBlZw.jpeg",
+        "width": 426,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/11o6HenS17ZgLkCfCb6aOOn085-NH8ltjfHWD03SRho/rs:fit/g:sm/q:90/h:427/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNjkwNjE3MTcz/LTEzNjkuanBlZw.jpeg",
+        "resource_url": "https://i.discogs.com/11o6HenS17ZgLkCfCb6aOOn085-NH8ltjfHWD03SRho/rs:fit/g:sm/q:90/h:427/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNjkwNjE3MTcz/LTEzNjkuanBlZw.jpeg",
+        "uri150": "https://i.discogs.com/ZY9bbh9BtZ6uhr44Anfyvew1IbvR8Tyc2mSa2Hx9AJY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNjkwNjE3MTcz/LTEzNjkuanBlZw.jpeg",
+        "width": 600,
+        "height": 427
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/ZMpkT-YmVXj67CZTHFvdkPuM26OZj2mJcZQRAFNDBss/rs:fit/g:sm/q:90/h:600/w:382/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xMjQ5MDgxNjE5/LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/ZMpkT-YmVXj67CZTHFvdkPuM26OZj2mJcZQRAFNDBss/rs:fit/g:sm/q:90/h:600/w:382/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xMjQ5MDgxNjE5/LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/w54MnY7L5BF5ApZfYAe69hCn9VJfm2Tm65aeGzLt4Xk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xMjQ5MDgxNjE5/LmpwZWc.jpeg",
+        "width": 382,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/Tq7BDEJutn8eKXV8RHXqEi5l2PwbPEb9-6r4mETKEl4/rs:fit/g:sm/q:90/h:361/w:388/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzkx/LTY5MTkucG5n.jpeg",
+        "resource_url": "https://i.discogs.com/Tq7BDEJutn8eKXV8RHXqEi5l2PwbPEb9-6r4mETKEl4/rs:fit/g:sm/q:90/h:361/w:388/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzkx/LTY5MTkucG5n.jpeg",
+        "uri150": "https://i.discogs.com/NmYT01LXBiOUlxbhU5pjipiWsllGYiwsn_FMQe18OIs/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzkx/LTY5MTkucG5n.jpeg",
+        "width": 388,
+        "height": 361
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/AtI-YyCpSVCfpy-QqnlgSZ3kEZE3-pSweq4OTKMK8NY/rs:fit/g:sm/q:90/h:436/w:542/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzk3/LTQwMjIucG5n.jpeg",
+        "resource_url": "https://i.discogs.com/AtI-YyCpSVCfpy-QqnlgSZ3kEZE3-pSweq4OTKMK8NY/rs:fit/g:sm/q:90/h:436/w:542/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzk3/LTQwMjIucG5n.jpeg",
+        "uri150": "https://i.discogs.com/hWmm7Tq2Jzmj_Af7Kx-q5UswKyjyWw1G4G4YlqZl3kM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzk3/LTQwMjIucG5n.jpeg",
+        "width": 542,
+        "height": 436
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/IRuOdDopWmtDRgerRQI296OSQ9vq6duYTlwQNfToIGA/rs:fit/g:sm/q:90/h:417/w:535/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzkz/LTg2NzYucG5n.jpeg",
+        "resource_url": "https://i.discogs.com/IRuOdDopWmtDRgerRQI296OSQ9vq6duYTlwQNfToIGA/rs:fit/g:sm/q:90/h:417/w:535/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzkz/LTg2NzYucG5n.jpeg",
+        "uri150": "https://i.discogs.com/iEYfwg8RTMGI6v6YIJ_qyI350G7LaYwA4OM4BbRagek/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTI3MDU3/OC0xNTU4MjM5Mzkz/LTg2NzYucG5n.jpeg",
+        "width": 535,
+        "height": 417
+      }
+    ],
+    "profile": "Spirit was an American west coast psychedelic rock band founded in 1967 and based in Los Angeles, California. They were one of the first groups to record for the newly formed Columbia subsidiary label Ode Records in 1968, and their self titled debut LP \"Spirit\" was released shortly thereafter. A single from the LP was released, but failed to chart, Spirit returned the studio later that year to record their second LP titled \"The Family That Plays Together\". A single from this album titled \"I Got a Line on You\" went on to become a minor hit in the US, and was pivotal in establishing them as a commercially successful group in the 1970's. Their fourth LP, released in 1971, \"Twelve Dreams of Dr. Sardonicus.\" became their best selling album and is listed in the top 500 rock albums of all time by Rolling Stone Magazine. \r\n\r\nOriginal lineup\r\n[a=Randy California] - guitar, vocals (1967–72, 1972–73, 1974–79, 1982–97; died 1997)\r\n[a=Ed Cassidy] - drums (1967–72, 1972–73, 1974–79, 1982–97; died 2012)\r\n[a=John Locke] - keyboards (1967–72, 1976, 1982–85, 1988–89; died 2006)\r\n[a=Mark Andes] - bass (1967–71, 1974, 1976, 1982–85, 1988–89)\r\n[a=Jay Ferguson] - vocals, percussion (1967–71, 1976, 1982–85)",
+    "urls": [
+      "http://randycaliforniaandspirit.com/",
+      "https://en.wikipedia.org/wiki/Spirit_(band)",
+      "https://www.progarchives.com/artist.asp?id=2643",
+      "https://www.imdb.com/name/nm3083211/",
+      "https://www.allmusic.com/artist/spirit-mn0000746010"
+    ],
+    "namevariations": [
+      "Spirit Carlin",
+      "The Spirit"
+    ],
+    "members": [
+      {
+        "id": 240613,
+        "name": "Jay Ferguson",
+        "resource_url": "https://api.discogs.com/artists/240613",
+        "active": true
+      },
+      {
+        "id": 275974,
+        "name": "Randy California",
+        "resource_url": "https://api.discogs.com/artists/275974",
+        "active": true
+      },
+      {
+        "id": 336761,
+        "name": "Jeff Baxter",
+        "resource_url": "https://api.discogs.com/artists/336761",
+        "active": true
+      },
+      {
+        "id": 379641,
+        "name": "Barry Keene",
+        "resource_url": "https://api.discogs.com/artists/379641",
+        "active": false
+      },
+      {
+        "id": 382076,
+        "name": "John Locke",
+        "resource_url": "https://api.discogs.com/artists/382076",
+        "active": true
+      },
+      {
+        "id": 504642,
+        "name": "Mark Andes",
+        "resource_url": "https://api.discogs.com/artists/504642",
+        "active": true
+      },
+      {
+        "id": 545993,
+        "name": "Mike Bunnell",
+        "resource_url": "https://api.discogs.com/artists/545993",
+        "active": true
+      },
+      {
+        "id": 545994,
+        "name": "Ed Cassidy",
+        "resource_url": "https://api.discogs.com/artists/545994",
+        "active": true
+      },
+      {
+        "id": 554139,
+        "name": "Stu Perry",
+        "resource_url": "https://api.discogs.com/artists/554139",
+        "active": false
+      },
+      {
+        "id": 643827,
+        "name": "Matt Andes",
+        "resource_url": "https://api.discogs.com/artists/643827",
+        "active": true
+      },
+      {
+        "id": 674450,
+        "name": "John Staehely",
+        "resource_url": "https://api.discogs.com/artists/674450",
+        "active": false
+      },
+      {
+        "id": 674465,
+        "name": "Al Staehely",
+        "resource_url": "https://api.discogs.com/artists/674465",
+        "active": false
+      },
+      {
+        "id": 1058071,
+        "name": "Scott Monahan",
+        "resource_url": "https://api.discogs.com/artists/1058071",
+        "active": true
+      },
+      {
+        "id": 1227234,
+        "name": "Larry Knight",
+        "resource_url": "https://api.discogs.com/artists/1227234",
+        "active": false
+      },
+      {
+        "id": 2743917,
+        "name": "Randy Wolfe",
+        "resource_url": "https://api.discogs.com/artists/2743917",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

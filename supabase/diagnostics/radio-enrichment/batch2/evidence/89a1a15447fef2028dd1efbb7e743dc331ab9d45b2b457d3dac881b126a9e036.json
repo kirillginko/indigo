@@ -1,0 +1,11 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22BELLY+UP%22+AND+artist%3A%22Moin%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:20:37.014032+00:00",
+  "body": {
+    "created": "2026-10-20T01:20:36.937Z",
+    "count": 0,
+    "offset": 0,
+    "recordings": []
+  }
+}

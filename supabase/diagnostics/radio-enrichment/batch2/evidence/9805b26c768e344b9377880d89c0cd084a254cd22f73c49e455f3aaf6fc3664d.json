@@ -1,0 +1,188 @@
+{
+  "url": "https://api.discogs.com/artists/7142",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:31.428461+00:00",
+  "body": {
+    "name": "The Art Of Noise",
+    "id": 7142,
+    "resource_url": "https://api.discogs.com/artists/7142",
+    "uri": "https://www.discogs.com/artist/7142-The-Art-Of-Noise",
+    "releases_url": "https://api.discogs.com/artists/7142/releases",
+    "images": [
+      {
+        "type": "primary",
+        "uri": "https://i.discogs.com/YWSduzyppcOX5ZSt0a96LSGajp1Tzrox4K85LePM8PI/rs:fit/g:sm/q:90/h:600/w:582/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg3MC0x/NzE3LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/YWSduzyppcOX5ZSt0a96LSGajp1Tzrox4K85LePM8PI/rs:fit/g:sm/q:90/h:600/w:582/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg3MC0x/NzE3LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/uvem3LrPc39QKE5GVx53LcC_7NcRKx0P5cCCxHSaDac/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg3MC0x/NzE3LmpwZWc.jpeg",
+        "width": 582,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/hi5oLg5eicFmvK3TCWd0x2kD0MSQrFHgrKlXZx4Fe-s/rs:fit/g:sm/q:90/h:428/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTM5NTkyNTE1My0z/MDY2LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/hi5oLg5eicFmvK3TCWd0x2kD0MSQrFHgrKlXZx4Fe-s/rs:fit/g:sm/q:90/h:428/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTM5NTkyNTE1My0z/MDY2LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/bPrm2tZwIc3xv2SwEdJhcPmBQlrnt8rhcOE9xvcSQBI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTM5NTkyNTE1My0z/MDY2LmpwZWc.jpeg",
+        "width": 599,
+        "height": 428
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/SimoaYwiSwY-Zzt3W_0zjWBSgGIXOfsOh39XhqY1kgc/rs:fit/g:sm/q:90/h:466/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5MzAwMi0z/Njc1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/SimoaYwiSwY-Zzt3W_0zjWBSgGIXOfsOh39XhqY1kgc/rs:fit/g:sm/q:90/h:466/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5MzAwMi0z/Njc1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/0tVOcr14xPrPnx6vNHMucWPiC22n_9qgTN9EhF8Gji8/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5MzAwMi0z/Njc1LmpwZWc.jpeg",
+        "width": 600,
+        "height": 466
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/D-PU2VClyRUcbRHchCuKbg14v6R__7G3-DELggR7ZlE/rs:fit/g:sm/q:90/h:574/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTM5NTkyNTI4My0z/MzEzLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/D-PU2VClyRUcbRHchCuKbg14v6R__7G3-DELggR7ZlE/rs:fit/g:sm/q:90/h:574/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTM5NTkyNTI4My0z/MzEzLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/9MOnjOHuC0Xm0jDeMZgXz3PrCanYP9GfPcuDVhUd6_c/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTM5NTkyNTI4My0z/MzEzLmpwZWc.jpeg",
+        "width": 598,
+        "height": 574
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/qd4X1tvGK1RzL9QvAp1vTfJru9T4nVWMGrT0fYa-OZ0/rs:fit/g:sm/q:90/h:326/w:580/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTQ1ODUwMzQ2My01/MDAzLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/qd4X1tvGK1RzL9QvAp1vTfJru9T4nVWMGrT0fYa-OZ0/rs:fit/g:sm/q:90/h:326/w:580/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTQ1ODUwMzQ2My01/MDAzLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/5uidgfkbGBPGZy1ohPwQg8q5OPRFmioH5iK_q8wvORA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTQ1ODUwMzQ2My01/MDAzLmpwZWc.jpeg",
+        "width": 580,
+        "height": 326
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/UzUkskHjTuzxrfeWz1tJJ3oSktHtqleyg7e1Tk7x88E/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg0NS03/MDc1LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/UzUkskHjTuzxrfeWz1tJJ3oSktHtqleyg7e1Tk7x88E/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg0NS03/MDc1LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/Gh_0geLHUGO1sBgTFH8oR-qXrTwRSqDdQhWB8HX2rkU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg0NS03/MDc1LmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/F23twhGf1J8dLyNO-bzSiH9G93ScjqNvmTIdWgdDcvI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1MC00/MjUzLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/F23twhGf1J8dLyNO-bzSiH9G93ScjqNvmTIdWgdDcvI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1MC00/MjUzLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/4XChLCZTkOTfBUFR1S3ml0HY4ug7zMEAKPQpqm6789M/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1MC00/MjUzLmpwZWc.jpeg",
+        "width": 600,
+        "height": 600
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/fnM-7KgtQgV8vl5dHLikTVRZsAYaGKy0FA19_F2iASk/rs:fit/g:sm/q:90/h:396/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg3My01/Mjk4LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/fnM-7KgtQgV8vl5dHLikTVRZsAYaGKy0FA19_F2iASk/rs:fit/g:sm/q:90/h:396/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg3My01/Mjk4LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/0QwYeAa9-NvtTse_aYY4XzsB9XQl4rPXT1yYSTPZbrk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg3My01/Mjk4LmpwZWc.jpeg",
+        "width": 600,
+        "height": 396
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/sCCP7-EZg0aeO-Oz1HwrDnzgCreKf3I_9c452N9NnXI/rs:fit/g:sm/q:90/h:315/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1OC05/NzMyLmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/sCCP7-EZg0aeO-Oz1HwrDnzgCreKf3I_9c452N9NnXI/rs:fit/g:sm/q:90/h:315/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1OC05/NzMyLmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/aYln4_sLL1ClcA_IM0ANpl-SDmo1aLdqKSSGmwEbHK4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1OC05/NzMyLmpwZWc.jpeg",
+        "width": 600,
+        "height": 315
+      },
+      {
+        "type": "secondary",
+        "uri": "https://i.discogs.com/s-7N8I0a7r2TvoQ7miaWhShBoijcIxvdPEKqqjEW_90/rs:fit/g:sm/q:90/h:329/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1OS04/NTM2LmpwZWc.jpeg",
+        "resource_url": "https://i.discogs.com/s-7N8I0a7r2TvoQ7miaWhShBoijcIxvdPEKqqjEW_90/rs:fit/g:sm/q:90/h:329/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1OS04/NTM2LmpwZWc.jpeg",
+        "uri150": "https://i.discogs.com/2RQ9wEWFBAlqyZQLpt8RV7UAZAQOLB1OxpJm1OTbZc0/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTcxNDIt/MTY2MjI5Mjg1OS04/NTM2LmpwZWc.jpeg",
+        "width": 600,
+        "height": 329
+      }
+    ],
+    "profile": "British art-pop group established in 1983. \r\n\r\nThe Art Of Noise scored hits with \"[m=2175]\" (1984), \"[url=https://www.discogs.com/master/3131-Art-Of-Noise-Beat-Box-Close-To-The-Edit]Close (To The Edit)[/url]\" (1985), \"[m=3650]\" (1985), \"[m=3213]\" (1986), and cover versions with guest performers, including guitarist [a=Duane Eddy] on a version of [a=Henry Mancini]'s \"Peter Gunn\", from album \"[m=2600]\" (1986), and [url=http://www.discogs.com/artist/Prince+And+The+Revolution]Prince[/url]'s \"[m=2888]\" (1988) featuring singer [a=Tom Jones]. \r\n\r\nOften cited as a pioneer in commercial electronic music and sampling, TAON used technology to rework the same recordings many times over, a novel approach at the time. Although only a relatively small amount of original material was commercially released during the project's active periods (1983-1989 and 1998-2000), their legacy includes scores of reissues, remixes, and compilations of previously released and unreleased material. \r\n\r\nThe group began as a project of studio engineer [a=Gary Langan] and Fairlight sampler whiz [a=J.J. Jeczalik], who were working together with producer/performer [a=Trevor Horn] and pianist/composer/arranger [a=Anne Dudley] on several of Horn's productions for other artists. Writer [a=Paul Morley] was brought in to tailor the group's image, which was at first that of a faceless \"non-group\" inspired by early 20th Century modernism. \r\n\r\nAn acrimonious split in 1985 left the group as a trio, sans Horn and Morley, and with a more tongue-in-cheek musical direction. Langan moved on amicably in 1987, leaving Dudley and Jeczalik to carry on until they too called it quits in 1990. In 1998, Horn, Dudley, and Morley temporarily reformed The Art Of Noise with the addition of guitarist [a=Lol Creme]. The resulting album, \"[m=4065]\" (1999), was another attempt to raid the 20th Century's musical forms, this time focusing on the life and work of longtime influence [url=https://www.discogs.com/artist/96123-Claude-Debussy]Debussy[/url]. The group went dormant again in 2000. \r\n\r\nThe name The Art Of Noise comes from the Futurist artist and composer [a=Luigi Russolo] (1885-1947) manifesto \"The Art of Noise\" (1913), as a tribute his portrait silhouette is also shown on the 12\" sleeve of \"[r=94160]\" (1985).",
+    "urls": [
+      "https://www.artofnoiseofficial.com/",
+      "https://www.theartofnoiseonline.com/",
+      "https://www.facebook.com/theartofnoisehomeservice",
+      "https://www.facebook.com/groups/57381437419",
+      "https://www.imdb.com/name/nm1691259/",
+      "https://www.instagram.com/artofnoiseofficial/",
+      "https://en.wikipedia.org/wiki/Art_of_Noise",
+      "https://www.youtube.com/@artofnoiseofficial"
+    ],
+    "namevariations": [
+      "(he)art of noise",
+      "A.O.N.",
+      "AON",
+      "An Art Of Noise",
+      "Art Of Noice",
+      "Art Of Noise",
+      "Art Of Noise°",
+      "Art Of Noize",
+      "Art of Noise",
+      "Art. Of Noise",
+      "ArtOfNoise",
+      "Artofnoise",
+      "Artofnoise*",
+      "Artofnoise°",
+      "Arts Of Noise",
+      "Heart Of Noise",
+      "Start Of Noise",
+      "The Art Of Noise!",
+      "The Metaphorical Art of Noise",
+      "The Moody Art Of Noise",
+      "The Staged Art Of Noise",
+      "[The Art Of] Noise",
+      "heArt Of Noise",
+      "heArt of Noise",
+      "stArt Of Noise",
+      "アート・オブ・ノイズ",
+      "ジ・アート・オブ・ノイズ",
+      "噪音美學",
+      "噪音美學合唱團",
+      "더 아트 오브 노이즈"
+    ],
+    "aliases": [
+      {
+        "id": 244936,
+        "name": "Vision (15)",
+        "resource_url": "https://api.discogs.com/artists/244936"
+      },
+      {
+        "id": 669644,
+        "name": "Image Of A Group",
+        "resource_url": "https://api.discogs.com/artists/669644"
+      }
+    ],
+    "members": [
+      {
+        "id": 32875,
+        "name": "Trevor Horn",
+        "resource_url": "https://api.discogs.com/artists/32875",
+        "active": true
+      },
+      {
+        "id": 65172,
+        "name": "J.J. Jeczalik",
+        "resource_url": "https://api.discogs.com/artists/65172",
+        "active": false
+      },
+      {
+        "id": 85928,
+        "name": "Anne Dudley",
+        "resource_url": "https://api.discogs.com/artists/85928",
+        "active": true
+      },
+      {
+        "id": 89908,
+        "name": "Gary Langan",
+        "resource_url": "https://api.discogs.com/artists/89908",
+        "active": false
+      },
+      {
+        "id": 231640,
+        "name": "Paul Morley",
+        "resource_url": "https://api.discogs.com/artists/231640",
+        "active": true
+      },
+      {
+        "id": 265697,
+        "name": "Lol Creme",
+        "resource_url": "https://api.discogs.com/artists/265697",
+        "active": true
+      }
+    ],
+    "data_quality": "Needs Vote"
+  }
+}

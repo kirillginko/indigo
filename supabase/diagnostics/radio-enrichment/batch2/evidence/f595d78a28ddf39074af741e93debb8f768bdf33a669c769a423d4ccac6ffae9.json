@@ -1,0 +1,1163 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording?query=recording%3A%22Come+On+My+Selector%22+AND+artist%3A%22Squarepusher%22&limit=100&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:25:13.453009+00:00",
+  "body": {
+    "created": "2026-10-20T01:25:13.258Z",
+    "count": 5,
+    "offset": 0,
+    "recordings": [
+      {
+        "id": "f7212871-a315-4e77-990f-5a63db978982",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Come on My Selector",
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2002",
+        "releases": [
+          {
+            "id": "7f7d6136-2b44-48b7-80e9-9d3b7a4465e7",
+            "status-id": "1156806e-d06a-38bd-83f0-cf2284a808b9",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 3,
+            "title": "Never Mind the Bootlegs",
+            "status": "Bootleg",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "7ea11be3-289f-4201-86d9-18f02e5be1c0",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Never Mind the Bootlegs",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2002",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2002",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 403,
+            "media": [
+              {
+                "id": "041b1840-788f-3830-be9f-17b1a0a7aa34",
+                "position": 2,
+                "format": "Data CD",
+                "track": [
+                  {
+                    "id": "d431ed63-7ab9-4e16-9e77-70ed39d5c6f1",
+                    "number": "128",
+                    "title": "Come on My Selector"
+                  }
+                ],
+                "track-count": 175,
+                "track-offset": 127
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "80980d6f-31cd-484c-8a9d-3d3310f1587f",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Come on My Selector",
+        "length": 204800,
+        "video": null,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "1997-07-21",
+        "releases": [
+          {
+            "id": "67050dc5-f3e8-48cd-9a3b-90513aaacf99",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Big Loada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "77bef9af-e438-3ad2-9d1c-eb45fa97a9f4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Big Loada",
+              "primary-type": "EP"
+            },
+            "date": "",
+            "country": "XW",
+            "release-events": [
+              {
+                "date": "",
+                "area": {
+                  "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                  "name": "[Worldwide]",
+                  "sort-name": "[Worldwide]",
+                  "iso-3166-1-codes": [
+                    "XW"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "1114711a-8cf1-3825-98b8-cdd5268c32a8",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "71eb7511-a730-489a-acfc-863dad11bad1",
+                    "number": "4",
+                    "title": "Come on My Selector",
+                    "length": 204800
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "367c8521-2d98-4e12-878e-b19acfb38c3b",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Big Loada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "77bef9af-e438-3ad2-9d1c-eb45fa97a9f4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Big Loada",
+              "primary-type": "EP"
+            },
+            "date": "1998-10-13",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "1998-10-13",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 12,
+            "media": [
+              {
+                "id": "c9ce0479-9a8b-3398-ba38-d950a06ed2ee",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "dbab06e3-cf41-393d-a0b1-e3c38d204453",
+                    "number": "1",
+                    "title": "Come on My Selector",
+                    "length": 207200
+                  }
+                ],
+                "track-count": 12,
+                "track-offset": 0
+              }
+            ]
+          },
+          {
+            "id": "8aa30ec2-dcc7-3c53-9559-ccbe49d03801",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Big Loada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "77bef9af-e438-3ad2-9d1c-eb45fa97a9f4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Big Loada",
+              "primary-type": "EP"
+            },
+            "date": "1997-07-21",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1997-07-21",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "69c3e58f-7446-39af-8fd1-411f88ecba94",
+                "position": 1,
+                "format": "12\" Vinyl",
+                "track": [
+                  {
+                    "id": "7d2aac5c-86a6-36f3-8d8f-4ea8e71b4a70",
+                    "number": "B4",
+                    "title": "Come on My Selector",
+                    "length": 204800
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "26448774-7505-3153-ba13-5a1a2d332b4d",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Big Loada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "77bef9af-e438-3ad2-9d1c-eb45fa97a9f4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Big Loada",
+              "primary-type": "EP"
+            },
+            "date": "1997",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "1997",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "5315d5d1-6a41-316f-98a2-d35fdd04c83f",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "82093353-c5e2-3733-8150-3e3ad3de50f8",
+                    "number": "4",
+                    "title": "Come on My Selector",
+                    "length": 204800
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "bcd4f874-1a65-489b-b335-215e6d28e610",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "Mondo Sonoro Delicatessen",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "28480bbd-e22b-4a0d-b8e9-1b255d8b44a2",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Mondo Sonoro Delicatessen",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "1997",
+            "country": "ES",
+            "release-events": [
+              {
+                "date": "1997",
+                "area": {
+                  "id": "471c46a7-afc5-31c4-923c-d0444f5053a4",
+                  "name": "Spain",
+                  "sort-name": "Spain",
+                  "iso-3166-1-codes": [
+                    "ES"
+                  ]
+                }
+              }
+            ],
+            "track-count": 38,
+            "media": [
+              {
+                "id": "219c0b55-158c-383d-884b-dcbfaefe9f5e",
+                "position": 2,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "f628cd50-2534-43ae-a9dc-07de523299bd",
+                    "number": "6",
+                    "title": "Come on My Selector",
+                    "length": 207733
+                  }
+                ],
+                "track-count": 17,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "42fff840-bd12-4f04-9209-1356dc8a495a",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Big Loada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "77bef9af-e438-3ad2-9d1c-eb45fa97a9f4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Big Loada",
+              "primary-type": "EP"
+            },
+            "track-count": 7,
+            "media": [
+              {
+                "id": "b16c8474-52db-307c-b5e4-53939b84216a",
+                "position": 1,
+                "format": "Digital Media",
+                "track": [
+                  {
+                    "id": "62a6c840-33c8-4571-a6be-40eb52feb88b",
+                    "number": "4",
+                    "title": "Come on My Selector",
+                    "length": 204800
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          },
+          {
+            "id": "11939557-adb6-4f5c-8f80-9b1822b466a7",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+            "count": 1,
+            "title": "Big Loada",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Squarepusher",
+                "artist": {
+                  "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+                  "name": "Squarepusher",
+                  "sort-name": "Squarepusher"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "77bef9af-e438-3ad2-9d1c-eb45fa97a9f4",
+              "type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "primary-type-id": "6d0c5bf6-7a33-3420-a519-44fc63eedebf",
+              "title": "Big Loada",
+              "primary-type": "EP"
+            },
+            "date": "1997-07-21",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "1997-07-21",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 7,
+            "media": [
+              {
+                "id": "729a75b0-145b-341b-9376-bfaf9068f85d",
+                "position": 1,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "72329399-e2cc-37e3-bc4f-e8fc59338480",
+                    "number": "4",
+                    "title": "Come on My Selector",
+                    "length": 204800
+                  }
+                ],
+                "track-count": 7,
+                "track-offset": 3
+              }
+            ]
+          }
+        ],
+        "tags": [
+          {
+            "count": 0,
+            "name": "acid"
+          },
+          {
+            "count": 2,
+            "name": "drill and bass"
+          }
+        ]
+      },
+      {
+        "id": "cbd0e5d3-8028-482b-be12-a3b82bcdcea3",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Come on My Selector",
+        "length": 444000,
+        "video": true,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2003-12",
+        "releases": [
+          {
+            "id": "e41b897d-1476-496d-80bd-46e2f16276c9",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "1335b93a-4ea3-4776-9345-56d5678eb0a2",
+            "count": 1,
+            "title": "The Work of Director Chris Cunningham",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Chris Cunningham",
+                "artist": {
+                  "id": "7e933375-f6bf-4451-ac9f-35962695630b",
+                  "name": "Chris Cunningham",
+                  "sort-name": "Cunningham, Chris",
+                  "disambiguation": "of Warp Records fame"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "e0c46bc4-2176-46a1-9857-43bb0bec6457",
+              "type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "primary-type-id": "4fc3be2b-de1e-396b-a933-beb8f1607a22",
+              "title": "The Work of Director Chris Cunningham",
+              "primary-type": "Other",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2003-12",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2003-12",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 15,
+            "media": [
+              {
+                "id": "a3f26666-6167-348f-8534-1ccbd8ddad08",
+                "position": 1,
+                "format": "DVD-Video",
+                "track": [
+                  {
+                    "id": "26e8b1de-a095-4035-9bc4-514646c67f03",
+                    "number": "6",
+                    "title": "Come On My Selector",
+                    "length": 445000
+                  }
+                ],
+                "track-count": 15,
+                "track-offset": 5
+              }
+            ]
+          },
+          {
+            "id": "a1b961ab-3921-3335-b611-49206ee218b1",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 2,
+            "title": "WarpVision: The Videos 1989–2004",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6e976615-53e1-4a36-a270-b85b9b1b526b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "WarpVision: The Videos 1989–2004",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2004-09-21",
+            "country": "US",
+            "release-events": [
+              {
+                "date": "2004-09-21",
+                "area": {
+                  "id": "489ce91b-6658-3307-9877-795b68554c98",
+                  "name": "United States",
+                  "sort-name": "United States",
+                  "iso-3166-1-codes": [
+                    "US"
+                  ]
+                }
+              }
+            ],
+            "track-count": 43,
+            "media": [
+              {
+                "id": "1750a417-af8c-3474-a04c-d47a7307918f",
+                "position": 1,
+                "format": "DVD",
+                "track": [
+                  {
+                    "id": "f3427aa0-9ea6-3a06-a516-d0c0846cdf67",
+                    "number": "12",
+                    "title": "Come on My Selector",
+                    "length": 444000
+                  }
+                ],
+                "track-count": 32,
+                "track-offset": 11
+              }
+            ]
+          },
+          {
+            "id": "5e022522-4c79-4985-a7eb-472c72481c1f",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "WarpVision: The Videos 1989–2004",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "6e976615-53e1-4a36-a270-b85b9b1b526b",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "WarpVision: The Videos 1989–2004",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2004-09-27",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2004-09-27",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 32,
+            "media": [
+              {
+                "id": "de2e1571-d416-30ae-84ba-ae0b459681ad",
+                "position": 1,
+                "format": "DVD",
+                "track": [
+                  {
+                    "id": "f8a51ec3-d695-3740-b3ed-790115537abc",
+                    "number": "12",
+                    "title": "Come on My Selector",
+                    "length": 444000
+                  }
+                ],
+                "track-count": 32,
+                "track-offset": 11
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0f5fff10-481d-4700-89b4-2a79bf2f6dfb",
+        "score": 100,
+        "artist-credit-id": "d089b6c6-8601-332f-b945-8d95b10e0bbc",
+        "title": "Come On My Selector",
+        "length": 446000,
+        "video": true,
+        "artist-credit": [
+          {
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2006-01-27",
+        "releases": [
+          {
+            "id": "64acfa25-d672-4131-87f2-6c40328b5240",
+            "status-id": "518ffc83-5cde-34df-8627-81bff5093d92",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 1,
+            "title": "25 Jahre Spex",
+            "status": "Promotion",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "734614c5-60af-480b-87a0-56ef8bae57db",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "25 Jahre Spex",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2006-01-27",
+            "country": "DE",
+            "release-events": [
+              {
+                "date": "2006-01-27",
+                "area": {
+                  "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                  "name": "Germany",
+                  "sort-name": "Germany",
+                  "iso-3166-1-codes": [
+                    "DE"
+                  ]
+                }
+              }
+            ],
+            "track-count": 28,
+            "media": [
+              {
+                "id": "f74302de-65e1-3a81-8dda-457ab6e2e722",
+                "position": 1,
+                "format": "DVD-Video",
+                "track": [
+                  {
+                    "id": "100bacff-cbc7-41b9-8bdb-4988b723f72c",
+                    "number": "17",
+                    "title": "Come On My Selector",
+                    "length": 446000
+                  }
+                ],
+                "track-count": 28,
+                "track-offset": 16
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0129b719-b86c-4827-95f3-a653dcef112a",
+        "score": 54,
+        "artist-credit-id": "ea7eeccd-a8b2-361e-bceb-f775ab202d8c",
+        "title": "Come on My Selector / Bricks / Bucephalus Bouncing Ball",
+        "length": 224773,
+        "video": null,
+        "artist-credit": [
+          {
+            "joinphrase": " / ",
+            "name": "Squarepusher",
+            "artist": {
+              "id": "4d86ad4e-28d8-4e9f-8cf4-735c57060fdc",
+              "name": "Squarepusher",
+              "sort-name": "Squarepusher",
+              "aliases": [
+                {
+                  "sort-name": "スクエアプッシャー",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "スクエアプッシャー",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Stereotype",
+                  "name": "Stereotype",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Square Pusher",
+                  "name": "Square Pusher",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "joinphrase": " / ",
+            "name": "Chris Clark",
+            "artist": {
+              "id": "5d0c202c-e30f-40c4-abf5-c0007af0d1cc",
+              "name": "Clark",
+              "sort-name": "Clark",
+              "disambiguation": "British electronic musician",
+              "aliases": [
+                {
+                  "sort-name": "Clark, Christopher Stephen",
+                  "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                  "name": "Christopher Stephen Clark",
+                  "locale": "en",
+                  "type": "Legal name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Clark, Chris",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Chris Clark",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "Aphex Twin",
+            "artist": {
+              "id": "f22942a1-6f70-4f48-866e-238cb2308fbd",
+              "name": "Aphex Twin",
+              "sort-name": "Aphex Twin",
+              "aliases": [
+                {
+                  "sort-name": "Aphex Twin, The",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "The Aphex Twin",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Aphex Twin",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "Aphex Twin",
+                  "locale": null,
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "エイフェックス・ツイン",
+                  "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                  "name": "エイフェックス・ツイン",
+                  "locale": "ja",
+                  "type": "Artist name",
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "aphex+twin",
+                  "name": "aphex+twin",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "Aphex Twins",
+                  "name": "Aphex Twins",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                },
+                {
+                  "sort-name": "AphexTwin",
+                  "name": "AphexTwin",
+                  "locale": null,
+                  "type": null,
+                  "primary": null,
+                  "begin-date": null,
+                  "end-date": null
+                }
+              ]
+            }
+          }
+        ],
+        "first-release-date": "2009-09-28",
+        "releases": [
+          {
+            "id": "3d91913e-a9b4-43f7-b1f6-4dd4a7585e63",
+            "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+            "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+            "count": 10,
+            "title": "Warp20",
+            "status": "Official",
+            "artist-credit": [
+              {
+                "name": "Various Artists",
+                "artist": {
+                  "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                  "name": "Various Artists",
+                  "sort-name": "Various Artists",
+                  "disambiguation": "add compilations to this artist"
+                }
+              }
+            ],
+            "release-group": {
+              "id": "f86c7496-9f94-476b-8891-f75df12747d5",
+              "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+              "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+              "title": "Warp20",
+              "primary-type": "Album",
+              "secondary-types": [
+                "Compilation"
+              ],
+              "secondary-type-ids": [
+                "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"
+              ]
+            },
+            "date": "2009-09-28",
+            "country": "GB",
+            "release-events": [
+              {
+                "date": "2009-09-28",
+                "area": {
+                  "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+                  "name": "United Kingdom",
+                  "sort-name": "United Kingdom",
+                  "iso-3166-1-codes": [
+                    "GB"
+                  ]
+                }
+              }
+            ],
+            "track-count": 120,
+            "media": [
+              {
+                "id": "18305846-d1fe-3e40-b179-85dbce975677",
+                "position": 6,
+                "format": "CD",
+                "track": [
+                  {
+                    "id": "a40b9a1e-53c0-3a63-a958-36b8f8294baf",
+                    "number": "8",
+                    "title": "Come on My Selector / Bricks / Bucephalus Bouncing Ball",
+                    "length": 224773
+                  }
+                ],
+                "track-count": 13,
+                "track-offset": 7
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

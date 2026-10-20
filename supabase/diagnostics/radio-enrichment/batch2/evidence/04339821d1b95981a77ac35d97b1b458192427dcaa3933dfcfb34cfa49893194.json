@@ -1,0 +1,407 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/86e9080c-564e-46ab-9414-e5f8c828b33c?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:07.819610+00:00",
+  "body": {
+    "length": 218824,
+    "id": "86e9080c-564e-46ab-9414-e5f8c828b33c",
+    "video": false,
+    "isrcs": [
+      "GB7CH1500016"
+    ],
+    "disambiguation": "",
+    "title": "L.O.V.E.",
+    "artist-credit": [
+      {
+        "artist": {
+          "name": "SOPHIE",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "sort-name": "SOPHIE",
+          "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+          "type": "Person",
+          "country": "GB",
+          "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon"
+        },
+        "name": "SOPHIE",
+        "joinphrase": ""
+      }
+    ],
+    "first-release-date": "2015-11-06",
+    "releases": [
+      {
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal",
+        "country": "XW",
+        "id": "01a62e9f-ce5f-4abe-b83f-9a5f5c557895",
+        "packaging": "None",
+        "status": "Official",
+        "date": "2015-11-06",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "title": "L.O.V.E.",
+        "barcode": "5060163491096",
+        "release-events": [
+          {
+            "date": "2015-11-06",
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]"
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "SOPHIE",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "SOPHIE",
+              "sort-name": "SOPHIE",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "type": "Person",
+              "country": "GB",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon"
+            }
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "release-events": [
+          {
+            "area": {
+              "disambiguation": "",
+              "type": null,
+              "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+              "type-id": null,
+              "name": "United Kingdom",
+              "iso-3166-1-codes": [
+                "GB"
+              ],
+              "sort-name": "United Kingdom"
+            },
+            "date": "2015-11-26"
+          }
+        ],
+        "barcode": "5060163490914",
+        "title": "PRODUCT",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "SOPHIE",
+              "sort-name": "SOPHIE",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "type": "Person",
+              "country": "GB",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon"
+            },
+            "name": "SOPHIE",
+            "joinphrase": ""
+          }
+        ],
+        "packaging": "Jewel Case",
+        "id": "0fa577fe-70e5-4282-b3b8-89e26811386a",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "date": "2015-11-26",
+        "status": "Official",
+        "country": "GB",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      },
+      {
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": null,
+        "id": "62ddf034-6f7d-4f3c-854f-f0ffab9ecf7f",
+        "packaging": "None",
+        "status": "Official",
+        "date": "2015-11-27",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "disambiguation": "",
+        "title": "PRODUCT",
+        "barcode": "5060163490907",
+        "release-events": [
+          {
+            "date": "2015-11-27",
+            "area": null
+          }
+        ],
+        "artist-credit": [
+          {
+            "name": "SOPHIE",
+            "artist": {
+              "sort-name": "SOPHIE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "SOPHIE",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "type": "Person",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+              "country": "GB"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "SOPHIE",
+              "sort-name": "SOPHIE",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "type": "Person",
+              "country": "GB",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon"
+            },
+            "name": "SOPHIE"
+          }
+        ],
+        "barcode": "5060163490907",
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "sort-name": "[Worldwide]",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f"
+            },
+            "date": "2015-11-27"
+          }
+        ],
+        "disambiguation": "",
+        "title": "PRODUCT",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2015-11-27",
+        "status": "Official",
+        "id": "2b6238c1-7ac6-43e1-aab2-f468d048412e",
+        "packaging": "None",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XW"
+      },
+      {
+        "release-events": [
+          {
+            "date": "2015-11-27",
+            "area": {
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "JP"
+              ],
+              "name": "Japan",
+              "sort-name": "Japan",
+              "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+              "type": null,
+              "disambiguation": ""
+            }
+          }
+        ],
+        "barcode": "4523132143934",
+        "title": "PRODUCT",
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "name": "SOPHIE",
+            "artist": {
+              "sort-name": "SOPHIE",
+              "name": "SOPHIE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "type": "Person",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+              "country": "GB"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "country": "JP",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": null,
+        "id": "a9b431bb-7283-45a3-998b-376c2491db08",
+        "date": "2015-11-27",
+        "packaging-id": null,
+        "status": "Official"
+      },
+      {
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "country": "XW",
+        "id": "2dfc0b36-fa17-4397-a2d1-7e5bc6befbbb",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "date": "2015-11-28",
+        "status": "Official",
+        "barcode": "5060163491065",
+        "release-events": [
+          {
+            "date": "2015-11-28",
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "disambiguation": "",
+              "type": null
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "PRODUCT",
+        "artist-credit": [
+          {
+            "name": "SOPHIE",
+            "artist": {
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+              "country": "GB",
+              "type": "Person",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "sort-name": "SOPHIE",
+              "name": "SOPHIE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      },
+      {
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "SOPHIE",
+            "artist": {
+              "type": "Person",
+              "country": "GB",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon",
+              "name": "SOPHIE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "SOPHIE",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde"
+            }
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "type-id": null,
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type": null,
+              "disambiguation": ""
+            },
+            "date": "2025-06-17"
+          }
+        ],
+        "barcode": "5060163492222",
+        "title": "PRODUCT",
+        "disambiguation": "10th Anniversary Edition",
+        "date": "2025-06-17",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "packaging": "None",
+        "id": "095f7c8c-eade-4239-9e1d-ab2c72c48874",
+        "country": "XW",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "quality": "normal"
+      },
+      {
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "date": "2025-06-17",
+        "status": "Official",
+        "packaging": "Cardboard/Paper Sleeve",
+        "id": "d393af24-b679-42e7-994b-a0f0c34baad5",
+        "country": "XW",
+        "quality": "normal",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "text-representation": {
+          "script": null,
+          "language": null
+        },
+        "artist-credit": [
+          {
+            "name": "SOPHIE",
+            "artist": {
+              "name": "SOPHIE",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "sort-name": "SOPHIE",
+              "id": "774b02d7-5056-4b0f-9d69-a82b6ae27cde",
+              "type": "Person",
+              "country": "GB",
+              "disambiguation": "Scottish producer, songwriter, and DJ Sophie Xeon"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "release-events": [
+          {
+            "area": {
+              "type": null,
+              "disambiguation": "",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "name": "[Worldwide]",
+              "sort-name": "[Worldwide]",
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f"
+            },
+            "date": "2025-06-17"
+          }
+        ],
+        "barcode": null,
+        "title": "PRODUCT",
+        "disambiguation": "10th Anniversary Edition"
+      }
+    ]
+  }
+}

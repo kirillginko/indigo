@@ -1,0 +1,379 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/0e186565-b892-43a6-9d30-563ed4a0f814?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:22:37.672049+00:00",
+  "body": {
+    "title": "G3 N15",
+    "isrcs": [
+      "USSM12109224"
+    ],
+    "artist-credit": [
+      {
+        "artist": {
+          "country": "ES",
+          "disambiguation": "Spanish singer",
+          "sort-name": "ROSALÍA",
+          "type": "Person",
+          "name": "ROSALÍA",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11"
+        },
+        "joinphrase": "",
+        "name": "ROSALÍA"
+      }
+    ],
+    "disambiguation": "",
+    "video": false,
+    "first-release-date": "2022-03-18",
+    "id": "0e186565-b892-43a6-9d30-563ed4a0f814",
+    "releases": [
+      {
+        "title": "MOTOMAMI",
+        "disambiguation": "",
+        "id": "5e437206-54c0-4313-9084-5da728933d2a",
+        "release-events": [
+          {
+            "area": null,
+            "date": "2022-03-18"
+          }
+        ],
+        "quality": "normal",
+        "barcode": "886449800193",
+        "text-representation": {
+          "script": "Latn",
+          "language": "spa"
+        },
+        "date": "2022-03-18",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "ROSALÍA",
+              "country": "ES",
+              "disambiguation": "Spanish singer",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "ROSALÍA",
+              "type": "Person"
+            },
+            "name": "ROSALÍA",
+            "joinphrase": ""
+          }
+        ],
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": null,
+        "status": "Official"
+      },
+      {
+        "title": "MOTOMAMI",
+        "disambiguation": "",
+        "barcode": "194399629727",
+        "release-events": [
+          {
+            "date": "2022-03-18",
+            "area": {
+              "type": null,
+              "name": "Europe",
+              "type-id": null,
+              "id": "89a675c2-3e37-3518-b83c-418bad59a85a",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "XE"
+              ],
+              "sort-name": "Europe"
+            }
+          }
+        ],
+        "id": "7ba72a0d-c1c6-4481-8935-1b1cfae7a424",
+        "quality": "normal",
+        "date": "2022-03-18",
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "joinphrase": "",
+            "artist": {
+              "type": "Person",
+              "name": "ROSALÍA",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "disambiguation": "Spanish singer",
+              "country": "ES",
+              "sort-name": "ROSALÍA"
+            }
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "spa"
+        },
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "Jewel Case",
+        "country": "XE",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official"
+      },
+      {
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "country": null,
+        "packaging": "None",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type": "Person",
+              "name": "ROSALÍA",
+              "sort-name": "ROSALÍA",
+              "country": "ES",
+              "disambiguation": "Spanish singer"
+            },
+            "joinphrase": "",
+            "name": "ROSALÍA"
+          }
+        ],
+        "date": "2022-09-09",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "barcode": "886449876266",
+        "quality": "normal",
+        "id": "bf06156b-e658-40a1-86e8-6aae9fd20f4a",
+        "release-events": [
+          {
+            "date": "2022-09-09",
+            "area": null
+          }
+        ],
+        "disambiguation": "",
+        "title": "MOTOMAMI +"
+      },
+      {
+        "barcode": "196589507525",
+        "id": "0117bc63-1c12-403a-904d-66113a70b8dc",
+        "release-events": [
+          {
+            "area": {
+              "name": "China",
+              "type": null,
+              "id": "7c81bb69-a99b-3487-b6d4-0f76d7a29ca0",
+              "type-id": null,
+              "iso-3166-1-codes": [
+                "CN"
+              ],
+              "disambiguation": "",
+              "sort-name": "China"
+            },
+            "date": "2022-09-23"
+          }
+        ],
+        "quality": "normal",
+        "title": "MOTOMAMI +",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "country": "CN",
+        "packaging": "None",
+        "date": "2022-09-23",
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "ES",
+              "disambiguation": "Spanish singer",
+              "sort-name": "ROSALÍA",
+              "name": "ROSALÍA",
+              "type": "Person",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "ROSALÍA",
+            "joinphrase": ""
+          }
+        ],
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        }
+      },
+      {
+        "release-events": [
+          {
+            "area": {
+              "sort-name": "China",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "CN"
+              ],
+              "type-id": null,
+              "id": "7c81bb69-a99b-3487-b6d4-0f76d7a29ca0",
+              "type": null,
+              "name": "China"
+            },
+            "date": "2022-09-30"
+          }
+        ],
+        "id": "6b2a657a-b0fd-45d5-b3a0-a47365326188",
+        "quality": "normal",
+        "barcode": "886449866533",
+        "title": "MOTOMAMI",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "country": "CN",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "status": "Official",
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        },
+        "date": "2022-09-30",
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "joinphrase": "",
+            "artist": {
+              "disambiguation": "Spanish singer",
+              "country": "ES",
+              "sort-name": "ROSALÍA",
+              "name": "ROSALÍA",
+              "type": "Person",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            }
+          }
+        ]
+      },
+      {
+        "id": "bde00408-bea6-4708-a200-8f7ecddcf0f9",
+        "release-events": [
+          {
+            "date": "2022",
+            "area": {
+              "sort-name": "United States",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ],
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "name": "United States"
+            }
+          }
+        ],
+        "quality": "normal",
+        "barcode": "194399629727",
+        "title": "MOTOMAMI",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "status": "Official",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "country": "US",
+        "packaging": "Jewel Case",
+        "text-representation": {
+          "script": "Latn",
+          "language": "spa"
+        },
+        "date": "2022",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "ROSALÍA",
+            "artist": {
+              "name": "ROSALÍA",
+              "type": "Person",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "ES",
+              "disambiguation": "Spanish singer",
+              "sort-name": "ROSALÍA"
+            }
+          }
+        ]
+      },
+      {
+        "barcode": "194399629727",
+        "quality": "normal",
+        "id": "56490afd-b5fd-414b-82fe-2df2ce83259d",
+        "release-events": [
+          {
+            "date": "2022",
+            "area": {
+              "sort-name": "Argentina",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "AR"
+              ],
+              "type-id": null,
+              "id": "0df04709-c7d8-3b55-a6ea-f3e5069a947b",
+              "type": null,
+              "name": "Argentina"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "MOTOMAMI",
+        "country": "AR",
+        "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+        "status": "Official",
+        "packaging": "Jewel Case",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "joinphrase": "",
+            "artist": {
+              "name": "ROSALÍA",
+              "type": "Person",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "country": "ES",
+              "disambiguation": "Spanish singer",
+              "sort-name": "ROSALÍA"
+            }
+          }
+        ],
+        "date": "2022",
+        "text-representation": {
+          "language": "spa",
+          "script": "Latn"
+        }
+      },
+      {
+        "text-representation": {
+          "language": null,
+          "script": "Latn"
+        },
+        "artist-credit": [
+          {
+            "name": "ROSALÍA",
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "ROSALÍA",
+              "country": "ES",
+              "disambiguation": "Spanish singer",
+              "id": "25f3abd9-63b5-471a-bd25-feb9672dfa11",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "ROSALÍA",
+              "type": "Person"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "title": "MOTOMAMI",
+        "quality": "normal",
+        "id": "9679942c-dc4a-419f-8608-0c8a1929969b",
+        "barcode": "194399949511",
+        "packaging": null,
+        "packaging-id": null,
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ],
+    "length": 252120
+  }
+}

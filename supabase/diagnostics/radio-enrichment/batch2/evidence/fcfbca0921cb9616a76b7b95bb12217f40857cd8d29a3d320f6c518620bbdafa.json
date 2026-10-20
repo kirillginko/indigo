@@ -1,0 +1,34 @@
+{
+  "url": "https://musicbrainz.org/ws/2/url?resource=https%3A%2F%2Fwww.discogs.com%2Fartist%2F48720&inc=artist-rels&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:23:04.472407+00:00",
+  "body": {
+    "relations": [
+      {
+        "ended": false,
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "artist": {
+          "id": "91cfbe94-7fc3-4bcc-9d95-767d87ac2ae5",
+          "disambiguation": "",
+          "type": "Person",
+          "sort-name": "Mason, Barbara",
+          "country": "US",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "name": "Barbara Mason"
+        },
+        "direction": "backward",
+        "source-credit": "",
+        "target-type": "artist",
+        "target-credit": "",
+        "type": "discogs",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4"
+      }
+    ],
+    "id": "1d5bf57f-786f-478b-bb76-c830a7dd25e9",
+    "resource": "https://www.discogs.com/artist/48720"
+  }
+}

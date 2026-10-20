@@ -1,0 +1,129 @@
+{
+  "url": "https://musicbrainz.org/ws/2/recording/879bc03f-84e6-4d7b-9727-352e27e327cb?inc=artist-credits%2Bisrcs%2Breleases&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:29.518307+00:00",
+  "body": {
+    "id": "879bc03f-84e6-4d7b-9727-352e27e327cb",
+    "releases": [
+      {
+        "barcode": "886443246287",
+        "release-events": [
+          {
+            "area": {
+              "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+              "type-id": null,
+              "name": "[Worldwide]",
+              "type": null,
+              "sort-name": "[Worldwide]",
+              "iso-3166-1-codes": [
+                "XW"
+              ],
+              "disambiguation": ""
+            },
+            "date": "2011-11-18"
+          }
+        ],
+        "id": "72160088-7cba-4c47-a7d3-78ef5c72e606",
+        "quality": "normal",
+        "title": "I’m Still in the Night",
+        "disambiguation": "",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+        "packaging": "None",
+        "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+        "country": "XW",
+        "status": "Official",
+        "date": "2011-11-18",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "SALEM",
+            "artist": {
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "name": "SALEM",
+              "type": "Group",
+              "sort-name": "SALEM",
+              "disambiguation": "US‐based electronic group",
+              "country": "US"
+            }
+          }
+        ],
+        "text-representation": {
+          "language": "eng",
+          "script": "Latn"
+        }
+      },
+      {
+        "disambiguation": "",
+        "title": "I’m Still in the Night",
+        "barcode": null,
+        "quality": "normal",
+        "id": "23e73c18-0689-496d-bf88-d29de14a51b8",
+        "release-events": [
+          {
+            "date": "2011-11-22",
+            "area": {
+              "type-id": null,
+              "id": "489ce91b-6658-3307-9877-795b68554c98",
+              "type": null,
+              "name": "United States",
+              "sort-name": "United States",
+              "disambiguation": "",
+              "iso-3166-1-codes": [
+                "US"
+              ]
+            }
+          }
+        ],
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+              "type": "Group",
+              "name": "SALEM",
+              "sort-name": "SALEM",
+              "country": "US",
+              "disambiguation": "US‐based electronic group"
+            },
+            "joinphrase": "",
+            "name": "SALEM"
+          }
+        ],
+        "date": "2011-11-22",
+        "text-representation": {
+          "script": "Latn",
+          "language": "eng"
+        },
+        "packaging": "Cardboard/Paper Sleeve",
+        "country": "US",
+        "packaging-id": "f7101ce3-0384-39ce-9fde-fbbd0044d35f",
+        "status": "Official",
+        "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+      }
+    ],
+    "length": 178227,
+    "first-release-date": "2011-11-18",
+    "video": false,
+    "isrcs": [
+      "US53Q1100102"
+    ],
+    "disambiguation": "",
+    "artist-credit": [
+      {
+        "artist": {
+          "type": "Group",
+          "name": "SALEM",
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "id": "987fc4c9-2c99-4f6c-949b-8da8019769a8",
+          "country": "US",
+          "disambiguation": "US‐based electronic group",
+          "sort-name": "SALEM"
+        },
+        "joinphrase": "",
+        "name": "SALEM"
+      }
+    ],
+    "title": "Krawl"
+  }
+}

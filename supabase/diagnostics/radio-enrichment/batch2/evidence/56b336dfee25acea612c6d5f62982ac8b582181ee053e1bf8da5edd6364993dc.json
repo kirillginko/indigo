@@ -1,0 +1,569 @@
+{
+  "url": "https://musicbrainz.org/ws/2/artist/9f7483cf-d8aa-45ce-b90c-da2e359a7815?inc=aliases%2Burl-rels%2Bartist-rels%2Bgenres%2Btags&fmt=json",
+  "status": 200,
+  "checked_at": "2026-10-20T01:24:20.630353+00:00",
+  "body": {
+    "country": "ZA",
+    "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+    "sort-name": "Mbulu, Letta",
+    "area": {
+      "disambiguation": "",
+      "id": "50cc7852-862e-30ae-aa82-385fe7135b7f",
+      "iso-3166-1-codes": [
+        "ZA"
+      ],
+      "name": "South Africa",
+      "type-id": null,
+      "sort-name": "South Africa",
+      "type": null
+    },
+    "gender": "Female",
+    "end-area": null,
+    "isnis": [
+      "0000000055187627"
+    ],
+    "life-span": {
+      "begin": "1942-08-23",
+      "ended": false,
+      "end": null
+    },
+    "disambiguation": "South African musician",
+    "ipis": [],
+    "name": "Letta Mbulu",
+    "type": "Person",
+    "aliases": [
+      {
+        "end": null,
+        "begin": null,
+        "ended": false,
+        "name": "Letta",
+        "locale": null,
+        "primary": null,
+        "sort-name": "Letta",
+        "type-id": null,
+        "type": null
+      }
+    ],
+    "tags": [
+      {
+        "count": 1,
+        "name": "jazz"
+      },
+      {
+        "name": "soul",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "soul jazz"
+      },
+      {
+        "name": "township bubblegum",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "name": "vocal jazz"
+      }
+    ],
+    "genres": [
+      {
+        "name": "jazz",
+        "id": "a715278f-1580-409f-8078-4ffbc800e08b",
+        "count": 1,
+        "disambiguation": ""
+      },
+      {
+        "name": "soul",
+        "id": "1b5e7b16-336b-473e-a364-5120413a9827",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "count": 1,
+        "id": "e70f0aa3-9531-448c-8182-7ff34e3d74f8",
+        "disambiguation": "",
+        "name": "soul jazz"
+      },
+      {
+        "name": "township bubblegum",
+        "id": "c372342c-dfc3-497b-9a99-163c02215de1",
+        "disambiguation": "",
+        "count": 1
+      },
+      {
+        "disambiguation": "",
+        "id": "782dc157-d1a5-42b9-9174-d329c24a7ef3",
+        "count": 1,
+        "name": "vocal jazz"
+      }
+    ],
+    "relations": [
+      {
+        "end": null,
+        "attribute-ids": {},
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "ended": false,
+        "direction": "backward",
+        "source-credit": "",
+        "artist": {
+          "id": "4f558a49-afb0-4b71-b8fa-68e5e7ad363c",
+          "disambiguation": "South African musician and composer",
+          "name": "Caiphus Semenya",
+          "sort-name": "Semenya, Caiphus",
+          "country": "ZA",
+          "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+          "type": "Person"
+        },
+        "target-credit": "",
+        "type": "married",
+        "target-type": "artist",
+        "type-id": "b2bf7a5d-2da6-4742-baf4-e38d8a7ad029"
+      },
+      {
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "6b3e3c85-0002-4f34-aca6-80ace0d7e846",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "type": "allmusic",
+        "url": {
+          "id": "98cd6741-4abc-479d-b1a4-72bcbc38fff5",
+          "resource": "https://www.allmusic.com/artist/mn0000215321"
+        },
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward"
+      },
+      {
+        "type-id": "ea45ed3d-2d5e-456e-8c32-94b6f51426e2",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null,
+        "url": {
+          "resource": "https://www.bandsintown.com/a/310168",
+          "id": "c87a8725-511e-4708-983f-e63ccd897522"
+        },
+        "type": "bandsintown",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "source-credit": "",
+        "end": "2020-11-19",
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "type-id": "d028a975-000c-4525-9333-d3c8425e4b54",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": true,
+        "type": "BBC Music page",
+        "url": {
+          "id": "a5cd2960-069e-436e-9274-84462c414ebc",
+          "resource": "https://www.bbc.co.uk/music/artists/9f7483cf-d8aa-45ce-b90c-da2e359a7815"
+        }
+      },
+      {
+        "type-id": "4fb0eeec-a6eb-4ae3-ad52-b55765b94e8f",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "url": {
+          "resource": "http://www.dougpayne.com/lmd.htm",
+          "id": "8997051a-d932-4d92-aa15-4cb83fb58eec"
+        },
+        "type": "discography page",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "url": {
+          "id": "96a64627-5b80-440b-a89a-8040d892eceb",
+          "resource": "https://www.discogs.com/artist/97988"
+        },
+        "type": "discogs",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward"
+      },
+      {
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "type": "free streaming",
+        "url": {
+          "resource": "https://open.spotify.com/artist/7iwwcDXXToUdUoDYP70EA0",
+          "id": "54a0205f-922d-44a6-b4b2-208e0dca7f49"
+        },
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "free streaming",
+        "url": {
+          "resource": "https://www.deezer.com/artist/245128",
+          "id": "5779b294-9f3a-4e47-b3d8-e5331df04a83"
+        },
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "769085a1-c2f7-4c24-a532-2375a77693bd"
+      },
+      {
+        "type": "last.fm",
+        "url": {
+          "id": "ce59af87-353d-43ee-b6ff-38af340bb92b",
+          "resource": "https://www.last.fm/music/Letta+Mbulu"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "08db8098-c0df-4b78-82c3-c8697b4bba7f",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": ""
+      },
+      {
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "type": "other databases",
+        "url": {
+          "resource": "https://d-nb.info/gnd/135312191",
+          "id": "d16e2a7a-7d79-44ef-bcfe-a4750f734ea1"
+        }
+      },
+      {
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "type": "other databases",
+        "url": {
+          "id": "702f9f0f-527c-478b-a409-b0018cadfa6b",
+          "resource": "https://rateyourmusic.com/artist/letta_mbulu"
+        },
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "url": {
+          "resource": "https://www.musik-sammler.de/artist/letta-mbulu/",
+          "id": "c70dcdc8-a7fe-4405-9038-43410fc64d44"
+        },
+        "type": "other databases",
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "target-type": "url",
+        "target-credit": ""
+      },
+      {
+        "url": {
+          "id": "1f6d09bc-5d02-4a0e-b404-094f7edf007d",
+          "resource": "https://www.whosampled.com/Letta-Mbulu/"
+        },
+        "type": "other databases",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null,
+        "source-credit": ""
+      },
+      {
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "d94fb61c-fa20-4e3c-a19a-71a949fb2c55",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": "",
+        "type": "other databases",
+        "url": {
+          "resource": "https://www.worldcat.org/identities/lccn-n91076322",
+          "id": "0ce1ba3a-514f-4eae-8e21-3dfd19675b2c"
+        },
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward"
+      },
+      {
+        "type": "purchase for download",
+        "url": {
+          "id": "06ee34c2-13f1-4e9b-9c51-99d580dd2478",
+          "resource": "https://itunes.apple.com/artist/id28473923"
+        },
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {}
+      },
+      {
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "url": {
+          "id": "8d455a2c-0aeb-4a75-bb45-c6730e597f8b",
+          "resource": "https://open.qobuz.com/artist/44158"
+        },
+        "type": "purchase for download",
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {}
+      },
+      {
+        "url": {
+          "id": "7e6fbacf-7d96-4d2e-a50b-76ca216e8c66",
+          "resource": "https://www.amazon.co.uk/-/e/B000APM5VM"
+        },
+        "type": "purchase for download",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "type-id": "f8319a2f-f824-4617-81c8-be6560b3b203",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "attributes": [],
+        "begin": null
+      },
+      {
+        "url": {
+          "id": "7e6fbacf-7d96-4d2e-a50b-76ca216e8c66",
+          "resource": "https://www.amazon.co.uk/-/e/B000APM5VM"
+        },
+        "type": "purchase for mail-order",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "611b1862-67af-4253-a64f-34adba305d1d",
+        "attributes": [],
+        "begin": null,
+        "end": null,
+        "attribute-values": {},
+        "source-credit": ""
+      },
+      {
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "id": "dc3e7ed6-d299-4bb1-8816-5747c0cea15c",
+          "resource": "https://secondhandsongs.com/artist/41889"
+        },
+        "type": "secondhandsongs",
+        "source-credit": "",
+        "end": null,
+        "attribute-values": {},
+        "begin": null,
+        "attributes": [],
+        "type-id": "79c5b84d-a206-4f4c-9832-78c028c312c3",
+        "target-credit": "",
+        "target-type": "url"
+      },
+      {
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "begin": null,
+        "attributes": [],
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "target-type": "url",
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false,
+        "url": {
+          "resource": "https://open.qobuz.com/artist/44158",
+          "id": "8d455a2c-0aeb-4a75-bb45-c6730e597f8b"
+        },
+        "type": "streaming"
+      },
+      {
+        "type-id": "63cc5d1f-f096-4c94-a43f-ecb32ea94161",
+        "target-credit": "",
+        "target-type": "url",
+        "source-credit": "",
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "type": "streaming",
+        "url": {
+          "resource": "https://tidal.com/artist/3505288",
+          "id": "2b44550b-1fca-4fc7-a788-9335ef2d6320"
+        },
+        "direction": "forward",
+        "attribute-ids": {},
+        "ended": false
+      },
+      {
+        "type": "VIAF",
+        "url": {
+          "id": "48e63c36-7d2e-46a2-88d3-ad59b295b901",
+          "resource": "http://viaf.org/viaf/59295175"
+        },
+        "direction": "forward",
+        "ended": false,
+        "attribute-ids": {},
+        "type-id": "e8571dcc-35d4-4e91-a577-a3382fd84460",
+        "target-type": "url",
+        "target-credit": "",
+        "source-credit": "",
+        "attributes": [],
+        "begin": null,
+        "attribute-values": {},
+        "end": null
+      },
+      {
+        "attribute-values": {},
+        "end": null,
+        "attributes": [],
+        "begin": null,
+        "source-credit": "",
+        "target-credit": "",
+        "target-type": "url",
+        "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+        "attribute-ids": {},
+        "ended": false,
+        "direction": "forward",
+        "url": {
+          "id": "9dbf6bbe-0642-41b7-95de-1510ece18d6b",
+          "resource": "https://www.wikidata.org/wiki/Q383215"
+        },
+        "type": "wikidata"
+      },
+      {
+        "url": {
+          "resource": "https://en.wikipedia.org/wiki/Letta_Mbulu",
+          "id": "706995aa-c8e9-4da2-9f05-a3cd6f44e929"
+        },
+        "type": "wikipedia",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "29651736-fa6d-48e4-aadc-a557c6add1cb",
+        "begin": null,
+        "attributes": [],
+        "attribute-values": {},
+        "end": null,
+        "source-credit": ""
+      },
+      {
+        "begin": null,
+        "attributes": [],
+        "end": null,
+        "attribute-values": {},
+        "source-credit": "",
+        "target-type": "url",
+        "target-credit": "",
+        "type-id": "6a540e5b-58c6-4192-b6ba-dbc71ec8fcf0",
+        "ended": false,
+        "attribute-ids": {},
+        "direction": "forward",
+        "type": "youtube",
+        "url": {
+          "id": "5bdcf8b5-e978-4d3a-bb56-a716b89cb05e",
+          "resource": "https://www.youtube.com/channel/UCfy6-SXfq3V1HBaWCwCTwMg"
+        }
+      }
+    ],
+    "begin-area": {
+      "type": null,
+      "id": "df69d2eb-1703-4107-b9e2-3ece0b982f5f",
+      "disambiguation": "",
+      "sort-name": "Soweto",
+      "type-id": null,
+      "name": "Soweto"
+    },
+    "gender-id": "93452b5a-a947-30c8-934f-6a4056b151c2",
+    "id": "9f7483cf-d8aa-45ce-b90c-da2e359a7815"
+  }
+}
