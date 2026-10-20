@@ -2,14 +2,14 @@ import XCTest
 @testable import Indigo
 
 final class RadioDiscoverTests: XCTestCase {
-    private func fixture() -> (RadioDiscover.Inputs, [Int: [UUID]], [RadioDiscover.Slot], [UUID: RadioDiscover.Identity]) {
+    private func fixture(episodes count: Int = 4) -> (RadioDiscover.Inputs, [Int: [UUID]], [RadioDiscover.Slot], [UUID: RadioDiscover.Identity]) {
         let seed0 = UUID(), seed1 = UUID()
         let inputs = RadioDiscover.Inputs(seeds: [.init(id: 1, name: "Seed A", cluster: 0, weight: 2, recordings: ["known"]),
                                                   .init(id: 2, name: "Seed B", cluster: 1, weight: 2, recordings: [])],
                                          labels: [0: "Ambient", 1: "Jazz"], styles: [0: ["ambient"], 1: ["jazz"]],
                                          artistStyles: [:], known: ["seed a", "seed b"], key: "fixture")
         var slots: [RadioDiscover.Slot] = [], identities: [UUID: RadioDiscover.Identity] = [:]
-        for e in 0..<4 {
+        for e in 0..<count {
             let episode = RadioDiscover.Episode(id: UUID(), radio_show_id: UUID(), provider: "nts", external_id: "show/\(e)",
                                                archive_url: "https://soundcloud.com/show/\(e)", title: "Episode \(e)", aired_at: Date(), image_url: nil,
                                                duration_seconds: 7200, radio_shows: .init(title: "Programme \(e)", host_name: "DJ \(e)"))
@@ -136,5 +136,22 @@ final class RadioDiscoverTests: XCTestCase {
         XCTAssertEqual(curated.first?.programmes.count, 2)
         XCTAssertEqual(curated.first?.bridges, ["Seed A", "Seed B"])
         XCTAssertTrue(curated.allSatisfy { $0.sharedStyles.isEmpty }, "no style from a programme or a seed")
+    }
+
+    /// Picks are shared out by how much of the listening each cluster holds,
+    /// and each says who connects it and how strongly.
+    func testPicksFollowTheClustersShareAndCarryTheirEvidence() async throws {
+        var (inputs, rows, slots, identities) = fixture(episodes: 8)
+        inputs.shares = [0: 0.75, 1: 0.25]
+        let found = try await RadioDiscover(source: source(rows, slots, identities)).discover(inputs)
+        XCTAssertEqual(found.picks.count, 8)
+        XCTAssertEqual(found.picks.filter { $0.cluster == 0 }.count, 6, "three quarters of the listening, three quarters of the picks")
+        XCTAssertEqual(found.picks.filter { $0.cluster == 1 }.count, 2)
+        let pick = try XCTUnwrap(found.picks.first)
+        let evidence = try XCTUnwrap(pick.evidence)
+        XCTAssertFalse(evidence.curated, "the fixture's programmes each play one seed once: adjacency, said as one episode")
+        XCTAssertEqual(evidence.programmes, [pick.programme])
+        XCTAssertTrue(pick.strength.hasPrefix("One episode"))
+        XCTAssertTrue(pick.connection.hasPrefix(pick.programme))
     }
 }

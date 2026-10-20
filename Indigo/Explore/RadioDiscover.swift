@@ -37,7 +37,34 @@ nonisolated struct RadioDiscoverPick: Identifiable, Codable, Sendable {
     var nearest: String
     var distance: Int
     var styles: [String]
+    /// The curatorial evidence, said on the card: who selected it, which of
+    /// the listener's artists they also play, on how many episodes.
+    struct Evidence: Codable, Sendable, Equatable {
+        var programmes: [String]
+        var bridges: [String]
+        var episodes: Int
+        var curators: Int
+        /// Curator affinity; false: played near one of the listener's artists in an episode.
+        var curated: Bool
+    }
+    var evidence: Evidence? = nil
     var id: String { "\(artistRow)|\(TrackDiscovery.trackKey(track.title))" }
+
+    /// How strong the connection is, in a few words. A single curator or a
+    /// single episode is said to be one.
+    var strength: String {
+        guard let e = evidence else { return "Radio Discover" }
+        if !e.curated { return distance <= 1 ? "One episode · played next to your artist" : "One episode · near your artist" }
+        let episodes = "\(e.episodes) episode\(e.episodes == 1 ? "" : "s")"
+        return e.curators >= 2 ? "\(e.curators) curators · \(episodes)" : "Single curator · \(episodes)"
+    }
+
+    /// The card's one line: who selected it, and the listener's artists they play.
+    var connection: String {
+        guard let e = evidence, !e.programmes.isEmpty else { return track.reason }
+        let who = e.programmes.count > 1 ? "\(e.programmes[0]) +\(e.programmes.count - 1)" : e.programmes[0]
+        return e.bridges.isEmpty ? who : "\(who) · \(e.bridges.prefix(2).joined(separator: ", "))"
+    }
 }
 
 nonisolated struct RadioDiscover: Sendable {
@@ -55,6 +82,9 @@ nonisolated struct RadioDiscover: Sendable {
         var artistStyles: [Int: Set<String>]
         var known: Set<String>
         var key: String
+        /// Each cluster's share of the listener's listening, long-term or
+        /// recent, whichever is larger: picks are shared out by it.
+        var shares: [Int: Double] = [:]
     }
     struct Episode: Codable, Sendable {
         struct Show: Codable, Sendable { var title: String?; var host_name: String? }
@@ -98,6 +128,8 @@ nonisolated struct RadioDiscover: Sendable {
         /// the listener's artists those programmes also play.
         var programmes: [String] = []
         var bridges: [String] = []
+        var episodes = 0
+        var curators = 0
     }
     /// How much one programme's selections overlap one taste cluster.
     struct Affinity: Sendable, Equatable {
@@ -158,8 +190,11 @@ nonisolated struct RadioDiscover: Sendable {
         var artistStyles = held.book.byID.mapValues(Set.init)
         for (id, tags) in held.book.recordsByID { artistStyles[id, default: []].formUnion(tags) }
         let parts = held.profile.units.map { "\($0.id)|\($0.longTerm)|\($0.recent)|\($0.styles.joined(separator: ","))" }.sorted()
+        var shares: [Int: Double] = [:]
+        for cluster in held.profile.clusters { shares[cluster.id] = max(cluster.longTermShare, cluster.recentShare) }
         return Inputs(seeds: seeds, labels: labels, styles: styles, artistStyles: artistStyles, known: held.known,
-                      key: "radio-curators-v2:" + CanonicalDigest.of(parts + seeds.map { "\($0.cluster):\($0.id)" }.sorted() + held.known.sorted()))
+                      key: "radio-curators-v2:" + CanonicalDigest.of(parts + seeds.map { "\($0.cluster):\($0.id)" }.sorted() + held.known.sorted()),
+                      shares: shares)
     }
 
     /// Conflicting destinations are excluded, including ambiguous MBID→Discogs
@@ -339,7 +374,8 @@ nonisolated struct RadioDiscover: Sendable {
                                      guard let curator = held.affinity.curator, !held.affinity.title.localizedCaseInsensitiveContains(curator) else { return held.affinity.title }
                                      return "\(held.affinity.title) (\(curator))"
                                  },
-                                 bridges: Array(Set(ordered.flatMap { $0.affinity.seeds })).sorted()))
+                                 bridges: Array(Set(ordered.flatMap { $0.affinity.seeds })).sorted(),
+                                 episodes: Set(e.programmes.values.flatMap(\.episodes)).count, curators: curators.count))
         }
         return out.sorted { $0.score != $1.score ? $0.score > $1.score : ($0.identity.id, $0.cluster) < ($1.identity.id, $1.cluster) }
     }
@@ -388,12 +424,22 @@ nonisolated struct RadioDiscover: Sendable {
         // The episode-adjacency ranking stays as the fallback, after every curated candidate.
         let (adjacent, programmes) = Self.rank(inputs: inputs, rows: rows, slots: slots, identities: identities)
         let ranked = curated + adjacent
-        // Round-robin clusters, then their strongest still-unheard recordings.
+        // Clusters share the picks by how much of the listening each holds,
+        // at least one each; slots left over go round the rest. Within a
+        // cluster, its strongest still-unheard recordings first.
         var queues = Dictionary(grouping: ranked, by: \.cluster)
+        let order = inputs.labels.keys.sorted { (inputs.shares[$0] ?? 0) != (inputs.shares[$1] ?? 0) ? (inputs.shares[$0] ?? 0) > (inputs.shares[$1] ?? 0) : $0 < $1 }
+        let present = order.filter { !(queues[$0] ?? []).isEmpty }
+        let weightTotal = present.reduce(0.0) { $0 + max(0.01, inputs.shares[$1] ?? 1) }
+        let quota = Dictionary(uniqueKeysWithValues: present.map { ($0, max(1, Int((8 * max(0.01, inputs.shares[$0] ?? 1) / max(weightTotal, 0.01)).rounded()))) })
+        var taken: [Int: Int] = [:]
         var picks: [RadioDiscoverPick] = [], used = Set<Int>(), checked = 0, perProgramme: [String: Int] = [:]
         var directLookups = 0
-        while picks.count < 8, checked < 28, queues.values.contains(where: { !$0.isEmpty }) {
-            for cluster in inputs.labels.keys.sorted() where picks.count < 8 && checked < 28 {
+        for capped in [true, false] {
+        while picks.count < 8, checked < 28 {
+            let open = order.filter { !(queues[$0] ?? []).isEmpty && (!capped || taken[$0, default: 0] < quota[$0, default: 1]) }
+            guard !open.isEmpty else { break }
+            for cluster in open where picks.count < 8 && checked < 28 {
                 guard var queue = queues[cluster], !queue.isEmpty else { continue }
                 try Task.checkCancellation()
                 let candidate = queue.removeFirst(); queues[cluster] = queue
@@ -455,9 +501,16 @@ nonisolated struct RadioDiscover: Sendable {
                 picks.append(RadioDiscoverPick(track: track, artistRow: row, cluster: cluster, clusterLabel: inputs.labels[cluster] ?? "",
                                               programme: episode.programme, episode: episode.title ?? episode.programme,
                                               curator: episode.radio_shows?.host_name, timing: timing, supportEpisodes: candidate.repeats,
-                                              nearest: candidate.nearest, distance: candidate.distance, styles: candidate.sharedStyles))
+                                              nearest: candidate.nearest, distance: candidate.distance, styles: candidate.sharedStyles,
+                                              evidence: candidate.programmes.isEmpty
+                                                ? .init(programmes: [episode.programme], bridges: [String(candidate.nearest.split(separator: "—").first ?? "").trimmingCharacters(in: .whitespaces)],
+                                                        episodes: 1, curators: 1, curated: false)
+                                                : .init(programmes: candidate.programmes, bridges: candidate.bridges, episodes: candidate.episodes,
+                                                        curators: candidate.curators, curated: true)))
+                taken[cluster, default: 0] += 1
                 await progress(picks)
             }
+        }
         }
         return Result(key: inputs.key, at: Date(), picks: picks, programmes: programmes, requests: await source.catalogueReads() - beforeReads, checked: checked)
     }

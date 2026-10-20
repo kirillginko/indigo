@@ -47,7 +47,7 @@ final class LiveCuratorAffinity: XCTestCase {
         var lines = ["Curator affinity for this Mac's listener: \(inputs.seeds.count) seeds over \(inputs.labels.count) clusters; \(Set(seedSlots.compactMap { $0.radio_episodes?.programmeKey }).count) programmes play them; \(affinities.count) programme–cluster affinities"]
         for cluster in inputs.labels.keys.sorted() {
             let top = affinities.filter { $0.cluster == cluster }.prefix(4)
-            lines.append("c\(cluster) \(inputs.labels[cluster] ?? ""): seeds \(inputs.seeds.filter { $0.cluster == cluster }.map(\.name).joined(separator: ", "))")
+            lines.append(String(format: "c%d (share %.2f) ", cluster, inputs.shares[cluster] ?? 0) + "\(inputs.labels[cluster] ?? ""): seeds \(inputs.seeds.filter { $0.cluster == cluster }.map(\.name).joined(separator: ", "))")
             for a in top { lines.append(String(format: "    %@%@ — %.2f: plays %@ in %d episodes", a.title, a.curator.map { " (\($0))" } ?? "", a.score, a.seeds.joined(separator: ", "), a.episodes)) }
             if top.isEmpty { lines.append("    no programme returns to this cluster's artists") }
         }
@@ -71,6 +71,7 @@ final class LiveCuratorAffinity: XCTestCase {
             lines.append("\(n + 1). \(pick.track.artist) — \(pick.track.title)  [\(pick.distance == 0 ? "curator affinity" : "adjacency")]")
             lines.append("   programme: \(pick.programme)\(pick.curator.map { " · \($0)" } ?? ""); episode: \(pick.episode)")
             lines.append("   evidence: \(pick.track.reason)")
+            lines.append("   card: \(pick.connection) — \(pick.strength)")
             lines.append("   plays: \(how) — \(pick.timing.label)")
             lines.append("   new to you: \(known ? "NO" : "yes"); cluster: c\(pick.cluster) \(pick.clusterLabel); artist's own styles: \(pick.styles.isEmpty ? "unknown" : pick.styles.joined(separator: ", "))")
         }
