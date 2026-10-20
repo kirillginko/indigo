@@ -524,3 +524,33 @@ nonisolated enum NoodsDate {
         return nil
     }
 }
+
+// MARK: - On air
+
+nonisolated struct NoodsLiveDTO: Decodable, Sendable {
+    struct Result: Decodable, Sendable {
+        struct Content: Decodable, Sendable { let title: String? }
+        struct Metadata: Decodable, Sendable { let title: String? }
+        let content: Content?
+        let metadata: Metadata?
+    }
+    let result: Result?
+}
+
+/// What Noods is broadcasting: the slot on the schedule, and what is
+/// actually playing in it.
+nonisolated struct NoodsOnAir: Sendable, Equatable {
+    let scheduledTitle: String?
+    let trackTitle: String?
+
+    /// The programme to name. Overnight the schedule only says "Repeats",
+    /// and what is playing is a resident's show, named by the track.
+    var showTitle: String? {
+        let slot = scheduledTitle?.trimmingCharacters(in: .whitespaces) ?? ""
+        let track = trackTitle?.trimmingCharacters(in: .whitespaces) ?? ""
+        if slot.isEmpty || slot.caseInsensitiveCompare("Repeats") == .orderedSame {
+            return track.isEmpty ? nil : track
+        }
+        return slot
+    }
+}

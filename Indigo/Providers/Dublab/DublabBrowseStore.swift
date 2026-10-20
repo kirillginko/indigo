@@ -63,6 +63,37 @@ final class DublabBrowseStore {
     private(set) var loadingBroadcasts: Set<String> = []
 
     @ObservationIgnored private let api = DublabAPI()
+
+    /// Pictures found for programmes on the air, nil where none was found.
+    private(set) var liveArtwork: [String: URL?] = [:]
+
+    /// Airtime names the slot "DJ - Programme" and carries no picture; the
+    /// archive files each broadcast of it as "DJ — Programme (date)" with
+    /// one. The newest broadcast with that exact name lends its picture.
+    func loadLiveArtworkIfNeeded(title: String) async {
+        guard liveArtwork[title] == nil else { return }
+        let wanted = Self.programmeKey(title)
+        let page: DublabArchivePage
+        do {
+            page = try await api.search(title, page: 1)
+        } catch {
+            Trace.note("dublab.live artwork \(title): \(error)")
+            liveArtwork[title] = .some(nil)
+            return
+        }
+        let match = page.broadcasts.first { Self.programmeKey($0.title) == wanted && $0.artworkURL != nil }
+        Trace.note("dublab.live artwork \(title): \(page.broadcasts.count) found, match \(match?.title ?? "none")")
+        liveArtwork[title] = .some(match?.artworkURL)
+    }
+
+    /// A broadcast's name without the date dublab puts after it.
+    nonisolated static func programmeKey(_ title: String) -> String {
+        var name = title.trimmingCharacters(in: .whitespaces)
+        if name.hasSuffix(")"), let open = name.lastIndex(of: "(") {
+            name = String(name[..<open])
+        }
+        return RecordingKey.normalize(name)
+    }
     /// Every broadcast seen anywhere, so opening one from a grid needs no
     /// round trip and a detail page always has something to show.
     @ObservationIgnored private var known: [String: DublabBroadcast] = [:]

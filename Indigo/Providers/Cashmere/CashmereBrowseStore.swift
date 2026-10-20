@@ -47,6 +47,29 @@ final class CashmereBrowseStore {
     private(set) var detailErrors: [String: String] = [:]
 
     @ObservationIgnored private let api = CashmereAPI()
+
+    /// Pictures of archived episodes replayed on air, by the track title
+    /// Airtime gives them; nil where none was found.
+    private(set) var replayArtwork: [String: URL?] = [:]
+
+    /// The episode a replay is, found by its title. Airtime writes
+    /// "Faulendes Holz – FAUL5 w/excel rose" and the archive "Faulendes
+    /// Holz FAUL5 w/excel rose"; failing that, the newest episode filed
+    /// under the programme lends its picture. Not every programme is in the
+    /// show directory — that one lists only categories it counts as
+    /// populated, and Faulendes Holz is not among them.
+    func loadReplayArtworkIfNeeded(trackTitle: String, programme: String?) async {
+        guard replayArtwork[trackTitle] == nil else { return }
+        let wanted = RecordingKey.normalize(trackTitle)
+        let found = (try? await api.fetchEpisodes(first: 10, search: trackTitle))?.episodes ?? []
+        let exact = found.first { RecordingKey.normalize($0.title) == wanted && $0.artworkURL != nil }
+        let sameProgramme = programme.flatMap { name in
+            found.first { episode in
+                episode.artworkURL != nil && episode.showName.map { RadioShowArtwork.matches($0, name) } == true
+            }
+        }
+        replayArtwork[trackTitle] = .some((exact ?? sameProgramme)?.artworkURL)
+    }
     @ObservationIgnored private var cursor: String?
     @ObservationIgnored private var hasMore = false
     @ObservationIgnored private var searchTask: Task<Void, Never>?

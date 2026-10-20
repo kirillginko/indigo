@@ -188,6 +188,20 @@ nonisolated struct CashmereOnAir: Sendable {
     let trackArtist: String?
     let upNext: [CashmereSlot]
 
+    /// The programme a replay belongs to. Cashmere fills its nights with
+    /// the archive under one slot, "Cashmere Radio Archive", and titles each
+    /// file "Programme – episode": "Faulendes Holz – FAUL5 w/excel rose".
+    var replayedProgramme: String? {
+        guard let trackTitle else { return nil }
+        for dash in [" – ", " — ", " - "] {
+            if let range = trackTitle.range(of: dash) {
+                let name = trackTitle[..<range.lowerBound].trimmingCharacters(in: .whitespaces)
+                return name.isEmpty ? nil : name
+            }
+        }
+        return nil
+    }
+
     var elapsedFraction: Double? {
         guard let showStartsAt, let showEndsAt, showEndsAt > showStartsAt else { return nil }
         let total = showEndsAt.timeIntervalSince(showStartsAt)

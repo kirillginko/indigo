@@ -41,32 +41,69 @@ struct LiveShowReader<Content: View>: View {
     @Environment(PanikProvider.self) private var panik
     @Environment(RovrProvider.self) private var rovr
     @Environment(N10ASProvider.self) private var n10as
+    @Environment(NoodsProvider.self) private var noods
 
     @Environment(CashmereBrowseStore.self) private var cashmereBrowse
     @Environment(Radio80000BrowseStore.self) private var radio80000Browse
     @Environment(N10ASBrowseStore.self) private var n10asBrowse
     @Environment(LYLBrowseStore.self) private var lylBrowse
     @Environment(PanikBrowseStore.self) private var panikBrowse
+    @Environment(NoodsBrowseStore.self) private var noodsBrowse
+    @Environment(DublabBrowseStore.self) private var dublabBrowse
+    @Environment(AlharaBrowseStore.self) private var alharaBrowse
 
     var body: some View {
         content(illustratedShow, next)
-            .task(id: show) { await loadArtwork() }
+            .task(id: ArtworkLookup(show: show, catalogues: catalogueSizes,
+                                    replay: cashmere.onAir?.replayedProgramme)) { await loadArtwork() }
+            // Noods is the one station nothing else asks about: its stream
+            // carries no metadata and no other view reads what is on.
+            .task(id: providerID) {
+                if providerID == NoodsProvider.providerID { await noods.refreshOnAir() }
+            }
+    }
+
+    /// What a lookup depends on. A directory another screen is already
+    /// loading answers "in hand" with nothing in it, so the lookup runs
+    /// again when the lists arrive, and when Cashmere moves on to the next
+    /// archived programme under the same slot.
+    private struct ArtworkLookup: Equatable {
+        let show: RadioShow?
+        let catalogues: [Int]
+        let replay: String?
+    }
+
+    private var catalogueSizes: [Int] {
+        [cashmereBrowse.shows.count, noodsBrowse.residents.count, panikBrowse.shows.count,
+         radio80000Browse.shows.count, n10asBrowse.shows.count, lylBrowse.shows.count]
     }
 
     /// Live metadata often carries only text. Use the same programme's
     /// directory picture, keeping any artwork supplied by the live feed.
     private var illustratedShow: RadioShow? {
         guard let show else { return nil }
+        // dublab's calendar gives every slot a picture, and for most of them
+        // it is the station's own artwork; a broadcast of the programme has
+        // the real one.
+        if providerID == DublabProvider.providerID, let found = dublabBrowse.liveArtwork[show.title] ?? nil {
+            return show.preferringArtwork(found)
+        }
         return show.withArtwork(archiveArtwork(for: show))
     }
 
     private func archiveArtwork(for show: RadioShow) -> URL? {
         switch providerID {
         case CashmereProvider.providerID:
-            let match = cashmereBrowse.shows.first {
-                $0.slug == show.detailID || RadioShowArtwork.matches($0.name, show.title)
+            if let programme = cashmereShow(for: show) {
+                return cashmereBrowse.preview(forShow: programme.slug)?.artworkURL
             }
-            return match.flatMap { cashmereBrowse.preview(forShow: $0.slug)?.artworkURL }
+            return cashmere.onAir?.trackTitle.flatMap { cashmereBrowse.replayArtwork[$0] ?? nil }
+        case NoodsProvider.providerID:
+            return noodsBrowse.residents.first { RadioShowArtwork.matches($0.name, show.title) }?.artworkURL
+        case DublabProvider.providerID:
+            return dublabBrowse.liveArtwork[show.title] ?? nil
+        case AlharaProvider.providerID:
+            return alharaBrowse.liveArtwork[show.title] ?? nil
         case Radio80000Provider.providerID:
             let match = radio80000Browse.shows.first { RadioShowArtwork.matches($0.title, show.title) }
             return match?.imageURL ?? match?.thumbnailURL
@@ -83,16 +120,36 @@ struct LiveShowReader<Content: View>: View {
         }
     }
 
+    /// The Cashmere programme on air: the slot itself, or, through the
+    /// night, the archived programme being replayed in it.
+    private func cashmereShow(for show: RadioShow) -> CashmereShow? {
+        let names = [show.title, cashmere.onAir?.replayedProgramme].compactMap { $0 }
+        return cashmereBrowse.shows.first { candidate in
+            candidate.slug == show.detailID || names.contains { RadioShowArtwork.matches(candidate.name, $0) }
+        }
+    }
+
     private func loadArtwork() async {
-        guard let show, show.artworkURL == nil else { return }
+        guard let show else { return }
+        if providerID == DublabProvider.providerID {
+            await dublabBrowse.loadLiveArtworkIfNeeded(title: show.title)
+            return
+        }
+        guard show.artworkURL == nil else { return }
         switch providerID {
         case CashmereProvider.providerID:
             await cashmereBrowse.loadShowsIfNeeded()
-            if let match = cashmereBrowse.shows.first(where: {
-                $0.slug == show.detailID || RadioShowArtwork.matches($0.name, show.title)
-            }) {
+            if let match = cashmereShow(for: show) {
                 await cashmereBrowse.loadShowPreviewIfNeeded(slug: match.slug)
+            } else if let onAir = cashmere.onAir, let track = onAir.trackTitle, onAir.replayedProgramme != nil {
+                await cashmereBrowse.loadReplayArtworkIfNeeded(trackTitle: track, programme: onAir.replayedProgramme)
             }
+        case NoodsProvider.providerID:
+            await noodsBrowse.loadResidentsIfNeeded()
+        case DublabProvider.providerID:
+            await dublabBrowse.loadLiveArtworkIfNeeded(title: show.title)
+        case AlharaProvider.providerID:
+            await alharaBrowse.loadLiveArtworkIfNeeded(title: show.title)
         case Radio80000Provider.providerID:
             await radio80000Browse.loadShowsIfNeeded()
         case N10ASProvider.providerID:
@@ -137,6 +194,7 @@ struct LiveShowReader<Content: View>: View {
         case PanikProvider.providerID: panik.now
         case RovrProvider.providerID: rovr.now
         case N10ASProvider.providerID: n10as.now
+        case NoodsProvider.providerID: noods.now
         default: nil
         }
     }
@@ -152,6 +210,12 @@ nonisolated enum RadioShowArtwork {
 }
 
 extension RadioShow {
+    func preferringArtwork(_ artwork: URL) -> RadioShow {
+        RadioShow(title: title, host: host, summary: summary, location: location,
+                  genres: genres, moods: moods, artworkURL: artwork,
+                  startsAt: startsAt, endsAt: endsAt, detailID: detailID)
+    }
+
     func withArtwork(_ fallback: URL?) -> RadioShow {
         RadioShow(title: title, host: host, summary: summary, location: location,
                   genres: genres, moods: moods, artworkURL: artworkURL ?? fallback,
