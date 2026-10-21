@@ -203,6 +203,14 @@ final class PlayedStationBackoffTests: XCTestCase {
         XCTAssertEqual(ReconnectPolicy.delay(attempt: 2, hasPlayed: true), .seconds(1))
         XCTAssertEqual(ReconnectPolicy.delay(attempt: 3, hasPlayed: true), .seconds(2))
         XCTAssertEqual(ReconnectPolicy.delay(attempt: 9, hasPlayed: true), .seconds(2))
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 15, hasPlayed: true), .seconds(2))
+    }
+
+    /// Half a minute of two-second retries, then the ordinary eight: a
+    /// station still refusing is not a dead zone ending.
+    func testTheQuickRetriesDoNotGoOnForever() {
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 16, hasPlayed: true), .seconds(8))
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 40, hasPlayed: true), .seconds(8))
     }
 
     func testThePolicyUsesItOnceTheStationHasPlayed() {

@@ -121,9 +121,15 @@ nonisolated struct ReconnectPolicy {
     /// ends without telling anyone: the path stays "satisfied" on one bar of
     /// signal, so nothing wakes a sleeping retry. At eight seconds the
     /// station could stay silent that long after the signal came back.
+    ///
+    /// Only for the first fifteen attempts, about half a minute. A station
+    /// still refusing after that is not a dead zone ending, and asking it
+    /// every two seconds for two more minutes is hammering a mount that
+    /// may be refusing because it is being asked.
     static func delay(attempt: Int, hasPlayed: Bool = false) -> Duration {
         guard attempt > 1 else { return .zero }
-        return .seconds(min(hasPlayed ? 2 : 8, 1 << (attempt - 2)))
+        let cap = hasPlayed && attempt <= 15 ? 2 : 8
+        return .seconds(min(cap, 1 << (attempt - 2)))
     }
 }
 
@@ -252,6 +258,31 @@ final class StreamAudioEngine {
     /// short of the cushion. Put back to `forwardBuffer` before it plays.
     @ObservationIgnored private static let holdingBuffer: TimeInterval = 30
 
+    /// The connection on the air has played since it was opened.
+    @ObservationIgnored private var connectionHasPlayed = false
+    /// Seconds this connection has spent held after playing.
+    ///
+    /// A held connection keeps its place, so every second held is a second
+    /// further behind live, and nothing brings it back: the server's queued
+    /// audio refills the cushion to the live edge it is now further from.
+    /// Measured against a stand-in mount, 12s gaps left the station 12.9s
+    /// behind, and a longer gap would add up to another ten. Past
+    /// `lagLimit` the station is reopened at the live edge instead.
+    @ObservationIgnored private var heldOnConnection: TimeInterval = 0
+    /// How far behind live a held station may fall before it is reopened.
+    @ObservationIgnored private let lagLimit: TimeInterval
+    /// When a station that had played started failing to come back.
+    @ObservationIgnored private var troubleSince: ContinuousClock.Instant?
+    /// How long a station that had played is tried before it is called
+    /// unavailable.
+    ///
+    /// Attempts alone do not bound it. A connection that hangs, as one does
+    /// on a bar of signal that carries nothing, costs the twenty-second
+    /// connect timeout every time, and sixty of those is twenty minutes of
+    /// "Buffering" — measured, one attempt every 22s. It still comes back by
+    /// itself when the network does: see `networkChanged(isOnline:)`.
+    @ObservationIgnored private let giveUpAfter: Duration
+
     /// `monitorsNetwork` is off only in tests, which say what the network
     /// is doing through `networkChanged(isOnline:)`, and use a smaller
     /// `reconnect` budget so that giving up takes seconds, not minutes.
@@ -259,11 +290,15 @@ final class StreamAudioEngine {
         monitorsNetwork: Bool = true,
         reconnect: ReconnectPolicy = ReconnectPolicy(limit: 5, sustainedLimit: 60),
         networkWaitLimit: Duration = .seconds(120),
-        cushion: CushionGate = CushionGate()
+        cushion: CushionGate = CushionGate(),
+        lagLimit: TimeInterval = 20,
+        giveUpAfter: Duration = .seconds(180)
     ) {
         self.reconnect = reconnect
         self.networkWaitLimit = networkWaitLimit
         self.cushion = cushion
+        self.lagLimit = lagLimit
+        self.giveUpAfter = giveUpAfter
         guard monitorsNetwork else { return }
         let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { [weak self] path in
@@ -310,6 +345,14 @@ final class StreamAudioEngine {
         return max(0, furthest - now)
     }
 
+    /// Seconds into the current connection's audio. With the moment that
+    /// connection's audio begins, it says how far behind live a station
+    /// has fallen. Read by the dropout harness.
+    var playhead: TimeInterval? {
+        guard let seconds = player.currentItem?.currentTime().seconds, seconds.isFinite else { return nil }
+        return seconds
+    }
+
     // MARK: - Transport
 
     func play(url: URL) {
@@ -318,6 +361,7 @@ final class StreamAudioEngine {
         isRetryPending = false
         reconnect.reset()
         wantsCushion = false
+        troubleSince = nil
         isUserPaused = false
         start(url: url)
     }
@@ -326,6 +370,7 @@ final class StreamAudioEngine {
         isUserPaused = false
         // The listener pressed play, and is not kept waiting for a cushion.
         wantsCushion = false
+        troubleSince = nil
         guard let currentURL else { return }
         // A live stream that has been paused is stale; reconnect at the live edge.
         start(url: currentURL)
@@ -351,6 +396,7 @@ final class StreamAudioEngine {
         endHold()
         reconnect.reset()
         wantsCushion = false
+        troubleSince = nil
         isWaitingForNetwork = false
         isRetryPending = false
         isUserPaused = false
@@ -431,6 +477,8 @@ final class StreamAudioEngine {
         isWaitingForNetwork = false
         isRetryPending = false
         connections += 1
+        connectionHasPlayed = false
+        heldOnConnection = 0
         currentURL = url
         setState(.buffering)
 
@@ -573,6 +621,9 @@ final class StreamAudioEngine {
         Trace.note("stream.hold \(reason)")
 
         let gate = cushion
+        // A connection still opening is at the live edge already; only a
+        // hold on one that has played puts it further behind.
+        let costsLag = connectionHasPlayed
         holdTask?.cancel()
         holdTask = Task { [weak self] in
             let started = ContinuousClock.now
@@ -598,8 +649,21 @@ final class StreamAudioEngine {
                 case .wait:
                     continue
                 case .play:
-                    Trace.note(String(format: "stream.cushion %.1fs after %.1fs", margin ?? 0, Self.seconds(now - started)))
+                    let waited = Self.seconds(now - started)
+                    if costsLag { self.heldOnConnection += waited }
+                    Trace.note(String(
+                        format: "stream.cushion %.1fs after %.1fs, held %.1fs on this connection",
+                        margin ?? 0, waited, self.heldOnConnection
+                    ))
                     self.isHolding = false
+                    if self.heldOnConnection > self.lagLimit, let url = self.currentURL {
+                        // Already silent, so this is the cheapest moment to
+                        // skip to now: the reopened station holds for its own
+                        // cushion and starts again at the live edge.
+                        Trace.note(String(format: "stream.behind live %.1fs, reopening at the live edge", self.heldOnConnection))
+                        self.start(url: url)
+                        return
+                    }
                     item.preferredForwardBufferDuration = Self.forwardBuffer
                     held.play()
                     return
@@ -706,6 +770,8 @@ final class StreamAudioEngine {
                 switch status {
                 case .playing:
                     self.reconnect.playing()
+                    self.connectionHasPlayed = true
+                    self.troubleSince = nil
                     self.connectDeadline?.cancel()
                     self.setState(.playing)
                 case .waitingToPlayAtSpecifiedRate:
@@ -790,12 +856,21 @@ final class StreamAudioEngine {
         guard !isUserPaused, let url = currentURL else { return }
         endHold()
         // A station that dropped after playing comes back on a cushion.
-        if reconnect.hasPlayed { wantsCushion = true }
+        if reconnect.hasPlayed {
+            wantsCushion = true
+            let now = ContinuousClock.now
+            if let since = troubleSince, now - since >= giveUpAfter {
+                Trace.note("stream.gave up after \(Int(Self.seconds(now - since)))s of trying")
+                giveUp(message)
+                return
+            }
+            if troubleSince == nil { troubleSince = now }
+        }
         switch reconnect.interrupted(isOnline: isOnline) {
         case .ignore:
             return
         case .giveUp:
-            setState(.failed(message))
+            giveUp(message)
         case .waitForNetwork:
             Trace.note("stream.reconnect waiting for a network \(message)")
             connectDeadline?.cancel()
@@ -832,6 +907,23 @@ final class StreamAudioEngine {
         }
     }
 
+    /// Calls the station unavailable, and lets go of the connection.
+    ///
+    /// Leaving the last attempt in place kept a hanging connection open
+    /// behind the "unavailable": measured, it failed by itself a hundred
+    /// seconds later and reported the station unavailable a second time.
+    private func giveUp(_ message: String) {
+        reconnectTask?.cancel()
+        connectDeadline?.cancel()
+        pauseCheck?.cancel()
+        isRetryPending = false
+        isWaitingForNetwork = false
+        removeObservers()
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+        setState(.failed(message))
+    }
+
     /// The device gained or lost its network path.
     ///
     /// A path coming back is the best news a dropped station can have, so a
@@ -851,6 +943,7 @@ final class StreamAudioEngine {
         if gaveUpAfterPlaying {
             // A fresh set of chances, as if the listener had pressed play.
             reconnect.reset()
+            troubleSince = nil
             start(url: url)
         } else if isWaitingForNetwork || isRetryPending {
             start(url: url)
