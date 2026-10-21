@@ -26,6 +26,9 @@ create table if not exists public.enrichment_cursors (
     updated_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select, insert, update, delete on public.enrichment_cursors to service_role;
+
 alter table public.enrichment_cursors enable row level security;
 -- No policy: the backend's bookkeeping, not the app's.
 

@@ -118,6 +118,7 @@ run -c "do \$\$ declare v text; begin foreach v in array array['split_artist_hal
 echo "    views read as whoever asked, and not for the app key"
 
 echo "· checks"
+run -f "$ROOT/supabase/tests/table_grants_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/radio_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/scene_smoke.sql" | sed 's/^/    /'
 run -f "$ROOT/supabase/tests/search_smoke.sql" | sed 's/^/    /'

@@ -28,6 +28,9 @@ create table if not exists public.r2_usage (
     updated_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select, insert, update, delete on public.r2_usage to service_role;
+
 alter table public.r2_usage enable row level security;
 revoke all on public.r2_usage from anon, authenticated;
 

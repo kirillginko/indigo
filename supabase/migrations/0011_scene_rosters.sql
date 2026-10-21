@@ -47,6 +47,10 @@ create table if not exists public.scene_rosters (
     updated_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.scene_rosters to anon, authenticated;
+grant select, insert, update, delete on public.scene_rosters to service_role;
+
 do $$
 begin
     if not exists (select 1 from pg_constraint where conname = 'scene_rosters_status_check') then
@@ -90,6 +94,10 @@ create table if not exists public.scene_members (
 
     created_at timestamptz not null default now()
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.scene_members to anon, authenticated;
+grant select, insert, update, delete on public.scene_members to service_role;
 
 create unique index if not exists scene_members_unique_idx
     on public.scene_members(roster_id, normalized_name);

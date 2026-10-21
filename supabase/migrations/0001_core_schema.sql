@@ -21,6 +21,10 @@ create table if not exists public.artists (
     updated_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.artists to anon, authenticated;
+grant select, insert, update, delete on public.artists to service_role;
+
 create table if not exists public.labels (
     id uuid primary key default gen_random_uuid(),
     name text not null,
@@ -29,6 +33,10 @@ create table if not exists public.labels (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.labels to anon, authenticated;
+grant select, insert, update, delete on public.labels to service_role;
 
 create table if not exists public.releases (
     id uuid primary key default gen_random_uuid(),
@@ -42,6 +50,10 @@ create table if not exists public.releases (
     updated_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.releases to anon, authenticated;
+grant select, insert, update, delete on public.releases to service_role;
+
 create table if not exists public.recordings (
     id uuid primary key default gen_random_uuid(),
     title text,
@@ -53,6 +65,10 @@ create table if not exists public.recordings (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.recordings to anon, authenticated;
+grant select, insert, update, delete on public.recordings to service_role;
 
 -- The same Indigo entity carries many upstream identities. The Indigo UUID
 -- stays canonical; this is how a Discogs or MusicBrainz id finds its way back
@@ -68,6 +84,10 @@ create table if not exists public.external_ids (
     updated_at timestamptz not null default now(),
     unique(provider, entity_type, external_id)
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.external_ids to anon, authenticated;
+grant select, insert, update, delete on public.external_ids to service_role;
 
 create table if not exists public.artwork (
     id uuid primary key default gen_random_uuid(),
@@ -88,6 +108,10 @@ create table if not exists public.artwork (
     unique(entity_type, entity_id)
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.artwork to anon, authenticated;
+grant select, insert, update, delete on public.artwork to service_role;
+
 -- The escape hatch that lets Indigo cache a provider's response before anyone
 -- has written a normalizer for it. Normalized tables are the goal; this keeps
 -- the app fast in the meantime.
@@ -101,6 +125,10 @@ create table if not exists public.metadata_cache (
     expires_at timestamptz,
     unique(provider, resource_type, resource_id)
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.metadata_cache to anon, authenticated;
+grant select, insert, update, delete on public.metadata_cache to service_role;
 
 -- ---------------------------------------------------------------------------
 -- Keep the polymorphic columns honest

@@ -24,6 +24,10 @@ create table if not exists public.radio_shows (
     unique(provider, external_id)
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.radio_shows to anon, authenticated;
+grant select, insert, update, delete on public.radio_shows to service_role;
+
 create table if not exists public.radio_appearances (
     id uuid primary key default gen_random_uuid(),
     recording_id uuid references public.recordings(id) on delete cascade,
@@ -32,6 +36,10 @@ create table if not exists public.radio_appearances (
     confidence double precision,
     created_at timestamptz not null default now()
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.radio_appearances to anon, authenticated;
+grant select, insert, update, delete on public.radio_appearances to service_role;
 
 -- A show plays a record once at a given point. Re-importing a tracklist should
 -- correct that row, not add a second one — without this, confidence in "played
@@ -63,6 +71,10 @@ create table if not exists public.music_relationships (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.music_relationships to anon, authenticated;
+grant select, insert, update, delete on public.music_relationships to service_role;
 
 -- An edge is the pair plus its kind. Re-deriving the graph must sharpen
 -- confidence on the existing edge rather than pile up copies of it.

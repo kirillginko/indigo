@@ -44,6 +44,9 @@ create table if not exists public.youtube_channels (
     added_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select, insert, update, delete on public.youtube_channels to service_role;
+
 alter table public.youtube_channels enable row level security;
 revoke all on public.youtube_channels from anon, authenticated;
 

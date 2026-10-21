@@ -206,6 +206,9 @@ create table if not exists public.enrichment_jobs (
     updated_at timestamptz not null default now()
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select, insert, update, delete on public.enrichment_jobs to service_role;
+
 do $$
 begin
     if not exists (select 1 from pg_constraint where conname = 'enrichment_jobs_status_check') then

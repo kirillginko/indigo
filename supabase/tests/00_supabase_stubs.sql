@@ -4,7 +4,10 @@
 
 create role anon nologin;
 create role authenticated nologin;
-create role service_role nologin;
+create role service_role nologin bypassrls;
+
+-- Tables deliberately have no default API grants, matching Supabase's
+-- October 30, 2026 behavior. Each table-creation migration must grant access.
 
 -- What a Supabase project grants on every new function, by role name. Without
 -- this a plain Postgres is stricter than the real thing: `revoke ... from

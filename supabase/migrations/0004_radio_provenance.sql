@@ -61,6 +61,10 @@ create table if not exists public.radio_episodes (
     unique(provider, external_id)
 );
 
+-- Explicit Data API access; do not rely on project default grants.
+grant select on public.radio_episodes to anon, authenticated;
+grant select, insert, update, delete on public.radio_episodes to service_role;
+
 do $$
 begin
     if not exists (select 1 from pg_constraint where conname = 'radio_episodes_tracklist_status_check') then
