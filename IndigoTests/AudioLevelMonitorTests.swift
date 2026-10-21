@@ -192,3 +192,54 @@ final class SustainedReconnectPolicyTests: XCTestCase {
         XCTAssertEqual(policy.currentLimit, 1)
     }
 }
+
+// MARK: - A station that has played comes back quickly
+
+final class PlayedStationBackoffTests: XCTestCase {
+    /// A dead zone ends without the path saying so, and an eight-second
+    /// sleep could keep the station quiet that long after the signal was back.
+    func testAStationThatHasPlayedWaitsAtMostTwoSeconds() {
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 1, hasPlayed: true), .zero)
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 2, hasPlayed: true), .seconds(1))
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 3, hasPlayed: true), .seconds(2))
+        XCTAssertEqual(ReconnectPolicy.delay(attempt: 9, hasPlayed: true), .seconds(2))
+    }
+
+    func testThePolicyUsesItOnceTheStationHasPlayed() {
+        var policy = ReconnectPolicy(limit: 5, sustainedLimit: 10)
+        policy.playing()
+        for _ in 0..<4 { _ = policy.interrupted(); policy.opening() }
+        XCTAssertEqual(policy.interrupted(), .retry(after: .seconds(2)))
+    }
+}
+
+// MARK: - A station that dropped out plays again from a cushion
+
+final class CushionGateTests: XCTestCase {
+    private let gate = CushionGate(target: 8, patience: 12, stallLimit: 10)
+
+    func testItWaitsForTheCushion() {
+        XCTAssertEqual(gate.decide(margin: 3, waited: 2, sinceProgress: 0.2, complete: false), .wait)
+        XCTAssertEqual(gate.decide(margin: 8, waited: 6, sinceProgress: 0.2, complete: false), .play)
+    }
+
+    /// A station receiving slowly is not held forever.
+    func testPatienceRunsOutForAStationThatIsReceiving() {
+        XCTAssertEqual(gate.decide(margin: 4, waited: 12, sinceProgress: 0.3, complete: false), .play)
+        XCTAssertEqual(gate.decide(margin: 0.5, waited: 12, sinceProgress: 0.3, complete: false), .wait,
+                       "Half a second would only run dry again")
+    }
+
+    /// A connection that carries nothing for ten seconds is given up on —
+    /// but not one still opening, which is the connect timeout's to judge.
+    func testADeadConnectionIsReopened() {
+        XCTAssertEqual(gate.decide(margin: 2, waited: 10, sinceProgress: 10, complete: false), .reopen)
+        XCTAssertEqual(gate.decide(margin: nil, waited: 15, sinceProgress: 15, complete: false), .wait)
+        XCTAssertEqual(gate.decide(margin: nil, waited: 30, sinceProgress: 30, complete: false), .reopen)
+    }
+
+    /// Everything there is, is in hand.
+    func testAnItemWithAKnownEndPlaysWhenItIsAllLoaded() {
+        XCTAssertEqual(gate.decide(margin: 1, waited: 0.25, sinceProgress: 0, complete: true), .play)
+    }
+}

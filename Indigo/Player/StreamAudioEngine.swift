@@ -56,8 +56,8 @@ nonisolated struct ReconnectPolicy {
     /// moment ago: that one dropping is the network far more often than the
     /// station, and a phone in a car loses the network for longer than
     /// sixteen seconds all the time. In the trace, a lookup failure spent
-    /// attempts one to five in 7.2s. Twenty, at the same backoff capped at
-    /// eight seconds, is a little over two minutes of trying.
+    /// attempts one to five in 7.2s. Sixty, at the two-second backoff a
+    /// station that has played gets, is about two minutes of trying.
     let sustainedLimit: Int
     /// Whether the station has played since it was put on.
     private(set) var hasPlayed = false
@@ -90,7 +90,7 @@ nonisolated struct ReconnectPolicy {
         guard attempts < currentLimit else { return .giveUp }
         attempts += 1
         isAwaitingRetry = true
-        return .retry(after: Self.delay(attempt: attempts))
+        return .retry(after: Self.delay(attempt: attempts, hasPlayed: hasPlayed))
     }
 
     /// The stream is being opened again, so whatever fails next is new.
@@ -115,9 +115,74 @@ nonisolated struct ReconnectPolicy {
     ///
     /// Waiting is right once a station is properly unreachable, so the
     /// backoff is kept for every attempt after the first.
-    static func delay(attempt: Int) -> Duration {
+    ///
+    /// A station that has played is capped at two seconds rather than eight.
+    /// It dropping is almost always a phone in a dead zone, and a dead zone
+    /// ends without telling anyone: the path stays "satisfied" on one bar of
+    /// signal, so nothing wakes a sleeping retry. At eight seconds the
+    /// station could stay silent that long after the signal came back.
+    static func delay(attempt: Int, hasPlayed: Bool = false) -> Duration {
         guard attempt > 1 else { return .zero }
-        return .seconds(min(8, 1 << (attempt - 2)))
+        return .seconds(min(hasPlayed ? 2 : 8, 1 << (attempt - 2)))
+    }
+}
+
+/// When a station that dropped out may play again.
+///
+/// Most of these stations hold almost nothing in hand. Measured on
+/// 2026-10-21, Kiosk keeps 1.3s ahead of the playhead, n10.as 1.6s, NTS 2.3s,
+/// Noods, Dublab and Radio 80000 about 2.7s — their servers burst that much
+/// on connect and then pace at realtime. In a car, any gap in the signal
+/// longer than that is heard.
+///
+/// The app cannot ask a paced server for more, but it can play further
+/// behind it. A paused player keeps downloading: Kiosk's margin went from
+/// 2.4s to 12.8s in ten seconds paused, and stayed there once it played
+/// again. So once a station has dropped out, it is held until it has a
+/// cushion, and the next dead zone on the same road is spent from that
+/// instead of heard.
+///
+/// It is only for a station that has dropped out. Starting a station stays
+/// as quick as it is; a listener who never loses the signal never waits.
+nonisolated struct CushionGate {
+    enum Decision: Equatable {
+        case wait
+        case play
+        /// Nothing is arriving: the connection is dead, open or not.
+        case reopen
+    }
+
+    /// Seconds in hand before playing again.
+    var target: TimeInterval = 8
+    /// How long a station that is receiving is held before it plays with
+    /// whatever it has.
+    var patience: TimeInterval = 12
+    /// How long without a single new byte before the connection is
+    /// given up on.
+    ///
+    /// A stalled connection usually comes back by itself. Against a stand-in
+    /// mount that went quiet for six seconds with its socket open, AVPlayer
+    /// stalled and then resumed on the same connection when the bytes
+    /// returned, with the six seconds the server had queued arriving at
+    /// once. Reconnecting instead throws that away, and in a dead zone the
+    /// new connection fails too.
+    var stallLimit: TimeInterval = 10
+
+    /// - Parameters:
+    ///   - margin: seconds loaded beyond the playhead, nil before anything has.
+    ///   - waited: seconds since the hold began.
+    ///   - sinceProgress: seconds since the loaded end last moved.
+    ///   - complete: the item has a known end and all of it is loaded, so
+    ///     there is no more to wait for.
+    func decide(
+        margin: TimeInterval?, waited: TimeInterval, sinceProgress: TimeInterval, complete: Bool
+    ) -> Decision {
+        // Nothing yet is the connect timeout's to judge, not this.
+        guard let margin else { return waited >= 30 ? .reopen : .wait }
+        if margin >= target || (complete && margin > 0) { return .play }
+        if sinceProgress >= stallLimit { return .reopen }
+        if waited >= patience, margin >= 1 { return .play }
+        return waited >= 30 ? .reopen : .wait
     }
 }
 
@@ -173,16 +238,32 @@ final class StreamAudioEngine {
     /// How many times a stream has been opened. Read by tests.
     @ObservationIgnored private(set) var connections = 0
 
+    @ObservationIgnored private let cushion: CushionGate
+    /// The station has dropped out since it was put on, so it plays from a
+    /// cushion from now on. See `CushionGate`.
+    @ObservationIgnored private var wantsCushion = false
+    /// The player is paused on purpose, gathering a cushion.
+    @ObservationIgnored private(set) var isHolding = false
+    @ObservationIgnored private var holdTask: Task<Void, Never>?
+
+    /// The forward buffer a station plays on. See `start(url:)`.
+    @ObservationIgnored private static let forwardBuffer: TimeInterval = 2
+    /// The forward buffer while held, high enough not to stop the download
+    /// short of the cushion. Put back to `forwardBuffer` before it plays.
+    @ObservationIgnored private static let holdingBuffer: TimeInterval = 30
+
     /// `monitorsNetwork` is off only in tests, which say what the network
     /// is doing through `networkChanged(isOnline:)`, and use a smaller
     /// `reconnect` budget so that giving up takes seconds, not minutes.
     init(
         monitorsNetwork: Bool = true,
-        reconnect: ReconnectPolicy = ReconnectPolicy(limit: 5, sustainedLimit: 20),
-        networkWaitLimit: Duration = .seconds(120)
+        reconnect: ReconnectPolicy = ReconnectPolicy(limit: 5, sustainedLimit: 60),
+        networkWaitLimit: Duration = .seconds(120),
+        cushion: CushionGate = CushionGate()
     ) {
         self.reconnect = reconnect
         self.networkWaitLimit = networkWaitLimit
+        self.cushion = cushion
         guard monitorsNetwork else { return }
         let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { [weak self] path in
@@ -236,12 +317,15 @@ final class StreamAudioEngine {
         isWaitingForNetwork = false
         isRetryPending = false
         reconnect.reset()
+        wantsCushion = false
         isUserPaused = false
         start(url: url)
     }
 
     func resume() {
         isUserPaused = false
+        // The listener pressed play, and is not kept waiting for a cushion.
+        wantsCushion = false
         guard let currentURL else { return }
         // A live stream that has been paused is stale; reconnect at the live edge.
         start(url: currentURL)
@@ -250,6 +334,7 @@ final class StreamAudioEngine {
     func pause() {
         connectDeadline?.cancel()
         pauseCheck?.cancel()
+        endHold()
         isUserPaused = true
         reconnectTask?.cancel()
         isWaitingForNetwork = false
@@ -263,7 +348,9 @@ final class StreamAudioEngine {
         reconnectTask?.cancel()
         connectDeadline?.cancel()
         pauseCheck?.cancel()
+        endHold()
         reconnect.reset()
+        wantsCushion = false
         isWaitingForNetwork = false
         isRetryPending = false
         isUserPaused = false
@@ -337,6 +424,7 @@ final class StreamAudioEngine {
     private func start(url: URL) {
         removeObservers()
         pauseCheck?.cancel()
+        endHold()
         // Whatever failed last is behind us; the next failure is a new one.
         reconnect.opening()
         reconnectTask?.cancel()
@@ -407,7 +495,7 @@ final class StreamAudioEngine {
         // which is how every station but the one already playing came to
         // report itself unavailable. This bounds the wait instead of
         // abolishing it.
-        item.preferredForwardBufferDuration = 2
+        item.preferredForwardBufferDuration = Self.forwardBuffer
         // No level tap on a live stream. It is what breaks them.
         //
         // Bisected by ear against this stream, out of the app, one setting at
@@ -433,8 +521,106 @@ final class StreamAudioEngine {
         // keeps its meter; it has a whole file in hand and no margin to lose.
         player.replaceCurrentItem(with: item)
         observe(item)
-        player.play()
+        if wantsCushion {
+            hold(player, "reopening")
+        } else {
+            player.play()
+        }
         watchForSilence()
+    }
+
+    // MARK: - Cushion
+
+    /// Seconds loaded beyond the playhead, nil before anything has, and
+    /// whether the item has a known end that is all loaded.
+    private static func loaded(_ item: AVPlayerItem) -> (margin: TimeInterval?, end: TimeInterval?, complete: Bool) {
+        let now = item.currentTime().seconds
+        let end = item.loadedTimeRanges.compactMap { value -> TimeInterval? in
+            let range = value.timeRangeValue
+            let end = (range.start + range.duration).seconds
+            return end.isFinite ? end : nil
+        }.max()
+        guard let end, now.isFinite else { return (nil, nil, false) }
+        let duration = item.duration.seconds
+        let complete = duration.isFinite && end >= duration - 0.05
+        return (max(0, end - now), end, complete)
+    }
+
+    /// Pauses the player on purpose until it has a cushion, keeping its
+    /// connection: a paused player goes on downloading.
+    ///
+    /// Used both for a station reopened after a drop and for one whose
+    /// connection stalled. The second is the one that matters most in a car:
+    /// a stall used to be answered by throwing the connection away and
+    /// opening another inside the same dead zone, which failed, and the
+    /// backoff that followed kept the station quiet after the signal came
+    /// back. Holding keeps the connection, which usually recovers by itself
+    /// and brings the audio the server queued for it.
+    private func hold(_ held: AVPlayer, _ reason: String) {
+        guard !isHolding, let item = held.currentItem else { return }
+        isHolding = true
+        wantsCushion = true
+        connectDeadline?.cancel()
+        pauseCheck?.cancel()
+        setState(.buffering)
+        #if os(iOS)
+        // A paused player is not playing, and iOS may suspend an app that is
+        // not playing. The hold is let go of when the stream plays again.
+        holdBackgroundTime()
+        #endif
+        item.preferredForwardBufferDuration = Self.holdingBuffer
+        held.pause()
+        Trace.note("stream.hold \(reason)")
+
+        let gate = cushion
+        holdTask?.cancel()
+        holdTask = Task { [weak self] in
+            let started = ContinuousClock.now
+            var furthest = -Double.infinity
+            var progressed = started
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(250))
+                guard !Task.isCancelled, let self, self.player === held, self.isHolding,
+                      !self.isUserPaused, held.currentItem === item
+                else { return }
+                let now = ContinuousClock.now
+                let (margin, end, complete) = Self.loaded(item)
+                if let end, end > furthest + 0.01 {
+                    furthest = end
+                    progressed = now
+                }
+                switch gate.decide(
+                    margin: margin,
+                    waited: Self.seconds(now - started),
+                    sinceProgress: Self.seconds(now - progressed),
+                    complete: complete
+                ) {
+                case .wait:
+                    continue
+                case .play:
+                    Trace.note(String(format: "stream.cushion %.1fs after %.1fs", margin ?? 0, Self.seconds(now - started)))
+                    self.isHolding = false
+                    item.preferredForwardBufferDuration = Self.forwardBuffer
+                    held.play()
+                    return
+                case .reopen:
+                    self.isHolding = false
+                    self.handleInterruption("The connection stalled.")
+                    return
+                }
+            }
+        }
+    }
+
+    private static func seconds(_ duration: Duration) -> TimeInterval {
+        let parts = duration.components
+        return TimeInterval(parts.seconds) + TimeInterval(parts.attoseconds) / 1e18
+    }
+
+    private func endHold() {
+        holdTask?.cancel()
+        holdTask = nil
+        isHolding = false
     }
 
     /// Calls a station that never starts what it is.
@@ -459,26 +645,6 @@ final class StreamAudioEngine {
         }
     }
 
-    /// How long a station that was playing may sit rebuffering before it is
-    /// treated as dropped.
-    ///
-    /// AVPlayer normally says a playing stream has stalled, and the stall is
-    /// answered at once. This is for when it does not: without it a stream
-    /// waiting for data that never comes would read "buffering" — playing,
-    /// to the lock screen — for as long as the listener let it.
-    @ObservationIgnored private static let rebufferTimeout = Duration.seconds(30)
-
-    private func watchRebuffering(_ waiting: AVPlayer) {
-        connectDeadline?.cancel()
-        connectDeadline = Task { [weak self] in
-            try? await Task.sleep(for: Self.rebufferTimeout)
-            guard !Task.isCancelled, let self, self.player === waiting, !self.isUserPaused,
-                  self.state == .buffering, !self.isRetryPending, !self.isWaitingForNetwork
-            else { return }
-            self.handleInterruption("The station stopped sending.")
-        }
-    }
-
     /// How long a pause nobody asked for is given to explain itself.
     @ObservationIgnored private static let pauseGrace = Duration.milliseconds(1500)
     @ObservationIgnored private var pauseCheck: Task<Void, Never>?
@@ -500,7 +666,7 @@ final class StreamAudioEngine {
         pauseCheck = Task { [weak self] in
             try? await Task.sleep(for: Self.pauseGrace)
             guard !Task.isCancelled, let self, self.player === paused, !self.isUserPaused,
-                  paused.timeControlStatus == .paused,
+                  !self.isHolding, paused.timeControlStatus == .paused,
                   !self.isRetryPending, !self.isWaitingForNetwork,
                   self.state == .playing || self.state == .buffering
             else { return }
@@ -544,10 +710,18 @@ final class StreamAudioEngine {
                     self.setState(.playing)
                 case .waitingToPlayAtSpecifiedRate:
                     if case .failed = self.state { break }
-                    let wasPlaying = self.state == .playing
-                    self.setState(.buffering)
-                    if wasPlaying { self.watchRebuffering(player) }
+                    // A station that was playing has run dry. AVPlayer would
+                    // resume the moment it has two seconds again, which is
+                    // the same two seconds that just ran out; holding it
+                    // gathers enough for the next gap.
+                    if self.state == .playing {
+                        self.hold(player, "ran dry")
+                    } else {
+                        self.setState(.buffering)
+                    }
                 case .paused:
+                    // The engine's own pause, gathering a cushion.
+                    if self.isHolding { break }
                     // Not a state of its own. A stream that ends or fails
                     // pauses as it goes, and the notifications below say
                     // which; on an iPhone the system also pauses it for a
@@ -569,7 +743,13 @@ final class StreamAudioEngine {
         ) { [weak self] note in
             MainActor.assumeIsolated {
                 guard let self, self.isOnAir(note) else { return }
-                self.handleInterruption("The connection stalled.")
+                // A station that has played keeps its connection through a
+                // stall; one still opening has nothing to keep.
+                if self.reconnect.hasPlayed {
+                    self.hold(self.player, "stalled")
+                } else {
+                    self.handleInterruption("The connection stalled.")
+                }
             }
         }
 
@@ -608,6 +788,9 @@ final class StreamAudioEngine {
 
     private func handleInterruption(_ message: String) {
         guard !isUserPaused, let url = currentURL else { return }
+        endHold()
+        // A station that dropped after playing comes back on a cushion.
+        if reconnect.hasPlayed { wantsCushion = true }
         switch reconnect.interrupted(isOnline: isOnline) {
         case .ignore:
             return
