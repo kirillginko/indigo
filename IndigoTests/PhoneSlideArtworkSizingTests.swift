@@ -59,6 +59,29 @@ final class PhoneSlideArtworkSizingTests: XCTestCase {
         XCTAssertTrue(PhoneSlideArtworkSizing.fillsViewport(imagePixels: CGSize(width: 3000, height: 3000), viewport: viewport, scale: 3))
     }
 
+    // MARK: - For You draws every small picture at one size
+
+    func testForYouDrawsEverySmallPictureAtTheSameSize() {
+        let sides = [CGSize(width: 150, height: 150), CGSize(width: 225, height: 225),
+                     CGSize(width: 447, height: 447), CGSize(width: 800, height: 240)].map {
+            PhoneSlideArtworkSizing.containedSide(viewport: viewport, imagePixels: $0, scale: 3,
+                                                  minimumSide: .infinity)
+        }
+        XCTAssertEqual(Set(sides), [200], "One size whatever the resolution")
+        XCTAssertEqual(PhoneSlideArtworkSizing.containedSide(
+            viewport: CGSize(width: 280, height: 600), imagePixels: CGSize(width: 150, height: 150),
+            scale: 3, minimumSide: .infinity), 168, accuracy: 0.001, "Still fits a narrow screen")
+    }
+
+    /// A good cover fills the slide; a thumbnail does not.
+    func testForYouFillsWithAHighQualityPicture() {
+        let floor = PhoneSlideArtworkSizing.forYouFillFloor
+        XCTAssertTrue(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 1200, height: 1200), minimumSide: floor))
+        XCTAssertTrue(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 1000, height: 1000), minimumSide: floor))
+        XCTAssertFalse(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 600, height: 600), minimumSide: floor))
+        XCTAssertFalse(PhoneSlideArtworkSizing.fillsSlide(imagePixels: CGSize(width: 1500, height: 500), minimumSide: floor))
+    }
+
     // MARK: - Live fills unless the picture is very small
 
     func testTheLotsCameraFrameFillsTheSlide() {

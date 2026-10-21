@@ -9,13 +9,26 @@ nonisolated enum PhoneSlideArtworkSizing {
     }
 
     /// Keep small images within their native pixels at the screen's backing scale.
+    ///
+    /// `minimumSide` is the size every picture is drawn at however few
+    /// pixels it has. For You passes the whole available side, so every
+    /// slide that cannot fill shows its picture at one size: a 150-pixel
+    /// thumbnail was drawn fifty points wide beside a 450-pixel one at 150.
     static func containedSide(viewport: CGSize, imagePixels: CGSize? = nil,
-                              scale: CGFloat = 1, maximumSide: CGFloat = 200) -> CGFloat {
+                              scale: CGFloat = 1, maximumSide: CGFloat = 200,
+                              minimumSide: CGFloat = 0) -> CGFloat {
         let available = max(0, min(maximumSide, viewport.width - 96, viewport.height * 0.28))
         guard let imagePixels else { return available }
         guard scale > 0 else { return 0 }
-        return max(0, min(available, min(imagePixels.width, imagePixels.height) / scale))
+        let native = min(imagePixels.width, imagePixels.height) / scale
+        return max(0, min(available, max(minimumSide, native)))
     }
+
+    /// For You fills the slide with any picture whose shorter side has this
+    /// many pixels. Requiring one as sharp as the screen in both directions
+    /// (1179×2556 on an iPhone 15) meant a 1200-pixel cover never filled,
+    /// and almost nothing did.
+    static let forYouFillFloor: CGFloat = 1000
 
     /// Whether a picture is enough to fill a slide when some softness is
     /// acceptable: its shorter side has at least `minimumSide` pixels. The
@@ -36,6 +49,10 @@ struct PhoneSlideArtwork: View {
     /// this many pixels, accepting some softness, rather than only one sharp
     /// at full Retina. Nil keeps the strict rule.
     var fillFloor: CGFloat? = nil
+    /// Draw every picture that cannot fill at the same size, however small
+    /// it is, rather than at its native pixels, station marks included.
+    /// For You's slides, so a page of them does not change size each swipe.
+    var uniformContained = false
     @Environment(\.displayScale) private var scale
     @State private var loaded: Loaded?
     @State private var settled = false
@@ -58,6 +75,9 @@ struct PhoneSlideArtwork: View {
         guard let loaded else { return nil }
         return loaded.request == request || loaded.address == stationMark ? loaded : nil
     }
+
+    /// The smallest show picture that displaces a station's mark.
+    private static let markFloor: CGFloat = 200
 
     /// How long a picture takes to come up out of the blur.
     private static let reveal = Animation.easeOut(duration: 0.5)
@@ -103,8 +123,11 @@ struct PhoneSlideArtwork: View {
                 let pixels = Self.pixels(of: image)
                 // On Live a picture too small to fill the slide does not
                 // displace the station's mark: a 60-pixel thumbnail drawn at
-                // twenty points is worse than the logo.
-                if fillFloor != nil, stationMark != nil, !fills(pixels) { continue }
+                // twenty points is worse than the logo. Judged on Live's own
+                // floor even where filling asks more, so For You still shows
+                // a show's 600-pixel picture rather than the logo.
+                if fillFloor != nil, stationMark != nil,
+                   !PhoneSlideArtworkSizing.fillsSlide(imagePixels: pixels, minimumSide: min(fillFloor ?? 0, Self.markFloor)) { continue }
                 let coverage = min(pixels.width / max(1, viewport.width), pixels.height / max(1, viewport.height))
                 if coverage > bestCoverage {
                     bestCoverage = coverage
@@ -146,7 +169,8 @@ struct PhoneSlideArtwork: View {
                 ArtworkView(remoteURL: current.address,
                             side: PhoneSlideArtworkSizing.containedSide(
                                 viewport: viewport, imagePixels: current.pixels,
-                                scale: scale, maximumSide: isStationMark ? 120 : 200),
+                                scale: scale, maximumSide: isStationMark && !uniformContained ? 120 : 200,
+                                minimumSide: uniformContained ? .infinity : 0),
                             glyphScale: 0.3)
                     .shadow(color: .black.opacity(0.45), radius: 24, y: 12)
                     .position(x: viewport.width / 2, y: viewport.height * 0.26)

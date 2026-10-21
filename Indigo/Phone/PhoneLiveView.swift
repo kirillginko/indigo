@@ -48,6 +48,9 @@ struct PhoneLiveSlide: View {
     let entry: StationEntry
     let item: MediaItem?
     let insets: EdgeInsets
+    /// For You's rules: every picture that cannot fill at one size, and only
+    /// a sharp one full-bleed. Live keeps its own.
+    var forYou = false
     let openStation: () -> Void
 
     @Environment(PlaybackCoordinator.self) private var player
@@ -67,7 +70,8 @@ struct PhoneLiveSlide: View {
                     PhoneSlideArtwork(
                         picture: show?.artworkURL, preview: nil, viewport: proxy.size,
                         stationMark: StationMark.logoURL(for: entry.station.providerID),
-                        fillFloor: 200
+                        fillFloor: forYou ? PhoneSlideArtworkSizing.forYouFillFloor : 200,
+                        uniformContained: forYou
                     )
                     .frame(width: proxy.size.width, height: proxy.size.height)
                 }

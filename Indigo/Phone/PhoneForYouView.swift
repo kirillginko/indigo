@@ -108,7 +108,7 @@ struct PhoneForYouView: View {
                                         Task { await open(suggestion.node, from: ListeningSurface.Origin(screen: "foryou.slides", via: suggestion.via, route: suggestion.kind.rawValue)) }
                                     }
                                 case .onNow(let entry):
-                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets) {
+                                    PhoneLiveSlide(entry: entry, item: playable(entry), insets: insets, forYou: true) {
                                         appState.select(entry.route)
                                     }
                                 }
@@ -323,7 +323,9 @@ struct PhoneForYouSlide: View {
     var body: some View {
         ZStack {
             GeometryReader { proxy in
-                PhoneSlideArtwork(picture: picture, preview: card.preview, viewport: proxy.size)
+                PhoneSlideArtwork(picture: picture, preview: card.preview, viewport: proxy.size,
+                                  fillFloor: PhoneSlideArtworkSizing.forYouFillFloor,
+                                  uniformContained: true)
                     .frame(width: proxy.size.width, height: proxy.size.height)
             }
             .clipped()
