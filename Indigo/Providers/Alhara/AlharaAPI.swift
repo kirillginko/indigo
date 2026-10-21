@@ -98,6 +98,24 @@ nonisolated struct AlharaAPI: Sendable {
         return show
     }
 
+    /// Pictures of a show on the air, from a Mixcloud search for its exact
+    /// name. A replay from the archive is often only on the host's own
+    /// account, not alHara's, so any uploader counts — but only a name that
+    /// begins with the host and show, word for word.
+    func searchArtwork(host: String?, show: String) async -> URL? {
+        let wanted = AlharaLiveTitle.matchKey(host: host, show: show)
+        guard !wanted.isEmpty,
+              var components = URLComponents(string: "https://api.mixcloud.com/search/") else { return nil }
+        components.queryItems = [
+            URLQueryItem(name: "q", value: [host, show].compactMap { $0 }.joined(separator: " ")),
+            URLQueryItem(name: "type", value: "cloudcast"),
+            URLQueryItem(name: "limit", value: "20")
+        ]
+        guard let url = components.url,
+              let page: MixcloudPageDTO = try? await decode(url: url) else { return nil }
+        return page.data.first { RecordingKey.normalize($0.name ?? "").hasPrefix(wanted) }?.artworkURL
+    }
+
     // MARK: - Transport
 
     private func decode<T: Decodable>(_ path: String) async throws -> T {

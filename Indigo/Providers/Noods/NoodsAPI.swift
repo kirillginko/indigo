@@ -94,6 +94,30 @@ nonisolated struct NoodsAPI: Sendable {
         try await get("collections/\(escape(slug))")
     }
 
+    // MARK: On air
+
+    /// What is on the air, from Radio Cult, which runs Noods' stream. This
+    /// endpoint is public and takes no key — the secret one above stays unused.
+    func fetchOnAir() async throws -> NoodsOnAir {
+        guard let url = URL(string: "https://api.radiocult.fm/api/station/noods-radio/schedule/live") else {
+            throw NoodsError.malformedResponse
+        }
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let data: Data
+        do {
+            (data, _) = try await session.data(for: request)
+        } catch let error as URLError where error.code == .cancelled {
+            throw CancellationError()
+        } catch {
+            throw NoodsError.transport(error.localizedDescription)
+        }
+        guard let live = try? JSONDecoder().decode(NoodsLiveDTO.self, from: data) else {
+            throw NoodsError.malformedResponse
+        }
+        return NoodsOnAir(scheduledTitle: live.result?.content?.title, trackTitle: live.result?.metadata?.title)
+    }
+
     // MARK: Transport
 
     private func pageQuery(_ page: Int) -> [URLQueryItem] {

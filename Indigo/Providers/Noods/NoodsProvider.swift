@@ -27,6 +27,26 @@ final class NoodsProvider: RadioProvider {
 
     var station: RadioStation { stations[0] }
 
+    private let api = NoodsAPI()
+    private(set) var onAir: NoodsOnAir?
+    @ObservationIgnored private var checkedAt: Date?
+
+    /// What is on now, by name. Noods publishes no picture with it; the Live
+    /// slide finds one in the residents directory.
+    var now: RadioShow? {
+        guard let title = onAir?.showTitle else { return nil }
+        return RadioShow(title: title, host: nil, summary: nil, location: "Bristol",
+                         genres: [], moods: [], artworkURL: nil,
+                         startsAt: nil, endsAt: nil, detailID: nil)
+    }
+
+    /// Asks again at most once a minute.
+    func refreshOnAir() async {
+        if let checkedAt, Date().timeIntervalSince(checkedAt) < 60 { return }
+        checkedAt = Date()
+        if let latest = try? await api.fetchOnAir(), latest != onAir { onAir = latest }
+    }
+
     /// The station's own mark, for the player when there is no picture of
     /// what is on — which for Noods is whenever the stream was not started
     /// from its page. Their touch icon: 180 pixels, and the only square mark

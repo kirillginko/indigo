@@ -35,6 +35,18 @@ final class AlharaBrowseStore {
     private(set) var detailErrors: [String: String] = [:]
 
     @ObservationIgnored private let api = AlharaAPI()
+
+    /// Pictures found for titles on the air, nil where the search found none.
+    private(set) var liveArtwork: [String: URL?] = [:]
+
+    func loadLiveArtworkIfNeeded(title: String) async {
+        guard liveArtwork[title] == nil else { return }
+        let parsed = AlharaLiveTitle.parse(title)
+        let found = await api.searchArtwork(host: parsed.host, show: parsed.show)
+        // Cancelled is not "none found": the restarted lookup asks again.
+        guard !Task.isCancelled else { return }
+        liveArtwork[title] = .some(found)
+    }
     @ObservationIgnored private var next: URL?
     /// Every show a grid has rendered, so opening one is instant.
     @ObservationIgnored private var known: [String: AlharaShow] = [:]

@@ -350,3 +350,22 @@ extension MixcloudCloudcastDTO {
         )
     }
 }
+
+// MARK: - The title on air
+
+/// alHara writes a replay as "[Host] 'Show'"; uploads of it are titled
+/// "Host - Show @ Radio alHara".
+nonisolated enum AlharaLiveTitle {
+    static func parse(_ title: String) -> (host: String?, show: String) {
+        let trimmed = title.trimmingCharacters(in: .whitespaces)
+        guard trimmed.hasPrefix("["), let close = trimmed.firstIndex(of: "]") else { return (nil, trimmed) }
+        let host = String(trimmed[trimmed.index(after: trimmed.startIndex)..<close])
+        let show = trimmed[trimmed.index(after: close)...]
+            .trimmingCharacters(in: CharacterSet(charactersIn: " '‘’\""))
+        return (host.isEmpty ? nil : host, show)
+    }
+
+    static func matchKey(host: String?, show: String) -> String {
+        RecordingKey.normalize([host, show].compactMap { $0 }.joined(separator: " "))
+    }
+}

@@ -252,8 +252,12 @@ nonisolated struct DublabAPI: Sendable {
     // MARK: - Transport
 
     private func url(_ path: String, query: [URLQueryItem] = []) -> URL {
+        // Resolved rather than appended: a search term arrives already
+        // percent-encoded, and appending encoded it a second time — "%20"
+        // became "%2520", and any search with a space in it failed to decode.
         var components = URLComponents(
-            url: Self.state.appendingPathComponent(path, isDirectory: false),
+            url: URL(string: path, relativeTo: Self.state)?.absoluteURL
+                ?? Self.state.appendingPathComponent(path, isDirectory: false),
             resolvingAgainstBaseURL: false
         )
         if !query.isEmpty { components?.queryItems = query }

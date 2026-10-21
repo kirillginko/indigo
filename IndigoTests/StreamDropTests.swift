@@ -121,6 +121,37 @@ final class StreamDropTests: XCTestCase {
         XCTAssertEqual(engine.connections, spent + 1)
     }
 
+    /// A station that had played and cannot be reached is tried for a
+    /// while, not for as many attempts as it has: a hanging connection
+    /// costs twenty seconds each, and sixty of them was twenty minutes of
+    /// "Buffering".
+    func testAStationThatKeepsFailingGivesUpOnTime() async throws {
+        let engine = StreamAudioEngine(
+            monitorsNetwork: false,
+            reconnect: ReconnectPolicy(limit: 5, sustainedLimit: 1000),
+            giveUpAfter: .seconds(2)
+        )
+        engine.setVolume(0)
+        defer { engine.stop() }
+        let file = try Self.shortStream()
+        engine.play(url: file)
+        await waitUntil(5) { engine.state == .playing }
+        XCTAssertEqual(engine.state, .playing)
+        try FileManager.default.removeItem(at: file)
+
+        await waitUntil(10) { if case .failed = engine.state { true } else { false } }
+        guard case .failed = engine.state else { return XCTFail("Still trying: \(engine.state)") }
+        let spent = engine.connections
+        XCTAssertLessThan(spent, 10, "Gave up on the clock, not after a thousand tries")
+        try await Task.sleep(for: .seconds(2))
+        XCTAssertEqual(engine.connections, spent, "And stopped trying")
+
+        // The network coming back is still a reason to try again.
+        engine.networkChanged(isOnline: false)
+        engine.networkChanged(isOnline: true)
+        XCTAssertEqual(engine.connections, spent + 1)
+    }
+
     // MARK: - Nothing outlives the listener's choice
 
     /// A station that cannot be reached, so every open fails at once and the
